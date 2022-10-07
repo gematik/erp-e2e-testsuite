@@ -1,0 +1,589 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "http://pvs.praxis-topp-gluecklich.local/fhir/Task/1a7e4116-1e53-11b2-80ba-c505a820f066",
+      "resource": {
+        "resourceType": "Task",
+        "id": "1a7e4116-1e53-11b2-80ba-c505a820f066",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/StructureDefinition/ErxTask"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/StructureDefinition/PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/CodeSystem/Flowtype",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          },
+          {
+            "url": "https://gematik.de/fhir/StructureDefinition/AcceptDate",
+            "valueDate": "2021-11-01"
+          },
+          {
+            "url": "https://gematik.de/fhir/StructureDefinition/ExpiryDate",
+            "valueDate": "2022-01-02"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/NamingSystem/PrescriptionID",
+            "value": "160.002.370.468.800.53"
+          },
+          {
+            "system": "https://gematik.de/fhir/NamingSystem/AccessCode",
+            "value": "e41386ad6e7212807b14a5238392a316b91e5d730c757e1490d1281c3d31f51f"
+          }
+        ],
+        "status": "ready",
+        "intent": "order",
+        "for": {
+          "identifier": {
+            "system": "http://fhir.de/NamingSystem/gkv/kvid-10",
+            "value": "X110406067"
+          }
+        },
+        "authoredOn": "2021-10-02T08:38:08.530195900+00:00",
+        "lastModified": "2021-10-02T08:38:08.530201300+00:00",
+        "performerType": [
+          {
+            "coding": [
+              {
+                "system": "urn:ietf:rfc:3986",
+                "code": "urn:oid:1.2.276.0.76.4.54",
+                "display": "\u00D6ffentliche Apotheke"
+              }
+            ]
+          }
+        ],
+        "input": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/CodeSystem/Documenttype",
+                  "code": "1",
+                  "display": "Health Care Provider Prescription"
+                }
+              ]
+            },
+            "valueReference": {
+              "reference": "TODO/9df7203c-7fec-4a55-998b-55f0fdf07ab4"
+            }
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/CodeSystem/Documenttype",
+                  "code": "2",
+                  "display": "Patient Confirmation"
+                }
+              ]
+            },
+            "valueReference": {
+              "reference": "TODO/1afc699c-1e53-11b2-80bc-c505a820f066"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "http://pvs.praxis-topp-gluecklich.local/fhir/Bundle/1afc699c-1e53-11b2-80bc-c505a820f066",
+      "resource": {
+        "resourceType": "Bundle",
+        "id": "1afc699c-1e53-11b2-80bc-c505a820f066",
+        "meta": {
+          "profile": [
+            "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle|1.0.2"
+          ]
+        },
+        "identifier": {
+          "system": "https://gematik.de/fhir/NamingSystem/PrescriptionID",
+          "value": "160.002.370.468.800.53"
+        },
+        "type": "document",
+        "timestamp": "2021-10-02T08:38:08.997+00:00",
+        "entry": [
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/Composition/935e8f66-11a3-473c-8bff-dcc73dfff200",
+            "resource": {
+              "resourceType": "Composition",
+              "id": "935e8f66-11a3-473c-8bff-dcc73dfff200",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Composition|1.0.2"
+                ]
+              },
+              "status": "final",
+              "type": {
+                "coding": [
+                  {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_FORMULAR_ART",
+                    "code": "e16A"
+                  }
+                ]
+              },
+              "subject": {
+                "reference": "Patient/c064a74d-0022-439b-8767-cb579559064b"
+              },
+              "date": "2021-10-02T10:38:08+02:00",
+              "author": [
+                {
+                  "reference": "Practitioner/ccbeb76b-4eb0-4e04-a985-db0ce993a7ce",
+                  "type": "Practitioner"
+                },
+                {
+                  "type": "Device",
+                  "identifier": {
+                    "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_FOR_Pruefnummer",
+                    "value": "GEMATIK/410/2109/36/123"
+                  }
+                }
+              ],
+              "title": "elektronische Arzneimittelverordnung",
+              "custodian": {
+                "reference": "Organization/d2540da2-3104-45a6-85a8-35f23d942895"
+              },
+              "section": [
+                {
+                  "code": {
+                    "coding": [
+                      {
+                        "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Section_Type",
+                        "code": "Prescription"
+                      }
+                    ]
+                  },
+                  "entry": [
+                    {
+                      "reference": "MedicationRequest/cb7bd2eb-ce8c-4184-8757-538d6e1ceef0"
+                    }
+                  ]
+                },
+                {
+                  "code": {
+                    "coding": [
+                      {
+                        "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Section_Type",
+                        "code": "Coverage"
+                      }
+                    ]
+                  },
+                  "entry": [
+                    {
+                      "reference": "Coverage/625eb015-2b4e-4a4b-a8c0-2fd53795fa07"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/MedicationRequest/cb7bd2eb-ce8c-4184-8757-538d6e1ceef0",
+            "resource": {
+              "resourceType": "MedicationRequest",
+              "id": "cb7bd2eb-ce8c-4184-8757-538d6e1ceef0",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.0.2"
+                ]
+              },
+              "extension": [
+                {
+                  "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_StatusCoPayment",
+                  "valueCoding": {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_StatusCoPayment",
+                    "code": "1"
+                  }
+                },
+                {
+                  "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee",
+                  "valueBoolean": true
+                },
+                {
+                  "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_BVG",
+                  "valueBoolean": true
+                },
+                {
+                  "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription",
+                  "extension": [
+                    {
+                      "url": "Kennzeichen",
+                      "valueBoolean": false
+                    }
+                  ]
+                }
+              ],
+              "status": "active",
+              "intent": "order",
+              "medicationReference": {
+                "reference": "Medication/b5d7e985-85c7-4285-acad-221929866503"
+              },
+              "subject": {
+                "reference": "Patient/c064a74d-0022-439b-8767-cb579559064b"
+              },
+              "authoredOn": "2021-10-02",
+              "requester": {
+                "reference": "Practitioner/ccbeb76b-4eb0-4e04-a985-db0ce993a7ce"
+              },
+              "insurance": [
+                {
+                  "reference": "Coverage/625eb015-2b4e-4a4b-a8c0-2fd53795fa07"
+                }
+              ],
+              "dosageInstruction": [
+                {
+                  "extension": [
+                    {
+                      "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag",
+                      "valueBoolean": true
+                    }
+                  ],
+                  "text": "1-0-0-1-0-1-1-"
+                }
+              ],
+              "dispenseRequest": {
+                "quantity": {
+                  "value": 13,
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{Package}"
+                }
+              },
+              "substitution": {
+                "allowedBoolean": true
+              }
+            }
+          },
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/Medication/b5d7e985-85c7-4285-acad-221929866503",
+            "resource": {
+              "resourceType": "Medication",
+              "id": "b5d7e985-85c7-4285-acad-221929866503",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.0.2"
+                ]
+              },
+              "extension": [
+                {
+                  "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Category",
+                  "valueCoding": {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Medication_Category",
+                    "code": "01"
+                  }
+                },
+                {
+                  "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Vaccine",
+                  "valueBoolean": false
+                },
+                {
+                  "url": "http://fhir.de/StructureDefinition/normgroesse",
+                  "valueCode": "NB"
+                }
+              ],
+              "code": {
+                "coding": [
+                  {
+                    "system": "http://fhir.de/CodeSystem/ifa/pzn",
+                    "code": "39884585"
+                  }
+                ],
+                "text": "Juan Fortharoad"
+              },
+              "form": {
+                "coding": [
+                  {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM",
+                    "code": "TKA"
+                  }
+                ]
+              },
+              "amount": {
+                "numerator": {
+                  "value": 11,
+                  "unit": "Stk",
+                  "system": "http://unitsofmeasure.org"
+                },
+                "denominator": {
+                  "value": 1
+                }
+              }
+            }
+          },
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/Patient/c064a74d-0022-439b-8767-cb579559064b",
+            "resource": {
+              "resourceType": "Patient",
+              "id": "c064a74d-0022-439b-8767-cb579559064b",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.0.3"
+                ]
+              },
+              "identifier": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                        "code": "GKV"
+                      }
+                    ]
+                  },
+                  "system": "http://fhir.de/NamingSystem/gkv/kvid-10",
+                  "value": "X110406067"
+                }
+              ],
+              "name": [
+                {
+                  "use": "official",
+                  "family": "Bussmann",
+                  "given": [
+                    "Melina"
+                  ]
+                }
+              ],
+              "birthDate": "1985-05-20",
+              "address": [
+                {
+                  "type": "both",
+                  "line": [
+                    "Graebestr. 6"
+                  ],
+                  "_line": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber",
+                          "valueString": "6"
+                        },
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName",
+                          "valueString": "Graebestr."
+                        }
+                      ]
+                    }
+                  ],
+                  "city": "Nord Ansgar",
+                  "postalCode": "72394",
+                  "country": "LV"
+                }
+              ]
+            }
+          },
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/Practitioner/ccbeb76b-4eb0-4e04-a985-db0ce993a7ce",
+            "resource": {
+              "resourceType": "Practitioner",
+              "id": "ccbeb76b-4eb0-4e04-a985-db0ce993a7ce",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner|1.0.3"
+                ]
+              },
+              "identifier": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                        "code": "LANR"
+                      }
+                    ]
+                  },
+                  "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+                  "value": "671443884"
+                }
+              ],
+              "name": [
+                {
+                  "use": "official",
+                  "family": "Deuschle",
+                  "given": [
+                    "Mariam"
+                  ],
+                  "prefix": [
+                    "Dr."
+                  ],
+                  "_prefix": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier",
+                          "valueCode": "AC"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "qualification": [
+                {
+                  "code": {
+                    "coding": [
+                      {
+                        "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Qualification_Type",
+                        "code": "02"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "code": {
+                    "text": "philosopher"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/Organization/d2540da2-3104-45a6-85a8-35f23d942895",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "d2540da2-3104-45a6-85a8-35f23d942895",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Organization|1.0.3"
+                ]
+              },
+              "identifier": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                        "code": "BSNR"
+                      }
+                    ]
+                  },
+                  "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR",
+                  "value": "709108410"
+                }
+              ],
+              "telecom": [
+                {
+                  "system": "phone",
+                  "value": "(03032) 2683399"
+                },
+                {
+                  "system": "email",
+                  "value": "Mio.Linnenbaum@kozakiewicz.info"
+                }
+              ],
+              "address": [
+                {
+                  "type": "both",
+                  "line": [
+                    "Albrecht-Haushofer-Str. 26b"
+                  ],
+                  "_line": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber",
+                          "valueString": "26b"
+                        },
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName",
+                          "valueString": "Albrecht-Haushofer-Str."
+                        }
+                      ]
+                    }
+                  ],
+                  "city": "Alt Tabealand",
+                  "postalCode": "16568",
+                  "country": "LT"
+                }
+              ]
+            }
+          },
+          {
+            "fullUrl": "https://pvs.gematik.de/fhir/Coverage/625eb015-2b4e-4a4b-a8c0-2fd53795fa07",
+            "resource": {
+              "resourceType": "Coverage",
+              "id": "625eb015-2b4e-4a4b-a8c0-2fd53795fa07",
+              "meta": {
+                "profile": [
+                  "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage|1.0.3"
+                ]
+              },
+              "extension": [
+                {
+                  "url": "http://fhir.de/StructureDefinition/gkv/besondere-personengruppe",
+                  "valueCoding": {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_PERSONENGRUPPE",
+                    "code": "09"
+                  }
+                },
+                {
+                  "url": "http://fhir.de/StructureDefinition/gkv/dmp-kennzeichen",
+                  "valueCoding": {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_PERSONENGRUPPE",
+                    "code": "08"
+                  }
+                },
+                {
+                  "url": "http://fhir.de/StructureDefinition/gkv/versichertenart",
+                  "valueCoding": {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_VERSICHERTENSTATUS",
+                    "code": "1"
+                  }
+                },
+                {
+                  "url": "http://fhir.de/StructureDefinition/gkv/wop",
+                  "valueCoding": {
+                    "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_ITA_WOP",
+                    "code": "83"
+                  }
+                }
+              ],
+              "status": "active",
+              "type": {
+                "coding": [
+                  {
+                    "system": "http://fhir.de/CodeSystem/versicherungsart-de-basis",
+                    "code": "PPV"
+                  }
+                ]
+              },
+              "beneficiary": {
+                "reference": "Patient/c064a74d-0022-439b-8767-cb579559064b"
+              },
+              "payor": [
+                {
+                  "identifier": {
+                    "system": "http://fhir.de/NamingSystem/arge-ik/iknr",
+                    "value": "717316371"
+                  },
+                  "display": "Jeanette Akenja Nearing"
+                }
+              ]
+            }
+          }
+        ],
+        "signature": {
+          "type": [
+            {
+              "system": "urn:iso-astm:E1762-95:2013",
+              "code": "1.2.840.10065.1.12.1.1",
+              "display": "Author's Signature"
+            }
+          ],
+          "when": "2021-10-02T08:38:09.357665200+00:00",
+          "who": {
+            "reference": "Device/software"
+          },
+          "targetFormat": "application/fhir+json",
+          "sigFormat": "application/jose",
+          "data": "SGVsbG8gV29ybGQhCg=="
+        }
+      }
+    }
+  ]
+}

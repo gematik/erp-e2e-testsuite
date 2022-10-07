@@ -1,0 +1,33 @@
+
+.cucumber-wrapper {
+    font-family: monospace;
+}
+
+.cucumber-annotation {
+    border: 1px dotted lightgray;
+    padding: 1em 0.2em;
+}
+
+.cucumber-keyword {
+    font-weight: bolder;
+    color: chocolate;
+}
+
+.cucumber-regex {
+    color: darkgreen;
+}
+
+.java-method-wrapper {
+    margin-top: 0.8em;
+    margin-bottom: 2.0em;
+}
+
+.java-keyword {
+    font-weight: lighter;
+    color: chocolate;
+}
+
+.java-method-name {
+    font-weight: bolder;
+    color: darkblue;
+}

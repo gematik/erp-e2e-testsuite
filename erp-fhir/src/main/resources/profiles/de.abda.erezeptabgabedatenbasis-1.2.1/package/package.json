@@ -1,0 +1,13 @@
+{
+  "name": "de.abda.erezeptabgabedatenbasis",
+  "version": "1.2.1",
+  "description": "Basis-Profile für die Abgabedaten im eRezept-Kontext",
+  "author": "ABDA FHIR Team",
+  "dependencies": {
+    "de.basisprofil.r4": "0.9.13",
+    "hl7.fhir.r4.core": "4.0.1"
+  },
+  "fhirVersions": [
+    "4.0.1"
+  ]
+}

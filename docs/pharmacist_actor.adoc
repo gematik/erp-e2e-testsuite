@@ -1,0 +1,68 @@
+:imagesdir: ./images
+:caution-caption: Achtung
+:important-caption: Wichtig
+:note-caption: Hinweis
+:tip-caption: Tip
+:warning-caption: Warnung
+:toc: macro
+:toclevels: 3
+:toc-title: Inhaltsverzeichnis
+:hide-uri-scheme:
+
+
+= Leistungserbringer: Apotheke
+
+image::pharmacist_01.png[width=35%, align="center"]
+
+Dokumentation des Leistungserbringes _Apotheke_ mit all seinen Steps und Behaviours.
+
+toc::[]
+
+= Steps
+Steps der Apotheke
+
+== Apotheke initialisieren
+Über diesen Step wird eine Apotheke mit ihrer Konfiguration anhand des Namens konfiguriert und intialisiert.
+
+[maroon]#*Angenommen*# die Apotheke [blue]#*Am Flughafen*# hat Zugriff auf ihre SMC-B Smartcard
+
+== E-Rezepte akzeptieren
+Um ein E-Rezept zu akzeptieren, stehen einer Apotheke die folgenden beiden Steps zur Verfügung.
+
+1. Das *letzte* physisch zugewiesenes E-Rezept (z.B. über einen _DataMatrixCode_) akzeptieren
++
+[maroon]#*Wenn*# die Apotheke [blue]#*Am Flughafen*# das [blue]#*letzte*# physisch zugewiesene E-Rezept beim Fachdienst akzeptiert
+
+2. Das *erste* physisch zugewiesenes E-Rezept (z.B. über einen _DataMatrixCode_) akzeptieren
++
+[maroon]#*Wenn*# die Apotheke [blue]#*Am Flughafen*# das [blue]#*erste*# physisch zugewiesene E-Rezept beim Fachdienst akzeptiert
+
+== E-Rezepte dispensieren
+Um ein E-Rezept zu dispensieren, stehen der Apotheke die folgenden Steps zur Verfügung.
+
+1. Ein E-Rezept *korrekt* dispensieren
++
+[maroon]#*Wenn*# die Apotheke [blue]#*Am Flughafen*# das [blue]#*letzte*# akzeptierte E-Rezept korrekt dispensiert
+
+2. Ein E-Rezept mit *falschem Secret* dispensieren
++
+[maroon]#*Dann*# kann die Apotheke das [blue]#*letzte*# akzeptierte E-Rezept nicht mit dem falschen Secret [blue]#*abc123*# dispensieren
+
+3. Ein E-Rezept an die *falsche KVNR* dispensieren
++
+[maroon]#*Und*# die Apotheke kann das [blue]#*letzte*# akzeptierte E-Rezept nicht an den Versicherten mit KVNR [blue]#*X123456789*# dispensieren
+
+== Quittung prüfen
+Um die Quittungen für dispensierte E-Rezepte zu prüfen, stehen der Apotheke die folgenden Steps zur Verfügung.
+
+1. Prüfen, ob nach einer erfolgreichen Medikamentenausgabe mindestens eine Quittung vorhanden ist:
++
+[maroon]#*Dann*# hat die Apotheke [blue]#*mindestens*# eine Quittung vorliegen
+
+2. Prüfen, ob maximal eine bestimmte Anzahl an E-Rezepte dispensiert und quittiert wurde:
++
+[maroon]#*Und*# die Apotheke hat [blue]#*maximal 2*# Quittungen vorliegen
+
+3. Prüfen, ob eine bestimmte Anzahl an Quittung für einen bestimmten Patienten vorliegen:
++
+[maroon]#*Und*# die Apotheke hat [blue]#*mindestens 1*# Quittung für [blue]#*Fridolin Straßer*# vorliegen

@@ -1,0 +1,17 @@
+/.idea/
+.vscode/
+*.iml
+**/target/
+/target/*
+/.idea/*
+/.idea/sonarlint/**
+
+*.apk
+*.idsig
+*.ipa
+*.xcarchive
+
+
+COPYRIGHT_HEADER
+Jenkinsfile
+CI

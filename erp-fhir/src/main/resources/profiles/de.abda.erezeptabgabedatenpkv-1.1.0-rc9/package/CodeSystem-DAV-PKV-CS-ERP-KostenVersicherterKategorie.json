@@ -1,0 +1,16 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "draft",
+  "content": "complete",
+  "name": "DAV_PKV_CS_ERP_KostenVersicherterKategorie",
+  "id": "DAV-PKV-CS-ERP-KostenVersicherterKategorie",
+  "version": "1.1",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-KostenVersicherterKategorie",
+  "concept": [
+    {
+      "code": "0",
+      "display": "Zuzahlung"
+    }
+  ],
+  "count": 1
+}

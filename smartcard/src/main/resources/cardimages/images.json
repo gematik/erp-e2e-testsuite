@@ -1,0 +1,231 @@
+{
+  "hba-cards": [
+    {
+      "iccsn": "80276883110000095767",
+      "auth": "hba/1-2-ARZT-SamSchraßer01/80276883110000095767_C.HP.AUT.R2048.p12",
+      "qes": "hba/1-2-ARZT-SamSchraßer01/80276883110000095767_C.HP.QES.R2048.p12",
+      "cardType": "HBA",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001011699910102",
+      "auth": "hba/1-1-ARZT-BerndClaudius01/80276001011699910102-C_HP_AUT_R2048.p12",
+      "qes": "hba/1-1-ARZT-BerndClaudius01/80276001011699910102-C_HP_QES_R2048.p12",
+      "cardType": "HBA",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000121166",
+      "auth": "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_AUT_E256.p12",
+      "qes": "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_QES_E256.p12",
+      "cardType": "HBA",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001081699900578",
+      "auth": "hba/1-1-ARZT-Gunther/c.hp.aut-erp-arztGunther.p12",
+      "qes": "hba/1-1-ARZT-Gunther/c.hp.qes-erp-arztGunther.p12",
+      "cardType": "HBA",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001081699900578",
+      "auth": "hba/1-1-ARZT-Gunther/c.hp.aut-erp-ecc-arztGunther.p12",
+      "qes": "hba/1-1-ARZT-Gunther/c.hp.qes-erp-ecc-arztGunther.p12",
+      "cardType": "HBA",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001081699900579",
+      "auth": "hba/3-1-REZEPTOR-APO-01/c.hp.aut-erp-apoAlbrecht.p12",
+      "qes": "hba/3-1-REZEPTOR-APO-01/c.hp.qes-erp-apoAlbrecht.p12",
+      "cardType": "HBA",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001081699900579",
+      "auth": "hba/3-1-REZEPTOR-APO-01/c.hp.aut-erp-ecc-apoAlbrecht.p12",
+      "qes": "hba/3-1-REZEPTOR-APO-01/c.hp.qes-erp-ecc-apoAlbrecht.p12",
+      "cardType": "HBA",
+      "algo": "E256",
+      "password": "00"
+    }
+  ],
+  "smcb-cards": [
+    {
+      "iccsn": "80276883110000116872",
+      "auth": "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_AUT_R2048_X509/80276883110000116872-C_SMCB_AUT_R2048_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000116872",
+      "auth": "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_HCI_AUT_E256/80276883110000116872-C_SMCB_HCI_AUT_E256.p12",
+      "cardType": "SMC-B",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000117369",
+      "auth": "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_AUT_R2048_X509/80276883110000117369-C_SMCB_AUT_R2048_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000117369",
+      "auth": "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_HCI_AUT_E256/80276883110000117369-C_SMCB_HCI_AUT_E256.p12",
+      "cardType": "SMC-B",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001011699910102",
+      "auth": "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_AUT_R2048_X509/80276001011699910102-C_SMCB_AUT_R2048_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001011699910102",
+      "auth": "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_AUT_E256_X509/80276001011699910102-C_SMCB_AUT_E256_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "8027600101169991010",
+      "auth": "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_AUT_R2048_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "8027600101169991010",
+      "auth": "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_AUT_E256_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000116873",
+      "auth": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_AUT_R2048_X509.p12",
+      "enc": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_HCI_ENC_R2048.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000116873",
+      "auth": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_AUT_E256.p12",
+      "enc": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_ENC_E256.p12",
+      "cardType": "SMC-B",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000092475",
+      "auth": "smcb/NordApothekeTEST-ONLY_80276883110000092475/80276883110000092475_C.HCI.AUT.R2048/80276883110000092475_C.HCI.AUT.R2048.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    }
+  ],
+  "egk-cards": [
+    {
+      "iccsn": "80276883110000113311",
+      "auth": "egk/X110406067/80276883110000113311-C_CH_AUT_R2048.p12",
+      "kvnr": "X110406067",
+      "cardType": "eGK",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000113323",
+      "auth": "egk/X110465770/80276883110000113323-C_CH_AUT_R2048.p12",
+      "kvnr": "X110465770",
+      "cardType": "eGK",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000113323",
+      "auth": "egk/X110465770/80276883110000113323-C_CH_AUT_E256.p12",
+      "kvnr": "X110465770",
+      "cardType": "eGK",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000113312",
+      "auth": "egk/X110488614/80276883110000113312-C_CH_AUT_R2048.p12",
+      "kvnr": "X110488614",
+      "cardType": "eGK",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000113312",
+      "auth": "egk/X110488614/80276883110000113312-C_CH_AUT_E256.p12",
+      "kvnr": "X110488614",
+      "cardType": "eGK",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000113298",
+      "auth": "egk/X110498565/80276883110000113298-C_CH_AUT_R2048.p12",
+      "kvnr": "X110498565",
+      "cardType": "eGK",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000113298",
+      "auth": "egk/X110498565/80276883110000113298-C_CH_AUT_E256.p12",
+      "kvnr": "X110498565",
+      "cardType": "eGK",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000108142",
+      "auth": "egk/X110499478/80276883110000108142-C_CH_AUT_R2048.p12",
+      "kvnr": "X110499478",
+      "cardType": "eGK",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276883110000108142",
+      "auth": "egk/X110499478/80276883110000108142-C_CH_AUT_E256.p12",
+      "kvnr": "X110499478",
+      "cardType": "eGK",
+      "algo": "E256",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276881025548431301",
+      "auth": "egk/X110525084/80276881025548431301-C_CH_AUT_R2048.p12",
+      "kvnr": "X110525084",
+      "cardType": "eGK",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276881025548431301",
+      "auth": "egk/X110525084/80276881025548431301-C_CH_AUT_E256.p12",
+      "kvnr": "X110525084",
+      "cardType": "eGK",
+      "algo": "E256",
+      "password": "00"
+    }
+  ]
+}

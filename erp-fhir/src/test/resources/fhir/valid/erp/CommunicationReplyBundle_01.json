@@ -1,0 +1,64 @@
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "entry": [
+    {
+      "fullUrl": "http://pvs.praxis-topp-gluecklich.local/fhir/Communication/1381400a-1dd2-11b2-802a-4e7357f6a773",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "1381400a-1dd2-11b2-802a-4e7357f6a773",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/StructureDefinition/ErxCommunicationReply"
+          ]
+        },
+        "basedOn":  [
+          {
+            "reference": "Task/4711"
+          }
+        ],
+        "status": "unknown",
+        "sent": "2021-03-16T08:50:05.220062400+00:00",
+        "received": "2021-03-16T08:50:20.611873200+00:00",
+        "recipient":  [
+          {
+            "identifier": {
+              "system": "http://fhir.de/NamingSystem/gkv/kvid-10",
+              "value": "X234567890"
+            }
+          }
+        ],
+        "sender": {
+          "identifier": {
+            "system": "https://gematik.de/fhir/NamingSystem/TelematikID",
+            "value": "606358757"
+          }
+        },
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/StructureDefinition/SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  }
+                ]
+              }
+            ],
+            "contentString": "Hallo Versicherter: ÄÖÜäöüß?!€$()[]{}=/`',.:;%@°\\\\+*-_&<>\""
+          }
+        ]
+      }
+    }
+  ]
+}

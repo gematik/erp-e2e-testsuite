@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration>
+
+<configuration>
+    <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
+    <import class="ch.qos.logback.core.ConsoleAppender"/>
+
+    <variable name="date_format" value="%d{HH:mm:ss.SSS}"/>
+
+    <appender name="STDOUT" class="ConsoleAppender">
+        <encoder class="PatternLayoutEncoder">
+            <pattern>${date_format} [%thread] %highlight(%-5level) %logger{6} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>target/log/testsuite.log</file>
+        <encoder>
+            <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="de.gematik.test.erezept" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="de.gematik.test.erezept.client" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="de.gematik.idp.client.IdpClient" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="de.gematik.test.erezept.primsys" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="de.gematik.test.erezept.integration" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+    <logger name="de.gematik.test.erezept.pspwsclient" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

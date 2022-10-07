@@ -1,0 +1,47 @@
+shouldLogCapabilityStatement: true
+
+users:
+  - name: Alice
+    device: Alexander Samsung Galaxy A50
+    #device: Android 12 Emulator
+    #device: iPhone 13 Emulator
+
+apps:
+  - platform: Android
+    appFile: android-googleTuInternal-debug.apk
+    packageName: de.gematik.ti.erp.app.test
+    useVirtualeGK: false
+    maxWaitTimeout: 5 # how many seconds to wait at maximum for an element
+  - platform: iOS
+    appFile: eRPApp_simulator_2.xcarchive/Products/Applications/eRpApp.app
+    packageName: de.gematik.erp4ios.eRezept
+    useVirtualeGK: true
+    maxWaitTimeout: 5 # how many seconds to wait at maximum for an element
+
+appium:
+  - id: local
+    url: http://0.0.0.0:4723
+  - id: t-systems
+    url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
+
+devices:
+  - name: Android 12 Emulator
+    platform: Android
+    udid: emulator-5554
+    platformVersion: 12
+    appium: local
+  - name: iPhone 13 Emulator
+    platform: iOS
+    udid: C33AC61F-31BF-4905-AA76-AE80B925726B
+    platformVersion: 15.0
+    appium: local
+  - name: Alexander Samsung Galaxy A50
+    platform: Android
+    udid: R58N51KBFWN
+    platformVersion: 11
+    appium: local
+  - name: T-Systems iPhone 12 Pro
+    platform: iOS
+    udid: 00008101-001469393A91001E
+    platformVersion: 14.4
+    appium: t-systems

@@ -1,0 +1,150 @@
+= Konnektathon Testdatengenerator
+:sectnums:
+:toc:
+:toc-title: Inhalt
+:toclevels: 4
+
+
+== Installation und Voraussetzungen
+Für die Ausführung wird Cygwin empfohlen. Erfahrene Benutzern können natürlich auch alternativ die PowerShell, WSL oder das Windows CMD nutzen. Auch wenn grundsätzlich möglich, sind diese nicht erprobt.
+
+=== Cygwin
+Auf den GWTOP-Rechnern ist https://de.wikipedia.org/wiki/Cygwin[Cygwin] in der Regel bereits vorinstalliert. In der Regel befindet sich die Installation unter `C:/cygwin` und ist für jeden Benutzer nutzbar.
+
+=== Java
+Das Tool benötigt `java` im `PATH` welches auf den GWTOP-Rechner für jeden Benutzer nachgepflegt werden muss.
+
+Dazu muss in der `~/.bashrc` folgende Zeile hinzufügt werden
+
+ PATH=$PATH:/cygdrive/c/Program\ Files/Java/openjdk-11/bin
+
+
+Anschließend kann man Cygwin starten und mit dem folgenden Kommando prüfen, ob Java benutzt werden kann:
+
+ java --version
+
+
+== Anwendungsfälle
+Im aktuellen Verzeichnis wird die Benutzung über die folgenden drei Shell-Scripte vereinfacht:
+
+.Shell-Skripte
+- `validate.sh` um Beispiele zu validieren und/oder _dry runs_ auszuführen
+- `testdaten.sh` um E-Rezepte für Testzwecke auszustellen
+- `dispense.sh` um ausgestelle E-Rezepte als Apotheke zu akzeptieren/dispensieren
+- `fakexamples.sh` um zufällige E-Rezepte für Testzwecke auszustellen
+
+=== Dry runs
+Das Script `validate.sh` ist in vielen Fällen hilfreich um Verordnungsdatensätze im Vorfeld zu prüfen und sich mit dem CLI Parametern vertraut zu machen.
+Damit sind z.B. die folgenden Anwendungsfälle möglich:
+
+==== Alle Verordnungsdatensätze validieren
+[source,console]
+----
+./validate.sh --bundels ./examples/bundels
+----
+Mit diesem Aufruf, werden alle enthaltenen Verordnungsdatensätze innerhalb von `./examples/bundels` eingelesen und mit dem HAPI FHIR Validator gegen die Profilierung validiert.
+
+==== Verordnungsdatensätze für die Validierung filtern
+[source,console]
+----
+./validate.sh --bundels ./examples/bundels --bundels-regex .*kostbarkeiten.*
+----
+Mit diesem Aufruf, werden alle Verordnungsdatensätze innerhalb von `./examples/bundels` die zusätzlich `kostbarkeiten` im Namen enthalten, mit dem HAPI FHIR Validator gegen die Profilierung validiert.
+
+==== Verordnungsdatensätze mit Krankenkassen kreuzen
+Prüfen, ob Kreuzungen zwischen Verordnungsdatensätzen und Versicherungen valide sind:
+[source,console]
+----
+./validate.sh --bundels ./examples/bundels --coverages ./examples/coverages
+----
+Mit diesem Aufruf, werden alle Verordnungsdatensätze innerhalb von `./examples/bundels` mit den Versicherungen innerhalb von `./examples/coverages` gekreuzt und dann mit dem HAPI FHIR Validator gegen die Profilierung validiert.
+
+==== Verordnungsdatensätze und Krankenkassen filtern und kreuzen
+[source,console]
+----
+./validate.sh --bundels ./examples/bundels --bundels-regex .*kostbarkeiten.* --coverages ./examples/coverages --coverages-regex .*aok.* --showall --output ./output
+----
+Mit diesem Aufruf werden alle Verordnungsdatensätze, die `kostbarkeiten` im Namen enthalten mit allen Versicherungen gekreuzt, die `aok` im Namen enthalten.
+
+Der Switch `--showall` bewirkt, dass auch valide Ergebnisse gezeigt werden.
+
+Der Parameter `--output`, wenn angegeben, bewirkt zusätzlich, dass unter diesem Pfad die gekreuzten Verordnungsdatensätze als XML abgelegt werden.
+
+TIP: Bevor große Mengen an E-Rezepten über die Kreuzung von Verordnungsdatensätzen und Krankenkassen ausgestellt werden, können hierüber erst einmal generiert, validiert und weiter geprüft werden.
+
+=== Testdatengenerierung
+Mit dem Script `testdaten.sh` werden die generierten Verordnungsdatensätze auch tatsächlich gegen den Fachdienst gesendet. Das Set der Parameter ist sehr ähnlich zu dem von `validate.sh`.
+
+
+==== Alle Verordnungsdatensätze ausstellen::
+[source,console]
+----
+./testdaten.sh --bundels ./examples/bundels
+----
+Mit diesem Aufruf, werden alle enthaltenen Verordnungsdatensätze innerhalb von `./examples/bundels` als E-Rezepte auf dem Fachdienst ausgestellt.
+
+==== Verordnungsdatensätze zum Ausstellen filtern::
+[source,console]
+----
+./testdaten.sh --bundels ./examples/bundels --bundels-regex .*kostbarkeiten.*
+----
+Mit diesem Aufruf, werden alle Verordnungsdatensätze innerhalb von `./examples/bundels` die zusätzlich `kostbarkeiten` im Namen enthalten, als E-Rezepte auf dem Fachdienst ausgestellt.
+
+==== Verordnungsdatensätze und Krankenkassen kreuzen
+[source,console]
+----
+./testdaten.sh --bundels ./examples/bundels --coverages ./examples/coverages
+----
+Mit diesem Aufruf, werden alle Verordnungsdatensätze innerhalb von `./examples/bundels` mit den Versicherungen innerhalb von `./examples/coverages` gekreuzt und dann als E-Rezpte auf dem Fachdienst ausgestellt.
+Die ursprünglichen Versicherungen innerhalb der Verordnungsdatensätze werden dabei verworfen.
+
+CAUTION: Die ursprüngliche Versicherung innerhalb des Verordnungsdatensatzes wird ungeprüft überschrieben und Duplikate werden nicht herausgefiltert. Wird eine Kombination von 100 Verordnungsdatensätzen und 10 Versicherungen angegeben, dann werden insgesamt 1000 E-Rezepte erzeugt.
+
+==== Ausgabe der Verordnungen
+Die Zusammenfassung (JSON-Datei) in einen anderen Ordner umleiten:
+[source,console]
+----
+./testdaten.sh --bundels ./examples/bundels --output ./output --failfast
+----
+
+Über den Parameter `--output` kann der konkrete Pfad angegeben werden, wo die Zusammenfassung als JSON-Datei abgelegt werden soll.
+
+NOTE: Diese JSON-Datei enthält sämtlich Informationen zu den ausgestellten E-Rezepten. In dieser Datei befinden sich auch Informationen wie *Task-ID*, *Prescription-ID*, *AccessCode* und weitere. Diese Datei wird in einem weiteren Schritt benötigt, um das *Excel-Sheet* zu erzeugen.
+
+Mittels des Switches `--failfast` kann das Tool angewiesen werden beim ersten Fehler (z.B. invalider Verordnungsdatensatz oder eine unerwartete Antwort vom Fachdienst) sofort abzubrechen.
+
+=== Dispensieren
+Mit der Ausgabe aus dem vorherigen Schritt von `testdaten.sh` können die E-Rezepte auch dispensiert werden.
+
+==== Ausgestellte Medikation dispensieren
+[source,console]
+----
+./dispense.sh --input ./out/kthon_20220321_162900.json
+----
+Mit diesem Aufruf werden sämtliche E-Rezepte die sich in `./out/kthon_20220321_162900.json` befinden durch eine Apotheke akzeptiert und anschließend dispensiert.
+
+==== Alternative Medikationen dispensieren
+Die Apotheke ist grundsätzlich in der Lage von der Medikation im E-Rezept abzuweichen. Das kann z.B. der Fall sein, wenn das verschriebene Medikament in der gewünschten Normgröße nicht vorhanden ist.
+
+[source,console]
+----
+./dispense.sh --input ./out/kthon_20220321_162900.json --substitute --subnum 3
+----
+Mit diesem Aufruf wird die nicht das ursprünglich verschriebene Medikament verschrieben. Stattdessen wird das E-Rezept in `3` zufälligen Einheiten dispensiert.
+
+=== FakeXamples
+Mit dem Script `fakexamples.sh` können zu Testzwecken randomisierte Verordnungsdatensätze erstellt werden.
+Mit dem nachfolgenden Kommando können z.B. 1000 randomisierte Verordnungsdatensätze erstellt werden. Dabei muss zusätzlich mit `--output` der Pfad angegeben werden, in dem die generierten Verordnungsdatensätze abgelegt werden.
+
+[source,console]
+----
+./fakexamples.sh -n 1000 --output <PATH>
+
+java -jar kthon-jar-with-dependencies.jar fakexamples -n 1000 --output <PATH>
+----
+
+Für weitere Parameter, die das Kommando `fakexamples` entgegennimmt, kann über die Hilfe erfragt werden
+[source,console]
+----
+java -jar kthon-jar-with-dependencies.jar fakexamples --help
+----

@@ -1,0 +1,5 @@
+# Mehrfachverordnung
+
+Mehrfachverordnungen sollen die Versorgung mit Arzneimittel für chronisch Kranke erleichtern. Hierfür wurde in § 31 Absatz 1b SGB V die Grundlage geschaffen: „Für Versicherte, die eine kontinuierliche Versorgung mit einem bestimmten Arzneimittel benötigen, können Vertragsärzte Verordnungen ausstellen, nach denen eine nach der Erstabgabe bis zu dreimal sich wiederholende Abgabe erlaubt ist. Die Verordnungen sind besonders zu kennzeichnen. Sie dürfen bis zu einem Jahr nach Ausstellungsdatum zu Lasten der gesetzlichen Krankenkasse durch Apotheken beliefert werden.“
+
+Aus der Mehrfachverordnung ergeben sich Vorteile für Patienten und die Abläufe in Arztpraxen, da die Rezepte für Dauermedikationen im Voraus ausgestellt werden können und somit Wege zur Arztpraxis zum Rezepte abholen entfallen

@@ -1,0 +1,80 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="b7e44735-1e93-11b2-b102-9b7f88ca1096"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/StructureDefinition/ErxReceipt"/>
+    </meta>
+    <identifier>
+        <system value="https://gematik.de/fhir/NamingSystem/PrescriptionID"/>
+        <value value="160.000.964.477.700.36"/>
+    </identifier>
+    <type value="document"/>
+    <timestamp value="2021-04-22T15:06:19.520863200+00:00"/>
+    <entry>
+        <resource>
+            <Composition>
+                <id value="test1234"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/StructureDefinition/ErxComposition"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/StructureDefinition/BeneficiaryExtension">
+                    <valueIdentifier>
+                        <system value="https://gematik.de/fhir/NamingSystem/TelematikID"/>
+                        <value value="3-SMC-B-Testkarte-883110000129070"/>
+                    </valueIdentifier>
+                </extension>
+
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="https://gematik.de/fhir/CodeSystem/Documenttype"/>
+                        <code value="3"/>
+                        <display value="Receipt"/>
+                    </coding>
+                </type>
+                <date value="2021-04-22T15:06:19.520861500+00:00"/>
+                <author>
+                    <reference value="ErxService"/>
+                </author>
+                <title value="Quittung"/>
+                <event>
+                    <period>
+                        <start value="2021-04-22T15:06:18.880074800+00:00"/>
+                        <end value="2021-04-22T15:06:19.520861500+00:00"/>
+                    </period>
+                </event>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <resource>
+            <Device>
+                <id value="ErxService"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/StructureDefinition/ErxDevice"/>
+                </meta>
+                <status value="active"/>
+                <deviceName>
+                    <name value="E-Rezept Fachdienst Referenzimplementierung"/>
+                    <type value="user-friendly-name"/>
+                </deviceName>
+                <version>
+                    <value value="0.1.0"/>
+                </version>
+            </Device>
+        </resource>
+    </entry>
+    <signature>
+        <type>
+            <system value="urn:iso-astm:E1762-95:2013"/>
+            <code value="1.2.840.10065.1.12.1.1"/>
+            <display value="Author&apos;s Signature"/>
+        </type>
+        <when value="2021-04-22T15:06:19.521495300+00:00"/>
+        <who>
+            <reference value="Device/software"/>
+        </who>
+        <targetFormat value="application/fhir+xml"/>
+        <sigFormat value="application/pkcs7-mime"/>
+        <data value="MIILAgYJKoZIhvcNAQcCoIIK8zCCCu8CAQExDTALBglghkgBZQMEAgEwggYnBgkqhkiG9w0BBwGgggYYBIIGFDxCdW5kbGUgeG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZCB2YWx1ZT0iYjdlNDQ3MzUtMWU5My0xMWIyLWIxMDItOWI3Zjg4Y2ExMDk2Ii8+PG1ldGE+PHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vRXJ4UmVjZWlwdCIvPjwvbWV0YT48aWRlbnRpZmllcj48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9OYW1pbmdTeXN0ZW0vUHJlc2NyaXB0aW9uSUQiLz48dmFsdWUgdmFsdWU9IjE2MC4wMDAuOTY0LjQ3Ny43MDAuMzYiLz48L2lkZW50aWZpZXI+PHR5cGUgdmFsdWU9ImRvY3VtZW50Ii8+PHRpbWVzdGFtcCB2YWx1ZT0iMjAyMS0wNC0yMlQxNTowNjoxOS41MjA4NjMyMDArMDA6MDAiLz48ZW50cnk+PHJlc291cmNlPjxDb21wb3NpdGlvbj48bWV0YT48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvU3RydWN0dXJlRGVmaW5pdGlvbi9FcnhDb21wb3NpdGlvbiIvPjwvbWV0YT48ZXh0ZW5zaW9uIHVybD0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvU3RydWN0dXJlRGVmaW5pdGlvbi9CZW5lZmljaWFyeUV4dGVuc2lvbiI+PHZhbHVlSWRlbnRpZmllcj48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9OYW1pbmdTeXN0ZW0vVGVsZW1hdGlrSUQiLz48dmFsdWUgdmFsdWU9IjMtU01DLUItVGVzdGthcnRlLTg4MzExMDAwMDEyOTA3MCIvPjwvdmFsdWVJZGVudGlmaWVyPjwvZXh0ZW5zaW9uPjxzdGF0dXMgdmFsdWU9ImZpbmFsIi8+PHR5cGU+PGNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9Db2RlU3lzdGVtL0RvY3VtZW50dHlwZSIvPjxjb2RlIHZhbHVlPSIzIi8+PGRpc3BsYXkgdmFsdWU9IlJlY2VpcHQiLz48L2NvZGluZz48L3R5cGU+PGRhdGUgdmFsdWU9IjIwMjEtMDQtMjJUMTU6MDY6MTkuNTIwODYxNTAwKzAwOjAwIi8+PGF1dGhvcj48cmVmZXJlbmNlIHZhbHVlPSJFcnhTZXJ2aWNlIi8+PC9hdXRob3I+PHRpdGxlIHZhbHVlPSJRdWl0dHVuZyIvPjxldmVudD48cGVyaW9kPjxzdGFydCB2YWx1ZT0iMjAyMS0wNC0yMlQxNTowNjoxOC44ODAwNzQ4MDArMDA6MDAiLz48ZW5kIHZhbHVlPSIyMDIxLTA0LTIyVDE1OjA2OjE5LjUyMDg2MTUwMCswMDowMCIvPjwvcGVyaW9kPjwvZXZlbnQ+PC9Db21wb3NpdGlvbj48L3Jlc291cmNlPjwvZW50cnk+PGVudHJ5PjxyZXNvdXJjZT48RGV2aWNlPjxpZCB2YWx1ZT0iRXJ4U2VydmljZSIvPjxtZXRhPjxwcm9maWxlIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9TdHJ1Y3R1cmVEZWZpbml0aW9uL0VyeERldmljZSIvPjwvbWV0YT48c3RhdHVzIHZhbHVlPSJhY3RpdmUiLz48ZGV2aWNlTmFtZT48bmFtZSB2YWx1ZT0iRS1SZXplcHQgRmFjaGRpZW5zdCBSZWZlcmVuemltcGxlbWVudGllcnVuZyIvPjx0eXBlIHZhbHVlPSJ1c2VyLWZyaWVuZGx5LW5hbWUiLz48L2RldmljZU5hbWU+PHZlcnNpb24+PHZhbHVlIHZhbHVlPSIwLjEuMCIvPjwvdmVyc2lvbj48L0RldmljZT48L3Jlc291cmNlPjwvZW50cnk+PC9CdW5kbGU+oIICyDCCAsQwggJroAMCAQICBwDz8THOg8cwCgYIKoZIzj0EAwIwgYQxCzAJBgNVBAYTAkRFMR8wHQYDVQQKDBZnZW1hdGlrIEdtYkggTk9ULVZBTElEMTIwMAYDVQQLDClLb21wb25lbnRlbi1DQSBkZXIgVGVsZW1hdGlraW5mcmFzdHJ1a3R1cjEgMB4GA1UEAwwXR0VNLktPTVAtQ0ExMCBURVNULU9OTFkwHhcNMjAxMDA3MDAwMDAwWhcNMjUwODA3MDAwMDAwWjBeMQswCQYDVQQGEwJERTEmMCQGA1UECgwdZ2VtYXRpayBURVNULU9OTFkgLSBOT1QtVkFMSUQxJzAlBgNVBAMMHkVSUCBSZWZlcmVuemVudHdpY2tsdW5nIEZEIFNpZzBaMBQGByqGSM49AgEGCSskAwMCCAEBBwNCAARJXWJ+givX7fC/BzKSQUS0hvOdi8Km5hVJIW3bCtRuKAQ2IQKgdCDMqPjyd31JboIKADh0Q0z09BkdFoakxZBbo4HrMIHoMDgGCCsGAQUFBwEBBCwwKjAoBggrBgEFBQcwAYYcaHR0cDovL2VoY2EuZ2VtYXRpay5kZS9vY3NwLzAOBgNVHQ8BAf8EBAMCB4AwIQYDVR0gBBowGDAKBggqghQATASBSzAKBggqghQATASBIzAfBgNVHSMEGDAWgBQo8Pjmqch3zENF25qu1zqDrA4PqDAdBgNVHQ4EFgQUxThe4wuB3vT+NbTdhIMoGq3Pc68wDAYDVR0TAQH/BAIwADArBgUrJAgDAwQiMCAwHjAcMBowGDAKDAhFLVJlemVwdDAKBggqghQATASCAzAKBggqhkjOPQQDAgNHADBEAiAtxoZ1gHo1ju91sBCgyV7bjAkDUHpsPypY0ngAc59B3QIgfsEhZAXHBDBN/kI2RDNEiW0NNp/tinVOKYrtqNE9+WgxggHiMIIB3gIBATCBkDCBhDELMAkGA1UEBhMCREUxHzAdBgNVBAoMFmdlbWF0aWsgR21iSCBOT1QtVkFMSUQxMjAwBgNVBAsMKUtvbXBvbmVudGVuLUNBIGRlciBUZWxlbWF0aWtpbmZyYXN0cnVrdHVyMSAwHgYDVQQDDBdHRU0uS09NUC1DQTEwIFRFU1QtT05MWQIHAPPxMc6DxzALBglghkgBZQMEAgGggeQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEwNDIyMTUwNjE5WjAvBgkqhkiG9w0BCQQxIgQgB4A5o+oHwz9w4q+XuQ+KYPZAWMLpYQtzk0I6LJJZYm8weQYJKoZIhvcNAQkPMWwwajALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwCgYIKoZIzj0EAwIERjBEAiBabkAeIuLp9V++Zdfp0SGXmSIy8A/Yci88XJN6xgkbfQIgZ0qFWsDlpwjSK3+zNchD19BlGVFi7cboBCLAJ5vUR00="/>
+    </signature>
+</Bundle>

@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.gematik.test.erezept</groupId>
+    <artifactId>erezept-testsuite</artifactId>
+    <version>0.1.3</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <encoding>UTF-8</encoding>
+        <!-- do not remove this property! -->
+        <groovy.version>3.0.7</groovy.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+        <version.fmt-maven-plugin>2.9</version.fmt-maven-plugin>
+        <version.jacoco>0.8.5</version.jacoco>
+        <version.sonar.jacoco.listener>5.0.1.12818</version.sonar.jacoco.listener>
+        <version.surefire>3.0.0-M2</version.surefire>
+        <version.surefire-report>3.0.0-M2</version.surefire-report>
+        <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
+        <version.maven-javadoc-plugin>3.3.2</version.maven-javadoc-plugin>
+
+        <version.fasterxml.jackson>2.13.3</version.fasterxml.jackson>
+        <version.junit>5.7.2</version.junit>
+        <failsafe.fork.count>1</failsafe.fork.count>
+        <version.mockito>3.12.1</version.mockito>
+        <version.faker>1.0.2</version.faker>
+
+        <version.lombok>1.18.22</version.lombok>
+        <version.logback>1.4.0</version.logback>
+        <version.sl4j-api>2.0.0</version.sl4j-api>
+
+        <version.unirest>3.13.6</version.unirest>
+        <version.dss>5.11.RC1</version.dss>
+        <version.bouncycastle>1.70</version.bouncycastle>
+
+        <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
+
+        <skip.unittests/>
+        <surefire.forkCount>1</surefire.forkCount>
+        <sonar.exclusions>
+            **/*Main.java,
+            **/primsys/cli/*.java
+        </sonar.exclusions>
+
+        <!-- JavaDoc properties -->
+        <javadoc.doctitle>E-Rezept E2E TestSuite</javadoc.doctitle>
+        <javadoc.header>${javadoc.doctitle}</javadoc.header>
+        <javadoc.footer>${javadoc.doctitle}</javadoc.footer>
+        <javadoc.bottom>© gematik GmbH 2022</javadoc.bottom>
+
+        <version.serenity>3.2.5</version.serenity>
+
+        <!-- gematik dependency version -->
+        <version.idp-client>19.2.0-256</version.idp-client>
+        <version.erp-fhir>0.1.3-SNAPSHOT</version.erp-fhir>
+        <version.testsuite>0.1.3-SNAPSHOT</version.testsuite>
+        <version.spotless>2.25.0</version.spotless>
+    </properties>
+
+    <modules>
+        <module>bdd-javadocs</module>
+        <module>smartcard</module>
+        <module>erp-crypto</module>
+        <module>erp-client</module>
+        <module>erp-fhir</module>
+        <module>erp-fhir-fuzzing</module>
+        <module>konnektor-client</module>
+        <module>erp-bdd-common</module>
+        <module>primsys-bdd</module>
+        <module>erp-app-bdd</module>
+        <module>primsys-restserver</module>
+        <module>erp-fd-product-test</module>
+        <module>pharmacy-service-provider</module>
+        <module>pharmacy-service-provider-ws-client</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${version.jacoco}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>de.gematik.ws.**.*</exclude>
+                                <exclude>oasis.names.tc.**.*</exclude>
+                                <exclude>org.**.*</exclude>
+                            </excludes>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>de.gematik.ws/**.*</exclude>
+                                <exclude>oasis.names.tc/**.*</exclude>
+                                <exclude>org/**.*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>${version.fmt-maven-plugin}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.cosium.code</groupId>
+                <artifactId>git-code-format-maven-plugin</artifactId>
+                <version>3.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>install-hooks</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.5.4,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>
+                    <excludes>
+                        <exclude>**/*TestSuite.java</exclude>
+                    </excludes>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>org.sonar.java.jacoco.JUnitListener</value>
+                        </property>
+                    </properties>
+                    <skip>${skip.unittests}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${version.spotless}</version>
+                <configuration>
+                    <java>
+                        <!-- make sure every file has the following copyright header.
+                          optionally, Spotless can set copyright years by digging
+                          through git history (see "license" section below) -->
+                        <licenseHeader>
+                            <file>COPYRIGHT_HEADER</file>
+                        </licenseHeader>
+                    </java>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${version.maven-javadoc-plugin}</version>
+                <configuration>
+                    <doctitle>${javadoc.doctitle}</doctitle>
+                    <header>${javadoc.header}</header>  <!-- let's place icon+link to GitHub here -->
+                    <footer>${javadoc.footer}</footer>
+                    <bottom>${javadoc.bottom}</bottom>
+                    <doclint>none</doclint>
+                    <noqualifier>all</noqualifier>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>non-aggregate</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited> <!-- don't run aggregate in child modules -->
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>${releaseDeploymentRepository}</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>${snapshotDeploymentRepository}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+            <version>${version.lombok}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version.logback}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- when mixing junit 4 and 5, junit 4 tests are not detected unless you add the vintage dependency -->
+        <!-- Serenity still works only with junit4 ! -->
+        <dependency>
+            <artifactId>junit-vintage-engine</artifactId>
+            <groupId>org.junit.vintage</groupId>
+            <scope>test</scope>
+            <version>${version.junit}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.23.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${version.mockito}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>1.0.0-rc1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+    <repositories>
+        <!--  Nexus Repositories  -->
+        <repository>
+            <id>public</id>
+            <name>Gematik Repository</name>
+            <url>https://build.top.local/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <!--  Zentrales Maven Repository deaktivieren  -->
+        <repository>
+            <id>central</id>
+            <name>Maven Central Repository</name>
+            <url>http://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>
+

@@ -1,0 +1,58 @@
+openapi: 3.0.0
+info:
+  title: PrimSys REST Server
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:9095
+    description: local development server
+  - url: http://primsys-test.top.local
+    description: TODO deployed server on LTU_DEV
+
+paths:
+  /actors:
+    get:
+      summary: "Get a List of all available Actors"
+      responses:
+        "200":
+          description: ""
+  /doc/{docId}/prescribe:
+    post:
+      summary: "Tell the doctor with ID {docId} to issue an ePrescription"
+      parameters:
+        - name: "docId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: "Describe the ePrescription"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Prescription"
+      responses:
+        "200":
+          description: "Successfully created and issues an ePrescription"
+        "400":
+          description: "Bad Request: some required Data like the KVNR is missing within the Request"
+        "404":
+          description: "Doctor with ID {docId} was not found"
+
+components:
+  schemas:
+    Prescription:
+      title: "Body for building the ePrescription content"
+      type: "object"
+      properties:
+        kvnr:
+          type: "string"
+          description: "The KVNR of the insured patient"
+        pzn:
+          type: "string"
+          description: "The PZN of the medication"
+      required:
+        - kvnr
+
+      

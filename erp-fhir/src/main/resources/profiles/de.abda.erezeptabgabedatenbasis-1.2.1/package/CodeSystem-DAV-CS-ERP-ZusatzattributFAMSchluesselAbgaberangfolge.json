@@ -1,0 +1,34 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "DAV_CS_ERP_ZusatzattributFAMSchluesselAbgaberangfolge",
+  "id": "DAV-CS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge",
+  "version": "1.2",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge",
+  "concept": [
+    {
+      "code": "0",
+      "display": "nicht relevant"
+    },
+    {
+      "code": "1",
+      "display": "ja, abgegeben"
+    },
+    {
+      "code": "2",
+      "display": "nein, nicht verfügbar",
+      "definition": "zusätzlich ggf. DokumentationFreitext über Großhandelsabfrage"
+    },
+    {
+      "code": "3",
+      "display": "nein, dringender Fall"
+    },
+    {
+      "code": "4",
+      "display": "nein, sonstige Bedenken",
+      "definition": "zusätzlich DokumentationFreitext"
+    }
+  ],
+  "count": 5
+}

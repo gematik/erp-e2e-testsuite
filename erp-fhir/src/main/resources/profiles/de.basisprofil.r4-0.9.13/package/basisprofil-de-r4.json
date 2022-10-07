@@ -1,0 +1,687 @@
+{
+  "resourceType": "ImplementationGuide",
+  "url": "https://simplifier.net/guide/basisprofil-de-r4",
+  "version": "0.9",
+  "name": "Leitfaden Basis DE (R4)",
+  "status": "draft",
+  "description": "Die Leitfaden wird von der [Projektgruppe Basisprofilierung](http://wiki.hl7.de/index.php?title=FHIR-Basisprofilierung_(Projekt)) des [Technischen Komitees FHIR von HL7 Deutschland e.V.](http://hl7.de/technische-komitees/fhir/ ) erstellt.\r\n\r\nDie Diskussion der Inhalte findet auf [Zulip](https://chat.fhir.org/#narrow/stream/german.20(d-a-ch)) statt. \r\nImplementierer und Interessenten sind herzlich eingeladen, sich an der Diskussion zu beteiligen, Fragen zu stellen,\r\noder Feedback zu geben.\r\n\r\nDie Weiterentwicklung der deutschen Basisprofile kann im [GitHub-Repository](https://github.com/hl7germany/basisprofil-de-r4) verfolgt werden.\r\n\r\nVerbesserungs- und Korrekturvorschläge sollten ebenfalls über den [GitHub-Issue-Tracker](https://github.com/hl7germany/basisprofil-de-r4/issues) eingereicht werden.\r\n\r\n**Die neueste stabile Fassung findet sich unter http://ig.fhir.de/basisprofile-de/stable/**\r\n\r\nEine formelle Abstimmung folgt. Um über Kommentierungsphasen, anstehende Abstimmungen und aktuelle Themen informiert zu werden, registrieren Sie sich bitte für den FHIR-Newsletter durch formlose Mail an fhir@hl7.de.",
+  "fhirVersion": [
+    "4.0.0"
+  ],
+  "definition": {
+    "page": {
+      "title": "Leitfaden Basis DE (R4)",
+      "page": [
+        {
+          "nameUrl": "Home.md",
+          "title": "Home",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "UeberDiesenLeitfaden.md",
+          "title": "Über diesen Leitfaden",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "Grundlagen.md",
+          "title": "Grundlagen",
+          "generation": "markdown"
+        },
+        {
+          "nameUrl": "Anwendungshinweise.md",
+          "title": "Anwendungshinweise",
+          "generation": "markdown",
+          "page": [
+            {
+              "nameUrl": "RessourcenPaket.md",
+              "title": "Ressourcen-Paket",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "NichtProfilierteRessourcen.md",
+              "title": "Nicht profilierte Ressourcen, zukünftige Erweiterung",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "AbleitungEigenerProfileBasisprofilen.md",
+              "title": "Ableitung eigener Profile von den Basisprofilen",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Beispiele.md",
+              "title": "Beispiele",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "FAQ.md",
+              "title": "FAQ",
+              "generation": "markdown"
+            }
+          ]
+        },
+        {
+          "nameUrl": "Ressourcen.md",
+          "title": "Ressourcen",
+          "generation": "markdown",
+          "page": [
+            {
+              "nameUrl": "Patient.md",
+              "title": "Patient",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Identifikatoren.md",
+                  "title": "Identifikatoren",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "organisationsinternerPatientenidentifierPID.md",
+                      "title": "organisationsinterner Patienten-Identifier (PID)",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "gesetzlicheKrankenversichertennummer10-stelligeKVID.md",
+                      "title": "gesetzliche Krankenversichertennummer (10-stellige KVID)",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "privateKrankenversichertennummer.md",
+                      "title": "private Krankenversichertennummer",
+                      "generation": "markdown"
+                    }
+                  ]
+                },
+                {
+                  "nameUrl": "Name.md",
+                  "title": "Name",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Anrede.md",
+                  "title": "Anrede",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Patient.gender.md",
+                  "title": "Geschlecht",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Patient.address.md",
+                  "title": "Adresse",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Patient.maritalStatus.md",
+                  "title": "Personenstand",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Geburtsdatum.md",
+                  "title": "Geburtsdatum",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "PersoneninGesundheitsberufen.md",
+              "title": "Personen in Gesundheitsberufen",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "LebenslangeArztnummerLANR.md",
+                  "title": "Lebenslange Arztnummer (LANR)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Zahnarztnummer.md",
+                  "title": "Zahnarztnummer (ZANR)",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "AllergienundIntoleranzen.md",
+              "title": "Allergien und Intoleranzen",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Observation.md",
+              "title": "Beobachtungen, Messungen",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "VitalParameter.md",
+                  "title": "VitalParameter",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "Atemfrequenz.md",
+                      "title": "Atemfrequenz",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Blutdruck.md",
+                      "title": "Blutdruck",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "BMI.md",
+                      "title": "BMI",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Herzfrequenz.md",
+                      "title": "Herzfrequenz",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Newitem-duplicate-12.md",
+                      "title": "Körpergewicht",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Krpergre.md",
+                      "title": "Körpergröße",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Krpertemperatur.md",
+                      "title": "Körpertemperatur",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Kopfumfang.md",
+                      "title": "Kopfumfang",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Sauerstoffsttigung.md",
+                      "title": "Sauerstoffsättigung",
+                      "generation": "markdown"
+                    }
+                  ]
+                },
+                {
+                  "nameUrl": "Anamnese.md",
+                  "title": "Anamnese",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "Raucherstatus.md",
+                      "title": "Raucherstatus",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Alkoholkonsum.md",
+                      "title": "Alkoholkonsum",
+                      "generation": "markdown"
+                    }
+                  ]
+                },
+                {
+                  "nameUrl": "Schwangerschaft.md",
+                  "title": "Schwangerschaft",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "Newitem-duplicate-13.md",
+                      "title": "Schwangerschaftsstatus",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "ErwarteterGeburtstermin.md",
+                      "title": "Erwarteter Geburtstermin",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Schwangerschafts-Historie.md",
+                      "title": "Schwangerschafts-Historie",
+                      "generation": "markdown"
+                    }
+                  ]
+                },
+                {
+                  "nameUrl": "Labor.md",
+                  "title": "Labor",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Pflegestufe.md",
+                  "title": "Pflegegrad",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "Condition.md",
+              "title": "Diagnosen",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Diagnose-TypenundRangfolgen.md",
+                  "title": "Diagnose-Typen und Rangfolgen",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "ICD-10.md",
+                  "title": "ICD-10-GM (Profil)",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "Condition.code.md",
+                      "title": "Condition.code",
+                      "generation": "markdown",
+                      "page": [
+                        {
+                          "nameUrl": "PostkoordinierteICD-Codes.md",
+                          "title": "Postkoordinierte ICD-Codes",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "Diagnosesicherheit.md",
+                          "title": "Diagnosesicherheit",
+                          "generation": "markdown"
+                        }
+                      ]
+                    },
+                    {
+                      "nameUrl": "BeispielDiagnosesicherheitZustandnach.md",
+                      "title": "Beispiel: Diagnosesicherheit: \"Zustand nach\"",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "BeispieleinfacherICD-Code.md",
+                      "title": "Beispiel: einfacher ICD-Code",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "BeispielICD-CodemitAusrufezeichen-Notation.md",
+                      "title": "Beispiel: ICD-Code mit Ausrufezeichen-Notation",
+                      "generation": "markdown"
+                    },
+                    {
+                      "nameUrl": "Newitem-duplicate-14.md",
+                      "title": "Beispiel: ICD-Code mit Kreuz-Stern-Notation",
+                      "generation": "markdown"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nameUrl": "Prozeduren.md",
+              "title": "Prozeduren",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "OPS.md",
+                  "title": "OPS",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "Procedure.code.md",
+                      "title": "Procedure.code",
+                      "generation": "markdown"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nameUrl": "Dokumente.md",
+              "title": "Dokumente",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Medikation.md",
+              "title": "Medikation",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Normgre.md",
+                  "title": "Normgröße",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "FragebgenundFormulare.md",
+              "title": "Fragebögen und Formulare",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Versicherungs-Informationen.md",
+              "title": "Versicherungs-Informationen",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Basisprofil.md",
+                  "title": "Basisprofil",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "GKV-Profil.md",
+                  "title": "GKV-Profil",
+                  "generation": "markdown",
+                  "page": [
+                    {
+                      "nameUrl": "Extensions.md",
+                      "title": "Extensions",
+                      "generation": "markdown",
+                      "page": [
+                        {
+                          "nameUrl": "EinlesedatumderVersichertenkarte.md",
+                          "title": "Einlesedatum der Versichertenkarte",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "VersionderVersichertenkarte.md",
+                          "title": "Version der Versichertenkarte",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "GenerationderVersichertenkarte.md",
+                          "title": "Generation der Versichertenkarte",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "Versichertenart.md",
+                          "title": "Versichertenart",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "Kostenerstattung.md",
+                          "title": "Kostenerstattung",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "Wohnortkennzeichen.md",
+                          "title": "Wohnortkennzeichen",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "BesonderePersonengruppe.md",
+                          "title": "Besondere Personengruppe",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "RuhenderLeistungsanspruch.md",
+                          "title": "Ruhender Leistungsanspruch",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "Zuzahlungsstatus.md",
+                          "title": "Zuzahlungsstatus",
+                          "generation": "markdown"
+                        },
+                        {
+                          "nameUrl": "DMP-Kennzeichen.md",
+                          "title": "DMP-Kennzeichen",
+                          "generation": "markdown"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nameUrl": "Selbstzahler-Profil.md",
+                  "title": "Selbstzahler-Profil",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "ambulanterstationrerFall.md",
+              "title": "ambulanter/stationärer Fall",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Aufnahmeart.md",
+                  "title": "Aufnahmeart",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "Einwilligungsmanagement.md",
+              "title": "Einwilligungsmanagement",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "AbrechnungsdatenLeistungsziffern.md",
+              "title": "Abrechnungsdaten, Leistungsziffern",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "EBM-Ziffern.md",
+                  "title": "EBM-Ziffern",
+                  "generation": "markdown"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nameUrl": "Extensions-Uebersicht.md",
+          "title": "Extensions",
+          "generation": "markdown",
+          "page": [
+            {
+              "nameUrl": "Name-duplicate-2.md",
+              "title": "Name",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Adresse.md",
+              "title": "Adresse",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Geschlecht.md",
+              "title": "Geschlecht",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "ICD-10Codierung.md",
+              "title": "ICD-10 Codierung",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Medikation-duplicate-2.md",
+              "title": "Medikation",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Coverage.md",
+              "title": "Coverage",
+              "generation": "markdown"
+            }
+          ]
+        },
+        {
+          "nameUrl": "Datentypen.md",
+          "title": "Datentypen",
+          "generation": "markdown",
+          "page": [
+            {
+              "nameUrl": "Address.md",
+              "title": "Address",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "HumanName.md",
+              "title": "HumanName",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Coding.md",
+              "title": "Coding",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "ICD-10GM.md",
+                  "title": "ICD-10 GM",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "OPS-duplicate-2.md",
+                  "title": "OPS",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Alpha-ID.md",
+                  "title": "Alpha-ID",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Alpha-ID-SE.md",
+                  "title": "Alpha-ID-SE",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "ASK.md",
+                  "title": "ASK",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "ATC.md",
+                  "title": "ATC",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "PZN.md",
+                  "title": "PZN",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "Identifier.md",
+              "title": "Identifier",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "BetriebsstttennummerBSN.md",
+                  "title": "Betriebsstättennummer (BSN)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "EinheitlichenFortbildungsnummerEFN.md",
+                  "title": "Einheitlichen Fortbildungsnummer (EFN)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "InstitutionskennzeichensIKNR.md",
+                  "title": "Institutionskennzeichens (IKNR)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "10-stelligeKrankenversichertennummer.md",
+                  "title": "10-stellige Krankenversichertennummer",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "LebenslangeArztnummerANR-duplicate-2.md",
+                  "title": "Lebenslange Arztnummer (ANR)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Patienten-IDPID.md",
+                  "title": "Patienten-ID (PID)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "PseudonymisierteKrankenversichertennummerPSN.md",
+                  "title": "Pseudonymisierte Krankenversichertennummer (PSN)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "VertragskassennummerVKNR.md",
+                  "title": "Vertragskassennummer (VKNR)",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "LebenslangeZahnarztnummerZANR.md",
+                  "title": "Lebenslange Zahnarztnummer (ZANR)",
+                  "generation": "markdown"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nameUrl": "Terminologie.md",
+          "title": "Terminologie",
+          "generation": "markdown",
+          "page": [
+            {
+              "nameUrl": "Newitem-duplicate-7.md",
+              "title": "Nomenklatur der Ressourcen",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Newitem-duplicate-8.md",
+              "title": "Codesystem-Versionen",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Newitem-duplicate-9.md",
+              "title": "Platzhalter-Codesysteme",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "ValueSets.md",
+              "title": "Valuesets",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Codesysteme.md",
+              "title": "Codesysteme",
+              "generation": "markdown"
+            },
+            {
+              "nameUrl": "Namensrume.md",
+              "title": "Namensräume",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Newitem-duplicate-10.md",
+                  "title": "lokale Namensräume",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "Newitem-duplicate-11.md",
+                  "title": "nationale Namensräume",
+                  "generation": "markdown"
+                }
+              ]
+            },
+            {
+              "nameUrl": "bersetzungen.md",
+              "title": "Codesystem-Übersetzungen",
+              "generation": "markdown",
+              "page": [
+                {
+                  "nameUrl": "Newitem-duplicate-15.md",
+                  "title": "administrative-gender",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "marital-status.md",
+                  "title": "marital-status",
+                  "generation": "markdown"
+                },
+                {
+                  "nameUrl": "LOINC.md",
+                  "title": "LOINC",
+                  "generation": "markdown"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
