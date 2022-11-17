@@ -54,6 +54,7 @@ public interface PSPClient {
   /** call connected server to transmit all stored messages with the client telematikId */
   void callServerStoredMessages();
 
+  String getId();
   /**
    * generate the connection to server
    *

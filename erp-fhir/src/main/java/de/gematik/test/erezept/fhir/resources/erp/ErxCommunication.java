@@ -17,20 +17,15 @@
 package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.exceptions.InvalidCommunicationType;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Value;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Communication;
@@ -123,17 +118,16 @@ public class ErxCommunication extends Communication {
   public boolean isSubstitutionAllowed() {
     return this.getPayload().get(0).getExtension().stream()
         .filter(
-            ext ->
-                ext.getUrl()
-                    .equals(ErpStructureDefinition.GEM_SUBSTITION_ALLOWED.getCanonicalUrl()))
+            ext -> ext.getUrl().equals(ErpWorkflowStructDef.SUBSTITION_ALLOWED.getCanonicalUrl()))
         .map(ext -> ext.castToBoolean(ext.getValue()).booleanValue())
         .findFirst()
         .orElse(true);
   }
 
-  public CommunicationType getType() {
+  @SuppressWarnings({"java:S1452"}) // the concrete ProfileVersion-Type is not of interest for now
+  public ICommunicationType<ProfileVersion<?>> getType() {
     return this.getMeta().getProfile().stream()
-        .map(url -> CommunicationType.fromUrl(url.getValue()))
+        .map(url -> ICommunicationType.fromUrl(url.getValue()))
         .findFirst()
         .orElseThrow(
             () ->
@@ -148,58 +142,5 @@ public class ErxCommunication extends Communication {
 
   public static ErxCommunication fromCommunication(Resource adaptee) {
     return fromCommunication((Communication) adaptee);
-  }
-
-  public enum CommunicationType {
-    INFO_REQ(ErpStructureDefinition.GEM_COM_INFO_REQ),
-    DISP_REQ(ErpStructureDefinition.GEM_COM_DISP_REQ),
-    REPLY(ErpStructureDefinition.GEM_COM_REPLY),
-    REPRESENTATIVE(ErpStructureDefinition.GEM_COM_REPRESENTATIVE),
-    CHANGE_REQ(ErpStructureDefinition.GEM_COM_CHARGE_CHANGE_REQ),
-    CHANGE_REPLY(ErpStructureDefinition.GEM_COM_CHARGE_CHANGE_REPLY);
-
-    // which communication types are received by KVIDs
-    private static final List<CommunicationType> PATIENT_RECEIVING =
-        List.of(REPLY, REPRESENTATIVE, CHANGE_REPLY);
-
-    // which communication types are sent by pharmacies
-    private static final List<CommunicationType> PHARMACY_SENDING = List.of(REPLY, CHANGE_REPLY);
-
-    @Getter private final ErpStructureDefinition type;
-
-    CommunicationType(ErpStructureDefinition type) {
-      this.type = type;
-    }
-
-    public String getTypeUrl() {
-      return type.getCanonicalUrl();
-    }
-
-    public ErpNamingSystem getRecipientNamingSystem() {
-      ErpNamingSystem ns;
-      if (PATIENT_RECEIVING.contains(this)) {
-        ns = ErpNamingSystem.KVID; // TODO: not always true, Patient might also be PKV!
-      } else {
-        ns = ErpNamingSystem.TELEMATIK_ID;
-      }
-      return ns;
-    }
-
-    public ErpNamingSystem getSenderNamingSystem() {
-      ErpNamingSystem ns;
-      if (PHARMACY_SENDING.contains(this)) {
-        ns = ErpNamingSystem.TELEMATIK_ID;
-      } else {
-        ns = ErpNamingSystem.KVID; // TODO: not always true, Patient might also be PKV!
-      }
-      return ns;
-    }
-
-    public static CommunicationType fromUrl(@NonNull final String profileUrl) {
-      return Arrays.stream(CommunicationType.values())
-          .filter(type -> type.getTypeUrl().contains(profileUrl))
-          .findFirst()
-          .orElseThrow(() -> new InvalidCommunicationType(profileUrl));
-    }
   }
 }

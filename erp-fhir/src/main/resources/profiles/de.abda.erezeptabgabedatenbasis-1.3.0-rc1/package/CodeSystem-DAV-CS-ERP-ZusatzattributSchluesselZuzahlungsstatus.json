@@ -1,0 +1,22 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "draft",
+  "content": "complete",
+  "name": "DAV_CS_ERP_ZusatzattributSchluesselZuzahlungsstatus",
+  "id": "DAV-CS-ERP-ZusatzattributSchluesselZuzahlungsstatus",
+  "version": "1.3",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzattributSchluesselZuzahlungsstatus",
+  "concept": [
+    {
+      "code": "0",
+      "display": "Nein (gebührenpflichtig)",
+      "definition": "von Zuzahlungspflicht nicht befreit (gebührenpflichtig)"
+    },
+    {
+      "code": "1",
+      "display": "Ja (gebührenfrei)",
+      "definition": "von Zuzahlungspflicht befreit (gebührenfrei)"
+    }
+  ],
+  "count": 2
+}

@@ -28,7 +28,7 @@ pipeline {
     stages {
         stage('Initialise') {
             steps {
-                //useJdk('OPENJDK17')
+                useJdk('OPENJDK17')
                 gitSetIdentity()
                 checkVersion(NEW_VERSION)
             }

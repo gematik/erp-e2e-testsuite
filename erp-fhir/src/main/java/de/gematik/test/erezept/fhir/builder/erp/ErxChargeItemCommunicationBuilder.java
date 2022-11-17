@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.hl7.fhir.r4.model.Reference;
 public class ErxChargeItemCommunicationBuilder
     extends AbstractCommunicationBuilder<ErxChargeItemCommunicationBuilder> {
 
+  private PatientenrechnungVersion patientenrechnungVersion = PatientenrechnungVersion.V1_0_0;
   private String chargeItemReference;
 
   private ErxChargeItemCommunicationBuilder() {}
@@ -47,7 +50,9 @@ public class ErxChargeItemCommunicationBuilder
 
   public ErxCommunication buildReq(String message) {
     checkRequiredForChargeItemCommunication();
-    val com = build(ErxCommunication.CommunicationType.CHANGE_REQ, message);
+    val type = ChargeItemCommunicationType.CHANGE_REQ;
+    val com =
+        build(type, () -> type.getType().asCanonicalType(patientenrechnungVersion, true), message);
     com.setBasedOn(List.of(new Reference(chargeItemReference)));
 
     return com;
@@ -55,7 +60,9 @@ public class ErxChargeItemCommunicationBuilder
 
   public ErxCommunication buildReply(String message) {
     checkRequiredForChargeItemCommunication();
-    val com = build(ErxCommunication.CommunicationType.CHANGE_REPLY, message);
+    val type = ChargeItemCommunicationType.CHANGE_REPLY;
+    val com =
+        build(type, () -> type.getType().asCanonicalType(patientenrechnungVersion, true), message);
     com.setBasedOn(List.of(new Reference(chargeItemReference)));
 
     return com;

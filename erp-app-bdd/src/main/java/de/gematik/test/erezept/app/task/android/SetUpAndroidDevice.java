@@ -19,14 +19,20 @@ package de.gematik.test.erezept.app.task.android;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
+import de.gematik.test.erezept.app.mobile.elements.CardWall;
+import de.gematik.test.erezept.app.mobile.elements.Debug;
+import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.Prescriptions;
+import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.exceptions.TestcaseAbortedException;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.jwt.JWTDecoder;
 import de.gematik.test.erezept.operator.UIProvider;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
 import java.util.Base64;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -34,7 +40,10 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SetUpAndroidDevice implements Task {
+
+  private final VersicherungsArtDeBasis insuranceKind;
 
   @Override
   public <T extends Actor> void performAs(T actor) {
@@ -44,72 +53,69 @@ public class SetUpAndroidDevice implements Task {
     // walk through onboarding
     app.swipe(SwipeDirection.LEFT);
     app.swipe(SwipeDirection.LEFT);
-    app.input(actor.getName(), "User Profile Name");
-    app.tap("Onboarding Next");
-    app.inputPassword(password, "Password Input", true);
-    app.inputPassword(password, "Password Confirmation");
-    app.tap(4, "Onboarding Next");
-    app.tap("Accept Privacy");
-    app.tap("Terms of Use");
-    app.tap("Confirm Legal");
+    app.input(actor.getName(), Onboarding.USER_PROFILE);
+    app.tap(Onboarding.NEXT);
+    app.inputPassword(password, Onboarding.PASSWORD_INPUT);
+    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION);
+    app.tap(4, Onboarding.NEXT);
+    app.tap(Onboarding.ACCEPT_PRIVACY);
+    app.tap(Onboarding.ACCEPT_TERMS_OF_USE);
+    app.tap(Onboarding.CONFIRM_LEGAL);
 
     if (app.useVirtualeGK()) {
       performWithVirtualeGK(actor, app);
+      getBaseDataFromDebugMenu(actor, app);
     } else {
       performWithRealeGK(app);
+      getBaseDataFromUser(actor);
     }
-
-    getBaseDataFromDebugMenu(actor, app);
   }
 
-  private void performWithRealeGK(UseTheApp app) {
+  private void performWithRealeGK(UseTheApp<?> app) {
     // walk through cardwall
-    app.tap("Refresh Prescriptions");
-    app.tap("Cardwall Next");
-    app.input("123123", "Cardwall CAN Input"); // TODO: find a way to configure
-    app.tap("Cardwall Next");
-    app.input("123456", "Cardwall PIN Input"); // TODO: find a way to configure
-    //    app.tap("Cardwall Next"); // seems to be not required??
+    app.tap(Prescriptions.REFRESH);
+    app.tap(CardWall.NEXT);
+    app.input("123123", CardWall.CAN_INPUT); // TODO: find a way to configure
+    app.tap(CardWall.NEXT);
+    app.input("123456", CardWall.PIN_INPUT); // TODO: find a way to configure
+    //    app.tap(CardWall.NEXT); // seems to be not required??
 
-    app.tap("Cardwall Sign in");
+    app.tap(CardWall.SIGN_IN);
     UIProvider.getInstructionResult(
         "Get your eGK ready and follow the Instructions on the Screen of your device");
   }
 
   @SneakyThrows
-  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp app) {
-    app.tap("Show Settings");
-    app.tap("Debug Menu");
+  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app) {
+    app.tap(Settings.SHOW);
+    app.tap(Debug.SHOW);
 
-    // TODO: take an eGK by ICCSN from config
-    val egk = SmartcardFactory.readArchive().getEgkCards(Crypto.ECC_256).get(0);
+    val egk = SafeAbility.getAbility(actor, ProvideEGK.class).getEgk();
     val pkBase64 = Base64.getEncoder().encodeToString(egk.getAuthPrivateKey().getEncoded());
     val cchBase64 = Base64.getEncoder().encodeToString(egk.getAuthCertificate().getEncoded());
     app.swipe(SwipeDirection.UP);
     app.swipe(SwipeDirection.UP); // one swipe is not enough to reach the bottom of the screen
-    app.input(pkBase64, "Debug Private Key eGK");
-    app.input(cchBase64, "Debug Certificate Chain eGK");
-    app.tap("Debug set virtual eGK");
+    app.input(pkBase64, Debug.EGK_PRIVATE_KEY);
+    app.input(cchBase64, Debug.EGK_CERTIFICATE_CHAIN);
+    app.tap(Debug.SET_VIRTUAL_EGK);
 
-    app.tap("Leave Debug Menu");
-    app.tap("Leave Settings");
+    app.tap(Debug.LEAVE);
+    app.tap(Settings.LEAVE);
   }
 
-  private <T extends Actor> void getBaseDataFromDebugMenu(T actor, UseTheApp app) {
+  private <T extends Actor> void getBaseDataFromDebugMenu(T actor, UseTheApp<?> app) {
     // visit the settings screen: and fetch KVID and name from Bearer Token
-    app.tap("Show Settings");
-    app.tap("Debug Menu");
-    val rawToken = app.getWebElement("Debug Menu Bearer Token").getText();
+    app.tap(Settings.SHOW);
+    app.tap(Debug.SHOW);
+    val rawToken = app.getWebElement(Debug.BEARER_TOKEN).getText();
     val token = JWTDecoder.decode(rawToken);
     val kvid = token.getPayload().getIdentifier();
     val givenName = token.getPayload().getGivenName();
     val familyName = token.getPayload().getFamilyName();
-    actor.can(
-        ProvidePatientBaseData.forGkvPatient(
-            kvid, givenName, familyName)); // TODO: by default GKV for, change later
+    actor.can(ProvidePatientBaseData.forPatient(kvid, givenName, familyName, insuranceKind));
 
-    app.tap("Leave Debug Menu");
-    app.tap("Leave Settings");
+    app.tap(Debug.LEAVE);
+    app.tap(Settings.LEAVE);
   }
 
   /**
@@ -127,7 +133,6 @@ public class SetUpAndroidDevice implements Task {
       throw new TestcaseAbortedException("Given KVID or Name is null");
     }
 
-    actor.can(
-        ProvidePatientBaseData.forGkvPatient(kvid, name)); // TODO: by default GKV for, change later
+    actor.can(ProvidePatientBaseData.forPatient(kvid, name, insuranceKind));
   }
 }

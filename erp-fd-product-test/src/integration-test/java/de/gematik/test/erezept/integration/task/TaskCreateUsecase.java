@@ -52,7 +52,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Task für ein E-Rezept erstellen")
-public class TaskCreateUsecase extends ErpTest {
+class TaskCreateUsecase extends ErpTest {
 
   @TestcaseId("ERP_TASK_CREATE_01")
   @ParameterizedTest(name = "[{index}] -> Verordnender Arzt erstellt Task mit WorkFlow {0}")

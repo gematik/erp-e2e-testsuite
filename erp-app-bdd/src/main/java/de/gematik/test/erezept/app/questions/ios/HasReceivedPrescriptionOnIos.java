@@ -16,14 +16,18 @@
 
 package de.gematik.test.erezept.app.questions.ios;
 
+import static java.text.MessageFormat.format;
+
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 
+@Slf4j
 public class HasReceivedPrescriptionOnIos implements Question<Boolean> {
 
   @Override
   public Boolean answeredBy(Actor actor) {
-    // TODO: not yet implemented for IOS
+    log.warn(format("{0} not yet implemented", this.getClass().getSimpleName()));
     return false;
   }
 }

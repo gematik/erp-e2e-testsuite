@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
-import de.gematik.test.erezept.fhir.util.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
 import lombok.val;

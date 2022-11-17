@@ -42,7 +42,6 @@ public class Main {
     val server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc, false);
 
     Runtime.getRuntime().addShutdownHook(new GrizzlyServerShutdownHook(server));
-
     server.start();
 
     log.info("Press CTRL+C to exit..");

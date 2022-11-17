@@ -18,7 +18,10 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -41,7 +44,7 @@ public class HasReceivedCommunication implements Question<Boolean> {
 
     answer.ifPresent(
         com -> {
-          if (com.getType().equals(ErxCommunication.CommunicationType.REPRESENTATIVE)) {
+          if (com.getType().equals(CommunicationType.REPRESENTATIVE)) {
             storeAssignedRepresentativePrescription(actor, com);
           }
         });
@@ -64,33 +67,33 @@ public class HasReceivedCommunication implements Question<Boolean> {
   }
 
   public static Builder infoRequest() {
-    return new Builder(ErxCommunication.CommunicationType.INFO_REQ);
+    return new Builder(CommunicationType.INFO_REQ);
   }
 
   public static Builder dispenseRequest() {
-    return new Builder(ErxCommunication.CommunicationType.DISP_REQ);
+    return new Builder(CommunicationType.DISP_REQ);
   }
 
   public static Builder representative() {
-    return new Builder(ErxCommunication.CommunicationType.REPRESENTATIVE);
+    return new Builder(CommunicationType.REPRESENTATIVE);
   }
 
   public static Builder reply() {
-    return new Builder(ErxCommunication.CommunicationType.REPLY);
+    return new Builder(CommunicationType.REPLY);
   }
 
   public static Builder changeRequest() {
-    return new Builder(ErxCommunication.CommunicationType.CHANGE_REQ);
+    return new Builder(ChargeItemCommunicationType.CHANGE_REQ);
   }
 
   public static Builder changeReply() {
-    return new Builder(ErxCommunication.CommunicationType.CHANGE_REPLY);
+    return new Builder(ChargeItemCommunicationType.CHANGE_REPLY);
   }
 
   public static class Builder {
     private final GetReceivedCommunication.Builder wrapee;
 
-    private Builder(ErxCommunication.CommunicationType type) {
+    private Builder(ICommunicationType type) {
       this.wrapee = new GetReceivedCommunication.Builder(type).last();
     }
 

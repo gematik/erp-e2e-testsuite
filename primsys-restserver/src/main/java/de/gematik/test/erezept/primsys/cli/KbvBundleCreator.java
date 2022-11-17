@@ -27,7 +27,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.Callable;
 import lombok.val;
@@ -123,7 +123,7 @@ public class KbvBundleCreator implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     val fhir = new FhirParser();
-    val smartcards = SmartcardFactory.readArchive();
+    val smartcards = SmartcardFactory.getArchive();
     val cfg = TestsuiteConfiguration.getInstance();
 
     val doc = cfg.getActors().getDoctors().get(0);
@@ -133,7 +133,6 @@ public class KbvBundleCreator implements Callable<Integer> {
     val xml = fhir.encode(kbvBundle, EncodingType.XML, prettyPrint);
     System.out.println(format("\n{0}\n-----", xml));
 
-    smartcards.destroy();
     return 0;
   }
 

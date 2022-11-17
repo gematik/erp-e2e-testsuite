@@ -17,12 +17,18 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.AddressBuilder;
+import de.gematik.test.erezept.fhir.builder.HumanNameBuilder;
+import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
 import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
@@ -42,11 +48,17 @@ import org.hl7.fhir.r4.model.Meta;
 
 public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
 
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
+
   private final List<Identifier> identifiers = new LinkedList<>();
 
-  private HumanName name;
+  private String givenName;
+  private String familyName;
+  private String namePrefix;
   private Date birthDate;
   private Address address;
+
+  private String kvIdentifier;
   private IdentifierTypeDe identifierTypeDe;
   private OrganizationReference assignerRef;
 
@@ -81,17 +93,22 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
     return builder;
   }
 
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public PatientBuilder version(KbvItaForVersion version) {
+    this.kbvItaForVersion = version;
+    return this;
+  }
+
   public PatientBuilder kvIdentifierDe(
       @NonNull String kvIdentifier, @NonNull IdentifierTypeDe identifierTypeDe) {
-    val identifier = new Identifier();
-    identifier.setType(identifierTypeDe.asCodeableConcept());
-    if (identifierTypeDe == IdentifierTypeDe.GKV) {
-      identifier.setSystem(ErpNamingSystem.KVID.getCanonicalUrl());
-    } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
-      identifier.setSystem(ErpNamingSystem.ACME_IDS_PATIENT.getCanonicalUrl());
-    }
-    identifier.setValue(kvIdentifier);
-    this.identifiers.add(identifier);
+    this.kvIdentifier = kvIdentifier;
     this.identifierTypeDe = identifierTypeDe;
     return self();
   }
@@ -104,9 +121,13 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
    * @return builder
    */
   public PatientBuilder name(@NonNull String given, @NonNull String family) {
-    this.name = new HumanName();
-    this.name.setUse(HumanName.NameUse.OFFICIAL);
-    this.name.addGiven(given).setFamily(family);
+    return name(given, family, "");
+  }
+
+  public PatientBuilder name(@NonNull String given, @NonNull String family, String prefix) {
+    this.givenName = given;
+    this.familyName = family;
+    this.namePrefix = prefix;
     return self();
   }
 
@@ -163,19 +184,33 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
     checkRequired();
     val patient = new KbvPatient();
 
-    val profile = ErpStructureDefinition.KBV_FOR_PATIENT.asCanonicalType();
+    val profile = KbvItaForStructDef.PATIENT.asCanonicalType(kbvItaForVersion);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
     patient.setId(this.getResourceId()).setMeta(meta);
 
+    setIdentifier();
     if (identifierTypeDe == IdentifierTypeDe.PKV) {
       setPkvAssigner();
     }
 
+    val humanNameBuilder =
+        HumanNameBuilder.official()
+            .prefix(this.namePrefix)
+            .given(this.givenName)
+            .family(this.familyName);
+
+    HumanName humanName;
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      humanName = humanNameBuilder.build();
+    } else {
+      humanName = humanNameBuilder.buildExt();
+    }
+
     patient
         .setIdentifier(identifiers)
-        .setName(List.of(name))
+        .setName(List.of(humanName))
         .setBirthDate(birthDate)
         .setAddress(List.of(address));
 
@@ -190,25 +225,59 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
       checkRequired(assignerRef, "PKV Patient requires an assigner");
     }
 
-    this.checkRequired(name, "Patient requires a name");
+    this.checkRequired(givenName, "Patient requires a given name");
+    this.checkRequired(familyName, "Patient requires a family name");
     this.checkRequired(birthDate, "Patient requires a birthdate");
     this.checkRequired(address, "Patient requires an address");
   }
 
   private void setPkvAssigner() {
-    val pkvIdentifier =
-        this.identifiers.stream()
-            .filter(
-                identifier ->
-                    identifier.getType().getCoding().stream()
-                        .anyMatch(
-                            coding ->
-                                coding.getCode().equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(KbvPatient.class, "PKV Identifier"));
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      val pkvIdentifier =
+          this.identifiers.stream()
+              .filter(
+                  identifier ->
+                      identifier.getType().getCoding().stream()
+                          .anyMatch(
+                              coding ->
+                                  coding
+                                      .getCode()
+                                      .equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
+              .findFirst()
+              .orElseThrow(() -> new MissingFieldException(KbvPatient.class, "PKV Identifier"));
 
-    val assigner = pkvIdentifier.getAssigner();
-    assigner.setReference(assignerRef.getReference());
-    assigner.setDisplay(assignerRef.getDisplay());
+      val assigner = pkvIdentifier.getAssigner();
+      assigner.setReference(assignerRef.getReference());
+      assigner.setDisplay(assignerRef.getDisplay());
+    }
+    // TODO: what about the assigner in kbv.ita.for >= 1.1.0 ?
+  }
+
+  private void setIdentifier() {
+    INamingSystem kvidNamingSystem = null;
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      if (identifierTypeDe == IdentifierTypeDe.GKV) {
+        kvidNamingSystem = DeBasisNamingSystem.KVID;
+      } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
+        kvidNamingSystem = CommonNamingSystem.ACME_IDS_PATIENT;
+      }
+    } else {
+      if (identifierTypeDe == IdentifierTypeDe.GKV) {
+        kvidNamingSystem = DeBasisNamingSystem.KVID_GKV;
+      } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
+        kvidNamingSystem = DeBasisNamingSystem.KVID_PKV;
+      }
+    }
+
+    if (kvidNamingSystem == null) {
+      throw new BuilderException(
+          format("Patient-Builder contains unsupported IdentifierType {0}", identifierTypeDe));
+    }
+
+    val identifier = new Identifier();
+    identifier.setType(identifierTypeDe.asCodeableConcept());
+    identifier.setSystem(kvidNamingSystem.getCanonicalUrl());
+    identifier.setValue(kvIdentifier);
+    this.identifiers.add(identifier);
   }
 }

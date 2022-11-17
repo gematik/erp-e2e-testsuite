@@ -22,24 +22,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import java.util.Optional;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
-public class AssignerOrganizationBuilderTest {
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class AssignerOrganizationBuilderTest extends ParsingTest {
 
   @Test
   public void buildAssignerOrganizationWithFixedValues() {
@@ -51,7 +44,7 @@ public class AssignerOrganizationBuilderTest {
             .iknr(IKNR.from("757299999"))
             .phone("+490309876543")
             .email("info@praxis.de")
-            .address(Country.D, "Berlin", "10623", "Wegelystraße 3")
+            .address("Berlin", "10623", "Wegelystraße 3")
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
@@ -59,7 +52,15 @@ public class AssignerOrganizationBuilderTest {
   }
 
   @Test
-  public void buildAssignerOrganizationWithFaker() {
+  public void buildAssignerOrganizationWithFaker01() {
+    val orgRef = new OrganizationReference("id");
+    val organization = AssignerOrganizationBuilder.faker(orgRef, "AOK").build();
+    val result = ValidatorUtil.encodeAndValidate(parser, organization);
+    assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  public void buildAssignerOrganizationWithFaker02() {
     val organization = AssignerOrganizationBuilder.faker().build();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());

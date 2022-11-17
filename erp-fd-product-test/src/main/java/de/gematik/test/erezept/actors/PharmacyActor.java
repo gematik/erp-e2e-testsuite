@@ -16,12 +16,27 @@
 
 package de.gematik.test.erezept.actors;
 
-import lombok.extern.slf4j.Slf4j;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Slf4j
+@EqualsAndHashCode
 public class PharmacyActor extends ErpActor {
 
   public PharmacyActor(String name) {
     super(ActorType.PHARMACY, name);
+  }
+
+  public String getCommonName() {
+    val useSmcb = SafeAbility.getAbility(this, UseSMCB.class);
+    return useSmcb.getSmcB().getOwner().getCommonName();
+  }
+
+  public TelematikID getTelematikId() {
+    val useSmcb = SafeAbility.getAbility(this, UseSMCB.class);
+    return TelematikID.from(useSmcb.getTelematikID());
   }
 }

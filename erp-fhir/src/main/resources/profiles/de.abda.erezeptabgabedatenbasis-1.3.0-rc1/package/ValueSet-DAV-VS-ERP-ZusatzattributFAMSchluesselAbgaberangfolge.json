@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "draft",
+  "name": "DAV_VS_ERP_ZusatzattributFAMSchluesselAbgaberangfolge",
+  "id": "DAV-VS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge",
+  "version": "1.3",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge"
+      }
+    ]
+  }
+}

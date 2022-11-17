@@ -16,8 +16,11 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
@@ -30,8 +33,7 @@ public class BuilderUtil {
   }
 
   public static Extension dosageFlag(boolean value) {
-    return new Extension(
-        ErpStructureDefinition.KBV_DOSAGE_FLAG.getCanonicalUrl(), new BooleanType(value));
+    return new Extension(KbvItaErpStructDef.DOSAGE_FLAG.getCanonicalUrl(), new BooleanType(value));
   }
 
   /**
@@ -43,23 +45,22 @@ public class BuilderUtil {
    * @return Extension
    */
   public static Extension isBVG(boolean value) {
-    return new Extension(ErpStructureDefinition.KBV_BVG.getCanonicalUrl(), new BooleanType(value));
+    return new Extension(KbvItaErpStructDef.BVG.getCanonicalUrl(), new BooleanType(value));
   }
 
   public static Extension hasEmergencyServiceFee(boolean value) {
     return new Extension(
-        ErpStructureDefinition.KBV_EMERGENCY_SERVICES_FEE.getCanonicalUrl(),
-        new BooleanType(value));
+        KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.getCanonicalUrl(), new BooleanType(value));
   }
 
   public static Extension vaccine(boolean value) {
     return new Extension(
-        ErpStructureDefinition.KBV_MEDICATION_VACCINE.getCanonicalUrl(), new BooleanType(value));
+        KbvItaErpStructDef.MEDICATION_VACCINE.getCanonicalUrl(), new BooleanType(value));
   }
 
   public static Extension markingFlag(
       boolean insuranceProvider, boolean subsidy, boolean taxOffice) {
-    val markingFlag = new Extension(ErpStructureDefinition.GEM_MARKING_FLAG.getCanonicalUrl());
+    val markingFlag = new Extension(ErpWorkflowStructDef.MARKING_FLAG.getCanonicalUrl());
 
     val extInsurance = new Extension("insuranceProvider", new BooleanType(insuranceProvider));
     val extSubsidy = new Extension("subsidy", new BooleanType(subsidy));
@@ -70,7 +71,7 @@ public class BuilderUtil {
 
   public static Quantity packageQuantity(int amount) {
     val q = new Quantity();
-    q.setSystem(ErpCodeSystem.UCUM.getCanonicalUrl());
+    q.setSystem(CommonCodeSystem.UCUM.getCanonicalUrl());
     q.setCode("{Package}");
     q.setValue(amount);
     return q;
@@ -82,13 +83,13 @@ public class BuilderUtil {
 
   public static CodeableConcept dataAbsent(String value) {
     val coding = new Coding();
-    coding.setSystem(ErpCodeSystem.DATA_ABSENT.getCanonicalUrl()).setCode(value);
+    coding.setSystem(Hl7CodeSystem.DATA_ABSENT.getCanonicalUrl()).setCode(value);
     return new CodeableConcept(coding);
   }
 
   public static CodeableConcept kbvSectionType(String code) {
     val coding = new Coding();
-    coding.setSystem(ErpCodeSystem.SECTION_TYPE.getCanonicalUrl());
+    coding.setSystem(KbvCodeSystem.SECTION_TYPE.getCanonicalUrl());
     coding.setCode(code);
     return new CodeableConcept(coding);
   }

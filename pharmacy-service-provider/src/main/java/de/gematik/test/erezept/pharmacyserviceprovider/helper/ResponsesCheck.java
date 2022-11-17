@@ -20,6 +20,8 @@ import jakarta.ws.rs.core.Response;
 
 public class ResponsesCheck {
 
+  private ResponsesCheck() {}
+
   public static Response generateResponse(String transactionId, byte[] body, int respCode) {
     String respMessage = "erfolgreiche Datenübermittlung, no telematikID";
     if (ValidatePayload.stringIsNull(transactionId)) {

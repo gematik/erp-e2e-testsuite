@@ -16,8 +16,10 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.core.ArgumentComposer;
-import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -27,13 +29,18 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.fuzzing.kbv.KbvBundleManipulatorFactory;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
+import de.gematik.test.fuzzing.kbv.KbvBundleManipulatorFactory;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -49,21 +56,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static java.text.MessageFormat.format;
-
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Invalide Verordnungen")
 @Tag("Fuzzing")
 @WithTag("Fuzzing")
-public class ActivateInvalidKbvBundles extends ErpTest {
+class ActivateInvalidKbvBundles extends ErpTest {
 
   @Actor(name = "Bernd Claudius")
   private DoctorActor bernd;

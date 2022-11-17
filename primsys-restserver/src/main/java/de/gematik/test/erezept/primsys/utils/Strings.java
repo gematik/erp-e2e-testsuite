@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.utils;
 
+import java.util.function.Supplier;
+
 public class Strings {
 
   private Strings() {
@@ -24,5 +26,15 @@ public class Strings {
 
   public static boolean isNullOrEmpty(String value) {
     return value == null || value.isEmpty();
+  }
+
+  public static String getOrDefault(String value, String defaultSupplier) {
+    if (value == null || value.isEmpty()) return defaultSupplier;
+    return value;
+  }
+
+  public static <T> T getOrDefault(T value, Supplier<T> defaultSupplier) {
+    if (value == null) return defaultSupplier.get();
+    return value;
   }
 }

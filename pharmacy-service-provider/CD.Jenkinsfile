@@ -27,7 +27,7 @@ pipeline {
             when { expression { params.Action == 'start' } }
             steps {
                 echo "Start Service"
-                dockerRun(IMAGE_NAME, params.Version, SERVICE_NAME, "-ti -p6003:9095")
+                dockerRun(IMAGE_NAME, params.Version, SERVICE_NAME, "-ti -p6003:9095 --restart always")
             }
         }
 

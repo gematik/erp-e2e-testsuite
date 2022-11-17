@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -34,7 +34,7 @@ public enum PersonGroup implements IValueSet {
   SVA_2("08", "SVA2"),
   ASY("09", "ASY");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.PERSON_GROUP;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.PERSON_GROUP;
   public static final String VERSION = "1.02";
   public static final String DESCRIPTION =
       "Personengruppe: kennzeichnet, zu welcher Personengruppe der Versicherte gehört (§ 264 SGB V). Die Angabe ist auf der EGK vorhanden und auf der KVK Teil des Feldes: Statusergänzung";
@@ -50,13 +50,12 @@ public enum PersonGroup implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
-    return new Extension(
-        ErpStructureDefinition.GKV_PERSON_GROUP.getCanonicalUrl(), this.asCoding());
+    return new Extension(DeBasisStructDef.GKV_PERSON_GROUP.getCanonicalUrl(), this.asCoding());
   }
 
   public static PersonGroup fromCode(@NonNull String coding) {

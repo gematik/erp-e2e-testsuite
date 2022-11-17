@@ -18,7 +18,7 @@ package de.gematik.test.erezept;
 
 import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class ErpConfiguration {
 
   public static ErpConfiguration create() {
     val actors = TestsuiteConfiguration.getInstance();
-    val smartcards = SmartcardFactory.readArchive();
+    val smartcards = SmartcardFactory.getArchive();
     return new ErpConfiguration(actors, smartcards);
   }
 }

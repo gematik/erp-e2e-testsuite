@@ -16,65 +16,67 @@
 
 package de.gematik.test.smartcard;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.smartcard.exceptions.CardNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.val;
 
+@Getter
 public class SmartcardArchive {
 
-  @Getter private final List<SmcB> smcbCards;
+  private final List<SmcB> smcbCards;
+  private final List<Hba> hbaCards;
+  private final List<Egk> egkCards;
 
-  @Getter private final List<Hba> hbaCards;
-
-  @Getter private final List<Egk> egkCards;
-
-  public SmartcardArchive(List<SmcB> smcbCards, List<Hba> hbaCards, List<Egk> egkCards) {
+  protected SmartcardArchive(List<SmcB> smcbCards, List<Hba> hbaCards, List<Egk> egkCards) {
     this.smcbCards = smcbCards;
     this.hbaCards = hbaCards;
     this.egkCards = egkCards;
   }
 
   public List<Hba> getHbaCards(Crypto crypto) {
-    return hbaCards.stream()
-        .filter(hba -> hba.getAlgorithm() == crypto)
-        .collect(Collectors.toList());
+    return filter(hbaCards, crypto);
   }
 
   public Hba getHbaByICCSN(String iccsn, Crypto crypto) {
-    return getHbaCards(crypto).stream()
-        .filter(hba -> hba.getIccsn().equals(iccsn))
-        .findFirst()
-        .orElseThrow(() -> new CardNotFoundException(SmartcardType.HBA, iccsn, crypto));
+    return getSmartcardByIccsn(getHbaCards(crypto), iccsn);
   }
 
   public List<SmcB> getSmcbCards(Crypto crypto) {
-    return smcbCards.stream()
-        .filter(smcb -> smcb.getAlgorithm() == crypto)
-        .collect(Collectors.toList());
+    return filter(smcbCards, crypto);
   }
 
   public SmcB getSmcbByICCSN(String iccsn, Crypto crypto) {
-    return getSmcbCards(crypto).stream()
-        .filter(smcb -> smcb.getIccsn().equals(iccsn))
-        .findFirst()
-        .orElseThrow(() -> new CardNotFoundException(SmartcardType.SMC_B, iccsn, crypto));
+    return getSmartcardByIccsn(getSmcbCards(crypto), iccsn);
   }
 
   public List<Egk> getEgkCards(Crypto crypto) {
-    return egkCards.stream()
-        .filter(egk -> egk.getAlgorithm() == crypto)
-        .collect(Collectors.toList());
+    return filter(egkCards, crypto);
   }
 
   public Egk getEgkByICCSN(String iccsn, Crypto crypto) {
-    return getEgkCards(crypto).stream()
-        .filter(egk -> egk.getIccsn().equals(iccsn))
-        .findFirst()
-        .orElseThrow(() -> new CardNotFoundException(SmartcardType.EGK, iccsn, crypto));
+    return getSmartcardByIccsn(getEgkCards(crypto), iccsn);
   }
 
-  public void destroy() {
-    hbaCards.forEach(Hba::destroy);
+  private <T extends Smartcard> List<T> filter(List<T> cards, Crypto crypto) {
+    return cards.stream().filter(smartcard -> smartcard.getAlgorithm() == crypto).toList();
+  }
+
+  private <T extends Smartcard> T getSmartcardByIccsn(List<T> cards, String iccsn) {
+    // simply make a pre-check to ensure we can fetch a template from the list
+    if (cards.isEmpty()) {
+      throw new CardNotFoundException(
+          format(
+              "Cannot find smartcard with ICCSN {0} in an empty list of given smartcards", iccsn));
+    }
+    val template = cards.get(0);
+    val type = template.getType();
+    val crypto = template.getAlgorithm();
+    return cards.stream()
+        .filter(smartcard -> smartcard.getIccsn().equals(iccsn))
+        .findFirst()
+        .orElseThrow(() -> new CardNotFoundException(type, iccsn, crypto));
   }
 }

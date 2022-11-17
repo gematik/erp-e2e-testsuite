@@ -41,7 +41,7 @@ import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class RemoteKonnektorTest {
+class RemoteKonnektorTest {
 
   private static KonnektorModuleConfiguration cfg;
 

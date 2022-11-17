@@ -17,12 +17,12 @@
 package de.gematik.test.erezept.fhir.values;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 
 public class AccessCode extends Value<String> {
 
   public AccessCode(final String accessCode) {
-    super(ErpNamingSystem.ACCESS_CODE, accessCode);
+    super(ErpWorkflowNamingSystem.ACCESS_CODE, accessCode);
   }
 
   public static AccessCode random() {

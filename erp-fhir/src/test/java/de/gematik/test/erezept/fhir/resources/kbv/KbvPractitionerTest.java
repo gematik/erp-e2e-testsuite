@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class KbvPractitionerTest {
 
-  private final String BASE_PATH = "fhir/valid/kbv/bundle/";
+  private final String BASE_PATH = "fhir/valid/kbv/1.0.2/bundle/";
 
   private FhirParser parser;
 

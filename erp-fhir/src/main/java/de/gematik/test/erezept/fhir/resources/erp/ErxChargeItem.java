@@ -18,9 +18,8 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -31,7 +30,7 @@ import org.hl7.fhir.r4.model.Extension;
  * @see <a href="https://simplifier.net/erezept-workflow/erxchargeitem">ErxMedicationDispense</a>
  */
 @Slf4j
-@ResourceDef(name = "ChargeItem", profile = StructureDefinitionFixedUrls.GEM_ERX_CHARGE_ITEM)
+@ResourceDef(name = "ChargeItem")
 @SuppressWarnings({"java:S110"})
 public class ErxChargeItem extends ChargeItem {
 
@@ -39,11 +38,15 @@ public class ErxChargeItem extends ChargeItem {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
-                ErpNamingSystem.PRESCRIPTION_ID.getCanonicalUrl().equals(identifier.getSystem()))
+                ErpWorkflowNamingSystem.PRESCRIPTION_ID
+                    .getCanonicalUrl()
+                    .equals(identifier.getSystem()))
         .map(identifier -> new PrescriptionId(identifier.getValue()))
         .findFirst() // Prescription ID has cardinality of 1..1 anyways
         .orElseThrow(
-            () -> new MissingFieldException(this.getClass(), ErpNamingSystem.PRESCRIPTION_ID));
+            () ->
+                new MissingFieldException(
+                    this.getClass(), ErpWorkflowNamingSystem.PRESCRIPTION_ID));
   }
 
   public String getSubjectKvid() {
@@ -82,12 +85,9 @@ public class ErxChargeItem extends ChargeItem {
 
   private Extension getMarkingFlag() {
     return this.getExtension().stream()
-        .filter(
-            ext -> ext.getUrl().equals(ErpStructureDefinition.GEM_MARKING_FLAG.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(ErpWorkflowStructDef.MARKING_FLAG.getCanonicalUrl()))
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(), ErpStructureDefinition.GEM_MARKING_FLAG));
+            () -> new MissingFieldException(this.getClass(), ErpWorkflowStructDef.MARKING_FLAG));
   }
 }

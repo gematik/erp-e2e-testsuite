@@ -16,8 +16,10 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.core.ArgumentComposer;
-import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.FhirRequirements;
@@ -27,9 +29,14 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.fuzzing.core.ByteArrayMutator;
-import de.gematik.test.fuzzing.string.SimpleMutatorsFactory;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.core.StringMutator;
+import de.gematik.test.fuzzing.string.SimpleMutatorsFactory;
 import de.gematik.test.fuzzing.string.XmlRegExpFactory;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -43,21 +50,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static java.text.MessageFormat.format;
-
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Verordnungen mit String Fuzzing")
 @Tag("Fuzzing")
 @WithTag("Fuzzing")
-public class ActivateFuzzedKbvBundles extends ErpTest {
+class ActivateFuzzedKbvBundles extends ErpTest {
 
   private static final Integer iterations =
       Integer.parseInt(System.getProperty("FUZZING_ITERATIONS", "10"));

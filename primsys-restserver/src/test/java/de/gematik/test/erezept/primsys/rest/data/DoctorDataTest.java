@@ -16,7 +16,8 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,20 +26,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.primsys.model.actor.Doctor;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class DoctorDataTest {
+class DoctorDataTest {
 
   private ObjectMapper mapper;
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     mapper = new ObjectMapper();
   }
 
   @Test
-  public void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
+  void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
     val doc = mock(Doctor.class);
     val tiData = new TelematikData();
     tiData.setFachdienst("http://localhost");

@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,7 +35,7 @@ public enum ConsentScope implements IValueSet {
       "Agreement to collect, access, use or disclose (share) information"),
   TREATMENT("treatment", "Treatment", "Consent to undergo a specific treatment");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.CONSENT_SCOPE;
+  public static final Hl7CodeSystem CODE_SYSTEM = Hl7CodeSystem.CONSENT_SCOPE;
   public static final String VERSION = "0.1.0";
   public static final String DESCRIPTION = "The Scope of a Consent";
   public static final String PUBLISHER = "CBCC";
@@ -51,7 +51,7 @@ public enum ConsentScope implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public Hl7CodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

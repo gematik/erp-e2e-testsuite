@@ -31,13 +31,12 @@ import de.gematik.test.konnektor.commands.ExternalAuthenticateCommand;
 import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import de.gematik.test.konnektor.commands.VerifyPinCommand;
 import de.gematik.test.smartcard.SmartcardArchive;
+import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.test.smartcard.SmartcardType;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResponseType;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
 import java.nio.charset.StandardCharsets;
 import lombok.val;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -47,12 +46,7 @@ class UseTheKonnektorTest {
 
   @BeforeAll
   static void setup() {
-    sca = SmartcardFactory.readArchive();
-  }
-
-  @AfterAll
-  static void teardown() {
-    sca.destroy();
+    sca = SmartcardFactory.getArchive();
   }
 
   @Test

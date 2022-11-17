@@ -17,27 +17,21 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static java.text.MessageFormat.format;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
 @Slf4j
-public class PatientBuilderTest {
-
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class PatientBuilderTest extends ParsingTest {
 
   @Test
   public void buildGkvPatientWithFaker() {

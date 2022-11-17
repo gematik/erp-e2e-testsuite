@@ -16,33 +16,34 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
-import static org.junit.Assert.*;
+import static de.gematik.test.erezept.primsys.rest.data.PatientData.create;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public class PatientDataTest {
-  private ObjectMapper mapper;
+class PatientDataTest {
+  static ObjectMapper mapper;
 
-  @Before
-  public void setup() {
+  @BeforeAll
+  static void setup() {
     mapper = new ObjectMapper();
   }
 
   @Test
-  public void roundTripSerialize() throws JsonProcessingException {
-    val data = PatientData.create();
+  void roundTripSerialize() throws JsonProcessingException {
+    val data = create();
     assertNotNull(data);
     val json = mapper.writeValueAsString(data);
     assertNotNull(json);
   }
 
   @Test
-  public void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
+  void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
     val kbvBundle = KbvErpBundleBuilder.faker("X123456789", "04773414").build();
     val data = PatientData.fromKbvBundle(kbvBundle);
     assertNotNull(data);
@@ -58,18 +59,84 @@ public class PatientDataTest {
   }
 
   @Test
-  public void generateRandomBaseData() {
+  void generateRandomBaseData() {
     val data = new PatientData();
-    assertNull("Patient must NOT get a faked KVNR", data.getKvnr());
+    assertNull(data.getKvnr(), "Patient must NOT get a faked KVNR");
     data.setKvnr("X1234567890");
     assertEquals("X1234567890", data.getKvnr());
 
-    assertNotNull("Patient must get a faked FirstName", data.getFirstName());
-    assertNotNull("Patient must get a faked LastName", data.getLastName());
-    assertNotNull("Patient must get a faked Birthdate", data.getBirthDate());
+    assertNotNull(data.getFirstName(), "Patient must get a faked FirstName");
+    assertNotNull(data.getLastName(), "Patient must get a faked LastName");
+    assertNotNull(data.getBirthDate(), "Patient must get a faked Birthdate");
 
-    assertNotNull("Patient must get a faked City", data.getCity());
-    assertNotNull("Patient must get a faked Postal Code", data.getPostal());
-    assertNotNull("Patient must get a faked Street", data.getStreet());
+    assertNotNull(data.getCity(), "Patient must get a faked City");
+    assertNotNull(data.getPostal(), "Patient must get a faked Postal Code");
+    assertNotNull(data.getStreet(), "Patient must get a faked Street");
+  }
+
+  @Test
+  void creatPatientDataWithEmptyPatientData() {
+    val emptyPd = new PatientData();
+    emptyPd.fakeMissing();
+    assertFalse(emptyPd.getKvnr().isEmpty());
+    assertFalse(emptyPd.getFirstName().isEmpty());
+    assertFalse(emptyPd.getLastName().isEmpty());
+    assertFalse(emptyPd.getBirthDate().isEmpty());
+    assertFalse(emptyPd.getCity().isEmpty());
+    assertFalse(emptyPd.getPostal().isEmpty());
+    assertFalse(emptyPd.getStreet().isEmpty());
+  }
+
+  @Test
+  void creatPatientDataWithFilledPatientData() {
+    val filledUpWithCreate = create();
+    filledUpWithCreate.fakeMissing();
+    assertFalse(filledUpWithCreate.getKvnr().isEmpty());
+    assertFalse(filledUpWithCreate.getFirstName().isEmpty());
+    assertFalse(filledUpWithCreate.getLastName().isEmpty());
+    assertFalse(filledUpWithCreate.getBirthDate().isEmpty());
+    assertFalse(filledUpWithCreate.getCity().isEmpty());
+    assertFalse(filledUpWithCreate.getPostal().isEmpty());
+    assertFalse(filledUpWithCreate.getStreet().isEmpty());
+  }
+
+  @Test
+  void creatPatientDataWithNullParts() {
+    val emptyPd = new PatientData();
+    emptyPd.setKvnr(null);
+    emptyPd.setFirstName(null);
+    emptyPd.setLastName(null);
+    emptyPd.setBirthDate(null);
+    emptyPd.setCity(null);
+    emptyPd.setPostal(null);
+    emptyPd.setStreet(null);
+    emptyPd.fakeMissing();
+    assertFalse(emptyPd.getKvnr().isEmpty());
+    assertFalse(emptyPd.getFirstName().isEmpty());
+    assertFalse(emptyPd.getLastName().isEmpty());
+    assertFalse(emptyPd.getBirthDate().isEmpty());
+    assertFalse(emptyPd.getCity().isEmpty());
+    assertFalse(emptyPd.getPostal().isEmpty());
+    assertFalse(emptyPd.getStreet().isEmpty());
+  }
+
+  @Test
+  void creatPatientDataWithEmptyParts() {
+    val emptyPd = new PatientData();
+    emptyPd.setKvnr("");
+    emptyPd.setFirstName("");
+    emptyPd.setLastName("");
+    emptyPd.setBirthDate("");
+    emptyPd.setCity("");
+    emptyPd.setPostal("");
+    emptyPd.setStreet("");
+    emptyPd.fakeMissing();
+    assertFalse(emptyPd.getKvnr().isEmpty());
+    assertFalse(emptyPd.getFirstName().isEmpty());
+    assertFalse(emptyPd.getLastName().isEmpty());
+    assertFalse(emptyPd.getBirthDate().isEmpty());
+    assertFalse(emptyPd.getCity().isEmpty());
+    assertFalse(emptyPd.getPostal().isEmpty());
+    assertFalse(emptyPd.getStreet().isEmpty());
   }
 }

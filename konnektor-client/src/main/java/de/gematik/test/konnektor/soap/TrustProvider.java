@@ -100,8 +100,8 @@ public class TrustProvider {
 
   private static X509TrustManager findX509TrustManager(TrustManager[] all) {
     return Arrays.stream(all)
-        .filter(tm -> tm instanceof X509TrustManager)
-        .map(tm -> (X509TrustManager) tm)
+        .filter(X509TrustManager.class::isInstance)
+        .map(X509TrustManager.class::cast)
         .findFirst()
         .orElseThrow();
   }

@@ -27,4 +27,8 @@ public class CardNotFoundException extends RuntimeException {
     super(
         format("Card of type {0} with ICCSN {1} and Algorithm {2} not found", type, iccsn, crypto));
   }
+
+  public CardNotFoundException(String message) {
+    super(message);
+  }
 }

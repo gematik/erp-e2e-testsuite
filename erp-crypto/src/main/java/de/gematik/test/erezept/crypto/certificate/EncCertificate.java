@@ -23,10 +23,6 @@ import java.security.cert.X509Certificate;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import lombok.val;
-import org.bouncycastle.asn1.ASN1PrintableString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 public class EncCertificate extends Certificate {
@@ -40,7 +36,7 @@ public class EncCertificate extends Certificate {
       throw new CertificateException(
           format(
               "Certificate {} does not contain the RSA encryption oid",
-              cert.getSubjectDN().getName()));
+              cert.getSubjectX500Principal().getName()));
     }
   }
 
@@ -54,12 +50,6 @@ public class EncCertificate extends Certificate {
   }
 
   public Optional<String> getTelematikId() {
-    val valueIsIsMttAdmission =
-        (ASN1Sequence)
-            certHolder
-                .getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_admission)
-                .getParsedValue();
-    return getAsn1ElementByType(valueIsIsMttAdmission.iterator(), ASN1PrintableString.class)
-        .map(ASN1PrintableString::getString);
+    return getProfessionItemValue();
   }
 }

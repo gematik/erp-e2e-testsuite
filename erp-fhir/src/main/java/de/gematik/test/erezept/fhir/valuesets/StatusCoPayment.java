@@ -17,11 +17,14 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.val;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
 
 /**
@@ -40,7 +43,7 @@ public enum StatusCoPayment implements IValueSet {
   STATUS_2("2", "künstliche Befruchtung (Regelung nach § 27a SGB V)"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.STATUS_CO_PAYMENT;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.STATUS_CO_PAYMENT;
   public static final String VERSION = "1.0.1";
   public static final String DESCRIPTION = "NO DESCRIPTION";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
@@ -60,13 +63,23 @@ public enum StatusCoPayment implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
+  public Coding asCoding(KbvCodeSystem system) {
+    val coding = new Coding();
+    coding.setCode(this.getCode());
+    coding.setSystem(system.getCanonicalUrl());
+    return coding;
+  }
+
   public Extension asExtension() {
-    return new Extension(
-        ErpStructureDefinition.KBV_STATUS_CO_PAYMENT.getCanonicalUrl(), this.asCoding());
+    return this.asExtension(KbvItaErpStructDef.STATUS_CO_PAYMENT, this.getCodeSystem());
+  }
+
+  public Extension asExtension(IStructureDefinition<?> structDef, KbvCodeSystem system) {
+    return new Extension(structDef.getCanonicalUrl(), this.asCoding(system));
   }
 
   public static StatusCoPayment fromCode(@NonNull String code) {

@@ -16,14 +16,11 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
 import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
 import lombok.val;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
 
-@ResourceDef(name = "Organization", profile = StructureDefinitionFixedUrls.KBV_PR_FOR_ORGANIZATION)
 @SuppressWarnings({"java:S110"})
 public class AssignerOrganization extends InstitutionalOrganization {
 

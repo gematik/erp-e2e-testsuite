@@ -64,6 +64,7 @@ public class PrescriptionData {
     prescriptionData.setTaskId(prescriptionTask.getUnqualifiedId());
     prescriptionData.setAuthoredOn(prescriptionTask.getAuthoredOn());
     prescriptionData.setAuthoredOnFormatted(formatDate(prescriptionTask.getAuthoredOn()));
+    patient.fakeMissing();
     prescriptionData.setPatient(patient);
     prescriptionData.setMedication(medication);
     prescriptionData.setCoverage(coverage);

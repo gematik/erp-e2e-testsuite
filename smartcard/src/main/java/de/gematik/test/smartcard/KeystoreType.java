@@ -19,6 +19,7 @@ package de.gematik.test.smartcard;
 import de.gematik.test.smartcard.exceptions.InvalidFileExtensionException;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.val;
 
 public enum KeystoreType {
   P12("PKCS12", ".p12"),
@@ -33,14 +34,13 @@ public enum KeystoreType {
     this.fileExtension = extension;
   }
 
-  public static KeystoreType fromFileExtension(@NonNull String fileExtension) {
-    switch (fileExtension.toLowerCase().strip().replace("-", "")) {
-      case "p12":
-        return P12;
-      case "jks":
-        return JKS;
-      default:
-        throw new InvalidFileExtensionException(fileExtension);
-    }
+  public static KeystoreType fromFileExtension(@NonNull String fileName) {
+    val tokens = fileName.split("\\.");
+    val ext = tokens.length >= 2 ? tokens[1] : tokens[0];
+    return switch (ext.toLowerCase()) {
+      case "p12" -> P12;
+      case "jks" -> JKS;
+      default -> throw new InvalidFileExtensionException(fileName);
+    };
   }
 }

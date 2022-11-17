@@ -20,7 +20,9 @@ import lombok.Getter;
 
 public enum KbvProfileRules implements RequirementsSet {
   AUTHORED_ON_DATEFORMAT(
-      "AUTHORED_ON_DATEFORMAT", "Begrenzung der Datumsangabe auf 10 Zeichen JJJJ-MM-TT");
+      "AUTHORED_ON_DATEFORMAT", "Begrenzung der Datumsangabe auf 10 Zeichen JJJJ-MM-TT"),
+  ACCIDENT_EXTENSION(
+      "UNFALLKENNZEICHEN", "Unfallkennzeichen müssen den Regeln der Profiling entsprechen");
 
   @Getter private final Requirement requirement;
 

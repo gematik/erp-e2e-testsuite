@@ -19,6 +19,7 @@ package de.gematik.test.erezept.app.cfg;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.gematik.test.erezept.app.exceptions.ActorConfigurationNotFoundException;
+import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
@@ -77,14 +78,28 @@ public class ErpAppConfiguration {
     return this.apps.stream()
         .filter(app -> app.getPlatformType() == platformType)
         .findFirst()
-        .orElseThrow(); // TODO: throw semantic Exception
+        .orElseThrow(
+            () ->
+                new ConfigurationMappingException(
+                    platformType.name(),
+                    apps.stream().map(AppConfiguration::getPlatform).collect(Collectors.toList())));
+  }
+
+  public AppConfiguration getAppConfigurationForUser(@NonNull String username) {
+    val userDeviceName = this.getAppUserByName(username).getDevice();
+    val device = this.getDeviceByName(userDeviceName);
+    return getAppConfiguration(device.getPlatformType());
   }
 
   public AppiumConfiguration getAppiumConfiguration(@NonNull String name) {
     return appium.stream()
         .filter(a -> a.getId().equalsIgnoreCase(name))
         .findFirst()
-        .orElseThrow(); // TODO: throw a specific semantic Exception
+        .orElseThrow(
+            () ->
+                new ConfigurationMappingException(
+                    name,
+                    appium.stream().map(AppiumConfiguration::getId).collect(Collectors.toList())));
   }
 
   public static ErpAppConfiguration getInstance() {

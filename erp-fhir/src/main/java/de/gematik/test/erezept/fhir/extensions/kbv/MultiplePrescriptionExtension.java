@@ -17,11 +17,9 @@
 package de.gematik.test.erezept.fhir.extensions.kbv;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Optional;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import java.util.*;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -57,8 +55,11 @@ public class MultiplePrescriptionExtension {
   }
 
   public Extension asExtension() {
-    val outerExt =
-        new Extension(ErpStructureDefinition.KBV_MULTIPLE_PRESCRIPTION.getCanonicalUrl());
+    return asExtension(KbvItaErpVersion.getDefaultVersion());
+  }
+
+  public Extension asExtension(KbvItaErpVersion kbvItaErpVersion) {
+    val outerExt = new Extension(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl());
     val kennzeichenExt = new Extension("Kennzeichen", new BooleanType(isMultiple));
 
     val innerExtensions = new LinkedList<Extension>();
@@ -74,6 +75,14 @@ public class MultiplePrescriptionExtension {
 
       innerExtensions.add(numExtension);
       innerExtensions.add(periodExt);
+
+      if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) >= 0) {
+        val idSystem = "urn:ietf:rfc:3986";
+        val id = "urn:uuid:" + UUID.randomUUID();
+        val mvoIdentifier = new Identifier().setSystem(idSystem).setValue(id);
+        val idExt = new Extension("ID", mvoIdentifier);
+        innerExtensions.add(idExt);
+      }
     }
 
     outerExt.setExtension(innerExtensions);
@@ -118,17 +127,32 @@ public class MultiplePrescriptionExtension {
      * @return MultiplePrescriptionExtension
      */
     public MultiplePrescriptionExtension withoutEndDate() {
-      return validUntil(null);
+      return withoutEndDate(true);
+    }
+
+    public MultiplePrescriptionExtension withoutEndDate(boolean autStart) {
+      return validUntil(null, autStart);
     }
 
     public MultiplePrescriptionExtension validForDays(int amount) {
+      return validForDays(amount, true);
+    }
+
+    public MultiplePrescriptionExtension validForDays(int amount, boolean autoStart) {
       val cal = Calendar.getInstance();
       cal.add(Calendar.DATE, amount);
       val end = cal.getTime();
-      return validUntil(end);
+      return validUntil(end, autoStart);
     }
 
     public MultiplePrescriptionExtension validUntil(Date end) {
+      return validUntil(end, true);
+    }
+
+    public MultiplePrescriptionExtension validUntil(Date end, boolean autoStart) {
+      if (autoStart && start == null) {
+        start = new Date();
+      }
       return validThrough(start, end);
     }
 

@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -28,7 +28,7 @@ public enum PayorType implements IValueSet {
   UK("UK", "Unfallkassen"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.PAYOR_TYPE;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.PAYOR_TYPE;
   public static final String VERSION = "1.0.3";
   public static final String DESCRIPTION = "Zulässige Kostenträgerarten";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
@@ -44,7 +44,7 @@ public enum PayorType implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

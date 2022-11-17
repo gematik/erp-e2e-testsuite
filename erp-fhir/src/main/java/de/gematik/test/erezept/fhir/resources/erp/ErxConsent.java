@@ -18,8 +18,7 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
 import de.gematik.test.erezept.fhir.valuesets.ConsentType;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +27,11 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Consent;
 import org.hl7.fhir.r4.model.Resource;
 
-/** @see <a href="https://simplifier.net/erezept-workflow/erxconsent">ErxConsent</a> */
+/**
+ * @see <a href="https://simplifier.net/erezept-workflow/erxconsent">ErxConsent</a>
+ */
 @Slf4j
-@ResourceDef(name = "Consent", profile = StructureDefinitionFixedUrls.GEM_ERX_CONSENT)
+@ResourceDef(name = "Consent")
 @SuppressWarnings({"java:S110"})
 public class ErxConsent extends Consent {
 
@@ -43,11 +44,12 @@ public class ErxConsent extends Consent {
                         coding ->
                             coding
                                 .getSystem()
-                                .equals(ErpCodeSystem.CONSENT_TYPE.getCanonicalUrl())))
+                                .equals(ErpWorkflowCodeSystem.CONSENT_TYPE.getCanonicalUrl())))
         .map(CodeableConcept::getCodingFirstRep)
         .map(coding -> ConsentType.fromCode(coding.getCode()))
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), ErpCodeSystem.CONSENT_TYPE));
+        .orElseThrow(
+            () -> new MissingFieldException(this.getClass(), ErpWorkflowCodeSystem.CONSENT_TYPE));
   }
 
   public ConsentScope getConsentScope() {

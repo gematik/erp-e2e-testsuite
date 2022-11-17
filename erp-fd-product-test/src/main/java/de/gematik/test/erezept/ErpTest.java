@@ -20,10 +20,9 @@ import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.exceptions.NotAnActorException;
 import de.gematik.test.core.extensions.ErpTestExtension;
 import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.lei.exceptions.ConfigurationMappingException;
+import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,7 +102,7 @@ public abstract class ErpTest {
     val actorFields =
         Arrays.stream(this.getClass().getDeclaredFields())
             .filter(field -> field.getAnnotation(Actor.class) != null)
-            .collect(Collectors.toList());
+            .toList();
 
     actorFields.forEach(this::instrumentActorField);
   }

@@ -24,7 +24,9 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1PrintableString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 
 public abstract class Certificate {
@@ -41,13 +43,23 @@ public abstract class Certificate {
       val element = iter.next();
       if (type.isInstance(element)) {
         return Optional.of(type.cast(element));
-      } else if (element instanceof ASN1Sequence) {
-        val ret = getAsn1ElementByType(((ASN1Sequence) element).iterator(), type);
+      } else if (element instanceof ASN1Sequence asn1Sequence) {
+        val ret = getAsn1ElementByType((asn1Sequence).iterator(), type);
         if (ret.isPresent()) {
           return ret;
         }
       }
     }
     return Optional.empty();
+  }
+
+  public Optional<String> getProfessionItemValue() {
+    val valueIsIsMttAdmission =
+        (ASN1Sequence)
+            certHolder
+                .getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_admission)
+                .getParsedValue();
+    return getAsn1ElementByType(valueIsIsMttAdmission.iterator(), ASN1PrintableString.class)
+        .map(ASN1PrintableString::getString);
   }
 }

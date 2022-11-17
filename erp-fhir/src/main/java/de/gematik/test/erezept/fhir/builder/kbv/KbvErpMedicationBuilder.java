@@ -20,9 +20,11 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.BuilderUtil;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
@@ -33,9 +35,13 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Ratio;
+import org.hl7.fhir.r4.model.StringType;
 
 public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedicationBuilder> {
 
+  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
+
+  private BaseMedicationType baseMedicationType = BaseMedicationType.MEDICAL_PRODUCT;
   private MedicationCategory category = MedicationCategory.C_00;
   private boolean isVaccine = false;
   private StandardSize normgroesse = StandardSize.NB;
@@ -45,7 +51,9 @@ public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedic
 
   private PZN pzn;
   private String medicationName;
-  private Ratio amount;
+
+  private long amountNumerator;
+  private String amountNumeratorUnit;
 
   public static KbvErpMedicationBuilder builder() {
     return new KbvErpMedicationBuilder();
@@ -60,18 +68,37 @@ public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedic
   }
 
   public static KbvErpMedicationBuilder faker(String pzn, String name) {
-    return faker(pzn, name, fakerValueSet(MedicationCategory.class));
+    return faker(pzn, name, MedicationCategory.C_00);
   }
 
   public static KbvErpMedicationBuilder faker(
       String pzn, String name, MedicationCategory category) {
     return builder()
+        .type(BaseMedicationType.MEDICAL_PRODUCT) // for now only Medical Products
         .category(category)
         .isVaccine(false)
         .normgroesse(fakerValueSet(StandardSize.class))
         .darreichungsform(fakerValueSet(Darreichungsform.class))
         .amount(fakerAmount(), "Stk")
         .pzn(pzn, name);
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public KbvErpMedicationBuilder version(KbvItaErpVersion version) {
+    this.kbvItaErpVersion = version;
+    return this;
+  }
+
+  public KbvErpMedicationBuilder type(BaseMedicationType type) {
+    this.baseMedicationType = type;
+    return self();
   }
 
   public KbvErpMedicationBuilder category(MedicationCategory category) {
@@ -109,24 +136,35 @@ public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedic
   }
 
   public KbvErpMedicationBuilder amount(long numerator, String unit) {
-    // probably some library required for mapping Darreichungsform to ucum e.g. Eclipse UOMo
-    // https://ucum.org/trac
-    // NOTE: MedicationRequest has also a quantity: possible to re-use?
-    this.amount = new Ratio();
-    amount.getDenominator().setValue(1); // always 1 defined by the Profile (??)
-    amount.getNumerator().setValue(numerator).setUnit(unit);
+    this.amountNumerator = numerator;
+    this.amountNumeratorUnit = unit;
     return self();
   }
 
   public KbvErpMedication build() {
     val medication = new KbvErpMedication();
 
-    val profile = ErpStructureDefinition.KBV_MEDICATION_PZN.asCanonicalType();
+    val profile = KbvItaErpStructDef.MEDICATION_PZN.asCanonicalType(kbvItaErpVersion);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
     medication.setId(this.getResourceId()).setMeta(meta);
     this.defaultAmount();
+
+    val amount = new Ratio();
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+      amount.getNumerator().setValue(amountNumerator);
+    } else {
+      extensions.add(baseMedicationType.asExtension());
+
+      val numerator = amount.getNumerator();
+      numerator
+          .addExtension()
+          .setValue(new StringType(String.valueOf(amountNumerator)))
+          .setUrl(KbvItaErpStructDef.PACKAGING_SIZE.getCanonicalUrl());
+    }
+    amount.getNumerator().setUnit(amountNumeratorUnit);
+    amount.getDenominator().setValue(1); // always 1 defined by the Profile (??)
 
     // handle default values
     extensions.add(category.asExtension());
@@ -149,10 +187,9 @@ public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedic
    * <p>See also the comment in this.amount(..)
    */
   private void defaultAmount() {
-    if (amount == null) {
-      this.amount = new Ratio();
-      amount.getDenominator().setValue(1);
-      amount.getNumerator().setValue(1).setUnit("Stk");
+    if (amountNumerator <= 0) {
+      this.amountNumerator = 1;
+      this.amountNumeratorUnit = "Stk";
     }
   }
 }

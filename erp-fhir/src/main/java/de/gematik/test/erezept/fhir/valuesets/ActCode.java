@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -44,7 +44,7 @@ public enum ActCode implements IValueSet {
       "opt-out with exceptions",
       "A grantor's dissent to the grantee's terms of agreement except for certain grantor or grantee selected terms.");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.ACT_CODE;
+  public static final Hl7CodeSystem CODE_SYSTEM = Hl7CodeSystem.ACT_CODE;
   public static final String VERSION = "5.0.0";
   public static final String DESCRIPTION =
       "A code specifying the particular kind of Act that the Act-instance represents within its class.";
@@ -61,7 +61,7 @@ public enum ActCode implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public Hl7CodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

@@ -29,7 +29,15 @@ public enum SwipeDirection {
   LEFT,
   RIGHT;
 
+  public Sequence swipeSlowly(Dimension dimension) {
+    return swipeOn(dimension, 500);
+  }
+
   public Sequence swipeOn(Dimension dimension) {
+    return swipeOn(dimension, 100);
+  }
+
+  public Sequence swipeOn(Dimension dimension, long millis) {
     val edgeBorderX = (int) (dimension.width * 0.1); // avoid swiping to or from edges
     val edgeBorderY = (int) (dimension.height * 0.1);
     val swipeDistX = dimension.width - 2 * edgeBorderX;
@@ -66,7 +74,7 @@ public enum SwipeDirection {
     swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.MIDDLE.asArg()));
     swipe.addAction(
         finger.createPointerMove(
-            Duration.ofMillis(100), PointerInput.Origin.viewport(), endPoint.x, endPoint.y));
+            Duration.ofMillis(millis), PointerInput.Origin.viewport(), endPoint.x, endPoint.y));
     swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.MIDDLE.asArg()));
 
     return swipe;

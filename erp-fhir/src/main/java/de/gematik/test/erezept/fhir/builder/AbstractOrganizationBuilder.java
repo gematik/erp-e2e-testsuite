@@ -16,9 +16,9 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
@@ -54,15 +54,15 @@ public abstract class AbstractOrganizationBuilder<T extends AbstractOrganization
   }
 
   protected final Organization buildOrganizationWith(
-      ErpStructureDefinition sd, Identifier identifier) {
-    return buildOrganizationWith(sd, List.of(identifier));
+      Supplier<CanonicalType> profileSupplier, Identifier identifier) {
+    return buildOrganizationWith(profileSupplier, List.of(identifier));
   }
 
   protected final Organization buildOrganizationWith(
-      ErpStructureDefinition sd, List<Identifier> identifiers) {
+      Supplier<CanonicalType> profileSupplier, List<Identifier> identifiers) {
     val organization = new Organization();
 
-    val profile = sd.asCanonicalType();
+    val profile = profileSupplier.get();
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI

@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 
 public class TelematikID extends Value<String> {
 
   private TelematikID(String telematikId) {
-    super(ErpNamingSystem.TELEMATIK_ID, telematikId);
+    super(ErpWorkflowNamingSystem.TELEMATIK_ID, telematikId);
   }
 
   public static TelematikID from(String value) {

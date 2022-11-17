@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.values;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.Coding;
 public class PZN extends Value<String> {
 
   private PZN(String value) {
-    super(ErpCodeSystem.PZN, value);
+    super(DeBasisCodeSystem.PZN, value);
   }
 
   public Coding asCoding() {

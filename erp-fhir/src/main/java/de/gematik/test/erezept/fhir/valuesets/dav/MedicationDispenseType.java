@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public enum MedicationDispenseType implements IValueSet {
   ABGABE("Abgabeinformationen", "MedicationDispense repräsentiert Abgabeinformationen"),
   ZUSATZ("ZusatzdatenHerstellung", "MedicationDispense repräsentiert ZusatzdatenHerstellung");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.DAV_CS_ERP_MEDICATIONDISPENSE_TYPE;
+  public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.MEDICATIONDISPENSE_TYPE;
   public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "Type of the dispensed medication";
   public static final String PUBLISHER = "DAV";
@@ -44,7 +44,7 @@ public enum MedicationDispenseType implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

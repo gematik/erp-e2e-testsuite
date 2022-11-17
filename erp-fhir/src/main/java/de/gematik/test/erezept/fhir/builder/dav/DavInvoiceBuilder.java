@@ -18,7 +18,9 @@ package de.gematik.test.erezept.fhir.builder.dav;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.extensions.dav.VatRate;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.util.Currency;
 import de.gematik.test.erezept.fhir.values.PZN;
@@ -34,6 +36,8 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.StringType;
 
 public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder> {
+
+  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
 
   private final List<PriceComponentData> priceComponents;
   private final InvoiceType type;
@@ -53,6 +57,19 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
 
   public static DavInvoiceBuilder builder(InvoiceType type) {
     return new DavInvoiceBuilder(type);
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public DavInvoiceBuilder version(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersion = version;
+    return this;
   }
 
   public DavInvoiceBuilder vatRate(float floatValue) {
@@ -87,7 +104,8 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
   public DavInvoice build() {
     val invoice = new DavInvoice();
 
-    val profile = ErpStructureDefinition.DAV_INVOICE.asCanonicalType();
+    val profile =
+        AbdaErpPkvStructDef.PKV_ABRECHNUNGSZEILEN.asCanonicalType(abdaErpPkvVersion, true);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -110,7 +128,7 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
       if (item.hasBatch()) {
         lineItemComponent
             .addExtension()
-            .setUrl(ErpStructureDefinition.DAV_EX_ERP_CHARGENBEZEICHNUNG.getCanonicalUrl())
+            .setUrl(AbdaErpBasisStructDef.CHARGENBEZEICHNUNG.getCanonicalUrl())
             .setValue(new StringType(item.batchDesignation));
       }
     }
@@ -144,7 +162,7 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
                             ext ->
                                 ext.getUrl()
                                     .equals(
-                                        ErpStructureDefinition.DAV_EX_ERP_KOSTEN_VERSICHERTER
+                                        AbdaErpBasisStructDef.KOSTEN_VERSICHERTER
                                             .getCanonicalUrl()))
                         .map(ext -> ext.getExtensionByUrl("Kostenbetrag"))
                         .mapToDouble(

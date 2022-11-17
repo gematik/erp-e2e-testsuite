@@ -23,8 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.gematik.test.erezept.client.cfg.INamedConfiguration;
+import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
 import de.gematik.test.erezept.lei.cfg.util.PartialConfigSubstituter;
-import de.gematik.test.erezept.lei.exceptions.ConfigurationMappingException;
+import de.gematik.test.erezept.pspwsclient.config.PSPClientConfig;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorConfiguration;
 import de.gematik.test.konnektor.cfg.LocalKonnektorConfiguration;
@@ -33,7 +34,6 @@ import de.gematik.test.konnektor.exceptions.MissingKonnektorKonfigurationExcepti
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +56,11 @@ public class TestsuiteConfiguration {
   private static TestsuiteConfiguration instance;
 
   private String activeEnvironment;
+
+  private boolean preferManualSteps = false;
+
+  private PSPClientConfig pspClientConfig;
+
   private ActorsConfiguration actors;
   private List<EnvironmentConfiguration> environments;
   private List<KonnektorConfiguration> konnektors;
@@ -137,10 +142,7 @@ public class TestsuiteConfiguration {
         .orElseThrow(
             () ->
                 new ConfigurationMappingException(
-                    name,
-                    configs.stream()
-                        .map(INamedConfiguration::getName)
-                        .collect(Collectors.toList())));
+                    name, configs.stream().map(INamedConfiguration::getName).toList()));
   }
 
   @SneakyThrows

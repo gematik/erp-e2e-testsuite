@@ -21,12 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import de.gematik.test.konnektor.PinType;
 import de.gematik.test.konnektor.cfg.KonnektorModuleConfiguration;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
-import de.gematik.test.konnektor.soap.RemoteKonnektorTest;
 import de.gematik.test.smartcard.Crypto;
 import de.gematik.test.smartcard.Egk;
 import de.gematik.test.smartcard.Hba;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -34,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.val;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -49,7 +47,7 @@ class ReadVsdCommandTest {
 
   @BeforeAll
   static void setUp() {
-    smartCardArchive = SmartcardFactory.readArchive();
+    smartCardArchive = SmartcardFactory.getArchive();
     hba = smartCardArchive.getHbaByICCSN("80276883110000095767", Crypto.RSA_2048);
     egk = smartCardArchive.getEgkByICCSN("80276881025548431301", Crypto.RSA_2048);
 
@@ -60,11 +58,6 @@ class ReadVsdCommandTest {
     ctx.setMandantId("m1");
     ctx.setUserId("u1");
     ctx.setWorkplaceId("w1");
-  }
-
-  @AfterAll
-  static void tearDown() {
-    smartCardArchive.destroy();
   }
 
   @Test
@@ -85,7 +78,7 @@ class ReadVsdCommandTest {
   void exampleIntegrationTest() {
     val is =
         Objects.requireNonNull(
-            RemoteKonnektorTest.class.getClassLoader().getResourceAsStream("config.yaml"));
+            ReadVsdCommandTest.class.getClassLoader().getResourceAsStream("config.yaml"));
     val yaml =
         new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
             .lines()

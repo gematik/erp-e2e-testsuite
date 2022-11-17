@@ -16,7 +16,8 @@
 
 package de.gematik.test.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.core.exceptions.ArgumentBuilderException;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -348,6 +349,13 @@ class ArgumentComposerTest {
   void shouldThrowOnMultiplyWithEmptyList() {
     val composer = ArgumentComposer.composeWith(TestEnum4.class);
     val emptyMultiplier = List.of();
+    assertThrows(ArgumentBuilderException.class, () -> composer.multiply(emptyMultiplier));
+  }
+
+  @Test
+  void shouldThrowOnMultiplyWithNull() {
+    val composer = ArgumentComposer.composeWith(TestEnum4.class);
+    List<String> emptyMultiplier = null;
     assertThrows(ArgumentBuilderException.class, () -> composer.multiply(emptyMultiplier));
   }
 

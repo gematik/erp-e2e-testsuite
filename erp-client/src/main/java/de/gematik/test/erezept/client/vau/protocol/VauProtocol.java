@@ -93,6 +93,9 @@ public class VauProtocol {
     }
   }
 
+  @SuppressWarnings({
+    "java:S1130"
+  }) // possibility required to catch BadPaddingExceptions on this call
   public byte[] decryptRawVauResponse(byte[] innerHttp) throws BadPaddingException {
     return vauVersion.getSymmetricMethod().decrypt(decryptionKey, innerHttp);
   }

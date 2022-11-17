@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.client.rest;
 
 import static java.text.MessageFormat.format;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.parser.DataFormatException;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
@@ -27,29 +27,30 @@ import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.val;
 import org.hl7.fhir.r4.model.OperationOutcome;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public class ErpResponseFactoryTest {
+class ErpResponseFactoryTest {
 
   private final Map<String, String> HEADERS_JSON =
       Map.of("content-type", MediaType.FHIR_JSON.asString());
   private final int STATUS_OK = 200;
   private final int STATUS_ERROR = 500;
 
-  private final String RESOURCE_PATH_ERP = "fhir/valid/erp/";
+  private final String RESOURCE_PATH_ERP = "fhir/valid/erp/1.1.1/";
 
-  private ErpResponseFactory responseFactory;
+  private static ErpResponseFactory responseFactory;
 
-  @Before
-  public void setUp() {
+  @BeforeAll
+  static void setUp() {
     responseFactory = new ErpResponseFactory(new FhirParser());
   }
 
   @Test
-  public void deserializeAuditEventResponses() {
+  void deserializeAuditEventResponses() {
     val auditEvents = List.of("AuditEvent_01.json");
 
     auditEvents.stream()
@@ -61,64 +62,67 @@ public class ErpResponseFactoryTest {
                   responseFactory.createFrom(STATUS_OK, HEADERS_JSON, content, ErxAuditEvent.class);
               val auditEvent = response.getResource();
               assertNotNull(
-                  format("Response must contain a Resource of Type {0}", ErxAuditEvent.class),
-                  auditEvent);
+                  auditEvent,
+                  format("Response must contain a Resource of Type {0}", ErxAuditEvent.class));
             });
   }
 
   @Test
-  public void unexpectedOperationOutcomeResponse() {
+  void unexpectedOperationOutcomeResponse() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
     val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
     val resource = response.getResource();
     assertNotNull(
-        format("Response must contain a Resource of Type {0}", OperationOutcome.class), resource);
-    assertTrue("Resource is expected to be OperationOutcome", resource instanceof OperationOutcome);
+        resource, format("Response must contain a Resource of Type {0}", OperationOutcome.class));
+    assertTrue(resource instanceof OperationOutcome, "Resource is expected to be OperationOutcome");
     assertTrue(
-        "Resource is expected to be the original OperationOutcome",
-        response.getResourceType().isInstance(testOperationOutcome));
+        Objects.requireNonNull(response.getResourceType()).isInstance(testOperationOutcome),
+        "Resource is expected to be the original OperationOutcome");
 
     // get the concrete OperationOutcome
     val concreteResource = response.getResource(OperationOutcome.class);
     assertNotNull(
-        format("Resource must be castable to Type {0}", OperationOutcome.class), concreteResource);
+        concreteResource, format("Resource must be castable to Type {0}", OperationOutcome.class));
   }
 
   @Test
-  public void expectedOperationOutcome() {
+  void expectedOperationOutcome() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
     val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
     val outputOO = response.getResource();
     assertNotNull(
-        format("Response must contain a Resource of Type {0}", OperationOutcome.class), outputOO);
-    assertTrue("Resource is expected to be OperationOutcome", outputOO instanceof OperationOutcome);
+        outputOO, format("Response must contain a Resource of Type {0}", OperationOutcome.class));
+    assertTrue(outputOO instanceof OperationOutcome, "Resource is expected to be OperationOutcome");
     assertTrue(
-        "Resource is expected to be the original OperationOutcome",
-        response.getResourceType().isInstance(testOperationOutcome));
+        Objects.requireNonNull(response.getResourceType()).isInstance(testOperationOutcome),
+        "Resource is expected to be the original OperationOutcome");
 
     val concreteResource = response.getResource(OperationOutcome.class);
     assertNotNull(
-        format("Resource must be castable to Type {0}", OperationOutcome.class), concreteResource);
-  }
-
-  @Test(expected = DataFormatException.class)
-  public void expectOperationOutcomeButWasAuditEvent() {
-    val filename = "AuditEvent_01.json";
-    val auditEventContent = ResourceUtils.readFileFromResource(RESOURCE_PATH_ERP + filename);
-    val response =
-        responseFactory.createFrom(
-            STATUS_ERROR, HEADERS_JSON, auditEventContent, OperationOutcome.class);
-  }
-
-  @Test(expected = UnexpectedResponseResourceError.class)
-  public void fetchUnexpectedResponseResource() {
-    val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
-    val resource = response.getResource(ErxAuditEvent.class);
+        concreteResource, format("Resource must be castable to Type {0}", OperationOutcome.class));
   }
 
   @Test
-  public void fetchUnexpectedResponseResourceOptional() {
+  void expectOperationOutcomeButWasAuditEvent() {
+    val filename = "AuditEvent_01.json";
+    val auditEventContent = ResourceUtils.readFileFromResource(RESOURCE_PATH_ERP + filename);
+    assertThrows(
+        DataFormatException.class,
+        () ->
+            responseFactory.createFrom(
+                STATUS_ERROR, HEADERS_JSON, auditEventContent, OperationOutcome.class));
+  }
+
+  @Test
+  void fetchUnexpectedResponseResource() {
+    val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
+    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    assertThrows(
+        UnexpectedResponseResourceError.class, () -> response.getResource(ErxAuditEvent.class));
+  }
+
+  @Test
+  void fetchUnexpectedResponseResourceOptional() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
     val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
     val resource = response.getResourceOptional(ErxAuditEvent.class);
@@ -126,14 +130,14 @@ public class ErpResponseFactoryTest {
   }
 
   @Test
-  public void isResourceOfType() {
+  void isResourceOfType() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
     val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
     assertTrue(response.isResourceOfType(OperationOutcome.class));
   }
 
   @Test
-  public void isNotResourceOfType() {
+  void isNotResourceOfType() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
     val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
     assertFalse(response.isResourceOfType(ErxAuditEvent.class));

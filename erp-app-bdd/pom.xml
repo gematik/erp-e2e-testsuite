@@ -5,17 +5,19 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.1.3</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>erp-app-bdd</artifactId>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>${version.java}</java.version>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
 
-        <tags></tags>
+        <tags/>
+        <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
     </properties>
 
     <dependencies>
@@ -27,7 +29,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -50,7 +52,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-bdd-common</artifactId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -62,6 +64,45 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <resourceBundles>
+                        <resourceBundle>de.gematik.test.erezept:smartcard:0.2.0-SNAPSHOT</resourceBundle>
+                    </resourceBundles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <includes>
+                        <include>**/${bdd.testsuite}.java</include>
+                    </includes>
+                    <parallel>suites</parallel>
+                    <forkCount>1</forkCount>
+                    <threadCount>1</threadCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>net.serenity-bdd.maven.plugins</groupId>
                 <artifactId>serenity-maven-plugin</artifactId>

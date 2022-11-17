@@ -16,42 +16,46 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
+import de.gematik.test.erezept.app.mobile.elements.Debug;
+import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
 import java.util.Base64;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
+@Slf4j
+@RequiredArgsConstructor
 public class SetUpIosDevice implements Task {
+
+  private final VersicherungsArtDeBasis insuranceKind;
 
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
     val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
 
-    // TODO: Ensure first the actor is on the right screen
-    //    actor.attemptsTo(Ensure.that(ElementIsAvailable.withName("Accept Privacy")).isTrue());
-
     // walk through onboarding
     app.swipe(SwipeDirection.LEFT);
     app.swipe(SwipeDirection.LEFT);
-    app.swipe(SwipeDirection.LEFT);
-    app.input(actor.getName(), "User Profile Name");
-    app.tap(2, "Onboarding Next");
-    app.inputPassword(password, "Password Input", true);
-    app.inputPassword(password, "Password Confirmation");
-    app.tap(2, "Onboarding Next");
-    app.tap("Accept Privacy");
-    app.tap("Terms of Use");
-    app.tap("Confirm Legal");
+    app.inputPassword(password, Onboarding.PASSWORD_INPUT);
+    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION);
+    app.tap(Onboarding.NEXT);
+    app.tap(Onboarding.ACCEPT_TERMS_OF_USE);
+    app.tap(Onboarding.ACCEPT_PRIVACY);
 
     // go to cardwall
     if (app.useVirtualeGK()) {
@@ -59,44 +63,31 @@ public class SetUpIosDevice implements Task {
     } else {
       performWithRealeGK(app);
     }
-
-    // refresh prescriptions should not open the CardWall anymore as we have already signed in with
-    // a (virtual) eGK
-    app.tap("Refresh Prescriptions");
-
-    // TODO: ability required because glue-code will set GKV/PKV after this step
-    // Only dummy data for now, because this information is only available after cardwall, which
-    // does not work yet!
-    actor.can(
-        ProvidePatientBaseData.forGkvPatient(
-            "X000000000", actor.getName())); // TODO: by default GKV for, change later
   }
 
-  private void performWithRealeGK(UseTheApp app) {
+  private void performWithRealeGK(UseTheApp<?> app) {
     // walk through cardwall
-    throw new FeatureNotImplementedException("virtual eGK on Android");
+    throw new FeatureNotImplementedException(
+        format("real eGK on iPhone with {0}", app.getDriverName()));
   }
 
   @SneakyThrows
-  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp app) {
-    app.tap("Show Settings");
-    app.tap("Debug Menu");
+  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app) {
+    app.tap(Settings.SHOW);
+    app.tap(Debug.SHOW);
 
     // first tap will scroll to the element, only the second tap will tap the switch
-    // TODO: implement something like scrollTo(WebElement)
-    app.tap(2, "Debug Activate virtual eGK");
+    app.tap(2, Debug.ACTIVATE_VIRTUAL_EGK); // why do I need to tap twice here?
 
-    // TODO: take an eGK by ICCSN from config
-    val egk = SmartcardFactory.readArchive().getEgkCards(Crypto.ECC_256).get(0);
+    val egk = SafeAbility.getAbility(actor, ProvideEGK.class).getEgk();
     val pkBase64 = Base64.getEncoder().encodeToString(egk.getAuthPrivateKey().getEncoded());
     val cchBase64 = Base64.getEncoder().encodeToString(egk.getAuthCertificate().getEncoded());
-    app.input(pkBase64, "Debug Private Key eGK");
-    app.input(cchBase64, "Debug Certificate Chain eGK");
+    app.input(pkBase64, Debug.EGK_PRIVATE_KEY);
+    app.tap(2, Debug.EGK_CERTIFICATE_CHAIN); // make sure we change the textbox
+    app.input(cchBase64, Debug.EGK_CERTIFICATE_CHAIN);
     // assume we are done now!
 
-    app.tap("Debug Login");
-
-    Thread.sleep(200); // TODO: what about Pause.perform()?
+    app.tap(2, Debug.LOGIN);
 
     // TODO: here we should have the SSO Token, read the PatientBaseData from there!
     //    val rawToken = app.getWebElement("Debug Menu Bearer Token").getText();
@@ -104,11 +95,15 @@ public class SetUpIosDevice implements Task {
     //    val kvid = token.getPayload().getIdentifier();
     //    val givenName = token.getPayload().getGivenName();
     //    val familyName = token.getPayload().getFamilyName();
-    // actor.can(ProvidePatientBaseData.forGkvPatient("X000000000", actor.getName())); // TODO: by
-    // default GKV for, change later
 
-    app.tap("Debug Hide Intro");
-    app.tap("Leave Debug Menu");
-    app.tap("Leave Settings");
+    actor.can(
+        ProvidePatientBaseData.forPatient(
+            egk.getKvnr(),
+            egk.getOwner().getGivenName(),
+            egk.getOwner().getSurname(),
+            insuranceKind));
+
+    app.tap(Debug.LEAVE);
+    app.tap(Settings.LEAVE);
   }
 }

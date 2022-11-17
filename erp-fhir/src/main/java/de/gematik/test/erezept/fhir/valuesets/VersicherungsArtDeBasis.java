@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,7 +35,7 @@ public enum VersicherungsArtDeBasis implements IValueSet {
   BEI("BEI", "Beihilfe"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.VERSICHERUNGSART_DE_BASIS;
+  public static final DeBasisCodeSystem CODE_SYSTEM = DeBasisCodeSystem.VERSICHERUNGSART_DE_BASIS;
   public static final String VERSION = "0.9.13";
   public static final String DESCRIPTION =
       "ValueSet zur Codierung der Versicherungsart in Deutschland";
@@ -58,7 +58,7 @@ public enum VersicherungsArtDeBasis implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public DeBasisCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 }

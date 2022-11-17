@@ -19,28 +19,20 @@ package de.gematik.test.erezept.fhir.builder.dav;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
-public class DavInvoiceBuilderTest {
-
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class DavInvoiceBuilderTest extends ParsingTest {
 
   @Test
   public void buildInvoiceWithFixedValues() {
     val pc1 =
-        PriceComponentBuilder.builder(KostenVersicherterKategorie.EIGENBETEILIGUNG)
+        PriceComponentBuilder.builder(KostenVersicherterKategorie.ZUZAHLUNG)
             .currency(Currency.EUR) // EUR by default
             .type("informational")
             .insurantCost(5.8f)
@@ -60,8 +52,8 @@ public class DavInvoiceBuilderTest {
             .currency(Currency.EUR) // EUR by default
             .status("issued")
             .vatRate(19.0f)
-            .addPriceComponent(pc1, "1234567890")
-            .addPriceComponent(pc2, "0987654321")
+            .addPriceComponent(pc1, "12345678")
+            .addPriceComponent(pc2, "87654321")
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, invoice);
@@ -77,8 +69,7 @@ public class DavInvoiceBuilderTest {
                 pc.getExtension().stream()
                     .filter(
                         ext ->
-                            ext.getUrl()
-                                .equals(ErpStructureDefinition.DAV_EX_ERP_VAT.getCanonicalUrl()))
+                            ext.getUrl().equals(AbdaErpBasisStructDef.MWST_SATZ.getCanonicalUrl()))
                     .map(
                         ext -> ext.getValue().castToDecimal(ext.getValue()).getValue().floatValue())
                     .forEach(vat -> assertEquals(19.0f, vat, 0.001)));

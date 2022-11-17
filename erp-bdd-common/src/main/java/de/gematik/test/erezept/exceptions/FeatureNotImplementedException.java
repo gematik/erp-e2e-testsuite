@@ -23,4 +23,8 @@ public class FeatureNotImplementedException extends RuntimeException {
   public FeatureNotImplementedException(String featureName) {
     super(format("Feature {0} not yet implemented", featureName));
   }
+
+  public FeatureNotImplementedException(String featureName, String platform) {
+    super(format("Feature {0} not yet implemented for Platform {1}", featureName, platform));
+  }
 }

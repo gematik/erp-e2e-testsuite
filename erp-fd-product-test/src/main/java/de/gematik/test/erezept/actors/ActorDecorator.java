@@ -16,13 +16,13 @@
 
 package de.gematik.test.erezept.actors;
 
-import de.gematik.test.erezept.ErpConfiguration;
-import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.cfg.ErpClientConfiguration;
+import de.gematik.test.erezept.*;
+import de.gematik.test.erezept.client.*;
+import de.gematik.test.erezept.client.cfg.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 @Slf4j
 public class ActorDecorator {

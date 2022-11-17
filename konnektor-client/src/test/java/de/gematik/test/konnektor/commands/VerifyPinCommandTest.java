@@ -16,19 +16,19 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.konnektor.PinType;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
 import de.gematik.test.smartcard.Crypto;
 import de.gematik.test.smartcard.Hba;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import java.math.BigInteger;
 import lombok.val;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,7 @@ class VerifyPinCommandTest {
 
   @BeforeAll
   static void setUp() {
-    smartCardArchive = SmartcardFactory.readArchive();
+    smartCardArchive = SmartcardFactory.getArchive();
     hba = smartCardArchive.getHbaByICCSN("80276883110000095767", Crypto.RSA_2048);
 
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
@@ -63,10 +63,5 @@ class VerifyPinCommandTest {
     assertNotNull(pinResponseType);
     assertEquals(BigInteger.valueOf(3), pinResponseType.getLeftTries());
     assertEquals(PinResultEnum.OK, pinResponseType.getPinResult());
-  }
-
-  @AfterAll
-  static void tearDown() {
-    smartCardArchive.destroy();
   }
 }

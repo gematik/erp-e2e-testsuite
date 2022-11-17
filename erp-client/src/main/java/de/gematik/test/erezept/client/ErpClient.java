@@ -19,6 +19,7 @@ package de.gematik.test.erezept.client;
 import static java.text.MessageFormat.format;
 
 import de.gematik.idp.client.IdpClient;
+import de.gematik.idp.client.IdpClientRuntimeException;
 import de.gematik.idp.client.IdpTokenResult;
 import de.gematik.idp.crypto.model.PkiIdentity;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -72,8 +73,14 @@ public class ErpClient {
   public void initialize() {
     Objects.requireNonNull(authentication);
     vauClient.initialize();
-    idpClient.initialize();
-    this.refreshIdpToken();
+    try {
+      idpClient.initialize();
+    } catch (NullPointerException npe) {
+      // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
+      // broken!
+      log.warn("Something went wrong during initialization of IDP-Client");
+      throw new IdpClientRuntimeException("Caught NullPointer from IDP-Client", npe);
+    }
   }
 
   /**
@@ -111,8 +118,15 @@ public class ErpClient {
   private void refreshIdpToken() {
     if (idpTokenExpired()) {
       log.info("Refresh the IDP Token");
-      idpToken = authentication.get();
-      idpTokenUpdated = Instant.now();
+      try {
+        idpToken = authentication.get();
+        idpTokenUpdated = Instant.now();
+      } catch (NullPointerException npe) {
+        // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
+        // broken!
+        log.warn("Something went wrong during authentication on IDP");
+        throw new IdpClientRuntimeException("Caught NullPointer from IDP-Client", npe);
+      }
     } else {
       log.info("IDP Token is still valid, no need to refresh");
     }

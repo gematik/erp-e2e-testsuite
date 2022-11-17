@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -41,7 +41,7 @@ public enum IdentifierTypeDe implements IValueSet {
   KZVA("KZVA", "KZVAbrechnungsnummer"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS;
+  public static final DeBasisCodeSystem CODE_SYSTEM = DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS;
   public static final String VERSION = "0.9.13";
   public static final String DESCRIPTION = "ValueSet zur Codierung des Identifier-Typs";
   public static final String PUBLISHER = "HL7 Deutschland e.V. (Technisches Komitee FHIR)";
@@ -60,15 +60,15 @@ public enum IdentifierTypeDe implements IValueSet {
     this.definition = definition;
   }
 
+  @Override
+  public DeBasisCodeSystem getCodeSystem() {
+    return CODE_SYSTEM;
+  }
+
   public static IdentifierTypeDe fromCode(@NonNull String value) {
     return Arrays.stream(IdentifierTypeDe.values())
         .filter(itd -> itd.code.equals(value))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(IdentifierTypeDe.class, value));
-  }
-
-  @Override
-  public ErpCodeSystem getCodeSystem() {
-    return CODE_SYSTEM;
   }
 }

@@ -55,9 +55,9 @@ public class LocalVerifier {
       val signerInfoStore = parser.getSignerInfos();
       val signerInfo = signerInfoStore.getSigners().stream().findFirst().orElseThrow();
 
-      val certCollection = certStore.getMatches(signerInfo.getSID()); // TODO: generify?
+      val certCollection = certStore.getMatches(signerInfo.getSID());
       val certIt = certCollection.iterator();
-      X509CertificateHolder certHolder = (X509CertificateHolder) certIt.next();
+      val certHolder = (X509CertificateHolder) certIt.next();
 
       isValid =
           signerInfo.verify(

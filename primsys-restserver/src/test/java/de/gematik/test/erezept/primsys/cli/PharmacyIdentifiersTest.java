@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
 
+@Disabled
 class PharmacyIdentifiersTest {
 
   @Test

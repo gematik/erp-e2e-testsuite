@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -51,7 +51,7 @@ public enum DeFederalState implements IValueSet {
   DE_TH("DE-TH", "Thüringen"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.ISO_31662_DE;
+  public static final CommonCodeSystem CODE_SYSTEM = CommonCodeSystem.ISO_31662_DE;
   public static final String VERSION = "0.9.13";
   public static final String DESCRIPTION =
       "Enthält die ISO-3166-2:DE Codes für die deutschen Bundesländer.";
@@ -72,7 +72,7 @@ public enum DeFederalState implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public CommonCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

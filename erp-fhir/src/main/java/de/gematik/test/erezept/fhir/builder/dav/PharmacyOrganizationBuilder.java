@@ -20,7 +20,9 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.AbstractOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.AddressBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
 import de.gematik.test.erezept.fhir.values.IKNR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
@@ -78,7 +80,9 @@ public class PharmacyOrganizationBuilder
   public PharmacyOrganization build() {
     checkRequired();
     return PharmacyOrganization.fromOrganization(
-        buildOrganizationWith(ErpStructureDefinition.DAV_PKV_PR_ERP_APOTHEKE, iknr.asIdentifier()));
+        buildOrganizationWith(
+            () -> AbdaErpPkvStructDef.APOTHEKE.asCanonicalType(AbdaErpPkvVersion.V1_1_0, true),
+            iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID)));
   }
 
   protected void checkRequired() {

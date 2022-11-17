@@ -27,7 +27,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -45,7 +44,7 @@ public class ActorsResource {
     List<ActorData> ret;
 
     if (roleValue.equals("all") || roleValue.isEmpty()) {
-      ret = ctx.getActors().stream().map(BaseActor::getBaseData).collect(Collectors.toList());
+      ret = ctx.getActors().stream().map(BaseActor::getBaseData).toList();
     } else {
       val role =
           ActorRole.optionalFromString(roleValue)
@@ -61,7 +60,7 @@ public class ActorsResource {
           ctx.getActors().stream()
               .filter(actor -> actor.getRole().equals(role))
               .map(BaseActor::getBaseData)
-              .collect(Collectors.toList());
+              .toList();
     }
 
     return ret;

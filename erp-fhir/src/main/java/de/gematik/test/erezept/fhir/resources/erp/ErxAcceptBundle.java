@@ -18,8 +18,8 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.values.Secret;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -43,9 +43,7 @@ public class ErxAcceptBundle extends Bundle {
         .map(ErxTask::fromTask)
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    ErxAcceptBundle.class, ErpStructureDefinition.GEM_ERX_TASK));
+            () -> new MissingFieldException(ErxAcceptBundle.class, ErpWorkflowStructDef.TASK));
   }
 
   public String getTaskId() {
@@ -56,7 +54,7 @@ public class ErxAcceptBundle extends Bundle {
     return getTask()
         .getSecret()
         .orElseThrow(
-            () -> new MissingFieldException(ErxAcceptBundle.class, ErpNamingSystem.SECRET));
+            () -> new MissingFieldException(ErxAcceptBundle.class, ErpWorkflowNamingSystem.SECRET));
   }
 
   public String getKbvBundleId() {
@@ -65,10 +63,7 @@ public class ErxAcceptBundle extends Bundle {
         .filter(resource -> resource.getResourceType().equals(ResourceType.Binary))
         .map(Resource::getId)
         .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    ErxAcceptBundle.class, ErpStructureDefinition.KBV_BUNDLE));
+        .orElseThrow(() -> new MissingFieldException(ErxAcceptBundle.class, ResourceType.Binary));
   }
 
   public Binary getKbvBundleAsBase64() {
@@ -77,10 +72,7 @@ public class ErxAcceptBundle extends Bundle {
         .filter(resource -> resource.getResourceType().equals(ResourceType.Binary))
         .map(Binary.class::cast)
         .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    ErxAcceptBundle.class, ErpStructureDefinition.KBV_BUNDLE));
+        .orElseThrow(() -> new MissingFieldException(ErxAcceptBundle.class, ResourceType.Binary));
   }
 
   public byte[] getSignedKbvBundle() {

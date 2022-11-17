@@ -18,52 +18,87 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.util.ParsingTest;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
 class ErxPrescriptionBundleTest extends ParsingTest {
-  private final String BASE_PATH = "fhir/valid/erp/";
+
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   @Test
   void shouldEncodeSinglePrescriptionBundle() {
     val fileName = "PrescriptionBundle_01.json";
 
     val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
-
-    val vr = parser.validate(content);
-
-    // give some help on debugging if still errors in "valid resources"
-    if (!vr.isSuccessful()) {
-      System.out.println("Errors: " + vr.getMessages().size() + " in File " + fileName);
-      vr.getMessages().forEach(System.out::println);
-    }
-
-    assertTrue(vr.isSuccessful());
-
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
     assertNotNull(prescriptionBundle, "Valid ErxPrescriptionBundle must be parseable");
 
-    val expectedTaskId = "1a7e4116-1e53-11b2-80ba-c505a820f066";
-    val erxTask = prescriptionBundle.getTask();
-    assertNotNull(erxTask);
-    assertEquals(expectedTaskId, erxTask.getUnqualifiedId());
-    assertEquals(PrescriptionFlowType.FLOW_TYPE_160, erxTask.getFlowType());
+    val task = prescriptionBundle.getTask();
+    assertNotNull(task);
+    assertEquals("169.000.000.006.874.07", task.getPrescriptionId().getValue());
 
-    val expectedPrescriptionId = "160.002.370.468.800.53";
     val kbvBundle = prescriptionBundle.getKbvBundle();
-    assertEquals(expectedPrescriptionId, kbvBundle.getPrescriptionId().getValue());
+    assertNotNull(kbvBundle);
+    assertEquals("169.000.000.006.874.07", kbvBundle.getPrescriptionId().getValue());
+
+    val receipt = prescriptionBundle.getReceipt();
+    assertTrue(receipt.isEmpty());
   }
 
   @Test
-  void shouldNotContainAReceipt() {
+  void shouldFailOnMissingTask() {
     val fileName = "PrescriptionBundle_01.json";
 
     val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
 
-    assertTrue(prescriptionBundle.getReceipt().isEmpty());
+    // remove the task from bundle
+    val taskResources =
+        prescriptionBundle.getEntry().stream()
+            .filter(resource -> resource.getResource().getResourceType().equals(ResourceType.Task))
+            .toList();
+    prescriptionBundle.getEntry().removeAll(taskResources);
+
+    assertThrows(MissingFieldException.class, prescriptionBundle::getTask);
+  }
+
+  @Test
+  void shouldFailOnMissingKbvBundle() {
+    val fileName = "PrescriptionBundle_01.json";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
+
+    // remove the KbvBundle from bundle
+    val kbvBundleResources =
+        prescriptionBundle.getEntry().stream()
+            .filter(
+                resource -> resource.getResource().getResourceType().equals(ResourceType.Bundle))
+            .toList();
+    prescriptionBundle.getEntry().removeAll(kbvBundleResources);
+
+    assertThrows(MissingFieldException.class, prescriptionBundle::getKbvBundle);
+  }
+
+  @Test
+  void shouldFailOnInvalidKbvBundle() {
+    val fileName = "PrescriptionBundle_01.json";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
+
+    // invalidate the Profile in the KbvBundle from bundle
+    prescriptionBundle.getEntry().stream()
+        .map(Bundle.BundleEntryComponent::getResource)
+        .filter(resource -> resource.getResourceType().equals(ResourceType.Bundle))
+        .forEach(
+            bundle -> bundle.getMeta().getProfile().get(0).setValueAsString("invalid profile!"));
+
+    assertThrows(MissingFieldException.class, prescriptionBundle::getKbvBundle);
   }
 }

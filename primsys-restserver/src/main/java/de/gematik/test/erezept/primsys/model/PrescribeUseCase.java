@@ -21,13 +21,14 @@ import static java.text.MessageFormat.format;
 import ca.uhn.fhir.parser.DataFormatException;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.primsys.model.actor.Doctor;
 import de.gematik.test.erezept.primsys.rest.data.*;
@@ -40,7 +41,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coverage;
-import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
 
 @Slf4j
@@ -60,7 +60,17 @@ public class PrescribeUseCase {
               .entity(new ErrorResponse("Given KBV Bundle cannot be parsed"))
               .build());
     }
+    return issuePrescription(doctor, kbvBundle);
+  }
 
+  public static Response issuePrescription(Doctor doctor, PrescribeRequest body) {
+    if (body.getPatient() == null || Strings.isNullOrEmpty(body.getPatient().getKvnr())) {
+      throw new WebApplicationException(
+          Response.status(400)
+              .entity(new ErrorResponse("KVNR is required field for the body"))
+              .build());
+    }
+    val kbvBundle = getKbvBundleFromRequest(doctor.getName(), body);
     return issuePrescription(doctor, kbvBundle);
   }
 
@@ -119,72 +129,16 @@ public class PrescribeUseCase {
     val prescriptionData =
         PrescriptionData.create(doctorData, activatedTask, patientData, coverageData, medication);
     ActorContext.getInstance().addPrescription(prescriptionData);
-    return Response.accepted(Map.of("id", prescriptionData.getTaskId())).build();
+    return Response.accepted(
+            Map.of(
+                "task-id",
+                prescriptionData.getTaskId(),
+                "access-code",
+                prescriptionData.getAccessCode()))
+        .build();
   }
 
-  public static Response issuePrescription(Doctor doctor, PrescribeRequest body) {
-    if (body.getPatient() == null || Strings.isNullOrEmpty(body.getPatient().getKvnr())) {
-      throw new WebApplicationException(
-          Response.status(400)
-              .entity(new ErrorResponse("KVNR is required field for the body"))
-              .build());
-    }
-
-    val kvnr =
-        body.getPatient()
-            .getKvnr(); // should be optimized by checking the age of the existing token
-
-    val flowType =
-        body.getCoverage().getEnumInsuranceKind().equals(VersicherungsArtDeBasis.GKV)
-            ? PrescriptionFlowType.FLOW_TYPE_160
-            : PrescriptionFlowType.FLOW_TYPE_200; // only FlowTypes 160/200 for now!
-    log.info(
-        format(
-            "Create Task with FlowType {0} for InsuranceType {1}",
-            flowType, body.getCoverage().getEnumInsuranceKind()));
-    val create = new TaskCreateCommand(flowType);
-    val createResponse = doctor.erpRequest(create);
-    val draftTask =
-        createResponse
-            .getResourceOptional(create.expectedResponseBody())
-            .orElseThrow(
-                () ->
-                    new WebApplicationException(
-                        Response.status(createResponse.getStatusCode())
-                            .entity(new ErrorResponse(createResponse))
-                            .build()));
-
-    val prescriptionId = draftTask.getPrescriptionId();
-    val kbvBundle = getKbvBundleFromRequest(doctor.getName(), prescriptionId, body);
-    val kbvXml = doctor.getClient().encode(kbvBundle, EncodingType.XML);
-    val signedKbv = doctor.signDocument(kbvXml);
-
-    log.info("Activate Task");
-    val accessCode = draftTask.getOptionalAccessCode().orElseThrow();
-    val activate = new TaskActivateCommand(draftTask.getUnqualifiedId(), accessCode, signedKbv);
-    val activateResponse = doctor.erpRequest(activate);
-    val activatedTask =
-        activateResponse
-            .getResourceOptional(activate.expectedResponseBody())
-            .orElseThrow(
-                () ->
-                    new WebApplicationException(
-                        Response.status(activateResponse.getStatusCode())
-                            .entity(new ErrorResponse(activateResponse))
-                            .build()));
-
-    log.info(
-        format(
-            "Doctor {0} issues Prescription {1} to {2}", doctor.getName(), prescriptionId, kvnr));
-    val prescriptionData =
-        PrescriptionData.create(
-            doctor, activatedTask, body.getPatient(), body.getCoverage(), body.getMedication());
-    ActorContext.getInstance().addPrescription(prescriptionData);
-    return Response.accepted(Map.of("id", prescriptionData.getTaskId())).build();
-  }
-
-  private static KbvErpBundle getKbvBundleFromRequest(
-      String docName, PrescriptionId prescriptionId, PrescribeRequest body) {
+  private static KbvErpBundle getKbvBundleFromRequest(String docName, PrescribeRequest body) {
     val practitioner = PractitionerBuilder.faker(docName).build();
     val organization = MedicalOrganizationBuilder.faker().build();
     val patient = getPatientFromRequest(body.getPatient());
@@ -192,7 +146,7 @@ public class PrescribeUseCase {
     val medication = getMedicationFromRequest(body.getMedication());
     val medicationRequest =
         getMedicationRequest(patient, coverage, practitioner, medication, body.getMedication());
-    return KbvErpBundleBuilder.forPrescription(prescriptionId)
+    return KbvErpBundleBuilder.forPrescription(GemFaker.fakerPrescriptionId())
         .practitioner(practitioner)
         .custodian(organization)
         .patient(patient)
@@ -234,23 +188,39 @@ public class PrescribeUseCase {
   }
 
   private static KbvErpMedicationRequest getMedicationRequest(
-      Patient patient,
+      KbvPatient patient,
       Coverage insurance,
       Practitioner practitioner,
       KbvErpMedication medication,
       MedicationData medicationData) {
-    return MedicationRequestBuilder.forPatient(patient)
-        .insurance(insurance)
-        .requester(practitioner)
-        .medication(medication)
-        .dosage(medicationData.getDosage())
-        .quantityPackages(medicationData.getPackageQuantity())
-        .status("active") // default ACTIVE
-        .intent("order") // default ORDER
-        .isBVG(false) // Bundesversorgungsgesetz default true
-        .hasEmergencyServiceFee(true) // default false
-        .substitution(medicationData.isSubstitutionAllowed())
-        .coPaymentStatus(StatusCoPayment.STATUS_1) // default StatusCoPayment.STATUS_0
-        .build();
+    val builder =
+        MedicationRequestBuilder.forPatient(patient)
+            .insurance(insurance)
+            .requester(practitioner)
+            .medication(medication)
+            .dosage(medicationData.getDosage())
+            .quantityPackages(medicationData.getPackageQuantity())
+            .status("active") // default ACTIVE
+            .intent("order") // default ORDER
+            .isBVG(false) // Bundesversorgungsgesetz default true
+            .hasEmergencyServiceFee(true) // default false
+            .substitution(medicationData.isSubstitutionAllowed())
+            .coPaymentStatus(StatusCoPayment.STATUS_1); // default StatusCoPayment.STATUS_0
+    if (medicationData.getMvoData() != null) {
+      if (medicationData.getMvoData().isValid()) {
+        builder.mvo(
+            MultiplePrescriptionExtension.asMultiple(
+                    medicationData.getMvoData().getNumerator(),
+                    medicationData.getMvoData().getDenominator())
+                .fromNow()
+                .withoutEndDate());
+      } else {
+        throw new WebApplicationException(
+            Response.status(400).entity(new ErrorResponse("MVO Data is invalid")).build());
+      }
+    } else {
+      builder.mvo(MultiplePrescriptionExtension.asNonMultiple());
+    }
+    return builder.build();
   }
 }

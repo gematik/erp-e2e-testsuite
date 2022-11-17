@@ -17,7 +17,7 @@
 
 Funktionalität: Hello World Feature
 
-  @NO_PS
+
   Szenario: Basic Testszenario
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
     Wenn die Versicherte Alice ihre E-Rezepte abruft

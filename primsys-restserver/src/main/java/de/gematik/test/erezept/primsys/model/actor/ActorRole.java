@@ -38,20 +38,11 @@ public enum ActorRole {
   }
 
   public static ActorRole fromString(String value) {
-    ActorRole ret;
-    switch (value.toLowerCase()) {
-      case "arzt":
-      case "doctor":
-        ret = DOCTOR;
-        break;
-      case "apotheke":
-      case "pharmacy":
-        ret = PHARMACY;
-        break;
-      default:
-        throw new InvalidActorRoleException(value);
-    }
-    return ret;
+    return switch (value.toLowerCase()) {
+      case "arzt", "doctor" -> DOCTOR;
+      case "apotheke", "pharmacy" -> PHARMACY;
+      default -> throw new InvalidActorRoleException(value);
+    };
   }
 
   public static Optional<ActorRole> optionalFromString(String value) {

@@ -17,7 +17,6 @@
 package de.gematik.test.erezept.fhir.resources.dav;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +26,7 @@ import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @Getter
-@ResourceDef(
-    name = "MedicationDispense",
-    profile = StructureDefinitionFixedUrls.DAV_PKV_PR_ERP_ABGABEINFORMATIONEN)
+@ResourceDef(name = "MedicationDispense")
 @SuppressWarnings({"java:S110"})
 public class DavDispensedMedication extends MedicationDispense {
 

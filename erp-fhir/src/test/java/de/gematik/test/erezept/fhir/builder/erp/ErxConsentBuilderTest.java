@@ -18,8 +18,8 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.util.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.ActCode;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
 import lombok.val;

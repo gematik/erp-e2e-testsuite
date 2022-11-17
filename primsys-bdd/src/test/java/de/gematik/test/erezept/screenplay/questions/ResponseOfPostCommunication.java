@@ -26,8 +26,7 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemCommunicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
@@ -63,31 +62,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
   public ErpResponse answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
-    ErxCommunication communication;
-
-    switch (builder.type) {
-      case INFO_REQ:
-        communication = createInfoRequestAs(actor);
-        break;
-      case REPRESENTATIVE:
-        communication = createRepresentativeCommunicationAs(actor);
-        break;
-      case DISP_REQ:
-        communication = createDispenseRequestAs(actor);
-        break;
-      case REPLY:
-        communication = createReplyAs(actor);
-        break;
-      case CHANGE_REQ:
-        communication = createChangeReqAs(actor);
-        break;
-      case CHANGE_REPLY:
-        communication = createChangeReplyAs(actor);
-        break;
-      default:
-        throw new FeatureNotImplementedException(
-            format("Sending Communication of Type {0}", builder.type));
-    }
+    val communication = this.createCommunication(actor);
 
     log.info(
         format(
@@ -100,6 +75,74 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
 
     val cmd = new CommunicationPostCommand(communication);
     return erpClient.request(cmd);
+  }
+
+  private ErxCommunication createCommunication(Actor actor) {
+    ErxCommunication communication;
+    if (builder.type.getClass().equals(CommunicationType.class)) {
+      val type = (CommunicationType) builder.type;
+      communication = createCommunication(actor, type);
+    } else if (builder.type.getClass().equals(ChargeItemCommunicationType.class)) {
+      val type = (ChargeItemCommunicationType) builder.type;
+      communication = createCommunication(actor, type);
+    } else {
+      throw new RuntimeException(
+          format("Cannot post communication of type {0}", builder.type.getClass().getSimpleName()));
+    }
+
+    return communication;
+  }
+
+  /**
+   * Creates one of the "normal" communications from CommunicationType
+   *
+   * @param actor to send the communication
+   * @param type of communication message to send
+   * @return ErxCommunication
+   */
+  private ErxCommunication createCommunication(Actor actor, CommunicationType type) {
+    ErxCommunication communication;
+    switch (type) {
+      case INFO_REQ:
+        communication = createInfoRequestAs(actor);
+        break;
+      case REPRESENTATIVE:
+        communication = createRepresentativeCommunicationAs(actor);
+        break;
+      case DISP_REQ:
+        communication = createDispenseRequestAs(actor);
+        break;
+      case REPLY:
+        communication = createReplyAs(actor);
+        break;
+      default:
+        throw new FeatureNotImplementedException(
+            format("Sending Communication of Type {0}", builder.type));
+    }
+    return communication;
+  }
+
+  /**
+   * Creates one of the chargeitem communications from ChargeItemCommunicationType
+   *
+   * @param actor to send the communication
+   * @param type of communication message to send
+   * @return ErxCommunication
+   */
+  private ErxCommunication createCommunication(Actor actor, ChargeItemCommunicationType type) {
+    ErxCommunication communication;
+    switch (type) {
+      case CHANGE_REQ:
+        communication = createChangeReqAs(actor);
+        break;
+      case CHANGE_REPLY:
+        communication = createChangeReplyAs(actor);
+        break;
+      default:
+        throw new FeatureNotImplementedException(
+            format("Sending Communication of Type {0}", builder.type));
+    }
+    return communication;
   }
 
   private ErxCommunication createInfoRequestAs(Actor actor) {
@@ -225,37 +268,37 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
   }
 
   public static Builder infoRequest() {
-    return new Builder(ErxCommunication.CommunicationType.INFO_REQ);
+    return new Builder(CommunicationType.INFO_REQ);
   }
 
   public static Builder representative() {
-    return new Builder(ErxCommunication.CommunicationType.REPRESENTATIVE);
+    return new Builder(CommunicationType.REPRESENTATIVE);
   }
 
   public static Builder dispenseRequest() {
-    return new Builder(ErxCommunication.CommunicationType.DISP_REQ);
+    return new Builder(CommunicationType.DISP_REQ);
   }
 
   public static Builder reply() {
-    return new Builder(ErxCommunication.CommunicationType.REPLY);
+    return new Builder(CommunicationType.REPLY);
   }
 
   public static Builder changeRequest() {
-    return new Builder(ErxCommunication.CommunicationType.CHANGE_REQ);
+    return new Builder(ChargeItemCommunicationType.CHANGE_REQ);
   }
 
   public static Builder changeReply() {
-    return new Builder(ErxCommunication.CommunicationType.CHANGE_REPLY);
+    return new Builder(ChargeItemCommunicationType.CHANGE_REPLY);
   }
 
   public static class Builder {
-    private final ErxCommunication.CommunicationType type;
+    private final ICommunicationType<?> type;
     private DequeStrategyEnum basedOnDequeStrategy;
     private DequeStrategyEnum requestDequeStrategy;
     private Actor receiver;
     private String message;
 
-    private Builder(ErxCommunication.CommunicationType type) {
+    private Builder(ICommunicationType<?> type) {
       this.type = type;
     }
 
@@ -297,7 +340,17 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     }
 
     public ResponseOfPostCommunication withRandomMessage() {
-      return withMessage(GemFaker.fakerCommunicationMessage(type));
+      if (type.getClass().equals(CommunicationType.class)) {
+        return withMessage(GemFaker.fakerCommunicationMessage((CommunicationType) type));
+      } else if (type.getClass().equals(ChargeItemCommunicationType.class)) {
+        return withMessage(
+            GemFaker.fakerChargeItemCommunicationMessage((ChargeItemCommunicationType) type));
+      } else {
+        throw new RuntimeException(
+            format(
+                "Cannot generate random message for communication of type {0}",
+                type.getClass().getSimpleName()));
+      }
     }
 
     public ResponseOfPostCommunication withMessage(String message) {

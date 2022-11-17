@@ -39,7 +39,9 @@ public class GrizzlyServerShutdownHook extends Thread {
 
   private final HttpServer server;
 
-  /** @param server The server to shut down */
+  /**
+   * @param server The server to shut down
+   */
   public GrizzlyServerShutdownHook(HttpServer server) {
     this.server = server;
     setName(THREAD_NAME);

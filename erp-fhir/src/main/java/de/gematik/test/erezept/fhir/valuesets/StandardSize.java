@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,7 +36,7 @@ public enum StandardSize implements IValueSet {
   NB("NB", "Nicht betroffen"),
   SONSTIGES("Sonstiges", "Sonstiges");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.NORMGROESSE;
+  public static final DeBasisCodeSystem CODE_SYSTEM = DeBasisCodeSystem.NORMGROESSE;
   public static final String VERSION = "1.00";
   public static final String DESCRIPTION =
       "Bildet die zulässigen Normgrößen im Rahmen der elektronischen Arzneimittelverordnung ab.";
@@ -52,13 +52,13 @@ public enum StandardSize implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public DeBasisCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
     return new Extension(
-        ErpStructureDefinition.NORMGROESSE.getCanonicalUrl(), new CodeType(this.getCode()));
+        DeBasisStructDef.NORMGROESSE.getCanonicalUrl(), new CodeType(this.getCode()));
   }
 
   public static StandardSize fromCode(@NonNull String coding) {

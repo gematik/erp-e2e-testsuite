@@ -19,23 +19,30 @@ package de.gematik.test.erezept.client.vau;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.client.*;
-import de.gematik.test.erezept.client.vau.protocol.*;
-import java.math.*;
-import java.nio.charset.*;
-import java.security.*;
-import java.security.cert.*;
-import java.security.spec.*;
-import java.time.*;
-import java.util.*;
+import de.gematik.test.erezept.client.ClientType;
+import de.gematik.test.erezept.client.vau.protocol.VauVersion;
+import de.gematik.test.erezept.crypto.BC;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 import kong.unirest.*;
-import lombok.*;
-import org.bouncycastle.asn1.x500.*;
-import org.bouncycastle.cert.jcajce.*;
-import org.bouncycastle.jce.provider.*;
-import org.bouncycastle.operator.jcajce.*;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.val;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.jupiter.api.*;
-import org.mockito.*;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
 
 class VauClientTest {
 
@@ -44,7 +51,7 @@ class VauClientTest {
 
   @BeforeAll
   static void init() throws Exception {
-    val keyPairGenerator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
+    val keyPairGenerator = KeyPairGenerator.getInstance("EC", BC.getSecurityProvider());
     keyPairGenerator.initialize(new ECGenParameterSpec(VauVersion.V1.getCurve()));
     val keyPair = keyPairGenerator.generateKeyPair();
     vauCertificate = generateX509Certificate(keyPair.getPrivate(), keyPair.getPublic());
@@ -62,7 +69,10 @@ class VauClientTest {
     val now = Instant.now();
     val notBefore = Date.from(now);
     val until = new Date(LocalDate.now().plusYears(100).toEpochDay());
-    val contentSigner = new JcaContentSignerBuilder("SHA256withECDSA").build(privateKey);
+    val contentSigner =
+        new JcaContentSignerBuilder("SHA256withECDSA")
+            .setProvider(BC.getSecurityProvider())
+            .build(privateKey);
     val x500Name = new X500Name("CN=Common Name,O=Organization,L=City,ST=State");
     val certificateBuilder =
         new JcaX509v3CertificateBuilder(
@@ -73,7 +83,7 @@ class VauClientTest {
             x500Name,
             publicKey);
     return new JcaX509CertificateConverter()
-        .setProvider(new BouncyCastleProvider())
+        .setProvider(BC.getSecurityProvider())
         .getCertificate(certificateBuilder.build(contentSigner));
   }
 
@@ -153,7 +163,7 @@ class VauClientTest {
 
   @Test
   void shouldThrowVauExceptionInvalidCertificate() {
-    prepareEndpointVauCertificate(new byte[0]);
+    prepareEndpointVauCertificate(new byte[1]);
     val vau = new VauClient("https://erp", ClientType.FDV, "", "");
     assertThrows(VauException.class, vau::initialize);
   }

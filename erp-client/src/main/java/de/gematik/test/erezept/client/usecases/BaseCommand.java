@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Resource;
 
-/** @param <R> the type of the expected Response Body */
+/**
+ * @param <R> the type of the expected Response Body
+ */
 public abstract class BaseCommand<R extends Resource> implements ICommand<R> {
 
   private final Class<R> expectedResponse;

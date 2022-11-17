@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
 import de.gematik.test.erezept.fhir.util.Currency;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import lombok.val;
@@ -38,8 +38,7 @@ public class DavExtensions {
 
   public static Extension getInsurantCost(
       KostenVersicherterKategorie category, float cost, Currency currency) {
-    val outer =
-        new Extension(ErpStructureDefinition.DAV_EX_ERP_KOSTEN_VERSICHERTER.getCanonicalUrl());
+    val outer = new Extension(AbdaErpBasisStructDef.KOSTEN_VERSICHERTER.getCanonicalUrl());
 
     val categoryExtension = new Extension("Kategorie", category.asCodeableConcept());
     outer.addExtension(categoryExtension);
@@ -51,7 +50,7 @@ public class DavExtensions {
   }
 
   public static Extension getGesamtZuzahlung(Currency currency, float value) {
-    val ext = new Extension(ErpStructureDefinition.DAV_EX_ERP_GESAMTZUZAHLUNG.getCanonicalUrl());
+    val ext = new Extension(AbdaErpBasisStructDef.GESAMTZUZAHLUNG.getCanonicalUrl());
     val money = currency.asMoney(value);
     ext.setValue(money);
     return ext;

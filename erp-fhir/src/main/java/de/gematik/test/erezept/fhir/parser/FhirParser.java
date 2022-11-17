@@ -16,62 +16,36 @@
 
 package de.gematik.test.erezept.fhir.parser;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport;
-import ca.uhn.fhir.context.support.IValidationSupport;
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.parser.StrictErrorHandler;
-import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.ResultSeverityEnum;
-import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.test.erezept.fhir.parser.profiles.FhirProfiledValidator;
+import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
+import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.common.hapi.validation.support.InMemoryTerminologyServerValidationSupport;
-import org.hl7.fhir.common.hapi.validation.support.SnapshotGeneratingValidationSupport;
-import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
-import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Configuration;
 import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r5.utils.IResourceValidator;
 
 @Slf4j
 public class FhirParser {
 
   private final FhirContext ctx;
-  private final FhirValidator hapiValidator;
+  private IParser xmlParser;
+  private IParser jsonParser;
+  private final List<FhirProfiledValidator> validators;
 
   public FhirParser() {
     this.ctx = FhirContext.forR4();
-
-    this.ctx.setParserErrorHandler(new StrictErrorHandler());
-    Configuration.setAcceptInvalidEnums(true);
-
-    this.hapiValidator = ctx.newValidator();
-
-    // create support chain for validation
-    val supportChain = new ArrayList<IValidationSupport>();
-    supportChain.add(new DefaultProfileValidationSupport(this.ctx));
-    supportChain.add(new InMemoryTerminologyServerValidationSupport(this.ctx));
-    supportChain.add(new SnapshotGeneratingValidationSupport(this.ctx));
-    supportChain.add(new CustomProfileSupport(this.ctx));
-
-    // configure the HAPI FhirParser
-    val fiv = new FhirInstanceValidator(this.ctx);
-    val support = new ValidationSupportChain(supportChain.toArray(IValidationSupport[]::new));
-
-    fiv.setValidationSupport(support);
-    fiv.setNoTerminologyChecks(true);
-    fiv.setAssumeValidRestReferences(false);
-
-    fiv.setBestPracticeWarningLevel(IResourceValidator.BestPracticeWarningLevel.Hint);
-    hapiValidator.registerValidatorModule(fiv);
-    hapiValidator.registerValidatorModule(new ErrorMessageFilter());
+    this.validators = ProfileFhirParserFactory.getProfiledValidators();
   }
 
   /**
@@ -80,25 +54,14 @@ public class FhirParser {
    * @param content to be validated
    * @return true if content represents a valid FHIR-Resource and false otherwise
    */
-  public ValidationResult validate(final String content) {
-    ValidationResult ret;
-    try {
-      ret = this.hapiValidator.validateWithResult(content);
-    } catch (Exception e) {
-      /*
-      some sort of error led to an Exception: handle this case via ValidationResult=ERROR
-       */
-      log.error("Error while validating FHIR content");
-      val svm = new SingleValidationMessage();
-      svm.setMessage(e.getMessage());
-      svm.setSeverity(ResultSeverityEnum.ERROR);
-      ret = new ValidationResult(this.ctx, List.of(svm));
-    }
-    return ret;
+  public ValidationResult validate(@NonNull final String content) {
+    val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
+    return p.validate(content);
   }
 
-  public boolean isValid(final String content) {
-    return this.validate(content).isSuccessful();
+  public boolean isValid(@NonNull final String content) {
+    val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
+    return p.isValid(content);
   }
 
   public <T extends Resource> T decode(Class<T> expectedClass, @NonNull final String content) {
@@ -106,10 +69,9 @@ public class FhirParser {
     return this.decode(expectedClass, content, encoding);
   }
 
-  public <T extends Resource> T decode(
+  public synchronized <T extends Resource> T decode(
       Class<T> expectedClass, @NonNull final String content, EncodingType encoding) {
-    IParser parser =
-        encoding.chooseAppropriateParser(this.ctx::newXmlParser, this.ctx::newJsonParser);
+    val parser = encoding.chooseAppropriateParser(ctx::newXmlParser, ctx::newJsonParser);
     return parser.parseResource(expectedClass, content);
   }
 
@@ -121,18 +83,62 @@ public class FhirParser {
     return this.decode(Resource.class, content, encoding);
   }
 
-  public String encode(IBaseResource resource, EncodingType encoding) {
+  public String encode(@NonNull IBaseResource resource, EncodingType encoding) {
     return encode(resource, encoding, false);
   }
 
-  public String encode(IBaseResource resource, EncodingType encoding, boolean prettyPrint) {
-    IParser parser =
-        encoding.chooseAppropriateParser(this.ctx::newXmlParser, this.ctx::newJsonParser);
-
+  public synchronized String encode(
+      @NonNull IBaseResource resource, EncodingType encoding, boolean prettyPrint) {
+    val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
     parser.setPrettyPrint(prettyPrint);
-
     val encoded = parser.encodeResourceToString(resource);
     return fixEncoded(resource, encoded);
+  }
+
+  private IParser getXmlParser() {
+    if (this.xmlParser == null) {
+      this.xmlParser = ctx.newXmlParser();
+    }
+    return this.xmlParser;
+  }
+
+  private IParser getJsonParser() {
+    if (this.jsonParser == null) {
+      this.jsonParser = ctx.newJsonParser();
+    }
+    return this.jsonParser;
+  }
+
+  private FhirProfiledValidator chooseProfileValidator(Supplier<Optional<String>> profileSupplier) {
+    val profileUrlOpt = profileSupplier.get();
+    AtomicReference<FhirProfiledValidator> chosenParser = new AtomicReference<>();
+    profileUrlOpt.ifPresentOrElse(
+        url -> chosenParser.set(chooseProfileValidator(url)),
+        () -> {
+          val defaultParser = this.validators.get(0);
+          log.debug(
+              format(
+                  "Could not determine the Profile from given content! Use default parser ''{0}''",
+                  defaultParser.getName()));
+          chosenParser.set(defaultParser);
+        });
+
+    return chosenParser.get();
+  }
+
+  private FhirProfiledValidator chooseProfileValidator(String profileUrl) {
+    val parserOpt = this.validators.stream().filter(p -> p.doesSupport(profileUrl)).findFirst();
+
+    if (parserOpt.isPresent()) {
+      log.debug(format("Use Parser ''{0}'' for {1}", parserOpt.get().getName(), profileUrl));
+    } else {
+      log.debug(
+          format(
+              "No supporting Parser found for {0}, use Parser ''{1}'' as default",
+              profileUrl, this.validators.get(0).getName()));
+    }
+
+    return parserOpt.orElse(this.validators.get(0));
   }
 
   /**

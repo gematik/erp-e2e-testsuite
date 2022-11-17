@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.references.dav;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
 import org.hl7.fhir.r4.model.Reference;
 
 @DatatypeDef(name = "Reference")
@@ -25,8 +25,8 @@ import org.hl7.fhir.r4.model.Reference;
 public class AbgabedatensatzReference extends Reference {
 
   private static final String DISPLAY_VALUE = "Abgabedatensatz";
-  private static final ErpStructureDefinition STRUCTURE_DEFINITION =
-      ErpStructureDefinition.DAV_ABGABEDATENSATZ;
+  private static final AbdaErpPkvStructDef STRUCTURE_DEFINITION =
+      AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ;
 
   public AbgabedatensatzReference(String id) {
     this.setDisplay(DISPLAY_VALUE).setReference(id).setType(STRUCTURE_DEFINITION.getCanonicalUrl());

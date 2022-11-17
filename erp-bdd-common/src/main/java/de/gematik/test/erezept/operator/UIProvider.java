@@ -18,9 +18,11 @@ package de.gematik.test.erezept.operator;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.operator.jframe.SwingImageInstructionUI;
 import de.gematik.test.erezept.operator.jframe.SwingInstructionUI;
 import de.gematik.test.erezept.operator.jframe.SwingQuestionUI;
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
+import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -61,12 +63,22 @@ public class UIProvider {
    * @param instruction to be shown to the human operator
    */
   public static void getInstructionResult(final String instruction) {
-    log.info("Instruct the human operator to " + instruction);
+    log.trace("Instruct the human operator to " + instruction);
     val suppliers =
         new SupplierTuple<InteractionView<Void>>(null, () -> new SwingInstructionUI(instruction));
     val controller = getController(suppliers);
     controller.call();
-    log.info("Human operator confirmed Instruction");
+    log.trace("Human operator confirmed Instruction");
+  }
+
+  public static void getInstructionResult(final BufferedImage image, final String instruction) {
+    log.trace("Instruct the human operator to " + instruction);
+    val suppliers =
+        new SupplierTuple<InteractionView<Void>>(
+            null, () -> new SwingImageInstructionUI(image, instruction));
+    val controller = getController(suppliers);
+    controller.call();
+    log.trace("Human operator confirmed Instruction with image");
   }
 
   /**

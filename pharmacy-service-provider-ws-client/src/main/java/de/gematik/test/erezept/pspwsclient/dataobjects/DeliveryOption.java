@@ -16,34 +16,24 @@
 
 package de.gematik.test.erezept.pspwsclient.dataobjects;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum DeliveryOption {
-  SHIPMENT,
-  DELIVERY,
-  ON_PREMISE;
+  SHIPMENT("delivery_only"),
+  DELIVERY("local_delivery"),
+  ON_PREMISE("pick_up");
+
+  private final String path;
 
   public static DeliveryOption defineDeliveryOption(String deliveryOption) {
-    DeliveryOption result;
-    switch (deliveryOption.toLowerCase()) {
-      case "shipment":
-      case "versandapotheke":
-      case "versand":
-      case "belieferung":
-        result = SHIPMENT;
-        break;
-      case "abholen":
-      case "pick_up":
-      case "abholung":
-      case "reservierung":
-        result = ON_PREMISE;
-        break;
-      case "bote":
-      case "lokalebelieferung":
-      case "botendienst":
-        result = DELIVERY;
-        break;
-      default:
-        throw new InvalidDeliveryOptionException();
-    }
-    return result;
+    return switch (deliveryOption.toLowerCase()) {
+      case "shipment", "versandapotheke", "versand", "belieferung" -> SHIPMENT;
+      case "abholen", "pick_up", "abholung", "reservierung" -> ON_PREMISE;
+      case "bote", "lokalebelieferung", "botendienst" -> DELIVERY;
+      default -> throw new InvalidDeliveryOptionException();
+    };
   }
 }

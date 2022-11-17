@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class ErxCommunicationBundleTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/";
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   private FhirParser parser;
 
@@ -47,7 +47,7 @@ public class ErxCommunicationBundleTest {
     assertEquals(1, communicationBundle.getCommunications().size());
 
     val com = communicationBundle.getCommunications().get(0);
-    assertEquals(ErxCommunication.CommunicationType.REPLY, com.getType());
+    assertEquals(CommunicationType.REPLY, com.getType());
 
     assertEquals(1, communicationBundle.getCommunicationsFromSender("606358757").size());
     assertEquals(1, communicationBundle.getCommunicationsForReceiver("X234567890").size());

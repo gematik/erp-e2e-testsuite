@@ -22,11 +22,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.validation.ResultSeverityEnum;
-import de.gematik.test.erezept.fhir.util.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -54,108 +56,50 @@ class ValidatorTest extends ParsingTest {
 
   @Test
   void shouldFailOnNullContent() {
-    val vr = parser.validate(null);
-    assertFalse(vr.isSuccessful());
-    assertTrue(vr.getMessages().size() > 0);
-    assertEquals(ResultSeverityEnum.ERROR, vr.getMessages().get(0).getSeverity());
+    assertThrows(NullPointerException.class, () -> parser.validate(null)); // intentionally null
   }
 
   @Test
-  void shouldPassValidResources() {
-    val validResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/erp");
-
-    validResources.forEach(
-        file -> {
-          log.info("Validate: " + file.getName());
-          val content = ResourceUtils.readFileFromResource(file);
-          val vr = parser.validate(content);
-
-          // give some help on debugging if still errors in "valid resources"
-          if (!vr.isSuccessful()) {
-            System.out.println("Errors: " + vr.getMessages().size() + " in File " + file.getName());
-            vr.getMessages().forEach(System.out::println);
-          }
-
-          assertTrue(vr.isSuccessful());
-        });
+  void shouldPassValidErpResources() {
+    val validResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/erp/1.1.1");
+    ValidatorUtil.validateFiles(parser, validResources, Assertions::assertTrue, true);
   }
 
   @Test
-  void shouldPassOfficialKbvBundleResources() {
-    val kbvBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/bundle");
+  void shouldPassOfficialKbvBundleResources102() {
+    val kbvBundleResources =
+        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
+    ValidatorUtil.validateFiles(parser, kbvBundleResources, Assertions::assertTrue, true);
+  }
 
-    kbvBundleResources.forEach(
-        file -> {
-          log.info("Validate: " + file.getName());
-          val content = ResourceUtils.readFileFromResource(file);
-          val vr = parser.validate(content);
-
-          // give some help on debugging if still errors in "valid resources"
-          if (!vr.isSuccessful()) {
-            System.out.println("Errors: " + vr.getMessages().size() + " in File " + file.getName());
-            vr.getMessages().forEach(System.out::println);
-          }
-
-          assertTrue(vr.isSuccessful());
-        });
+  @Test
+  void shouldPassOfficialKbvBundleResources110() {
+    val kbvBundleResources =
+        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.1.0/bundle");
+    ValidatorUtil.validateFiles(parser, kbvBundleResources, Assertions::assertTrue, true);
   }
 
   @Test
   void shouldPassOfficialAbdaBundleResources() {
-    val kbvBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/dav");
-
-    kbvBundleResources.forEach(
-        file -> {
-          log.info("Validate: " + file.getName());
-          val content = ResourceUtils.readFileFromResource(file);
-          val vr = parser.validate(content);
-
-          // give some help on debugging if still errors in "valid resources"
-          if (!vr.isSuccessful()) {
-            System.out.println("Errors: " + vr.getMessages().size() + " in File " + file.getName());
-            vr.getMessages().forEach(System.out::println);
-          }
-
-          assertTrue(vr.isSuccessful());
-        });
+    val davBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/dav");
+    ValidatorUtil.validateFiles(parser, davBundleResources, Assertions::assertTrue, true);
   }
 
   @Test
   void shouldPassOfficialKbvPatientResources() {
-    val kbvPatients = ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/patient");
-
-    kbvPatients.stream()
-        .map(ResourceUtils::readFileFromResource)
-        .forEach(
-            content -> {
-              val vr = parser.validate(content);
-              assertTrue(vr.isSuccessful());
-            });
+    val kbvPatients = ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/patient");
+    ValidatorUtil.validateFiles(parser, kbvPatients, Assertions::assertTrue, true);
   }
 
   @Test
   void shouldFailInvalidErpResources() {
     val invalidResources = ResourceUtils.getResourceFilesInDirectory("fhir/invalid/erp");
-
-    invalidResources.stream()
-        .map(ResourceUtils::readFileFromResource)
-        .forEach(
-            content -> {
-              val vr = parser.validate(content);
-              assertFalse(vr.isSuccessful());
-            });
+    ValidatorUtil.validateFiles(parser, invalidResources, Assertions::assertFalse, false);
   }
 
   @Test
   void shouldFailInvalidKbvResources() {
     val invalidResources = ResourceUtils.getResourceFilesInDirectory("fhir/invalid/kbv");
-
-    invalidResources.stream()
-        .map(ResourceUtils::readFileFromResource)
-        .forEach(
-            content -> {
-              val vr = parser.validate(content);
-              assertFalse(vr.isSuccessful());
-            });
+    ValidatorUtil.validateFiles(parser, invalidResources, Assertions::assertFalse, false);
   }
 }

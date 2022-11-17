@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.screenplay.util;
 
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +27,7 @@ import lombok.Getter;
 public class ExchangedCommunication {
 
   private final String communicationId;
-  private final ErxCommunication.CommunicationType type;
+  private final ICommunicationType<?> type;
   private final String senderName;
   private final String receiverName;
 

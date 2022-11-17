@@ -14,7 +14,7 @@
         </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>target/log/testsuite.log</file>
+        <file>target/site/testsuite.log</file>
         <encoder>
             <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
         </encoder>
@@ -23,6 +23,15 @@
 
     <logger name="de.gematik.test.erezept" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="de.gematik.test.erezept" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="de.gematik.test.core" level="ALL" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="de.gematik.test.erezept.client" level="ALL" additivity="false">

@@ -16,13 +16,17 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.param.QueryParameter;
-import java.util.List;
+import de.gematik.test.erezept.client.rest.param.*;
 
 public class TaskGetByExamEvidenceCommand extends TaskGetCommand {
 
   /** Get all Tasks without any sorting or filtering */
   public TaskGetByExamEvidenceCommand(String kvnr, String examEvidence) {
-    super(List.of(new QueryParameter("KVNR", kvnr), new QueryParameter("PNW", examEvidence)));
+    if (kvnr != null) {
+      queryParameters.add(new QueryParameter("KVNR", kvnr));
+    }
+    if (examEvidence != null) {
+      queryParameters.add(new QueryParameter("PNW", examEvidence));
+    }
   }
 }

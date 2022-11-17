@@ -198,7 +198,9 @@ public class VauClient {
     return fdBaseUrl + "/VAU/" + vauUserPseudonym;
   }
 
-  /** @return "v" if communication from App otherwise "l" */
+  /**
+   * @return "v" if communication from App otherwise "l"
+   */
   private String getErpUserHeaderValue() {
     String ret = "l";
     if (clientType == ClientType.FDV) {

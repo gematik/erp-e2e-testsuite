@@ -17,20 +17,54 @@
 package de.gematik.test.erezept.lei.steps;
 
 import static java.text.MessageFormat.format;
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static net.serenitybdd.screenplay.GivenWhenThen.and;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.questions.*;
+import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
+import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.questions.HasChargeItem;
+import de.gematik.test.erezept.screenplay.questions.HasDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
+import de.gematik.test.erezept.screenplay.questions.HasReceivedCommunication;
+import de.gematik.test.erezept.screenplay.questions.HisInsuranceType;
+import de.gematik.test.erezept.screenplay.questions.HistSentCommunications;
+import de.gematik.test.erezept.screenplay.questions.MedicationDispenseContains;
+import de.gematik.test.erezept.screenplay.questions.PatientDoesHaveMessagesForTask;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfGetCommunicationFrom;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
+import de.gematik.test.erezept.screenplay.questions.TheLastPrescription;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
-import de.gematik.test.erezept.screenplay.task.*;
+import de.gematik.test.erezept.screenplay.task.AbortPrescription;
+import de.gematik.test.erezept.screenplay.task.AlternativelyAssign;
+import de.gematik.test.erezept.screenplay.task.BillingInformationConsent;
+import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.screenplay.task.DeleteAllSentCommunications;
+import de.gematik.test.erezept.screenplay.task.DeleteSentCommunication;
+import de.gematik.test.erezept.screenplay.task.HandoverDataMatrixCode;
+import de.gematik.test.erezept.screenplay.task.HandoverDispenseRequestAsRepresentative;
+import de.gematik.test.erezept.screenplay.task.RedeemPrescription;
+import de.gematik.test.erezept.screenplay.task.RetrievePrescriptionFromServer;
+import de.gematik.test.erezept.screenplay.task.SendCommunication;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.de.*;
+import io.cucumber.java.de.Aber;
+import io.cucumber.java.de.Angenommen;
+import io.cucumber.java.de.Dann;
+import io.cucumber.java.de.Und;
+import io.cucumber.java.de.Wenn;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.PendingStepException;
@@ -49,14 +83,9 @@ public class PatientSteps {
 
   @Before
   public void setUp() {
-    smartcards = SmartcardFactory.readArchive();
+    smartcards = SmartcardFactory.getArchive();
     config = TestsuiteConfiguration.getInstance();
     OnStage.setTheStage(new OnlineCast());
-  }
-
-  @After
-  public void tearDown() {
-    OnStage.drawTheCurtain();
   }
 
   /**
@@ -110,6 +139,7 @@ public class PatientSteps {
     givenThat(thePatient).can(provideBaseData);
     givenThat(thePatient).can(ManagePatientPrescriptions.itWorksWith());
     givenThat(thePatient).can(ManageCommunications.sheExchanges());
+    givenThat(thePatient).can(DecideUserBehaviour.fromConfiguration(config));
     useErpClient.authenticateWith(egk);
   }
 
@@ -882,27 +912,23 @@ public class PatientSteps {
   }
 
   /**
-   * Manueller Teststep zum Scannen des DMC mit dem FdV
-   *
-   * @param patientName
-   */
-  @Wenn("^(?:der Versicherte|die Versicherte) (.+) das E-Rezept per DMC in das FdV einscannt$")
-  public void whenPatientScansDmc(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
    * Manueller Teststep zum Auslösen der alternativen Zuweisung im FdV
    *
    * @param patientName
+   * @param order
    * @param pharmName
    * @param option
    */
   @Wenn(
-      "^(?:der Versicherte|die Versicherte) (.+) für das E-Rezept die alternative Zuweisung an die Apotheke (.+) mit der Option (.+) auslöst$")
+      "^(?:der Versicherte|die Versicherte) (.+) für das (letzte|erste) E-Rezept die alternative Zuweisung an die Apotheke (.+) mit der Option (.+) auslöst$")
   public void whenPatientInitiatsAlternativeAssignment(
-      String patientName, String pharmName, String option) {
-    throw new PendingStepException("Not yet implemented");
+      String patientName, String order, String pharmName, String option) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+
+    when(thePatient)
+        .attemptsTo(
+            AlternativelyAssign.thePrescriptionReceived(order).to(thePharmacy).with(option));
   }
 
   @Dann(

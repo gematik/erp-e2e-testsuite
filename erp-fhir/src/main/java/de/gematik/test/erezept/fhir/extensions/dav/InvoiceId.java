@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.extensions.dav;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Reference;
@@ -27,8 +27,8 @@ import org.hl7.fhir.r4.model.Reference;
 @SuppressWarnings({"java:S110"})
 public class InvoiceId extends Extension {
 
-  public static final ErpStructureDefinition STRUCTURE_DEFINITION =
-      ErpStructureDefinition.DAV_EX_ERP_ABRECHNUNGSZEILEN;
+  public static final AbdaErpBasisStructDef STRUCTURE_DEFINITION =
+      AbdaErpBasisStructDef.ABRECHNUNGSZEILEN;
 
   private InvoiceId(String id) {
     super(STRUCTURE_DEFINITION.getCanonicalUrl());

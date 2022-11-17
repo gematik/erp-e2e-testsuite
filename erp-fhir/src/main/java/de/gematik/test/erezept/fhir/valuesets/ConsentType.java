@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,7 +26,7 @@ import lombok.NonNull;
 public enum ConsentType implements IValueSet {
   CHARGCONS("CHARGCONS", "Consent for saving electronic charge item", "N/A");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.CONSENT_TYPE;
+  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.CONSENT_TYPE;
   public static final String VERSION = "1.1.0";
   public static final String DESCRIPTION = "Type of Consents for the ePrescription";
   public static final String PUBLISHER = "gematik GmbH";
@@ -42,7 +42,7 @@ public enum ConsentType implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public ErpWorkflowCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

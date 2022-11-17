@@ -34,16 +34,11 @@ public enum Crypto {
   }
 
   public static Crypto fromString(String value) {
-    switch (value.toUpperCase()) {
-      case "RSA_2048":
-      case "R2048":
-        return RSA_2048;
-      case "E256":
-      case "ECC_256":
-        return ECC_256;
-      default:
-        throw new AssertionError(format("Given Algorithm {0} is not supported", value));
-    }
+    return switch (value.toUpperCase()) {
+      case "RSA_2048", "R2048" -> RSA_2048;
+      case "E256", "ECC_256" -> ECC_256;
+      default -> throw new AssertionError(format("Given Algorithm {0} is not supported", value));
+    };
   }
 
   @Override

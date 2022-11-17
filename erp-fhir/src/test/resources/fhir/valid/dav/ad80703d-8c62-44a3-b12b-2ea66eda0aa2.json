@@ -16,7 +16,7 @@
   },
   "type": "document",
   "identifier": {
-    "system": "https://gematik.de/fhir/NamingSystem/PrescriptionID",
+    "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
     "value": "200.100.000.000.081.90"
   },
   "timestamp": "2022-03-24T11:30:00Z",
@@ -78,7 +78,7 @@
         },
         "identifier": [
           {
-            "system": "http://fhir.de/NamingSystem/arge-ik/iknr",
+            "system": "http://fhir.de/sid/arge-ik/iknr",
             "value": "123456789"
           }
         ],
@@ -159,7 +159,7 @@
         "authorizingPrescription": [
           {
             "identifier": {
-              "system": "https://gematik.de/fhir/NamingSystem/PrescriptionID",
+              "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
               "value": "200.100.000.000.081.90"
             }
           }

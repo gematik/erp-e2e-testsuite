@@ -75,12 +75,12 @@ public class ErpResponseVerifier {
 
   public static VerificationStep<ErpResponse> returnCodeIsBetween(
       int lower, int upper, RequirementsSet req) {
-    val list = IntStream.rangeClosed(lower, upper).boxed().collect(Collectors.toList());
+    val list = IntStream.rangeClosed(lower, upper).boxed().toList();
     return returnCodeIsIn(list, req);
   }
 
   public static VerificationStep<ErpResponse> returnCodeIsIn(RequirementsSet req, int... expected) {
-    val list = Arrays.stream(expected).boxed().collect(Collectors.toList());
+    val list = Arrays.stream(expected).boxed().toList();
     return returnCodeIsIn(list, req);
   }
 

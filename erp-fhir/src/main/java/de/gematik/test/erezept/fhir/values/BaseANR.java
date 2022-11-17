@@ -20,10 +20,17 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,17 +42,17 @@ public abstract class BaseANR {
 
   @Getter
   public enum ANRType {
-    LANR(ErpCodeSystem.HL7_V2_0203, ErpNamingSystem.KBV_NS_BASE_ANR, IdentifierTypeDe.LANR),
+    LANR(Hl7CodeSystem.HL7_V2_0203, KbvNamingSystem.BASE_ANR, IdentifierTypeDe.LANR),
     ZANR(
-        ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS,
-        ErpNamingSystem.ZAHNARZTNUMMER,
+        DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS,
+        DeBasisNamingSystem.ZAHNARZTNUMMER,
         IdentifierTypeDe.ZANR);
 
-    private final ErpCodeSystem codeSystem;
-    private final ErpNamingSystem namingSystem;
+    private final ICodeSystem codeSystem;
+    private final INamingSystem namingSystem;
     private final IdentifierTypeDe codeType;
 
-    ANRType(ErpCodeSystem codeSystem, ErpNamingSystem namingSystem, IdentifierTypeDe codeType) {
+    ANRType(ICodeSystem codeSystem, INamingSystem namingSystem, IdentifierTypeDe codeType) {
       this.codeSystem = codeSystem;
       this.namingSystem = namingSystem;
       this.codeType = codeType;
@@ -53,6 +60,18 @@ public abstract class BaseANR {
 
     public static ANRType fromCode(@NonNull String code) {
       return ANRType.valueOf(code.toUpperCase());
+    }
+
+    public static List<ICodeSystem> validCodeSystems() {
+      return Arrays.stream(ANRType.values()).map(ANRType::getCodeSystem).toList();
+    }
+
+    public static List<INamingSystem> validNamingSystems() {
+      return Arrays.stream(ANRType.values()).map(ANRType::getNamingSystem).toList();
+    }
+
+    public static List<IdentifierTypeDe> validCodeTypes() {
+      return Arrays.stream(ANRType.values()).map(ANRType::getCodeType).toList();
     }
   }
 
@@ -71,7 +90,7 @@ public abstract class BaseANR {
     return String.valueOf(expConNo).equals(actContNo);
   }
 
-  public final ErpNamingSystem getNamingSystem() {
+  public final INamingSystem getNamingSystem() {
     return this.type.getNamingSystem();
   }
 
@@ -80,14 +99,18 @@ public abstract class BaseANR {
   }
 
   public Identifier asIdentifier() {
+    return asIdentifier(this.getNamingSystem());
+  }
+
+  public Identifier asIdentifier(INamingSystem namingSystem) {
     val id = new Identifier();
     id.getType()
         .addCoding(new Coding().setCode(this.type.name()).setSystem(this.getCodeSystemUrl()));
-    id.setSystem(this.getNamingSystemUrl()).setValue(value);
+    id.setSystem(namingSystem.getCanonicalUrl()).setValue(value);
     return id;
   }
 
-  public final ErpCodeSystem getCodeSystem() {
+  public final ICodeSystem getCodeSystem() {
     return this.type.getCodeSystem();
   }
 
@@ -141,6 +164,31 @@ public abstract class BaseANR {
           format("Profession for Doctors of Type {0} not implemented", qualificationType));
     }
     return doctorNumber;
+  }
+
+  public static boolean hasValidIdentifier(Identifier identifier) {
+    val validNamingSystems =
+        List.of(
+            KbvNamingSystem.BASE_ANR.getCanonicalUrl(),
+            KbvNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl(),
+            DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
+    return validNamingSystems.contains(identifier.getSystem());
+  }
+
+  public static boolean isPractitioner(Identifier identifier) {
+    return isPractitioner(identifier.getType().getCodingFirstRep());
+  }
+
+  public static boolean isPractitioner(Coding coding) {
+    val practitionerCodeSystems =
+        ANRType.validCodeSystems().stream().map(IWithSystem::getCanonicalUrl).toList();
+
+    if (!practitionerCodeSystems.contains(coding.getSystem())) {
+      return false; // no CodeSystem of a ANRType found
+    }
+
+    return ANRType.validCodeTypes().stream()
+        .anyMatch(anrCodeType -> anrCodeType.getCode().equals(coding.getCode()));
   }
 
   private static ANRType decideType(Identifier identifier) {

@@ -25,8 +25,8 @@ public class DeviceConfiguration {
   private String platform;
   private String platformVersion;
   private String udid;
-
   private String appium;
+  private boolean enforceInstall = true;
 
   public PlatformType getPlatformType() {
     return PlatformType.fromString(platform);

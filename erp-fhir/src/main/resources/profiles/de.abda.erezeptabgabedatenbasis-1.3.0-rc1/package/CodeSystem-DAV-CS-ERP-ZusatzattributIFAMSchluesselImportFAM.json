@@ -1,0 +1,38 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "draft",
+  "content": "complete",
+  "name": "DAV_CS_ERP_ZusatzattributFAMSchluesselImportFAM",
+  "id": "DAV-CS-ERP-ZusatzattributFAMSchluesselImportFAM",
+  "version": "1.3",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzattributFAMSchluesselImportFAM",
+  "concept": [
+    {
+      "code": "0",
+      "display": "nicht relevant"
+    },
+    {
+      "code": "1",
+      "display": "ja, abgegeben"
+    },
+    {
+      "code": "2",
+      "display": "nein, nicht verfügbar",
+      "definition": "zusätzlich ggf. DokumentationFreitext über Großhandelsabfrage"
+    },
+    {
+      "code": "3",
+      "display": "nein, dringender Fall"
+    },
+    {
+      "code": "4",
+      "display": "nein, sonstige Bedenken",
+      "definition": "zusätzlich DokumentationFreitext"
+    },
+    {
+      "code": "5",
+      "display": "nicht abgegeben"
+    }
+  ],
+  "count": 6
+}

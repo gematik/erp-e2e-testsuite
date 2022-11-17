@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
@@ -32,7 +32,7 @@ public enum PkvTariff implements IValueSet {
   BASIS("03", "Basistarif"),
   NOTLAGE("04", "Notlagentarif");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.KBV_PKV_TARIFF;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.PKV_TARIFF;
   public static final String VERSION = "1.0.1";
   public static final String DESCRIPTION =
       "Diese Schlüsseltabelle beinhaltet die zulässigen Kostenträgerarten im PKV-Bereich";
@@ -47,13 +47,13 @@ public enum PkvTariff implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
     val valueCoding = new Coding();
     valueCoding.setCode(this.getCode()).setSystem(CODE_SYSTEM.getCanonicalUrl());
-    return new Extension(ErpStructureDefinition.KBV_PKV_TARIFF.getCanonicalUrl(), valueCoding);
+    return new Extension(KbvItaForStructDef.TARIFF.getCanonicalUrl(), valueCoding);
   }
 }

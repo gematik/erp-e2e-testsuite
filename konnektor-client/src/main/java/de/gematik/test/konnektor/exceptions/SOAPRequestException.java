@@ -21,7 +21,7 @@ import static java.text.MessageFormat.format;
 public class SOAPRequestException extends RuntimeException {
 
   public SOAPRequestException(Class<?> cmdClass, Exception cause) {
-    super(format("Error on {0} Request: {1}", cmdClass.getSimpleName(), cause.getMessage(), cause));
+    super(format("Error on {0} Request: {1}", cmdClass.getSimpleName(), cause.getMessage()), cause);
   }
 
   public SOAPRequestException(Class<?> cmdClass, String message) {

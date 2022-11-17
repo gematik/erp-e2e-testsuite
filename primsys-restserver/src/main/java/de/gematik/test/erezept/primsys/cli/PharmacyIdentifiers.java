@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.net.URL;
@@ -66,7 +66,7 @@ public class PharmacyIdentifiers implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     val cfg = TestsuiteConfiguration.getInstance();
-    val sca = SmartcardFactory.readArchive();
+    val sca = SmartcardFactory.getArchive();
 
     val md = MessageDigest.getInstance("sha-1"); // NOSONAR not security related!
 
@@ -85,8 +85,6 @@ public class PharmacyIdentifiers implements Callable<Integer> {
               printFullUrl(id, DeliveryOption.PICKUP);
               printFullUrl(id, DeliveryOption.ON_PREMISE);
             });
-
-    sca.destroy();
     return 0;
   }
 

@@ -47,9 +47,9 @@ public class GrizzlyWsServerApp extends WebSocketApplication implements WsServer
   @Override
   public WebSocket createSocket(
       ProtocolHandler handler, HttpRequestPacket requestPacket, WebSocketListener... listeners) {
-    log.info("createSocket....");
     val idOfClient = requestPacket.getRequestURI().substring(1);
     val websocket = new SimpleWebSocket(handler, listeners);
+    log.info("createSocket. has new Socket with id: " + idOfClient);
     socketsMap.put(idOfClient, websocket);
     return websocket;
   }
@@ -118,6 +118,8 @@ public class GrizzlyWsServerApp extends WebSocketApplication implements WsServer
   }
 
   public void send(String telemId, PspMessage pspMessage) {
+    log.info(
+        "@Send teleId: {}, pspMessage.getBlob().lenght: {}", telemId, pspMessage.getBlob().length);
     if (telemId == null || pspMessage.getBlob() == null) {
       throw new WebApplicationException(
           "no fitted receiver connected cause NO  Telematik Id received or blob == null",
@@ -137,8 +139,8 @@ public class GrizzlyWsServerApp extends WebSocketApplication implements WsServer
 
     if (!hasSpecificWsConnected(pspMessage.getClientId())) {
       log.info(
-          "!getInstance().connectionIsActive() not connected! getPspMessageMessageQueueList().add(pspMessage)"
-              + pspMessage);
+          "!getInstance().connectionIsActive() not connected! getPspMessageMessageQueueList().add(pspMessage) for "
+              + pspMessage.getClientId());
       this.prescriptionMessageQueue.getPspMessageMessageQueueList().add(pspMessage);
       throw new WebApplicationException(
           format(

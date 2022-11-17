@@ -18,25 +18,17 @@ package de.gematik.test.erezept.fhir.builder.dav;
 
 import static org.junit.Assert.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
-public class DavAbgabedatenBuilderTest {
-
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class DavAbgabedatenBuilderTest extends ParsingTest {
 
   @Test
   public void buildDavAbgabedatenBundleWithFixedValues() {
@@ -50,7 +42,7 @@ public class DavAbgabedatenBuilderTest {
             .build();
 
     val pc1 =
-        PriceComponentBuilder.builder(KostenVersicherterKategorie.EIGENBETEILIGUNG)
+        PriceComponentBuilder.builder(KostenVersicherterKategorie.ZUZAHLUNG)
             .currency(Currency.EUR) // EUR by default
             .type("informational")
             .insurantCost(5.8f)
@@ -62,7 +54,7 @@ public class DavAbgabedatenBuilderTest {
             .currency(Currency.EUR) // EUR by default
             .status("issued")
             .vatRate(19.0f)
-            .addPriceComponent(pc1, "1234567890")
+            .addPriceComponent(pc1, "12345678")
             .build();
 
     val dispensedMedication =

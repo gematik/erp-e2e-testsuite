@@ -32,6 +32,7 @@ pipeline {
             steps {
                 checkVersion(params.NEW_VERSION)
                 gitSetIdentity()
+                useJdk('OPENJDK17')
                 //nur für die Testumgebung notwendig!
                 useTestBuildServer()
             }

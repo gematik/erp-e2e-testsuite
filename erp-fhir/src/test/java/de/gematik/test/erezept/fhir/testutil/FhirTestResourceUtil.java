@@ -16,11 +16,16 @@
 
 package de.gematik.test.erezept.fhir.testutil;
 
-import java.util.LinkedList;
-import lombok.val;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Narrative;
-import org.hl7.fhir.r4.model.OperationOutcome;
+import static java.text.MessageFormat.*;
+
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.values.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.AuditEvent.*;
+import org.hl7.fhir.r4.model.Bundle.*;
 
 public class FhirTestResourceUtil {
 
@@ -41,5 +46,46 @@ public class FhirTestResourceUtil {
     oo.getText().setDivAsString("<div>narrative</div>");
     oo.setId(IdType.newRandomUuid());
     return oo;
+  }
+
+  public static ErxAuditEventBundle createErxAuditEventBundle(
+      TelematikID telematikId, String agentName, String checksum) {
+    val textItems =
+        List.of(
+            format(
+                "{0} hat mit Ihrer Gesundheitskarte alle Ihre einlösbaren E-Rezepte abgerufen (Prüfziffer: {1}).",
+                agentName, checksum),
+            format(
+                "{0} hat mit Ihrer Gesundheitskarte alle Ihre einlösbaren E-Rezepte abgerufen. (Keine Prüfziffer vorhanden)",
+                agentName),
+            format(
+                "{0} konnte aufgrund eines Fehlers Ihre E-Rezepte nicht mit Ihrer Gesundheitskarte abrufen.",
+                agentName));
+
+    val erxAuditEventBundle = new ErxAuditEventBundle();
+    textItems.forEach(
+        i ->
+            erxAuditEventBundle.addEntry(
+                new BundleEntryComponent()
+                    .setResource(
+                        createErxAuditEvent(i, telematikId, agentName, AuditEventAction.R))));
+    return erxAuditEventBundle;
+  }
+
+  public static ErxAuditEvent createErxAuditEvent(
+      String text, TelematikID telematikId, String agentName, AuditEventAction action) {
+    val erxAuditEvent = new ErxAuditEvent();
+    erxAuditEvent.setMeta(
+        new Meta().addProfile(ErpWorkflowStructDef.AUDIT_EVENT.getCanonicalUrl()));
+    val narrative = new Narrative();
+    narrative.setDivAsString(format("<div xmlns=\"http://www.w3.org/1999/xhtml\">{0}</div>", text));
+    erxAuditEvent.setText(narrative);
+    erxAuditEvent.setAction(action);
+    val agentReference =
+        new Reference().setIdentifier(new Identifier().setValue(telematikId.getValue()));
+    val agent = erxAuditEvent.addAgent();
+    agent.setWho(agentReference);
+    agent.setName(agentName);
+    return erxAuditEvent;
   }
 }

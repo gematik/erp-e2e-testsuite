@@ -1,0 +1,45 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "KBV_CS_SFHIR_ICD_SEITENLOKALISATION",
+  "id": "KBV-CS-SFHIR-ICD-SEITENLOKALISATION",
+  "description": "Angaben zur Lokalisation (Seitigkeit - links, recht, beidseitig) von Organen. Zusatzangabe zur Spezifikation der Diagnosen (ICD-10) oder Operationen und Prozeduren (OPS) bei paarigen Organen oder Körperteilen.",
+  "version": "1.00",
+  "url": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_ICD_SEITENLOKALISATION",
+  "concept": [
+    {
+      "code": "B",
+      "display": "beiderseits"
+    },
+    {
+      "code": "L",
+      "display": "links"
+    },
+    {
+      "code": "R",
+      "display": "rechts"
+    }
+  ],
+  "identifier": [
+    {
+      "system": "urn:ietf:rfc:3986",
+      "value": "urn:oid:1.2.276.0.76.3.1.1.5.1.22"
+    }
+  ],
+  "date": "2005-08-01",
+  "publisher": "Kassenärztliche Bundesvereinigung",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.kbv.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "Kassenärztliche Bundesvereinigung",
+  "caseSensitive": true,
+  "count": 3
+}

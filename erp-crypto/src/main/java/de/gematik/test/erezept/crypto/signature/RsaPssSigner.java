@@ -135,8 +135,7 @@ public class RsaPssSigner implements Signature<PrivateKey, PublicKey> {
   }
 
   private RSAKeyParameters generatePrivateKeyParameter(RSAPrivateKey key) {
-    if (key instanceof RSAPrivateCrtKey) {
-      val crtKey = (RSAPrivateCrtKey) key;
+    if (key instanceof RSAPrivateCrtKey crtKey) {
       return new RSAPrivateCrtKeyParameters(
           crtKey.getModulus(),
           crtKey.getPublicExponent(),

@@ -26,7 +26,7 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -63,7 +63,7 @@ class VerifyTest {
     val cmd = new TaskCreateCommand();
     val task = new ErxTask();
     val coding = PrescriptionFlowType.FLOW_TYPE_160.asCoding(true);
-    task.addExtension(ErpStructureDefinition.GEM_PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
+    task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
 
     val response = new ErpResponse(201, Map.of(), task);
     val interaction = new ErpInteraction<>(cmd, response);

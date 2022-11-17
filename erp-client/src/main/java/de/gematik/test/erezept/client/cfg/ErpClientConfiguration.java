@@ -16,11 +16,15 @@
 
 package de.gematik.test.erezept.client.cfg;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.idp.field.IdpScope;
 import de.gematik.test.erezept.client.ClientType;
+import de.gematik.test.erezept.client.exceptions.ConfigurationException;
 import de.gematik.test.erezept.client.rest.MediaType;
 import java.util.Set;
 import lombok.Data;
+import lombok.val;
 
 @Data
 public class ErpClientConfiguration implements INamedConfiguration {
@@ -73,13 +77,25 @@ public class ErpClientConfiguration implements INamedConfiguration {
   }
 
   public MediaType getAcceptMimeType() {
-    MediaType ret = MediaType.fromString(acceptMime);
+    var ret = MediaType.fromString(acceptMime);
 
     // fromString generates only send-types but not accept-types!
     if (ret == MediaType.FHIR_JSON) {
       ret = MediaType.ACCEPT_FHIR_JSON;
     } else if (ret == MediaType.FHIR_XML) {
       ret = MediaType.ACCEPT_FHIR_XML;
+    } else {
+      throw new ConfigurationException(format("Given Accept-Mime ''{0}'' is invalid", acceptMime));
+    }
+    return ret;
+  }
+
+  public MediaType getSendMimeType() {
+    val ret = MediaType.fromString(sendMime);
+
+    // check for invalid send mime-types
+    if (ret != MediaType.FHIR_JSON && ret != MediaType.FHIR_XML) {
+      throw new ConfigurationException(format("Given Send-Mime ''{0}'' is invalid", sendMime));
     }
     return ret;
   }
@@ -88,9 +104,5 @@ public class ErpClientConfiguration implements INamedConfiguration {
     return Set.of(
         IdpScope.OPENID,
         getFdBaseUrl().startsWith("https://erp-dev.") ? IdpScope.EREZEPTDEV : IdpScope.EREZEPT);
-  }
-
-  public MediaType getSendMimeType() {
-    return MediaType.fromString(sendMime);
   }
 }

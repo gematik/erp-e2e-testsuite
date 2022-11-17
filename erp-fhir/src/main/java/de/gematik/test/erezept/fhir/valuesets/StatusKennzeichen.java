@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.valuesets;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,7 +39,7 @@ public enum StatusKennzeichen implements IValueSet {
   TSS_SUBSTITUTE("17", "TSS-Kennzeichen mit Ersatzverordnungskennzeichen"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.STATUSKENNZEICHEN;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.STATUSKENNZEICHEN;
   public static final String VERSION = "1.01";
   public static final String DESCRIPTION =
       "Das Statuskennzeichen wird im Statusfeld des Personalienfeldes auf den KBV-Mustern angegeben. Weitere Informationen dazu siehe: technische Anlage zur Anlage 4a des BMV-Ä";
@@ -55,12 +55,12 @@ public enum StatusKennzeichen implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
-    return new Extension(ErpStructureDefinition.KBV_LEGAL_BASIS.getCanonicalUrl(), this.asCoding());
+    return new Extension(KbvItaForStructDef.BASIS.getCanonicalUrl(), this.asCoding());
   }
 
   @Override

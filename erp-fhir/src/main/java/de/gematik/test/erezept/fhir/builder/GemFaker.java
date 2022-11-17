@@ -19,8 +19,10 @@ package de.gematik.test.erezept.fhir.builder;
 import static java.text.MessageFormat.format;
 
 import com.github.javafaker.Faker;
+import de.gematik.test.erezept.fhir.exceptions.FakerException;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Country;
@@ -28,10 +30,12 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.val;
 
 public class GemFaker {
@@ -80,8 +84,8 @@ public class GemFaker {
   }
 
   public static Date fakerFutureExpirationDate() {
-    int min = 24 * 31; // at least one month
-    int most = min * 12 * 4; // at most 4 years
+    int min = 24 * 7; // at least one week
+    int most = 24 * 28; // at most 28 Days
     return faker.date().future(most, min, TimeUnit.HOURS);
   }
 
@@ -385,7 +389,9 @@ public class GemFaker {
     return faker.dune().quote();
   }
 
-  public static String fakerCommunicationMessage(ErxCommunication.CommunicationType type) {
+  public static String fakerCommunicationMessage(CommunicationType type) {
+    // TODO: this switch case appears on some other places! find a better solution like
+    // visitor/command pattern?
     var message = format("No random message was given for message type {0}", type);
     switch (type) {
       case INFO_REQ:
@@ -400,12 +406,16 @@ public class GemFaker {
       case REPRESENTATIVE:
         message = GemFaker.fakerCommunicationRepresentativeMessage();
         break;
-      case CHANGE_REQ:
-        message = GemFaker.fakerCommunicationChargeItemChangeRequest();
-        break;
-      case CHANGE_REPLY:
-        message = GemFaker.fakerCommunicationChargeItemChangeReply();
-        break;
+    }
+    return message;
+  }
+
+  public static String fakerChargeItemCommunicationMessage(ChargeItemCommunicationType type) {
+    var message = format("No random message was given for message type {0}", type);
+    if (type.equals(ChargeItemCommunicationType.CHANGE_REQ)) {
+      message = GemFaker.fakerCommunicationChargeItemChangeRequest();
+    } else if (type.equals(ChargeItemCommunicationType.CHANGE_REPLY)) {
+      message = GemFaker.fakerCommunicationChargeItemChangeReply();
     }
     return message;
   }
@@ -442,10 +452,30 @@ public class GemFaker {
    * @return a random choice
    */
   public static <V extends Enum<?>> V fakerValueSet(Class<V> valueSet) {
-    val idx = faker.random().nextInt(valueSet.getEnumConstants().length);
-    return valueSet.getEnumConstants()[idx];
+    return fakerValueSet(valueSet, List.of());
   }
 
+  public static <V extends Enum<?>> V fakerValueSet(Class<V> valueSet, V exclude) {
+    return fakerValueSet(valueSet, List.of(exclude));
+  }
+
+  public static <V extends Enum<?>> V fakerValueSet(Class<V> valueSet, List<V> exclude) {
+    val included =
+        Arrays.stream(valueSet.getEnumConstants()).filter(ec -> !exclude.contains(ec)).toList();
+
+    if (included.isEmpty()) {
+      throw new FakerException(
+          format(
+              "List of included choices for {0} is empty: probably all possible choices are excluded {1}",
+              valueSet.getSimpleName(),
+              exclude.stream().map(Enum::name).collect(Collectors.joining(", "))));
+    }
+
+    val idx = faker.random().nextInt(included.size());
+    return included.get(idx);
+  }
+
+  @SafeVarargs
   public static <T> T randomElement(T... elements) {
     return randomElement(List.of(elements));
   }

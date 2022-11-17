@@ -16,6 +16,12 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
+
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
@@ -34,6 +40,11 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -45,23 +56,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
-
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept ausstellen")
-public class TaskActivateUsecase extends ErpTest {
+class TaskActivateUsecase extends ErpTest {
 
   @Actor(name = "Bernd Claudius")
   private DoctorActor bernd;

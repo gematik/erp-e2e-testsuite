@@ -16,31 +16,46 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class PrescriptionIdTest {
+class PrescriptionIdTest {
 
   @Test
-  public void checkValidPrescriptionId() {
+  void checkValidPrescriptionId() {
     val id = "160.000.000.000.123.76";
     assertTrue(PrescriptionId.checkId(id));
   }
 
   @Test
-  public void checkInvalidPrescriptionId() {
+  void checkInvalidPrescriptionId() {
     val id = "160.000.000.000.123.77";
     assertFalse(PrescriptionId.checkId(id));
   }
 
   @Test
-  public void checkRandomPrescriptionId() {
-    for (int i = 0; i < 100; i++) {
+  void checkRandomPrescriptionId() {
+    for (int i = 0; i < 10; i++) {
       // just run a few iterations to really make sure random IDs are okay!
       val r = PrescriptionId.random();
       assertTrue(PrescriptionId.checkId(r));
     }
+  }
+
+  @Test
+  void shouldDetectOldPrescriptionId() {
+    val identifier = PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
+    assertTrue(PrescriptionId.isPrescriptionId(identifier));
+  }
+
+  @Test
+  void shouldDetectNewPrescriptionId() {
+    val identifier =
+        PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
+    assertTrue(PrescriptionId.isPrescriptionId(identifier));
   }
 }

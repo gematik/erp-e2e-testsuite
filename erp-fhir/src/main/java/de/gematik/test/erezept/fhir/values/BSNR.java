@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.values;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.val;
@@ -29,8 +29,8 @@ import org.hl7.fhir.r4.model.Identifier;
 
 public class BSNR {
 
-  private static final ErpNamingSystem NAMING_SYSTEM = ErpNamingSystem.KBV_NS_BASE_BSNR;
-  private static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.HL7_V2_0203;
+  private static final KbvNamingSystem NAMING_SYSTEM = KbvNamingSystem.BASE_BSNR;
+  private static final Hl7CodeSystem CODE_SYSTEM = Hl7CodeSystem.HL7_V2_0203;
   private static final String CODE = "BSNR";
 
   @Getter private final String value;
@@ -54,7 +54,7 @@ public class BSNR {
     return id;
   }
 
-  public static ErpNamingSystem getNamingSystem() {
+  public static KbvNamingSystem getNamingSystem() {
     return NAMING_SYSTEM;
   }
 
@@ -62,7 +62,7 @@ public class BSNR {
     return NAMING_SYSTEM.getCanonicalUrl();
   }
 
-  public static ErpCodeSystem getCodeSystem() {
+  public static Hl7CodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

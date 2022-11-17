@@ -17,13 +17,17 @@
 package de.gematik.test.erezept.fhir.values;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.val;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Reference;
 
 public class PrescriptionId extends Value<String> {
 
-  public static final ErpNamingSystem NAMING_SYSTEM = ErpNamingSystem.PRESCRIPTION_ID;
+  public static final ErpWorkflowNamingSystem NAMING_SYSTEM =
+      ErpWorkflowNamingSystem.PRESCRIPTION_ID;
 
   public PrescriptionId(final String value) {
     super(NAMING_SYSTEM, value);
@@ -31,6 +35,31 @@ public class PrescriptionId extends Value<String> {
 
   public boolean check() {
     return checkId(this.getValue());
+  }
+
+  /**
+   * Note: ErpWorkflowNamingSystem.PRESCRIPTION_ID is the default NamingSystem for PrescriptionId,
+   * however on some newer profiles ErpWorkflowNamingSystem.PRESCRIPTION_ID_121 is required. This
+   * method will become obsolete once all profiles are using a common naming system for
+   * PrescriptionId
+   *
+   * @param system to use for encoding the PrescriptionId value
+   * @return the PrescriptionId as Identifier
+   */
+  public Identifier asIdentifier(INamingSystem system) {
+    return new Identifier().setSystem(system.getCanonicalUrl()).setValue(this.getValue());
+  }
+
+  /**
+   * see {@link this#asIdentifier(INamingSystem)}
+   *
+   * @param system
+   * @return
+   */
+  public Reference asReference(INamingSystem system) {
+    val ref = new Reference();
+    ref.setIdentifier(asIdentifier(system));
+    return ref;
   }
 
   public static PrescriptionId random() {
@@ -49,5 +78,14 @@ public class PrescriptionId extends Value<String> {
     val raw = Long.parseLong(value.replace(".", ""));
     val check = raw % 97;
     return check == 1;
+  }
+
+  public static boolean isPrescriptionId(Identifier identifier) {
+    return isPrescriptionId(identifier.getSystem());
+  }
+
+  public static boolean isPrescriptionId(String system) {
+    return system.equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl())
+        || system.equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.getCanonicalUrl());
   }
 }

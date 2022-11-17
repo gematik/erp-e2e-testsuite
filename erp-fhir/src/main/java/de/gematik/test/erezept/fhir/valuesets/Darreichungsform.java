@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -248,7 +248,7 @@ public enum Darreichungsform implements IValueSet {
   WUE("WUE", "Würfel"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.DARREICHUNGSFORM;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.DARREICHUNGSFORM;
   public static final String VERSION = "1.07";
   public static final String DESCRIPTION = "Darreichungsform Arzneimittel/Rezeptur";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
@@ -263,7 +263,7 @@ public enum Darreichungsform implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

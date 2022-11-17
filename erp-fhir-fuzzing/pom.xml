@@ -21,22 +21,23 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.1.3</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>erp-fhir-fuzzing</artifactId>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>${version.java}</java.version>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
-            <version>0.1.3</version>
+            <version>0.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -44,7 +45,7 @@
         <dependency>
             <artifactId>erp-fhir</artifactId>
             <groupId>de.gematik.test.erezept</groupId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
             <type>test-jar</type>
         </dependency>
     </dependencies>

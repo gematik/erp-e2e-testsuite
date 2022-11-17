@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.fhir.resources;
 
+import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.PrimitiveType;
 
 @Slf4j
+@ResourceDef(name = "Organization")
 @SuppressWarnings({"java:S110"})
 public abstract class AbstractOrganization extends Organization {
 

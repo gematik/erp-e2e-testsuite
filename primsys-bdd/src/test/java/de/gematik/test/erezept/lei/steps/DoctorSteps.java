@@ -17,7 +17,9 @@
 package de.gematik.test.erezept.lei.steps;
 
 import static java.text.MessageFormat.format;
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
@@ -33,9 +35,8 @@ import de.gematik.test.erezept.screenplay.task.IssuePrescription;
 import de.gematik.test.erezept.screenplay.task.Negate;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
@@ -55,15 +56,9 @@ public class DoctorSteps {
 
   @Before
   public void setUp() {
-    smartcards = SmartcardFactory.readArchive();
+    smartcards = SmartcardFactory.getArchive();
     config = TestsuiteConfiguration.getInstance();
     OnStage.setTheStage(new OnlineCast());
-  }
-
-  @After
-  public void tearDown() {
-    smartcards.destroy();
-    OnStage.drawTheCurtain();
   }
 
   /**

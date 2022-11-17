@@ -16,11 +16,11 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 
 public class Secret extends Value<String> {
 
   public Secret(final String secret) {
-    super(ErpNamingSystem.SECRET, secret);
+    super(ErpWorkflowNamingSystem.SECRET, secret);
   }
 }

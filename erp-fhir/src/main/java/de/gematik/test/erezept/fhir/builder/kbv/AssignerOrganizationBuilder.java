@@ -22,7 +22,10 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.fhir.builder.AbstractOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.AddressBuilder;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.IKNR;
@@ -30,6 +33,7 @@ import de.gematik.test.erezept.fhir.valuesets.Country;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Reference;
 
 /**
@@ -40,6 +44,7 @@ import org.hl7.fhir.r4.model.Reference;
 public class AssignerOrganizationBuilder
     extends AbstractOrganizationBuilder<AssignerOrganizationBuilder> {
 
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
   private IKNR iknr;
 
   public static AssignerOrganizationBuilder builder() {
@@ -90,8 +95,25 @@ public class AssignerOrganizationBuilder
     // get the second token if available, otherwise the first one if reference was only <UUID>
     val resourceId = refTokens.length > 1 ? refTokens[1] : refTokens[0];
     builder.setResourceId(resourceId);
-    builder.name(name).iknr(fakerIknr()).phone(fakerPhone());
+    builder
+        .name(name)
+        .iknr(fakerIknr())
+        .phone(fakerPhone())
+        .address(Country.D, fakerCity(), fakerZipCode(), fakerStreetName());
     return builder;
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public AssignerOrganizationBuilder version(KbvItaForVersion version) {
+    this.kbvItaForVersion = version;
+    return this;
   }
 
   public AssignerOrganizationBuilder address(
@@ -118,8 +140,29 @@ public class AssignerOrganizationBuilder
 
   public AssignerOrganization build() {
     checkRequired();
-    return AssignerOrganization.fromOrganization(
-        buildOrganizationWith(ErpStructureDefinition.KBV_ORGANIZATION, iknr.asIdentifier()));
+    var iknrNamingSystem = DeBasisNamingSystem.IKNR;
+
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) >= 0) {
+      iknrNamingSystem = DeBasisNamingSystem.IKNR_SID;
+    }
+
+    val assignerOrganization =
+        AssignerOrganization.fromOrganization(
+            buildOrganizationWith(
+                () -> KbvItaForStructDef.ORGANIZATION.asCanonicalType(kbvItaForVersion),
+                iknr.asIdentifier(iknrNamingSystem)));
+
+    assignerOrganization
+        .getIdentifierFirstRep()
+        .getType()
+        .addCoding(
+            new Coding()
+                .setCode("XX")
+                .setSystem(
+                    Hl7CodeSystem.HL7_V2_0203
+                        .getCanonicalUrl())); // TODO: what about moving this to IKNR?
+
+    return assignerOrganization;
   }
 
   protected void checkRequired() {

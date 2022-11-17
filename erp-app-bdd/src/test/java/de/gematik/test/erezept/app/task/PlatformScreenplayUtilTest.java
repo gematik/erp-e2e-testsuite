@@ -16,7 +16,8 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 
 import de.gematik.test.erezept.app.cfg.PlatformType;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
@@ -24,6 +25,7 @@ import de.gematik.test.erezept.app.questions.android.HasReceivedPrescriptionOnAn
 import de.gematik.test.erezept.app.questions.ios.HasReceivedPrescriptionOnIos;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import org.junit.Test;
 
@@ -33,19 +35,25 @@ public class PlatformScreenplayUtilTest {
   public void chooseTaskForPlatform() {
     val androidTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
-            PlatformType.ANDROID, SetUpAndroidDevice::new, SetUpIosDevice::new);
+            PlatformType.ANDROID,
+            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV),
+            () -> new SetUpIosDevice(VersicherungsArtDeBasis.BG));
     assertSame(androidTask.getClass(), SetUpAndroidDevice.class);
 
     val iosTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
-            PlatformType.IOS, SetUpAndroidDevice::new, SetUpIosDevice::new);
+            PlatformType.IOS,
+            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV),
+            () -> new SetUpIosDevice(VersicherungsArtDeBasis.BG));
     assertSame(iosTask.getClass(), SetUpIosDevice.class);
 
     assertThrows(
         UnsupportedPlatformException.class,
         () ->
             PlatformScreenplayUtil.chooseTaskForPlatform(
-                PlatformType.DESKTOP, SetUpAndroidDevice::new, SetUpIosDevice::new));
+                PlatformType.DESKTOP,
+                () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV),
+                () -> new SetUpIosDevice(VersicherungsArtDeBasis.BG)));
   }
 
   @Test

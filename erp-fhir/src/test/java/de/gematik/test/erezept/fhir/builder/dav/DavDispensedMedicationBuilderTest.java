@@ -18,23 +18,15 @@ package de.gematik.test.erezept.fhir.builder.dav;
 
 import static org.junit.Assert.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Date;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
-public class DavDispensedMedicationBuilderTest {
-
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class DavDispensedMedicationBuilderTest extends ParsingTest {
 
   @Test
   public void buildMedicationDispenseWithFixedValues() {

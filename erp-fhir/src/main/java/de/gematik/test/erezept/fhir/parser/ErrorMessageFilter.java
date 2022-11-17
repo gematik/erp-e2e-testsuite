@@ -59,10 +59,16 @@ public class ErrorMessageFilter implements IValidatorModule {
           // dom-6 is just a Guideline: https://www.hl7.org/fhir/domainresource-definitions.html
           "^dom-6: Rule 'A resource should have narrative for robust management'.*",
 
+          // TODO: check if these are still required!
+          "^Dies scheint keine FHIR-Ressource zu sein \\(unbekannter Name \"Bundle\"\\)",
+          "^Found a reference to a CodeSystem \\(https://gematik.de/fhir/CodeSystem/Documenttype\\) where a ValueSet belongs",
+
           // this issue occurs only on round-trips (xml -> json): XML-comments <!-- ... --> are
           // converted to fhir_comments ["..."]
           "^Unrecognised property '@fhir_comments'.*",
-          "^Nicht erkannte Property '@fhir_comments'");
+          "^Nicht erkannte Property '@fhir_comments'"
+          // "^Slicing cannot be evaluated: Konnte nicht mit dem Diskriminator.*"
+          );
 
   @Override
   public void validateResource(final IValidationContext<IBaseResource> iValidationContext) {

@@ -18,9 +18,8 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
@@ -35,7 +34,7 @@ import org.hl7.fhir.r4.model.*;
 /** <a href="https://simplifier.net/base1x0/kbvprbasepatient">KBV Base Patient</a> */
 @Slf4j
 @Getter
-@ResourceDef(name = "Patient", profile = StructureDefinitionFixedUrls.KBV_PR_FOR_PATIENT)
+@ResourceDef(name = "Patient")
 @SuppressWarnings({"java:S110"})
 public class KbvPatient extends Patient {
 
@@ -74,12 +73,15 @@ public class KbvPatient extends Patient {
         .map(id -> id.getType().getCodingFirstRep())
         .filter(
             coding ->
-                coding.getSystem().equals(ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
+                coding
+                    .getSystem()
+                    .equals(DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
         .map(Coding::getCode)
         .findFirst()
         .orElseThrow(
             () ->
-                new MissingFieldException(this.getClass(), ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
+                new MissingFieldException(
+                    this.getClass(), DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
   }
 
   public Optional<String> getKvid() {
@@ -101,7 +103,8 @@ public class KbvPatient extends Patient {
 
   private Optional<Identifier> getKvidIdentifier() {
     return this.getIdentifier().stream()
-        .filter(identifier -> identifier.getSystem().equals(ErpNamingSystem.KVID.getCanonicalUrl()))
+        .filter(
+            identifier -> identifier.getSystem().equals(DeBasisNamingSystem.KVID.getCanonicalUrl()))
         //                .filter(identifier ->
         // identifier.getValue().equals(IdentifierTypeDe.GKV.getCode()))
         .findFirst();
@@ -122,7 +125,7 @@ public class KbvPatient extends Patient {
     val pkvIdentifer = this.getPkvIdentifier();
 
     AtomicReference<Optional<Reference>> ret = new AtomicReference<>(Optional.empty());
-    pkvIdentifer.ifPresent(identifier -> ret.set(Optional.of(identifier.getAssigner())));
+    pkvIdentifer.ifPresent(identifier -> ret.set(Optional.ofNullable(identifier.getAssigner())));
     return ret.get();
   }
 
@@ -131,7 +134,7 @@ public class KbvPatient extends Patient {
 
     AtomicReference<Optional<String>> ret = new AtomicReference<>(Optional.empty());
     pkvIdentifer.ifPresent(
-        identifier -> ret.set(Optional.of(identifier.getAssigner().getDisplay())));
+        identifier -> ret.set(Optional.ofNullable(identifier.getAssigner().getDisplay())));
     return ret.get();
   }
 

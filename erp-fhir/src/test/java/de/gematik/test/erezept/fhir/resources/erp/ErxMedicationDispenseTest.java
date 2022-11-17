@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseTest {
-  private final String BASE_PATH = "fhir/valid/erp/";
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   private static FhirParser parser;
 

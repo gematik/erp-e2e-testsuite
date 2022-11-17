@@ -25,21 +25,11 @@ public enum PlatformType {
   DESKTOP;
 
   public static PlatformType fromString(@NonNull final String platform) {
-    PlatformType pft;
-    switch (platform.toLowerCase()) {
-      case "ios":
-        pft = PlatformType.IOS;
-        break;
-      case "android":
-        pft = PlatformType.ANDROID;
-        break;
-      case "desktop":
-      case "adv":
-        pft = PlatformType.DESKTOP;
-        break;
-      default:
-        throw new UnsupportedPlatformException(platform);
-    }
-    return pft;
+    return switch (platform.toLowerCase()) {
+      case "ios" -> PlatformType.IOS;
+      case "android" -> PlatformType.ANDROID;
+      case "desktop", "adv" -> PlatformType.DESKTOP;
+      default -> throw new UnsupportedPlatformException(platform);
+    };
   }
 }

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.rest.request;
 
+import static de.gematik.test.erezept.primsys.rest.data.CoverageData.create;
+
 import de.gematik.test.erezept.primsys.rest.data.CoverageData;
 import de.gematik.test.erezept.primsys.rest.data.MedicationData;
 import de.gematik.test.erezept.primsys.rest.data.PatientData;
@@ -32,7 +34,9 @@ public class PrescribeRequest {
 
   public CoverageData getCoverage() {
     if (coverage == null) {
-      coverage = CoverageData.create();
+      coverage = create();
+    } else {
+      coverage.fakeMissing();
     }
     return coverage;
   }
@@ -40,7 +44,18 @@ public class PrescribeRequest {
   public MedicationData getMedication() {
     if (medication == null) {
       medication = MedicationData.create();
+    } else {
+      medication.fakeMissing();
     }
     return medication;
+  }
+
+  public PatientData getPatient() {
+    if (patient == null) {
+      patient = PatientData.create();
+    } else {
+      patient.fakeMissing();
+    }
+    return patient;
   }
 }

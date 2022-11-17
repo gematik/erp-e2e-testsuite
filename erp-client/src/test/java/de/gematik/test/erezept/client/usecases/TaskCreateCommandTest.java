@@ -16,12 +16,11 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class TaskCreateCommandTest {
 
@@ -35,7 +34,7 @@ class TaskCreateCommandTest {
   }
 
   @Test
-  void requestBodyShuoldBeNotNull() {
+  void requestBodyShouldBeNotNull() {
     val cmd = new TaskCreateCommand(PrescriptionFlowType.FLOW_TYPE_160);
     assertNotNull(cmd.getRequestBody());
   }

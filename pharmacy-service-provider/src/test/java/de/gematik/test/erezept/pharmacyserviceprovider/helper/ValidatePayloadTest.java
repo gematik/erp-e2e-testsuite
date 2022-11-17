@@ -19,6 +19,8 @@ package de.gematik.test.erezept.pharmacyserviceprovider.helper;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ValidatePayloadTest {
 
@@ -32,15 +34,15 @@ class ValidatePayloadTest {
     assertTrue(ValidatePayload.stringIsNull(null));
   }
 
-  @org.junit.jupiter.api.Test
-  void bodyIsNotNull() {
-    byte[] testByteArray = "test body from App".getBytes();
-    assertTrue(ValidatePayload.bodyHasContent(testByteArray));
-  }
-
-  @org.junit.jupiter.api.Test
-  void bodyIsNotNullSmall() {
-    byte[] testByteArray = "t".getBytes();
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "test body from App",
+        "t",
+        "senseless long String without an idea what to write inside because it does not make sense to write something senseless, but a good idea is to try to push all keys at the same time like that: asudzigkughjevfuilgqwe678tdguzb079rhoifweksdcvn 89wquoejedjgfbhasweupq OCERIO/=()q2zwe OPFfgWERZOZOIQUZE IROUZFTw eIWUEHFRUZq3wuzepi IUEWZSGTuzwe iWEGRUZFqw3teoI Eiuzwer  "
+      })
+  void bodyHasContent(String args) {
+    byte[] testByteArray = args.getBytes();
     assertTrue(ValidatePayload.bodyHasContent(testByteArray));
   }
 
@@ -48,14 +50,6 @@ class ValidatePayloadTest {
   void bodyIsNotNullButEmpty() {
     byte[] testByteArray = "".getBytes();
     assertFalse(ValidatePayload.bodyHasContent(testByteArray));
-  }
-
-  @org.junit.jupiter.api.Test
-  void bodyIsNotNullLong() {
-    byte[] testByteArray =
-        "senseless long String without an idea what to write inside because it does not make sense to write something senseless, but a good idea is to try to push all keys at the same time like that: asudzigkughjevfuilgqwe678tdguzb079rhoifweksdcvn 89wquoejedjgfbhasweupq OCERIO/=()q2zwe OPFfgWERZOZOIQUZE IROUZFTw eIWUEHFRUZq3wuzepi IUEWZSGTuzwe iWEGRUZFqw3teoI Eiuzwer  "
-            .getBytes();
-    assertTrue(ValidatePayload.bodyHasContent(testByteArray));
   }
 
   @org.junit.jupiter.api.Test

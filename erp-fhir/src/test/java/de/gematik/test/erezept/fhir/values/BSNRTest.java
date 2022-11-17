@@ -17,17 +17,15 @@
 package de.gematik.test.erezept.fhir.values;
 
 import static de.gematik.test.erezept.fhir.valuesets.Wop.fromCode;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.valuesets.Wop;
-import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class BSNRTest {
+class BSNRTest {
 
   @Test
-  public void testRandomBsnrKeyNumber() {
+  void testRandomBsnrKeyNumber() {
     String testNo = BSNR.random().toString().substring(6, 15);
     String jobKey = testNo.substring(0, 2);
     // "fromCode()" throws Exception if jobKey is invalid for Wop
@@ -36,20 +34,20 @@ public class BSNRTest {
   }
 
   @Test
-  public void testRandomBsnrRealisticLength() {
+  void testRandomBsnrRealisticLength() {
     String testNum = String.valueOf(BSNR.random());
     assertEquals(15, testNum.length());
   }
 
   @Test
-  public void testRandomBsnrRealisticBegin() {
+  void testRandomBsnrRealisticBegin() {
     String testNum = BSNR.random().toString().substring(0, 5);
     assertEquals("BSNR:", testNum);
   }
 
-  @Test(expected = Test.None.class)
-  public void testRandomFakerBsnrAsInteger() {
+  @Test
+  void testRandomFakerBsnrAsInteger() {
     String testLanr = BSNR.random().getValue();
-    val testNo = Integer.parseInt(testLanr);
+    assertDoesNotThrow(() -> Integer.parseInt(testLanr));
   }
 }

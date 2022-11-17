@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class KbvBasePatientTest {
 
-  private final String BASE_PATH = "fhir/valid/kbv/patient/";
+  private final String BASE_PATH = "fhir/valid/kbv/1.0.2/patient/";
 
   private FhirParser parser;
 

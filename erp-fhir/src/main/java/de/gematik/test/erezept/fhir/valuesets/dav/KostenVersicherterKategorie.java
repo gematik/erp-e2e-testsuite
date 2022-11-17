@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -33,8 +33,7 @@ public enum KostenVersicherterKategorie implements IValueSet {
       "2",
       "Eigenbeteiligung des Versicherten bei Verordnungen im Rahmen der künstlichen Befruchtung");
 
-  public static final ErpCodeSystem CODE_SYSTEM =
-      ErpCodeSystem.DAV_PKV_CS_ERP_KOSTEN_VERSICHERTER_KATEGORIE;
+  public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.KOSTEN_VERSICHERTER_KATEGORIE;
   public static final String VERSION = "1.1";
   public static final String DESCRIPTION = "Category of the cost";
   public static final String PUBLISHER = "DAV";
@@ -48,7 +47,7 @@ public enum KostenVersicherterKategorie implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

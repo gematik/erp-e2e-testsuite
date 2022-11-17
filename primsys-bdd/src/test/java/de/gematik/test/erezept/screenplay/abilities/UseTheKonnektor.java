@@ -24,12 +24,20 @@ import de.gematik.test.konnektor.CardHandle;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.PinType;
 import de.gematik.test.konnektor.cfg.KonnektorConfiguration;
-import de.gematik.test.konnektor.commands.*;
+import de.gematik.test.konnektor.commands.DecryptDocumentCommand;
+import de.gematik.test.konnektor.commands.ExternalAuthenticateCommand;
+import de.gematik.test.konnektor.commands.GetCardHandleCommand;
+import de.gematik.test.konnektor.commands.ReadCardCertificateCommand;
+import de.gematik.test.konnektor.commands.ReadVsdCommand;
+import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
+import de.gematik.test.konnektor.commands.VerifyDocumentCommand;
+import de.gematik.test.konnektor.commands.VerifyPinCommand;
 import de.gematik.test.smartcard.Egk;
 import de.gematik.test.smartcard.Hba;
 import de.gematik.test.smartcard.SmartcardType;
 import de.gematik.test.smartcard.SmcB;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Optional;
@@ -59,6 +67,16 @@ public class UseTheKonnektor implements Ability {
     if (smcb != null) this.smcbHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb));
     if (hba != null) this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba));
   }
+
+  public String decrypt(byte[] data) {
+    val decrypted = this.konnektor.execute(new DecryptDocumentCommand(smcbHandle, data));
+    return new String(decrypted, StandardCharsets.UTF_8);
+  }
+
+  public byte[] encrypt(String data) {
+    log.warn("Encrypt in Konnektor Ability not yet implemented.. ");
+    return "".getBytes();
+  } // todo
 
   public byte[] signDocument(String document) {
     if (hbaHandle == null) {

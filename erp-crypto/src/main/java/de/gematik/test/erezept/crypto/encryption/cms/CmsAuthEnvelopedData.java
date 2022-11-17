@@ -22,27 +22,18 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.RecipientIdentifier;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSAuthEnvelopedData;
-import org.bouncycastle.cms.CMSAuthEnvelopedDataGenerator;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.SimpleAttributeTableGenerator;
+import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
@@ -55,8 +46,7 @@ public class CmsAuthEnvelopedData {
   @SneakyThrows
   public byte[] encrypt(List<X509Certificate> recipientCertificates, byte[] plaintext) {
 
-    val certs =
-        recipientCertificates.stream().map(EncCertificate::new).collect(Collectors.toList());
+    val certs = recipientCertificates.stream().map(EncCertificate::new).toList();
 
     val msg = new CMSProcessableByteArray(plaintext);
     val edGen = new CMSAuthEnvelopedDataGenerator();

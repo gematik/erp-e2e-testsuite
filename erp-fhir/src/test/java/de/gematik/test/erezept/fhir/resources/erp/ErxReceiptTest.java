@@ -19,25 +19,17 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.DocumentType;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Resource;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class ErxReceiptTest {
-  private final String BASE_PATH = "fhir/valid/erp/";
-
-  private static FhirParser parser;
-
-  @BeforeAll
-  static void setUp() {
-    parser = new FhirParser();
-  }
+class ErxReceiptTest extends ParsingTest {
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   @Test
   void shouldEncodeSingleReceipt() {

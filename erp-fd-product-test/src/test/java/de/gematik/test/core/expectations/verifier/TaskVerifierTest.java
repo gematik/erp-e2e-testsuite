@@ -21,7 +21,7 @@ import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflo
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.val;
@@ -40,7 +40,7 @@ class TaskVerifierTest {
   void shouldThrowOnInvalidPrescriptionFlowType() {
     val task = new ErxTask();
     val coding = PrescriptionFlowType.FLOW_TYPE_169.asCoding(true);
-    task.addExtension(ErpStructureDefinition.GEM_PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
+    task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
 
     val step = hasWorkflowType(PrescriptionFlowType.FLOW_TYPE_160);
     assertThrows(AssertionError.class, () -> step.apply(task));
@@ -50,7 +50,7 @@ class TaskVerifierTest {
   void shouldPassOnCorrectPrescriptionFlowType() {
     val task = new ErxTask();
     val coding = PrescriptionFlowType.FLOW_TYPE_160.asCoding(true);
-    task.addExtension(ErpStructureDefinition.GEM_PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
+    task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
 
     val step = hasWorkflowType(PrescriptionFlowType.FLOW_TYPE_160);
     step.apply(task);

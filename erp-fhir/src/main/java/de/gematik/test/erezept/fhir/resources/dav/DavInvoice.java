@@ -19,9 +19,8 @@ package de.gematik.test.erezept.fhir.resources.dav;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.dav.InvoiceId;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
@@ -33,9 +32,7 @@ import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @Getter
-@ResourceDef(
-    name = "Invoice",
-    profile = StructureDefinitionFixedUrls.DAV_PKV_PR_ERP_ABRECHNUNGSZEILEN)
+@ResourceDef(name = "Invoice")
 @SuppressWarnings({"java:S110"})
 public class DavInvoice extends Invoice {
 
@@ -45,12 +42,12 @@ public class DavInvoice extends Invoice {
 
   public String getPzn() {
     return this.getPznOptional()
-        .orElseThrow(() -> new MissingFieldException(DavInvoice.class, ErpCodeSystem.PZN));
+        .orElseThrow(() -> new MissingFieldException(DavInvoice.class, DeBasisCodeSystem.PZN));
   }
 
   public Optional<String> getPznOptional() {
     return this.getLineItemFirstRep().getChargeItemCodeableConcept().getCoding().stream()
-        .filter(coding -> coding.getSystem().equals(ErpCodeSystem.PZN.getCanonicalUrl()))
+        .filter(coding -> coding.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
         .map(Coding::getCode)
         .findFirst();
   }
@@ -61,9 +58,7 @@ public class DavInvoice extends Invoice {
 
   public float getTotalCoPayment() {
     return this.getTotalGross().getExtension().stream()
-        .filter(
-            ext ->
-                ext.getUrl().equals(ErpStructureDefinition.DAV_EX_ERP_CO_PAYMENT.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(AbdaErpBasisStructDef.GESAMTZUZAHLUNG.getCanonicalUrl()))
         .map(ext -> ext.getValue().castToMoney(ext.getValue()).getValue().floatValue())
         .findFirst()
         .orElse(0.0f);
@@ -80,12 +75,11 @@ public class DavInvoice extends Invoice {
    */
   public float getVAT() {
     return this.getLineItemFirstRep().getPriceComponentFirstRep().getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(ErpStructureDefinition.DAV_EX_ERP_VAT.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(AbdaErpBasisStructDef.MWST_SATZ.getCanonicalUrl()))
         .findFirst()
         .map(ext -> Float.parseFloat(ext.getValue().primitiveValue()))
         .orElseThrow(
-            () ->
-                new MissingFieldException(DavInvoice.class, ErpStructureDefinition.DAV_EX_ERP_VAT));
+            () -> new MissingFieldException(DavInvoice.class, AbdaErpBasisStructDef.MWST_SATZ));
   }
 
   public List<InvoiceLineItemPriceComponentComponent> getPriceComponents() {

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.1.3</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,25 +25,25 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>konnektor-client</artifactId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
             <scope>test</scope> <!-- required for the integration test -->
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-crypto</artifactId>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
 
         <!-- TODO: why jackson not shipped with erp-fhir? -->
@@ -63,7 +63,7 @@
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
             <type>test-jar</type>
-            <version>${version.testsuite}</version>
+            <version>0.2.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
 
@@ -71,6 +71,12 @@
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-cades</artifactId>
             <version>${version.dss}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -84,7 +90,7 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
             <version>${version.bouncycastle}</version>
         </dependency>
 
@@ -99,11 +105,7 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15on</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

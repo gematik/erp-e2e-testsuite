@@ -7,26 +7,29 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.1.3</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
+        <version.java>17</version.java>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <encoding>UTF-8</encoding>
         <!-- do not remove this property! -->
         <groovy.version>3.0.7</groovy.version>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
+        <java.version>${version.java}</java.version>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
-        <version.fmt-maven-plugin>2.9</version.fmt-maven-plugin>
-        <version.jacoco>0.8.5</version.jacoco>
+        <version.jacoco>0.8.8</version.jacoco>
         <version.sonar.jacoco.listener>5.0.1.12818</version.sonar.jacoco.listener>
         <version.surefire>3.0.0-M2</version.surefire>
         <version.surefire-report>3.0.0-M2</version.surefire-report>
         <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
         <version.maven-javadoc-plugin>3.3.2</version.maven-javadoc-plugin>
+        <version.maven-owasp-plugin>7.3.0</version.maven-owasp-plugin>
 
         <version.fasterxml.jackson>2.13.3</version.fasterxml.jackson>
         <version.junit>5.7.2</version.junit>
@@ -40,7 +43,8 @@
 
         <version.unirest>3.13.6</version.unirest>
         <version.dss>5.11.RC1</version.dss>
-        <version.bouncycastle>1.70</version.bouncycastle>
+        <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
+        <version.bouncycastle>1.72</version.bouncycastle>
 
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
 
@@ -48,7 +52,9 @@
         <surefire.forkCount>1</surefire.forkCount>
         <sonar.exclusions>
             **/*Main.java,
-            **/primsys/cli/*.java
+            **/primsys/cli/*.java,
+            **/primsys/rest/*Resource.java,
+            **/test/erezept/operator/jframe/*.java
         </sonar.exclusions>
 
         <!-- JavaDoc properties -->
@@ -60,9 +66,7 @@
         <version.serenity>3.2.5</version.serenity>
 
         <!-- gematik dependency version -->
-        <version.idp-client>19.2.0-256</version.idp-client>
-        <version.erp-fhir>0.1.3-SNAPSHOT</version.erp-fhir>
-        <version.testsuite>0.1.3-SNAPSHOT</version.testsuite>
+        <version.idp-client>21.0.8</version.idp-client>
         <version.spotless>2.25.0</version.spotless>
     </properties>
 
@@ -126,13 +130,19 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.coveo</groupId>
-                <artifactId>fmt-maven-plugin</artifactId>
-                <version>${version.fmt-maven-plugin}</version>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${version.maven-owasp-plugin}</version>
+                <configuration>
+<!--                    <failBuildOnCVSS>8</failBuildOnCVSS>--> <!-- activate once we've fixed all bad dependencies -->
+                    <skipProvidedScope>true</skipProvidedScope>
+                    <skipRuntimeScope>true</skipRuntimeScope>
+                </configuration>
                 <executions>
                     <execution>
+                        <phase>deploy</phase>
                         <goals>
-                            <goal>format</goal>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -140,11 +150,18 @@
             <plugin>
                 <groupId>com.cosium.code</groupId>
                 <artifactId>git-code-format-maven-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.5</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>install-hooks</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>validate-code-format</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>validate-code-format</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -184,6 +201,7 @@
                         </property>
                     </properties>
                     <skip>${skip.unittests}</skip>
+                    <parallel>classes</parallel>
                 </configuration>
             </plugin>
             <plugin>
@@ -233,6 +251,18 @@
                     <reportSet>
                         <id>aggregate</id>
                         <inherited>false</inherited> <!-- don't run aggregate in child modules -->
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${version.maven-owasp-plugin}</version>
+                <reportSets>
+                    <reportSet>
                         <reports>
                             <report>aggregate</report>
                         </reports>
@@ -293,6 +323,12 @@
             <version>3.23.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${version.mockito}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>

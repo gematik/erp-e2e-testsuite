@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.fhir.resources;
 
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.values.IKNR;
 
 @SuppressWarnings({"java:S110"})
@@ -24,7 +25,17 @@ public abstract class InstitutionalOrganization extends AbstractOrganization {
 
   public IKNR getIknr() {
     return this.identifier.stream()
-        .filter(identifier -> identifier.getSystem().equals(IKNR.getSystem().getCanonicalUrl()))
+        .filter(
+            identifier ->
+                identifier
+                        .getSystem()
+                        .equals(
+                            DeBasisNamingSystem.IKNR.getCanonicalUrl()) // old IKNR naming system
+                    || identifier
+                        .getSystem()
+                        .equals(
+                            DeBasisNamingSystem.IKNR_SID
+                                .getCanonicalUrl())) // or new IKNR naming system
         .map(identifer -> new IKNR(identifer.getValue()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), IKNR.getSystem()));

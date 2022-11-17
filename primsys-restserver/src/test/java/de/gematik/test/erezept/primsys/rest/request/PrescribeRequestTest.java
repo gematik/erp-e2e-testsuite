@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.primsys.rest.data.CoverageData;
 import de.gematik.test.erezept.primsys.rest.data.MedicationData;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,5 +77,38 @@ public class PrescribeRequestTest {
     assertEquals(medication, requestMedication);
     val json = mapper.writeValueAsString(requestMedication);
     assertNotNull(json);
+  }
+
+  @SneakyThrows
+  @Test
+  public void shouldAutomaticFillUpEmpty() {
+    String input = "{\"patient\":{\"kvnr\": \"X11....\"}, \"medication\": {\"category\":\"00\"}}";
+    val prescripe = mapper.readValue(input, PrescribeRequest.class);
+    assertEquals("00", prescripe.getMedication().getCategory());
+    assertEquals("X11....", prescripe.getPatient().getKvnr());
+
+    assertNotNull(prescripe.getMedication().getNote());
+    assertNotNull(prescripe.getMedication().getName());
+    assertNotNull(prescripe.getPatient().getStreet());
+    assertNotNull(prescripe.getPatient().getLastName());
+    assertNotNull(prescripe.getMedication().getDosage());
+    assertNotNull(prescripe.getMedication().getExpirationDate());
+    assertNotNull(prescripe.getCoverage().getInsuranceName());
+    assertNotNull(prescripe.getCoverage().getIknr());
+  }
+
+  @SneakyThrows
+  @Test
+  public void shouldAutomaticFillUpEmpty2() {
+    String input = "{}";
+    val prescripe = mapper.readValue(input, PrescribeRequest.class);
+
+    assertNotNull(prescripe.getMedication().getNote());
+    assertNotNull(prescripe.getMedication().getName());
+    assertNotNull(prescripe.getPatient().getStreet());
+    assertNotNull(prescripe.getPatient().getLastName());
+    assertNotNull(prescripe.getMedication().getDosage());
+    assertNotNull(prescripe.getCoverage().getInsuranceName());
+    assertNotNull(prescripe.getCoverage().getIknr());
   }
 }

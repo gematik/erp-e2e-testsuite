@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -35,8 +35,8 @@ public enum ZusatzattributFAMSchluesselMarkt implements IValueSet {
   SUBSTITUTIONS_AUSSCHLUSS("5", "Produkt der Substitutionsausschlussliste"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM =
-      ErpCodeSystem.DAV_CS_ERP_ZUSATZATTRIBUTE_FAM_SCHLUESSEL_MARKT;
+  public static final AbdaCodeSystem CODE_SYSTEM =
+      AbdaCodeSystem.ZUSATZATTRIBUTE_FAM_SCHLUESSEL_MARKT;
   public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "";
   public static final String PUBLISHER = "DAV";
@@ -50,7 +50,7 @@ public enum ZusatzattributFAMSchluesselMarkt implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

@@ -48,7 +48,7 @@ import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 @DisplayName("Generate random Prescriptions")
 @Tag("Smoketest")
 @Disabled("Just a PoC for Dynamic Tests") // still need to figure out how this can be useful
-public class RandomPrescriptionGenerator extends ErpTest {
+class RandomPrescriptionGenerator extends ErpTest {
 
   @Actor(name = "Bernd Claudius")
   private DoctorActor bernd;

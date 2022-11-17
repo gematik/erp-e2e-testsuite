@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "draft",
+  "name": "DAV_VS_ERP_InvoiceTyp",
+  "id": "DAV-VS-ERP-InvoiceTyp",
+  "version": "1.3",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-InvoiceTyp",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-InvoiceTyp"
+      }
+    ]
+  }
+}

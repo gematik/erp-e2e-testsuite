@@ -17,7 +17,8 @@
 package de.gematik.test.erezept.screenplay.strategy;
 
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -78,7 +79,8 @@ public class PrescriptionToDispenseStrategy {
           taskToDispense
               .getTask()
               .getForKvid()
-              .orElseThrow(() -> new MissingFieldException(ErxTask.class, ErpNamingSystem.KVID));
+              .orElseThrow(
+                  () -> new MissingFieldException(ErxTask.class, DeBasisNamingSystem.KVID));
     }
     return this.kvid;
   }
@@ -89,7 +91,8 @@ public class PrescriptionToDispenseStrategy {
           taskToDispense
               .getTask()
               .getSecret()
-              .orElseThrow(() -> new MissingFieldException(ErxTask.class, ErpNamingSystem.SECRET));
+              .orElseThrow(
+                  () -> new MissingFieldException(ErxTask.class, ErpWorkflowNamingSystem.SECRET));
     }
     return this.secret;
   }

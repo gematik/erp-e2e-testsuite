@@ -18,12 +18,14 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
 import java.util.List;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.val;
+import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.Communication;
 import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.StringType;
 
 abstract class AbstractCommunicationBuilder<T extends AbstractCommunicationBuilder<T>>
@@ -52,28 +54,26 @@ abstract class AbstractCommunicationBuilder<T extends AbstractCommunicationBuild
     return self();
   }
 
-  protected ErxCommunication build(ErxCommunication.CommunicationType type, String message) {
+  protected ErxCommunication build(
+      ICommunicationType<?> type, Supplier<CanonicalType> profileSupplier, String message) {
     checkRequiredCommon();
     val com = new ErxCommunication();
-    val profile = type.getType().asCanonicalType();
+
+    val profile = profileSupplier.get();
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
-    com.setMeta(meta);
+    com.setId(this.getResourceId()).setMeta(meta);
 
     com.setStatus(status);
 
-    val recipientRef = new Reference();
-    val recipientSystem = type.getRecipientNamingSystem().getCanonicalUrl();
-    recipientRef.getIdentifier().setSystem(recipientSystem).setValue(recipient);
+    val recipientRef = type.getRecipientReference(recipient);
     com.setRecipient(List.of(recipientRef));
 
     // NOTE: "normal" communications do not necessarily require a sender: why?
-    // will be added for all Communications in Version 1.2
+    // probably will be added for all Communications in Version 1.2
     if (sender != null) {
-      val senderRef = new Reference();
-      val senderSystem = type.getSenderNamingSystem().getCanonicalUrl();
-      senderRef.getIdentifier().setSystem(senderSystem).setValue(sender);
+      val senderRef = type.getSenderReference(sender);
       com.setSender(senderRef);
     }
 

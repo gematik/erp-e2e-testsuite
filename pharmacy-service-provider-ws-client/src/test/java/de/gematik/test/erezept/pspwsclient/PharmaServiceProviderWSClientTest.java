@@ -20,16 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.InetAddress;
 import java.net.Socket;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.HandshakeImpl1Server;
 import org.java_websocket.handshake.ServerHandshake;
 import org.junit.jupiter.api.Test;
@@ -169,5 +174,78 @@ class PharmaServiceProviderWSClientTest {
     when(mockClient.getSocket()).thenReturn(socketMock);
     when(mockClient.getQueueLength()).thenCallRealMethod();
     assertTrue(mockClient.consumeOldest().isEmpty());
+  }
+
+  @SneakyThrows
+  @Test
+  void shouldChangeIsConnectedToFalse() {
+    val client = new PharmaServiceProviderWSClient(testUri, apoId);
+    val mockClient = spy(client);
+    val socketMock = mock(Socket.class);
+    val superSocketMock = mock(org.java_websocket.client.WebSocketClient.class);
+    when(socketMock.getInetAddress()).thenReturn(InetAddress.getLocalHost());
+    when(mockClient.getSocket()).thenReturn(socketMock);
+    doCallRealMethod().when(mockClient).onClose(anyInt(), anyString(), anyBoolean());
+    doCallRealMethod().when(mockClient).isConnected();
+    mockClient.onClose(1, "", true);
+    assertFalse(mockClient.isConnected());
+  }
+
+  @SneakyThrows
+  @Test
+  void callOnErrorForCoverage() {
+    val client = new PharmaServiceProviderWSClient(testUri, apoId);
+    val mockClient = spy(client);
+    val socketMock = mock(Socket.class);
+    when(socketMock.getInetAddress()).thenReturn(InetAddress.getLocalHost());
+    when(mockClient.getSocket()).thenReturn(socketMock);
+    doCallRealMethod().when(mockClient).onError(new Exception());
+    mockClient.onError(new IllegalArgumentException("argument"));
+  }
+
+  @Test
+  void callServerStoredMessagesCorrect() {
+    val client = spy(new PharmaServiceProviderWSClient(testUri, apoId));
+    doNothing().when((WebSocketClient) client).send(anyString());
+    client.callServerStoredMessages();
+    verify(client).send("call stored messages");
+  }
+
+  @Test
+  void callClearQueueServerSideForCoverage() {
+    val client = spy(new PharmaServiceProviderWSClient(testUri, apoId));
+    doNothing().when((WebSocketClient) client).send(anyString());
+    client.clearQueueOnServer();
+    verify(client).send("Clear Queue Serverside");
+  }
+
+  @Test
+  void callCloseForCoverage() {
+    val client = new PharmaServiceProviderWSClient(testUri, apoId);
+    val mockClient = spy(client);
+    val socketMock = mock(Socket.class);
+    when(mockClient.getSocket()).thenReturn(socketMock);
+    doCallRealMethod().when(mockClient).close();
+    mockClient.close();
+    assertFalse(mockClient.isConnected());
+  }
+
+  @Test
+  void callOnCloseForCoverage() {
+    val client = new PharmaServiceProviderWSClient(testUri, apoId);
+    val mockClient = spy(client);
+    val socketMock = mock(Socket.class);
+    when(mockClient.getSocket()).thenReturn(socketMock);
+    doCallRealMethod().when(mockClient).onClose(anyInt(), anyString(), anyBoolean());
+    mockClient.onClose(1, "", true);
+    assertFalse(mockClient.isConnected());
+  }
+
+  @Test
+  void callServerStoredMessagesCorrect2() {
+    val client = spy(new PharmaServiceProviderWSClient(testUri, apoId));
+    doNothing().when((WebSocketClient) client).send(anyString());
+    client.callServerStoredMessages();
+    verify(client).send("call stored messages");
   }
 }

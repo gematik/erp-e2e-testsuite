@@ -23,11 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import lombok.Getter;
@@ -47,11 +43,13 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
   @Getter private static final boolean MESSAGE_ARRIVED = false;
   private static final int WAITING_TIME_IN_MILLIS = 2000;
   private final List<PspMessage> pspMessages;
+  @Getter private String id;
 
   @SneakyThrows
   public PharmaServiceProviderWSClient(@NonNull String pspUrl, String id) {
     super(createUri(pspUrl, id));
     this.pspMessages = Collections.synchronizedList(new ArrayList<>());
+    this.id = id;
     log.info("SubscriptionService Url: {} with id {}", pspUrl, id);
   }
 
@@ -78,6 +76,7 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
           " Message: {}",
           new String(Objects.requireNonNull(serverHandshake.getContent()), StandardCharsets.UTF_8));
     }
+    this.isConnected = true;
   }
 
   @Override
@@ -85,7 +84,7 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
     log.info(
         "Message from Server @ WebsocketTestClient {}: {}",
         this.getSocket().getInetAddress().getHostAddress(),
-        message);
+        message.length());
     if (message.equals("connected to WebSocketServerImpl")) {
       isConnected = true;
       return;
@@ -107,12 +106,6 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
   @Override
   public void onError(Exception e) {
     log.error("Exception: {}", e.fillInStackTrace().getMessage());
-  }
-
-  @Override
-  public void send(String text) {
-    super.send(text);
-    log.info("Send Message: {}", text);
   }
 
   @Override
@@ -194,7 +187,7 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
     double x = .0;
     // save current time plus WAITING_TIME_IN_MILLIS
     final long finishTime = System.currentTimeMillis() + WAITING_TIME_IN_MILLIS * 5;
-    while (this.isConnected() && System.currentTimeMillis() <= finishTime) {
+    while (!this.isConnected() && System.currentTimeMillis() <= finishTime) {
       log.info(format("wait for isNotConnected()... iterations in %s sec.", x));
       Thread.currentThread().join(500);
       x = x + 0.5;

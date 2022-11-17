@@ -20,8 +20,17 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.primsys.model.AcceptUseCase;
 import de.gematik.test.erezept.primsys.model.ActorContext;
+import de.gematik.test.erezept.primsys.model.RejectUseCase;
+import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -41,18 +50,35 @@ public class PharmacyResource {
       @PathParam("id") String id,
       @QueryParam("taskId") String taskId,
       @QueryParam("ac") String accessCode) {
-    val pharmacy =
-        actors
-            .getPharmacy(id)
-            .orElseThrow(
-                () ->
-                    new WebApplicationException(
-                        Response.status(404)
-                            .entity(new ErrorResponse(format("No Pharmacy found with ID {0}", id)))
-                            .build()));
-
+    val pharmacy = getPharmacy(id);
     log.info(
         format("Pharmacy {0} will accept Task {1} with accessCode {2}", id, taskId, accessCode));
     return AcceptUseCase.acceptPrescription(pharmacy, taskId, accessCode);
+  }
+
+  @PUT
+  @Path("{id}/reject")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response rejectPrescription(
+      @PathParam("id") String id,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("ac") String accessCode,
+      @QueryParam("secret") String secret) {
+    val pharmacy = getPharmacy(id);
+    log.info(
+        format("Pharmacy {0} will reject Task {1} with accessCode {2}", id, taskId, accessCode));
+    return RejectUseCase.rejectPrescription(pharmacy, taskId, accessCode, secret);
+  }
+
+  private Pharmacy getPharmacy(String id) {
+    return actors
+        .getPharmacy(id)
+        .orElseThrow(
+            () ->
+                new WebApplicationException(
+                    Response.status(404)
+                        .entity(new ErrorResponse(format("No Pharmacy found with ID {0}", id)))
+                        .build()));
   }
 }

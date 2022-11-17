@@ -40,8 +40,8 @@ public enum ErpAfos implements RequirementsSet {
   A_22633("A_22633", "Mehrfachverordnung - keine Ersatzverordnung"),
   A_22634("A_22634", "Mehrfachverordnung - Beginn Einlösefrist-Pflicht"),
   A_22704("A_22704", "Mehrfachverordnung - Numerator größer 0"),
-  A_22927("A_22927", "Ausschluss unspezifizierter Extensions");
-
+  A_22927("A_22927", "Ausschluss unspezifizierter Extensions"),
+  A_19284("A_19284-04", "Versichertenprotokoll zu Operationen");
   @Getter private final Requirement requirement;
 
   ErpAfos(String id, String description) {

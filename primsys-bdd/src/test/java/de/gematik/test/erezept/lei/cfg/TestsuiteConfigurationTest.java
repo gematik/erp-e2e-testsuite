@@ -19,7 +19,7 @@ package de.gematik.test.erezept.lei.cfg;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.lei.exceptions.ConfigurationMappingException;
+import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.net.InetAddress;

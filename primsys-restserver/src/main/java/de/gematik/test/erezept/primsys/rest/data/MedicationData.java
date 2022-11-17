@@ -17,8 +17,10 @@
 package de.gematik.test.erezept.primsys.rest.data;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.primsys.utils.Strings.getOrDefault;
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
@@ -62,6 +64,7 @@ public class MedicationData {
   private String lotNumber;
   private Date expirationDate;
   private boolean substitutionAllowed;
+  @Nullable private MvoData mvoData;
 
   @XmlTransient
   public @Nullable MedicationCategory getEnumCategory() {
@@ -144,13 +147,33 @@ public class MedicationData {
     return m;
   }
 
+  public void fakeMissing() {
+    this.category = getOrDefault(this.category, fakerValueSet(MedicationCategory.class).getCode());
+    this.type = getOrDefault(this.type, fakerValueSet(MedicationType.class).getCode());
+    this.standardSize =
+        getOrDefault(this.standardSize, fakerValueSet(StandardSize.class).getCode());
+    this.supplyForm =
+        getOrDefault(this.supplyForm, fakerValueSet(Darreichungsform.class).getCode());
+    if (this.amount <= 0) this.amount = fakerAmount(1, 20);
+    this.ingredientStrength = getOrDefault(this.ingredientStrength, "Fake_Strength");
+    if (this.packageQuantity <= 0) this.packageQuantity = fakerAmount(1, 20);
+    this.pzn = getOrDefault(this.pzn, fakerPzn());
+    this.freeText = getOrDefault(this.freeText, "faked FreeText...");
+    this.name = getOrDefault(this.name, fakerDrugName());
+    this.ingredient = getOrDefault(this.ingredient, "very hard stuff");
+    this.dosage = getOrDefault(this.dosage, fakerDosage());
+    if (!this.substitutionAllowed) this.substitutionAllowed = fakerBool();
+    this.note = getOrDefault(this.note, "FakeNote");
+    this.lotNumber = getOrDefault(this.lotNumber, fakerLotNumber());
+    this.expirationDate = getOrDefault(this.expirationDate, GemFaker::fakerFutureExpirationDate);
+  }
+
   public static MedicationData fromKbvBundle(KbvErpBundle bundle) {
     val m = fromMedication(bundle.getMedication());
     m.packageQuantity = bundle.getDispenseQuantity();
     m.dosage = bundle.getDosageInstruction();
     m.substitutionAllowed = bundle.isSubstitutionAllowed();
-    m.note = bundle.getKbvErpMedicationRequestAsCopy().getNoteTextOrEmpty();
-
+    m.note = bundle.getMedicationRequest().getNoteTextOrEmpty();
     return m;
   }
 

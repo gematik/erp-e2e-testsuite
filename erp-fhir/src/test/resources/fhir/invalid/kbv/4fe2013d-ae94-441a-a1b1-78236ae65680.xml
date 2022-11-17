@@ -117,7 +117,8 @@
           <extension url="Kennzeichen">
             <valueBoolean value="true" />
           </extension>
-          <extension url="Nummerierung">
+          <!-- enforce to fail -->
+          <extension url="NummerierungXXX">
             <valueRatio>
               <numerator>
                 <value value="2" />

@@ -17,8 +17,7 @@
 package de.gematik.test.erezept.fhir.resources.kbv;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -26,9 +25,8 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
-@ResourceDef(
-    name = "MedicationRequest",
-    profile = StructureDefinitionFixedUrls.KBV_PR_ERP_PRESCRIPTION)
+@ResourceDef(name = "MedicationRequest")
+@SuppressWarnings({"java:S110"})
 public class KbvErpMedicationRequest extends MedicationRequest {
 
   public String getLogicalId() {
@@ -49,8 +47,7 @@ public class KbvErpMedicationRequest extends MedicationRequest {
     return this.getExtension().stream()
         .filter(
             ext ->
-                ext.getUrl()
-                    .equals(ErpStructureDefinition.KBV_MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+                ext.getUrl().contains(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
         .map(ext -> ext.getExtensionByUrl("Kennzeichen"))
         .map(
             kennzeichen ->

@@ -19,7 +19,7 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.BuilderUtil;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
 import de.gematik.test.erezept.fhir.references.erp.ErxReceiptReference;
 import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
@@ -161,7 +161,7 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
   public ErxChargeItem build() {
     val chargeItem = new ErxChargeItem();
 
-    val profile = ErpStructureDefinition.GEM_CHARGE_ITEM.asCanonicalType();
+    val profile = ErpWorkflowStructDef.CHARGE_ITEM.asCanonicalType();
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI

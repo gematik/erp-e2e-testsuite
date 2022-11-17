@@ -16,7 +16,8 @@
 
 package de.gematik.test.fuzzing.kbv;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -39,9 +40,18 @@ public class MvoExtensionManipulatorFactory {
             "MVO Kennzeichen = false mit Nummerierung und Zeitraum",
             b -> {
               val ext =
-                  b.getMedicationRequest()
-                      .getExtensionByUrl(
-                          ErpStructureDefinition.KBV_MULTIPLE_PRESCRIPTION.getUnversionedUrl());
+                  b.getMedicationRequest().getExtension().stream()
+                      .filter(
+                          extension ->
+                              extension
+                                  .getUrl()
+                                  .contains(
+                                      KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+                      .findAny()
+                      .orElseThrow(
+                          () ->
+                              new MissingFieldException(
+                                  KbvErpBundle.class, KbvItaErpStructDef.MULTIPLE_PRESCRIPTION));
               val kennzeichen = ext.getExtensionByUrl("Kennzeichen");
               kennzeichen.getValue().castToBoolean(kennzeichen.getValue()).setValue(false);
             }));
@@ -50,10 +60,19 @@ public class MvoExtensionManipulatorFactory {
         NamedEnvelope.of(
             "MVO ohne Kennzeichen und mit Nummerierung und Zeitraum",
             b -> {
-              val mr = b.getMedicationRequest();
               val ext =
-                  mr.getExtensionByUrl(
-                      ErpStructureDefinition.KBV_MULTIPLE_PRESCRIPTION.getUnversionedUrl());
+                  b.getMedicationRequest().getExtension().stream()
+                      .filter(
+                          extension ->
+                              extension
+                                  .getUrl()
+                                  .contains(
+                                      KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+                      .findAny()
+                      .orElseThrow(
+                          () ->
+                              new MissingFieldException(
+                                  KbvErpBundle.class, KbvItaErpStructDef.MULTIPLE_PRESCRIPTION));
               val kennzeichen = ext.getExtensionByUrl("Kennzeichen");
               ext.getExtension().remove(kennzeichen);
             }));
@@ -62,10 +81,19 @@ public class MvoExtensionManipulatorFactory {
         NamedEnvelope.of(
             "MVO Kennzeichen = true ohne Nummerierung und mit Zeitraum",
             b -> {
-              val mr = b.getMedicationRequest();
               val ext =
-                  mr.getExtensionByUrl(
-                      ErpStructureDefinition.KBV_MULTIPLE_PRESCRIPTION.getUnversionedUrl());
+                  b.getMedicationRequest().getExtension().stream()
+                      .filter(
+                          extension ->
+                              extension
+                                  .getUrl()
+                                  .contains(
+                                      KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+                      .findAny()
+                      .orElseThrow(
+                          () ->
+                              new MissingFieldException(
+                                  KbvErpBundle.class, KbvItaErpStructDef.MULTIPLE_PRESCRIPTION));
               val nummerierung = ext.getExtensionByUrl("Nummerierung");
               ext.getExtension().remove(nummerierung);
             }));
@@ -74,10 +102,19 @@ public class MvoExtensionManipulatorFactory {
         NamedEnvelope.of(
             "MVO Kennzeichen = true mit Nummerierung und ohne Zeitraum",
             b -> {
-              val mr = b.getMedicationRequest();
               val ext =
-                  mr.getExtensionByUrl(
-                      ErpStructureDefinition.KBV_MULTIPLE_PRESCRIPTION.getUnversionedUrl());
+                  b.getMedicationRequest().getExtension().stream()
+                      .filter(
+                          extension ->
+                              extension
+                                  .getUrl()
+                                  .contains(
+                                      KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+                      .findAny()
+                      .orElseThrow(
+                          () ->
+                              new MissingFieldException(
+                                  KbvErpBundle.class, KbvItaErpStructDef.MULTIPLE_PRESCRIPTION));
               val zeitraum = ext.getExtensionByUrl("Zeitraum");
               ext.getExtension().remove(zeitraum);
             }));

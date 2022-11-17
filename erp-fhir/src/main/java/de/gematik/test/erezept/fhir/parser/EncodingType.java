@@ -69,31 +69,23 @@ public enum EncodingType {
    * @return either the XML or the JSON parser depending on the actual {@link EncodingType}
    */
   public IParser chooseAppropriateParser(final IParser xml, final IParser json) {
-    IParser appropriate;
-    if (this == XML) {
-      appropriate = xml;
-    } else if (this == JSON) {
-      appropriate = json;
-    } else {
-      // should never happen!
-      throw new UnsupportedEncodingException(
-          format("No appropriate Parser for encoding {0}", this));
-    }
-    return appropriate;
+    return chooseAppropriateParser(() -> xml, () -> json);
   }
 
   public IParser chooseAppropriateParser(Supplier<IParser> xml, Supplier<IParser> json) {
-    IParser appropriate;
+    return choose(xml, json);
+  }
+
+  public <T> T choose(Supplier<T> xml, Supplier<T> json) {
     if (this == XML) {
-      appropriate = xml.get();
+      return xml.get();
     } else if (this == JSON) {
-      appropriate = json.get();
+      return json.get();
     } else {
       // should never happen!
       throw new UnsupportedEncodingException(
-          format("No appropriate Parser for encoding {0}", this));
+          format("No appropriate choice for encoding {0}", this));
     }
-    return appropriate;
   }
 
   /**

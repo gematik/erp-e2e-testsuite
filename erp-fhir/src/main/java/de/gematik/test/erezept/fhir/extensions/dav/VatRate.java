@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.extensions.dav;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.DecimalType;
 import org.hl7.fhir.r4.model.Extension;
@@ -27,8 +27,7 @@ import org.hl7.fhir.r4.model.Extension;
 @SuppressWarnings({"java:S110"})
 public class VatRate extends Extension {
 
-  public static final ErpStructureDefinition STRUCTURE_DEFINITION =
-      ErpStructureDefinition.DAV_EX_ERP_MWSTSATZ;
+  public static final AbdaErpBasisStructDef STRUCTURE_DEFINITION = AbdaErpBasisStructDef.MWST_SATZ;
 
   private VatRate(float primitiveValue) {
     super(STRUCTURE_DEFINITION.getCanonicalUrl());

@@ -19,7 +19,11 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.builder.HumanNameBuilder;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
@@ -33,9 +37,14 @@ import org.hl7.fhir.r4.model.*;
 
 public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBuilder> {
 
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
   private final List<Identifier> identifiers = new LinkedList<>();
 
-  private HumanName name;
+  private BaseANR baseAnr;
+  private String givenName;
+  private String familyName;
+  private String namePrefix;
+  private String jobTitle;
   private final List<Practitioner.PractitionerQualificationComponent> qualifications =
       new LinkedList<>();
 
@@ -56,12 +65,26 @@ public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBui
 
   public static PractitionerBuilder faker(String firstName, String lastName) {
     val builder = builder();
+    val qualificationType = randomElement(QualificationType.DOCTOR, QualificationType.DENTIST);
     builder
-        .lanr(fakerLanr())
+        .anr(BaseANR.randomFromQualification(qualificationType))
         .name(firstName, lastName, "Dr.") // Doctors always have Dr. in Germany ;)
-        .addQualification(fakerQualificationType())
+        .addQualification(qualificationType)
         .addQualification(fakerProfession());
     return builder;
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public PractitionerBuilder version(KbvItaForVersion version) {
+    this.kbvItaForVersion = version;
+    return this;
   }
 
   /**
@@ -85,7 +108,7 @@ public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBui
    * @return builder
    */
   public PractitionerBuilder anr(@NonNull BaseANR anr) {
-    this.identifiers.add(anr.asIdentifier());
+    this.baseAnr = anr;
     return self();
   }
 
@@ -108,20 +131,9 @@ public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBui
    * @return builder
    */
   public PractitionerBuilder name(@NonNull String given, @NonNull String family, String prefix) {
-    this.name = new HumanName();
-    this.name.setUse(HumanName.NameUse.OFFICIAL);
-    this.name.addGiven(given).setFamily(family);
-
-    if (prefix != null && prefix.length() > 0) {
-      this.name.addPrefix(prefix);
-      // ISO21090 http://hl7.org/fhir/R4/extension-iso21090-en-qualifier.html
-      // required in ErpStructureDefinition?
-      this.name
-          .getPrefix()
-          .get(0)
-          .addExtension(
-              "http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier", new CodeType("AC"));
-    }
+    this.givenName = given;
+    this.familyName = family;
+    this.namePrefix = prefix;
 
     return self();
   }
@@ -132,22 +144,52 @@ public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBui
     return self();
   }
 
-  public PractitionerBuilder addQualification(@NonNull String qualification) {
-    val codeable = new CodeableConcept().setText(qualification);
-    this.qualifications.add(new Practitioner.PractitionerQualificationComponent(codeable));
+  public PractitionerBuilder addQualification(@NonNull String jobTitle) {
+    this.jobTitle = jobTitle;
     return self();
   }
 
   public KbvPractitioner build() {
     val practitioner = new KbvPractitioner();
 
-    val profile = ErpStructureDefinition.KBV_PRACTITIONER.asCanonicalType();
+    val profile = KbvItaForStructDef.PRACTITIONER.asCanonicalType(kbvItaForVersion);
     val meta = new Meta().setProfile(List.of(profile));
-
-    // set FHIR-specific values provided by HAPI
     practitioner.setId(this.getResourceId()).setMeta(meta);
 
-    practitioner.setIdentifier(identifiers).setQualification(qualifications).setName(List.of(name));
+    val humanNameBuilder =
+        HumanNameBuilder.official()
+            .prefix(this.namePrefix)
+            .given(this.givenName)
+            .family(this.familyName);
+
+    HumanName humanName;
+
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      val codeable = new CodeableConcept().setText(jobTitle);
+      this.qualifications.add(new Practitioner.PractitionerQualificationComponent(codeable));
+
+      this.identifiers.add(this.baseAnr.asIdentifier());
+      humanName = humanNameBuilder.build();
+    } else {
+      val codeable = new CodeableConcept().setText(jobTitle);
+      codeable
+          .getCodingFirstRep()
+          .setCode("Berufsbezeichnung")
+          .setSystem(KbvCodeSystem.BERUFSBEZEICHNUNG.getCanonicalUrl());
+      this.qualifications.add(new Practitioner.PractitionerQualificationComponent(codeable));
+
+      if (this.baseAnr.getType().equals(BaseANR.ANRType.ZANR)) {
+        this.identifiers.add(this.baseAnr.asIdentifier(KbvNamingSystem.ZAHNARZTNUMMER));
+      } else {
+        this.identifiers.add(this.baseAnr.asIdentifier());
+      }
+      humanName = humanNameBuilder.buildExt();
+    }
+
+    practitioner
+        .setIdentifier(identifiers)
+        .setQualification(qualifications)
+        .setName(List.of(humanName));
 
     return practitioner;
   }

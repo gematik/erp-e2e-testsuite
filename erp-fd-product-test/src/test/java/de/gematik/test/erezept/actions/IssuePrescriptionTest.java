@@ -32,7 +32,7 @@ import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -221,7 +221,7 @@ class IssuePrescriptionTest {
                       kbvBundle
                           .getCoverage()
                           .getExtensionByUrl(
-                              ErpStructureDefinition.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
+                              DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
                   val codingValue = dmpExtension.getValue().castToCoding(dmpExtension.getValue());
                   assertEquals("42", codingValue.getCode());
                   assertEquals(
@@ -239,7 +239,7 @@ class IssuePrescriptionTest {
                   val ext =
                       b.getCoverage()
                           .getExtensionByUrl(
-                              ErpStructureDefinition.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
+                              DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
                   ext.getValue().castToCoding(ext.getValue()).setCode("42");
                 })
             .withRandomKbvBundle());

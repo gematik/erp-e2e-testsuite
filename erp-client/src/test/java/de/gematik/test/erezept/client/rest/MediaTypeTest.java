@@ -16,15 +16,16 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.exceptions.UnsupportedEncodingException;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import java.util.Arrays;
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MediaTypeTest {
+class MediaTypeTest {
 
   // valid Media Types according to RFC 1945
   // https://tools.ietf.org/html/rfc1945#section-3.6
@@ -63,7 +64,7 @@ public class MediaTypeTest {
           "charset=utf-8;application/fhir+xml");
 
   @Test
-  public void fromStringJson() {
+  void fromStringJson() {
     for (val s : jsonTypes) {
       val expected = MediaType.FHIR_JSON;
       val actual = MediaType.fromString(s);
@@ -72,7 +73,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void fromStringXml() {
+  void fromStringXml() {
     for (val s : xmlTypes) {
       val expected = MediaType.FHIR_XML;
       val actual = MediaType.fromString(s);
@@ -81,7 +82,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void fromStringUnknown() {
+  void fromStringUnknown() {
     for (val s : unknownTypes) {
       val expected = MediaType.UNKNOWN;
       val actual = MediaType.fromString(s);
@@ -90,7 +91,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void fromStringEmpty() {
+  void fromStringEmpty() {
     val inputs = Arrays.asList("", null);
     inputs.forEach(
         s -> {
@@ -101,7 +102,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void comparisonJson() {
+  void comparisonJson() {
     jsonTypes.forEach(
         typeString -> {
           val expectedPlain = MediaType.FHIR_JSON;
@@ -113,7 +114,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void comparisonXml() {
+  void comparisonXml() {
     xmlTypes.forEach(
         typeString -> {
           val expectedPlain = MediaType.FHIR_XML;
@@ -125,7 +126,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void asStringXml() {
+  void asStringXml() {
     val mt1 = MediaType.ACCEPT_FHIR_XML.asString();
     val exp1 = "application/fhir+xml;q=1.0, application/xml+fhir;q=0.9";
     assertEquals(exp1, mt1);
@@ -140,7 +141,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void asStringJson() {
+  void asStringJson() {
     val mt1 = MediaType.ACCEPT_FHIR_JSON.asString();
     val exp1 = "application/fhir+json;q=1.0, application/json+fhir;q=0.9";
     assertEquals(exp1, mt1);
@@ -155,7 +156,7 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void toFhirEncodingJson() {
+  void toFhirEncodingJson() {
     val mediaTypes = List.of(MediaType.FHIR_JSON, MediaType.ACCEPT_FHIR_JSON);
     mediaTypes.forEach(
         mt -> {
@@ -165,12 +166,18 @@ public class MediaTypeTest {
   }
 
   @Test
-  public void toFhirEncodingXml() {
+  void toFhirEncodingXml() {
     val mediaTypes = List.of(MediaType.FHIR_XML, MediaType.ACCEPT_FHIR_XML);
     mediaTypes.forEach(
         mt -> {
           val encoding = mt.toFhirEncoding();
           assertEquals(EncodingType.XML, encoding);
         });
+  }
+
+  @Test
+  void shouldThrowOnInvalidFhirEncoding() {
+    val mediaType = List.of(MediaType.EMPTY, MediaType.UNKNOWN);
+    mediaType.forEach(mt -> assertThrows(UnsupportedEncodingException.class, mt::toFhirEncoding));
   }
 }

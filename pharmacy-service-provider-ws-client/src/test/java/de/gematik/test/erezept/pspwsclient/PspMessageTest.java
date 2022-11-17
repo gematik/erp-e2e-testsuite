@@ -52,7 +52,7 @@ class PspMessageTest {
   @Test
   void crateTest() {
     PspMessage pspMessage2 =
-        PspMessage.create(deliverOption, telematikId, transactionId, blob, "Fuck´n tests ;-)");
+        PspMessage.create(deliverOption, telematikId, transactionId, blob, "lovely tests ;-)");
     assertNotEquals(pspMessage, pspMessage2);
   }
 
@@ -81,7 +81,7 @@ class PspMessageTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          PspMessage.create(deliverOption, null, transactionId, blob, "Fuck´n tests ;-)");
+          PspMessage.create(deliverOption, null, transactionId, blob, "lovely tests ;-)");
         });
   }
 
@@ -90,7 +90,7 @@ class PspMessageTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          PspMessage.create(deliverOption, telematikId, transactionId, null, "Fuck´n tests ;-)");
+          PspMessage.create(deliverOption, telematikId, transactionId, null, "lovely tests ;-)");
         });
   }
 }

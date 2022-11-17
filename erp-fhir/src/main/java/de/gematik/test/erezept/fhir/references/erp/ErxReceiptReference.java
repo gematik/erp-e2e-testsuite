@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.references.erp;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import org.hl7.fhir.r4.model.Reference;
 
@@ -25,8 +25,7 @@ import org.hl7.fhir.r4.model.Reference;
 @SuppressWarnings({"java:S110"})
 public class ErxReceiptReference extends Reference {
 
-  private static final ErpStructureDefinition STRUCTURE_DEFINITION =
-      ErpStructureDefinition.GEM_RECEIPT;
+  private static final ErpWorkflowStructDef STRUCTURE_DEFINITION = ErpWorkflowStructDef.RECEIPT;
   private static final String DISPLAY_VALUE = "Quittung";
 
   public ErxReceiptReference(PrescriptionId id) {

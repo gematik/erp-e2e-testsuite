@@ -76,21 +76,12 @@ public enum MediaType {
   }
 
   public EncodingType toFhirEncoding() {
-    EncodingType encoding;
-    switch (this) {
-      case FHIR_XML:
-      case ACCEPT_FHIR_XML:
-        encoding = EncodingType.XML;
-        break;
-      case FHIR_JSON:
-      case ACCEPT_FHIR_JSON:
-        encoding = EncodingType.JSON;
-        break;
-      default:
-        throw new UnsupportedEncodingException(
-            format("MediaType {0} cannot be translated to proper FHIR encoding", this.asString()));
-    }
-    return encoding;
+    return switch (this) {
+      case FHIR_XML, ACCEPT_FHIR_XML -> EncodingType.XML;
+      case FHIR_JSON, ACCEPT_FHIR_JSON -> EncodingType.JSON;
+      default -> throw new UnsupportedEncodingException(
+          format("MediaType {0} cannot be translated to proper FHIR encoding", this.asString()));
+    };
   }
 
   /**
@@ -105,7 +96,6 @@ public enum MediaType {
     }
 
     val tokens = stringValue.split(";"); // https://tools.ietf.org/html/rfc1945#section-3.6
-    assert tokens.length > 0;
     val mts = tokens[0].toLowerCase(); // contains only media-type (type/sub-type) as lower case
 
     MediaType mediaType;

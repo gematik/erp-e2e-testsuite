@@ -16,7 +16,8 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
@@ -29,7 +30,7 @@ import org.junit.Test;
 
 public class ErxConsentTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/";
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   private FhirParser parser;
 

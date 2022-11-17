@@ -37,7 +37,6 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -116,25 +115,20 @@ public class LocalSigner {
   public List<CertificateToken> getQesCertificateChain() {
     return Arrays.stream(smartcard.getQesCertificateChain())
         .map(c -> new CertificateToken((X509Certificate) c))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private EncryptionAlgorithm getEncryptionAlgorithm() {
-    EncryptionAlgorithm ret;
-    switch (smartcard.getAlgorithm()) {
-      case RSA_2048:
-        ret = EncryptionAlgorithm.RSA;
-        break;
-      case ECC_256:
-        ret = EncryptionAlgorithm.ECDSA;
-        break;
-      default:
-        throw new AssertionError(
-            format(
-                "Smartcard has Algorithm {0} which is not mapped to "
-                    + "eu.europa.esig.dss.EncryptionAlgorithm",
-                smartcard.getAlgorithm()));
-    }
+    val ret =
+        switch (smartcard.getAlgorithm()) {
+          case RSA_2048 -> EncryptionAlgorithm.RSA;
+          case ECC_256 -> EncryptionAlgorithm.ECDSA;
+          default -> throw new AssertionError(
+              format(
+                  "Smartcard has Algorithm {0} which is not mapped to "
+                      + "eu.europa.esig.dss.EncryptionAlgorithm",
+                  smartcard.getAlgorithm()));
+        };
 
     log.trace(
         format("Encryption Algorithm for signing from {0} to {1}", smartcard.getAlgorithm(), ret));

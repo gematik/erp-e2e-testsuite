@@ -18,23 +18,19 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
 @Slf4j
-@ResourceDef(
-    name = "MedicationDispense",
-    profile = StructureDefinitionFixedUrls.GEM_ERX_MEDICATION_DISPENSE)
+@ResourceDef(name = "MedicationDispense")
 @SuppressWarnings({"java:S110"})
 public class ErxMedicationDispense extends MedicationDispense {
 
@@ -42,7 +38,7 @@ public class ErxMedicationDispense extends MedicationDispense {
     return this.getContained().stream()
         .filter(c -> c.getResourceType().equals(ResourceType.Medication))
         .map(KbvErpMedication::fromMedication)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public PrescriptionId getPrescriptionId() {
@@ -55,7 +51,7 @@ public class ErxMedicationDispense extends MedicationDispense {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    KbvErpMedication.class, ErpStructureDefinition.KBV_MEDICATION_PZN));
+                    KbvErpMedication.class, KbvItaErpStructDef.MEDICATION_PZN));
   }
 
   public String getSubjectId() {
@@ -67,7 +63,7 @@ public class ErxMedicationDispense extends MedicationDispense {
         .map(MedicationDispensePerformerComponent::getActor)
         .map(Reference::getIdentifier)
         .map(Identifier::getValue)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public String getPerformerIdFirstRep() {
@@ -76,7 +72,7 @@ public class ErxMedicationDispense extends MedicationDispense {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    ErxMedicationDispense.class, ErpNamingSystem.TELEMATIK_ID));
+                    ErxMedicationDispense.class, ErpWorkflowNamingSystem.TELEMATIK_ID));
   }
 
   public ZonedDateTime getZonedWhenHandedOver() {
@@ -84,7 +80,7 @@ public class ErxMedicationDispense extends MedicationDispense {
   }
 
   public List<String> getDosageInstructionText() {
-    return this.getDosageInstruction().stream().map(Dosage::getText).collect(Collectors.toList());
+    return this.getDosageInstruction().stream().map(Dosage::getText).toList();
   }
 
   public String getDosageInstructionTextFirstRep() {

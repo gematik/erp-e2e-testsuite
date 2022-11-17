@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseBundleTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/";
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   private static FhirParser parser;
 
@@ -43,7 +43,11 @@ class ErxMedicationDispenseBundleTest {
     val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
     val vr = parser.validate(content);
 
-    vr.getMessages().forEach(System.out::println);
+    if (!vr.isSuccessful()) {
+      System.out.println(
+          format("Found {0} errors in {1}", vr.getMessages().size(), BASE_PATH + fileName));
+      vr.getMessages().forEach(System.out::println);
+    }
     assertTrue(vr.isSuccessful(), format("{0} must be valid, but is not", fileName));
 
     val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);

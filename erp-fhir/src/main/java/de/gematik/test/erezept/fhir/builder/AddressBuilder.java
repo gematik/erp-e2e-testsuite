@@ -19,7 +19,7 @@ package de.gematik.test.erezept.fhir.builder;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import java.util.regex.Pattern;
 import lombok.NonNull;
@@ -70,11 +70,11 @@ public class AddressBuilder {
     streetLine.setValue(street);
     streetLine
         .addExtension()
-        .setUrl(ErpStructureDefinition.HOUSE_NUMBER.getCanonicalUrl())
+        .setUrl(Hl7StructDef.HOUSE_NUMBER.getCanonicalUrl())
         .setValue(new StringType(houseNumber));
     streetLine
         .addExtension()
-        .setUrl(ErpStructureDefinition.STREET_NAME.getCanonicalUrl())
+        .setUrl(Hl7StructDef.STREET_NAME.getCanonicalUrl())
         .setValue(new StringType(streetName));
 
     return address;

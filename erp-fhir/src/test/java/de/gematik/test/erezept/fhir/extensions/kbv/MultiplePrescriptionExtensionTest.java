@@ -66,6 +66,18 @@ class MultiplePrescriptionExtensionTest {
   }
 
   @Test
+  void shouldBuildCorrectValuePeriodWithoutAutoStart() {
+    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).validForDays(30, false);
+    val ext = mvo.asExtension();
+
+    val zeitraum = ext.getExtensionByUrl("Zeitraum");
+    assertNotNull(zeitraum);
+    val period = zeitraum.getValue().castToPeriod(zeitraum.getValue());
+    assertNull(period.getStartElement().getValue());
+    assertNotNull(period.getEndElement().getValue());
+  }
+
+  @Test
   void shouldBuildWithStartDaysDiff() {
     val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).starting(10).withoutEndDate();
     val ext = mvo.asExtension();
@@ -97,18 +109,6 @@ class MultiplePrescriptionExtensionTest {
   }
 
   @Test
-  void shouldBuildPeriodWithoutStart() {
-    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).validForDays(30);
-    val ext = mvo.asExtension();
-
-    val zeitraum = ext.getExtensionByUrl("Zeitraum");
-    assertNotNull(zeitraum);
-    val period = zeitraum.getValue().castToPeriod(zeitraum.getValue());
-    assertNull(period.getStartElement().getValue());
-    assertNotNull(period.getEndElement().getValue());
-  }
-
-  @Test
   void shouldBuildPeriodWithoutEnd() {
     val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).fromNow().withoutEndDate();
     val ext = mvo.asExtension();
@@ -121,8 +121,20 @@ class MultiplePrescriptionExtensionTest {
   }
 
   @Test
-  void shouldBuildPeriodWithoutAnyDates() {
+  void shouldBuildPeriodWithoutEndDateAndAutoStart() {
     val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).withoutEndDate();
+    val ext = mvo.asExtension();
+
+    val zeitraum = ext.getExtensionByUrl("Zeitraum");
+    assertNotNull(zeitraum);
+    val period = zeitraum.getValue().castToPeriod(zeitraum.getValue());
+    assertNotNull(period.getStartElement().getValue());
+    assertNull(period.getEndElement().getValue());
+  }
+
+  @Test
+  void shouldBuildPeriodWithoutEndDateAndWithoutAutoStart() {
+    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).withoutEndDate(false);
     val ext = mvo.asExtension();
 
     val zeitraum = ext.getExtensionByUrl("Zeitraum");

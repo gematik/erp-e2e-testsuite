@@ -18,14 +18,14 @@ package de.gematik.test.erezept.fhir.resources.dav;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
 import de.gematik.test.erezept.fhir.values.IKNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -35,7 +35,7 @@ import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
 @Getter
-@ResourceDef(name = "Bundle", profile = StructureDefinitionFixedUrls.DAV_PKV_PR_ERP_ABGABEDATEN)
+@ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
 public class DavAbgabedatenBundle extends Bundle {
 
@@ -48,7 +48,10 @@ public class DavAbgabedatenBundle extends Bundle {
   }
 
   public PrescriptionId getPrescriptionId() {
-    if (!this.getIdentifier().getSystem().equals(PrescriptionId.NAMING_SYSTEM.getCanonicalUrl())) {
+    if (!this.getIdentifier().getSystem().equals(PrescriptionId.NAMING_SYSTEM.getCanonicalUrl())
+        && !this.getIdentifier()
+            .getSystem()
+            .equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.getCanonicalUrl())) {
       throw new MissingFieldException(DavAbgabedatenBundle.class, PrescriptionId.NAMING_SYSTEM);
     }
     return new PrescriptionId(this.getIdentifier().getValue());
@@ -69,7 +72,10 @@ public class DavAbgabedatenBundle extends Bundle {
                 org.getIdentifier().stream()
                     .anyMatch(
                         identifier ->
-                            identifier.getSystem().equals(IKNR.getSystem().getCanonicalUrl())))
+                            identifier.getSystem().equals(IKNR.getSystem().getCanonicalUrl())
+                                || identifier
+                                    .getSystem()
+                                    .equals(DeBasisNamingSystem.IKNR_SID.getCanonicalUrl())))
         .map(PharmacyOrganization::fromOrganization)
         .findAny()
         .orElseThrow(() -> new MissingFieldException(PharmacyOrganization.class, IKNR.getSystem()));
@@ -84,7 +90,7 @@ public class DavAbgabedatenBundle extends Bundle {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    DavDispensedMedication.class, ErpStructureDefinition.DAV_ABGABEINFORMATIONEN));
+                    DavDispensedMedication.class, AbdaErpPkvStructDef.PKV_ABGABEINFORMATIONEN));
   }
 
   public DavInvoice getInvoice() {
@@ -96,7 +102,7 @@ public class DavAbgabedatenBundle extends Bundle {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    DavDispensedMedication.class, ErpStructureDefinition.DAV_INVOICE));
+                    DavDispensedMedication.class, AbdaErpPkvStructDef.PKV_ABRECHNUNGSZEILEN));
   }
 
   private List<Organization> getOrganizations() {
@@ -104,6 +110,6 @@ public class DavAbgabedatenBundle extends Bundle {
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Organization))
         .map(Organization.class::cast)
-        .collect(Collectors.toList());
+        .toList();
   }
 }

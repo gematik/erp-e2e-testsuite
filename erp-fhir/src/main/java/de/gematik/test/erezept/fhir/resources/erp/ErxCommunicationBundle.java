@@ -18,7 +18,6 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -33,18 +32,18 @@ public class ErxCommunicationBundle extends Bundle {
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Communication))
         .map(ErxCommunication::fromCommunication)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public List<ErxCommunication> getCommunicationsFromSender(String senderId) {
     return this.getCommunications().stream()
         .filter(com -> com.getSenderId().equals(senderId))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public List<ErxCommunication> getCommunicationsForReceiver(String receiverId) {
     return this.getCommunications().stream()
         .filter(com -> com.getRecipientId().equals(receiverId))
-        .collect(Collectors.toList());
+        .toList();
   }
 }

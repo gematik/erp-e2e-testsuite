@@ -20,7 +20,7 @@ public abstract class AbstractMockService {
 
   protected final MockKonnektor mockKonnektor;
 
-  public AbstractMockService(MockKonnektor mockKonnektor) {
+  protected AbstractMockService(MockKonnektor mockKonnektor) {
     this.mockKonnektor = mockKonnektor;
   }
 }

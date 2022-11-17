@@ -18,14 +18,28 @@ package de.gematik.test.erezept.fhir.builder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.exceptions.FakerException;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class GemFakerTest {
+
+  @Test
+  void fakerFutureExpirationShouldBetweenOneAndFourWeeks() {
+    var expirationDate = GemFaker.fakerFutureExpirationDate();
+    Date minDate = new Date(new Date().getTime() + TimeUnit.HOURS.toMillis((long) 24 * 7));
+    Date maxDate = new Date(new Date().getTime() + TimeUnit.HOURS.toMillis((long) 24 * 28));
+    assertTrue(expirationDate.getTime() >= minDate.getTime());
+    assertTrue(expirationDate.getTime() <= maxDate.getTime());
+  }
 
   @Test
   void shouldThrowOnConstructorCall() throws NoSuchMethodException {
@@ -46,30 +60,49 @@ class GemFakerTest {
 
   @Test
   void testInfoRequest() {
-    ErxCommunication.CommunicationType type = ErxCommunication.CommunicationType.INFO_REQ;
+    val type = CommunicationType.INFO_REQ;
     val message = GemFaker.fakerCommunicationMessage(type);
     assertTrue(message.length() > 0);
   }
 
   @Test
   void testRepresentative() {
-    ErxCommunication.CommunicationType type = ErxCommunication.CommunicationType.REPRESENTATIVE;
+    val type = CommunicationType.REPRESENTATIVE;
     val message = GemFaker.fakerCommunicationMessage(type);
     assertTrue(message.length() > 0);
   }
 
   @Test
   void testDispenseRequest() {
-    ErxCommunication.CommunicationType type = ErxCommunication.CommunicationType.DISP_REQ;
+    val type = CommunicationType.DISP_REQ;
     val message = GemFaker.fakerCommunicationMessage(type);
     assertTrue(message.length() > 0);
   }
 
   @Test
   void testReply() {
-    ErxCommunication.CommunicationType type = ErxCommunication.CommunicationType.REPLY;
+    val type = CommunicationType.REPLY;
     val message = GemFaker.fakerCommunicationMessage(type);
     assertTrue(message.length() > 0);
+  }
+
+  @Test
+  void shouldPickRandomFromValueSet() {
+    val e = GemFaker.fakerValueSet(PayorType.class);
+    assertNotNull(e);
+  }
+
+  @Test
+  void shouldPickRandomFromValueSetWithExclude() {
+    val e = GemFaker.fakerValueSet(PayorType.class, PayorType.SKT);
+    assertNotNull(e);
+    assertEquals(PayorType.UK, e); // because we only have SKT and UK within the PayorType
+  }
+
+  @Test
+  void shouldPickRandomFromValueSetWithExclude2() {
+    val exclude = List.of(PayorType.SKT, PayorType.UK); // all possible values!
+    assertThrows(FakerException.class, () -> GemFaker.fakerValueSet(PayorType.class, exclude));
   }
 
   @Test

@@ -16,7 +16,15 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles;
 
+import lombok.NonNull;
+import lombok.val;
+
 public interface IWithSystem {
 
   String getCanonicalUrl();
+
+  default boolean match(@NonNull String url) {
+    val unversioned = url.split("\\|")[0];
+    return this.getCanonicalUrl().equals(unversioned);
+  }
 }

@@ -21,12 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.gematik.test.erezept.app.cfg.AppConfiguration;
 import de.gematik.test.erezept.app.cfg.PlatformType;
-import de.gematik.test.erezept.app.exceptions.InvalidLocatorException;
-import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.locators.GenericLocator;
-import de.gematik.test.erezept.app.mobile.locators.LocatorDictionary;
-import de.gematik.test.erezept.app.mobile.locators.PlatformSpecificLocator;
+import de.gematik.test.erezept.app.mobile.elements.PageElement;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.AppiumFluentWait;
 import java.time.Duration;
@@ -38,57 +34,53 @@ import lombok.val;
 import net.serenitybdd.screenplay.Ability;
 import net.serenitybdd.screenplay.HasTeardown;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.FluentWait;
 
 @Slf4j
-public abstract class UseTheApp implements Ability, HasTeardown {
+public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasTeardown {
 
-  protected AppiumDriver driver;
+  protected T driver;
   @Getter private final PlatformType platformType;
   private final AppConfiguration appConfiguration;
-  private static final LocatorDictionary locatorDict = LocatorDictionary.getInstance();
 
-  protected UseTheApp(
-      AppiumDriver driver, PlatformType platformType, AppConfiguration appConfiguration) {
+  protected UseTheApp(T driver, PlatformType platformType, AppConfiguration appConfiguration) {
     this.driver = driver;
     this.platformType = platformType;
     this.appConfiguration = appConfiguration;
+  }
+
+  public String getDriverName() {
+    return format(
+        "Appium Driver for {0} connected to {1}", platformType, driver.getRemoteAddress());
   }
 
   protected int getMaxWaitTimeout() {
     return appConfiguration.getMaxWaitTimeout();
   }
 
+  protected int getPollingInterval() {
+    return appConfiguration.getPollingInterval();
+  }
+
   public boolean useVirtualeGK() {
     return appConfiguration.isUseVirtualeGK();
   }
 
-  public static UseTheApp with(
-      AppiumDriver driver, PlatformType platformType, AppConfiguration appConfiguration) {
-    UseTheApp app;
-    if (platformType == PlatformType.ANDROID) {
-      app = new UseAndroidApp(driver, appConfiguration);
-    } else if (platformType == PlatformType.IOS) {
-      app = new UseIOSApp(driver, appConfiguration);
-    } else {
-      throw new UnsupportedPlatformException(platformType);
-    }
-    return app;
+  public void tap(PageElement pageElement) {
+    this.tap(pageElement.forPlatform(platformType));
   }
 
-  public void tap(String identifier) {
-    val element = this.getWebElement(identifier);
-    this.tap(element);
-  }
-
-  public void tap(int times, String identifier) {
+  public void tap(int times, PageElement pageElement) {
     assertThat(times).isGreaterThan(0);
     for (int i = 0; i < times; i++) {
-      this.tap(identifier);
+      this.tap(pageElement);
     }
   }
 
@@ -110,24 +102,24 @@ public abstract class UseTheApp implements Ability, HasTeardown {
     }
   }
 
-  public void tap(WebElement element) {
+  protected void tap(WebElement element) {
     log.info(format("Tap on element {0}", element));
     element.click();
   }
 
-  public void tap(By locator) {
+  protected void tap(By locator) {
     val element = this.getWebElement(locator);
     this.tap(element);
   }
 
-  public void input(final String text, String identifier) {
-    val element = this.getWebElement(identifier);
-    log.info(format("Type {0} into {1} ({2})", text, identifier, element));
+  public void input(final String text, PageElement pageElement) {
+    val element = this.getWebElement(pageElement);
+    log.info(format("Type {0} into {1} ({2})", text, pageElement.getFullName(), element));
     element.clear(); // clear the default text in the input
     element.sendKeys(text);
 
     // refetch the element and check if appium sent the text correctly
-    val input = this.getWebElement(identifier).getText();
+    val input = this.getWebElement(pageElement).getText();
     assertThat(input).isEqualTo(text);
   }
 
@@ -136,99 +128,85 @@ public abstract class UseTheApp implements Ability, HasTeardown {
    * down the process and prevent losing characters.
    *
    * @param password is the password to be typed
-   * @param identifier is the input field where the password is typed in
+   * @param pageElement is the input field where the password is typed in
    */
-  public void inputPassword(final String password, String identifier) {
-    this.inputPassword(password, identifier, false);
-  }
-
-  /**
-   * Just as PoC to check if x/y guessing works reliably
-   *
-   * @param password
-   * @param identifier
-   * @param showPassword
-   */
-  public void inputPassword(final String password, String identifier, boolean showPassword) {
-    val element = this.getWebElement(identifier);
-    log.info(format("Type Password {0} into {1} ({2})", password, identifier, element));
+  public void inputPassword(final String password, PageElement pageElement) {
+    val element = this.getWebElement(pageElement);
+    log.info(
+        format("Type Password {0} into {1} ({2})", password, pageElement.getFullName(), element));
     element.clear();
     for (val c : password.toCharArray()) {
       element.sendKeys(format("{0}", c));
     }
-
-    if (showPassword) {
-      // try to guess the position of "eye-icon"
-      val rect = element.getRect();
-      val x = (int) (rect.getX() + rect.getWidth() * 0.95);
-      val y = (int) (rect.getY() + rect.getHeight() * 0.5);
-      val p = new Point(x, y);
-      this.tap(p);
-    }
   }
 
   public void swipe(SwipeDirection direction) {
+    swipe(direction, 1.0f);
+  }
+
+  public void swipe(SwipeDirection direction, float factor) {
+    swipe(direction, factor, 100);
+  }
+
+  public void swipe(SwipeDirection direction, float factor, int millis) {
     log.info(format("Swipe {0} on the Screen", direction));
-    val screenDimension = driver.manage().window().getSize();
-    val swipe = direction.swipeOn(screenDimension);
+    var screenDimension = driver.manage().window().getSize();
+
+    val swipeDimension =
+        switch (direction) {
+          case UP, DOWN -> {
+            val height = screenDimension.height * factor;
+            yield new Dimension(screenDimension.width, (int) height);
+          }
+          case LEFT, RIGHT -> {
+            val width = screenDimension.width * factor;
+            yield new Dimension((int) width, screenDimension.height);
+          }
+        };
+
+    val swipe = direction.swipeOn(swipeDimension, millis);
     this.performGesture(swipe);
+  }
+
+  public final void waitUntil(ExpectedCondition<Boolean> expected) {
+    val wait = this.getFluentWaitDriver();
+    wait.until(expected);
+  }
+
+  public final boolean isDisplayed(PageElement pageElement) {
+    return isDisplayed(pageElement.forPlatform(this.platformType));
+  }
+
+  protected final boolean isDisplayed(By locator) {
+    val elements = this.driver.findElements(locator);
+    return elements.stream().map(WebElement::isDisplayed).findFirst().orElse(false);
   }
 
   public void performGesture(Sequence sequence) {
     driver.perform(Collections.singletonList(sequence));
   }
 
-  public WebElement getWebElement(String identifier) {
-    log.info(format("Fetch element via semantic locator <{0}>", identifier));
-    val locator = this.getLocator(identifier);
-    return getWebElement(locator);
+  public WebElement getWebElement(PageElement element) {
+    return getWebElement(element.forPlatform(this.platformType));
   }
 
-  public abstract WebElement getWebElement(By locator);
+  protected abstract WebElement getWebElement(By locator);
 
-  public abstract List<WebElement> getWebElementList(String identifier);
+  public abstract List<WebElement> getWebElementList(PageElement pageElement);
 
-  public int getWebElementListLen(String identifier) {
-    return this.getWebElementList(identifier).size();
+  public int getWebElementListLen(PageElement pageElement) {
+    return this.getWebElementList(pageElement).size();
   }
 
-  /**
-   * By this method, the sub-classes can easily search for a platform-specific locator
-   *
-   * @param identifier can be either the semantic name or the identifier from the
-   *     locators-dictionary
-   * @return a concrete platform-specific By locator
-   */
-  public final By getLocator(String identifier) {
-    val locator = getPlatformLocator(identifier);
-    return locator.getLocator();
+  protected final By getLocator(PageElement pageElement) {
+    return pageElement.forPlatform(this.platformType);
   }
 
-  public final PlatformSpecificLocator getPlatformLocator(String identifier) {
-    // first, look by its semantic name
-    var locatorOpt = locatorDict.getOptionallyBySemanticName(identifier);
-
-    GenericLocator genericLocator;
-    if (locatorOpt.isEmpty()) {
-      // if not found by semantic name, try finding by ID
-      // this will definitely throw an exception if the locator is unknown to the dictionary
-      genericLocator = locatorDict.getByIdentifier(identifier);
-    } else {
-      genericLocator = locatorOpt.orElseThrow(() -> new InvalidLocatorException(identifier));
-    }
-
-    return genericLocator.getSpecificLocator(platformType);
-  }
-
-  protected FluentWait<AppiumDriver> getFluentWaitDriver() {
+  protected FluentWait<T> getFluentWaitDriver() {
     return new AppiumFluentWait<>(driver)
-        .withTimeout(Duration.ofSeconds(this.getMaxWaitTimeout()))
-        .pollingEvery(Duration.ofMillis(50));
-  }
-
-  public String getDriverName() {
-    return format(
-        "Appium Driver for {0} connected to {1}", platformType, driver.getRemoteAddress());
+        .withTimeout(Duration.ofMillis(this.getMaxWaitTimeout()))
+        .ignoring(NoSuchElementException.class)
+        .pollingEvery(Duration.ofMillis(this.getPollingInterval()));
   }
 
   @Override
@@ -239,5 +217,6 @@ public abstract class UseTheApp implements Ability, HasTeardown {
   @Override
   public void tearDown() {
     driver.quit();
+    driver.close();
   }
 }

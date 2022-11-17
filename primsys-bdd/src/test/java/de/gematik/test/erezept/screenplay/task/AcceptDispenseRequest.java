@@ -19,7 +19,7 @@ package de.gematik.test.erezept.screenplay.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.GetReceivedCommunication;
@@ -53,7 +53,7 @@ public class AcceptDispenseRequest implements Task {
                     new MissingPreconditionError(
                         format(
                             "No {0} received from {1}",
-                            ErxCommunication.CommunicationType.DISP_REQ, sender.getName())));
+                            CommunicationType.DISP_REQ, sender.getName())));
 
     val responseOfAcceptOperation =
         ResponseOfAcceptOperation.forDispenseRequest(receivedDispenseRequest);

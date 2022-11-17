@@ -19,7 +19,8 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import static org.junit.Assert.*;
 
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import java.time.ZoneId;
@@ -32,7 +33,7 @@ import org.junit.Test;
 
 public class ErxCommunicationTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/";
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   private FhirParser parser;
 
@@ -66,7 +67,7 @@ public class ErxCommunicationTest {
 
               assertFalse(communication.hasAboutReference());
               assertFalse(communication.getAboutReference().isPresent());
-              assertEquals(ErxCommunication.CommunicationType.DISP_REQ, communication.getType());
+              assertEquals(CommunicationType.DISP_REQ, communication.getType());
               assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
               assertTrue(communication.getBasedOnAccessCode().isPresent());
               assertEquals(expectedAccessCode, communication.getBasedOnAccessCode().orElseThrow());
@@ -100,7 +101,7 @@ public class ErxCommunicationTest {
                       .atZone(ZoneId.systemDefault())
                       .toLocalDateTime();
 
-              assertEquals(ErxCommunication.CommunicationType.INFO_REQ, communication.getType());
+              assertEquals(CommunicationType.INFO_REQ, communication.getType());
               assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
               assertTrue(communication.hasAboutReference());
               assertEquals(expectedAboutRef, communication.getAboutReference().orElseThrow());
@@ -134,7 +135,7 @@ public class ErxCommunicationTest {
                       .atZone(ZoneId.systemDefault())
                       .toLocalDateTime();
 
-              assertEquals(ErxCommunication.CommunicationType.REPLY, communication.getType());
+              assertEquals(CommunicationType.REPLY, communication.getType());
               assertFalse(communication.hasAboutReference());
               assertFalse(communication.getAboutReference().isPresent());
               assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
@@ -147,24 +148,33 @@ public class ErxCommunicationTest {
   }
 
   @Test
-  public void shouldProvideKvidNamingSystemFromType() {
-    val kvidReceiving =
-        List.of(
-            ErxCommunication.CommunicationType.REPLY,
-            ErxCommunication.CommunicationType.REPRESENTATIVE,
-            ErxCommunication.CommunicationType.CHANGE_REPLY);
+  public void shouldProvideKvidNamingSystemFromType01() {
+    val kvidReceiving = List.of(CommunicationType.REPLY, CommunicationType.REPRESENTATIVE);
     kvidReceiving.forEach(
-        type -> assertEquals(ErpNamingSystem.KVID, type.getRecipientNamingSystem()));
+        type -> assertEquals(DeBasisNamingSystem.KVID, type.getRecipientNamingSystem()));
   }
 
   @Test
-  public void shouldProvidePharmacyNamingSystemFromType() {
-    val kvidReceiving =
-        List.of(
-            ErxCommunication.CommunicationType.INFO_REQ,
-            ErxCommunication.CommunicationType.DISP_REQ,
-            ErxCommunication.CommunicationType.CHANGE_REQ);
+  public void shouldProvideKvidNamingSystemFromType02() {
+    val kvidReceiving = List.of(ChargeItemCommunicationType.CHANGE_REPLY);
     kvidReceiving.forEach(
-        type -> assertEquals(ErpNamingSystem.TELEMATIK_ID, type.getRecipientNamingSystem()));
+        type -> assertEquals(DeBasisNamingSystem.KVID_PKV, type.getRecipientNamingSystem()));
+  }
+
+  @Test
+  public void shouldProvidePharmacyNamingSystemFromType01() {
+    val kvidReceiving = List.of(CommunicationType.INFO_REQ, CommunicationType.DISP_REQ);
+    kvidReceiving.forEach(
+        type ->
+            assertEquals(ErpWorkflowNamingSystem.TELEMATIK_ID, type.getRecipientNamingSystem()));
+  }
+
+  @Test
+  public void shouldProvidePharmacyNamingSystemFromType02() {
+    val kvidReceiving = List.of(ChargeItemCommunicationType.CHANGE_REQ);
+    kvidReceiving.forEach(
+        type ->
+            assertEquals(
+                ErpWorkflowNamingSystem.TELEMATIK_ID_SID, type.getRecipientNamingSystem()));
   }
 }

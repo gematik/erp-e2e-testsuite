@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -30,13 +30,14 @@ public interface IValueSet {
 
   String getDefinition();
 
-  ErpCodeSystem getCodeSystem();
+  ICodeSystem getCodeSystem();
 
   default CodeableConcept asCodeableConcept() {
-    val coding = new Coding();
-    coding.setCode(this.getCode());
-    coding.setSystem(this.getCodeSystem().getCanonicalUrl());
+    return asCodeableConcept(false);
+  }
 
+  default CodeableConcept asCodeableConcept(boolean withDisplay) {
+    val coding = asCoding(withDisplay);
     return new CodeableConcept().setCoding(List.of(coding));
   }
 

@@ -18,7 +18,6 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.DocumentType;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +27,11 @@ import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
-/** @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a> */
+/**
+ * @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a>
+ */
 @Slf4j
-@ResourceDef(name = "Bundle", profile = StructureDefinitionFixedUrls.GEM_ERX_RECEIPT)
+@ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
 public class ErxReceipt extends Bundle {
 
@@ -42,7 +43,8 @@ public class ErxReceipt extends Bundle {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Composition))
-        .map(resource -> ((Composition) resource).getType())
+        .map(Composition.class::cast)
+        .map(Composition::getType)
         .map(
             compositionType ->
                 compositionType.getCoding().stream()

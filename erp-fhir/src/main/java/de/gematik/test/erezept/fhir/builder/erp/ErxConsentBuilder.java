@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.valuesets.ActCode;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
@@ -63,7 +63,7 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
   public ErxConsent build() {
     val consent = new ErxConsent();
 
-    val profile = ErpStructureDefinition.GEM_CONSENT.asCanonicalType();
+    val profile = ErpWorkflowStructDef.CONSENT.asCanonicalType();
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -72,7 +72,9 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
     consent.setPatient(
         new Reference()
             .setIdentifier(
-                new Identifier().setSystem(ErpNamingSystem.KVID.getCanonicalUrl()).setValue(kvid)));
+                new Identifier()
+                    .setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl())
+                    .setValue(kvid)));
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);
     consent.setScope(scope.asCodeableConcept());

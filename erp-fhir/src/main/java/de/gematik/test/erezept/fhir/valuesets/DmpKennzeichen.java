@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.Extension;
 
@@ -38,7 +38,7 @@ public enum DmpKennzeichen implements IValueSet {
   OSTEOPOROSE("11", "Osteoporose"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.DMP;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.DMP;
   public static final String VERSION = "1.05";
   public static final String DESCRIPTION =
       "DMP-Kennzeichen: gibt an, in welchen DMPs ein Versicherter eingeschrieben ist (§ 267 Abs. 2 Satz 4 SGB V). Die Angabe ist auf der EGK vorhanden und auf der KVK Teil des Feldes: Statusergänzung.";
@@ -54,12 +54,11 @@ public enum DmpKennzeichen implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
-    return new Extension(
-        ErpStructureDefinition.GKV_DMP_KENNZEICHEN.getCanonicalUrl(), this.asCoding());
+    return new Extension(DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl(), this.asCoding());
   }
 }

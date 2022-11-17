@@ -20,46 +20,57 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.app.cfg.AppConfiguration;
 import de.gematik.test.erezept.app.cfg.PlatformType;
-import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
-import io.appium.java_client.AppiumDriver;
+import de.gematik.test.erezept.app.mobile.elements.PageElement;
+import io.appium.java_client.ios.IOSDriver;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Slf4j
-public class UseIOSApp extends UseTheApp {
+public class UseIOSApp extends UseTheApp<IOSDriver> {
 
-  protected UseIOSApp(AppiumDriver driver, AppConfiguration appConfiguration) {
+  public UseIOSApp(IOSDriver driver, AppConfiguration appConfiguration) {
     super(driver, PlatformType.IOS, appConfiguration);
   }
 
   @Override
-  public WebElement getWebElement(By locator) {
-    log.info(format("Try to fetch element {0}", locator));
+  protected WebElement getWebElement(By locator) {
+    return waitForElement(locator, ExpectedConditions::presenceOfElementLocated);
+  }
 
+  public List<WebElement> getWebElementList(PageElement pageElement) {
+    return waitForElement(pageElement, ExpectedConditions::presenceOfAllElementsLocatedBy);
+  }
+
+  private <T> T waitForElement(
+      PageElement pageElement, Function<By, ExpectedCondition<T>> expectation) {
+    return waitForElement(this.getLocator(pageElement), expectation);
+  }
+
+  private <T> T waitForElement(By locator, Function<By, ExpectedCondition<T>> expectation) {
+    log.info(format("Try to fetch element {0}", locator));
     val wait = this.getFluentWaitDriver();
     val start = Instant.now();
     try {
-      val el = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+      val el = wait.until(expectation.apply(locator));
       val duration = Duration.between(start, Instant.now());
       log.info(format("Found element <{0}> after {1}ms", el, duration.toMillis()));
       return el;
-    } catch (NoSuchElementException nsee) {
+    } catch (TimeoutException | NoSuchElementException e) {
       val duration = Duration.between(start, Instant.now());
-      log.error(
-          format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis()));
-      throw nsee;
+      val errorMsg =
+          format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis());
+      log.error(errorMsg);
+      throw new NoSuchElementException(errorMsg, e);
     }
-  }
-
-  @Override
-  public List<WebElement> getWebElementList(String identifier) {
-    throw new FeatureNotImplementedException("getWebElementList on iOS");
   }
 }

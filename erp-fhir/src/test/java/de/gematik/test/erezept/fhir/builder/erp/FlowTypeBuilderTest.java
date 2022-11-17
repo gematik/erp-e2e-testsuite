@@ -21,23 +21,15 @@ import static org.junit.Assert.assertTrue;
 
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Arrays;
 import lombok.val;
 import org.hl7.fhir.r4.model.Parameters;
-import org.junit.Before;
 import org.junit.Test;
 
-public class FlowTypeBuilderTest {
-
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class FlowTypeBuilderTest extends ParsingTest {
 
   @Test
   public void buildParametersFlowType160() {
@@ -51,6 +43,9 @@ public class FlowTypeBuilderTest {
   @Test
   public void buildParametersForAllFlowTypes() {
     Arrays.stream(PrescriptionFlowType.values())
+        .filter(
+            flowType ->
+                !flowType.equals(PrescriptionFlowType.FLOW_TYPE_209)) // 209 not yet supported!
         .forEach(
             flowType -> {
               val params = FlowTypeBuilder.build(flowType);

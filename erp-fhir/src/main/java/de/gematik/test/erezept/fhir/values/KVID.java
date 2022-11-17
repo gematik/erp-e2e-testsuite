@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 
 public class KVID extends Value<String> {
 
   private KVID(String value) {
-    super(ErpNamingSystem.KVID, value);
+    super(DeBasisNamingSystem.KVID, value);
   }
 
   public static KVID from(String value) {

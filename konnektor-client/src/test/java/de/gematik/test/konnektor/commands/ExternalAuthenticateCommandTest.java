@@ -23,7 +23,7 @@ import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.LocalKonnektorConfiguration;
 import de.gematik.test.smartcard.Crypto;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.BeforeClass;
@@ -36,7 +36,7 @@ public class ExternalAuthenticateCommandTest {
 
   @BeforeClass
   public static void setup() {
-    sca = SmartcardFactory.readArchive();
+    sca = SmartcardFactory.getArchive();
     mockKonnektor = LocalKonnektorConfiguration.createMock();
   }
 

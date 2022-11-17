@@ -2,8 +2,8 @@
   "hba-cards": [
     {
       "iccsn": "80276883110000095767",
-      "auth": "hba/1-2-ARZT-SamSchraßer01/80276883110000095767_C.HP.AUT.R2048.p12",
-      "qes": "hba/1-2-ARZT-SamSchraßer01/80276883110000095767_C.HP.QES.R2048.p12",
+      "auth": "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.AUT.R2048.p12",
+      "qes": "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.QES.R2048.p12",
       "cardType": "HBA",
       "algo": "R2048",
       "password": "00"
@@ -135,6 +135,20 @@
       "auth": "smcb/NordApothekeTEST-ONLY_80276883110000092475/80276883110000092475_C.HCI.AUT.R2048/80276883110000092475_C.HCI.AUT.R2048.p12",
       "cardType": "SMC-B",
       "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001011699900861",
+      "auth": "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_AUT_R2048_X509/80276001011699900861-C_SMCB_AUT_R2048_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "R2048",
+      "password": "00"
+    },
+    {
+      "iccsn": "80276001011699900861",
+      "auth": "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_AUT_E256_X509/80276001011699900861-C_SMCB_AUT_E256_X509.p12",
+      "cardType": "SMC-B",
+      "algo": "E256",
       "password": "00"
     }
   ],

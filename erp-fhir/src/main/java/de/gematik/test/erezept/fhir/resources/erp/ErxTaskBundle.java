@@ -19,7 +19,6 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -32,12 +31,12 @@ public class ErxTaskBundle extends Bundle {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .map(ErxTask::fromTask)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public ErxTask getLatestTask() {
     Comparator<? super ErxTask> comparator =
         Comparator.comparing(ErxTask::getAuthoredOn).reversed();
-    return this.getTasks().stream().sorted(comparator).collect(Collectors.toList()).get(0);
+    return this.getTasks().stream().sorted(comparator).toList().get(0);
   }
 }

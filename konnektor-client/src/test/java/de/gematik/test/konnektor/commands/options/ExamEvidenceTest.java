@@ -16,52 +16,51 @@
 
 package de.gematik.test.konnektor.commands.options;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.Date;
-import java.util.regex.Pattern;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.nio.charset.*;
+import java.time.*;
+import java.time.format.*;
+import java.time.temporal.*;
+import java.util.*;
+import java.util.regex.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class ExamEvidenceTest {
-  private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+  private final DateTimeFormatter timestampFormatter =
+      DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.from(ZoneOffset.UTC));
 
   @Test
   void generateValidBase64EncodedEvidences() {
     for (ExamEvidence examEvidence : ExamEvidence.values()) {
+      Assertions.assertNotNull(examEvidence.toString());
       val evidenceAsBase64 = examEvidence.encodeAsBase64().getBytes(StandardCharsets.UTF_8);
       Assertions.assertDoesNotThrow(() -> Base64.getDecoder().decode(evidenceAsBase64));
+      Assertions.assertNotNull(examEvidence.getChecksum());
     }
   }
 
   @SneakyThrows
   @Test
   void generateExpiredEvidence() {
-    val expected =
-        new Date().toInstant().minus(29, ChronoUnit.MINUTES).minus(59, ChronoUnit.SECONDS);
-    val timestamp =
-        parseTimestamp(ExamEvidence.UPDATES_SUCCESSFUL.withExpiredEvidence().asXml())
-            .minus(30, ChronoUnit.MINUTES);
-    Assertions.assertTrue(timestamp.isBefore(expected));
+    val expected = Instant.now().minus(30, ChronoUnit.MINUTES);
+    val expiredTimestamp = parseTimestamp(ExamEvidence.NO_UPDATE_WITH_EXPIRED_TIMESTAMP.asXml());
+    Assertions.assertTrue(
+        expiredTimestamp.isBefore(expected),
+        format("{0} is expected to be before {1}", expiredTimestamp, expected));
   }
 
   @SneakyThrows
   @Test
-  void generateNotYetValidEvidence() {
-    val expected = new Date().toInstant().plus(29, ChronoUnit.MINUTES).plus(40, ChronoUnit.SECONDS);
-    val timestamp =
-        parseTimestamp(ExamEvidence.UPDATES_SUCCESSFUL.withNotYetValidEvidence().asXml())
-            .plus(30, ChronoUnit.MINUTES);
-    Assertions.assertTrue(
-        timestamp.isAfter(expected),
-        format("{0} is expected to be after {1}", timestamp, expected));
+  void evidenceWithoutChecksum() {
+    val evidences =
+        List.of(
+            ExamEvidence.ERROR_EGK,
+            ExamEvidence.ERROR_AUTH_CERT_INVALID,
+            ExamEvidence.ERROR_ONLINECHECK_NOT_POSSIBLE,
+            ExamEvidence.ERROR_OFFLINE_PERIOD_EXCEEDED);
+    evidences.forEach(e -> Assertions.assertFalse(e.asXml().contains("<PZ>")));
   }
 
   @SneakyThrows
@@ -69,6 +68,6 @@ class ExamEvidenceTest {
     val pattern = Pattern.compile("<TS>(.*?)</TS>");
     val matcher = pattern.matcher(evidenceAsXml);
     Assertions.assertTrue(matcher.find());
-    return TIMESTAMP_FORMAT.parse(matcher.group(1)).toInstant();
+    return Instant.from(timestampFormatter.parse(matcher.group(1)));
   }
 }

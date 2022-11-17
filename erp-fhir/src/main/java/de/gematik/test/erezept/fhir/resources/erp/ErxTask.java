@@ -20,10 +20,9 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -35,9 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
-/** @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a> */
+/**
+ * @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a>
+ */
 @Slf4j
-@ResourceDef(name = "Task", profile = StructureDefinitionFixedUrls.GEM_ERX_TASK)
+@ResourceDef(name = "Task")
 @SuppressWarnings({"java:S110"})
 public class ErxTask extends Task {
 
@@ -56,20 +57,25 @@ public class ErxTask extends Task {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
-                ErpNamingSystem.PRESCRIPTION_ID.getCanonicalUrl().equals(identifier.getSystem()))
+                ErpWorkflowNamingSystem.PRESCRIPTION_ID
+                    .getCanonicalUrl()
+                    .equals(identifier.getSystem()))
         .map(identifier -> new PrescriptionId(identifier.getValue()))
         .findFirst() // Prescription ID has cardinality of 1..1 anyways
         .orElseThrow(
-            () -> new MissingFieldException(this.getClass(), ErpNamingSystem.PRESCRIPTION_ID));
+            () ->
+                new MissingFieldException(
+                    this.getClass(), ErpWorkflowNamingSystem.PRESCRIPTION_ID));
   }
 
   public PrescriptionFlowType getFlowType() {
-    return this.getExtensionsByUrl(ErpStructureDefinition.GEM_PRESCRIPTION_TYPE.getCanonicalUrl())
+    return this.getExtensionsByUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl())
         .stream()
         .map(Extension::getValue)
         .filter(Coding.class::isInstance)
         .map(Coding.class::cast)
-        .filter(coding -> ErpCodeSystem.FLOW_TYPE.getCanonicalUrl().equals(coding.getSystem()))
+        .filter(
+            coding -> ErpWorkflowCodeSystem.FLOW_TYPE.getCanonicalUrl().equals(coding.getSystem()))
         .map(coding -> PrescriptionFlowType.fromCode(coding.getCode()))
         .findFirst()
         .orElseThrow(
@@ -80,14 +86,17 @@ public class ErxTask extends Task {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
-                ErpNamingSystem.ACCESS_CODE.getCanonicalUrl().equals(identifier.getSystem()))
+                ErpWorkflowNamingSystem.ACCESS_CODE
+                    .getCanonicalUrl()
+                    .equals(identifier.getSystem()))
         .map(identifier -> new AccessCode(identifier.getValue()))
         .findFirst(); // AccessCode has cardinality of 0..1 -> is optional
   }
 
   public AccessCode getAccessCode() {
     return this.getOptionalAccessCode()
-        .orElseThrow(() -> new MissingFieldException(ErxTask.class, ErpNamingSystem.ACCESS_CODE));
+        .orElseThrow(
+            () -> new MissingFieldException(ErxTask.class, ErpWorkflowNamingSystem.ACCESS_CODE));
   }
 
   public boolean hasAccessCode() {
@@ -97,7 +106,8 @@ public class ErxTask extends Task {
   public Optional<Secret> getSecret() {
     return this.getIdentifier().stream()
         .filter(
-            identifier -> ErpNamingSystem.SECRET.getCanonicalUrl().equals(identifier.getSystem()))
+            identifier ->
+                ErpWorkflowNamingSystem.SECRET.getCanonicalUrl().equals(identifier.getSystem()))
         .map(identifier -> new Secret(identifier.getValue()))
         .findFirst(); // Secret has cardinality of 0..1 -> is optional
   }

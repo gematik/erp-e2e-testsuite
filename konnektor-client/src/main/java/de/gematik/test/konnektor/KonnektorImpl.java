@@ -63,7 +63,10 @@ public class KonnektorImpl implements Konnektor {
     try {
       return Optional.of(execute(cmd));
     } catch (SOAPRequestException sre) {
-      log.warn(sre.getMessage());
+      log.warn(
+          format(
+              "Execute {0} produced an error: {1}",
+              cmd.getClass().getSimpleName(), sre.getMessage()));
       return Optional.empty();
     }
   }

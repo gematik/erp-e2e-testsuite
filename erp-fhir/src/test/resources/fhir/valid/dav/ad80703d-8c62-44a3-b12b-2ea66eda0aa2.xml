@@ -10,7 +10,7 @@
     </tag>
   </meta>
   <identifier>
-    <system value="https://gematik.de/fhir/NamingSystem/PrescriptionID" />
+    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId" />
     <value value="200.100.000.000.081.90" />
   </identifier>
   <type value="document" />
@@ -59,7 +59,7 @@
           <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.1" />
         </meta>
         <identifier>
-          <system value="http://fhir.de/NamingSystem/arge-ik/iknr" />
+          <system value="http://fhir.de/sid/arge-ik/iknr" />
           <value value="123456789" />
         </identifier>
         <name value="Adler-Apotheke" />
@@ -115,7 +115,7 @@
         </performer>
         <authorizingPrescription>
           <identifier>
-            <system value="https://gematik.de/fhir/NamingSystem/PrescriptionID" />
+            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId" />
             <value value="200.100.000.000.081.90" />
           </identifier>
         </authorizingPrescription>

@@ -16,13 +16,17 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.util.Currency;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Invoice;
 
+@Slf4j
 public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponentBuilder> {
 
   private final KostenVersicherterKategorie category;
@@ -83,6 +87,13 @@ public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponen
   public Invoice.InvoiceLineItemPriceComponentComponent build() {
     val pc = new Invoice.InvoiceLineItemPriceComponentComponent();
     pc.setType(priceComponentType);
+
+    if (!category.equals(KostenVersicherterKategorie.ZUZAHLUNG)) {
+      log.warn(
+          format(
+              "Given {0} is {1} ({2}) which might be not allowed by the profile!",
+              KostenVersicherterKategorie.class.getSimpleName(), category, category.getDisplay()));
+    }
     pc.addExtension(DavExtensions.getInsurantCost(category, insurantCost, currency));
 
     val amount = pc.getAmount();

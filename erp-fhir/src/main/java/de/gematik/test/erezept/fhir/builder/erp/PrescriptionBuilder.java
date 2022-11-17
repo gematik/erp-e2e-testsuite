@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Binary;
@@ -30,7 +30,7 @@ public class PrescriptionBuilder {
 
   public static Parameters builder(byte[] data) {
     val b = new Binary();
-    b.getMeta().setProfile(List.of(ErpStructureDefinition.GEM_BINARY.asCanonicalType()));
+    b.getMeta().setProfile(List.of(ErpWorkflowStructDef.BINARY.asCanonicalType()));
     b.getContentTypeElement().setValue("application/pkcs7-mime");
     b.setData(data);
 

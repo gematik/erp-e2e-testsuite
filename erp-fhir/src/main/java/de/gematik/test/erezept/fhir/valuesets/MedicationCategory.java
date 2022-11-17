@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -41,7 +41,7 @@ public enum MedicationCategory implements IValueSet {
   C_02("02", "AMVV § 3a Abs. 1 (Thalidomid o. ä.)"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.MEDICATION_CATEGORY;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.MEDICATION_CATEGORY;
   public static final String VERSION = "1.0.1";
   public static final String DESCRIPTION = "NO DESCRIPTION";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
@@ -61,13 +61,12 @@ public enum MedicationCategory implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
-    return new Extension(
-        ErpStructureDefinition.KBV_MEDICATION_CATEGORY.getCanonicalUrl(), this.asCoding());
+    return new Extension(KbvItaErpStructDef.MEDICATION_CATEGORY.getCanonicalUrl(), this.asCoding());
   }
 
   public static MedicationCategory fromCode(@NonNull String coding) {

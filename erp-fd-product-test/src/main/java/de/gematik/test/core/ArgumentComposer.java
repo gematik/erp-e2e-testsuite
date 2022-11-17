@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.val;
@@ -54,7 +53,7 @@ public class ArgumentComposer {
         Arrays.stream(enumeration.getEnumConstants())
             .filter(e -> !exclude.contains(e))
             .map(Object.class::cast)
-            .collect(Collectors.toList());
+            .toList();
     return composeWith(list);
   }
 
@@ -66,7 +65,7 @@ public class ArgumentComposer {
 
   public static ArgumentComposer composeWith(Stream<Arguments> argumentsStream) {
     val builder = composeWith();
-    for (var args : argumentsStream.map(Arguments::get).collect(Collectors.toList())) {
+    for (var args : argumentsStream.map(Arguments::get).toList()) {
       val row = new ArrayList<>(Arrays.asList(args));
       builder.arguments(row);
     }
@@ -121,7 +120,7 @@ public class ArgumentComposer {
         Arrays.stream(enumeration.getEnumConstants())
             .filter(e -> !exclude.contains(e))
             .map(Object.class::cast)
-            .collect(Collectors.toList());
+            .toList();
     return multiply(index, l);
   }
 

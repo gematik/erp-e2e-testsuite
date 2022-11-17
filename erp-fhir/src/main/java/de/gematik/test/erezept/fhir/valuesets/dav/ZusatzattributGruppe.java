@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -53,7 +53,7 @@ public enum ZusatzattributGruppe implements IValueSet {
   ZUZAHLUNGSSTATUS("15", "Zuzahlungsstatus", "von Zuzahlungspflicht befreit"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.DAV_CS_ERP_ZUSATZATTRIBUTE_GRUPPE;
+  public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.ZUSATZATTRIBUTE_GRUPPE;
   public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "Group of additional attributes";
   public static final String PUBLISHER = "DAV";
@@ -67,7 +67,7 @@ public enum ZusatzattributGruppe implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

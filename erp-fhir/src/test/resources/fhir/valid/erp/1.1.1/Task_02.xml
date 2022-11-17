@@ -1,0 +1,32 @@
+<Task xmlns="http://hl7.org/fhir">
+    <id value="16aaabf2-1de1-11b2-8057-a3c264e57515"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/StructureDefinition/ErxTask"/>
+    </meta>
+    <extension url="https://gematik.de/fhir/StructureDefinition/PrescriptionType">
+        <valueCoding>
+            <system value="https://gematik.de/fhir/CodeSystem/Flowtype"/>
+            <code value="160"/>
+            <display value="Muster 16 (Apothekenpflichtige Arzneimittel)"/>
+        </valueCoding>
+    </extension>
+    <identifier>
+        <system value="https://gematik.de/fhir/NamingSystem/PrescriptionID"/>
+        <value value="160.002.266.580.400.83"/>
+    </identifier>
+    <identifier>
+        <system value="https://gematik.de/fhir/NamingSystem/AccessCode"/>
+        <value value="8d7d61c14e3e24c79d17dbe4ef0fc3cf9356cbfa07aecb593246314434606642"/>
+    </identifier>
+    <status value="requested"/>
+    <intent value="order"/>
+    <authoredOn value="2021-09-20T08:03:24.340036300+00:00"/>
+    <lastModified value="2021-09-20T08:03:24.340059100+00:00"/>
+    <performerType>
+        <coding>
+            <system value="urn:ietf:rfc:3986"/>
+            <code value="urn:oid:1.2.276.0.76.4.54"/>
+            <display value="Öffentliche Apotheke"/>
+        </coding>
+    </performerType>
+</Task>

@@ -25,6 +25,8 @@ public class AppiumConfiguration {
 
   private String id;
   private String url;
+  private String accessKey;
+  private String version;
 
   @SneakyThrows
   public URL getUrl() {

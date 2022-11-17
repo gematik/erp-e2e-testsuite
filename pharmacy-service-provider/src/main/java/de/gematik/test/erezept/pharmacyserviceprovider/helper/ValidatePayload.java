@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.pharmacyserviceprovider.helper;
 
 public class ValidatePayload {
+  private ValidatePayload() {}
 
   public static boolean stringIsNull(String s) {
     return (s == null);

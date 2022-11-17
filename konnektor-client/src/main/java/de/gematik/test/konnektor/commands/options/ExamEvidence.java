@@ -16,15 +16,24 @@
 
 package de.gematik.test.konnektor.commands.options;
 
-import java.io.*;
-import java.nio.charset.*;
-import java.text.*;
-import java.time.temporal.*;
-import java.util.*;
-import java.util.zip.*;
-import lombok.*;
+import static java.text.MessageFormat.format;
 
-@Getter
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import lombok.SneakyThrows;
+import lombok.val;
+
 public enum ExamEvidence {
   UPDATES_SUCCESSFUL(1),
   NO_UPDATES(2),
@@ -32,9 +41,13 @@ public enum ExamEvidence {
   ERROR_AUTH_CERT_INVALID(4),
   ERROR_ONLINECHECK_NOT_POSSIBLE(5),
   ERROR_OFFLINE_PERIOD_EXCEEDED(6),
-  INVALID(-1);
+  INVALID_EVIDENCE_NUMBER(-1),
+  NO_UPDATE_WITH_EXPIRED_TIMESTAMP(2),
+  NO_WELL_FORMED_XML(-1),
+  ;
 
-  private final SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyyMMddHHmmss");
+  private final DateTimeFormatter timestampFormatter =
+      DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.from(ZoneOffset.UTC));
   private final String template =
       "H4sIAFMA8mIA/zWN0UvDMBDG/5WSd3ur9GFIklFMBB8unW4T9EWCibV1TYcp7Zq/freBD7/vuB/cd3xz7o/Z5P9iOwTBi"
           + "nzFMh++BteGRrDD/uluzbI42uDscQhesMVHtpF8azI6DFGwn3E8PQDMMW98b8f2N3cevi1M0fVwCjNMt9JHhZ9v"
@@ -43,7 +56,7 @@ public enum ExamEvidence {
   private final int number;
   private final String xml;
 
-  private Date timestamp = new Date();
+  private final Instant timestamp = Instant.now();
 
   ExamEvidence(int number) {
     this.number = number;
@@ -51,8 +64,25 @@ public enum ExamEvidence {
   }
 
   public String asXml() {
-    return xml.replace("<TS></TS>", String.format("<TS>%s</TS>", genTimestamp()))
-        .replace("<E></E>", String.format("<E>%s</E>", getNumber()));
+    if (this == NO_WELL_FORMED_XML) {
+      return "<foo></bar>";
+    }
+    return replaceChecksum(xml)
+        .replace("<TS></TS>", String.format("<TS>%s</TS>", genTimestamp()))
+        .replace("<E></E>", String.format("<E>%s</E>", number));
+  }
+
+  public Optional<String> getChecksum() {
+    val pattern = Pattern.compile("<PZ>(.*?)</PZ>");
+    val matcher = pattern.matcher(this.asXml());
+    return matcher.find() ? Optional.of(matcher.group(1)) : Optional.empty();
+  }
+
+  private String replaceChecksum(String xml) {
+    if (number > 2) {
+      return xml.replaceFirst("<PZ>.*?</PZ>", "");
+    }
+    return xml;
   }
 
   public byte[] encode() {
@@ -63,19 +93,11 @@ public enum ExamEvidence {
     return Base64.getEncoder().encodeToString(encode());
   }
 
-  public ExamEvidence withExpiredEvidence() {
-    val minus = timestamp.toInstant().minus(30, ChronoUnit.MINUTES);
-    this.timestamp = Date.from(minus);
-    return this;
-  }
-
-  public ExamEvidence withNotYetValidEvidence() {
-    val minus = timestamp.toInstant().plus(30, ChronoUnit.MINUTES);
-    this.timestamp = Date.from(minus);
-    return this;
-  }
-
   private String genTimestamp() {
+    if (this == NO_UPDATE_WITH_EXPIRED_TIMESTAMP) {
+      val minus = this.timestamp.minus(30, ChronoUnit.MINUTES).minus(1, ChronoUnit.SECONDS);
+      return timestampFormatter.format(minus);
+    }
     // example 20220808134833
     return timestampFormatter.format(timestamp);
   }
@@ -98,5 +120,10 @@ public enum ExamEvidence {
       output.write(gis.readAllBytes());
     }
     return output.toByteArray();
+  }
+
+  @Override
+  public String toString() {
+    return format("Name: {0}, TS: {1}", this.name(), genTimestamp());
   }
 }

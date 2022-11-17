@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public enum InvoiceType implements IValueSet {
   ABRECHNUNGSZEILEN("Abrechnungszeilen", "Abrechnungszeilen eines eAbgabdatensatzes"),
   ZUSATZDATENEINHEIT("ZusatzdatenEinheit", "Einheit einer ZusatzdatenHerstellung");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.DAV_CS_ERP_INVOICE_TYPE;
+  public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.INVOICE_TYPE;
   public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "Type of the Invoice";
   public static final String PUBLISHER = "DAV";
@@ -44,7 +44,7 @@ public enum InvoiceType implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

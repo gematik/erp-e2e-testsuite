@@ -19,7 +19,9 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
@@ -40,7 +42,7 @@ import net.serenitybdd.screenplay.Question;
 public class GetReceivedCommunication implements Question<Optional<ErxCommunication>> {
 
   private final Actor sender;
-  private final ErxCommunication.CommunicationType type;
+  private final ICommunicationType type;
   private final DequeStrategyEnum dequeStrategy;
 
   @Override
@@ -84,7 +86,7 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
 
   private String getSenderId() {
     String id;
-    if (this.type.equals(ErxCommunication.CommunicationType.REPLY)) {
+    if (this.type.equals(CommunicationType.REPLY)) {
       id = SafeAbility.getAbility(sender, UseSMCB.class).getTelematikID();
     } else {
       id = SafeAbility.getAbility(sender, ProvidePatientBaseData.class).getKvid();
@@ -93,26 +95,26 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
   }
 
   public static Builder infoRequest() {
-    return new Builder(ErxCommunication.CommunicationType.INFO_REQ);
+    return new Builder(CommunicationType.INFO_REQ);
   }
 
   public static Builder dispenseRequest() {
-    return new Builder(ErxCommunication.CommunicationType.DISP_REQ);
+    return new Builder(CommunicationType.DISP_REQ);
   }
 
   public static Builder representative() {
-    return new Builder(ErxCommunication.CommunicationType.REPRESENTATIVE);
+    return new Builder(CommunicationType.REPRESENTATIVE);
   }
 
   public static Builder reply() {
-    return new Builder(ErxCommunication.CommunicationType.REPLY);
+    return new Builder(CommunicationType.REPLY);
   }
 
   public static class Builder {
-    private final ErxCommunication.CommunicationType type;
+    private final ICommunicationType type;
     private DequeStrategyEnum dequeStrategy;
 
-    Builder(ErxCommunication.CommunicationType type) {
+    Builder(ICommunicationType type) {
       this.type = type;
     }
 

@@ -17,66 +17,19 @@
 package de.gematik.test.erezept.app.questions.android;
 
 import static java.text.MessageFormat.format;
-import static org.junit.Assert.assertEquals;
 
-import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.locators.LocatorStrategy;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.SneakyThrows;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
-import org.openqa.selenium.By;
 
+@Slf4j
 public class HasReceivedPrescriptionOnAndroid implements Question<Boolean> {
 
   @Override
   @SneakyThrows
   public Boolean answeredBy(Actor actor) {
-    val app = SafeAbility.getAbility(actor, UseTheApp.class);
-    val dmcs = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
-
-    // check the precondition by counting existing DMCs for this actor
-    //        if(dmcs.getDmcList().size() == 0) {
-    //            throw new MissingPreconditionException("No Prescriptions via DMC available");
-    //        }
-
-    // check the number of visible prescriptions on the screen
-    val numOfPrescriptions =
-        app.getWebElementListLen("List of Prescriptions") - 1; // subtract Archive ComposeNode
-    if (numOfPrescriptions == 0) {
-      // could not find any prescriptions on the screen
-      return false;
-    }
-
-    /*
-    Note: this construct is pretty hacky because the "List of Prescriptions" does not have proper Identifiers
-    here, we will fetch each single element by instrumenting the original XPath
-    */
-    val platformLocator = app.getPlatformLocator("List of Prescriptions");
-    assertEquals(
-        "Locating single Prescriptions works only with XPath for now",
-        LocatorStrategy.XPATH,
-        platformLocator.getStrategy());
-
-    boolean foundPrescription = false;
-    for (int prescriptionIdx = 1; prescriptionIdx <= numOfPrescriptions; prescriptionIdx++) {
-      val xpath = format("{0}[{1}]", platformLocator.getLocatorId(), prescriptionIdx);
-      val prescriptionLocator = By.xpath(xpath);
-
-      /*
-      Well, nasty hack but required as long as espresso-driver cannot wait for an element to be clickable.
-      This sleep bridges the gap while the app is loading the prescriptions again: elements are available but not yet clickable
-      TODO: what about using Pause extends org.openqa.selenium.interactions.Interaction
-       */
-      Thread.sleep(2000);
-      app.tap(prescriptionLocator);
-      // TODO: check the prescription details here!
-      foundPrescription = false;
-      app.tap("Leave Prescription Details");
-    }
-
-    return foundPrescription;
+    log.warn(format("{0} not yet implemented", this.getClass().getSimpleName()));
+    return false;
   }
 }

@@ -92,8 +92,6 @@ class KbvBundleManipulatorFactoryTest {
                                     "''{0}'' manipulation was not detected as invalid by HAPI",
                                     m.getName()));
                           }
-                          // However, once KBV profiles are updated, all of these MUST fail
-
                         });
     assertAll("Should fail on manipulated KbvErpBundle", executables);
   }

@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -52,7 +52,7 @@ public class HandoverDispenseRequestAsRepresentative implements Task {
         expectedCommunications.getRawList().stream()
             .filter(exp -> exp.getReceiverName().equals(actor.getName()))
             .filter(exp -> exp.getSenderName().equals(owner.getName()))
-            .filter(exp -> exp.getType().equals(ErxCommunication.CommunicationType.REPRESENTATIVE))
+            .filter(exp -> exp.getType().equals(CommunicationType.REPRESENTATIVE))
             .collect(Collectors.toList());
 
     if (expectedCommunications.isEmpty()) {

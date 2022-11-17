@@ -20,35 +20,32 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
 @Slf4j
-@ResourceDef(name = "Medication", profile = StructureDefinitionFixedUrls.KBV_PR_ERP_MEDICATION_PZN)
+@ResourceDef(name = "Medication")
 @SuppressWarnings({"java:S110"})
 public class KbvErpMedication extends Medication {
 
   public List<MedicationCategory> getCatagory() {
     return this.getExtension().stream()
         .filter(
-            ext ->
-                ext.getUrl()
-                    .equals(ErpStructureDefinition.KBV_MEDICATION_CATEGORY.getCanonicalUrl()))
+            ext -> ext.getUrl().equals(KbvItaErpStructDef.MEDICATION_CATEGORY.getCanonicalUrl()))
         .map(Extension::getValue)
         .map(coding -> coding.castToCoding(coding))
         .map(coding -> MedicationCategory.fromCode(coding.getCode()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public MedicationCategory getCategoryFirstRep() {
@@ -57,23 +54,19 @@ public class KbvErpMedication extends Medication {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    KbvErpMedication.class, ErpStructureDefinition.KBV_MEDICATION_CATEGORY));
+                    KbvErpMedication.class, KbvItaErpStructDef.MEDICATION_CATEGORY));
   }
 
   public Optional<MedicationType> getMedicationType() {
     return this.getCode().getCoding().stream()
-        .filter(
-            coding -> coding.getSystem().equals(ErpCodeSystem.MEDICATION_TYPE.getCanonicalUrl()))
+        .filter(coding -> coding.getSystem().equals(MedicationType.CODE_SYSTEM.getCanonicalUrl()))
         .map(coding -> MedicationType.fromCode(coding.getCode()))
         .findFirst();
   }
 
   public boolean isVaccine() {
     return this.getExtension().stream()
-        .filter(
-            ext ->
-                ext.getUrl()
-                    .equals(ErpStructureDefinition.KBV_MEDICATION_VACCINE.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(KbvItaErpStructDef.MEDICATION_VACCINE.getCanonicalUrl()))
         .map(Extension::getValue)
         .map(coding -> coding.castToBoolean(coding))
         .map(BooleanType::booleanValue)
@@ -118,15 +111,16 @@ public class KbvErpMedication extends Medication {
 
   public List<String> getPzn() {
     return this.getCode().getCoding().stream()
-        .filter(coding -> coding.getSystem().equals(ErpCodeSystem.PZN.getCanonicalUrl()))
+        .filter(coding -> coding.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
         .map(Coding::getCode)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public String getPznFirstRep() {
     return this.getPzn().stream()
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(KbvErpMedication.class, ErpCodeSystem.PZN));
+        .orElseThrow(
+            () -> new MissingFieldException(KbvErpMedication.class, DeBasisCodeSystem.PZN));
   }
 
   public String getMedicationName() {
@@ -136,7 +130,7 @@ public class KbvErpMedication extends Medication {
   public List<Darreichungsform> getDarreichungsform() {
     return this.getForm().getCoding().stream()
         .map(coding -> Darreichungsform.fromCode(coding.getCode()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public Optional<Darreichungsform> getDarreichungsformFirstRep() {
@@ -145,7 +139,7 @@ public class KbvErpMedication extends Medication {
 
   public StandardSize getStandardSize() {
     return this.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(ErpStructureDefinition.NORMGROESSE.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
         .map(ext -> StandardSize.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst()
         .orElse(StandardSize.KA);

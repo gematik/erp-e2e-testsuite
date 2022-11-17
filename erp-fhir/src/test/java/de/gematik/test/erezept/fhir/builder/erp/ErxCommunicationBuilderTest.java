@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.util.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.IKNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
@@ -43,6 +43,7 @@ class ErxCommunicationBuilderTest extends ParsingTest {
             .medication(medication)
             .insurance(IKNR.from("104212059"))
             .recipient("606358757")
+            .substitution(false)
             .flowType(PrescriptionFlowType.FLOW_TYPE_160)
             .buildInfoReq("Hallo, das ist meine Request Nachricht!");
 
@@ -88,6 +89,19 @@ class ErxCommunicationBuilderTest extends ParsingTest {
             .buildDispReq("Bitte schicken Sie einen Boten.");
 
     val result = ValidatorUtil.encodeAndValidate(parser, dispReq);
+    assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void buildRepresentative() {
+    val representative =
+        ErxCommunicationBuilder.builder()
+            .basedOnTask("4711", "777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea")
+            .recipient("X123456789")
+            .flowType(PrescriptionFlowType.FLOW_TYPE_160)
+            .buildRepresentative("Bitte für mich abholen");
+
+    val result = ValidatorUtil.encodeAndValidate(parser, representative);
     assertTrue(result.isSuccessful());
   }
 

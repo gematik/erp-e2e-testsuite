@@ -30,18 +30,11 @@ public enum ClientType {
   }
 
   public static ClientType fromString(@NonNull String type) {
-    switch (type.toLowerCase()) {
-      case "ps":
-      case "primärsystem":
-        return PS;
-      case "app":
-      case "benutzer-app":
-      case "fdv":
-      case "adv":
-        return FDV;
-      default:
-        throw new InvalidClientTypeException(type);
-    }
+    return switch (type.toLowerCase()) {
+      case "ps", "primärsystem" -> PS;
+      case "app", "benutzer-app", "fdv", "adv" -> FDV;
+      default -> throw new InvalidClientTypeException(type);
+    };
   }
 
   @Override

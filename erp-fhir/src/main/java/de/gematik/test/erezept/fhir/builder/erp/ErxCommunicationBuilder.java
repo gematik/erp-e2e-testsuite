@@ -17,7 +17,8 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -27,7 +28,9 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
 import lombok.NonNull;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Reference;
 
 public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCommunicationBuilder> {
 
@@ -98,24 +101,25 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
 
   public ErxCommunication buildInfoReq(@NonNull final String message) {
     checkRequiredForInfoReq();
-    val com = build(ErxCommunication.CommunicationType.INFO_REQ, message);
+    val type = CommunicationType.INFO_REQ;
+    val com = build(type, () -> type.getType().asCanonicalType(), message);
 
     com.addContained(medication);
     com.setAbout(List.of(new Reference(aboutReference)));
 
     val payload = com.getPayloadFirstRep();
+
+    val insuranceIdentifier = insuranceIknr.asIdentifier();
     val insuranceExt =
         new Extension(
-            ErpStructureDefinition.GEM_INSURANCE_PROVIDER.getCanonicalUrl(),
-            insuranceIknr.asIdentifier());
+            ErpWorkflowStructDef.INSURANCE_PROVIDER.getCanonicalUrl(), insuranceIdentifier);
     val substitutionExt =
         new Extension(
-            ErpStructureDefinition.GEM_SUBSTITION_ALLOWED.getCanonicalUrl(),
+            ErpWorkflowStructDef.SUBSTITION_ALLOWED.getCanonicalUrl(),
             new BooleanType(substitutionAllowed));
     val prescriptionTypeExt =
         new Extension(
-            ErpStructureDefinition.GEM_PRESCRIPTION_TYPE.getCanonicalUrl(),
-            flowType.asCoding(true));
+            ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), flowType.asCoding(true));
 
     payload.addExtension(insuranceExt);
     payload.addExtension(substitutionExt);
@@ -126,17 +130,17 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
 
   public ErxCommunication buildRepresentative(@NonNull final String message) {
     checkRequiredForRepresentative();
-    val com = build(ErxCommunication.CommunicationType.REPRESENTATIVE, message);
+    val type = CommunicationType.REPRESENTATIVE;
+    val com = build(type, () -> type.getType().asCanonicalType(), message);
 
     val payload = com.getPayloadFirstRep();
     val substitutionExt =
         new Extension(
-            ErpStructureDefinition.GEM_SUBSTITION_ALLOWED.getCanonicalUrl(),
+            ErpWorkflowStructDef.SUBSTITION_ALLOWED.getCanonicalUrl(),
             new BooleanType(substitutionAllowed));
     val prescriptionTypeExt =
         new Extension(
-            ErpStructureDefinition.GEM_PRESCRIPTION_TYPE.getCanonicalUrl(),
-            flowType.asCoding(true));
+            ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), flowType.asCoding(true));
 
     payload.addExtension(substitutionExt);
     payload.addExtension(prescriptionTypeExt);
@@ -146,21 +150,23 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
 
   public ErxCommunication buildDispReq(@NonNull final String message) {
     checkRequiredForDispReq();
-    val com = build(ErxCommunication.CommunicationType.DISP_REQ, message);
+    val type = CommunicationType.DISP_REQ;
+    val com = build(type, () -> type.getType().asCanonicalType(), message);
     com.setBasedOn(List.of(new Reference(taskReference)));
     return com;
   }
 
   public ErxCommunication buildReply(@NonNull final String message) {
     checkRequiredForReply();
-    val com = build(ErxCommunication.CommunicationType.REPLY, message);
+    val type = CommunicationType.REPLY;
+    val com = build(type, () -> type.getType().asCanonicalType(), message);
 
     val payload = com.getPayloadFirstRep();
 
     if (availabilityStatus != null) {
       val ext =
           new Extension(
-              ErpStructureDefinition.GEM_AVAILABILITY_STATUS.getCanonicalUrl(),
+              ErpWorkflowStructDef.AVAILABILITY_STATUS.getCanonicalUrl(),
               availabilityStatus.asCoding());
       payload.addExtension(ext);
     }
@@ -189,7 +195,7 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
   private void checkRequiredForRepresentative() {
     checkRequiredForTaskCommunication();
     this.checkRequired(
-        flowType, "A InfoReq Communication requires a Flow-Type of the Prescription");
+        flowType, "A Representative Communication requires a Flow-Type of the Prescription");
   }
 
   private void checkRequiredForDispReq() {

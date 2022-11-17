@@ -20,9 +20,9 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
 import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
@@ -44,7 +44,7 @@ import org.hl7.fhir.r4.model.*;
 /** <a href="https://simplifier.net/erezept/kbvprerpbundle">KBV E-Rezept Bundle</a> */
 @Slf4j
 @Getter
-@ResourceDef(name = "Bundle", profile = StructureDefinitionFixedUrls.KBV_PR_ERP_BUNDLE)
+@ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
 public class KbvErpBundle extends Bundle {
 
@@ -91,20 +91,12 @@ public class KbvErpBundle extends Bundle {
     this.getMeta().setLastUpdated(date);
   }
 
-  public void setAuthoredOnDate() {
-    this.setAuthoredOnDate(new Date());
-  }
-
   public void setAuthoredOnDate(Date authoredOn) {
     this.getMedicationRequest().setAuthoredOn(authoredOn);
   }
 
   public Date getAuthoredOn() {
     return this.getKbvErpMedicationRequestAsCopy().getAuthoredOn();
-  }
-
-  public void setCompositionDate() {
-    this.setCompositionDate(new Date());
   }
 
   public void setCompositionDate(Date date) {
@@ -122,7 +114,7 @@ public class KbvErpBundle extends Bundle {
    * @return the prescription ID of this bundle
    */
   public PrescriptionId getPrescriptionId() {
-    if (!this.getIdentifier().getSystem().equals(PrescriptionId.NAMING_SYSTEM.getCanonicalUrl())) {
+    if (!PrescriptionId.isPrescriptionId(this.getIdentifier())) {
       throw new MissingFieldException(KbvErpBundle.class, PrescriptionId.NAMING_SYSTEM);
     }
     return new PrescriptionId(this.getIdentifier().getValue());
@@ -146,7 +138,7 @@ public class KbvErpBundle extends Bundle {
     return this.entry.stream()
         .filter(entry -> entry.getResource().getClass().equals(MedicationRequest.class))
         .map(entry -> KbvErpMedicationRequest.fromMedicationRequest(entry.getResource()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public Optional<KbvErpMedicationRequest> getFirstMedicationRequest() {
@@ -170,8 +162,7 @@ public class KbvErpBundle extends Bundle {
     if (medRequestOpt.isPresent()) {
       val medRequest = medRequestOpt.orElseThrow();
       val extension =
-          medRequest.getExtensionByUrl(
-              ErpStructureDefinition.KBV_EMERGENCY_SERVICES_FEE.getCanonicalUrl());
+          medRequest.getExtensionByUrl(KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.getCanonicalUrl());
       ret = extension.castToBoolean(extension.getValue()).booleanValue();
     }
 
@@ -183,7 +174,7 @@ public class KbvErpBundle extends Bundle {
         this.entry.stream()
             .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Patient))
             .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), "Patient"));
+            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Patient));
 
     KbvPatient ret;
     if (!patientEntry.getResource().getClass().equals(KbvPatient.class)) {
@@ -208,7 +199,7 @@ public class KbvErpBundle extends Bundle {
                     .getType()
                     .getCodingFirstRep()
                     .getSystem()
-                    .equals(ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
+                    .equals(DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
         .map(
             identifier ->
                 VersicherungsArtDeBasis.fromCode(
@@ -216,7 +207,8 @@ public class KbvErpBundle extends Bundle {
         .findFirst()
         .orElseThrow(
             () ->
-                new MissingFieldException(this.getClass(), ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
+                new MissingFieldException(
+                    this.getClass(), DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
   }
 
   public String getKvid() {
@@ -229,12 +221,13 @@ public class KbvErpBundle extends Bundle {
                     .getType()
                     .getCodingFirstRep()
                     .getSystem()
-                    .equals(ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
+                    .equals(DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
         .map(Identifier::getValue)
         .findFirst()
         .orElseThrow(
             () ->
-                new MissingFieldException(this.getClass(), ErpCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
+                new MissingFieldException(
+                    this.getClass(), DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()));
   }
 
   public String getFamilyName() {
@@ -244,10 +237,7 @@ public class KbvErpBundle extends Bundle {
 
   public String getPatientGivenName() {
     val patient = this.getPatient();
-    val given =
-        patient.getNameFirstRep().getGiven().stream()
-            .map(PrimitiveType::getValue)
-            .collect(Collectors.toList());
+    val given = patient.getNameFirstRep().getGiven().stream().map(PrimitiveType::getValue).toList();
     return String.join(" ", given);
   }
 
@@ -282,14 +272,13 @@ public class KbvErpBundle extends Bundle {
    * Get the <a href="https://simplifier.net/erezept/kbvprerpcomposition">KBV E-Rezept
    * Composition</a> from Bundle
    *
-   * @return {@link Composition} which should comply the profile {@link
-   *     ErpStructureDefinition#KBV_COMPOSITION}
+   * @return the {@link Composition}
    */
   public Composition getComposition() {
     return this.entry.stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getClass().equals(Composition.class))
-        .map(resource -> (Composition) resource)
+        .map(Composition.class::cast)
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), "Composition"));
   }
@@ -300,7 +289,7 @@ public class KbvErpBundle extends Bundle {
         .filter(resource -> resource.getResourceType().equals(ResourceType.Coverage))
         .map(Coverage.class::cast)
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), "Coverage"));
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
   }
 
   /**
@@ -323,7 +312,7 @@ public class KbvErpBundle extends Bundle {
                         .getResourceType()
                         .equals(ResourceType.Coverage))
             .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), "Coverage"));
+            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
     val oldEntry = this.getEntry().get(covIdx);
     val oldCoverage = this.getCoverage();
     val oldId = IdentifierUtil.getUnqualifiedId(oldCoverage.getId());
@@ -370,9 +359,7 @@ public class KbvErpBundle extends Bundle {
   public VersicherungsArtDeBasis getCoverageKind() {
     return getCoverageKindOptional()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(), ErpCodeSystem.VERSICHERUNGSART_DE_BASIS));
+            () -> new MissingFieldException(this.getClass(), VersicherungsArtDeBasis.CODE_SYSTEM));
   }
 
   public boolean hasCoverageKind() {
@@ -384,16 +371,14 @@ public class KbvErpBundle extends Bundle {
     return coverage.getType().getCoding().stream()
         .filter(
             coding ->
-                coding
-                    .getSystem()
-                    .equals(ErpCodeSystem.VERSICHERUNGSART_DE_BASIS.getCanonicalUrl()))
+                coding.getSystem().equals(VersicherungsArtDeBasis.CODE_SYSTEM.getCanonicalUrl()))
         .map(coding -> VersicherungsArtDeBasis.fromCode(coding.getCode()))
         .findFirst();
   }
 
   public PayorType getPayorType() {
     return getPayorTypeOptional()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), ErpCodeSystem.PAYOR_TYPE));
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), PayorType.CODE_SYSTEM));
   }
 
   public boolean hasPayorType() {
@@ -403,7 +388,7 @@ public class KbvErpBundle extends Bundle {
   public Optional<PayorType> getPayorTypeOptional() {
     val coverage = this.getCoverage();
     return coverage.getType().getCoding().stream()
-        .filter(coding -> coding.getSystem().equals(ErpCodeSystem.PAYOR_TYPE.getCanonicalUrl()))
+        .filter(coding -> coding.getSystem().equals(PayorType.CODE_SYSTEM.getCanonicalUrl()))
         .map(coding -> PayorType.fromCode(coding.getCode()))
         .findFirst();
   }
@@ -411,7 +396,7 @@ public class KbvErpBundle extends Bundle {
   public Optional<Wop> getCoverageWop() {
     val coverage = this.getCoverage();
     return coverage.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(ErpStructureDefinition.GKV_WOP.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.GKV_WOP.getCanonicalUrl()))
         .map(ext -> Wop.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst();
   }
@@ -419,30 +404,23 @@ public class KbvErpBundle extends Bundle {
   public VersichertenStatus getCoverageState() {
     val coverage = this.getCoverage();
     return coverage.getExtension().stream()
-        .filter(
-            ext ->
-                ext.getUrl().equals(ErpStructureDefinition.GKV_VERSICHERTENART.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.GKV_VERSICHERTENART.getCanonicalUrl()))
         .map(
             ext ->
                 VersichertenStatus.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(), ErpStructureDefinition.GKV_VERSICHERTENART));
+            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_VERSICHERTENART));
   }
 
   public PersonGroup getCoveragePersonGroup() {
     val coverage = this.getCoverage();
     return coverage.getExtension().stream()
-        .filter(
-            ext -> ext.getUrl().equals(ErpStructureDefinition.GKV_PERSON_GROUP.getCanonicalUrl()))
+        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.GKV_PERSON_GROUP.getCanonicalUrl()))
         .map(ext -> PersonGroup.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(), ErpStructureDefinition.GKV_PERSON_GROUP));
+            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_PERSON_GROUP));
   }
 
   public KbvPractitioner getPractitioner() {
@@ -455,19 +433,10 @@ public class KbvErpBundle extends Bundle {
                     ((Practitioner) orgEntry.getResource())
                         .getIdentifier().stream()
                             .map(identifier -> identifier.getType().getCodingFirstRep())
-                            .anyMatch(
-                                coding ->
-                                    coding
-                                            .getSystem()
-                                            .equals(
-                                                BaseANR.ANRType.LANR
-                                                    .getCodeSystem()
-                                                    .getCanonicalUrl())
-                                        && coding
-                                            .getCode()
-                                            .equals(IdentifierTypeDe.LANR.getCode())))
+                            .anyMatch(BaseANR::isPractitioner))
             .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), "Practitioner"));
+            .orElseThrow(
+                () -> new MissingFieldException(this.getClass(), ResourceType.Practitioner));
 
     KbvPractitioner ret;
     if (!practitionerEntry.getResource().getClass().equals(KbvPractitioner.class)) {
@@ -562,7 +531,7 @@ public class KbvErpBundle extends Bundle {
         this.entry.stream()
             .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Medication))
             .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), "Medication"));
+            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Medication));
 
     KbvErpMedication ret;
     if (!medicationEntry.getResource().getClass().equals(KbvErpMedication.class)) {
@@ -627,7 +596,8 @@ public class KbvErpBundle extends Bundle {
         .filter(resource -> resource.getResourceType().equals(ResourceType.MedicationRequest))
         .map(KbvErpMedicationRequest::fromMedicationRequest)
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), "MedicationRequest"));
+        .orElseThrow(
+            () -> new MissingFieldException(this.getClass(), ResourceType.MedicationRequest));
   }
 
   public KbvErpMedicationRequest getMedicationRequest() {
@@ -637,7 +607,8 @@ public class KbvErpBundle extends Bundle {
                 entry ->
                     entry.getResource().getResourceType().equals(ResourceType.MedicationRequest))
             .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), "MedicationRequest"));
+            .orElseThrow(
+                () -> new MissingFieldException(this.getClass(), ResourceType.MedicationRequest));
 
     KbvErpMedicationRequest ret;
     if (!medicationRequestEntry.getResource().getClass().equals(KbvErpMedicationRequest.class)) {

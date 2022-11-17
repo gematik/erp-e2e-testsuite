@@ -19,23 +19,35 @@ package de.gematik.test.erezept.app.task;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SetUpDevice implements Task {
+
+  private final VersicherungsArtDeBasis insuranceKind;
 
   @Override
   public <T extends Actor> void performAs(final T actor) {
     val driverAbility = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
     val platformTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
-            driverAbility.getPlatformType(), SetUpAndroidDevice::new, SetUpIosDevice::new);
+            driverAbility.getPlatformType(),
+            () -> new SetUpAndroidDevice(insuranceKind),
+            () -> new SetUpIosDevice(insuranceKind));
     platformTask.performAs(actor);
   }
 
-  public static SetUpDevice withDefaultValues() {
-    return new SetUpDevice();
+  public static SetUpDevice withInsuranceType(String insuranceKind) {
+    return withInsuranceType(VersicherungsArtDeBasis.fromCode(insuranceKind));
+  }
+
+  public static SetUpDevice withInsuranceType(VersicherungsArtDeBasis insuranceKind) {
+    return new SetUpDevice(insuranceKind);
   }
 }

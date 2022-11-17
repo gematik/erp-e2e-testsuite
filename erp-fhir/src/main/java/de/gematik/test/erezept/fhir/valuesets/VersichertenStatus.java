@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,7 +31,7 @@ public enum VersichertenStatus implements IValueSet {
   FAMILY_MEMBERS("3", "Familienangehoerige"),
   PENSIONER("5", "Rentner");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.VERSICHERTEN_STATUS;
+  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.VERSICHERTEN_STATUS;
   public static final String VERSION = "1.02";
   public static final String DESCRIPTION =
       "Versichertenstatus gibt an, ob ein Versicherter ein Familienversicherter, Mitglied oder Rentner ist. Auf der KVK ist diese Angabe Teil des Feldes VERSICHERTENSTATUS - die 1. Stelle.";
@@ -47,13 +47,12 @@ public enum VersichertenStatus implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public KbvCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
-    return new Extension(
-        ErpStructureDefinition.GKV_VERSICHERTENART.getCanonicalUrl(), this.asCoding());
+    return new Extension(DeBasisStructDef.GKV_VERSICHERTENART.getCanonicalUrl(), this.asCoding());
   }
 
   public static VersichertenStatus fromCode(@NonNull String coding) {

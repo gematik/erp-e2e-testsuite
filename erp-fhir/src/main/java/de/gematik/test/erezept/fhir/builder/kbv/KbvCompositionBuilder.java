@@ -18,9 +18,10 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.BuilderUtil;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.references.kbv.*;
 import java.util.Date;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ import org.hl7.fhir.r4.model.Reference;
 
 public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositionBuilder> {
 
+  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
   private Composition.CompositionStatus status = Composition.CompositionStatus.FINAL;
   private String title = "elektronische Arzneimittelverordnung";
 
@@ -51,6 +53,19 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
 
   protected static KbvCompositionBuilder builder() {
     return new KbvCompositionBuilder();
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public KbvCompositionBuilder version(KbvItaErpVersion version) {
+    this.kbvItaErpVersion = version;
+    return this;
   }
 
   protected KbvCompositionBuilder addExtension(@NonNull Extension extension) {
@@ -91,7 +106,7 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
     val devRef = new Reference();
     devRef
         .getIdentifier()
-        .setSystem(ErpNamingSystem.KBV_PRUEFNUMMER.getCanonicalUrl())
+        .setSystem(KbvNamingSystem.PRUEFNUMMER.getCanonicalUrl())
         .setValue(checkNumber);
     devRef.setType("Device");
     return this.addAuthor(devRef);
@@ -128,7 +143,7 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
   protected Composition build() {
     val composition = new Composition();
 
-    val profile = ErpStructureDefinition.KBV_COMPOSITION.asCanonicalType();
+    val profile = KbvItaErpStructDef.COMPOSITION.asCanonicalType(kbvItaErpVersion);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -145,7 +160,7 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
         .setExtension(extensions);
 
     // Composition-Type is required: let's use a default one for now
-    composition.setType(ErpCodeSystem.FORMULAR_ART.asCodeableConcept("e16A"));
+    composition.setType(KbvCodeSystem.FORMULAR_ART.asCodeableConcept("e16A"));
 
     return composition;
   }

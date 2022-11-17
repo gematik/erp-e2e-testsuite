@@ -25,9 +25,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -119,10 +124,8 @@ public class PartialConfigSubstituter {
     if (useAutoPcs) {
       optionalPcsFile =
           Arrays.stream(additionalFiles)
-              .filter(
-                  f ->
-                      f.getName().endsWith(FILE_EXTENSION)
-                          && f.getName().toLowerCase().contains(getHostName().toLowerCase()))
+              .filter(f -> f.getName().endsWith(FILE_EXTENSION))
+              .filter(PartialConfigSubstituter::isUserMatchingPcsFile)
               .findFirst();
     }
 
@@ -161,7 +164,7 @@ public class PartialConfigSubstituter {
     return System.getProperties().entrySet().stream()
         .filter(entry -> ((String) entry.getKey()).startsWith(SYS_PROP_PREFIX))
         .map(entry -> KeyValuePair.create((String) entry.getKey(), (String) entry.getValue()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private static KeyValuePair splitLine(String line) {
@@ -170,6 +173,12 @@ public class PartialConfigSubstituter {
       throw new IllegalArgumentException(format("Given line in .pcs File is invalid: {0}", line));
     }
     return KeyValuePair.create(pair[0], pair[1]);
+  }
+
+  private static boolean isUserMatchingPcsFile(File file) {
+    val fileName = file.getName().toLowerCase();
+    return fileName.contains(getHostName().toLowerCase())
+        || fileName.contains(getUsername().toLowerCase());
   }
 
   private static String getHostName() {
@@ -182,14 +191,31 @@ public class PartialConfigSubstituter {
       hostName = UUID.randomUUID().toString(); // just return something random!
     }
 
-    // machines with zeroconf contain .local top-level domain which needs to be removed!
-    return hostName.replace(".local", "");
+    return hostName.split("\\.")[0];
+  }
+
+  private static String getUsername() {
+    return System.getProperty("user.name");
   }
 
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
   private static class KeyValuePair {
     private final String key;
     private final String value;
+
+    /**
+     * create the key value pair if a value for the key was given via system property the given
+     * value will be ignored
+     *
+     * @param key is the property key
+     * @param value is the value which will be taken if no system property was given
+     * @return a key value pair
+     */
+    private static KeyValuePair create(String key, String value) {
+      val keyStripped = key.strip();
+      val propertyValue = System.getProperty(keyStripped, value.strip());
+      return new KeyValuePair(keyStripped, propertyValue);
+    }
 
     public String getNonPrefixedKey() {
       return key.replace(format("{0}.", SYS_PROP_PREFIX), "");
@@ -214,20 +240,6 @@ public class PartialConfigSubstituter {
         // key is already a leaf node, no parent keys
         return new String[] {};
       }
-    }
-
-    /**
-     * create the key value pair if a value for the key was given via system property the given
-     * value will be ignored
-     *
-     * @param key is the property key
-     * @param value is the value which will be taken if no system property was given
-     * @return a key value pair
-     */
-    private static KeyValuePair create(String key, String value) {
-      val keyStripped = key.strip();
-      val propertyValue = System.getProperty(keyStripped, value.strip());
-      return new KeyValuePair(keyStripped, propertyValue);
     }
   }
 }

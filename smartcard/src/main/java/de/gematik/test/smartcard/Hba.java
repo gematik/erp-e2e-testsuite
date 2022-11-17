@@ -17,52 +17,35 @@
 package de.gematik.test.smartcard;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.experimental.SuperBuilder;
+import lombok.val;
 
-@Slf4j
+@SuperBuilder
+@Getter
 public class Hba extends Smartcard {
 
-  @Getter @Setter private Certificate[] qesCertificateChain;
+  private Certificate[] qesCertificateChain;
 
-  @Setter @Getter private X509Certificate qesCertificate;
+  private X509Certificate qesCertificate;
 
-  @Setter @Getter private File qesP12File; // required for CAdESSignature
+  private File qesP12File; // required for CAdESSignature
 
-  @Setter @Getter private String qesP12Password; // required for CAdESSignature
+  private String qesP12Password; // required for CAdESSignature
 
-  @Setter @Getter private PrivateKey qesPrivateKey;
-
-  public Hba(String iccsn) {
-    super(iccsn, SmartcardType.HBA);
-  }
-
-  @Override
-  public void destroy() {
-    if (Files.exists(qesP12File.toPath())) {
-      try {
-        Files.delete(qesP12File.toPath());
-        log.info("Successfully deleted temporary HBA file: " + qesP12File);
-      } catch (IOException e) {
-        log.error("Could not delete temporary HBA file: " + qesP12File, e);
-      }
-    }
-  }
+  private PrivateKey qesPrivateKey;
 
   @Override
   public boolean equals(final Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
-    final Hba hba = (Hba) o;
+    val hba = (Hba) o;
     return Arrays.equals(getQesCertificateChain(), hba.getQesCertificateChain())
         && Objects.equals(getQesCertificate(), hba.getQesCertificate())
         && Objects.equals(getQesP12Password(), hba.getQesP12Password())

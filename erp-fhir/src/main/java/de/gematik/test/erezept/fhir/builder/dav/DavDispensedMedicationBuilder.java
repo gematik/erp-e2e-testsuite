@@ -16,10 +16,13 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.BuilderUtil;
 import de.gematik.test.erezept.fhir.extensions.dav.InvoiceId;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.resources.dav.DavDispensedMedication;
 import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
@@ -30,11 +33,14 @@ import java.util.Date;
 import java.util.List;
 import lombok.NonNull;
 import lombok.val;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.hl7.fhir.r4.model.Meta;
 
 public class DavDispensedMedicationBuilder
     extends AbstractResourceBuilder<DavDispensedMedicationBuilder> {
+
+  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
 
   private final MedicationDispenseType dispenseType;
   private final AbrechnungsTyp type;
@@ -60,6 +66,19 @@ public class DavDispensedMedicationBuilder
   public static DavDispensedMedicationBuilder builder(
       MedicationDispenseType dispenseType, AbrechnungsTyp type) {
     return new DavDispensedMedicationBuilder(dispenseType, type);
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public DavDispensedMedicationBuilder version(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersion = version;
+    return this;
   }
 
   public DavDispensedMedicationBuilder status(@NonNull String status) {
@@ -106,7 +125,8 @@ public class DavDispensedMedicationBuilder
   public DavDispensedMedication build() {
     val dm = new DavDispensedMedication();
 
-    val profile = ErpStructureDefinition.DAV_PKV_PR_ERP_ABGABEINFORMATIONEN.asCanonicalType();
+    val profile =
+        AbdaErpPkvStructDef.PKV_ABGABEINFORMATIONEN.asCanonicalType(abdaErpPkvVersion, true);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -114,13 +134,13 @@ public class DavDispensedMedicationBuilder
     dm.setMeta(meta);
 
     dm.addExtension(
-        ErpStructureDefinition.DAV_PKV_EX_ERP_ABRECHNUNGSTYP.getCanonicalUrl(),
-        type.asCodeableConcept());
+        AbdaErpPkvStructDef.PKV_ABRECHNUNGSTYP.getCanonicalUrl(), type.asCodeableConcept());
 
     dm.setType(dispenseType.asCodeableConcept());
-    dm.setWhenHandedOver(whenHandedOver);
+    dm.setWhenHandedOverElement(new DateTimeType(whenHandedOver, TemporalPrecisionEnum.DAY));
     dm.setStatus(status);
-    dm.setAuthorizingPrescription(List.of(authorizingPrescription.asReference()));
+    dm.setAuthorizingPrescription(
+        List.of(authorizingPrescription.asReference(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121)));
 
     val mdp = new MedicationDispense.MedicationDispensePerformerComponent();
     mdp.getActor().setReference(performerId);

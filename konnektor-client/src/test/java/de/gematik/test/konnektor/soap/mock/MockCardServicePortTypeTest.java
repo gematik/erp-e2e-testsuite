@@ -18,11 +18,10 @@ package de.gematik.test.konnektor.soap.mock;
 
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import lombok.val;
 import org.apache.commons.lang3.NotImplementedException;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ class MockCardServicePortTypeTest {
 
   @BeforeAll
   static void setup() {
-    smartCardArchive = SmartcardFactory.readArchive();
+    smartCardArchive = SmartcardFactory.getArchive();
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
 
     ctx = new ContextType();
@@ -70,10 +69,5 @@ class MockCardServicePortTypeTest {
     Assertions.assertThrows(
         NotImplementedException.class,
         () -> cardService.unblockPin(ctx, null, null, null, null, null, null));
-  }
-
-  @AfterAll
-  static void tearDown() {
-    smartCardArchive.destroy();
   }
 }

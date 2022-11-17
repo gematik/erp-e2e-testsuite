@@ -17,8 +17,9 @@
 package de.gematik.test.erezept.fhir.builder.dav;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import java.util.Date;
 import java.util.List;
 import lombok.NonNull;
@@ -29,6 +30,7 @@ import org.hl7.fhir.r4.model.Reference;
 
 public class DavCompositionBuilder extends AbstractResourceBuilder<DavCompositionBuilder> {
 
+  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
   private static final String TITLE = "ERezeptAbgabedaten";
 
   private Composition.CompositionStatus status = Composition.CompositionStatus.FINAL;
@@ -39,6 +41,19 @@ public class DavCompositionBuilder extends AbstractResourceBuilder<DavCompositio
 
   protected static DavCompositionBuilder builder() {
     return new DavCompositionBuilder();
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public DavCompositionBuilder version(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersion = version;
+    return this;
   }
 
   protected DavCompositionBuilder status(@NonNull String statusCode) {
@@ -71,13 +86,14 @@ public class DavCompositionBuilder extends AbstractResourceBuilder<DavCompositio
   protected Composition build() {
     val composition = new Composition();
 
-    val profile = ErpStructureDefinition.DAV_PKV_PR_ERP_ABGABEDATEN_COMPOSITION.asCanonicalType();
+    val profile =
+        AbdaErpPkvStructDef.PKV_ABGABEDATEN_COMPOSITION.asCanonicalType(abdaErpPkvVersion, true);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
     composition.setId(this.getResourceId()).setMeta(meta);
     composition.setDate(new Date());
-    composition.setType(ErpCodeSystem.DAV_CS_ERP_COMPOSITION_TYPES.asCodeableConcept(TITLE));
+    composition.setType(AbdaCodeSystem.COMPOSITION_TYPES.asCodeableConcept(TITLE));
     composition.setTitle(TITLE);
     composition.setStatus(status);
 

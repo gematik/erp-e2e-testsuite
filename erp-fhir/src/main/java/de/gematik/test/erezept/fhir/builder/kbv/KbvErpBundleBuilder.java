@@ -17,9 +17,12 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
 import de.gematik.test.erezept.fhir.references.kbv.MedicationRequestReference;
 import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
@@ -51,6 +54,8 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
   private static final String DEVICE_AUTHOR_ID = "GEMATIK/410/2109/36/123";
 
   private static final String BASE_URL = "https://pvs.gematik.de/fhir/";
+
+  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
 
   private PrescriptionId prescriptionId;
 
@@ -159,6 +164,20 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
         .medication(medication);
   }
 
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public KbvErpBundleBuilder version(KbvItaErpVersion version) {
+    this.kbvItaErpVersion = version;
+    this.compositionBuilder.version(version);
+    return this;
+  }
+
   public KbvErpBundleBuilder prescriptionId(@NonNull PrescriptionId prescriptionId) {
     this.prescriptionId = prescriptionId;
     return self();
@@ -220,7 +239,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     checkRequired();
     val kbv = new KbvErpBundle();
 
-    val profile = ErpStructureDefinition.KBV_BUNDLE.asCanonicalType();
+    val profile = KbvItaErpStructDef.BUNDLE.asCanonicalType(kbvItaErpVersion);
     val meta = new Meta().setLastUpdated(new Date()).setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -277,20 +296,29 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     kbv.getEntry().add(practitionerEntry);
 
     if (patient.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
-      val assignerFullUrl = BASE_URL + "Organization/" + assignerOrganization.getId();
-      val assignerEntry =
-          new Bundle.BundleEntryComponent()
-              .setResource(assignerOrganization)
-              .setFullUrl(assignerFullUrl);
-      kbv.getEntry().add(assignerEntry);
+      if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+        val assignerFullUrl = BASE_URL + "Organization/" + assignerOrganization.getId();
+        val assignerEntry =
+            new Bundle.BundleEntryComponent()
+                .setResource(assignerOrganization)
+                .setFullUrl(assignerFullUrl);
+        kbv.getEntry().add(assignerEntry);
+      }
 
       // PKV has also an extension for PKV Tariff
       kbv.getComposition().addExtension(PkvTariff.BASIS.asExtension());
     }
 
     compositionBuilder.addExtension(statusKennzeichen.asExtension());
-    // set specific value from KbvErpBundle via auxiliary methods
-    kbv.setPrescriptionId(this.prescriptionId);
+
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+      val identifier = this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
+      kbv.setIdentifier(identifier);
+    } else {
+      val identifier =
+          this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
+      kbv.setIdentifier(identifier);
+    }
 
     return kbv;
   }
@@ -339,9 +367,14 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     this.checkRequired(practitioner, "KBV Bundle requires a practitioner");
     this.checkRequired(medicalOrganization, "KBV Bundle requires a custodian organization");
 
-    if (patient.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0
+        && patient.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
+      // assigner organization not required from kbv.ita.erp-1.1.0??
       this.checkRequired(
-          assignerOrganization, "KBV Bundle with PKV patient requires an assigner organization");
+          assignerOrganization,
+          format(
+              "KBV Bundle with PKV patient requires an assigner organization for {0}",
+              kbvItaErpVersion));
     }
   }
 }

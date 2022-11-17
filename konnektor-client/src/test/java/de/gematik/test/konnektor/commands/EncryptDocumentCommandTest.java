@@ -20,8 +20,8 @@ import de.gematik.test.konnektor.PinType;
 import de.gematik.test.konnektor.cfg.KonnektorModuleConfiguration;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
 import de.gematik.test.smartcard.Crypto;
+import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.test.smartcard.SmcB;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -52,7 +52,7 @@ class EncryptDocumentCommandTest {
 
   @BeforeEach
   void setUp() {
-    val smartCardArchive = SmartcardFactory.readArchive();
+    val smartCardArchive = SmartcardFactory.getArchive();
     smcb = smartCardArchive.getSmcbByICCSN("80276883110000116873", Crypto.RSA_2048);
 
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);

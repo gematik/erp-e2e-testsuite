@@ -27,13 +27,11 @@ import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.util.Currency;
+import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
-import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.fuzzing.kbv.KbvBundleManipulatorFactory;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.nio.file.Path;
@@ -113,15 +111,9 @@ public class FhirFakerGenerator implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    val smartcards = SmartcardFactory.readArchive();
-    val cfg = TestsuiteConfiguration.getInstance();
-
-    val doc = cfg.getActors().getDoctors().get(0);
-    val hba = smartcards.getHbaByICCSN(doc.getHbaIccsn(), doc.getCryptoAlgorithm());
-
     if (!noKbv) {
       for (var i = 0; i < numOfElements; i++) {
-        val kbvBundle = createPrescription(hba);
+        val kbvBundle = createPrescription();
         val xml = fhir.encode(kbvBundle, encodingType, prettyPrint);
 
         val result = fhir.validate(xml);
@@ -153,7 +145,6 @@ public class FhirFakerGenerator implements Callable<Integer> {
       }
     }
 
-    smartcards.destroy();
     return 0;
   }
 
@@ -168,7 +159,7 @@ public class FhirFakerGenerator implements Callable<Integer> {
 
           val result = fhir.validate(xml);
           val baseName = createBaseName(bundle, result.isSuccessful());
-          val fuzzingName = m.getName().replace(" ", "_").replace(":", "");
+          val fuzzingName = m.getName().replace(" ", "_").replace(":", "").replace("/", "-");
           val fName = format("{0}_{1}", baseName, fuzzingName);
           writeResource(xml, format("{0}.{1}", fName, encodingType.toFileExtension()));
           log.info(format("Created Prescription: {0}", fName));
@@ -222,17 +213,19 @@ public class FhirFakerGenerator implements Callable<Integer> {
     return davBundle.build();
   }
 
-  private KbvErpBundle createPrescription(Hba hba) {
-    val qualification = GemFaker.fakerQualificationType();
+  private KbvErpBundle createPrescription() {
+    val qualification = GemFaker.randomElement(QualificationType.DOCTOR, QualificationType.DENTIST);
+    val anr = BaseANR.randomFromQualification(qualification);
+    val practitionerLastName = GemFaker.fakerLastName();
     val practitioner =
         PractitionerBuilder.builder()
-            .lanr(GemFaker.fakerLanr())
-            .name(hba.getOwner().getGivenName(), hba.getOwner().getSurname(), "Dr.")
+            .anr(anr)
+            .name(GemFaker.fakerFirstName(), practitionerLastName, "Dr.")
             .addQualification(qualification)
             .addQualification("Super-Facharzt für alles Mögliche")
             .build();
 
-    val medOrgName = format("{0} {1}", qualification.getDisplay(), hba.getOwner().getSurname());
+    val medOrgName = format("{0} {1}", qualification.getDisplay(), practitionerLastName);
     val medicalOrganization =
         MedicalOrganizationBuilder.builder()
             .name(medOrgName)
@@ -273,7 +266,7 @@ public class FhirFakerGenerator implements Callable<Integer> {
 
     val medication =
         KbvErpMedicationBuilder.builder()
-            .category(GemFaker.fakerValueSet(MedicationCategory.class))
+            .category(MedicationCategory.C_00)
             .isVaccine(GemFaker.fakerBool())
             .normgroesse(GemFaker.fakerValueSet(StandardSize.class))
             .darreichungsform(GemFaker.fakerValueSet(Darreichungsform.class))
@@ -302,8 +295,7 @@ public class FhirFakerGenerator implements Callable<Integer> {
         patientIdentifierType == IdentifierTypeDe.GKV
             ? GemFaker.randomElement(
                 PrescriptionFlowType.FLOW_TYPE_160, PrescriptionFlowType.FLOW_TYPE_169)
-            : GemFaker.randomElement(
-                PrescriptionFlowType.FLOW_TYPE_200, PrescriptionFlowType.FLOW_TYPE_209);
+            : PrescriptionFlowType.FLOW_TYPE_200;
     val prescriptionId = PrescriptionId.random(flowType);
     val kbvBundleBuilder =
         KbvErpBundleBuilder.forPrescription(prescriptionId)

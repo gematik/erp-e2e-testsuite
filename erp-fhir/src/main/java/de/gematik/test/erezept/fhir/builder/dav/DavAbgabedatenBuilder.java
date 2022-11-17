@@ -17,8 +17,11 @@
 package de.gematik.test.erezept.fhir.builder.dav;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.extensions.dav.InvoiceId;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.resources.dav.DavDispensedMedication;
 import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
@@ -33,6 +36,7 @@ import org.hl7.fhir.r4.model.*;
 
 public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedatenBuilder> {
 
+  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
   private static final String BASE_URL = "urn:uuid:";
 
   private final PrescriptionId prescriptionId;
@@ -55,6 +59,20 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
     return new DavAbgabedatenBuilder(prescriptionId);
   }
 
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public DavAbgabedatenBuilder version(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersion = version;
+    this.compositionBuilder.version(version);
+    return this;
+  }
+
   public DavAbgabedatenBuilder pharmacy(PharmacyOrganization pharmacy) {
     this.pharmacy = pharmacy;
     return self();
@@ -73,7 +91,7 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
   public DavAbgabedatenBundle build() {
     val dav = new DavAbgabedatenBundle();
 
-    val profile = ErpStructureDefinition.DAV_ABGABEDATENSATZ.asCanonicalType();
+    val profile = AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ.asCanonicalType(abdaErpPkvVersion, true);
     val meta = new Meta().setLastUpdated(new Date()).setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -81,7 +99,7 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
     dav.setTimestamp(new Date());
     dav.setId(this.getResourceId()).setMeta(meta);
 
-    dav.setIdentifier(prescriptionId.asIdentifier());
+    dav.setIdentifier(prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
 
     val pharmacyEntry = this.createBundleEntryFrom(this.pharmacy, compositionBuilder::pharmacy);
     dav.addEntry(pharmacyEntry);
@@ -106,7 +124,14 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
    * @return the BundleEntryComponent
    */
   private Bundle.BundleEntryComponent createMedicationEntry(DavDispensedMedication medication) {
-    val mext = medication.getExtensionByUrl(InvoiceId.STRUCTURE_DEFINITION.getCanonicalUrl());
+    val mext =
+        medication.getExtension().stream()
+            .filter(ext -> AbdaErpBasisStructDef.ABRECHNUNGSZEILEN.match(ext.getUrl()))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new MissingFieldException(
+                        medication.getClass(), AbdaErpBasisStructDef.ABRECHNUNGSZEILEN));
     val plainInvoiceId = mext.getValue().castToReference(mext.getValue()).getReference();
     mext.setValue(new Reference(createFullUrl(plainInvoiceId)));
 

@@ -20,7 +20,8 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.app.cfg.AppConfiguration;
 import de.gematik.test.erezept.app.cfg.PlatformType;
-import io.appium.java_client.AppiumDriver;
+import de.gematik.test.erezept.app.mobile.elements.PageElement;
+import io.appium.java_client.android.AndroidDriver;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -29,19 +30,19 @@ import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.core.exceptions.NoSuchElementException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 @Slf4j
-public class UseAndroidApp extends UseTheApp {
+public class UseAndroidApp extends UseTheApp<AndroidDriver> {
 
-  protected UseAndroidApp(AppiumDriver driver, AppConfiguration appConfiguration) {
+  public UseAndroidApp(AndroidDriver driver, AppConfiguration appConfiguration) {
     super(driver, PlatformType.ANDROID, appConfiguration);
   }
 
   @Override
-  public WebElement getWebElement(By locator) {
+  protected WebElement getWebElement(By locator) {
     log.info(format("Try to fetch element <{0}>", locator));
     val start = Instant.now();
     try {
@@ -57,10 +58,9 @@ public class UseAndroidApp extends UseTheApp {
     }
   }
 
-  @Override
-  public List<WebElement> getWebElementList(String identifier) {
-    val locator = this.getLocator(identifier);
-    log.info(format("Try to fetch element <{0}> via {1}", identifier, locator));
+  public List<WebElement> getWebElementList(PageElement pageElement) {
+    val locator = this.getLocator(pageElement);
+    log.info(format("Try to fetch element <{0}> via {1}", pageElement.getFullName(), locator));
     return probeWebElements(locator, () -> driver.findElements(locator));
   }
 
@@ -76,12 +76,7 @@ public class UseAndroidApp extends UseTheApp {
    * @throws org.openqa.selenium.NoSuchElementException if WebElement is not on the Screen
    */
   private <R> R probeWebElements(By locator, Supplier<R> supplier) {
-    // 500 ms per probe should be enough; still might cause problems on long round-trip-times to the
-    // appium server
-    val probeDuration = 0.5;
-    val probeDurationMs = (int) (probeDuration * 1000);
-    int retries =
-        (int) Math.ceil(this.getMaxWaitTimeout() / probeDuration); // divide by 50ms per retry
+    int retries = (int) Math.ceil((float) this.getMaxWaitTimeout() / this.getPollingInterval());
 
     R webElements = null;
 
@@ -91,7 +86,7 @@ public class UseAndroidApp extends UseTheApp {
       Future<R> future = executor.submit(new BlockingCall<>(supplier));
 
       try {
-        webElements = future.get(probeDurationMs, TimeUnit.MILLISECONDS);
+        webElements = future.get(this.getPollingInterval(), TimeUnit.MILLISECONDS);
         // we got our element, break out of the while-loop
         break;
       } catch (InterruptedException ie) {

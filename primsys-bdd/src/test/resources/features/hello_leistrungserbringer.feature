@@ -113,3 +113,8 @@ Funktionalität: Hello World Demo Feature
     Wenn der Arzt Bernd Claudius ein E-Rezept an den Versicherten Fridolin Straßer verschreibt
     Und der Versicherte Fridolin Straßer sein letztes E-Rezept per Nachricht an die Vertreterin Hanna Bäcker schickt
     Dann hat die Vertreterin Hanna Bäcker die Nachricht mit dem Rezept des Versicherten Fridolin Straßer empfangen
+
+
+#  Szenario: Verbinde PSP-Client mit PSP-Server
+#    Angenommen die Apotheke Am Flughafen verbindet sich mit seinem Apothekendienstleister
+#    Wenn die Apotheke Am Flughafen eine Nachricht mit einer alternativen Zuweisung vom Dienstleister empfängt und entschlüsselt

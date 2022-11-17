@@ -16,8 +16,10 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
+
 import de.gematik.test.core.ArgumentComposer;
-import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -27,7 +29,6 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.fuzzing.kbv.MvoExtensionManipulatorFactory;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
@@ -37,6 +38,11 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
+import de.gematik.test.fuzzing.kbv.MvoExtensionManipulatorFactory;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -50,20 +56,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
-
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept als Mehrfachverordnung ausstellen")
 @Tag("Feature:MVO")
 @WithTag("Feature:MVO")
-public class TaskActivateMvoUsecase extends ErpTest {
+class TaskActivateMvoUsecase extends ErpTest {
 
   @Actor(name = "Bernd Claudius")
   private DoctorActor bernd;
@@ -274,12 +273,12 @@ public class TaskActivateMvoUsecase extends ErpTest {
             .arguments(
                 NamedEnvelope.of(
                     "1 von 4 ohne Beginn Einlösefrist",
-                    MultiplePrescriptionExtension.asMultiple(1, 4).validForDays(365)),
+                    MultiplePrescriptionExtension.asMultiple(1, 4).validForDays(365, false)),
                 ErpAfos.A_22634)
             .arguments(
                 NamedEnvelope.of(
                     "1 von 4 ohne Einlösefristen",
-                    MultiplePrescriptionExtension.asMultiple(1, 4).withoutEndDate()),
+                    MultiplePrescriptionExtension.asMultiple(1, 4).withoutEndDate(false)),
                 ErpAfos.A_22634);
 
     return multiplyWithFlowTypes(composer);

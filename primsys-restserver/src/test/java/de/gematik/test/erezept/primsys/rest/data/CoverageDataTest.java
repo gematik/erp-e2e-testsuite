@@ -16,7 +16,9 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
-import static org.junit.Assert.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerIknr;
+import static de.gematik.test.erezept.primsys.rest.data.CoverageData.create;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,28 +29,28 @@ import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
 import jakarta.ws.rs.WebApplicationException;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public class CoverageDataTest {
+class CoverageDataTest {
 
-  private ObjectMapper mapper;
+  static ObjectMapper mapper;
 
-  @Before
-  public void setup() {
+  @BeforeAll
+  static void setup() {
     mapper = new ObjectMapper();
   }
 
   @Test
-  public void roundTripSerialize() throws JsonProcessingException {
-    val data = CoverageData.create();
+  void roundTripSerialize() throws JsonProcessingException {
+    val data = create();
     assertNotNull(data);
     val json = mapper.writeValueAsString(data);
     assertNotNull(json);
   }
 
   @Test
-  public void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
+  void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
     val kbvBundle = KbvErpBundleBuilder.faker("X123456789", "04773414").build();
     val data = CoverageData.fromKbvBundle(kbvBundle);
     assertNotNull(data);
@@ -60,14 +62,14 @@ public class CoverageDataTest {
   }
 
   @Test
-  public void mustThrowOnInvalidWop() {
+  void mustThrowOnInvalidWop() {
     val coverage = new CoverageData();
     coverage.setWop("invalid");
     assertThrows(WebApplicationException.class, coverage::getEnumWop);
   }
 
   @Test
-  public void mustNotThrowOnValidWop() {
+  void mustNotThrowOnValidWop() {
     val coverage = new CoverageData();
     val wop = Wop.BERLIN;
     coverage.setWop(wop.getCode());
@@ -75,14 +77,14 @@ public class CoverageDataTest {
   }
 
   @Test
-  public void mustThrowOnInvalidPersonGroup() {
+  void mustThrowOnInvalidPersonGroup() {
     val coverage = new CoverageData();
     coverage.setPersonGroup("invalid");
     assertThrows(WebApplicationException.class, coverage::getEnumPersonGroup);
   }
 
   @Test
-  public void mustNotThrowOnValidPersonGroup() {
+  void mustNotThrowOnValidPersonGroup() {
     val coverage = new CoverageData();
     val pg = PersonGroup.SOZ;
     coverage.setPersonGroup(pg.getCode());
@@ -90,14 +92,14 @@ public class CoverageDataTest {
   }
 
   @Test
-  public void mustThrowOnInvalidInsuranceKind() {
+  void mustThrowOnInvalidInsuranceKind() {
     val coverage = new CoverageData();
     coverage.setInsuranceKind("invalid");
     assertThrows(WebApplicationException.class, coverage::getEnumInsuranceKind);
   }
 
   @Test
-  public void mustNotThrowOnValidInsuranceKind() {
+  void mustNotThrowOnValidInsuranceKind() {
     val coverage = new CoverageData();
     val ik = VersicherungsArtDeBasis.GKV;
     coverage.setInsuranceKind(ik.getCode());
@@ -105,17 +107,80 @@ public class CoverageDataTest {
   }
 
   @Test
-  public void mustThrowOnInvalidInsuranceState() {
+  void mustThrowOnInvalidInsuranceState() {
     val coverage = new CoverageData();
     coverage.setInsuranceState("invalid");
     assertThrows(WebApplicationException.class, coverage::getEnumInsuranceState);
   }
 
   @Test
-  public void mustNotThrowOnValidInsuranceState() {
+  void mustNotThrowOnValidInsuranceState() {
     val coverage = new CoverageData();
     val ik = VersichertenStatus.PENSIONER;
     coverage.setInsuranceState(ik.getCode());
     assertEquals(ik, coverage.getEnumInsuranceState());
+  }
+
+  @Test
+  void createCorrectWithGivenPartOfCoverageData1() {
+    val coverage = new CoverageData();
+    val ik = VersichertenStatus.PENSIONER;
+    coverage.setInsuranceState(ik.getCode());
+    val newCoverage = coverage.fakeMissing();
+    assertNotNull(newCoverage.getIknr());
+  }
+
+  @Test
+  void createCorrectWithGivenPartOfCoverageData2() {
+    val coverage = new CoverageData();
+    coverage.setIknr(fakerIknr());
+    val newCoverage = coverage.fakeMissing();
+    assertNotNull(newCoverage.getPayorType());
+    assertNotNull(newCoverage.getInsuranceKind());
+    assertNotNull(newCoverage.getInsuranceName());
+    assertNotNull(newCoverage.getWop());
+    assertNotNull(newCoverage.getInsuranceState());
+    assertNotNull(newCoverage.getPersonGroup());
+    assertNotNull(newCoverage.getIknr());
+  }
+
+  @Test
+  void createCovDataWithNullEntries() {
+    val emptyCd = new CoverageData();
+    emptyCd.setIknr(null);
+    emptyCd.setInsuranceName(null);
+    emptyCd.setWop(null);
+    emptyCd.setInsuranceState(null);
+    emptyCd.setInsuranceKind(null);
+    emptyCd.setPayorType(null);
+    emptyCd.setPersonGroup(null);
+    val filledCoverage = emptyCd.fakeMissing();
+    assertNotNull(filledCoverage.getPayorType());
+    assertNotNull(filledCoverage.getInsuranceKind());
+    assertNotNull(filledCoverage.getWop());
+    assertNotNull(filledCoverage.getInsuranceState());
+    assertNotNull(filledCoverage.getPersonGroup());
+    assertNotNull(filledCoverage.getInsuranceName());
+    assertNotNull(filledCoverage.getIknr());
+  }
+
+  @Test
+  void createCovDataWithEmptyEntries() {
+    val emptyCd = new CoverageData();
+    emptyCd.setIknr("");
+    emptyCd.setInsuranceName("");
+    emptyCd.setWop("");
+    emptyCd.setInsuranceState("");
+    emptyCd.setInsuranceKind("");
+    emptyCd.setPayorType("");
+    emptyCd.setPersonGroup("");
+    val filledCoverage = emptyCd.fakeMissing();
+    assertFalse(filledCoverage.getPayorType().isEmpty());
+    assertFalse(filledCoverage.getInsuranceKind().isEmpty());
+    assertFalse(filledCoverage.getWop().isEmpty());
+    assertFalse(filledCoverage.getInsuranceState().isEmpty());
+    assertFalse(filledCoverage.getPersonGroup().isEmpty());
+    assertFalse(filledCoverage.getInsuranceName().isEmpty());
+    assertFalse(filledCoverage.getIknr().isEmpty());
   }
 }

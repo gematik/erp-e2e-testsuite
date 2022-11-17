@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class ErxChargeItemTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/";
+  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   private FhirParser parser;
 

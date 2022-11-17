@@ -19,7 +19,7 @@ package de.gematik.test.erezept.fhir.valuesets;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Arrays;
 import lombok.Getter;
@@ -42,7 +42,7 @@ public enum PrescriptionFlowType implements IValueSet {
   FLOW_TYPE_200("200", "PKV (Apothekenpflichtige Arzneimittel)"),
   FLOW_TYPE_209("209", "PKV (Direkte Zuweisung)");
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.FLOW_TYPE;
+  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.FLOW_TYPE;
   public static final String VERSION = "1.0.3";
   public static final String DESCRIPTION =
       "Type of the prescription according to the 'Muster 16' forms";
@@ -78,7 +78,7 @@ public enum PrescriptionFlowType implements IValueSet {
     return PrescriptionFlowType.fromCode(rawFlowType);
   }
 
-  public ErpCodeSystem getCodeSystem() {
+  public ErpWorkflowCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

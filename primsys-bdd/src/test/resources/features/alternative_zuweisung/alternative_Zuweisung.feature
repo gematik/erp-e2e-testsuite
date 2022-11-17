@@ -27,27 +27,24 @@ Funktionalität: Alternative Zuweisung
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
-
+    Und die Apotheke Am Flughafen verbindet sich mit seinem Apothekendienstleister
 
   @TCID=ERP_EE_altZuweisung_01
   @Path=happy
   Szenariogrundriss:  E-Rezept per alternative Zuweisung einlösen
-  Der Arzt verschreibt der GKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept. Dieses Rezept soll im FdV angezeigt werden.
+  Der Arzt verschreibt der GKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept.
+  Der Versicherte weist das E-Rezept seiner Apotheke über den Apothekendienstleister zu.
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | Name          | PZN      |
       | Schmerzmittel | 12345678 |
 
-    #Beginn manuelle Teststeps im FdV
-    Und die Versicherte Sina Hüllmann das E-Rezept per DMC in das FdV einscannt
-    Und die Versicherte Sina Hüllmann für das E-Rezept die alternative Zuweisung an die Apotheke Am Flughafen mit der Option <Belieferungsoption> auslöst
-    #Ende manuelle Teststeps im FdV
+    Und die Versicherte Sina Hüllmann für das letzte E-Rezept die alternative Zuweisung an die Apotheke Am Flughafen mit der Option <Belieferungsoption> auslöst
     Und die Apotheke Am Flughafen eine Nachricht mit einer alternativen Zuweisung vom Dienstleister empfängt und entschlüsselt
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Sina Hüllmann dispensiert
     Dann hat die Apotheke Am Flughafen genau 1 Quittung vorliegen
     Und hat der Versicherte Sina Hüllmann genau 1 Medikament erhalten
-
 
     Beispiele:
       | Belieferungsoption |

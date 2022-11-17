@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.extensions.erp;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -38,7 +38,7 @@ public class SupplyOptionsType {
   }
 
   public Extension asExtension() {
-    val ext = new Extension(ErpStructureDefinition.GEM_SUPPLY_OPTIONS_TYPE.getCanonicalUrl());
+    val ext = new Extension(ErpWorkflowStructDef.SUPPLY_OPTIONS_TYPE.getCanonicalUrl());
     ext.addExtension(new Extension("onPremise", new BooleanType(onPremise)));
     ext.addExtension(new Extension("delivery", new BooleanType(delivery)));
     ext.addExtension(new Extension("shipment", new BooleanType(shipment)));

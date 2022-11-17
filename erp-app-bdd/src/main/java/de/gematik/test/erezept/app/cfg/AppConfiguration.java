@@ -25,9 +25,11 @@ public class AppConfiguration {
 
   private String platform;
   private String appFile;
+  private String espressoServerUniqueName;
   private String packageName;
   private boolean useVirtualeGK = true;
-  private int maxWaitTimeout;
+  private int maxWaitTimeout = 5000; // duration until timeout and finally NoSuchElementException
+  private int pollingInterval = 50; // polling interval in milli seconds
 
   public PlatformType getPlatformType() {
     return PlatformType.fromString(platform);

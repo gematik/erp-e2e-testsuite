@@ -19,7 +19,9 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.IKNR;
@@ -33,6 +35,8 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 
 public class CoverageBuilder extends AbstractResourceBuilder<CoverageBuilder> {
+
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
 
   private PersonGroup personGroup = PersonGroup.NOT_SET;
   private DmpKennzeichen dmpKennzeichen = DmpKennzeichen.NOT_SET;
@@ -75,6 +79,19 @@ public class CoverageBuilder extends AbstractResourceBuilder<CoverageBuilder> {
         .wop(fakerValueSet(Wop.class))
         .versichertenStatus(fakerValueSet(VersichertenStatus.class));
     return builder;
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public CoverageBuilder version(KbvItaForVersion version) {
+    this.kbvItaForVersion = version;
+    return this;
   }
 
   public CoverageBuilder personGroup(PersonGroup personGroup) {
@@ -124,7 +141,7 @@ public class CoverageBuilder extends AbstractResourceBuilder<CoverageBuilder> {
   public Coverage build() {
     val coverage = new Coverage();
 
-    val profile = ErpStructureDefinition.KBV_COVERAGE.asCanonicalType();
+    val profile = KbvItaForStructDef.COVERAGE.asCanonicalType(kbvItaForVersion);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -144,7 +161,13 @@ public class CoverageBuilder extends AbstractResourceBuilder<CoverageBuilder> {
 
     // set the payor
     val insuranceRef = new Reference().setDisplay(insuranceName);
-    insuranceRef.setIdentifier(iknr.asIdentifier());
+
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      insuranceRef.setIdentifier(iknr.asIdentifier());
+    } else {
+      insuranceRef.setIdentifier(iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID));
+    }
+
     coverage.setPayor(List.of(insuranceRef));
 
     return coverage;

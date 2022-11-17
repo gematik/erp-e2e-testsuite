@@ -16,34 +16,14 @@
 
 package de.gematik.test.smartcard;
 
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+@Getter
+@SuperBuilder
+@EqualsAndHashCode
 public class Egk extends Smartcard {
 
-  @Setter @Getter private String kvnr;
-
-  public Egk(String icssn) {
-    super(icssn, SmartcardType.EGK);
-  }
-
-  @Override
-  public void destroy() {
-    // nothing to be done!
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    final Egk egk = (Egk) o;
-    return Objects.equals(getKvnr(), egk.getKvnr());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), getKvnr());
-  }
+  private String kvnr;
 }

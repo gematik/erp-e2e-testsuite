@@ -17,16 +17,18 @@
 package de.gematik.test.erezept.fhir.references.kbv;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Reference;
 
+@Slf4j
 @DatatypeDef(name = "Reference")
 @SuppressWarnings({"java:S110"})
 public class KbvBundleReference extends Reference {
 
   private static final String DISPLAY_VALUE = "E-Rezept";
-  private static final ErpStructureDefinition STRUCTURE_DEFINITION =
-      ErpStructureDefinition.KBV_BUNDLE;
+  private static final IWithSystem STRUCTURE_DEFINITION = KbvItaErpStructDef.BUNDLE;
 
   public KbvBundleReference(String id) {
     this.setDisplay(DISPLAY_VALUE).setReference(id).setType(STRUCTURE_DEFINITION.getCanonicalUrl());

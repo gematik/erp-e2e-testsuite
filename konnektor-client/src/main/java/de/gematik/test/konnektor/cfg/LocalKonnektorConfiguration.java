@@ -21,7 +21,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.KonnektorImpl;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import lombok.Data;
 import lombok.val;
@@ -43,7 +43,7 @@ public class LocalKonnektorConfiguration extends KonnektorConfiguration {
 
   @Override
   public Konnektor create() {
-    val smartcards = SmartcardFactory.readArchive();
+    val smartcards = SmartcardFactory.getArchive();
     val ctx = getDefaultContextType();
     val serviceProvider = new MockKonnektorServiceProvider(smartcards);
     return new KonnektorImpl(ctx, this.getName(), KonnektorType.LOCAL, serviceProvider);

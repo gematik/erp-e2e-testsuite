@@ -22,6 +22,8 @@ import de.gematik.test.erezept.client.*;
 import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.exceptions.*;
 import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.erezept.pspwsclient.*;
+import de.gematik.test.erezept.pspwsclient.config.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.strategy.*;
@@ -29,7 +31,6 @@ import de.gematik.test.erezept.screenplay.task.*;
 import de.gematik.test.erezept.screenplay.util.*;
 import de.gematik.test.konnektor.commands.options.*;
 import de.gematik.test.smartcard.*;
-import de.gematik.test.smartcard.factory.*;
 import io.cucumber.datatable.*;
 import io.cucumber.java.*;
 import io.cucumber.java.de.*;
@@ -49,14 +50,9 @@ public class PharmacySteps {
 
   @Before
   public void setUp() {
-    smartcards = SmartcardFactory.readArchive();
+    smartcards = SmartcardFactory.getArchive();
     config = TestsuiteConfiguration.getInstance();
     OnStage.setTheStage(new OnlineCast());
-  }
-
-  @After
-  public void tearDown() {
-    OnStage.drawTheCurtain();
   }
 
   /**
@@ -109,6 +105,17 @@ public class PharmacySteps {
     givenThat(thePharmacist).can(useKonnektor);
   }
 
+  @Angenommen("^die Apotheke (.+) verbindet sich mit seinem Apothekendienstleister$")
+  public void initConnectionToPharmacyServiceProvider(String pharmName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val id = SafeAbility.getAbility(thePharmacy, UseSMCB.class);
+
+    PSPClient pspClient = PSPClientFactory.create(config.getPspClientConfig(), id.getTelematikID());
+    val pspClientAbility = UsePspClient.with(pspClient).andConfig(config.getPspClientConfig());
+    givenThat(thePharmacy).attemptsTo(Ensure.that(pspClientAbility.isConnected()).isTrue());
+    givenThat(thePharmacy).can(pspClientAbility);
+  }
+
   @Wenn(
       "^die Apotheke (.+) das (letzte|erste) (?:zugewiesene|abgerufene) E-Rezept beim Fachdienst akzeptiert$")
   public void whenAcceptPrescription(String pharmName, String order) {
@@ -152,7 +159,9 @@ public class PharmacySteps {
         .attemptsTo(
             CheckTheReturnCode.of(ResponseOfAcceptOperation.fromStack(order)).isEqualTo(403));
   }
-  /** @param order */
+  /**
+   * @param order
+   */
   @Dann(
       "^kann die Apotheke das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es nicht mehr existiert$")
   public void thenForbiddenToAcceptPrescriptionWith410(String order) {
@@ -732,11 +741,14 @@ public class PharmacySteps {
     throw new PendingStepException("Not yet implemented");
   }
 
-  /** @param pharmName */
+  /**
+   * @param pharmName
+   */
   @Wenn(
       "^die Apotheke (.+) eine Nachricht mit einer alternativen Zuweisung vom Dienstleister empfängt und entschlüsselt$")
   public void whenPharmacyGetsMessageFromServiceProvider(String pharmName) {
-    throw new PendingStepException("Not yet implemented");
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    when(thePharmacy).attemptsTo(DecryptPSPMessage.receivedFromPharmacyService());
   }
 
   /**
@@ -790,16 +802,16 @@ public class PharmacySteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
     val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
+    val examEvidence = thePharmacy.asksFor(RetrieveExamEvidence.with(egk)).orElseThrow();
+    val question =
+        HasDownloadableOpenTask.builder().kvnr(egk.getKvnr()).examEvidence(examEvidence).build();
 
-    when(thePharmacy)
-        .attemptsTo(
-            new DownloadAllOpenPrescriptions.Builder(
-                    egk, thePharmacy.asksFor(RetrieveExamEvidence.with(egk)).orElse(""))
-                .build());
+    when(thePharmacy).attemptsTo(Ensure.that(question).isTrue());
   }
 
   @Wenn(
       "^die Apotheke (.+) für die eGK von (.+) (?:einen alten|keinen) Prüfungsnachweis (?:verwendet|abruft)$")
+  @Wenn("^die Krankenhaus-Apotheke (.+) die E-Rezepte mit der eGK von (.+) abruft$")
   public void whenPharmacyUseExpiredEvidence(String pharmName, String patientName) {
     // dummy step to increase comprehensibility in the test scenario
   }
@@ -816,19 +828,21 @@ public class PharmacySteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis nicht gültig ist$")
+      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis zeitlich ungültig ist$")
   public void thenPharmacyCanNotRequestPrescriptionsWithExpiredEvidence(
       String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
     val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
-
+    val examEvidence = ExamEvidence.NO_UPDATE_WITH_EXPIRED_TIMESTAMP.encodeAsBase64();
     when(thePharmacy)
         .attemptsTo(
-            new DownloadAllOpenPrescriptions.Builder(
-                    egk, ExamEvidence.NO_UPDATES.withExpiredEvidence().encodeAsBase64())
-                .setExpectedStatusCode(403)
-                .build());
+            Ensure.that(
+                    HasDownloadableOpenTask.builder()
+                        .kvnr(egk.getKvnr())
+                        .examEvidence(examEvidence)
+                        .build())
+                .isFalse());
   }
 
   @Dann(
@@ -841,6 +855,24 @@ public class PharmacySteps {
 
     when(thePharmacy)
         .attemptsTo(
-            new DownloadAllOpenPrescriptions.Builder(egk, "").setExpectedStatusCode(403).build());
+            Ensure.that(HasDownloadableOpenTask.builder().kvnr(egk.getKvnr()).build()).isFalse());
+  }
+
+  @Dann(
+      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil Krankenhaus-Apotheken nicht berechtigt sind$")
+  public void thenHospitalPharmacyCanNotRequestPrescriptions(String pharmName, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
+
+    val examEvidence = ExamEvidence.NO_UPDATES.encodeAsBase64();
+    when(thePharmacy)
+        .attemptsTo(
+            Ensure.that(
+                    HasDownloadableOpenTask.builder()
+                        .kvnr(egk.getKvnr())
+                        .examEvidence(examEvidence)
+                        .build())
+                .isFalse());
   }
 }

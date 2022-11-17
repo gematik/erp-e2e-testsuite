@@ -18,7 +18,6 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -31,6 +30,6 @@ public class ErxMedicationDispenseBundle extends Bundle {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .map(ErxMedicationDispense::fromMedicationDispense)
-        .collect(Collectors.toList());
+        .toList();
   }
 }

@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -41,7 +41,7 @@ public enum AvailabilityStatus implements IValueSet {
   AS_90("90", "unbekannt"),
   ;
 
-  public static final ErpCodeSystem CODE_SYSTEM = ErpCodeSystem.AVAILABILITY_STATUS;
+  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.AVAILABILITY_STATUS;
   public static final String VERSION = "1.0.3";
   public static final String DESCRIPTION =
       "Type of the availability status for medication availability request";
@@ -62,7 +62,7 @@ public enum AvailabilityStatus implements IValueSet {
   }
 
   @Override
-  public ErpCodeSystem getCodeSystem() {
+  public ErpWorkflowCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

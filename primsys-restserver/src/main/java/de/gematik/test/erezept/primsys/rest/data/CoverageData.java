@@ -17,10 +17,12 @@
 package de.gematik.test.erezept.primsys.rest.data;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.primsys.utils.Strings.getOrDefault;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
@@ -121,6 +123,19 @@ public class CoverageData {
     c.insuranceKind = VersicherungsArtDeBasis.GKV.getCode();
     c.personGroup = fakerValueSet(PersonGroup.class).getCode();
     return c;
+  }
+
+  public CoverageData fakeMissing() {
+    this.iknr = getOrDefault(this.iknr, fakerIknr());
+    var tmpWop = fakerValueSet(Wop.class);
+    this.wop = getOrDefault(this.wop, tmpWop.getCode());
+    this.insuranceName = getOrDefault(this.insuranceName, insuranceName(tmpWop));
+    this.insuranceState =
+        getOrDefault(this.insuranceState, fakerValueSet(VersichertenStatus.class).getCode());
+    this.insuranceKind = getOrDefault(this.insuranceKind, VersicherungsArtDeBasis.GKV.getCode());
+    this.payorType = getOrDefault(this.payorType, fakerValueSet(PayorType.class).getCode());
+    this.personGroup = getOrDefault(this.personGroup, fakerValueSet(PersonGroup.class).getCode());
+    return this;
   }
 
   public static CoverageData fromKbvBundle(KbvErpBundle bundle) {

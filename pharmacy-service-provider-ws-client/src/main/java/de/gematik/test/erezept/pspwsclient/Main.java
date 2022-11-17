@@ -18,7 +18,9 @@ package de.gematik.test.erezept.pspwsclient;
 
 import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Main {
   static PharmaServiceProviderWSClient clientEndPoint;
   static final String URL_TO_GRIZZLY_WS = "ws://localhost:9095/";
@@ -43,11 +45,12 @@ public class Main {
     if (args.length > 0) url = args[0];
     if (args.length > 1) id = args[1];
     if (args.length > 2) authorisation = args[2];
-    // System.out.println("authorisation: " + authorisation);
     // generate client
     clientEndPoint = new PharmaServiceProviderWSClient(url, id, authorisation);
     // connect to client
-    clientEndPoint.connectBlocking(1, TimeUnit.SECONDS);
+    clientEndPoint.connectBlocking(10, TimeUnit.SECONDS);
+    Thread.currentThread().join(500);
+    log.info("clientEndPoint.isConnected() ? : " + clientEndPoint.isConnected());
     // keep client alive
     Thread.currentThread().join(0);
   }

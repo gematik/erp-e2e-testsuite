@@ -24,11 +24,10 @@ import de.gematik.test.erezept.primsys.rest.data.AcceptData;
 import de.gematik.test.erezept.primsys.rest.data.DispensedData;
 import de.gematik.test.erezept.primsys.rest.data.PrescriptionData;
 import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.factory.SmartcardFactory;
+import de.gematik.test.smartcard.SmartcardFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +52,7 @@ public class ActorContext {
 
   private ActorContext() {
     val cfg = TestsuiteConfiguration.getInstance();
-    this.sca = SmartcardFactory.readArchive();
+    this.sca = SmartcardFactory.getArchive();
 
     this.doctors = new ArrayList<>();
     cfg.getActors()
@@ -91,7 +90,7 @@ public class ActorContext {
   }
 
   public List<BaseActor> getActors() {
-    return Stream.concat(doctors.stream(), pharmacies.stream()).collect(Collectors.toList());
+    return Stream.concat(doctors.stream(), pharmacies.stream()).toList();
   }
 
   public void addPrescription(PrescriptionData prescription) {
@@ -107,11 +106,14 @@ public class ActorContext {
   }
 
   public boolean removeAcceptedPrescription(AcceptData prescription) {
-    return this.acceptedPrescriptions.removeIf(
-        ad -> ad.getTaskId().equals(prescription.getTaskId()));
+    return removeAcceptedPrescription(prescription.getTaskId());
+  }
+
+  public boolean removeAcceptedPrescription(String taskId) {
+    return this.acceptedPrescriptions.removeIf(ad -> ad.getTaskId().equals(taskId));
   }
 
   public void shutdown() {
-    sca.destroy();
+    // nothing to be done yet
   }
 }

@@ -18,20 +18,16 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.StructureDefinitionFixedUrls;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
-@ResourceDef(name = "Practitioner", profile = StructureDefinitionFixedUrls.KBV_PR_FOR_PRACTITIONER)
+@ResourceDef(name = "Practitioner")
 @SuppressWarnings({"java:S110"})
 public class KbvPractitioner extends Practitioner {
 
@@ -47,11 +43,11 @@ public class KbvPractitioner extends Practitioner {
                     .getCode()
                     .getCodingFirstRep()
                     .getSystem()
-                    .equals(ErpCodeSystem.QUALIFICATION_TYPE.getCanonicalUrl()))
+                    .equals(QualificationType.CODE_SYSTEM.getCanonicalUrl()))
         .map(quali -> QualificationType.fromCode(quali.getCode().getCodingFirstRep().getCode()))
         .findFirst()
         .orElseThrow(
-            () -> new MissingFieldException(this.getClass(), ErpCodeSystem.QUALIFICATION_TYPE));
+            () -> new MissingFieldException(this.getClass(), QualificationType.CODE_SYSTEM));
   }
 
   public List<String> getAdditionalQualifications() {
@@ -59,17 +55,13 @@ public class KbvPractitioner extends Practitioner {
         .filter(
             quali -> (quali.getCode().getText() != null) && !quali.getCode().getText().isEmpty())
         .map(quali -> quali.getCode().getText())
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public BaseANR getANR() {
+
     return this.identifier.stream()
-        .filter(
-            identifier ->
-                identifier.getSystem().equals(ErpNamingSystem.KBV_NS_BASE_ANR.getCanonicalUrl())
-                    || identifier
-                        .getSystem()
-                        .equals(ErpNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl()))
+        .filter(BaseANR::hasValidIdentifier)
         .map(BaseANR::fromIdentifier)
         .findFirst()
         .orElseThrow(

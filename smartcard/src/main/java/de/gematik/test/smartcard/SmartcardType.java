@@ -24,7 +24,7 @@ public enum SmartcardType {
   HBA("HBA"),
   SMC_B("SMC-B");
 
-  private String name;
+  private final String name;
 
   SmartcardType(String name) {
     this.name = name;
@@ -36,20 +36,11 @@ public enum SmartcardType {
   }
 
   public static SmartcardType fromString(@NonNull String type) {
-    SmartcardType ret;
-    switch (type.toLowerCase().strip().replace("-", "")) {
-      case "egk":
-        ret = EGK;
-        break;
-      case "hba":
-        ret = HBA;
-        break;
-      case "smcb":
-        ret = SMC_B;
-        break;
-      default:
-        throw new InvalidSmartcardTypeException(type);
-    }
-    return ret;
+    return switch (type.toLowerCase().strip().replace("-", "")) {
+      case "egk" -> EGK;
+      case "hba" -> HBA;
+      case "smcb" -> SMC_B;
+      default -> throw new InvalidSmartcardTypeException(type);
+    };
   }
 }

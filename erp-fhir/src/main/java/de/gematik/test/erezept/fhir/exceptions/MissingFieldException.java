@@ -18,22 +18,47 @@ package de.gematik.test.erezept.fhir.exceptions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
+import de.gematik.test.erezept.fhir.valuesets.IValueSet;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 
 public class MissingFieldException extends RuntimeException {
-  public MissingFieldException(Class<? extends Resource> clazz, ErpNamingSystem field) {
+  public MissingFieldException(Class<? extends Resource> clazz, IWithSystem field) {
     this(clazz, field.getCanonicalUrl());
   }
 
-  public MissingFieldException(Class<? extends Resource> clazz, ErpCodeSystem field) {
-    this(clazz, field.getCanonicalUrl());
+  public MissingFieldException(Class<? extends Resource> clazz, IWithSystem... fields) {
+    this(
+        clazz,
+        Arrays.stream(fields).map(IWithSystem::getCanonicalUrl).collect(Collectors.joining(" | ")));
   }
 
-  public MissingFieldException(Class<? extends Resource> clazz, ErpStructureDefinition field) {
-    this(clazz, field.getCanonicalUrl());
+  public MissingFieldException(Class<? extends Resource> clazz, IValueSet valueSet) {
+    this(clazz, format("{0}#{1}", valueSet.getCodeSystem(), valueSet.getCode()));
+  }
+
+  public MissingFieldException(Class<? extends Resource> clazz, IValueSet... valueSets) {
+    this(clazz, Arrays.stream(valueSets).toList());
+  }
+
+  public MissingFieldException(Class<? extends Resource> clazz, List<? extends IValueSet> fields) {
+    this(
+        clazz,
+        fields.stream()
+            .map(valueSet -> format("{0}#{1}", valueSet.getCodeSystem(), valueSet.getCode()))
+            .collect(Collectors.joining(" | ")));
+  }
+
+  public MissingFieldException(Class<? extends Resource> clazz, ResourceType type) {
+    this(clazz, type.name());
+  }
+
+  public MissingFieldException(Class<? extends Resource> clazz, ResourceType... types) {
+    this(clazz, Arrays.stream(types).map(Enum::name).collect(Collectors.joining(" | ")));
   }
 
   public MissingFieldException(Class<? extends Resource> clazz, String fieldName) {

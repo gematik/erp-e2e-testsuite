@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import java.util.Objects;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.Identifier;
@@ -26,7 +26,7 @@ public class IKNR {
 
   @Getter private final String value;
 
-  @Getter private static final ErpNamingSystem system = ErpNamingSystem.IKNR;
+  @Getter private static final DeBasisNamingSystem system = DeBasisNamingSystem.IKNR;
 
   public IKNR(String iknr) {
     this.value = iknr;
@@ -37,6 +37,18 @@ public class IKNR {
   }
 
   public Identifier asIdentifier() {
+    return this.asIdentifier(system);
+  }
+
+  /**
+   * Note: DeBasisNamingSystem.IKNR is the default NamingSystem for IKNR, however on some newer
+   * profiles DeBasisNamingSystem.IKNR_SID is required. This method will become obsolete once all
+   * profiles are using a common naming system for IKNR
+   *
+   * @param system to use for encoding the IKNR value
+   * @return the IKNR as Identifier
+   */
+  public Identifier asIdentifier(DeBasisNamingSystem system) {
     return new Identifier().setSystem(system.getCanonicalUrl()).setValue(value);
   }
 

@@ -20,8 +20,10 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -35,6 +37,7 @@ import org.hl7.fhir.r4.model.*;
 public class ErxMedicationDispenseBuilder
     extends AbstractResourceBuilder<ErxMedicationDispenseBuilder> {
 
+  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private final SimpleDateFormat dateFormat10 = new SimpleDateFormat("yyyy-MM-dd");
 
   private String kvid;
@@ -76,6 +79,19 @@ public class ErxMedicationDispenseBuilder
     val b = new ErxMedicationDispenseBuilder();
     b.kvid = kvid;
     return b;
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public ErxMedicationDispenseBuilder version(ErpWorkflowVersion version) {
+    this.erpWorkflowVersion = version;
+    return this;
   }
 
   public ErxMedicationDispenseBuilder performerId(@NonNull String performer) {
@@ -134,7 +150,7 @@ public class ErxMedicationDispenseBuilder
     checkRequired();
     val medDisp = new ErxMedicationDispense();
 
-    val profile = ErpStructureDefinition.GEM_MEDICATION_DISPENSE.asCanonicalType();
+    val profile = ErpWorkflowStructDef.MEDICATION_DISPENSE.asCanonicalType(erpWorkflowVersion);
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -148,12 +164,12 @@ public class ErxMedicationDispenseBuilder
     medDisp
         .getSubject()
         .setIdentifier(
-            new Identifier().setSystem(ErpNamingSystem.KVID.getCanonicalUrl()).setValue(kvid));
+            new Identifier().setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl()).setValue(kvid));
 
     val performerRef = new Reference();
     performerRef
         .getIdentifier()
-        .setSystem(ErpNamingSystem.TELEMATIK_ID.getCanonicalUrl())
+        .setSystem(ErpWorkflowNamingSystem.TELEMATIK_ID.getCanonicalUrl())
         .setValue(performer);
     medDisp
         .getPerformer()

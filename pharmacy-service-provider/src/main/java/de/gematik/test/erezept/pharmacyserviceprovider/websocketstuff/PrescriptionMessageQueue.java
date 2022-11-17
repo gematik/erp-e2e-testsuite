@@ -20,7 +20,6 @@ import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -52,6 +51,6 @@ public class PrescriptionMessageQueue {
   private List<PspMessage> getPrescriptionWith(String clientId) {
     return pspMessageMessageQueueList.stream()
         .filter(x -> x.getClientId().equals(clientId))
-        .collect(Collectors.toList());
+        .toList();
   }
 }

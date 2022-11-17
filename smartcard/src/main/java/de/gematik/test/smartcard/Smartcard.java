@@ -22,14 +22,16 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import lombok.Data;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
+import lombok.val;
 
-@Data
+@Getter
+@SuperBuilder
 public abstract class Smartcard {
 
   private final String iccsn;
   private final SmartcardType type;
-
   private BigInteger serialnumber;
   private Crypto algorithm;
 
@@ -39,16 +41,42 @@ public abstract class Smartcard {
 
   private SmartcardOwnerData owner;
 
-  protected Smartcard(String iccsn, SmartcardType type) {
-    this.iccsn = iccsn;
-    this.type = type;
-  }
-
-  public abstract void destroy();
-
   @Override
   public String toString() {
     return format(
         "Smartcard {0} [iccsn={1}, sn={2}, algorithm={3}]", type, iccsn, serialnumber, algorithm);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    val smartcard = (Smartcard) o;
+
+    if (this.getType() != smartcard.getType()) {
+      return false;
+    }
+    if (!this.getSerialnumber().equals(smartcard.getSerialnumber())) {
+      return false;
+    }
+    if (this.getAlgorithm() != smartcard.getAlgorithm()) {
+      return false;
+    }
+    return this.getIccsn().equals(smartcard.getIccsn());
+  }
+
+  @Override
+  public int hashCode() {
+    int result = iccsn.hashCode();
+    result = 31 * result + type.hashCode();
+    result = 31 * result + serialnumber.hashCode();
+    result = 31 * result + algorithm.hashCode();
+    result = 31 * result + owner.hashCode();
+    return result;
   }
 }

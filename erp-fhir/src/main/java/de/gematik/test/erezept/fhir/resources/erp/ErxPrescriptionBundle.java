@@ -18,7 +18,8 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +40,7 @@ public class ErxPrescriptionBundle extends Bundle {
         .findFirst()
         .orElseThrow(
             () ->
-                new MissingFieldException(
-                    ErxPrescriptionBundle.class, ErpStructureDefinition.GEM_ERX_TASK));
+                new MissingFieldException(ErxPrescriptionBundle.class, ErpWorkflowStructDef.TASK));
   }
 
   public KbvErpBundle getKbvBundle() {
@@ -51,13 +51,12 @@ public class ErxPrescriptionBundle extends Bundle {
             resource ->
                 resource.getMeta().getProfile().stream()
                     .map(PrimitiveType::getValue)
-                    .anyMatch(p -> p.equals(ErpStructureDefinition.KBV_BUNDLE.getCanonicalUrl())))
+                    .anyMatch(KbvItaErpStructDef.BUNDLE::match))
         .map(KbvErpBundle::fromBundle)
         .findFirst()
         .orElseThrow(
             () ->
-                new MissingFieldException(
-                    ErxPrescriptionBundle.class, ErpStructureDefinition.KBV_BUNDLE));
+                new MissingFieldException(ErxPrescriptionBundle.class, KbvItaErpStructDef.BUNDLE));
   }
 
   /**
@@ -76,8 +75,7 @@ public class ErxPrescriptionBundle extends Bundle {
                     .map(PrimitiveType::getValue)
                     // match the ErxPrescription by the unversioned Profile as the version is
                     // checked by HAPI anyways
-                    .anyMatch(
-                        p -> p.contains(ErpStructureDefinition.GEM_RECEIPT.getUnversionedUrl())))
+                    .anyMatch(p -> p.contains(ErpWorkflowStructDef.RECEIPT.getCanonicalUrl())))
         .map(ErxReceipt::fromBundle)
         .findFirst();
   }

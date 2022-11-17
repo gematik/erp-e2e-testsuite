@@ -1,5 +1,9 @@
 activeEnvironment: TU
 
+preferManualSteps: false
+
+pspClientConfig:
+
 actors:
   doctors:
     - name: Bernd Claudius
@@ -49,6 +53,10 @@ actors:
 
     - name: Keine Apotheke
       smcbIccsn: 8027600101169991010 #Praxis Damian Claudius
+      konnektor: Soft-Konn
+
+    - name: Am Waldesrand
+      smcbIccsn: 80276001011699900861
       konnektor: Soft-Konn
 
   apothecaries:

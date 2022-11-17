@@ -16,9 +16,8 @@
 
 package de.gematik.test.erezept.crypto;
 
-import java.security.Provider;
-import java.security.Security;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import java.security.*;
+import org.bouncycastle.jce.provider.*;
 
 public class BC {
   private static final Provider SECURITY_PROVIDER = new BouncyCastleProvider();

@@ -16,30 +16,24 @@
 
 package de.gematik.test.smartcard;
 
-import java.security.PrivateKey;
+import de.gematik.test.erezept.crypto.certificate.*;
+import java.security.*;
+import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode
+@SuperBuilder
+@Getter
 public class SmcB extends Smartcard {
 
-  @Getter @Setter private Certificate[] encCertificateChain;
-  @Getter @Setter private X509Certificate encCertificate;
-  @Getter @Setter private PrivateKey encPrivateKey;
-
-  public SmcB(String iccsn) {
-    super(iccsn, SmartcardType.SMC_B);
-  }
+  private Certificate[] encCertificateChain;
+  private X509Certificate encCertificate;
+  private PrivateKey encPrivateKey;
 
   public String getTelematikId() {
-    return this.getOwner().getOrganization();
-  }
-
-  @Override
-  public void destroy() {
-    // nothing to be done!
+    val cert = new AutCertificate(getAuthCertificate());
+    return cert.getProfessionItemValue().orElse(this.getOwner().getOrganization());
   }
 }

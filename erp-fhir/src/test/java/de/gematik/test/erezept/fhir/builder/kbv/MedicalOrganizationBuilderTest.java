@@ -20,22 +20,14 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.util.ValidatorUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
-public class MedicalOrganizationBuilderTest {
-
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
+public class MedicalOrganizationBuilderTest extends ParsingTest {
 
   @Test
   public void buildMedicalOrganizationWithFixedValues() {

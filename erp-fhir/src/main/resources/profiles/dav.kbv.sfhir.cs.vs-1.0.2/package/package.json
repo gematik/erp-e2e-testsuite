@@ -1,0 +1,14 @@
+{
+  "name": "dav.kbv.sfhir.cs.vs",
+  "version": "1.0.2",
+  "description": "externe Codesysteme und Valuesets der KBV",
+  "author": "DAV",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "devDependencies": null,
+  "canonicals": null,
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1"
+  }
+}

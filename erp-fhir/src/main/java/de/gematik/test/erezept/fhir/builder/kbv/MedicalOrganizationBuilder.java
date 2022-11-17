@@ -20,7 +20,8 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.AbstractOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.AddressBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ErpStructureDefinition;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
@@ -35,6 +36,7 @@ import org.hl7.fhir.r4.model.Address;
 public class MedicalOrganizationBuilder
     extends AbstractOrganizationBuilder<MedicalOrganizationBuilder> {
 
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
   private BSNR bsnr;
 
   public static MedicalOrganizationBuilder builder() {
@@ -50,6 +52,19 @@ public class MedicalOrganizationBuilder
         .email(fakerEMail())
         .address(fakerCountry(), fakerCity(), fakerZipCode(), fakerStreetName());
     return builder;
+  }
+
+  /**
+   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
+   * This builder will set the default version automatically, so there should be no need to provide
+   * an explicit version
+   *
+   * @param version to use for generation of this resource
+   * @return Builder
+   */
+  public MedicalOrganizationBuilder version(KbvItaForVersion version) {
+    this.kbvItaForVersion = version;
+    return this;
   }
 
   public MedicalOrganizationBuilder bsnr(@NonNull String bsnr) {
@@ -77,7 +92,9 @@ public class MedicalOrganizationBuilder
   public MedicalOrganization build() {
     checkRequired();
     return MedicalOrganization.fromOrganization(
-        buildOrganizationWith(ErpStructureDefinition.KBV_ORGANIZATION, bsnr.asIdentifier()));
+        buildOrganizationWith(
+            () -> KbvItaForStructDef.ORGANIZATION.asCanonicalType(kbvItaForVersion),
+            bsnr.asIdentifier()));
   }
 
   protected void checkRequired() {

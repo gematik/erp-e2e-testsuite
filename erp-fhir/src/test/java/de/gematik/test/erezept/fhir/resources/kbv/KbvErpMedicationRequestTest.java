@@ -18,14 +18,14 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.util.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class KbvErpMedicationRequestTest extends ParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/kbv/medicationrequest/";
+  private final String BASE_PATH = "fhir/valid/kbv/1.0.2/medicationrequest/";
 
   @Test
   void encodingSingleValidMedicationRequest() {
