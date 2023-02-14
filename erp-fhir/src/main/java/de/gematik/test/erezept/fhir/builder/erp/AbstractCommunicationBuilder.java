@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
 import java.util.List;
@@ -31,9 +32,16 @@ import org.hl7.fhir.r4.model.StringType;
 abstract class AbstractCommunicationBuilder<T extends AbstractCommunicationBuilder<T>>
     extends AbstractResourceBuilder<T> {
 
+  protected ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
+
   protected Communication.CommunicationStatus status = Communication.CommunicationStatus.UNKNOWN;
   protected String recipient;
   protected String sender;
+
+  public T version(ErpWorkflowVersion version) {
+    this.erpWorkflowVersion = version;
+    return self();
+  }
 
   public T status(@NonNull final String code) {
     return status(Communication.CommunicationStatus.fromCode(code));
@@ -67,13 +75,13 @@ abstract class AbstractCommunicationBuilder<T extends AbstractCommunicationBuild
 
     com.setStatus(status);
 
-    val recipientRef = type.getRecipientReference(recipient);
+    val recipientRef = type.getRecipientReference(erpWorkflowVersion, recipient);
     com.setRecipient(List.of(recipientRef));
 
     // NOTE: "normal" communications do not necessarily require a sender: why?
     // probably will be added for all Communications in Version 1.2
     if (sender != null) {
-      val senderRef = type.getSenderReference(sender);
+      val senderRef = type.getSenderReference(erpWorkflowVersion, sender);
       com.setSender(senderRef);
     }
 

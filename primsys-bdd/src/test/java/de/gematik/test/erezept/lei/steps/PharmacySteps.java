@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,105 +16,59 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.client.*;
-import de.gematik.test.erezept.client.exceptions.*;
-import de.gematik.test.erezept.exceptions.*;
-import de.gematik.test.erezept.lei.cfg.*;
-import de.gematik.test.erezept.pspwsclient.*;
-import de.gematik.test.erezept.pspwsclient.config.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.task.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.konnektor.commands.options.*;
-import de.gematik.test.smartcard.*;
-import io.cucumber.datatable.*;
-import io.cucumber.java.*;
-import io.cucumber.java.de.*;
-import lombok.*;
-import net.serenitybdd.core.*;
-import net.serenitybdd.screenplay.actors.*;
-import net.serenitybdd.screenplay.ensure.*;
+import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
+import de.gematik.test.erezept.screenplay.questions.HasChargeItem;
+import de.gematik.test.erezept.screenplay.questions.HasDownloadableOpenTask;
+import de.gematik.test.erezept.screenplay.questions.HasNewSubscriptionPing;
+import de.gematik.test.erezept.screenplay.questions.HasReceipts;
+import de.gematik.test.erezept.screenplay.questions.HasRetrieved;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortUnaccepted;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfDispenseMedicationOperation;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfGetCommunicationFrom;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfPostChargeItem;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfReDispenseMedication;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfRejectOperation;
+import de.gematik.test.erezept.screenplay.questions.RetrieveExamEvidence;
+import de.gematik.test.erezept.screenplay.questions.VerifyReceiptSignature;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.task.AbortPrescription;
+import de.gematik.test.erezept.screenplay.task.AcceptDispenseRequest;
+import de.gematik.test.erezept.screenplay.task.AcceptPrescription;
+import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.screenplay.task.DecryptPSPMessage;
+import de.gematik.test.erezept.screenplay.task.DeleteSentCommunication;
+import de.gematik.test.erezept.screenplay.task.DispenseMedication;
+import de.gematik.test.erezept.screenplay.task.Negate;
+import de.gematik.test.erezept.screenplay.task.RegisterNewSubscription;
+import de.gematik.test.erezept.screenplay.task.RejectPrescription;
+import de.gematik.test.erezept.screenplay.task.RetrieveReceiptAgain;
+import de.gematik.test.erezept.screenplay.task.SendCommunication;
+import de.gematik.test.erezept.screenplay.task.ThatNotAllowedToAsk;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.konnektor.commands.options.ExamEvidence;
+import io.cucumber.datatable.DataTable;
+import io.cucumber.java.de.Dann;
+import io.cucumber.java.de.Und;
+import io.cucumber.java.de.Wenn;
+import lombok.val;
+import net.serenitybdd.core.PendingStepException;
+import net.serenitybdd.screenplay.actors.OnStage;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
 /**
  * Testschritte die aus der Perspektive einer Apotheke und Apotheker bzw. Apothekerin ausgeführt
  * werden
  */
 public class PharmacySteps {
-
-  private SmartcardArchive smartcards;
-  private TestsuiteConfiguration config;
-
-  @Before
-  public void setUp() {
-    smartcards = SmartcardFactory.getArchive();
-    config = TestsuiteConfiguration.getInstance();
-    OnStage.setTheStage(new OnlineCast());
-  }
-
-  /**
-   * Initialisiere einen Apotheker mit einer SMC-B <br>
-   * <b>Notiz:</b> Der Name im ersten Parameter entspricht nicht dem echten Namen, der auf der
-   * Smartcard hinterlegt ist. Dieser Name wird lediglich für das Screenplay-Pattern benötigt
-   *
-   * @param pharmName der Name der Apotheke, der innerhalb des Szenarios verwendet wird, um diesen
-   *     zu identifizieren
-   */
-  @Angenommen("^die Apotheke (.+) hat Zugriff auf ihre SMC-B$")
-  public void initPharmacy(String pharmName) {
-    // fetch the chosen Smartcards
-    val pharmConfig = config.getPharmacyConfig(pharmName);
-    val smcb =
-        smartcards.getSmcbByICCSN(pharmConfig.getSmcbIccsn(), pharmConfig.getCryptoAlgorithm());
-
-    // create the abilities
-    val useKonnektor =
-        UseTheKonnektor.with(smcb).on(config.instantiatePharmacyKonnektor(pharmConfig));
-    val useErpClient =
-        UseTheErpClient.with(
-            pharmConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.PS));
-    useErpClient.authenticateWith(useKonnektor);
-    // assemble the screenplay
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    thePharmacy.describedAs(
-        "Eine 'E-Rezept-ready' Apotheke die E-Rezepte akzeptieren und dispensieren kann");
-    givenThat(thePharmacy).can(useErpClient);
-    givenThat(thePharmacy).can(UseSMCB.itHasAccessTo(smcb));
-    givenThat(thePharmacy).can(ManagePharmacyPrescriptions.itWorksWith());
-    givenThat(thePharmacy).can(ManageCommunications.itExchanges());
-
-    givenThat(thePharmacy).can(UseSubscriptionService.use());
-    givenThat(thePharmacy).can(useKonnektor);
-  }
-
-  @Angenommen("^(?:der Apotheker|die Apothekerin) (.+) hat Zugriff auf (?:seinen|ihren) HBA$")
-  public void initApothecary(String pharmacistName) {
-    val apothecaryConfig = config.getApothecaryConfig(pharmacistName);
-    val hba =
-        smartcards.getHbaByICCSN(
-            apothecaryConfig.getHbaIccsn(), apothecaryConfig.getCryptoAlgorithm());
-
-    val useKonnektor =
-        UseTheKonnektor.with(hba).on(config.instantiateApothecaryKonnektor(apothecaryConfig));
-
-    val thePharmacist = OnStage.theActorCalled(pharmacistName);
-    thePharmacist.describedAs("Ein Apotheker der QES-Signaturen mittels seines HBA erstellen kann");
-    givenThat(thePharmacist).can(useKonnektor);
-  }
-
-  @Angenommen("^die Apotheke (.+) verbindet sich mit seinem Apothekendienstleister$")
-  public void initConnectionToPharmacyServiceProvider(String pharmName) {
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    val id = SafeAbility.getAbility(thePharmacy, UseSMCB.class);
-
-    PSPClient pspClient = PSPClientFactory.create(config.getPspClientConfig(), id.getTelematikID());
-    val pspClientAbility = UsePspClient.with(pspClient).andConfig(config.getPspClientConfig());
-    givenThat(thePharmacy).attemptsTo(Ensure.that(pspClientAbility.isConnected()).isTrue());
-    givenThat(thePharmacy).can(pspClientAbility);
-  }
 
   @Wenn(
       "^die Apotheke (.+) das (letzte|erste) (?:zugewiesene|abgerufene) E-Rezept beim Fachdienst akzeptiert$")
@@ -195,7 +149,7 @@ public class PharmacySteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(AcceptPrescription.fromStack(DequeStrategyEnum.FIFO))
+            Negate.the(AcceptPrescription.fromStack(DequeStrategy.FIFO))
                 .with(MissingPreconditionError.class));
   }
 
@@ -361,9 +315,7 @@ public class PharmacySteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(
-                    DispenseMedication.fromStack(DequeStrategyEnum.LIFO)
-                        .withPrescribedMedications())
+            Negate.the(DispenseMedication.fromStack(DequeStrategy.LIFO).withPrescribedMedications())
                 .with(MissingPreconditionError.class));
   }
 
@@ -373,9 +325,7 @@ public class PharmacySteps {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(
-                    DispenseMedication.fromStack(DequeStrategyEnum.LIFO)
-                        .withPrescribedMedications())
+            Negate.the(DispenseMedication.fromStack(DequeStrategy.LIFO).withPrescribedMedications())
                 .with(MissingPreconditionError.class));
   }
 
@@ -497,16 +447,6 @@ public class PharmacySteps {
   public void whenRegisterForSubscription(String pharmName, String criteria) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy).attemptsTo(RegisterNewSubscription.forCriteria(criteria));
-  }
-
-  @Wenn("^die Apotheke (.+) sich mit dem Subscription Service verbindet$")
-  public void whenConnectedToSubscriptionService(String pharmName) {
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    val pharmacyConfig = config.getPharmacyConfig(pharmName);
-    when(thePharmacy)
-        .attemptsTo(
-            ConnectSubscriptionService.connect(
-                config.getActiveEnvironment().getTi().getSubscriptionServiceUrl()));
   }
 
   @Dann("^wird die Apotheke (.+) durch den Subscription Service informiert$")
@@ -654,40 +594,54 @@ public class PharmacySteps {
 
   /**
    * In diesem Step wird für das letzte dispensierte Rezept des Versicherten ein PKV-Abgabedatensatz
-   * erstellt, mit der SMC-B der Apotheke signiert und per POST/chargeItem beim Fachdienst
-   * hinterlegt.
+   * erstellt. Der PKV-Abgabendatensatz wird mit der SMC-B der Apotheke signiert und per POST
+   * /chargeItem beim Fachdienst hinterlegt.
    *
-   * @param pharmName Name der Apotheke
-   * @param patientName Name des Versicherten
+   * @param pharmName ist der Name der Apotheke, die den PKV-Abrechnungsdatensatz erstellen soll
+   * @param order gibt an, ob für das letzte oder das erste dispensierte E-Rezept der
+   *     Abrechnungsdatensatz erstellt werden soll
    */
   @Wenn(
-      "^die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept einen PKV-Abrechnungsdatensatz mit der SMC-B signiert und beim Fachdienst hinterlegt$")
-  public void whenPharmacySignsWithSmcbAndPostsChargeItem(String pharmName, String patientName) {
-    throw new PendingStepException("Not yet implemented");
+      "^die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt$")
+  public void whenPharmacySignsWithSmcbAndPostsChargeItem(String pharmName, String order) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    when(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(ResponseOfPostChargeItem.fromStack(order).signedByPharmacy())
+                .isEqualTo(201));
   }
 
   @Dann(
       "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil keine Einwilligung vorliegt$")
   public void thenCannotPostChargeItem403(String pharmName, String order) {
-    throw new PendingStepException("Not yet implemented");
-    /*   val thePharmacy = OnStage.theActorCalled(pharmName);
-    then(thePharmacy)
-            .attemptsTo(
-                    CheckTheReturnCode.of(
-                            ResponseOfChargeItemOperationfromStack(order)
-                                    .forPrescribedMedications())
-                            .isEqualTo(403)); */
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    when(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(ResponseOfPostChargeItem.fromStack(order).signedByPharmacy())
+                .isEqualTo(403));
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die Abrechnungsinformationen für das letzte dispensierte E-Rezept ändern$")
-  public void thenChargeItemCanBeChanged(String pharmName) {
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil es kein PKV-Rezept ist$")
+  @Dann(
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil der Task nicht mehr existiert$")
+  public void thenCannotPostChargeItem400(String pharmName, String order) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    when(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(ResponseOfPostChargeItem.fromStack(order).signedByPharmacy())
+                .isEqualTo(400));
+  }
+
+  @Dann(
+      "^kann die Apotheke (.+) die Abrechnungsinformationen für das (letzte|erste) dispensierte E-Rezept ändern$")
+  public void thenChargeItemCanBeChanged(String pharmName, String order) {
     throw new PendingStepException("Not yet implemented");
   }
 
   @Wenn(
       "^die Apotheke (.+) die (letzte|erste) Nachricht (?:der|des) Versicherten (.+) mit dem Änderungswunsch empfängt und beantwortet$")
-  public void whenReceiveAndAnswerChargChangeReq(
+  public void whenReceiveAndAnswerChargeChangeReq(
       String order, String pharmName, String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -702,8 +656,8 @@ public class PharmacySteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die Abrechnungsinformationen für das letzte dispensierte E-Rezept nicht ändern, weil sie kein Recht dazu hat$")
-  public void thenCannotChangeCargeItem403(String pharmName) {
+      "^kann die Apotheke (.+) die Abrechnungsinformationen für das (letzte|erste) dispensierte E-Rezept nicht ändern, weil sie kein Recht dazu hat$")
+  public void thenCannotChangeChargeItem403(String pharmName, String order) {
     throw new PendingStepException("Not yet implemented");
     /*   val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -714,31 +668,12 @@ public class PharmacySteps {
                             .isEqualTo(403)); */
   }
 
-  @Wenn(
-      "^(?:der Apotheker|die Apothekerin) (.+) in der Apotheke (.+) für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz mit dem HBA signiert und beim Fachdienst hinterlegt$")
-  public void whenPharmacySignsWithHbaAndPostsChargeItem(String pharmName, String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil es kein PKV-Rezept ist$")
-  @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil der Task nicht mehr existiert$")
-  public void thenCannotPostChargeItem400(String pharmName) {
-    throw new PendingStepException("Not yet implemented");
-    /*   val thePharmacy = OnStage.theActorCalled(pharmName);
-    then(thePharmacy)
-            .attemptsTo(
-                    CheckTheReturnCode.of(
-                            ResponseOfChargeItemOperationfromStack(order)
-                                    .forPrescribedMedications())
-                            .isEqualTo(400)); */
-  }
-
   @Dann(
       "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept die Abrechnungsinformationen vom Fachdienst abrufen$")
   public void whenPharmacygetsChargeItem(String pharmName, String order) {
-    throw new PendingStepException("Not yet implemented");
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    then(thePharmacy)
+        .attemptsTo(Ensure.that(HasChargeItem.forPrescription(order).asPharmacy()).isTrue());
   }
 
   /**

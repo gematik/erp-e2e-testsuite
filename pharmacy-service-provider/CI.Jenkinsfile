@@ -3,7 +3,6 @@
 def CREDENTIAL_ID_GEMATIK_GIT = 'GITLAB.tst_tt_build.Username_Password'
 def REPO_URL = 'https://gitlab.prod.ccs.gematik.solutions/git/erezept/fachdienst/erp-e2e'
 def BRANCH = 'Development_1.x'
-
 def JIRA_PROJECT_ID = 'TMD'
 def GITLAB_PROJECT_ID = '843'
 def TITLE_TEXT = 'Release'
@@ -52,7 +51,17 @@ pipeline {
                 mavenBuild("pharmacy-service-provider/pom.xml")
             }
         }
-        stage('Push Dockerimage') {
+        stage('unitTests'){
+            steps {
+                mavenTest("pharmacy-service-provider/pom.xml")
+            }
+        }
+        stage('Integration Test'){
+            steps {
+                mavenVerify("pharmacy-service-provider/pom.xml", "-Punix -Dskip.unittests " )
+            }
+        }
+         stage('Push Dockerimage') {
             steps {
                 script {
                     def buildDir = "pharmacy-service-provider"
@@ -67,7 +76,7 @@ pipeline {
         }
     }
     post {
-        always {
+         always {
             dockerRemoveLocalImage(IMAGE_NAME, version)
         }
     }

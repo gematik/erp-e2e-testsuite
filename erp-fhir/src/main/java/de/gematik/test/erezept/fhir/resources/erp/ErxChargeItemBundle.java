@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2023 gematik GmbH
+ * 
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.gematik.test.erezept.fhir.resources.erp;
+
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+
+@Getter
+@ResourceDef(name = "Bundle")
+public class ErxChargeItemBundle extends Bundle {
+
+  public ErxChargeItem getChargeItem() {
+    return this.getEntry().stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(x -> x.getResourceType().equals(ResourceType.ChargeItem))
+        .map(ErxChargeItem::fromChargeItem)
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(ErxChargeItem.class, ResourceType.ChargeItem));
+  }
+
+  public Optional<ErxReceipt> getReceipt() {
+    return this.getEntry().stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(resource -> resource.getResourceType().equals(ResourceType.Bundle))
+        .filter(
+            resource ->
+                resource.getMeta().getProfile().stream()
+                    .map(PrimitiveType::getValue)
+                    .anyMatch(ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE::match))
+        .map(ErxReceipt::fromBundle)
+        .findFirst();
+  }
+}

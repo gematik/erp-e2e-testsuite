@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,23 @@
 
 package de.gematik.test.erezept.fhir.testutil;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.util.*;
+import java.io.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
-public class ResourceUtilsTest {
+class ResourceUtilsTest {
 
   @Test
-  public void getResourceFilesInDirectory() {
+  void getResourceFilesInDirectory() {
     val path = "simple";
     val expectedFiles = List.of("sample_01.txt", "sample_01.xml");
     val files = ResourceUtils.getResourceFilesInDirectory(path);
 
     assertEquals(expectedFiles.size(), files.size());
-    assertTrue(
-        files.stream().map(File::getName).collect(Collectors.toList()).containsAll(expectedFiles));
+    assertTrue(files.stream().map(File::getName).toList().containsAll(expectedFiles));
   }
 }

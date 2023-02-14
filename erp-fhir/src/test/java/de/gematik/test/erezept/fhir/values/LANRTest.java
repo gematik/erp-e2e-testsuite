@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,28 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class LANRTest {
+class LANRTest {
 
   @Test
-  public void testRandomFakerLanrRealisticLength() {
+  void testRandomFakerLanrRealisticLength() {
     String testNum = LANR.random().toString();
     assertEquals(15, testNum.length());
   }
 
   @Test
-  public void testRandomFakerLanrRealisticBegin() {
+  void testRandomFakerLanrRealisticBegin() {
     String testLanr = String.valueOf(LANR.random()).substring(0, 5);
     assertEquals("LANR:", testLanr);
   }
 
-  @Test(expected = Test.None.class)
-  public void testRandomFakerLanrRealisticEnd() {
+  @Test
+  void testRandomFakerLanrRealisticEnd() {
     String testLanr = LANR.random().getValue();
-    val testNo = Integer.parseInt(testLanr);
+    assertDoesNotThrow(() -> Integer.parseInt(testLanr));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ class PageElementTest {
 
   @Test
   void shouldGetFullname() {
-    val element = Onboarding.NEXT;
+    val element = Onboarding.NEXT_BUTTON;
     assertTrue(element.getFullName().contains("Onboarding"));
     assertTrue(element.getFullName().contains("Next"));
   }
 
   @Test
   void shouldThrowOnUnsupportedPlatform() {
-    val element = Onboarding.SKIP;
+    val element = Onboarding.SKIP_BUTTON;
     assertThrows(
         UnsupportedPlatformException.class, () -> element.forPlatform(PlatformType.DESKTOP));
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,32 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import java.util.Optional;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.references.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
-public class AssignerOrganizationBuilderTest extends ParsingTest {
+class AssignerOrganizationBuilderTest extends ParsingTest {
 
-  @Test
-  public void buildAssignerOrganizationWithFixedValues() {
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildAssignerOrganizationWithFixedValues(KbvItaForVersion version) {
     val organizationResourceId = "d55c6c01-057b-483d-a1eb-2bd1e182551f";
     val organization =
         AssignerOrganizationBuilder.builder()
+            .version(version)
             .setResourceId(organizationResourceId)
             .name("Arztpraxis Meyer")
             .iknr(IKNR.from("757299999"))
@@ -51,35 +54,39 @@ public class AssignerOrganizationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  public void buildAssignerOrganizationWithFaker01() {
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildAssignerOrganizationWithFaker01(KbvItaForVersion version) {
     val orgRef = new OrganizationReference("id");
-    val organization = AssignerOrganizationBuilder.faker(orgRef, "AOK").build();
+    val organization = AssignerOrganizationBuilder.faker(orgRef, "AOK").version(version).build();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  public void buildAssignerOrganizationWithFaker02() {
-    val organization = AssignerOrganizationBuilder.faker().build();
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildAssignerOrganizationWithFaker02(KbvItaForVersion version) {
+    val organization = AssignerOrganizationBuilder.faker().version(version).build();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  public void shouldFailOnEmptyAssignerOrganizationBuilder() {
-    val ob = AssignerOrganizationBuilder.builder();
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void shouldFailOnEmptyAssignerOrganizationBuilder(KbvItaForVersion version) {
+    val ob = AssignerOrganizationBuilder.builder().version(version);
     assertThrows(BuilderException.class, ob::build);
   }
 
-  @Test
-  public void shouldFailOnFakerWithGkvPatient() {
-    val patient = PatientBuilder.faker(IdentifierTypeDe.GKV).build();
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void shouldFailOnFakerWithGkvPatient(KbvItaForVersion version) {
+    val patient = PatientBuilder.faker(IdentifierTypeDe.GKV).version(version).build();
     assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(patient));
   }
 
   @Test
-  public void shouldFailOnFakerWithInvalidPkvPatient01() {
+  void shouldFailOnFakerWithInvalidPkvPatient01() {
     val mockPatient = mock(KbvPatient.class);
     when(mockPatient.hasPkvId()).thenReturn(true);
     when(mockPatient.getPkvAssigner()).thenReturn(Optional.empty());
@@ -87,7 +94,7 @@ public class AssignerOrganizationBuilderTest extends ParsingTest {
   }
 
   @Test
-  public void shouldFailOnFakerWithInvalidPkvPatient02() {
+  void shouldFailOnFakerWithInvalidPkvPatient02() {
     val patient = PatientBuilder.faker(IdentifierTypeDe.PKV).build();
     val mockPatient = mock(KbvPatient.class);
     when(mockPatient.hasPkvId()).thenReturn(true);
@@ -97,7 +104,7 @@ public class AssignerOrganizationBuilderTest extends ParsingTest {
   }
 
   @Test
-  public void shouldFailOnNullIknr() {
+  void shouldFailOnNullIknr() {
     val ob = AssignerOrganizationBuilder.builder();
     String iknrString = null;
     assertThrows(

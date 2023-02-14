@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,22 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ca.uhn.fhir.validation.ValidationResult;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import java.util.Arrays;
-import lombok.val;
-import org.hl7.fhir.r4.model.Parameters;
-import org.junit.Test;
+import ca.uhn.fhir.validation.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
 
-public class FlowTypeBuilderTest extends ParsingTest {
+class FlowTypeBuilderTest extends ParsingTest {
 
   @Test
-  public void buildParametersFlowType160() {
+  void buildParametersFlowType160() {
     val params = FlowTypeBuilder.build(PrescriptionFlowType.FLOW_TYPE_160);
 
     assertNotNull(params);
@@ -41,7 +40,7 @@ public class FlowTypeBuilderTest extends ParsingTest {
   }
 
   @Test
-  public void buildParametersForAllFlowTypes() {
+  void buildParametersForAllFlowTypes() {
     Arrays.stream(PrescriptionFlowType.values())
         .filter(
             flowType ->

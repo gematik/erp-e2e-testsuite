@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,55 +16,60 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static java.text.MessageFormat.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static java.text.MessageFormat.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 @Slf4j
-public class PatientBuilderTest extends ParsingTest {
+class PatientBuilderTest extends ParsingTest {
 
-  @Test
-  public void buildGkvPatientWithFaker() {
-    val patient = PatientBuilder.faker("X123123123", IdentifierTypeDe.GKV).build();
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildGkvPatientWithFaker(KbvItaForVersion version) {
+    val patient = PatientBuilder.faker("X123123123", IdentifierTypeDe.GKV).version(version).build();
     log.info(format("Validating Faker Patient with ID {0}", patient.getLogicalId()));
     val result = ValidatorUtil.encodeAndValidate(parser, patient);
     assertTrue(result.isSuccessful());
 
     val insuranceKind = patient.getInsuranceKind();
     assertEquals(VersicherungsArtDeBasis.GKV, insuranceKind);
+    assertTrue(patient.hasGkvId());
   }
 
-  @Test
-  public void buildPkvPatientWithFaker() {
-    val patient = PatientBuilder.faker("X123123123", IdentifierTypeDe.PKV).build();
+  @ParameterizedTest(name = "[{index}] -> Build KBV PKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildPkvPatientWithFaker(KbvItaForVersion version) {
+    val patient = PatientBuilder.faker("X123123123", IdentifierTypeDe.PKV).version(version).build();
     log.info(format("Validating Faker Patient with ID {0}", patient.getLogicalId()));
     val result = ValidatorUtil.encodeAndValidate(parser, patient);
     assertTrue(result.isSuccessful());
 
     val insuranceKind = patient.getInsuranceKind();
     assertEquals(VersicherungsArtDeBasis.PKV, insuranceKind);
+    assertTrue(patient.hasPkvId());
   }
 
-  @Test
-  public void shouldFailOnEmptyPatientBuilder() {
-    val pb = PatientBuilder.builder();
+  @ParameterizedTest(name = "[{index}] -> Build KBV PKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void shouldFailOnEmptyPatientBuilder(KbvItaForVersion version) {
+    val pb = PatientBuilder.builder().version(version);
     assertThrows(BuilderException.class, pb::build);
   }
 
-  @Test
-  public void shouldFailOnPkvPatientWithoutAssigner() {
+  @ParameterizedTest(name = "[{index}] -> Build KBV PKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void shouldFailOnPkvPatientWithoutAssigner(KbvItaForVersion version) {
     val pb =
-        PatientBuilder.faker("X123123123", IdentifierTypeDe.GKV); // GKV Faker won't set assigner!
+        PatientBuilder.faker("X123123123", IdentifierTypeDe.GKV) // GKV Faker won't set assigner!
+            .version(version);
     pb.kvIdentifierDe("X123123123", IdentifierTypeDe.PKV); // setting PKV without assigner
     assertThrows(BuilderException.class, pb::build);
   }

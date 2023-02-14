@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +39,7 @@ import org.hl7.fhir.r4.model.Resource;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfRejectOperation extends FhirResponseQuestion<Resource> {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
   private final Map<String, String> replacementMap;
 
   @Override
@@ -79,10 +79,10 @@ public class ResponseOfRejectOperation extends FhirResponseQuestion<Resource> {
   }
 
   public static ResponseOfRejectOperation fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static ResponseOfRejectOperation fromStack(DequeStrategyEnum deque) {
+  public static ResponseOfRejectOperation fromStack(DequeStrategy deque) {
     return new ResponseOfRejectOperation(deque, new HashMap<>());
   }
 
@@ -95,10 +95,10 @@ public class ResponseOfRejectOperation extends FhirResponseQuestion<Resource> {
     }
 
     public ResponseOfRejectOperation fromStack(String order) {
-      return fromStack(DequeStrategyEnum.fromString(order));
+      return fromStack(DequeStrategy.fromString(order));
     }
 
-    public ResponseOfRejectOperation fromStack(DequeStrategyEnum deque) {
+    public ResponseOfRejectOperation fromStack(DequeStrategy deque) {
       return new ResponseOfRejectOperation(deque, replacementMap);
     }
   }

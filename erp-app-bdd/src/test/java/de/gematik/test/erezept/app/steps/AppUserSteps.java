@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,20 @@
 
 package de.gematik.test.erezept.app.steps;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
-import de.gematik.test.erezept.app.cfg.AppiumDriverFactory;
-import de.gematik.test.erezept.app.cfg.ErpAppConfiguration;
-import de.gematik.test.erezept.app.questions.HasReceivedPrescription;
-import de.gematik.test.erezept.app.questions.IsElementAvailable;
-import de.gematik.test.erezept.app.task.RefreshPrescriptions;
-import de.gematik.test.erezept.app.task.SetUpDevice;
-import de.gematik.test.erezept.app.task.SkipOnboarding;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.de.Angenommen;
-import io.cucumber.java.de.Dann;
-import io.cucumber.java.de.Wenn;
-import lombok.val;
-import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.actors.OnlineCast;
+import de.gematik.test.erezept.app.abilities.*;
+import de.gematik.test.erezept.app.cfg.*;
+import de.gematik.test.erezept.app.questions.*;
+import de.gematik.test.erezept.app.task.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.smartcard.*;
+import io.cucumber.java.*;
+import io.cucumber.java.de.*;
+import lombok.*;
+import net.serenitybdd.screenplay.actors.*;
 
 public class AppUserSteps {
 
@@ -77,8 +65,7 @@ public class AppUserSteps {
 
     if (config.getAppConfigurationForUser(userName).isUseVirtualeGK()) {
       val egk =
-          smartcards.getEgkByICCSN(
-              "80276883110000113311", Crypto.RSA_2048); // TODO: use a default eGK for now!
+          smartcards.getEgkByICCSN("80276883110000113311"); // TODO: use a default eGK for now!
       givenThat(theAppUser).can(ProvideEGK.sheOwns(egk));
     }
 
@@ -102,8 +89,7 @@ public class AppUserSteps {
 
     if (config.getAppConfigurationForUser(userName).isUseVirtualeGK()) {
       val egk =
-          smartcards.getEgkByICCSN(
-              "80276883110000113311", Crypto.RSA_2048); // TODO: use a default eGK for now!
+          smartcards.getEgkByICCSN("80276883110000113311"); // TODO: use a default eGK for now!
       givenThat(theAppUser).can(ProvideEGK.sheOwns(egk));
     }
     givenThat(theAppUser).attemptsTo(SkipOnboarding.directly());

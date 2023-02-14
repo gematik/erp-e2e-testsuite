@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,24 @@
 
 package de.gematik.test.erezept.client;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.idp.client.IdpClient;
-import de.gematik.idp.client.IdpClientRuntimeException;
-import de.gematik.idp.client.IdpTokenResult;
-import de.gematik.idp.crypto.model.PkiIdentity;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.ErpResponseFactory;
-import de.gematik.test.erezept.client.rest.MediaType;
-import de.gematik.test.erezept.client.usecases.ICommand;
-import de.gematik.test.erezept.client.vau.InnerHttp;
-import de.gematik.test.erezept.client.vau.VauClient;
-import de.gematik.test.erezept.fhir.exceptions.FhirValidationException;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.smartcard.Smartcard;
-import java.security.cert.X509Certificate;
+import de.gematik.idp.client.*;
+import de.gematik.idp.crypto.model.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.client.vau.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.smartcard.*;
+import java.security.cert.*;
+import java.time.*;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.*;
+import java.util.function.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-import org.hl7.fhir.r4.model.Resource;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @Getter
@@ -91,10 +84,11 @@ public class ErpClient {
   public void authenticateWith(final Smartcard smartcard) {
     authentication =
         () -> {
+          val autCertificate = smartcard.getAutCertificate();
           val pki =
               PkiIdentity.builder()
-                  .certificate(smartcard.getAuthCertificate())
-                  .privateKey(smartcard.getAuthPrivateKey())
+                  .certificate(autCertificate.getX509Certificate())
+                  .privateKey(autCertificate.getPrivateKey())
                   .build();
           return idpClient.login(pki);
         };
@@ -171,12 +165,16 @@ public class ErpClient {
 
     val innerHttpRequest = createInnerHttpRequest(command, accessToken, reqBody);
 
+    val start = Instant.now();
     val response = vauClient.send(innerHttpRequest, accessToken, command.getFhirResource());
+    val duration = Duration.between(start, Instant.now());
+    log.info(format("Request against {0} took {1} msec", baseFdUrl, duration.toMillis()));
 
     // validate and decode the Response and wrap into an ErpResponse
     this.validateFhirContent(response.getBody(), validateResponse);
     return responseFactory.createFrom(
         response.getStatusCode(),
+        duration,
         response.getHeader(),
         response.getBody(),
         command.expectedResponseBody());

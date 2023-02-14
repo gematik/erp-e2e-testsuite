@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,24 @@
 
 package de.gematik.test.smartcard;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import de.gematik.test.erezept.crypto.certificate.*;
+import java.util.*;
+import java.util.function.*;
+import lombok.*;
 
 @Getter
-@SuperBuilder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Egk extends Smartcard {
 
-  private String kvnr;
+  @Getter private final String kvnr;
+
+  public Egk(List<Supplier<SmartcardCertificate>> certificates, String iccsn, String kvnr) {
+    super(certificates, iccsn, SmartcardType.EGK);
+    this.kvnr = kvnr;
+  }
+
+  @Override
+  public List<Oid> getAutOids() {
+    return List.of(Oid.OID_EGK_AUT, Oid.OID_EGK_AUT_ALT);
+  }
 }

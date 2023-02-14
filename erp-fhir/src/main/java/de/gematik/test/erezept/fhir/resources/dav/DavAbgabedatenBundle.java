@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package de.gematik.test.erezept.fhir.resources.dav;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
+import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
+import de.gematik.test.erezept.fhir.util.*;
 import de.gematik.test.erezept.fhir.values.IKNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -31,16 +35,17 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
 @Getter
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
-public class DavAbgabedatenBundle extends Bundle {
+public class DavAbgabedatenBundle extends Bundle implements ErpFhirResource {
 
   public String getLogicalId() {
-    return this.id.getValue();
+    return IdentifierUtil.getUnqualifiedId(this.id);
   }
 
   public AbgabedatensatzReference getReference() {
@@ -94,15 +99,25 @@ public class DavAbgabedatenBundle extends Bundle {
   }
 
   public DavInvoice getInvoice() {
-    return this.entry.stream()
-        .map(BundleEntryComponent::getResource)
-        .filter(resource -> resource.getResourceType().equals(ResourceType.Invoice))
-        .map(DavInvoice::fromInvoice)
-        .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    DavDispensedMedication.class, AbdaErpPkvStructDef.PKV_ABRECHNUNGSZEILEN));
+    val davInvoice =
+        this.entry.stream()
+            .filter(
+                resource -> resource.getResource().getResourceType().equals(ResourceType.Invoice))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new MissingFieldException(
+                        this.getClass(), AbdaErpPkvStructDef.PKV_ABRECHNUNGSZEILEN));
+
+    DavInvoice ret;
+    if (!davInvoice.getResource().getClass().equals(DavInvoice.class)) {
+      ret = DavInvoice.fromInvoice(davInvoice.getResource());
+      davInvoice.setResource(ret);
+    } else {
+      ret = (DavInvoice) davInvoice.getResource();
+    }
+
+    return ret;
   }
 
   private List<Organization> getOrganizations() {
@@ -111,5 +126,31 @@ public class DavAbgabedatenBundle extends Bundle {
         .filter(resource -> resource.getResourceType().equals(ResourceType.Organization))
         .map(Organization.class::cast)
         .toList();
+  }
+
+  public static DavAbgabedatenBundle fromBundle(Bundle adaptee) {
+    val davBundle = new DavAbgabedatenBundle();
+    adaptee.copyValues(davBundle);
+    return davBundle;
+  }
+
+  public static DavAbgabedatenBundle fromBundle(Resource adaptee) {
+    return fromBundle((Bundle) adaptee);
+  }
+
+  @Override
+  public String getDescription() {
+    val workflow = this.getFlowType();
+    val type = format("{0} Abgabedatensatz", workflow.getDisplay());
+    val prescriptionId = this.getPrescriptionId().getValue();
+    val pzn = this.getInvoice().getPzn();
+    val totalPrice = this.getInvoice().getTotalPrice();
+    val insurantPrice = this.getInvoice().getTotalCoPayment();
+    val currency = this.getInvoice().getCurrency();
+    val pharmacyName = this.getPharmacy().getName();
+    val vat = this.getInvoice().getVAT();
+    return format(
+        "{0} für das E-Rezept {1} mit der PZN {2} im Gesamtwert von {3} {6} (Selbstbeteiligung: {4} {6}) inkl. MwSt {7}% durch die {5}",
+        type, prescriptionId, pzn, totalPrice, insurantPrice, pharmacyName, currency, vat);
   }
 }

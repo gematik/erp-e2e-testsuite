@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -18,99 +18,140 @@ package de.gematik.test.erezept.fhir.values;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
+import de.gematik.test.erezept.fhir.exceptions.*;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import java.util.Arrays;
-import java.util.List;
-import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Identifier;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.values.BaseANR.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 class BaseANRTest {
 
   @Test
   void shouldCreateZANR() {
-    val identifer = new Identifier();
-    identifer.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
-    identifer.setValue("123456789");
+    val identifier = new Identifier();
+    identifier.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
+    identifier.setValue("123456789");
 
-    val coding = identifer.getType().getCodingFirstRep();
+    val coding = identifier.getType().getCodingFirstRep();
     coding.setSystem(DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl());
     coding.setCode("ZANR");
 
-    val anr = BaseANR.fromIdentifier(identifer);
+    val anr = BaseANR.fromIdentifier(identifier);
     assertEquals(BaseANR.ANRType.ZANR, anr.getType());
     assertEquals("123456789", anr.getValue());
+    assertEquals(
+        DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl(), anr.getCodeSystemUrl());
+    assertEquals(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl(), anr.getNamingSystemUrl());
+    // just for the sake of code-coverage
+    assertEquals(anr.hashCode(), anr.hashCode());
   }
 
   @Test
   void shouldCreateLANR() {
-    val identifer = new Identifier();
-    identifer.setSystem(KbvNamingSystem.BASE_ANR.getCanonicalUrl());
-    identifer.setValue("123456789");
+    val identifier = new Identifier();
+    identifier.setSystem(KbvNamingSystem.BASE_ANR.getCanonicalUrl());
+    identifier.setValue("123456789");
 
-    val coding = identifer.getType().getCodingFirstRep();
+    val coding = identifier.getType().getCodingFirstRep();
     coding.setSystem(Hl7CodeSystem.HL7_V2_0203.getCanonicalUrl());
     coding.setCode("LANR");
 
-    val anr = BaseANR.fromIdentifier(identifer);
+    val anr = BaseANR.fromIdentifier(identifier);
     assertEquals(BaseANR.ANRType.LANR, anr.getType());
+    assertEquals("123456789", anr.getValue());
+    assertEquals(Hl7CodeSystem.HL7_V2_0203.getCanonicalUrl(), anr.getCodeSystemUrl());
+    assertEquals(KbvNamingSystem.BASE_ANR.getCanonicalUrl(), anr.getNamingSystemUrl());
+  }
+
+  @ParameterizedTest(name = "Create BaseANR for QualificationType {0}")
+  @EnumSource(
+      value = QualificationType.class,
+      names = {"DOCTOR", "DENTIST"})
+  void shouldCreateDependingOnQualification(QualificationType qt) {
+    val anr = BaseANR.forQualification(qt, "123456789");
+    if (qt == QualificationType.DOCTOR) {
+      assertEquals(ANRType.LANR, anr.getType());
+      assertEquals(Hl7CodeSystem.HL7_V2_0203.getCanonicalUrl(), anr.getCodeSystemUrl());
+      assertEquals(KbvNamingSystem.BASE_ANR.getCanonicalUrl(), anr.getNamingSystemUrl());
+    } else if (qt == QualificationType.DENTIST) {
+      assertEquals(ANRType.ZANR, anr.getType());
+      assertEquals(
+          DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl(), anr.getCodeSystemUrl());
+      assertEquals(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl(), anr.getNamingSystemUrl());
+    } else {
+      fail();
+    }
     assertEquals("123456789", anr.getValue());
   }
 
   @Test
-  void shouldThrowOnUndicidableANRCode01() {
-    val identifer = new Identifier();
-    identifer.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
-    identifer.setValue("123456789");
+  void shouldThrowOnUnsupportedQualificationType() {
+    List.of(
+            QualificationType.DOCTOR_IN_TRAINING,
+            QualificationType.DOCTOR_AS_REPLACEMENT,
+            QualificationType.MIDWIFE)
+        .forEach(
+            qt -> {
+              assertThrows(
+                  IllegalArgumentException.class, () -> BaseANR.forQualification(qt, "123456789"));
+            });
+  }
 
-    val coding = identifer.getType().getCodingFirstRep();
+  @Test
+  void shouldThrowOnUndecidableANRCode01() {
+    val identifier = new Identifier();
+    identifier.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
+    identifier.setValue("123456789");
+
+    val coding = identifier.getType().getCodingFirstRep();
     coding.setSystem(KbvNamingSystem.PRUEFNUMMER.getCanonicalUrl());
     coding.setCode("LANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifer));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
   }
 
   @Test
-  void shouldThrowOnUndicidableANRCode02() {
-    val identifer = new Identifier();
-    identifer.setSystem(CommonNamingSystem.ACME_IDS_PATIENT.getCanonicalUrl());
-    identifer.setValue("123456789");
+  void shouldThrowOnUndecidableANRCode02() {
+    val identifier = new Identifier();
+    identifier.setSystem(CommonNamingSystem.ACME_IDS_PATIENT.getCanonicalUrl());
+    identifier.setValue("123456789");
 
-    val coding = identifer.getType().getCodingFirstRep();
+    val coding = identifier.getType().getCodingFirstRep();
     coding.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
     coding.setCode("ZANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifer));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
   }
 
   @Test
-  void shouldThrowOnUndicidableANRCode03() {
-    val identifer = new Identifier();
-    identifer.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
-    identifer.setValue("123456789");
+  void shouldThrowOnUndecidableANRCode03() {
+    val identifier = new Identifier();
+    identifier.setSystem(DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
+    identifier.setValue("123456789");
 
-    val coding = identifer.getType().getCodingFirstRep();
+    val coding = identifier.getType().getCodingFirstRep();
     coding.setSystem(VersicherungsArtDeBasis.CODE_SYSTEM.getCanonicalUrl());
     coding.setCode("LANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifer));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
   }
 
   @Test
-  void shouldThrowOnUndicidableANRCode04() {
-    val identifer = new Identifier();
-    identifer.setSystem(KbvNamingSystem.BASE_ANR.getCanonicalUrl());
-    identifer.setValue("123456789");
+  void shouldThrowOnUndecidableANRCode04() {
+    val identifier = new Identifier();
+    identifier.setSystem(KbvNamingSystem.BASE_ANR.getCanonicalUrl());
+    identifier.setValue("123456789");
 
-    val coding = identifer.getType().getCodingFirstRep();
+    val coding = identifier.getType().getCodingFirstRep();
     coding.setSystem(Hl7CodeSystem.HL7_V2_0203.getCanonicalUrl());
     coding.setCode("ZANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifer));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
   }
 
   @Test

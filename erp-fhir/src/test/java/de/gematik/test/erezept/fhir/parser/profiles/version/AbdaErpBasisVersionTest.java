@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
-import java.util.Arrays;
-import lombok.val;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
+import org.junitpioneer.jupiter.*;
 
 class AbdaErpBasisVersionTest {
 
@@ -36,7 +35,7 @@ class AbdaErpBasisVersionTest {
   }
 
   @Test
-  @Disabled("due to possible interference with other unit-tests ")
+  @ClearSystemProperty(key = "de.abda.erezeptabgabedatenbasis")
   void getDefaultVersionViaSystemProperty() {
     val propertyName = CustomProfiles.ABDA_ERP_BASIS.getName();
     Arrays.stream(AbdaErpBasisVersion.values())

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,25 @@
 
 package de.gematik.test.fuzzing.kbv;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import java.lang.reflect.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.junitpioneer.jupiter.*;
 
 @Slf4j
-class KbvBundleManipulatorFactoryTest {
+class KbvBundleManipulatorFactoryTest extends ParsingTest {
 
   private static final boolean DEBUG = false;
-  private static FhirParser fhir;
-
-  @BeforeAll
-  static void setupFhirParser() {
-    fhir = new FhirParser();
-  }
 
   @Test
   void shouldThrowOnConstructorCall() throws NoSuchMethodException {
@@ -51,8 +45,13 @@ class KbvBundleManipulatorFactoryTest {
     assertThrows(InvocationTargetException.class, constructor::newInstance);
   }
 
-  @Test
-  void shouldFailAgainstHapi() {
+  @ParameterizedTest(
+      name = "[{index}] -> Try KbvBundleManipulators with E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void shouldFailAgainstHapi(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val manipulators = KbvBundleManipulatorFactory.getAllKbvBundleManipulators();
 
     val executables =
@@ -64,8 +63,8 @@ class KbvBundleManipulatorFactoryTest {
                         () -> {
                           val kbvBundle = KbvErpBundleBuilder.faker("X123456789").build();
                           assertDoesNotThrow(() -> m.getParameter().accept(kbvBundle));
-                          val encoded = fhir.encode(kbvBundle, EncodingType.XML);
-                          val result = fhir.validate(encoded);
+                          val encoded = parser.encode(kbvBundle, EncodingType.XML);
+                          val result = parser.validate(encoded);
 
                           if (DEBUG) {
                             if (result.isSuccessful()) {

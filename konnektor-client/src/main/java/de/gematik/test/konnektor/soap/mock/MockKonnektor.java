@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,16 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardType;
-import de.gematik.ws.conn.cardservice.v8.Cards;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.signatureservice.wsdl.v7.FaultMessage;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.cardservice.v8.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import de.gematik.ws.conn.signatureservice.wsdl.v7.*;
 import de.gematik.ws.tel.error.v2.Error;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.xml.datatype.DatatypeFactory;
-import lombok.SneakyThrows;
-import lombok.val;
+import java.util.*;
+import javax.xml.datatype.*;
+import lombok.*;
 
 public class MockKonnektor {
 
@@ -49,8 +42,7 @@ public class MockKonnektor {
 
   public Cards getAllCards() {
     val cards = new Cards();
-    val cardInfoTypes =
-        cardsMap.values().stream().map(SmartcardWrapper::getInfoType).collect(Collectors.toList());
+    val cardInfoTypes = cardsMap.values().stream().map(SmartcardWrapper::getInfoType).toList();
     cards.getCard().addAll(cardInfoTypes);
     return cards;
   }
@@ -78,15 +70,18 @@ public class MockKonnektor {
     }
 
     val smartcard = wrapper.getSmartcard();
-    if (smartcard.getType() != SmartcardType.HBA) {
+    if (smartcard.getType() != SmartcardType.HBA && smartcard.getType() != SmartcardType.SMC_B) {
       throw new FaultMessage(
-          format("Given CardHandle {0} does not belong to a HBA", cardHandle),
+          format("Given CardHandle {0} does not belong to a institute card", cardHandle),
           createError(cardHandle));
     }
 
-    val signer = new LocalSigner((Hba) smartcard);
+    val signer =
+        (smartcard.getType() == SmartcardType.HBA)
+            ? LocalSigner.signQES((Hba) smartcard, Crypto.RSA_2048)
+            : LocalSigner.signNonQES((SmcB) smartcard, Crypto.RSA_2048);
 
-    return signer.signQES(data);
+    return signer.signDocument(data);
   }
 
   public boolean verifyDocument(byte[] data) {

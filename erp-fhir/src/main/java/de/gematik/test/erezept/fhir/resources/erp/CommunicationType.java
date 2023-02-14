@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,18 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import java.util.*;
 
-@RequiredArgsConstructor
 public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> {
-  INFO_REQ(ErpWorkflowStructDef.COM_INFO_REQ),
-  DISP_REQ(ErpWorkflowStructDef.COM_DISP_REQ),
-  REPLY(ErpWorkflowStructDef.COM_REPLY),
-  REPRESENTATIVE(ErpWorkflowStructDef.COM_REPRESENTATIVE),
-  ;
+  INFO_REQ(ErpWorkflowStructDef.COM_INFO_REQ, ErpWorkflowStructDef.COM_INFO_REQ_12),
+  DISP_REQ(ErpWorkflowStructDef.COM_DISP_REQ, ErpWorkflowStructDef.COM_DISP_REQ_12),
+  REPLY(ErpWorkflowStructDef.COM_REPLY, ErpWorkflowStructDef.COM_REPLY_12),
+  REPRESENTATIVE(
+      ErpWorkflowStructDef.COM_REPRESENTATIVE, ErpWorkflowStructDef.COM_REPRESENTATIVE_12);
 
   // which communication types are received by KVIDs
   private static final List<CommunicationType> PATIENT_RECEIVING = List.of(REPLY, REPRESENTATIVE);
@@ -39,25 +35,59 @@ public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> 
   // which communication types are sent by pharmacies
   private static final List<CommunicationType> PHARMACY_SENDING = List.of(REPLY);
 
-  @Getter private final ErpWorkflowStructDef type;
+  private List<ErpWorkflowStructDef> types;
 
-  public INamingSystem getRecipientNamingSystem() {
+  CommunicationType(ErpWorkflowStructDef... type) {
+    this(List.of(type));
+  }
+
+  CommunicationType(List<ErpWorkflowStructDef> types) {
+    this.types = types;
+  }
+
+  @Override
+  public IStructureDefinition<ErpWorkflowVersion> getType() {
+    return types.get(0);
+  }
+
+  public INamingSystem getRecipientNamingSystem(ErpWorkflowVersion version) {
     INamingSystem ns;
     if (PATIENT_RECEIVING.contains(this)) {
-      ns = DeBasisNamingSystem.KVID; // TODO: not always true, Patient might also be PKV!
+      ns = getKvid(version);
     } else {
-      ns = ErpWorkflowNamingSystem.TELEMATIK_ID;
+      ns = getTelematikId(version);
     }
     return ns;
   }
 
-  public INamingSystem getSenderNamingSystem() {
+  public INamingSystem getSenderNamingSystem(ErpWorkflowVersion version) {
     INamingSystem ns;
     if (PHARMACY_SENDING.contains(this)) {
-      ns = ErpWorkflowNamingSystem.TELEMATIK_ID;
+      ns = getTelematikId(version);
     } else {
-      ns = DeBasisNamingSystem.KVID; // TODO: not always true, Patient might also be PKV!
+      ns = getKvid(version);
     }
     return ns;
+  }
+
+  @Override
+  public boolean doesMatch(String url) {
+    return this.types.stream().anyMatch(type -> type.match(url));
+  }
+
+  private INamingSystem getTelematikId(ErpWorkflowVersion version) {
+    if (version.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      return ErpWorkflowNamingSystem.TELEMATIK_ID;
+    } else {
+      return ErpWorkflowNamingSystem.TELEMATIK_ID_SID;
+    }
+  }
+
+  private INamingSystem getKvid(ErpWorkflowVersion version) {
+    if (version.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      return DeBasisNamingSystem.KVID;
+    } else {
+      return DeBasisNamingSystem.KVID_GKV; // TODO: not always true, Patient might also be PKV!
+    }
   }
 }

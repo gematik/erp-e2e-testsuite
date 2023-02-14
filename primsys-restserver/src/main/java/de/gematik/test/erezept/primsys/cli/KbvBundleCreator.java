@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,20 @@
 
 package de.gematik.test.erezept.primsys.cli;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.SmartcardFactory;
-import java.text.SimpleDateFormat;
-import java.util.concurrent.Callable;
-import lombok.val;
-import picocli.CommandLine;
+import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.smartcard.*;
+import java.text.*;
+import java.util.concurrent.*;
+import lombok.*;
+import picocli.*;
 
 public class KbvBundleCreator implements Callable<Integer> {
 
@@ -76,7 +74,7 @@ public class KbvBundleCreator implements Callable<Integer> {
       paramLabel = "Street",
       type = String.class,
       description = "The name of the street with a house number")
-  private String streetParam = GemFaker.fullStreetName();
+  private String streetParam = GemFaker.fakerStreetName();
 
   @CommandLine.Option(
       names = "--insurance",
@@ -127,7 +125,7 @@ public class KbvBundleCreator implements Callable<Integer> {
     val cfg = TestsuiteConfiguration.getInstance();
 
     val doc = cfg.getActors().getDoctors().get(0);
-    val hba = smartcards.getHbaByICCSN(doc.getHbaIccsn(), doc.getCryptoAlgorithm());
+    val hba = smartcards.getHbaByICCSN(doc.getHbaIccsn());
 
     val kbvBundle = create(hba);
     val xml = fhir.encode(kbvBundle, EncodingType.XML, prettyPrint);
@@ -164,7 +162,7 @@ public class KbvBundleCreator implements Callable<Integer> {
             .build();
 
     val insurance =
-        CoverageBuilder.insurance(iknrParam, insuranceParam)
+        KbvCoverageBuilder.insurance(iknrParam, insuranceParam)
             .beneficiary(patient)
             .personGroup(PersonGroup.NOT_SET) // default NOT_SET
             .dmpKennzeichen(DmpKennzeichen.NOT_SET) // default NOT_SET

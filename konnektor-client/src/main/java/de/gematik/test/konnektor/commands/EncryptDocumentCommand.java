@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,33 @@
 
 package de.gematik.test.konnektor.commands;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
 import de.gematik.ws.conn.connectorcommon.v5.DocumentType;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.OptionalInputs;
-import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.RecipientKeys;
-import de.gematik.ws.conn.encryptionservice.v6.KeyOnCardType;
-import javax.xml.ws.Holder;
-import lombok.AllArgsConstructor;
-import lombok.val;
-import oasis.names.tc.dss._1_0.core.schema.Base64Data;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import de.gematik.ws.conn.encryptionservice.v6.*;
+import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.*;
+import javax.xml.ws.*;
+import lombok.*;
+import oasis.names.tc.dss._1_0.core.schema.*;
 
-@AllArgsConstructor
 public class EncryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 
   private final CardHandle cardHandle;
-  private final byte[] data;
+  private final byte[] payload;
+  private final Crypto algorithm;
+
+  public EncryptDocumentCommand(CardHandle cardHandle, byte[] payload, Crypto algorithm) {
+    this.cardHandle = cardHandle;
+    this.payload = payload;
+    this.algorithm = algorithm;
+  }
+
+  public EncryptDocumentCommand(CardHandle cardHandle, byte[] payload) {
+    this(cardHandle, payload, Crypto.RSA_2048);
+  }
 
   @Override
   public byte[] execute(ContextType ctx, ServicePortProvider serviceProvider) {
@@ -42,10 +51,11 @@ public class EncryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
     val recipientKeys = new RecipientKeys();
     val keyOnCardType = new KeyOnCardType();
     keyOnCardType.setCardHandle(cardHandle.getHandle());
+    keyOnCardType.setCrypt(algorithm.getAlgorithm());
     recipientKeys.setCertificateOnCard(keyOnCardType);
 
     val base64Data = new Base64Data();
-    base64Data.setValue(data);
+    base64Data.setValue(payload);
     val document = new Holder<>(new DocumentType());
     document.value.setBase64Data(base64Data);
     val optionalInputs = new OptionalInputs();

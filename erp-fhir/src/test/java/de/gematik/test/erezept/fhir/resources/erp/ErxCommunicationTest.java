@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,15 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import java.time.ZoneId;
@@ -28,28 +32,20 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Communication;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ErxCommunicationTest {
+class ErxCommunicationTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void shouldEncodeSingleCommunicationDispReq() {
+  void shouldEncodeSingleCommunicationDispReq() {
     List.of("CommunicationDispReq_01.xml", "CommunicationDispReq_01.json")
         .forEach(
             fileName -> {
               val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
               val communication = parser.decode(ErxCommunication.class, content);
-              assertNotNull("Valid ErxCommunicationDispReq must be parseable", communication);
+              assertNotNull(communication, "Valid ErxCommunicationDispReq must be parseable");
 
               val expectedTaskId = "4711";
               val expectedAccessCode =
@@ -80,13 +76,13 @@ public class ErxCommunicationTest {
   }
 
   @Test
-  public void shouldEncodeSingleCommunicationInfoReq() {
+  void shouldEncodeSingleCommunicationInfoReq() {
     List.of("CommunicationInfoReq_01.xml", "CommunicationInfoReq_01.json")
         .forEach(
             fileName -> {
               val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
               val communication = parser.decode(ErxCommunication.class, content);
-              assertNotNull("Valid ErxCommunicationInfoReq must be parseable", communication);
+              assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
               val expectedTaskId = "4711";
               val expectedAboutRef = "#5fe6e06c-8725-46d5-aecd-e65e041ca3de";
@@ -115,13 +111,13 @@ public class ErxCommunicationTest {
   }
 
   @Test
-  public void shouldEncodeSingleCommunicationReply() {
+  void shouldEncodeSingleCommunicationReply() {
     List.of("CommunicationReply_01.xml", "CommunicationReply_01.json")
         .forEach(
             fileName -> {
               val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
               val communication = parser.decode(ErxCommunication.class, content);
-              assertNotNull("Valid ErxCommunicationInfoReq must be parseable", communication);
+              assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
               val expectedTaskId = "4711";
               val expectedRecipientKvid = "X234567890";
@@ -148,33 +144,42 @@ public class ErxCommunicationTest {
   }
 
   @Test
-  public void shouldProvideKvidNamingSystemFromType01() {
+  void shouldProvideKvidNamingSystemFromType01() {
     val kvidReceiving = List.of(CommunicationType.REPLY, CommunicationType.REPRESENTATIVE);
     kvidReceiving.forEach(
-        type -> assertEquals(DeBasisNamingSystem.KVID, type.getRecipientNamingSystem()));
+        type ->
+            assertEquals(
+                DeBasisNamingSystem.KVID,
+                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_1_1)));
   }
 
   @Test
-  public void shouldProvideKvidNamingSystemFromType02() {
+  void shouldProvideKvidNamingSystemFromType02() {
     val kvidReceiving = List.of(ChargeItemCommunicationType.CHANGE_REPLY);
     kvidReceiving.forEach(
-        type -> assertEquals(DeBasisNamingSystem.KVID_PKV, type.getRecipientNamingSystem()));
+        type ->
+            assertEquals(
+                DeBasisNamingSystem.KVID_PKV,
+                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_2_0)));
   }
 
   @Test
-  public void shouldProvidePharmacyNamingSystemFromType01() {
+  void shouldProvidePharmacyNamingSystemFromType01() {
     val kvidReceiving = List.of(CommunicationType.INFO_REQ, CommunicationType.DISP_REQ);
     kvidReceiving.forEach(
         type ->
-            assertEquals(ErpWorkflowNamingSystem.TELEMATIK_ID, type.getRecipientNamingSystem()));
+            assertEquals(
+                ErpWorkflowNamingSystem.TELEMATIK_ID,
+                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_1_1)));
   }
 
   @Test
-  public void shouldProvidePharmacyNamingSystemFromType02() {
+  void shouldProvidePharmacyNamingSystemFromType02() {
     val kvidReceiving = List.of(ChargeItemCommunicationType.CHANGE_REQ);
     kvidReceiving.forEach(
         type ->
             assertEquals(
-                ErpWorkflowNamingSystem.TELEMATIK_ID_SID, type.getRecipientNamingSystem()));
+                ErpWorkflowNamingSystem.TELEMATIK_ID_SID,
+                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_2_0)));
   }
 }

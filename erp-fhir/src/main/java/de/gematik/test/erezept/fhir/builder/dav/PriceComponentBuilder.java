@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,21 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.Invoice;
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.util.*;
+import de.gematik.test.erezept.fhir.valuesets.dav.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponentBuilder> {
+
+  @SuppressWarnings("java:S1068") // will be used in the future!
+  private AbdaErpPkvVersion abdaErpPkvVersion;
 
   private final KostenVersicherterKategorie category;
   private Invoice.InvoicePriceComponentType priceComponentType =
@@ -47,6 +50,11 @@ public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponen
 
   public static PriceComponentBuilder builder() {
     return builder(KostenVersicherterKategorie.ZUZAHLUNG);
+  }
+
+  public PriceComponentBuilder version(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersion = version;
+    return self();
   }
 
   public PriceComponentBuilder type(@NonNull String typeCode) {

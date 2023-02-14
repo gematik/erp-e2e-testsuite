@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,45 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static java.text.MessageFormat.format;
-import static org.junit.Assert.assertTrue;
+import static java.text.MessageFormat.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 @Slf4j
-public class CoverageBuilderTest extends ParsingTest {
+class CoverageBuilderTest extends ParsingTest {
 
-  @Test
-  public void buildCoverageWithFaker01() {
-    for (var i = 0; i < 5; i++) {
-      val coverage = CoverageBuilder.faker().build();
-      log.info(format("Validating Faker Coverage with ID {0}", coverage.getId()));
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildCoverageWithFaker01(KbvItaForVersion version) {
+    for (var i = 0; i < 2; i++) {
+      val coverage = KbvCoverageBuilder.faker().version(version).build();
       val result = ValidatorUtil.encodeAndValidate(parser, coverage);
       assertTrue(result.isSuccessful());
     }
   }
 
-  @Test
-  public void buildCoverageWithFaker02() {
-    val insuranceKinds = List.of(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV);
+  @ParameterizedTest(name = "[{index}] -> Build KBV GKV/PKV Patient with KbvItaForVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
+  void buildCoverageWithFaker02(KbvItaForVersion version) {
+    val insuranceKinds =
+        List.of(
+            VersicherungsArtDeBasis.GKV,
+            VersicherungsArtDeBasis.PKV,
+            VersicherungsArtDeBasis.BG,
+            VersicherungsArtDeBasis.BEI);
 
     insuranceKinds.forEach(
         ik -> {
-          for (var i = 0; i < 5; i++) {
-            val coverage = CoverageBuilder.faker(ik).build();
+          for (var i = 0; i < 2; i++) {
+            val coverage = KbvCoverageBuilder.faker(ik).version(version).build();
             log.info(format("Validating Faker Coverage with ID {0}", coverage.getId()));
             val result = ValidatorUtil.encodeAndValidate(parser, coverage);
             assertTrue(result.isSuccessful());

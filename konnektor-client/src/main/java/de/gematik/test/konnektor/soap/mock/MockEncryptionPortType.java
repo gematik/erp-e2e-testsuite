@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,20 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.crypto.encryption.cms.CmsAuthEnvelopedData;
-import de.gematik.test.smartcard.SmcB;
+import de.gematik.test.erezept.crypto.encryption.cms.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
 import de.gematik.ws.conn.connectorcommon.v5.DocumentType;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.OptionalInputs;
-import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.RecipientKeys;
-import de.gematik.ws.conn.encryptionservice.v6.KeyOnCardType;
-import de.gematik.ws.conn.encryptionservice.wsdl.v6.EncryptionServicePortType;
-import java.util.List;
-import javax.xml.ws.Holder;
-import lombok.SneakyThrows;
-import lombok.val;
-import oasis.names.tc.dss._1_0.core.schema.Base64Data;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import de.gematik.ws.conn.encryptionservice.v6.*;
+import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.*;
+import de.gematik.ws.conn.encryptionservice.wsdl.v6.*;
+import java.util.*;
+import javax.xml.ws.*;
+import lombok.*;
+import oasis.names.tc.dss._1_0.core.schema.*;
 
 public class MockEncryptionPortType extends AbstractMockService
     implements EncryptionServicePortType {
@@ -51,12 +49,15 @@ public class MockEncryptionPortType extends AbstractMockService
 
     val cardHandle = recipientKeys.getCertificateOnCard().getCardHandle();
     val scw = getSmartcardWrapper(cardHandle);
-    val smcb = (SmcB) scw.getSmartcard();
+    val smartcard = (InstituteSmartcard) scw.getSmartcard();
 
     val plain = document.value.getBase64Data().getValue();
+    val algorithm = Crypto.fromString(recipientKeys.getCertificateOnCard().getCrypt());
 
     val cmsAuthEnvelopedData = new CmsAuthEnvelopedData();
-    val decrypted = cmsAuthEnvelopedData.encrypt(List.of(smcb.getEncCertificate()), plain);
+    val decrypted =
+        cmsAuthEnvelopedData.encrypt(
+            List.of(smartcard.getEncCertificate(algorithm).getX509Certificate()), plain);
     val base64Data = new Base64Data();
     base64Data.setValue(decrypted);
     document.value.setBase64Data(base64Data);
@@ -74,12 +75,15 @@ public class MockEncryptionPortType extends AbstractMockService
 
     val cardHandle = privateKeyOnCard.getCardHandle();
     val scw = getSmartcardWrapper(cardHandle);
-    val smcb = (SmcB) scw.getSmartcard();
+    val smartcard = (InstituteSmartcard) scw.getSmartcard();
 
     val encrypted = document.value.getBase64Data().getValue();
+    val algorithm = Crypto.fromString(privateKeyOnCard.getCrypt());
 
     val cmsAuthEnvelopedData = new CmsAuthEnvelopedData();
-    val decrypted = cmsAuthEnvelopedData.decrypt(smcb.getEncPrivateKey(), encrypted);
+    val decrypted =
+        cmsAuthEnvelopedData.decrypt(
+            smartcard.getEncCertificate(algorithm).getPrivateKey(), encrypted);
     val base64Data = new Base64Data();
     base64Data.setValue(decrypted);
     document.value.setBase64Data(base64Data);

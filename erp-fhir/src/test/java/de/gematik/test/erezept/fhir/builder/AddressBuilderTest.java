@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import java.util.List;
-import lombok.val;
-import org.hl7.fhir.r4.model.Address;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
 
-public class AddressBuilderTest {
+class AddressBuilderTest {
 
-  @Test(expected = Test.None.class) /* no exception expected */
-  public void testFixedStreetnames() {
+  @Test
+  void testFixedStreetnames() {
     val city = "Berlin";
     val postal = "10117";
     val input =
@@ -41,21 +41,24 @@ public class AddressBuilderTest {
             "Nisbléstr 87",
             "Adalbertstr. 198 Apt. 191");
     input.forEach(
-        street -> AddressBuilder.address(city, postal, street, Address.AddressType.PHYSICAL));
+        street ->
+            assertDoesNotThrow(
+                () -> AddressBuilder.address(city, postal, street, Address.AddressType.PHYSICAL)));
   }
 
-  @Test(expected = Test.None.class) /* no exception expected */
-  public void testRandomStreetnames() {
+  @Test
+  void testRandomStreetnames() {
     val city = "Berlin";
     val postal = "10117";
     for (int i = 0; i < 10; i++) {
-      val rndStreet = GemFaker.fullStreetName();
-      AddressBuilder.address(city, postal, rndStreet, Address.AddressType.BOTH);
+      val rndStreet = GemFaker.fakerStreetName();
+      assertDoesNotThrow(
+          () -> AddressBuilder.address(city, postal, rndStreet, Address.AddressType.BOTH));
     }
   }
 
   @Test
-  public void shouldThrowOnInvalidStreetnamePattern() {
+  void shouldThrowOnInvalidStreetnamePattern() {
     val city = "Berlin";
     val postal = "10117";
     val invalidStreet = "13te Straße";

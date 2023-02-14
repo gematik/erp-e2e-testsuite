@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,18 @@
 
 package de.gematik.test.erezept.primsys.cli;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.SmartcardFactory;
-import java.io.PrintStream;
-import java.math.BigInteger;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.concurrent.Callable;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.val;
-import picocli.CommandLine;
+import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.smartcard.*;
+import java.io.*;
+import java.math.*;
+import java.net.*;
+import java.nio.charset.*;
+import java.security.*;
+import java.util.concurrent.*;
+import lombok.*;
+import picocli.*;
 
 /**
  * This subcommand will generate the full urls for the pharmacy service provider to be put into
@@ -75,7 +72,7 @@ public class PharmacyIdentifiers implements Callable<Integer> {
         .forEach(
             pharm -> {
               val name = pharm.getName();
-              val smcb = sca.getSmcbByICCSN(pharm.getSmcbIccsn(), Crypto.RSA_2048);
+              val smcb = sca.getSmcbByICCSN(pharm.getSmcbIccsn());
               val telematikId = smcb.getTelematikId();
               val digest = md.digest(telematikId.getBytes(StandardCharsets.UTF_8));
               val id = new BigInteger(1, digest).toString(16);

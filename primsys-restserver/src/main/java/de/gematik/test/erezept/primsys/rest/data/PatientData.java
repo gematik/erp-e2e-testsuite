@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public class PatientData {
 
   public String getStreet() {
     if (Strings.isNullOrEmpty(street)) {
-      street = fullStreetName();
+      street = fakerStreetName();
     }
     return street;
   }
@@ -90,7 +90,7 @@ public class PatientData {
     p.birthDate = new SimpleDateFormat(DATE_FORMAT).format(fakerBirthday());
     p.city = fakerCity();
     p.postal = fakerZipCode();
-    p.street = fullStreetName(false);
+    p.street = fakerStreetName();
     return p;
   }
 
@@ -102,7 +102,7 @@ public class PatientData {
         getOrDefault(this.birthDate, new SimpleDateFormat(DATE_FORMAT).format(fakerBirthday()));
     this.city = getOrDefault(this.city, fakerCity());
     this.postal = getOrDefault(this.postal, fakerZipCode());
-    this.street = getOrDefault(this.street, fullStreetName(false));
+    this.street = getOrDefault(this.street, fakerStreetName());
   }
 
   public static PatientData fromKbvBundle(KbvErpBundle bundle) {

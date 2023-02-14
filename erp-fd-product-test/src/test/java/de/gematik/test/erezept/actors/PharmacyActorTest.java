@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,7 @@ class PharmacyActorTest {
     val pharmacy = new PharmacyActor("Am Flughafen");
     val pharmacyConfig = config.getPharmacyConfig(pharmacy.getName());
     val smartcards = config.getSmartcards();
-    val smcb =
-        smartcards.getSmcbByICCSN(
-            pharmacyConfig.getSmcbIccsn(), pharmacyConfig.getCryptoAlgorithm());
+    val smcb = smartcards.getSmcbByICCSN(pharmacyConfig.getSmcbIccsn());
 
     val useSmcb = UseSMCB.itHasAccessTo(smcb);
     pharmacy.can(useSmcb);

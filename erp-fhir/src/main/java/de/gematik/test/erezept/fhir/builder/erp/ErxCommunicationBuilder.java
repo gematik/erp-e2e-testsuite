@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
@@ -29,7 +32,9 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Reference;
 
 public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCommunicationBuilder> {
@@ -102,24 +107,45 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
   public ErxCommunication buildInfoReq(@NonNull final String message) {
     checkRequiredForInfoReq();
     val type = CommunicationType.INFO_REQ;
-    val com = build(type, () -> type.getType().asCanonicalType(), message);
+
+    ErxCommunication com;
+    ErpWorkflowStructDef insuranceProvider;
+    ErpWorkflowStructDef substitutionAllowedExt;
+    ErpWorkflowStructDef prescriptionType;
+    Identifier insuranceIdentifier;
+    Coding flowTypeCoding;
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      com = build(type, () -> type.getType().asCanonicalType(), message);
+      insuranceProvider = ErpWorkflowStructDef.INSURANCE_PROVIDER;
+      substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED;
+      prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE;
+      insuranceIdentifier = insuranceIknr.asIdentifier();
+      flowTypeCoding = flowType.asCoding(true);
+    } else {
+      com =
+          build(
+              type,
+              () -> ErpWorkflowStructDef.COM_INFO_REQ_12.asCanonicalType(erpWorkflowVersion, true),
+              message);
+      insuranceProvider = ErpWorkflowStructDef.INSURANCE_PROVIDER_12;
+      substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED_12;
+      prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12;
+      insuranceIdentifier = insuranceIknr.asIdentifier(DeBasisNamingSystem.IKNR_SID);
+      // hacky but should work fow now!
+      flowTypeCoding =
+          flowType.asCoding(true).setSystem(ErpWorkflowCodeSystem.FLOW_TYPE_12.getCanonicalUrl());
+    }
 
     com.addContained(medication);
     com.setAbout(List.of(new Reference(aboutReference)));
 
     val payload = com.getPayloadFirstRep();
 
-    val insuranceIdentifier = insuranceIknr.asIdentifier();
-    val insuranceExt =
-        new Extension(
-            ErpWorkflowStructDef.INSURANCE_PROVIDER.getCanonicalUrl(), insuranceIdentifier);
+    val insuranceExt = new Extension(insuranceProvider.getCanonicalUrl(), insuranceIdentifier);
     val substitutionExt =
         new Extension(
-            ErpWorkflowStructDef.SUBSTITION_ALLOWED.getCanonicalUrl(),
-            new BooleanType(substitutionAllowed));
-    val prescriptionTypeExt =
-        new Extension(
-            ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), flowType.asCoding(true));
+            substitutionAllowedExt.getCanonicalUrl(), new BooleanType(substitutionAllowed));
+    val prescriptionTypeExt = new Extension(prescriptionType.getCanonicalUrl(), flowTypeCoding);
 
     payload.addExtension(insuranceExt);
     payload.addExtension(substitutionExt);
@@ -131,16 +157,35 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
   public ErxCommunication buildRepresentative(@NonNull final String message) {
     checkRequiredForRepresentative();
     val type = CommunicationType.REPRESENTATIVE;
-    val com = build(type, () -> type.getType().asCanonicalType(), message);
+    ErxCommunication com;
+    ErpWorkflowStructDef substitutionAllowedExt;
+    ErpWorkflowStructDef prescriptionType;
+    Coding flowTypeCoding;
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      com = build(type, () -> type.getType().asCanonicalType(), message);
+      substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED;
+      prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE;
+      flowTypeCoding = flowType.asCoding(true);
+    } else {
+      com =
+          build(
+              type,
+              () ->
+                  ErpWorkflowStructDef.COM_REPRESENTATIVE_12.asCanonicalType(
+                      erpWorkflowVersion, true),
+              message);
+      substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED_12;
+      prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12;
+      // hacky but should work fow now!
+      flowTypeCoding =
+          flowType.asCoding(true).setSystem(ErpWorkflowCodeSystem.FLOW_TYPE_12.getCanonicalUrl());
+    }
 
     val payload = com.getPayloadFirstRep();
     val substitutionExt =
         new Extension(
-            ErpWorkflowStructDef.SUBSTITION_ALLOWED.getCanonicalUrl(),
-            new BooleanType(substitutionAllowed));
-    val prescriptionTypeExt =
-        new Extension(
-            ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), flowType.asCoding(true));
+            substitutionAllowedExt.getCanonicalUrl(), new BooleanType(substitutionAllowed));
+    val prescriptionTypeExt = new Extension(prescriptionType.getCanonicalUrl(), flowTypeCoding);
 
     payload.addExtension(substitutionExt);
     payload.addExtension(prescriptionTypeExt);
@@ -151,7 +196,18 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
   public ErxCommunication buildDispReq(@NonNull final String message) {
     checkRequiredForDispReq();
     val type = CommunicationType.DISP_REQ;
-    val com = build(type, () -> type.getType().asCanonicalType(), message);
+
+    ErxCommunication com;
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      com = build(type, () -> type.getType().asCanonicalType(), message);
+    } else {
+      com =
+          build(
+              type,
+              () -> ErpWorkflowStructDef.COM_DISP_REQ_12.asCanonicalType(erpWorkflowVersion, true),
+              message);
+    }
+
     com.setBasedOn(List.of(new Reference(taskReference)));
     return com;
   }
@@ -159,22 +215,37 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
   public ErxCommunication buildReply(@NonNull final String message) {
     checkRequiredForReply();
     val type = CommunicationType.REPLY;
-    val com = build(type, () -> type.getType().asCanonicalType(), message);
+    ErxCommunication com;
+    ErpWorkflowStructDef availabilityStatusStructDef;
+    ErpWorkflowCodeSystem availabilityCodeSystem;
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      com = build(type, () -> type.getType().asCanonicalType(), message);
+      availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS;
+      availabilityCodeSystem = ErpWorkflowCodeSystem.AVAILABILITY_STATUS;
+    } else {
+      com =
+          build(
+              type,
+              () -> ErpWorkflowStructDef.COM_REPLY_12.asCanonicalType(erpWorkflowVersion, true),
+              message);
+      availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS_12;
+      availabilityCodeSystem = ErpWorkflowCodeSystem.AVAILABILITY_STATUS_12;
+    }
 
     val payload = com.getPayloadFirstRep();
 
     if (availabilityStatus != null) {
       val ext =
           new Extension(
-              ErpWorkflowStructDef.AVAILABILITY_STATUS.getCanonicalUrl(),
-              availabilityStatus.asCoding());
+              availabilityStatusStructDef.getCanonicalUrl(),
+              availabilityStatus.asCoding(availabilityCodeSystem));
       payload.addExtension(ext);
     }
 
     if (supplyOptionsType == null) {
       supplyOptionsType = SupplyOptionsType.onPremise();
     }
-    payload.addExtension(supplyOptionsType.asExtension());
+    payload.addExtension(supplyOptionsType.asExtension(erpWorkflowVersion));
     com.setBasedOn(List.of(new Reference(taskReference)));
 
     return com;

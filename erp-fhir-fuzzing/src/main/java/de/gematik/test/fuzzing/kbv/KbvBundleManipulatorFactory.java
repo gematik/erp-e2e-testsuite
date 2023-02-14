@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
@@ -197,6 +198,11 @@ public class KbvBundleManipulatorFactory {
 
   public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
       getMedicationRequestManipulators() {
+    return getMedicationRequestManipulators(KbvItaErpVersion.getDefaultVersion());
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getMedicationRequestManipulators(
+      KbvItaErpVersion kbvItaErpVersion) {
     val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
 
     manipulators.add(
@@ -250,19 +256,21 @@ public class KbvBundleManipulatorFactory {
                   .setValue(Date.valueOf(LocalDate.now().plusDays(1)));
             }));
 
-    manipulators.add(
-        NamedEnvelope.of(
-            "MedicationRequest Quantity 1000",
-            b -> b.getMedicationRequest().getDispenseRequest().getQuantity().setValue(1000)));
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
+      manipulators.add(
+          NamedEnvelope.of(
+              "MedicationRequest Quantity 1000",
+              b -> b.getMedicationRequest().getDispenseRequest().getQuantity().setValue(1000)));
 
-    manipulators.add(
-        NamedEnvelope.of(
-            "MedicationRequest DosageInstruction Text Length",
-            b ->
-                b.getMedicationRequest()
-                    .getDosageInstructionFirstRep()
-                    .setText(
-                        "jeweils zu den Mahlzeiten und die Tablette 32 mal ordentlich zerkauen")));
+      manipulators.add(
+          NamedEnvelope.of(
+              "MedicationRequest DosageInstruction Text Length",
+              b ->
+                  b.getMedicationRequest()
+                      .getDosageInstructionFirstRep()
+                      .setText(
+                          "jeweils zu den Mahlzeiten und die Tablette 32 mal ordentlich zerkauen")));
+    }
 
     return manipulators;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package de.gematik.test.konnektor;
 
-import de.gematik.test.konnektor.cfg.KonnektorType;
-import de.gematik.test.konnektor.commands.KonnektorCommand;
-import de.gematik.test.konnektor.profile.ProfileType;
-import java.util.Optional;
+import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.konnektor.commands.*;
+import de.gematik.test.konnektor.profile.*;
+import java.util.*;
 
 public interface Konnektor {
 
@@ -29,7 +29,7 @@ public interface Konnektor {
 
   KonnektorType getType();
 
-  <R> R execute(KonnektorCommand<R> cmd);
+  <R> KonnektorResponse<R> execute(KonnektorCommand<R> cmd);
 
-  <R> Optional<R> safeExecute(KonnektorCommand<R> cmd);
+  <R> Optional<KonnektorResponse<R>> safeExecute(KonnektorCommand<R> cmd);
 }

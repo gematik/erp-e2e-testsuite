@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.screenplay.task;
 
 import de.gematik.test.erezept.screenplay.questions.ResponseOfRejectOperation;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +43,10 @@ public class RejectPrescription implements Task {
   }
 
   public static RejectPrescription fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static RejectPrescription fromStack(DequeStrategyEnum deque) {
+  public static RejectPrescription fromStack(DequeStrategy deque) {
     return new RejectPrescription(ResponseOfRejectOperation.fromStack(deque));
   }
 
@@ -58,10 +58,10 @@ public class RejectPrescription implements Task {
     }
 
     public RejectPrescription fromStack(String order) {
-      return fromStack(DequeStrategyEnum.fromString(order));
+      return fromStack(DequeStrategy.fromString(order));
     }
 
-    public RejectPrescription fromStack(DequeStrategyEnum deque) {
+    public RejectPrescription fromStack(DequeStrategy deque) {
       return new RejectPrescription(
           ResponseOfRejectOperation.withInvalidSecret(this.secreteReplacement).fromStack(deque));
     }

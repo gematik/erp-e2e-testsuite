@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -44,11 +44,7 @@ public class ActorContext {
 
   @Getter private final List<Pharmacy> pharmacies;
 
-  @Getter private final List<PrescriptionData> prescriptions;
-
-  @Getter private final List<AcceptData> acceptedPrescriptions;
-
-  @Getter private final List<DispensedData> dispensedMedications;
+  private final ContextData contextData;
 
   private ActorContext() {
     val cfg = TestsuiteConfiguration.getInstance();
@@ -68,9 +64,7 @@ public class ActorContext {
         .getPharmacies()
         .forEach(p -> this.pharmacies.add(new Pharmacy(p, cfg.getActiveEnvironment(), sca)));
 
-    this.prescriptions = new ArrayList<>();
-    this.acceptedPrescriptions = new ArrayList<>();
-    this.dispensedMedications = new ArrayList<>();
+    contextData = new ContextData();
   }
 
   public static ActorContext getInstance() {
@@ -94,15 +88,15 @@ public class ActorContext {
   }
 
   public void addPrescription(PrescriptionData prescription) {
-    this.prescriptions.add(prescription);
+    contextData.addPrescription(prescription);
   }
 
   public void addAcceptedPrescription(AcceptData prescription) {
-    this.acceptedPrescriptions.add(prescription);
+    contextData.addAcceptedPrescription(prescription);
   }
 
   public void addDispensedMedications(DispensedData dispensed) {
-    this.dispensedMedications.add(dispensed);
+    contextData.addDispensedMedications(dispensed);
   }
 
   public boolean removeAcceptedPrescription(AcceptData prescription) {
@@ -110,7 +104,19 @@ public class ActorContext {
   }
 
   public boolean removeAcceptedPrescription(String taskId) {
-    return this.acceptedPrescriptions.removeIf(ad -> ad.getTaskId().equals(taskId));
+    return contextData.removeAcceptedPrescription(taskId);
+  }
+
+  public List<PrescriptionData> getPrescriptions() {
+    return contextData.getPrescriptions();
+  }
+
+  public List<AcceptData> getAcceptedPrescriptions() {
+    return contextData.getAcceptedPrescriptions();
+  }
+
+  public List<DispensedData> getDispensedMedications() {
+    return contextData.getDispensedMedications();
   }
 
   public void shutdown() {

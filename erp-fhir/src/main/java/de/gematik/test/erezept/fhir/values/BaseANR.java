@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,16 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Identifier;
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
 
 public abstract class BaseANR {
 
@@ -142,15 +131,23 @@ public abstract class BaseANR {
   }
 
   public static BaseANR fromTypedValue(ANRType type, String value) {
-    BaseANR anr;
-    if (type == ANRType.ZANR) {
-      anr = new ZANR(value);
-    } else if (type == ANRType.LANR) {
-      anr = new LANR(value);
+    return switch (type) {
+      case ZANR -> new ZANR(value);
+      case LANR -> new LANR(value);
+    };
+  }
+
+  public static BaseANR forQualification(QualificationType qualificationType, String value) {
+    BaseANR doctorNumber;
+    if (qualificationType == QualificationType.DOCTOR) {
+      doctorNumber = new LANR(value);
+    } else if (qualificationType == QualificationType.DENTIST) {
+      doctorNumber = new ZANR(value);
     } else {
-      throw new InvalidBaseANR(type);
+      throw new IllegalArgumentException(
+          format("Profession for Doctors of Type {0} not implemented", qualificationType));
     }
-    return anr;
+    return doctorNumber;
   }
 
   public static BaseANR randomFromQualification(QualificationType qualificationType) {

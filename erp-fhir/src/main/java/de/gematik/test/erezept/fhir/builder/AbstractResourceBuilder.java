@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
-import java.util.List;
-import java.util.UUID;
-import lombok.NonNull;
-import lombok.val;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
 
 public class AbstractResourceBuilder<B extends AbstractResourceBuilder<B>> {
 
@@ -42,7 +40,6 @@ public class AbstractResourceBuilder<B extends AbstractResourceBuilder<B>> {
    */
   public String getResourceId() {
     if (this.resourceId == null) {
-      // TODO: check if IdType.newRandomUuid() is better here!  // NOSONAR still needs be checked!
       this.resourceId = UUID.randomUUID().toString();
     }
     return resourceId;

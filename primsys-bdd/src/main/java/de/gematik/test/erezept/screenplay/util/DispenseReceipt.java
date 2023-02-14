@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.screenplay.util;
 
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import lombok.Getter;
@@ -26,10 +27,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DispenseReceipt {
 
-  private final String subjectKvid;
+  private final String receiverKvid;
   private final String taskId;
   private final PrescriptionId prescriptionId;
+  private final AccessCode accessCode;
   private final Secret secret;
-  private final String receiverKvid;
   private final ErxReceipt receipt;
 }

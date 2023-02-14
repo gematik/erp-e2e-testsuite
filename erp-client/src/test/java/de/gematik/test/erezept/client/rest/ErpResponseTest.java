@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,15 @@ package de.gematik.test.erezept.client.rest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import java.util.Map;
-import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.hl7.fhir.r4.model.Resource;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.client.exceptions.*;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
 
 class ErpResponseTest {
 
@@ -91,5 +90,11 @@ class ErpResponseTest {
     val response = new ErpResponse(500, headers, null);
     assertTrue(response.isXML());
     assertFalse(response.isJson());
+  }
+
+  @Test
+  void doesNotThrowExceptionToString() {
+    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    assertDoesNotThrow(response::toString);
   }
 }

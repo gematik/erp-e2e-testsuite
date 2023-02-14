@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ public class ActorDecorator {
 
     val docConfig = config.getDoctorConfig(actor.getName());
     val smartcards = config.getSmartcards();
-    val smcb = smartcards.getSmcbByICCSN(docConfig.getSmcbIccsn(), docConfig.getCryptoAlgorithm());
-    val hba = smartcards.getHbaByICCSN(docConfig.getHbaIccsn(), docConfig.getCryptoAlgorithm());
+    val smcb = smartcards.getSmcbByICCSN(docConfig.getSmcbIccsn());
+    val hba = smartcards.getHbaByICCSN(docConfig.getHbaIccsn());
 
     val useSmcb = UseSMCB.itHasAccessTo(smcb);
     val useKonnektor =
@@ -61,9 +61,7 @@ public class ActorDecorator {
 
     val pharmacyConfig = config.getPharmacyConfig(actor.getName());
     val smartcards = config.getSmartcards();
-    val smcb =
-        smartcards.getSmcbByICCSN(
-            pharmacyConfig.getSmcbIccsn(), pharmacyConfig.getCryptoAlgorithm());
+    val smcb = smartcards.getSmcbByICCSN(pharmacyConfig.getSmcbIccsn());
 
     val useSmcb = UseSMCB.itHasAccessTo(smcb);
     val useKonnektor =
@@ -83,8 +81,7 @@ public class ActorDecorator {
 
     val patientConfig = config.getPatientConfig(actor.getName());
     val smartcards = config.getSmartcards();
-    val egk =
-        smartcards.getEgkByICCSN(patientConfig.getEgkIccsn(), patientConfig.getCryptoAlgorithm());
+    val egk = smartcards.getEgkByICCSN(patientConfig.getEgkIccsn());
 
     val erpClientConfig =
         patientConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.FDV);

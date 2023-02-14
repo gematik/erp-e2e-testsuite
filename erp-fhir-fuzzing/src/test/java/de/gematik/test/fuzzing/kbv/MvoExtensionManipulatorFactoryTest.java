@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.junitpioneer.jupiter.*;
 
 class MvoExtensionManipulatorFactoryTest {
 
@@ -40,14 +43,19 @@ class MvoExtensionManipulatorFactoryTest {
     assertThrows(InvocationTargetException.class, constructor::newInstance);
   }
 
-  @Test
-  void getMvoExtensionKennzeichenFalsifier() {
+  @ParameterizedTest(
+      name = "[{index}] -> Try MVO KbvBundleManipulators with E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void getMvoExtensionKennzeichenFalsifier(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val manipulators = MvoExtensionManipulatorFactory.getMvoExtensionKennzeichenFalsifier();
 
     manipulators.forEach(
         m -> {
           val patient = PatientBuilder.faker(IdentifierTypeDe.GKV).build();
-          val coverage = CoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
+          val coverage = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
           val practitioner = PractitionerBuilder.faker().build();
           val medication =
               KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();

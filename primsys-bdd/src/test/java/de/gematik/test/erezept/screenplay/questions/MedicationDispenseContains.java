@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.screenplay.strategy.ActorRole;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -61,13 +61,13 @@ public class MedicationDispenseContains implements Question<Boolean> {
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
     private final ActorRole role;
-    private DequeStrategyEnum deque;
+    private DequeStrategy deque;
 
     public Builder andPrescription(String order) {
-      return andPrescription(DequeStrategyEnum.fromString(order));
+      return andPrescription(DequeStrategy.fromString(order));
     }
 
-    public Builder andPrescription(DequeStrategyEnum deque) {
+    public Builder andPrescription(DequeStrategy deque) {
       this.deque = deque;
       return this;
     }

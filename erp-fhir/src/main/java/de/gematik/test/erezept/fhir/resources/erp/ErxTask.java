@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.PrimitiveType;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.Task;
 
 /**
  * @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a>
@@ -41,6 +45,23 @@ import org.hl7.fhir.r4.model.*;
 @ResourceDef(name = "Task")
 @SuppressWarnings({"java:S110"})
 public class ErxTask extends Task {
+
+  /**
+   * This constructor translates a Task into a ErxTask. For example if you receive an
+   * ErxPrescriptionBundle HAPI interprets the containing Task as plain HAPI-Task and not as a
+   * ErxTask. This constructor allows mapping to ErxTask
+   *
+   * @param adaptee
+   */
+  public static ErxTask fromTask(Task adaptee) {
+    val erxTask = new ErxTask();
+    adaptee.copyValues(erxTask);
+    return erxTask;
+  }
+
+  public static ErxTask fromTask(Resource adaptee) {
+    return fromTask((Task) adaptee);
+  }
 
   /**
    * While ErxTask.getId() returns a qualified ID (Task/[ID]) this method will return only the
@@ -58,24 +79,39 @@ public class ErxTask extends Task {
         .filter(
             identifier ->
                 ErpWorkflowNamingSystem.PRESCRIPTION_ID
-                    .getCanonicalUrl()
-                    .equals(identifier.getSystem()))
+                        .getCanonicalUrl()
+                        .equals(identifier.getSystem())
+                    || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121
+                        .getCanonicalUrl()
+                        .equals(identifier.getSystem()))
         .map(identifier -> new PrescriptionId(identifier.getValue()))
-        .findFirst() // Prescription ID has cardinality of 1..1 anyways
+        .findFirst() // Prescription ID has cardinality of 1..1 anyway
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    this.getClass(), ErpWorkflowNamingSystem.PRESCRIPTION_ID));
+                    this.getClass(),
+                    ErpWorkflowNamingSystem.PRESCRIPTION_ID,
+                    ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
   }
 
   public PrescriptionFlowType getFlowType() {
-    return this.getExtensionsByUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl())
-        .stream()
+    //    return this.getExtensionsByUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl())
+    return this.getExtension().stream()
+        .filter(
+            extension ->
+                extension.getUrl().equals(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl())
+                    || extension
+                        .getUrl()
+                        .equals(ErpWorkflowStructDef.PRESCRIPTION_TYPE_12.getCanonicalUrl()))
         .map(Extension::getValue)
         .filter(Coding.class::isInstance)
         .map(Coding.class::cast)
         .filter(
-            coding -> ErpWorkflowCodeSystem.FLOW_TYPE.getCanonicalUrl().equals(coding.getSystem()))
+            coding ->
+                ErpWorkflowCodeSystem.FLOW_TYPE.getCanonicalUrl().equals(coding.getSystem())
+                    || ErpWorkflowCodeSystem.FLOW_TYPE_12
+                        .getCanonicalUrl()
+                        .equals(coding.getSystem()))
         .map(coding -> PrescriptionFlowType.fromCode(coding.getCode()))
         .findFirst()
         .orElseThrow(
@@ -86,9 +122,10 @@ public class ErxTask extends Task {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
-                ErpWorkflowNamingSystem.ACCESS_CODE
-                    .getCanonicalUrl()
-                    .equals(identifier.getSystem()))
+                ErpWorkflowNamingSystem.ACCESS_CODE.getCanonicalUrl().equals(identifier.getSystem())
+                    || ErpWorkflowNamingSystem.ACCESS_CODE_121
+                        .getCanonicalUrl()
+                        .equals(identifier.getSystem()))
         .map(identifier -> new AccessCode(identifier.getValue()))
         .findFirst(); // AccessCode has cardinality of 0..1 -> is optional
   }
@@ -96,7 +133,11 @@ public class ErxTask extends Task {
   public AccessCode getAccessCode() {
     return this.getOptionalAccessCode()
         .orElseThrow(
-            () -> new MissingFieldException(ErxTask.class, ErpWorkflowNamingSystem.ACCESS_CODE));
+            () ->
+                new MissingFieldException(
+                    ErxTask.class,
+                    ErpWorkflowNamingSystem.ACCESS_CODE,
+                    ErpWorkflowNamingSystem.ACCESS_CODE_121));
   }
 
   public boolean hasAccessCode() {
@@ -107,7 +148,10 @@ public class ErxTask extends Task {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
-                ErpWorkflowNamingSystem.SECRET.getCanonicalUrl().equals(identifier.getSystem()))
+                ErpWorkflowNamingSystem.SECRET.getCanonicalUrl().equals(identifier.getSystem())
+                    || ErpWorkflowNamingSystem.SECRET_12
+                        .getCanonicalUrl()
+                        .equals(identifier.getSystem()))
         .map(identifier -> new Secret(identifier.getValue()))
         .findFirst(); // Secret has cardinality of 0..1 -> is optional
   }
@@ -122,23 +166,6 @@ public class ErxTask extends Task {
 
   public Optional<String> getForKvid() {
     return Optional.ofNullable(this.getFor().getIdentifier().getValue());
-  }
-
-  /**
-   * This constructor translates a Task into a ErxTask. For example if you receive an
-   * ErxPrescriptionBundle HAPI interprets the containing Task as plain HAPI-Task and not as a
-   * ErxTask. This constructor allows mapping to ErxTask
-   *
-   * @param adaptee
-   */
-  public static ErxTask fromTask(Task adaptee) {
-    val erxTask = new ErxTask();
-    adaptee.copyValues(erxTask);
-    return erxTask;
-  }
-
-  public static ErxTask fromTask(Resource adaptee) {
-    return fromTask((Task) adaptee);
   }
 
   @Override

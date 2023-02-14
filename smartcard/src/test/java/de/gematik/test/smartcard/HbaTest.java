@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 
 package de.gematik.test.smartcard;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 
-import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.crypto.certificate.*;
+import de.gematik.test.smartcard.exceptions.*;
+import java.io.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class HbaTest {
 
@@ -36,6 +34,21 @@ class HbaTest {
   }
 
   @Test
+  void shouldReadQesFromSupplier() {
+    val first =
+        archive.getHbaCards().stream()
+            .filter(it -> it.getKey(Oid.OID_HBA_QES, Crypto.RSA_2048).isPresent())
+            .findFirst()
+            .orElseThrow();
+    val supplier = first.getQesCertificate(Crypto.RSA_2048).getInputStreamSupplier();
+    try (val stream = supplier.get()) {
+      assertNotNull(stream);
+    } catch (IOException e) {
+      fail();
+    }
+  }
+
+  @Test
   void shouldEqualOnSame() {
     val first = archive.getHbaCards().get(0);
     val second = archive.getHbaCards().get(0);
@@ -44,28 +57,10 @@ class HbaTest {
   }
 
   @Test
-  void shouldEqualOnSameData() {
-    val first = archive.getHbaCards().get(0);
-    val second = mock(Hba.class);
-    when(second.getQesCertificateChain()).thenReturn(first.getQesCertificateChain());
-    when(second.getQesCertificate()).thenReturn(first.getQesCertificate());
-    when(second.getQesP12Password()).thenReturn(first.getQesP12Password());
-    when(second.getQesPrivateKey()).thenReturn(first.getQesPrivateKey());
-    when(second.getSerialnumber()).thenReturn(first.getSerialnumber());
-    when(second.getAlgorithm()).thenReturn(first.getAlgorithm());
-    when(second.getType()).thenReturn(first.getType());
-    when(second.getIccsn()).thenReturn(first.getIccsn());
-
-    assertNotSame(first, second);
-    assertEquals(first, second);
-  }
-
-  @Test
-  void shouldNotEqualOnDifferentCrypto() {
+  void shouldNotEqualOnNull() {
     val iccsn = "80276001081699900578";
-    val first = archive.getHbaByICCSN(iccsn, Crypto.RSA_2048);
-    val second = archive.getHbaByICCSN(iccsn, Crypto.ECC_256);
-    assertNotEquals(first, second);
+    val first = archive.getHbaByICCSN(iccsn);
+    assertNotEquals(null, first); // NOSONAR
   }
 
   @Test
@@ -73,5 +68,25 @@ class HbaTest {
     val first = archive.getHbaCards().get(0);
     val second = archive.getHbaCards().get(1);
     assertNotEquals(first, second);
+  }
+
+  @Test
+  void getTelematikId() {
+    val hba = archive.getHbaCards().get(0);
+    assertNotNull(hba.getTelematikId());
+  }
+
+  @Test
+  void getEncCertificate() {
+    val hba = archive.getHbaCards().get(0);
+    assertDoesNotThrow(() -> hba.getEncCertificate(Crypto.RSA_2048));
+    assertNotNull(hba.getEncCertificate(Crypto.RSA_2048));
+  }
+
+  @Test
+  void shouldThrowSmartCardKeyNotFoundException() {
+    val hba = archive.getHbaCards().get(0);
+    assertThrows(
+        SmartCardKeyNotFoundException.class, () -> hba.getEncCertificate(Crypto.RSA_PSS_2048));
   }
 }

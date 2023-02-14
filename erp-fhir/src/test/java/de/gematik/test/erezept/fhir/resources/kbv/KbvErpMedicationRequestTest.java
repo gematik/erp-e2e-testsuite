@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,9 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     assertTrue(medicationRequest.getNoteText().isPresent());
     val expectedNote = "Patient erneut auf Anwendung der Schmelztabletten hinweisen";
     assertEquals(expectedNote, medicationRequest.getNoteTextOrEmpty());
+    assertNotNull(medicationRequest.getDescription());
+    assertFalse(medicationRequest.allowSubstitution());
+    assertTrue(medicationRequest.getDescription().contains("ohne aut-idem"));
   }
 
   @Test
@@ -66,5 +69,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertTrue(medicationRequest.isMultiple());
+    assertNotNull(medicationRequest.getDescription());
+    assertTrue(medicationRequest.getDescription().contains("mit aut-idem"));
   }
 }

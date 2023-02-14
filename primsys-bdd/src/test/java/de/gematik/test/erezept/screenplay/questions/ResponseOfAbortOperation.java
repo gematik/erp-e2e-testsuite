@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.ActorRole;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +47,7 @@ import org.hl7.fhir.r4.model.Resource;
 public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
 
   private final ActorRole role;
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
   private final Map<String, String> replacementMap;
 
   @Override
@@ -190,10 +190,10 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     }
 
     public ResponseOfAbortOperation fromStack(String order) {
-      return fromStack(DequeStrategyEnum.fromString(order));
+      return fromStack(DequeStrategy.fromString(order));
     }
 
-    public ResponseOfAbortOperation fromStack(DequeStrategyEnum deque) {
+    public ResponseOfAbortOperation fromStack(DequeStrategy deque) {
       return new ResponseOfAbortOperation(role, deque, replacementMap);
     }
   }

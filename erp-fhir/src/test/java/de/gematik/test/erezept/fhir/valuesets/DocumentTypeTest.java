@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import java.util.List;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
-public class DocumentTypeTest {
+class DocumentTypeTest {
 
   @Test
-  public void shouldParseValidDocumentTypesFromCode() {
+  void shouldParseValidDocumentTypesFromCode() {
     val codes = List.of("1", "2", "3");
     val expectedTypes =
         List.of(DocumentType.PRESCRIPTION, DocumentType.CONFIRMATION, DocumentType.RECEIPT);
@@ -40,7 +39,7 @@ public class DocumentTypeTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidDocumentTypeCodes() {
+  void shouldThrowExceptionOnInvalidDocumentTypeCodes() {
     val codes = List.of("eins", "zwei", "0", "4", "12", "33");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> DocumentType.fromCode(code)));

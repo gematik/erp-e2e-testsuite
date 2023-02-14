@@ -14,7 +14,10 @@
         </encoder>
     </appender>
 
-    <logger name="de.gematik" level="TRACE" additivity="false">
+    <logger name="de.gematik" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="de.gematik.test.erezept.fhir.parser" level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

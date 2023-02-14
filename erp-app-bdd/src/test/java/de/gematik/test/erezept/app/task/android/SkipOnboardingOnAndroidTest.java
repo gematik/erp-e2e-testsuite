@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,6 @@ class SkipOnboardingOnAndroidTest {
 
     theAppUser.attemptsTo(skipOnboardong);
     verify(appAbility, times(swipeDirections.size())).swipe(any());
-    verify(appAbility, times(1)).tap(Onboarding.SKIP);
+    verify(appAbility, times(1)).tap(Onboarding.SKIP_BUTTON);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.smartcard.cfg;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.smartcard.SmartcardType;
-import java.util.Arrays;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.smartcard.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class SmartcardConfigDtoTest {
 
@@ -31,7 +31,7 @@ class SmartcardConfigDtoTest {
     Arrays.stream(SmartcardType.values())
         .forEach(
             smt -> {
-              smConf.setCardType(smt.toString());
+              smConf.setType(smt.toString());
               assertEquals(smt, smConf.getCardType());
             });
   }
@@ -42,7 +42,7 @@ class SmartcardConfigDtoTest {
     Arrays.stream(SmartcardType.values())
         .forEach(
             smt -> {
-              smConf.setCardType(smt.toString().toUpperCase());
+              smConf.setType(smt.toString().toUpperCase());
               assertEquals(smt, smConf.getCardType());
             });
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,32 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.values.BaseANR;
-import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Resource;
+import static java.text.MessageFormat.*;
+
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.resources.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @ResourceDef(name = "Practitioner")
 @SuppressWarnings({"java:S110"})
-public class KbvPractitioner extends Practitioner {
+public class KbvPractitioner extends Practitioner implements ErpFhirResource {
+
+  public static KbvPractitioner fromPractitioner(Practitioner adaptee) {
+    val kbvPractitioner = new KbvPractitioner();
+    adaptee.copyValues(kbvPractitioner);
+    return kbvPractitioner;
+  }
+
+  public static KbvPractitioner fromPractitioner(Resource adaptee) {
+    return fromPractitioner((Practitioner) adaptee);
+  }
 
   public String getFullName() {
     return this.getNameFirstRep().getNameAsSingleString();
@@ -72,13 +84,13 @@ public class KbvPractitioner extends Practitioner {
     return this.getANR().getType();
   }
 
-  public static KbvPractitioner fromPractitioner(Practitioner adaptee) {
-    val kbvPractitioner = new KbvPractitioner();
-    adaptee.copyValues(kbvPractitioner);
-    return kbvPractitioner;
-  }
+  @Override
+  public String getDescription() {
+    val qualificationType = getQualificationType();
+    val anr = getANR();
 
-  public static KbvPractitioner fromPractitioner(Resource adaptee) {
-    return fromPractitioner((Practitioner) adaptee);
+    return format(
+        "{0} {1} mit {2} {3}",
+        qualificationType.getDisplay(), getFullName(), anr.getType(), anr.getValue());
   }
 }

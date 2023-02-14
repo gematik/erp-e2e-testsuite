@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,15 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static java.text.MessageFormat.format;
-import static org.assertj.core.api.Assertions.assertThat;
+import static java.text.MessageFormat.*;
+import static org.assertj.core.api.Assertions.*;
 
-import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.core.expectations.requirements.Requirement;
-import de.gematik.test.core.expectations.requirements.RequirementsSet;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.val;
-import net.serenitybdd.core.steps.Instrumented;
-import net.thucydides.core.annotations.Step;
-import org.assertj.core.api.AbstractPredicateAssert;
-import org.assertj.core.api.PredicateAssert;
+import de.gematik.test.core.expectations.requirements.*;
+import java.util.function.*;
+import lombok.*;
+import net.serenitybdd.core.steps.*;
+import net.thucydides.core.annotations.*;
+import org.assertj.core.api.*;
 
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class VerificationStep<T> {
@@ -61,7 +53,7 @@ public class VerificationStep<T> {
     return format("muss {0}", expectation);
   }
 
-  static class StepBuilder<U> {
+  public static class StepBuilder<U> {
     private final Requirement requirement;
     private final String expectation;
     private Predicate<U> predicate;
@@ -70,7 +62,7 @@ public class VerificationStep<T> {
       this(requirement.getRequirement(), expectation);
     }
 
-    StepBuilder(Requirement requirement, String expectation) {
+    public StepBuilder(Requirement requirement, String expectation) {
       this.requirement = requirement;
       this.expectation = expectation;
     }

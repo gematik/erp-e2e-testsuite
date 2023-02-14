@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,30 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.val;
-import net.serenitybdd.core.steps.Instrumented;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Question;
-import net.thucydides.core.annotations.Step;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.strategy.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import lombok.*;
+import net.serenitybdd.core.steps.*;
+import net.serenitybdd.screenplay.*;
+import net.thucydides.core.annotations.*;
 
 public class VerifyReceiptSignature implements Question<Boolean> {
 
-  private final DequeStrategyEnum dequeStrategy;
+  private final DequeStrategy dequeStrategy;
 
-  public VerifyReceiptSignature(DequeStrategyEnum dequeStrategy) {
+  public VerifyReceiptSignature(DequeStrategy dequeStrategy) {
     this.dequeStrategy = dequeStrategy;
+  }
+
+  public static VerifyReceiptSignature fromStack(String dequeStrategy) {
+    return fromStack(DequeStrategy.fromString(dequeStrategy));
+  }
+
+  public static VerifyReceiptSignature fromStack(DequeStrategy dequeStrategy) {
+    Object[] params = {dequeStrategy};
+    return new Instrumented.InstrumentedBuilder<>(VerifyReceiptSignature.class, params)
+        .newInstance();
   }
 
   @Override
@@ -42,16 +50,6 @@ public class VerifyReceiptSignature implements Question<Boolean> {
 
     val receipt = dequeStrategy.chooseFrom(pharmacyPrescriptions.getReceiptsList());
     val signature = receipt.getReceipt().getSignature().getDataElement().getValue();
-    return konnektor.verifyDocument(signature);
-  }
-
-  public static VerifyReceiptSignature fromStack(String dequeStrategy) {
-    return fromStack(DequeStrategyEnum.fromString(dequeStrategy));
-  }
-
-  public static VerifyReceiptSignature fromStack(DequeStrategyEnum dequeStrategy) {
-    Object[] params = {dequeStrategy};
-    return new Instrumented.InstrumentedBuilder<>(VerifyReceiptSignature.class, params)
-        .newInstance();
+    return konnektor.verifyDocument(signature).getPayload();
   }
 }

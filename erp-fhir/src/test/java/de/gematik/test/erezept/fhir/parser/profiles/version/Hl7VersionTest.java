@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,13 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class Hl7VersionTest {
+
+  @Test
+  void shouldGetDefaultVersion() {
+    val defaultVersion = Hl7Version.getDefaultVersion();
+    assertEquals(Hl7Version.V1_1_1, defaultVersion);
+    assertEquals("1.0.0", defaultVersion.getVersion());
+  }
 
   @Test
   void getDefaultVersionViaInterface() {

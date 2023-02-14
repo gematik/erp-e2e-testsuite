@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ Funktionalität: Mehrere Medication Dispenses
   @Path=happy
   @Afo=A_22069
   @Afo=A_22070
+  @MainActor=Apotheke
   Szenario: Dispensierung des E-Rezeptes mit unterschiedlichen Normgrößen
   Die Apotheke dispensiert das akzeptierte E-Rezept über mehrere Packungen unterschiedlicher Größe.
   In diesem Szenario verschreibt der Arzt eine große Packung (N3) mit 50 Stk Inhalt.

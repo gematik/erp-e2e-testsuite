@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,31 @@ import org.openqa.selenium.By;
 @RequiredArgsConstructor
 @SuppressWarnings({"java:S1192"}) // it's okay to duplicate string literals here
 public enum CardWall implements PageElement {
-  NEXT(
-      "Next",
-      () -> By.tagName("cardWall/next"),
-      () -> AppiumBy.accessibilityId("erx_btn_show_settings")),
+  NEXT_BUTTON(
+      "Next Button",
+      () -> By.tagName("CardWall.ContinueButton"),
+      () -> AppiumBy.accessibilityId("cdw_btn_intro_later")),
+  @Deprecated // Don't know which Screen that should be
   SIGN_IN(
       "Sign in",
       () -> By.tagName("cardWall/next"),
       () -> AppiumBy.accessibilityId("erx_btn_show_settings")),
-  CAN_INPUT(
-      "CAN Input",
-      () -> By.tagName("cardWall/cardAccessNumberInputField"),
-      () -> AppiumBy.accessibilityId("erx_btn_show_settings")),
-  PIN_INPUT(
-      "PIN Input",
-      () -> By.tagName("cardWall/personalIdentificationNumberInputField"),
-      () -> AppiumBy.accessibilityId("erx_btn_show_settings")),
+  CAN_INPUT_FIELD(
+      "CAN Input Field",
+      () -> By.tagName("CardWall.CAN.CANField"),
+      () -> AppiumBy.accessibilityId("cdw_txt_can_input")),
+  CAN_ACCEPT_BUTTON(
+      "CAN Accept Button",
+      () -> By.tagName("CardWall.ContinueButton"),
+      () -> AppiumBy.accessibilityId("cdw_btn_can_done")),
+  PIN_INPUT_FIELD(
+      "PIN Input Field",
+      () -> By.tagName("CardWall.PIN.PINField"),
+      () -> AppiumBy.accessibilityId("cdw_edt_pin_input")),
+  PIN_ACCEPT_BUTTON(
+      "PIN Accept Button",
+      () -> By.tagName("CardWall.ContinueButton"),
+      () -> AppiumBy.accessibilityId("cdw_btn_pin_done")),
   ;
 
   private final String elementName;

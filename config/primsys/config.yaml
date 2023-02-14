@@ -7,8 +7,8 @@ pspClientConfig:
 actors:
   doctors:
     - name: Bernd Claudius
-      smcbIccsn: 8027600101169991010 #Praxis Damian Claudius
-      hbaIccsn: 80276001011699910102  #Arzt Bernd Claudius
+      smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
+      hbaIccsn: 8027600101169991010  #Arzt Bernd Claudius
       qualificationType: Arzt
       konnektor: Soft-Konn
 
@@ -19,13 +19,13 @@ actors:
       konnektor: Soft-Konn
 
     - name: Gündüla Gunther
-      smcbIccsn: 8027600101169991010 #Praxis Damian Claudius
+      smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
       hbaIccsn: 80276001081699900578 #Arzt Gunther
       qualificationType: Zahnarzt
       konnektor: Soft-Konn
 
     - name: Kein Arzt
-      smcbIccsn: 8027600101169991010 #Praxis Damian Claudius
+      smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
       hbaIccsn: 80276883110000121166  #Apotheke
       algorithm: E256
       qualificationType: Arzt
@@ -43,7 +43,7 @@ actors:
       smcbIccsn: 80276883110000116873
       konnektor: Soft-Konn
 
-    - name: NordApotheke
+    - name: NordApotheke  # Apotheke mit abgelaufener SMCB
       smcbIccsn: 80276883110000092475
       konnektor: Soft-Konn
 
@@ -52,11 +52,23 @@ actors:
       konnektor: Soft-Konn
 
     - name: Keine Apotheke
-      smcbIccsn: 8027600101169991010 #Praxis Damian Claudius
+      smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
       konnektor: Soft-Konn
 
     - name: Am Waldesrand
       smcbIccsn: 80276001011699900861
+      konnektor: Soft-Konn
+
+    - name: Adelheid Ulmendorfer
+      smcbIccsn: 80276001011699902301
+      konnektor: Soft-Konn
+
+    - name: Bernd Ulmendorfer
+      smcbIccsn: 80276001011699902302
+      konnektor: Soft-Konn
+
+    - name: Christine Ulmendorfer
+      smcbIccsn: 80276001011699902303
       konnektor: Soft-Konn
 
   apothecaries:
@@ -115,7 +127,7 @@ environments:
     ti:
       discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
-      subscriptionServiceUrl: wss://subscription-ref.zentral.erp.splitdns.ti-dienste.de/subscription
+      subscriptionServiceUrl: wss://subscription-dev.zentral.erp.splitdns.ti-dienste.de/subscription
     internet:
       discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de

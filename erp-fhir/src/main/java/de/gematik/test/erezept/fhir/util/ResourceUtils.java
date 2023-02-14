@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -72,21 +74,30 @@ public class ResourceUtils {
    * Reads a file from the resources folder and returns the content as an UTF-8 encoded String
    *
    * @param fileName of the File to read
-   * @return the file content as an UTF-8 encoded String
+   * @return the file content as a UTF-8 encoded String
    */
+  @SneakyThrows
   public static String readFileFromResource(final String fileName) {
     val stream = ResourceUtils.getFileFromResourceAsStream(fileName);
+    return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+  }
 
-    try {
-      return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      throw new ResourceFileException(
-          format("Error while reading from resources file {0}", fileName));
+  public static List<File> getResourceFilesInDirectory(final String path) {
+    return getResourceFilesInDirectory(path, false);
+  }
+
+  @SneakyThrows
+  public static List<File> getResourceFilesInDirectory(final String path, boolean recursive) {
+    val pathUrl = Objects.requireNonNull(CLASS_LOADER.getResource(path)).toURI();
+    val dir = Path.of(String.valueOf(Paths.get(pathUrl)));
+    val maxDepth = recursive ? Integer.MAX_VALUE : 1;
+    try (val walker = Files.find(dir, maxDepth, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
+      return walker.map(Path::toFile).collect(Collectors.toCollection(LinkedList::new));
     }
   }
 
   @SneakyThrows
-  public static List<File> getResourceFilesInDirectory(final String path) {
+  public static List<File> getResourceFilesDirectoryStructure(final String path) {
     val pathUrl = Objects.requireNonNull(CLASS_LOADER.getResource(path)).toURI();
     val dir = Path.of(String.valueOf(Paths.get(pathUrl))).toFile();
     if (!dir.exists() || !dir.isDirectory()) {

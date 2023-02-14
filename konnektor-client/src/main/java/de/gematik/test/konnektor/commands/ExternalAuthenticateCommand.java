@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,35 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.signatureservice.v7_4.BinaryDocumentType;
-import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.OptionalInputs;
-import javax.xml.ws.Holder;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import oasis.names.tc.dss._1_0.core.schema.Base64Data;
-import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
-import org.apache.commons.codec.digest.DigestUtils;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import de.gematik.ws.conn.signatureservice.v7_4.*;
+import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.*;
+import javax.xml.ws.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import oasis.names.tc.dss._1_0.core.schema.*;
+import org.apache.commons.codec.digest.*;
 
 @Slf4j
 public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]> {
 
   private final CardHandle cardHandle;
+  private final Crypto algorithm;
   private byte[] toBeSignedData;
 
   public ExternalAuthenticateCommand(CardHandle cardHandle) {
+    this(cardHandle, Crypto.RSA_PSS_2048);
+  }
+
+  public ExternalAuthenticateCommand(CardHandle cardHandle, Crypto algorithm) {
     this.cardHandle = cardHandle;
+    this.algorithm = algorithm;
   }
 
   public void setToBeSignedData(byte[] toBeSignedData) {
@@ -61,8 +67,13 @@ public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]
     binaryDocument.setBase64Data(base64Data);
 
     val optionalInputs = new OptionalInputs();
-    optionalInputs.setSignatureType("urn:ietf:rfc:3447");
-    optionalInputs.setSignatureSchemes("RSASSA-PSS");
+
+    if (this.algorithm == Crypto.RSA_2048 || this.algorithm == Crypto.RSA_PSS_2048) {
+      optionalInputs.setSignatureType("urn:ietf:rfc:3447");
+      optionalInputs.setSignatureSchemes(Crypto.RSA_PSS_2048.getAlgorithm());
+    } else if (algorithm == Crypto.ECC_256) {
+      optionalInputs.setSignatureType("urn:bsi:tr:03111:ecdsa");
+    }
 
     val outStatus = new Holder<Status>();
     val signatureObject = new Holder<SignatureObject>();

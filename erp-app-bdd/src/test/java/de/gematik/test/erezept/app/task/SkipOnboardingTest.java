@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class SkipOnboardingTest {
 
     theAppUser.attemptsTo(SkipOnboarding.bySwiping());
     verify(androidAbility, times(4)).swipe(any());
-    verify(androidAbility, times(1)).tap(Onboarding.SKIP);
+    verify(androidAbility, times(1)).tap(Onboarding.SKIP_BUTTON);
   }
 
   @Test
@@ -77,7 +77,7 @@ class SkipOnboardingTest {
 
     theAppUser.attemptsTo(SkipOnboarding.directly());
     verify(androidAbility, times(0)).swipe(any());
-    verify(androidAbility, times(1)).tap(Onboarding.SKIP);
+    verify(androidAbility, times(1)).tap(Onboarding.SKIP_BUTTON);
   }
 
   @Test

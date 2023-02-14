@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -55,11 +55,11 @@ public class FhirProfiledValidator {
     log.debug(
         format(
             "Instantiate Parser ''{0}'' with support for \n\t{1}",
-            cfg.getName(),
+            cfg.getId(),
             cfg.getProfiles().stream()
                 .map(p -> p.getVersionedProfile().toString())
                 .collect(Collectors.joining("\n\t"))));
-    this.name = cfg.getName();
+    this.name = cfg.getId();
     this.ctx = ctx;
     ctx.setParserErrorHandler(new StrictErrorHandler());
     this.customProfileSupports = customProfileSupports;
@@ -91,7 +91,7 @@ public class FhirProfiledValidator {
     fiv.setAnyExtensionsAllowed(false);
 
     hapiValidator.registerValidatorModule(fiv);
-    hapiValidator.registerValidatorModule(new ErrorMessageFilter());
+    hapiValidator.registerValidatorModule(new ErrorMessageFilter(cfg.getErrorFilter()));
   }
 
   public boolean doesSupport(@NonNull String url) {

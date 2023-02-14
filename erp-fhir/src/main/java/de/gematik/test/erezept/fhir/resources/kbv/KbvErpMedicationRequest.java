@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,30 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Resource;
+import static java.text.MessageFormat.*;
+
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.resources.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @ResourceDef(name = "MedicationRequest")
 @SuppressWarnings({"java:S110"})
-public class KbvErpMedicationRequest extends MedicationRequest {
+public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhirResource {
+
+  public static KbvErpMedicationRequest fromMedicationRequest(MedicationRequest adaptee) {
+    val kbvMedicationRequest = new KbvErpMedicationRequest();
+    adaptee.copyValues(kbvMedicationRequest);
+    return kbvMedicationRequest;
+  }
+
+  public static KbvErpMedicationRequest fromMedicationRequest(Resource adaptee) {
+    return fromMedicationRequest((MedicationRequest) adaptee);
+  }
 
   public String getLogicalId() {
     return this.id.getIdPart();
@@ -56,6 +68,10 @@ public class KbvErpMedicationRequest extends MedicationRequest {
         .orElse(false);
   }
 
+  public boolean allowSubstitution() {
+    return this.getSubstitution().getAllowedBooleanType().booleanValue();
+  }
+
   public String getNoteTextOr(String alternative) {
     return getNoteText().orElse(alternative);
   }
@@ -64,13 +80,14 @@ public class KbvErpMedicationRequest extends MedicationRequest {
     return getNoteTextOr("");
   }
 
-  public static KbvErpMedicationRequest fromMedicationRequest(MedicationRequest adaptee) {
-    val kbvMedicationRequest = new KbvErpMedicationRequest();
-    adaptee.copyValues(kbvMedicationRequest);
-    return kbvMedicationRequest;
-  }
-
-  public static KbvErpMedicationRequest fromMedicationRequest(Resource adaptee) {
-    return fromMedicationRequest((MedicationRequest) adaptee);
+  @Override
+  public String getDescription() {
+    val prescription = this.isMultiple() ? "Mehrfachverordnung" : "Verordnung";
+    val dosageInstruction = this.getDosageInstructionFirstRep().getText();
+    val quantity = this.getDispenseRequest().getQuantity();
+    val autIdem = this.allowSubstitution() ? "mit aut-idem" : "ohne aut-idem";
+    return format(
+        "{0} {1} für {2} {3} mit Dosieranweisung {4}",
+        prescription, autIdem, quantity.getValue(), quantity.getCode(), dosageInstruction);
   }
 }

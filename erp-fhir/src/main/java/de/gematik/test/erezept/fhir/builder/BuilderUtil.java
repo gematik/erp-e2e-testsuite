@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Quantity;
 
 // TODO: get rid of this class and move remaining methods to separate extension packages
 /** Utility Class provides convenient way for creating predefined FHIR Types/Extension etc. */
@@ -56,17 +59,6 @@ public class BuilderUtil {
   public static Extension vaccine(boolean value) {
     return new Extension(
         KbvItaErpStructDef.MEDICATION_VACCINE.getCanonicalUrl(), new BooleanType(value));
-  }
-
-  public static Extension markingFlag(
-      boolean insuranceProvider, boolean subsidy, boolean taxOffice) {
-    val markingFlag = new Extension(ErpWorkflowStructDef.MARKING_FLAG.getCanonicalUrl());
-
-    val extInsurance = new Extension("insuranceProvider", new BooleanType(insuranceProvider));
-    val extSubsidy = new Extension("subsidy", new BooleanType(subsidy));
-    val extTaxOffice = new Extension("taxOffice", new BooleanType(taxOffice));
-    markingFlag.addExtension(extInsurance).addExtension(extSubsidy).addExtension(extTaxOffice);
-    return markingFlag;
   }
 
   public static Quantity packageQuantity(int amount) {

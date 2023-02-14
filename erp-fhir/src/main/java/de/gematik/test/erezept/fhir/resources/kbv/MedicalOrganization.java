@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.resources.AbstractOrganization;
+import de.gematik.test.erezept.fhir.resources.*;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import lombok.val;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
 
 @SuppressWarnings({"java:S110"})
-public class MedicalOrganization extends AbstractOrganization {
+public class MedicalOrganization extends AbstractOrganization implements ErpFhirResource {
 
   public BSNR getBsnr() {
     return this.identifier.stream()
@@ -32,6 +34,13 @@ public class MedicalOrganization extends AbstractOrganization {
         .map(identifer -> new BSNR(identifer.getValue()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), BSNR.getNamingSystem()));
+  }
+
+  @Override
+  public String getDescription() {
+    return format(
+        "{0} (BSNR: {1}) aus {2} {3}",
+        this.getName(), getBsnr().getValue(), this.getPostalCode(), this.getCity());
   }
 
   public static MedicalOrganization fromOrganization(Organization adaptee) {

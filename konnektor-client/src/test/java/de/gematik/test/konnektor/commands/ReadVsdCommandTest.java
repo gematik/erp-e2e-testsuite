@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,32 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.konnektor.PinType;
-import de.gematik.test.konnektor.cfg.KonnektorModuleConfiguration;
-import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.stream.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class ReadVsdCommandTest {
 
   private static ContextType ctx;
-  private static SmartcardArchive smartCardArchive;
   private static Hba hba;
   private static Egk egk;
   private static MockKonnektorServiceProvider mockKonnektor;
 
   @BeforeAll
   static void setUp() {
-    smartCardArchive = SmartcardFactory.getArchive();
-    hba = smartCardArchive.getHbaByICCSN("80276883110000095767", Crypto.RSA_2048);
-    egk = smartCardArchive.getEgkByICCSN("80276881025548431301", Crypto.RSA_2048);
+    val smartCardArchive = SmartcardFactory.getArchive();
+    hba = smartCardArchive.getHbaByICCSN("80276883110000095767");
+    egk = smartCardArchive.getEgkByICCSN("80276881025548431301");
 
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
 
@@ -88,12 +80,14 @@ class ReadVsdCommandTest {
     val konnektorConfiguration = cfg.getKonnektorConfiguration("KOCO@kon7");
     val konnektor = konnektorConfiguration.create();
 
-    val egkCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(egk));
-    val hbaCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba));
+    val egkCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(egk)).getPayload();
+    val hbaCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
     konnektor.execute(new VerifyPinCommand(hbaCardHandle, PinType.PIN_CH));
 
     val readVSDResponse =
-        konnektor.execute(new ReadVsdCommand(egkCardHandle, hbaCardHandle, true, true));
+        konnektor
+            .execute(new ReadVsdCommand(egkCardHandle, hbaCardHandle, true, true))
+            .getPayload();
     assertNotNull(readVSDResponse.getPruefungsnachweis());
   }
 }

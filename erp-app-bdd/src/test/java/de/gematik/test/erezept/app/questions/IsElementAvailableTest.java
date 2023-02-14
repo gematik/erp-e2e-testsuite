@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class IsElementAvailableTest {
     val mockElement = mock(WebElement.class);
     when(useMockAppAbility.getWebElement(any())).thenReturn(mockElement); // pretend to find one
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
-    assertTrue(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP)));
+    assertTrue(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP_BUTTON)));
   }
 
   @Test
@@ -60,6 +60,6 @@ class IsElementAvailableTest {
     when(useMockAppAbility.getWebElement(any()))
         .thenThrow(NoSuchElementException.class); // pretend element not found
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
-    assertFalse(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP)));
+    assertFalse(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP_BUTTON)));
   }
 }

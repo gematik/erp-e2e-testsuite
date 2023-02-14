@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -25,21 +25,21 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum Debug implements PageElement {
-  SHOW("Show", () -> By.tagName("stg_btn_debug_menu"), () -> AppiumBy.accessibilityId("Debug")),
-  LEAVE(
-      "Leave",
-      () -> AppiumBy.accessibilityId("nav_btn_back"),
+  MENU_BUTTON(
+      "Debug Menu Button",
+      () -> By.tagName("Settings.DebugMenuButton"),
+      () -> AppiumBy.accessibilityId("stg_btn_debug")),
+  LEAVE_BUTTON(
+      "Leave Debug Menu",
+      () -> AppiumBy.accessibilityId("TopNavigation.BackButton"),
       () -> By.xpath("(//XCUIElementTypeButton[@name=\"Einstellungen\"])[1]")),
-  SET_VIRTUAL_EGK(
-      "Set virtual eGK",
-      () -> By.xpath("/ComposeNode/ComposeNode/VerticalScrollAxisRange/ComposeNode[2]/Button[1]"),
-      null),
-  ACTIVATE_VIRTUAL_EGK(
-      "Activate virtual eGK",
+  SET_VIRTUAL_EGK_FIELD(
+      "Set virtual eGK Field", () -> By.tagName("DebugMenu.SetVirtualHealthCardButton"), null),
+  ENABLE_VIRTUAL_EGK_USAGE_BUTTON(
+      "Activate virtual eGK Button",
       null,
-      () ->
-          By.xpath(
-              "//XCUIElementTypeSwitch[@name=\"debug_enable_virtual_egk\"]/XCUIElementTypeSwitch")),
+      () -> AppiumBy.accessibilityId("debug_enable_virtual_egk")),
+  // TODO Alexander: I need clarification which Field that should be;
   EGK_PRIVATE_KEY(
       "Input Private Key of eGK",
       () ->

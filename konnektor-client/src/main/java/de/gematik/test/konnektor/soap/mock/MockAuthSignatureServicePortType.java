@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.crypto.signature.EcdsaSigner;
-import de.gematik.test.erezept.crypto.signature.RsaPssSigner;
-import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureServicePortType;
-import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.FaultMessage;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.signatureservice.v7_4.BinaryDocumentType;
-import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.OptionalInputs;
-import java.security.interfaces.RSAPrivateKey;
-import javax.xml.ws.Holder;
-import lombok.val;
-import oasis.names.tc.dss._1_0.core.schema.Base64Signature;
-import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
+import de.gematik.test.erezept.crypto.signature.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.test.smartcard.exceptions.*;
+import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import de.gematik.ws.conn.signatureservice.v7_4.*;
+import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.*;
+import java.security.interfaces.*;
+import javax.xml.ws.*;
+import lombok.*;
+import oasis.names.tc.dss._1_0.core.schema.*;
 
 public class MockAuthSignatureServicePortType extends AbstractMockService
     implements AuthSignatureServicePortType {
@@ -59,13 +58,22 @@ public class MockAuthSignatureServicePortType extends AbstractMockService
                         mockKonnektor.createError(cardHandle)));
 
     val toBeSignedData = binaryString.getBase64Data().getValue();
+    val algorithm = Crypto.fromSpecificationUrn(optionalInputs.getSignatureType());
+
+    val autCert =
+        scw.getSmartcard()
+            .getAutCertificate(algorithm)
+            .orElseThrow(
+                () ->
+                    new SmartCardKeyNotFoundException(
+                        scw.getSmartcard(), scw.getSmartcard().getAutOids(), algorithm));
 
     val signatureMethod =
-        scw.getSmartcard().getAuthPrivateKey() instanceof RSAPrivateKey
+        autCert.getPrivateKey() instanceof RSAPrivateKey
             ? RsaPssSigner.sha256withMgf1()
             : new EcdsaSigner();
 
-    val signedData = signatureMethod.sign(scw.getSmartcard().getAuthPrivateKey(), toBeSignedData);
+    val signedData = signatureMethod.sign(autCert.getPrivateKey(), toBeSignedData);
 
     val base64Signature = new Base64Signature();
     base64Signature.setValue(signedData);

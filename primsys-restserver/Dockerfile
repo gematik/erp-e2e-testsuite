@@ -3,7 +3,7 @@ FROM openjdk:17
 LABEL de.gematik.vendor="gematik GmbH"
 LABEL maintainer="alexander.kaiser@gematik.de"
 LABEL de.gematik.app="E-Rezept PrimSys REST"
-LABEL de.gematik.git-repo-name="https://build.top.local/source/git/erezept/fachdienst/erp-e2e.git"
+LABEL de.gematik.git-repo-name="https://gitlab.prod.ccs.gematik.solutions/git/erezept/fachdienst/erp-e2e"
 LABEL de.gematik.commit-sha=$COMMIT_HASH
 LABEL de.gematik.version=$VERSION
 

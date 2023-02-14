@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ Funktionalität:  Entlassrezept
   @TCID=ERP_IOP_C_10721_01
   @Path=happy
   @Afo=A_19517-02
+  @MainActor=Arztpraxis
   Szenariogrundriss: Korrektes AcceptDate für Entlassrezepte
   GF Im Entlassrezept ist das Task-AcceptDate bei Entlassmanagement-Kennzeichen "04" oder "14" richtig gesetzt
 
@@ -50,6 +51,7 @@ Funktionalität:  Entlassrezept
   @TCID=ERP_IOP_C_10721_02
   @Path=happy
   @Afo=A_19517-02
+  @MainActor=Arztpraxis
   Szenariogrundriss: AcceptDate ist identisch zum Signatur-Datum für Entlassrezepte
   Im E-Rezept entspricht das Task-AcceptDate dem Datum der QES-Erstellung, wenn weder Entlassmanagement-Kennzeichen "04" oder "14" gesetzt wurde.
 

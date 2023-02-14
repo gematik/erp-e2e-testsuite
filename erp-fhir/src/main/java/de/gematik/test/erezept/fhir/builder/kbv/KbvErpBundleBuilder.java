@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
    * KBV Prüfnummer e.g. <a
    * href="https://update.kbv.de/ita-update/Service-Informationen/Zulassungsverzeichnisse/KBV_ITA_SIEX_Verzeichnis_AVWG_eRezept.pdf">KBV_ITA_SIEX_Verzeichnis_AVWG_eRezept.pdf</a>
    */
+  @SuppressWarnings({"java:S6418"}) // this is not an AUTH token
   private static final String DEVICE_AUTHOR_ID = "GEMATIK/410/2109/36/123";
 
   private static final String BASE_URL = "https://pvs.gematik.de/fhir/";
@@ -87,7 +88,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
   }
 
   public static KbvErpBundleBuilder faker() {
-    return forPrescription(fakerPrescriptionId());
+    return faker(fakerKvid(), fakerPrescriptionId());
   }
 
   public static KbvErpBundleBuilder faker(String kvid) {
@@ -145,7 +146,8 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     val assignerOrganization = AssignerOrganizationBuilder.faker().build();
     val patient =
         PatientBuilder.faker(kvid, IdentifierTypeDe.GKV).assigner(assignerOrganization).build();
-    val insurance = CoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
+    val insurance =
+        KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
     val medication =
         KbvErpMedicationBuilder.faker(pzn, medicationName, MedicationCategory.C_00).build();
     val medicationRequest =

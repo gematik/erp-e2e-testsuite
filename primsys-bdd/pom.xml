@@ -5,11 +5,12 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>primsys-bdd</artifactId>
+    <name>E-Rezept E2E</name>
 
     <properties>
         <tags/>
@@ -23,6 +24,12 @@
                 <bdd.testsuite>DryRunTestSuite</bdd.testsuite>
             </properties>
         </profile>
+        <profile>
+            <id>with-dump</id>
+            <properties>
+                <bdd.testsuite>CompleteDumpingTestSuite</bdd.testsuite>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -34,7 +41,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-bdd-common</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -44,32 +51,32 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>pharmacy-service-provider-ws-client</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>konnektor-client</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
 
         <dependency>
@@ -97,7 +104,9 @@
                 <version>3.0.0</version>
                 <configuration>
                     <resourceBundles>
-                        <resourceBundle>de.gematik.test.erezept:smartcard:0.2.0-SNAPSHOT</resourceBundle>
+                        <resourceBundle>
+                            de.gematik.test.erezept:smartcard:${project.parent.version}
+                        </resourceBundle>
                     </resourceBundles>
                 </configuration>
                 <executions>
@@ -123,7 +132,7 @@
                                 <artifactItem>
                                     <artifactId>erp-bdd-common</artifactId>
                                     <groupId>de.gematik.test.erezept</groupId>
-                                    <version>0.2.0-SNAPSHOT</version>
+                                    <version>0.3.0-SNAPSHOT</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/classes</outputDirectory>
                                     <includes>**/*.class</includes>
@@ -205,7 +214,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>0.2.0-SNAPSHOT</version>
+                <version>0.3.0</version>
             </plugin>
 
         </plugins>

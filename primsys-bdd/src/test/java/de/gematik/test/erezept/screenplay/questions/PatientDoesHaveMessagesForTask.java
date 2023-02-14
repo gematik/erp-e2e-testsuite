@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -34,7 +34,7 @@ import net.serenitybdd.screenplay.Question;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PatientDoesHaveMessagesForTask implements Question<Boolean> {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
 
   @Override
   public Boolean answeredBy(Actor actor) {
@@ -54,10 +54,10 @@ public class PatientDoesHaveMessagesForTask implements Question<Boolean> {
   }
 
   public static PatientDoesHaveMessagesForTask fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static PatientDoesHaveMessagesForTask fromStack(DequeStrategyEnum deque) {
+  public static PatientDoesHaveMessagesForTask fromStack(DequeStrategy deque) {
     return new PatientDoesHaveMessagesForTask(deque);
   }
 }

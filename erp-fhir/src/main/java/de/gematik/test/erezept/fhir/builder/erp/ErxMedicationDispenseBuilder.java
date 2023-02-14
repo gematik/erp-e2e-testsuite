@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPzn;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
@@ -32,14 +34,18 @@ import java.util.Date;
 import java.util.List;
 import lombok.NonNull;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Medication;
+import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Reference;
 
 public class ErxMedicationDispenseBuilder
     extends AbstractResourceBuilder<ErxMedicationDispenseBuilder> {
 
-  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private final SimpleDateFormat dateFormat10 = new SimpleDateFormat("yyyy-MM-dd");
-
+  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private String kvid;
   private String performer;
   private PrescriptionId prescriptionId;
@@ -150,27 +156,47 @@ public class ErxMedicationDispenseBuilder
     checkRequired();
     val medDisp = new ErxMedicationDispense();
 
-    val profile = ErpWorkflowStructDef.MEDICATION_DISPENSE.asCanonicalType(erpWorkflowVersion);
-    val meta = new Meta().setProfile(List.of(profile));
+    CanonicalType profile;
+    Identifier prescriptionIdentifier;
+    Identifier subjectIdentifier;
+    val performerRef = new Reference();
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      profile = ErpWorkflowStructDef.MEDICATION_DISPENSE.asCanonicalType(erpWorkflowVersion);
+      prescriptionIdentifier =
+          this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
+      subjectIdentifier =
+          new Identifier().setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl()).setValue(kvid);
+      performerRef
+          .getIdentifier()
+          .setSystem(ErpWorkflowNamingSystem.TELEMATIK_ID.getCanonicalUrl())
+          .setValue(performer);
+    } else {
+      prescriptionIdentifier =
+          this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
+      profile =
+          ErpWorkflowStructDef.MEDICATION_DISPENSE_12.asCanonicalType(erpWorkflowVersion, true);
+      subjectIdentifier = new Identifier().setValue(kvid);
 
+      // TODO: temporary hack
+      if (prescriptionId.getValue().startsWith("16")) {
+        subjectIdentifier.setSystem(DeBasisNamingSystem.KVID_GKV.getCanonicalUrl());
+      } else {
+        subjectIdentifier.setSystem(DeBasisNamingSystem.KVID_PKV.getCanonicalUrl());
+      }
+
+      performerRef
+          .getIdentifier()
+          .setSystem(ErpWorkflowNamingSystem.TELEMATIK_ID_SID.getCanonicalUrl())
+          .setValue(performer);
+    }
+
+    val meta = new Meta().setProfile(List.of(profile));
     // set FHIR-specific values provided by HAPI
     medDisp.setId(this.getResourceId()).setMeta(meta);
 
-    val pidIdentifier =
-        new Identifier()
-            .setSystem(prescriptionId.getSystemAsString())
-            .setValue(prescriptionId.getValue());
-    medDisp.setIdentifier(List.of(pidIdentifier));
-    medDisp
-        .getSubject()
-        .setIdentifier(
-            new Identifier().setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl()).setValue(kvid));
+    medDisp.setIdentifier(List.of(prescriptionIdentifier));
+    medDisp.getSubject().setIdentifier(subjectIdentifier);
 
-    val performerRef = new Reference();
-    performerRef
-        .getIdentifier()
-        .setSystem(ErpWorkflowNamingSystem.TELEMATIK_ID.getCanonicalUrl())
-        .setValue(performer);
     medDisp
         .getPerformer()
         .add(new MedicationDispense.MedicationDispensePerformerComponent(performerRef));

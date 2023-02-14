@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSyste
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.val;
+import org.hl7.fhir.r4.model.Coding;
 
 /**
  * <br>
@@ -64,6 +66,20 @@ public enum AvailabilityStatus implements IValueSet {
   @Override
   public ErpWorkflowCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
+  }
+
+  public Coding asCoding(ErpWorkflowCodeSystem codeSystem) {
+    return asCoding(codeSystem, false);
+  }
+
+  public Coding asCoding(ErpWorkflowCodeSystem codeSystem, boolean withDisplay) {
+    val coding = new Coding();
+    coding.setCode(this.getCode());
+    coding.setSystem(codeSystem.getCanonicalUrl());
+    if (withDisplay) {
+      coding.setDisplay(getDisplay());
+    }
+    return coding;
   }
 
   public static AvailabilityStatus fromCode(@NonNull String code) {

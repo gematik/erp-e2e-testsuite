@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Optional;
@@ -43,7 +43,7 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
 
   private final Actor sender;
   private final ICommunicationType type;
-  private final DequeStrategyEnum dequeStrategy;
+  private final DequeStrategy dequeStrategy;
 
   @Override
   public Optional<ErxCommunication> answeredBy(Actor actor) {
@@ -112,21 +112,21 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
 
   public static class Builder {
     private final ICommunicationType type;
-    private DequeStrategyEnum dequeStrategy;
+    private DequeStrategy dequeStrategy;
 
     Builder(ICommunicationType type) {
       this.type = type;
     }
 
     public Builder last() {
-      return of(DequeStrategyEnum.LIFO);
+      return of(DequeStrategy.LIFO);
     }
 
     public Builder first() {
-      return of(DequeStrategyEnum.FIFO);
+      return of(DequeStrategy.FIFO);
     }
 
-    public Builder of(DequeStrategyEnum order) {
+    public Builder of(DequeStrategy order) {
       this.dequeStrategy = order;
       return this;
     }

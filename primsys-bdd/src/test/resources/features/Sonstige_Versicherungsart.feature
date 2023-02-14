@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ Funktionalität: Sonstige Versicherungsarten
   @TCID=ERP_EE_sonstVA_01
     @Path=bad
     @Afo=A_22222
+    @MainActor=Fachdienst
   Szenariogrundriss: Sonstige Versicherungsarten sind nicht zulässig
   Der E-Rezept Fachdienst muss das Ausstellen von E-Rezepten unterbinden, wenn ein unzulässiger Kostenträger
   gemäß der Anforderung A_22222 im QES-Datensatz hinterlegt ist.

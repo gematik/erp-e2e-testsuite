@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,18 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.payloadIsOfType;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
 
-import de.gematik.test.core.expectations.ErpResponseExpectation;
-import de.gematik.test.core.expectations.requirements.Requirement;
-import de.gematik.test.core.expectations.requirements.RequirementsSet;
-import de.gematik.test.core.expectations.verifier.VerificationStep;
-import de.gematik.test.erezept.ErpInteraction;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.val;
-import net.serenitybdd.core.steps.Instrumented;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Performable;
-import net.thucydides.core.annotations.Step;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.test.core.expectations.*;
+import de.gematik.test.core.expectations.requirements.*;
+import de.gematik.test.core.expectations.verifier.*;
+import de.gematik.test.erezept.*;
+import de.gematik.test.erezept.client.rest.*;
+import lombok.*;
+import net.serenitybdd.core.steps.*;
+import net.serenitybdd.screenplay.*;
+import net.thucydides.core.annotations.*;
+import org.hl7.fhir.r4.model.*;
 
 @AllArgsConstructor
 public class Verify<T extends Resource> implements Performable {

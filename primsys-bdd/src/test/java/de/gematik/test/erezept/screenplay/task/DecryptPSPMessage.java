@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,22 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.pspwsclient.dataobjects.PharmacyPrescriptionInformation;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.UsePspClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.util.DmcPrescription;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.SneakyThrows;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Task;
+import de.gematik.test.erezept.exceptions.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.pspwsclient.dataobjects.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.nio.charset.*;
+import lombok.*;
+import net.serenitybdd.screenplay.*;
 
 public class DecryptPSPMessage implements Task {
+  public static DecryptPSPMessage receivedFromPharmacyService() {
+    return new DecryptPSPMessage();
+  }
+
   @SneakyThrows
   @Override
   public <T extends Actor> void performAs(T actor) {
@@ -50,14 +50,12 @@ public class DecryptPSPMessage implements Task {
                             actor.getName())))
             .getBlob();
     val decryptedRecipe = konectorClient.decrypt(encrypedReciepData);
-    val prescriptionInfo = PharmacyPrescriptionInformation.fromRawString(decryptedRecipe);
+    val prescriptionInfo =
+        PharmacyPrescriptionInformation.fromRawString(
+            new String(decryptedRecipe.getPayload(), StandardCharsets.UTF_8));
     val dmc =
         DmcPrescription.ownerDmc(
             prescriptionInfo.getTaskID(), new AccessCode(prescriptionInfo.getAccessCode()));
     prescriptionStack.appendAssignedPrescription(dmc);
-  }
-
-  public static DecryptPSPMessage receivedFromPharmacyService() {
-    return new DecryptPSPMessage();
   }
 }

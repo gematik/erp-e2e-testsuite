@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,30 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class KostenVersicherterKategorieTest {
+class KostenVersicherterKategorieTest {
 
   @Test
-  public void testFromCode() {
+  void testFromCode() {
     assertEquals(KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromCode("0"));
     assertEquals(KostenVersicherterKategorie.MEHRKOSTEN, KostenVersicherterKategorie.fromCode("1"));
     assertEquals(
         KostenVersicherterKategorie.EIGENBETEILIGUNG, KostenVersicherterKategorie.fromCode("2"));
   }
 
-  @Test(expected = InvalidValueSetException.class)
-  public void testInvalidValueSetException() {
-    KostenVersicherterKategorie.fromCode("4");
+  @Test
+  void testInvalidValueSetException() {
+    assertThrows(InvalidValueSetException.class, () -> KostenVersicherterKategorie.fromCode("4"));
   }
 
   @Test
-  public void shouldHaveDefinition() {
+  void shouldHaveDefinition() {
     assertNotNull(KostenVersicherterKategorie.ZUZAHLUNG.getDefinition());
   }
 }

@@ -7,10 +7,11 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
+    <name>E-Rezept Produkttest</name>
 
     <properties>
         <java.version>${version.java}</java.version>
@@ -34,14 +35,14 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
 
         <!-- is required for the config only! -->
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -56,7 +57,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
             <type>test-jar</type>
             <exclusions>
                 <exclusion>
@@ -72,7 +73,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir-fuzzing</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
 
         <dependency>
@@ -91,7 +92,7 @@
         <dependency>
             <artifactId>erp-fhir</artifactId>
             <groupId>de.gematik.test.erezept</groupId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
             <type>test-jar</type>
         </dependency>
         <dependency>
@@ -167,7 +168,9 @@
                 <version>3.0.0</version>
                 <configuration>
                     <resourceBundles>
-                        <resourceBundle>de.gematik.test.erezept:smartcard:0.2.0-SNAPSHOT</resourceBundle>
+                        <resourceBundle>
+                            de.gematik.test.erezept:smartcard:${project.parent.version}
+                        </resourceBundle>
                     </resourceBundles>
                 </configuration>
                 <executions>
@@ -195,6 +198,18 @@
                             </sources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-performance-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/performance-test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -204,6 +219,7 @@
                     <includes>
                         <!-- integration test against SUT everything in de.gematik.test.erezept -->
                         <include>%regex[.*/erezept/integration/.*.class]</include>
+                        <include>%regex[.*/erezept/performance/.*.class]</include>
                     </includes>
                     <systemPropertyVariables>
                         <junit.jupiter.extensions.autodetection.enabled>true
@@ -211,9 +227,9 @@
                     </systemPropertyVariables>
                     <groups>${junit.tags}</groups>
                     <parallel>all</parallel>
-                    <forkCount>2C</forkCount>
+                    <forkCount>1C</forkCount>
                     <reuseForks>true</reuseForks>
-                    <useUnlimitedThreads>true</useUnlimitedThreads>
+                    <useUnlimitedThreads>false</useUnlimitedThreads>
                 </configuration>
                 <executions>
                     <execution>

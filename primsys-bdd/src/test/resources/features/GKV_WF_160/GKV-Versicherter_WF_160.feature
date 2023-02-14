@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | Name          | PZN      |
       | Schmerzmittel | 12345678 |
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
 
   @TCID=ERP_EE_WF160_02
   @Path=happy
@@ -65,6 +65,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_02
   @Path=happy
   @Afo=A_19248-01
+  @MainActor=Versicherter
   Szenario: Dispensierinformationen zum E-Rezept als Versicherter einsehen
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
@@ -80,6 +81,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @Path=happy
   @Anwendungsfall=A_19117
   @Afo=A_19226
+  @MainActor=Apotheke
   Szenario: Quittung erneut abfragen
   Die Apotheke kann nach erfolgreicher Dispensierung die Quittung erneut abrufen.
 
@@ -98,6 +100,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @Path=happy
   @Anwendungsfall=A_18505
   @Afo=A_19149
+  @MainActor=Arztpraxis
   Szenario: E-Rezept durch Verordnenden löschen
   Der Arzt verschreibt der GKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept. Dieses Rezept kann er löschen,
   solange es nicht von einer Apotheke akzeptiert wurde.
@@ -113,6 +116,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_04
   @Path=happy
   @Anwendungsfall=A_18507
+  @MainActor=Versicherter
   Szenario: E-Rezept durch Versicherten löschen
   Der Arzt verschreibt der GKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept.
   Dieses Rezept kann die Versicherte löschen, solange es nicht von einer Apotheke akzeptiert wurde.
@@ -127,6 +131,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_05
   @Path=bad
   @Afo=A_19120-03
+  @MainActor=Arztpraxis
   Szenario: Löschen des E-Rezepts nicht möglich, weil durch Apotheke reserviert
   Der Arzt verschreibt der GKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept. Dieses Rezept kann er nicht mehr löschen,
   sobald es von einer Apotheke akzeptiert wurde.
@@ -137,12 +142,14 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Ärztin Dr. Schraßer das letzte von ihr eingestellte E-Rezept nicht löschen, weil sie nicht das Recht dazu hat
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
   @TCID=ERP_EE_WF160_06
   @Path=bad
   @Anwendungsfall=A_18512
   @Afo=A_19172
+  @MainActor=Apotheke
   Szenario: Einlösen des E-Rezepts nicht möglich, weil durch Apotheke zurückgegeben
   Die Apotheke gibt das zugewiesene Rezept zurück. Anschließend kann sie es nicht einlösen.
 
@@ -159,6 +166,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @Path=bad
   @Anwendungsfall=A_18513
   @Afo=A_19121
+  @MainActor=Apotheke
   Szenario: Einlösen des E-Rezepts nicht möglich, weil durch Apotheke gelöscht
   Die Apotheke löscht das zugewiesene Rezept. Anschließend kann sie es nicht einlösen.
 
@@ -174,6 +182,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_08
   @Path=bad
   @Afo=A_19168
+  @MainActor=Apotheke
   Szenario: Zweimaliges Akzeptieren des E-Rezepts durch gleiche Apotheke nicht möglich
   Die Apotheke akzeptiert das zugewiesene Rezept. Anschließend kann sie es nicht noch mal akzeptieren.
 
@@ -183,11 +192,13 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es einen Konflikt gibt
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
 
   @TCID=ERP_EE_WF160_09
   @Path=bad
   @Afo=A_19168
+  @MainActor=Apotheke
   Szenario: E-Rezept kann nicht durch eine zweite Apotheke reserviert werden
   Die Apotheke akzeptiert das Rezept. Anschließend versucht eine zweite Apotheke das Rezept einzulösen. Das wird durch den Fachdienst verhindert.
 
@@ -198,11 +209,13 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Stadtapotheke via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Stadtapotheke das letzte zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es einen Konflikt gibt
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
 
   @TCID=ERP_EE_WF160_10
   @Path=bad
   @Afo=A_19121
+  @MainActor=Apotheke
   Szenario: Einlösen des E-Rezepts nicht möglich, weil durch Versicherten gelöscht
   Der Versicherte löscht das Rezept nach der Zuweisung an eine Apotheke. Die Apotheke kann es deshalb nicht akzeptieren.
 
@@ -217,6 +230,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_10
   @Path=bad
   @Afo=A_19146
+  @MainActor=Apotheke
   Szenario: Löschen des E-Rezepts durch Apotheke nicht möglich, weil nicht akzeptiert
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
@@ -228,6 +242,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_11
   @Path=bad
   @Afo=A_19145
+  @MainActor=Versicherter
   Szenario: Löschen von akzeptierten E-Rezepten durch den Versicherten nicht möglich
   Der Versicherte versucht das Rezept zu löschen, nachdem es schon von einer Apotheke akzeptiert wurde. Das wird durch den Fachdienst verhindert.
 
@@ -237,9 +252,11 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Versicherte Sina Hüllmann ihr letztes E-Rezept nicht löschen, weil sie nicht das Recht dazu hat
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
   @TCID=ERP_EE_WF160_12
   @Path=bad
+  @MainActor=Versicherter
   Szenario: Löschen von eingelösten E-Rezepten durch den Versicherten möglich
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
@@ -250,11 +267,12 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Sina Hüllmann dispensiert
     Und die Versicherte Sina Hüllmann ihr letztes E-Rezept löscht
     Und hat der Versicherte Sina Hüllmann genau 1 Medikamente erhalten
-    Dann wird der Versicherten Sina Hüllmann ihr letztes gelöschte E-Rezept nicht mehr im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann ihr letztes gelöschte E-Rezept nicht mehr angezeigt
 
   @TCID=ERP_EE_WF160_03
   @Path=bad
   @Afo=A_19232
+  @MainActor=Apotheke
   Szenario: Erneutes Dispensieren durch die gleiche Apotheke nicht möglich
   Die Apotheke kann nach erfolgreicher Dispensierung den Task nicht noch einmal mit einem /Task/<id>/$close-Operation beenden,
   weil der Task im Status "completed" ist.
@@ -270,6 +288,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_03
   @Path=bad
   @Afo=A_19231
+  @MainActor=Apotheke
   Szenario: Dispensieren mit falschem Secret nicht möglich
   Der Fachdienst muss beim Dispensieren das mitgelieferte Secret prüfen und bei ungültigem Secret die HTTP-POST-Operation
   über /Task/<id>/$close ablehnen.
@@ -280,10 +299,12 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept nicht mit dem falschen Secret fgdkjfgd dispensieren
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
   @TCID=ERP_EE_WF160_03
   @Path=bad
   @Afo=A_19224
+  @MainActor=Apotheke
   Szenario: Löschen mit falschem Secret nicht möglich
   Der Fachdienst muss beim Löschen das mitgelieferte Secret prüfen und bei ungültigem Secret die HTTP-POST-Operation
   über /Task/<id>/$abort ablehnen.
@@ -294,10 +315,12 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept nicht mit dem falschen Secret fgdkjfgd löschen
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
   @TCID=ERP_EE_WF160_03
   @Path=bad
   @Afo=A_19171
+  @MainActor=Apotheke
   Szenario: Zurückgeben mit falschem Secret nicht möglich
   Der Fachdienst muss beim Zurückgeben das mitgelieferte Secret prüfen und bei ungültigem Secret die HTTP-POST-Operation
   über /Task/<id>/$reject ablehnen.
@@ -308,10 +331,12 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept nicht mit dem falschen Secret fgdkjfgd zurückgeben
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
   @TCID=ERP_EE_WF160_02
   @Path=bad
   @Afo=A_19405-01
+  @MainActor=Apotheke
   Szenario: Apotheke darf Dispensierinformationen nicht abrufen
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
@@ -325,8 +350,9 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_02
   @Path=bad
   @Afo=A_19018
+  @MainActor=Apotheke
   Szenario: Eine Apotheke darf kein E-Rezept einstellen
-  Der Fachdienst muss das Anlegen eines E-Rezepts ablehenen, wenn der Acces_Token nicht eine der folgendes OID aufweist:
+  Der Fachdienst muss das Anlegen eines E-Rezepts ablehnen, wenn der Access-Token nicht eine der folgendes OID aufweist:
   oid_arzt
   oid_zahnarzt
   oid_praxis_arzt
@@ -337,7 +363,6 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   In diesem Testfall wird versucht mit der SMC-B einer Apotheke ein Create-Aufruf zum Fachdienst zu schicken.
 
     Angenommen die Ärztin Keine Arztpraxis hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
-
     Dann darf der Arzt Keine Arztpraxis der Versicherten Sina Hüllmann das folgende E-Rezept nicht ausstellen:
       | Name          | PZN      |
       | Schmerzmittel | 12345678 |
@@ -346,8 +371,9 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @TCID=ERP_EE_WF160_02
   @Path=bad
   @Afo=A_19225-01
+  @MainActor=Apotheke
   Szenario: Ein Apotheker darf kein E-Rezept signieren
-  Der Fachdienst muss die Aktivierung ablehenen, wenn die QES nicht von der Berufsgruppe
+  Der Fachdienst muss die Aktivierung ablehnen, wenn die QES nicht von der Berufsgruppe
   oid_arzt, oid_zahnarzt ode id-baek-at-namingAuthorityÄrzteschaft-Ärztin/Arzt (1.3.6.1.4.1.24796.4.11.1) gemäß [BÄK_G0] erstellt wurde.
   In diesem Testfall wird die QES mit einem HBA Apotheker erstellt.
 
@@ -358,6 +384,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
   @Path=happy
   @Anwendungsfall=A_18781
   @Afo=A_19116
+  @MainActor=Versicherter
   Szenario: Abrufen des E-Rezepts als Vertreter
   Der Versicherte weist das ausgestellte Rezept einem Vertreter zu. Dieser kann es erfolgreich in seinem FdV abrufen.
 
@@ -367,13 +394,14 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
       | Schmerzmittel | 12345678 |
     Und die Versicherte Sina Hüllmann ihr letztes E-Rezept per Nachricht an den Vertreter Günther Angermänn schickt
     Dann hat der Vertreter Günther Angermänn die Nachricht mit dem Rezept der Versicherten Sina Hüllmann empfangen
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
-    Dann wird dem Vertreter Günther Angermänn das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
+    Dann wird dem Vertreter Günther Angermänn das neue E-Rezept angezeigt
 
 
   @TCID=ERP_WF160_04
   @Path=happy
   @Afo=A_20546-01
+  @MainActor=Versicherter
   Szenario: Löschen des E-Rezepts als Vertreter nur mit AccessCode möglich
   Der Versicherte weist das ausgestellte Rezept einem Vertreter zu. Dieser kann es ohne AccessCode nicht beim Fachdienst löschen.
 

@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "DAV_PKV_VS_ERP_ArtRezeptaenderung",
+  "id": "DAV-PKV-VS-ERP-ArtRezeptaenderung",
+  "version": "1.1",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-PKV-VS-ERP-ArtRezeptaenderung",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-ArtRezeptaenderung"
+      }
+    ]
+  }
+}

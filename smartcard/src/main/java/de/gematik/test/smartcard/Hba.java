@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,48 +16,34 @@
 
 package de.gematik.test.smartcard;
 
-import java.io.File;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Objects;
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
-import lombok.val;
+import de.gematik.test.erezept.crypto.certificate.*;
+import de.gematik.test.smartcard.exceptions.*;
+import java.util.*;
+import java.util.function.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
-@SuperBuilder
 @Getter
-public class Hba extends Smartcard {
+@Slf4j
+@EqualsAndHashCode(callSuper = true)
+public class Hba extends InstituteSmartcard {
 
-  private Certificate[] qesCertificateChain;
+  public Hba(List<Supplier<SmartcardCertificate>> certificates, String iccsn) {
+    super(certificates, iccsn, SmartcardType.HBA);
+  }
 
-  private X509Certificate qesCertificate;
-
-  private File qesP12File; // required for CAdESSignature
-
-  private String qesP12Password; // required for CAdESSignature
-
-  private PrivateKey qesPrivateKey;
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    val hba = (Hba) o;
-    return Arrays.equals(getQesCertificateChain(), hba.getQesCertificateChain())
-        && Objects.equals(getQesCertificate(), hba.getQesCertificate())
-        && Objects.equals(getQesP12Password(), hba.getQesP12Password())
-        && Objects.equals(getQesPrivateKey(), hba.getQesPrivateKey());
+  public SmartcardCertificate getQesCertificate(Crypto algorithm) {
+    return getKey(Oid.OID_HBA_QES, algorithm)
+        .orElseThrow(() -> new SmartCardKeyNotFoundException(this, Oid.OID_HBA_QES, algorithm));
   }
 
   @Override
-  public int hashCode() {
-    int result =
-        Objects.hash(
-            super.hashCode(), getQesCertificate(), getQesP12Password(), getQesPrivateKey());
-    result = 31 * result + Arrays.hashCode(getQesCertificateChain());
-    return result;
+  public List<Oid> getAutOids() {
+    return List.of(Oid.OID_HBA_AUT);
+  }
+
+  @Override
+  protected Oid getEncOid() {
+    return Oid.OID_HBA_ENC;
   }
 }

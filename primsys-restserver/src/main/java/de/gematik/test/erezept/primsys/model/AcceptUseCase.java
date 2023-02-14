@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import de.gematik.test.erezept.primsys.rest.data.AcceptData;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import java.util.Map;
 import lombok.val;
 
 public class AcceptUseCase {
@@ -52,8 +53,14 @@ public class AcceptUseCase {
     acceptData.setTaskId(acceptedTask.getTask().getUnqualifiedId());
     acceptData.setAccessCode(acceptedTask.getTask().getAccessCode().getValue());
     acceptData.setSecret(acceptedTask.getSecret().getValue());
+    acceptData.setKbvBundle(acceptedTask.getKbvBundleAsString());
     ActorContext.getInstance().addAcceptedPrescription(acceptData);
 
-    return Response.accepted(acceptData).build();
+    return Response.accepted(
+            Map.of(
+                "task-id", acceptData.getTaskId(),
+                "accessCode", acceptData.getAccessCode(),
+                "secret", acceptData.getSecret()))
+        .build();
   }
 }

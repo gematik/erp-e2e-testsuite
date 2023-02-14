@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,24 @@
 
 package de.gematik.test.smartcard.cfg;
 
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.KeystoreType;
-import de.gematik.test.smartcard.SmartcardType;
-import lombok.Data;
+import de.gematik.test.smartcard.*;
+import java.util.*;
+import lombok.*;
 
 @Data
 public class SmartcardConfigDto {
 
-  private String auth;
   private String iccsn;
-  private String algo;
-  private String cardType;
-  private String password;
+
+  private String name;
+  private String type;
+
+  private List<String> stores;
+
+  private String kvnr;
 
   public SmartcardType getCardType() {
-    return SmartcardType.fromString(cardType);
-  }
-
-  public Crypto getAlgorithm() {
-    return Crypto.fromString(algo);
+    return SmartcardType.fromString(type);
   }
 
   /**

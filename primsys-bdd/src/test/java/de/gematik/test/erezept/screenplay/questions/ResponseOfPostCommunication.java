@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
@@ -212,7 +212,8 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val receiverId = SafeAbility.getAbility(builder.receiver, UseSMCB.class).getTelematikID();
 
     val chargeItemResponse =
-        actor.asksFor(ResponseOfGetChargeItem.forPrescription(builder.basedOnDequeStrategy));
+        actor.asksFor(
+            ResponseOfGetChargeItem.forPrescription(builder.basedOnDequeStrategy).asPatient());
     val chargeItem = chargeItemResponse.getResource(ErxChargeItem.class);
     return ErxChargeItemCommunicationBuilder.builder()
         .basedOnChargeItem(chargeItem)
@@ -293,8 +294,8 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
 
   public static class Builder {
     private final ICommunicationType<?> type;
-    private DequeStrategyEnum basedOnDequeStrategy;
-    private DequeStrategyEnum requestDequeStrategy;
+    private DequeStrategy basedOnDequeStrategy;
+    private DequeStrategy requestDequeStrategy;
     private Actor receiver;
     private String message;
 
@@ -303,28 +304,28 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     }
 
     public Builder forPrescriptionFromBackend(String order) {
-      return forPrescriptionFromBackend(DequeStrategyEnum.fromString(order));
+      return forPrescriptionFromBackend(DequeStrategy.fromString(order));
     }
 
-    public Builder forPrescriptionFromBackend(DequeStrategyEnum dequeStrategy) {
+    public Builder forPrescriptionFromBackend(DequeStrategy dequeStrategy) {
       this.basedOnDequeStrategy = dequeStrategy;
       return this;
     }
 
     public Builder forChargeItemFromBackend(String order) {
-      return forChargeItemFromBackend(DequeStrategyEnum.fromString(order));
+      return forChargeItemFromBackend(DequeStrategy.fromString(order));
     }
 
-    public Builder forChargeItemFromBackend(DequeStrategyEnum dequeStrategy) {
+    public Builder forChargeItemFromBackend(DequeStrategy dequeStrategy) {
       this.basedOnDequeStrategy = dequeStrategy;
       return this;
     }
 
     public Builder forCommunicationRequestFromBackend(String order) {
-      return forCommunicationRequestFromBackend(DequeStrategyEnum.fromString(order));
+      return forCommunicationRequestFromBackend(DequeStrategy.fromString(order));
     }
 
-    public Builder forCommunicationRequestFromBackend(DequeStrategyEnum dequeStrategy) {
+    public Builder forCommunicationRequestFromBackend(DequeStrategy dequeStrategy) {
       this.requestDequeStrategy = dequeStrategy;
       return this;
     }

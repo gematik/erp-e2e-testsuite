@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,16 @@
 package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class ChargeItemGetByIdCommand extends BaseCommand<ErxChargeItem> {
+public class ChargeItemGetByIdCommand extends BaseCommand<ErxChargeItemBundle> {
 
   public ChargeItemGetByIdCommand(PrescriptionId prescriptionId) {
-    super(ErxChargeItem.class, HttpRequestMethod.GET, "ChargeItem", prescriptionId.getValue());
+    super(
+        ErxChargeItemBundle.class, HttpRequestMethod.GET, "ChargeItem", prescriptionId.getValue());
   }
 
   /**

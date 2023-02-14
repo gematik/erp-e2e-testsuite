@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package de.gematik.test.smartcard;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.smartcard.exceptions.CardNotFoundException;
-import java.util.List;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.smartcard.exceptions.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class SmartcardArchiveTest {
 
@@ -31,8 +29,8 @@ class SmartcardArchiveTest {
   void shouldThrowOnFetchFromEmptySmartcards() {
     val archive = new SmartcardArchive(List.of(), List.of(), List.of());
 
-    assertDoesNotThrow(() -> archive.getEgkCards(Crypto.RSA_2048));
-    assertTrue(archive.getEgkCards(Crypto.RSA_2048).isEmpty());
-    assertThrows(CardNotFoundException.class, () -> archive.getEgkByICCSN("123", Crypto.RSA_2048));
+    assertDoesNotThrow(archive::getEgkCards);
+    assertTrue(archive.getEgkCards().isEmpty());
+    assertThrows(CardNotFoundException.class, () -> archive.getEgkByICCSN("123"));
   }
 }

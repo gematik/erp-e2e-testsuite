@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -36,4 +36,8 @@ public enum KbvBasisVersion implements ProfileVersion<KbvBasisVersion> {
   private final LocalDate validFromDate;
   private final LocalDate validUntilDate;
   private final CustomProfiles customProfile = CustomProfiles.KBV_BASIS;
+
+  public static KbvBasisVersion getDefaultVersion() {
+    return ProfileVersion.getDefaultVersion(KbvBasisVersion.class, CustomProfiles.KBV_BASIS);
+  }
 }

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
 
   @TCID=ERP_EE_Communication_01
   @Path=happy
+  @MainActor=Versicherter
    Szenario: Zuweisung per Nachricht
   Der Versicherte weist das gerade erhaltene E-Rezept per Nachricht einer Apotheke zu.
   Diese kann das Rezept erfolgreich akzeptieren und einlösen.
@@ -48,6 +49,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
 
   @TCID=ERP_EE_Communication_02
   @Path=happy
+  @MainActor=Versicherter
   Szenario: Anfrage zu einem E-Rezept und Antwort der Apotheke
   Der Versicherte stellt zum grad erhaltenen Rezept eine Anfrage an die Apotheke. Diese beantwortet die Anfrage.
 
@@ -59,6 +61,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TCID=ERP_EE_Communication_03
   @Path=happy
   @Anwendungsfall=A_18781
+  @MainActor=Versicherter
   Szenario: Zuweisung an einen Vertreter
   Der Versicherte weist das ausgestellte Rezept einem Vertreter zu. Dieser kann es erfolgreich in der Apotheke einlösen.
 
@@ -74,6 +77,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TCID=ERP_EE_Communication_04
   @Path=bad
   @Afo=A_20230
+  @MainActor=Versicherter
   Szenario: Zuweisung an einen Vertreter nicht möglich nach dem Einlösen
   Der Versicherte weist das ausgestellte Rezept einem Vertreter zu. Dieser kann es erfolgreich in der Apotheke einlösen.
 
@@ -86,6 +90,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TCID=ERP_EE_Communication_05
   @Path=bad
   @Afo=A_20231
+  @MainActor=Versicherter
   Szenario: Zuweisung an sich selbst nicht möglich
   Der E-Rezept-Fachdienst muss eine Nachricht mit Empfänger gleich Absender ablehnen
 
@@ -95,6 +100,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TCID=ERP_EE_Communication_06
   @Path=happy
   @Afo=A_20513
+  @MainActor=Fachdienst
   Szenario: Fachdienst löscht alle Nachrichten zu einem E-Rezept nach dem Einlösen
   Der Testfall überprüft, ob alle Nachrichten, die sich auf ein E-Rezept beziehen, nach dem erfolgreichem Einlösen vom Fachdienst gelöscht wurden.
 
@@ -108,6 +114,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @Path=happy
   @Anwendungsfall=A_20260
   @Afo=A_20258
+  @MainActor=Versicherter
   Szenario: Versicherte löscht alle Nachrichten
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Und die Apotheke Am Flughafen die letzte Nachricht von Sina Hüllmann beantwortet
@@ -119,6 +126,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @Path=happy
   @Anwendungsfall=A_20776
   @Afo=A_20258
+  @MainActor=Apotheke
   Szenario: Apotheke löscht Nachricht
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Und die Apotheke Am Flughafen die letzte Nachricht von Sina Hüllmann beantwortet
@@ -129,6 +137,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TCID=ERP_EE_Communication_09
   @Path=bad
   @Afo=A_19446-01
+  @MainActor=Arztpraxis
   Szenario: Arztpraxis darf keine Nachricht versenden
   Der Versicherte schreibt eine Nachricht an eine Arztpraxis "Keine Apotheke". Der Fachdienst muss die Antwort ablehnen,
   weil nur Apotheken und Versicherte Nachrichten versenden dürfen.
@@ -142,6 +151,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @Path=happy
   @Anwendungsfall=A_20260
   @Afo=A_20258
+  @MainActor=Versicherter
   Szenario: Versicherte löscht eine Nachricht
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Und die Versicherte Sina Hüllmann ihre letzte versendete Nachricht löscht

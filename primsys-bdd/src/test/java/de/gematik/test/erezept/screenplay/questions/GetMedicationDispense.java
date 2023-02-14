@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.ActorRole;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ import net.serenitybdd.screenplay.Question;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class GetMedicationDispense implements Question<ErxMedicationDispenseBundle> {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
   private final ActorRole role;
 
   @Override
@@ -87,10 +87,10 @@ public class GetMedicationDispense implements Question<ErxMedicationDispenseBund
     private final ActorRole role;
 
     public GetMedicationDispense forPrescription(String order) {
-      return forPrescription(DequeStrategyEnum.fromString(order));
+      return forPrescription(DequeStrategy.fromString(order));
     }
 
-    public GetMedicationDispense forPrescription(DequeStrategyEnum deque) {
+    public GetMedicationDispense forPrescription(DequeStrategy deque) {
       return new GetMedicationDispense(deque, role);
     }
   }

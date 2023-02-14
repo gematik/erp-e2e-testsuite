@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ Funktionalität: Subscription Service für Apotheken
   @Path=happy
   @Afo=A_22367-01
   @Afo=A_22364
+  @MainActor=Apotheke
   Szenario: Benachrichtigung beim Eingang einer neuen Zuweisung
   Eine Apotheke wird durch den Subscription Service informiert, wenn ein Versicherter ein E-Rezept mit dem FdV an diese Apotheke zuweist.
 
@@ -38,14 +39,14 @@ Funktionalität: Subscription Service für Apotheken
     Und der Arzt Dr. Schraßer folgendes E-Rezept an die Versicherte Sina Hüllmann verschreibt:
       | Name          | PZN      | Substitution | Verordnungskategorie | Normgröße | Darreichungsform | Dosierung | Menge | Notdiensgebühr | Zahlungsstatus |
       | Schmerzmittel | 12345678 | false        | 00                   | N1        | TAB              | 1-0-0-1   | 3     | false          | 0              |
-    Und die Versicherte Sina Hüllmann das letztes ihm zugewiesene E-Rezept herunterlädt
-    Und die Versicherte Sina Hüllmann das letztes heruntergeladene E-Rezept der Apotheke Am Flughafen zuweist
+    Und die Versicherte Sina Hüllmann ihr letztes E-Rezept der Apotheke Am Flughafen per Nachricht zuweist
     Dann wird die Apotheke Am Flughafen durch den Subscription Service informiert
 
   @TCID=ERP_EE_Subscrp_02
   @Path=happy
   @Afo=A_22367-01
   @Afo=A_22364
+  @MainActor=Apotheke
   Szenario: Benachrichtigung beim Eingang einer neuen Anfrage
   Eine Apotheke wird durch den Subscription Service informiert, wenn ein Versicherter für ein E-Rezept mit dem FdV eine Anfrage an diese Apotheke schickt
 
@@ -54,6 +55,5 @@ Funktionalität: Subscription Service für Apotheken
     Und der Arzt Dr. Schraßer folgendes E-Rezept an den Versicherten Sina Hüllmann verschreibt:
       | Name          | PZN      | Substitution | Verordnungskategorie | Normgröße | Darreichungsform | Dosierung | Menge | Notdiensgebühr | Zahlungsstatus |
       | Schmerzmittel | 12345678 | false        | 00                   | N1        | TAB              | 1-0-0-1   | 3     | false          | 0              |
-    Und die Versicherte Sina Hüllmann das letztes ihr zugewiesene E-Rezept herunterlädt
-    Und die Versicherte Sina Hüllmann für das letztes heruntergeladene E-Rezept eine Anfrage an die Apotheke Am Flughafen schickt
+    Und die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Dann wird die Apotheke Am Flughafen durch den Subscription Service informiert

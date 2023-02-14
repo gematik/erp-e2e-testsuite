@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ package de.gematik.test.erezept.fhir.builder;
 import static java.text.MessageFormat.format;
 
 import com.github.javafaker.Faker;
+import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.FakerException;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.DoctorProfession;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -42,29 +44,25 @@ public class GemFaker {
   private static final String DATE_FORMAT_SIMPLE = "dd.MM.yyyy";
 
   private static final Faker faker = new Faker(new Locale("de"));
-
-  private GemFaker() {
-    throw new AssertionError();
-  }
-
   private static final List<String> HEALTH_INSURANCE_NAMES =
       List.of("KOA", "Farmer", "Künstler-Krankenkasse", "KVED Krankenversicherungs-AG");
-
   private static final List<String> DRUG_NAME_PREFIXES =
       List.of(
           "Aba", "Aca", "Ace", "Aci", "Ada", "Amo", "Aze", "Bac", "Bec", "Bel", "Ben", "Bet", "Bus",
           "Cab", "Cal", "Can", "Cap", "Dab", "Def", "Dex", "Dic", "Dox", "Ecal", "Ecul", "Elag",
           "Enox", "Eren", "Fam", "Fen", "Fes", "Fex", "Flur", "Fom", "Gab", "Gem", "Glim", "Gos",
           "Hem", "Hep", "Hem", "Hom", "Hyd", "Ibal", "Iban", "Ibu", "Ilop");
-
   private static final List<String> DRUG_NAME_INFIXES =
       List.of("abra", "ali", "ami", "ame", "gluco", "imo", "ter", "vomil", "voflox");
-
   private static final List<String> DRUG_NAME_POSTFIXES =
       List.of(
           "ab", "an", "at", "cain", "en", "fen", "ib", "id", "um", "mus", "mid", "mib", "nat",
           "nin", "or", "ol", "säure", "tal", "pa", "pam", "pin", "proston", "rat", "zol", "xalon",
           "xital", "xin");
+
+  private GemFaker() {
+    throw new AssertionError();
+  }
 
   public static String fakerPzn() {
     return faker.regexify("[0-9]{8}");
@@ -337,10 +335,23 @@ public class GemFaker {
     return faker.address().zipCode();
   }
 
+  /**
+   * <b>Attention:</b> this might include a secondary appendix to the street name which might be an
+   * invalid address in FHIR resources
+   *
+   * @return a street name
+   */
   public static String fullStreetName() {
     return fullStreetName(faker.random().nextBoolean());
   }
 
+  /**
+   * <b>Attention:</b> use with caution, if <code>withSecondary</code> argument is set to true, the
+   * street might be invalid for certain FHIR profiles
+   *
+   * @param withSecondary defines if a secondary appendix should be added to the address
+   * @return a street name
+   */
   public static String fullStreetName(boolean withSecondary) {
     return faker.address().streetAddress(withSecondary);
   }
@@ -363,6 +374,14 @@ public class GemFaker {
 
   public static String fakerProfession() {
     return faker.company().profession();
+  }
+
+  public static String fakerDoctorProfessionAsString() {
+    return randomElement(DoctorProfession.values()).getNaming();
+  }
+
+  public static DoctorProfession fakerDoctorProfession() {
+    return randomElement(DoctorProfession.values());
   }
 
   public static String fakerCommunicationInfoReqMessage() {
@@ -442,6 +461,42 @@ public class GemFaker {
     } else {
       return builder.withoutEndDate();
     }
+  }
+
+  public static float vatRate() {
+    return vatRate(10.0f, 30.0f);
+  }
+
+  public static float vatRate(float min, float max) {
+    if (min <= 0.0f || max >= 100.0f || min >= max) {
+      throw new BuilderException(format("Invalid VAT range {0}..{1}", min, max));
+    }
+
+    val base = faker.random().nextDouble();
+    val diff = max - min;
+    return (float) (min + diff * base);
+  }
+
+  public static float cost() {
+    val minBase = faker.random().nextInt(1, 100);
+    val min = (float) (minBase * faker.random().nextDouble());
+    return cost(min);
+  }
+
+  public static float cost(float min) {
+    val maxBase = faker.random().nextInt(1, 10);
+    val max = (float) (min + min * maxBase * faker.random().nextDouble());
+    return cost(min, max);
+  }
+
+  public static float cost(float min, float max) {
+    if (min <= 0.0f || max < 0.0f || min >= max) {
+      throw new BuilderException(format("Invalid cost range {0}..{1}", min, max));
+    }
+
+    val base = faker.random().nextDouble();
+    val diff = max - min;
+    return (float) (min + diff * base);
   }
 
   /**

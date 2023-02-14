@@ -1,245 +1,272 @@
-{
-  "hba-cards": [
-    {
-      "iccsn": "80276883110000095767",
-      "auth": "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.AUT.R2048.p12",
-      "qes": "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.QES.R2048.p12",
-      "cardType": "HBA",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001011699910102",
-      "auth": "hba/1-1-ARZT-BerndClaudius01/80276001011699910102-C_HP_AUT_R2048.p12",
-      "qes": "hba/1-1-ARZT-BerndClaudius01/80276001011699910102-C_HP_QES_R2048.p12",
-      "cardType": "HBA",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000121166",
-      "auth": "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_AUT_E256.p12",
-      "qes": "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_QES_E256.p12",
-      "cardType": "HBA",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001081699900578",
-      "auth": "hba/1-1-ARZT-Gunther/c.hp.aut-erp-arztGunther.p12",
-      "qes": "hba/1-1-ARZT-Gunther/c.hp.qes-erp-arztGunther.p12",
-      "cardType": "HBA",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001081699900578",
-      "auth": "hba/1-1-ARZT-Gunther/c.hp.aut-erp-ecc-arztGunther.p12",
-      "qes": "hba/1-1-ARZT-Gunther/c.hp.qes-erp-ecc-arztGunther.p12",
-      "cardType": "HBA",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001081699900579",
-      "auth": "hba/3-1-REZEPTOR-APO-01/c.hp.aut-erp-apoAlbrecht.p12",
-      "qes": "hba/3-1-REZEPTOR-APO-01/c.hp.qes-erp-apoAlbrecht.p12",
-      "cardType": "HBA",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001081699900579",
-      "auth": "hba/3-1-REZEPTOR-APO-01/c.hp.aut-erp-ecc-apoAlbrecht.p12",
-      "qes": "hba/3-1-REZEPTOR-APO-01/c.hp.qes-erp-ecc-apoAlbrecht.p12",
-      "cardType": "HBA",
-      "algo": "E256",
-      "password": "00"
-    }
-  ],
-  "smcb-cards": [
-    {
-      "iccsn": "80276883110000116872",
-      "auth": "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_AUT_R2048_X509/80276883110000116872-C_SMCB_AUT_R2048_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000116872",
-      "auth": "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_HCI_AUT_E256/80276883110000116872-C_SMCB_HCI_AUT_E256.p12",
-      "cardType": "SMC-B",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000117369",
-      "auth": "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_AUT_R2048_X509/80276883110000117369-C_SMCB_AUT_R2048_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000117369",
-      "auth": "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_HCI_AUT_E256/80276883110000117369-C_SMCB_HCI_AUT_E256.p12",
-      "cardType": "SMC-B",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001011699910102",
-      "auth": "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_AUT_R2048_X509/80276001011699910102-C_SMCB_AUT_R2048_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001011699910102",
-      "auth": "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_AUT_E256_X509/80276001011699910102-C_SMCB_AUT_E256_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "8027600101169991010",
-      "auth": "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_AUT_R2048_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "8027600101169991010",
-      "auth": "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_AUT_E256_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000116873",
-      "auth": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_AUT_R2048_X509.p12",
-      "enc": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_HCI_ENC_R2048.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000116873",
-      "auth": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_AUT_E256.p12",
-      "enc": "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_ENC_E256.p12",
-      "cardType": "SMC-B",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000092475",
-      "auth": "smcb/NordApothekeTEST-ONLY_80276883110000092475/80276883110000092475_C.HCI.AUT.R2048/80276883110000092475_C.HCI.AUT.R2048.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001011699900861",
-      "auth": "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_AUT_R2048_X509/80276001011699900861-C_SMCB_AUT_R2048_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276001011699900861",
-      "auth": "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_AUT_E256_X509/80276001011699900861-C_SMCB_AUT_E256_X509.p12",
-      "cardType": "SMC-B",
-      "algo": "E256",
-      "password": "00"
-    }
-  ],
-  "egk-cards": [
-    {
-      "iccsn": "80276883110000113311",
-      "auth": "egk/X110406067/80276883110000113311-C_CH_AUT_R2048.p12",
-      "kvnr": "X110406067",
-      "cardType": "eGK",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000113323",
-      "auth": "egk/X110465770/80276883110000113323-C_CH_AUT_R2048.p12",
-      "kvnr": "X110465770",
-      "cardType": "eGK",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000113323",
-      "auth": "egk/X110465770/80276883110000113323-C_CH_AUT_E256.p12",
-      "kvnr": "X110465770",
-      "cardType": "eGK",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000113312",
-      "auth": "egk/X110488614/80276883110000113312-C_CH_AUT_R2048.p12",
-      "kvnr": "X110488614",
-      "cardType": "eGK",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000113312",
-      "auth": "egk/X110488614/80276883110000113312-C_CH_AUT_E256.p12",
-      "kvnr": "X110488614",
-      "cardType": "eGK",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000113298",
-      "auth": "egk/X110498565/80276883110000113298-C_CH_AUT_R2048.p12",
-      "kvnr": "X110498565",
-      "cardType": "eGK",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000113298",
-      "auth": "egk/X110498565/80276883110000113298-C_CH_AUT_E256.p12",
-      "kvnr": "X110498565",
-      "cardType": "eGK",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000108142",
-      "auth": "egk/X110499478/80276883110000108142-C_CH_AUT_R2048.p12",
-      "kvnr": "X110499478",
-      "cardType": "eGK",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276883110000108142",
-      "auth": "egk/X110499478/80276883110000108142-C_CH_AUT_E256.p12",
-      "kvnr": "X110499478",
-      "cardType": "eGK",
-      "algo": "E256",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276881025548431301",
-      "auth": "egk/X110525084/80276881025548431301-C_CH_AUT_R2048.p12",
-      "kvnr": "X110525084",
-      "cardType": "eGK",
-      "algo": "R2048",
-      "password": "00"
-    },
-    {
-      "iccsn": "80276881025548431301",
-      "auth": "egk/X110525084/80276881025548431301-C_CH_AUT_E256.p12",
-      "kvnr": "X110525084",
-      "cardType": "eGK",
-      "algo": "E256",
-      "password": "00"
-    }
-  ]
-}
+[
+  {
+    "iccsn": "80276883110000113311",
+    "type": "EGK",
+    "name": "Schraßer, Fridolin Fedilio Diether Johann Wolfgang",
+    "kvnr": "X110406067",
+    "stores": [
+      "egk/X110406067/80276883110000113311-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276881025548431301",
+    "type": "EGK",
+    "name": "Bäcker, Hanna Sophie Gisela",
+    "kvnr": "X110499478",
+    "stores": [
+      "egk/X110525084/80276881025548431301-C_CH_AUT_E256.p12",
+      "egk/X110525084/80276881025548431301-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000108142",
+    "type": "EGK",
+    "name": "Bäcker, Hanna Sophie Gisela",
+    "kvnr": "X110499478",
+    "stores": [
+      "egk/X110499478/80276883110000108142_EF.C.CH.AUT_ALVI.E256.p12",
+      "egk/X110499478/80276883110000108142-C_CH_AUT_R2048.p12",
+      "egk/X110499478/80276883110000108142-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000113298",
+    "type": "EGK",
+    "name": "Hüllmann, Sina Karla Gräfin",
+    "kvnr": "X110498565",
+    "stores": [
+      "egk/X110498565/80276883110000113298-C_CH_AUT_R2048.p12",
+      "egk/X110498565/80276883110000113298-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000113312",
+    "type": "EGK",
+    "name": "Hütter, Leonie Tatjana Amelie Sieglinde Freifrau",
+    "kvnr": "X110488614",
+    "stores": [
+      "egk/X110488614/80276883110000113312-C_CH_AUT_R2048.p12",
+      "egk/X110488614/80276883110000113312-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000113323",
+    "type": "EGK",
+    "name": "Angermänn, Günther Wolfgang Graf",
+    "kvnr": "X110465770",
+    "stores": [
+      "egk/X110465770/80276883110000113323-C_CH_AUT_E256.p12",
+      "egk/X110465770/80276883110000113323-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000092475",
+    "type": "SMC_B",
+    "stores": [
+      "smcb/NordApothekeTEST-ONLY_80276883110000092475/80276883110000092475_C.HCI.OSIG.R2048/80276883110000092475_C.HCI.OSIG.R2048.p12",
+      "smcb/NordApothekeTEST-ONLY_80276883110000092475/80276883110000092475_C.HCI.AUT.R2048/80276883110000092475_C.HCI.AUT.R2048.p12",
+      "smcb/NordApothekeTEST-ONLY_80276883110000092475/80276883110000092475_C.HCI.ENC.R2048/80276883110000092475_C.HCI.ENC.R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699902301",
+    "type": "SMC_B",
+    "name": "Ulmendorfer, Adelheid",
+    "stores": [
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_ENC_E256_X509/80276001011699902301-C_SMCB_ENC_E256_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_OSIG_R2048_X509/80276001011699902301-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_AUT_E256_X509/80276001011699902301-C_SMCB_AUT_E256_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_HCI_ENC_E256.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_OSIG_E256_X509/80276001011699902301-C_SMCB_OSIG_E256_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_ENC_R2048_X509/80276001011699902301-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_HCI_OSIG_E256.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_OSIG_R2048.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_HCI_ENC_R2048.p12",
+      "smcb/ApothekeAdelheidUlmendorferTEST-ONLY_80276001011699902301/80276001011699902301-C_SMCB_AUT_R2048_X509/80276001011699902301-C_SMCB_AUT_R2048_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699902303",
+    "type": "SMC_B",
+    "name": "Ulmendorfer, Christine",
+    "stores": [
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_HCI_ENC_R2048.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_ENC_E256_X509/80276001011699902303-C_SMCB_ENC_E256_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_ENC_R2048_X509/80276001011699902303-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_OSIG_E256_X509/80276001011699902303-C_SMCB_OSIG_E256_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_OSIG_R2048_X509/80276001011699902303-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_AUT_R2048_X509/80276001011699902303-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_HCI_OSIG_E256.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_AUT_E256_X509/80276001011699902303-C_SMCB_AUT_E256_X509.p12",
+      "smcb/ApothekeChristineUlmendorferTEST-ONLY_80276001011699902303/80276001011699902303-C_SMCB_HCI_ENC_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699910104",
+    "type": "SMC_B",
+    "name": "Claudius, Damian",
+    "stores": [
+      "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_OSIG_E256_X509.p12",
+      "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/1-2-PRAXIS-DamianClaudius01/80276001011699910104-C_SMCB_AUT_E256_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000116873",
+    "type": "SMC_B",
+    "name": "Schraßer, Siegfried",
+    "stores": [
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_OSIG_E256.p12",
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_HCI_ENC_R2048.p12",
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/ApothekeAmFlughafenTEST-ONLY_80276883110000116873/80276883110000116873-C_SMCB_HCI_ENC_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699910102",
+    "type": "SMC_B",
+    "name": "Claudius, Bernd",
+    "stores": [
+      "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_OSIG_E256_X509/80276001011699910102-C_SMCB_OSIG_E256_X509.p12",
+      "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_OSIG_R2048_X509/80276001011699910102-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_ENC_R2048_X509/80276001011699910102-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_ENC_E256_X509/80276001011699910102-C_SMCB_ENC_E256_X509.p12",
+      "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_AUT_R2048_X509/80276001011699910102-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/1-2-PRAXIS-BerndClaudius01/80276001011699910102-C_SMCB_AUT_E256_X509/80276001011699910102-C_SMCB_AUT_E256_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "833621999741611",
+    "type": "SMC_B",
+    "stores": [
+      "smcb/1-2-EPA-833621999741611/833621999741611_c.hci.aut-arge_E256.p12",
+      "smcb/1-2-EPA-833621999741611/833621999741611_c.hci.osig-arge_E256.p12",
+      "smcb/1-2-EPA-833621999741611/833621999741611_c.hci.aut-arge_R2048.p12",
+      "smcb/1-2-EPA-833621999741611/833621999741611_c.hci.osig-arge_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000116872",
+    "type": "SMC_B",
+    "name": "Niggemeyer, Ubbo",
+    "stores": [
+      "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_HCI_AUT_E256/80276883110000116872-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_OSIG_R2048_X509/80276883110000116872-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_ENC_R2048_X509/80276883110000116872-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_HCI_OSIG_E256/80276883110000116872-C_SMCB_HCI_OSIG_E256.p12",
+      "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_HCI_ENC_E256/80276883110000116872-C_SMCB_HCI_ENC_E256.p12",
+      "smcb/StadtApothekeTEST-ONLY_80276883110000116872/80276883110000116872-C_SMCB_AUT_R2048_X509/80276883110000116872-C_SMCB_AUT_R2048_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000117369",
+    "type": "SMC_B",
+    "name": "Blôch-Bauer, Annemarie",
+    "stores": [
+      "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_AUT_R2048_X509/80276883110000117369-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_HCI_AUT_E256/80276883110000117369-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_ENC_R2048_X509/80276883110000117369-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_HCI_ENC_E256/80276883110000117369-C_SMCB_HCI_ENC_E256.p12",
+      "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_HCI_OSIG_E256/80276883110000117369-C_SMCB_HCI_OSIG_E256.p12",
+      "smcb/PraxisBloch-BauerTEST-ONLY_80276883110000117369/80276883110000117369-C_SMCB_OSIG_R2048_X509/80276883110000117369-C_SMCB_OSIG_R2048_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699900861",
+    "type": "SMC_B",
+    "stores": [
+      "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_OSIG_E256_X509/80276001011699900861-C_SMCB_OSIG_E256_X509.p12",
+      "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_ENC_E256_X509/80276001011699900861-C_SMCB_ENC_E256_X509.p12",
+      "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_ENC_R2048_X509/80276001011699900861-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_AUT_E256_X509/80276001011699900861-C_SMCB_AUT_E256_X509.p12",
+      "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_OSIG_R2048_X509/80276001011699900861-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/smcb-kh-aoptheke_80276001011699900861/80276001011699900861-C_SMCB_AUT_R2048_X509/80276001011699900861-C_SMCB_AUT_R2048_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699902302",
+    "type": "SMC_B",
+    "name": "Ulmendorfer, Bernd",
+    "stores": [
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_HCI_ENC_E256.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_AUT_R2048_X509/80276001011699902302-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_OSIG_E256_X509/80276001011699902302-C_SMCB_OSIG_E256_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_ENC_E256_X509/80276001011699902302-C_SMCB_ENC_E256_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_AUT_R2048_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_ENC_R2048_X509/80276001011699902302-C_SMCB_ENC_R2048_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_OSIG_R2048_X509/80276001011699902302-C_SMCB_OSIG_R2048_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_AUT_E256_X509/80276001011699902302-C_SMCB_AUT_E256_X509.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_SMCB_HCI_OSIG_E256.p12",
+      "smcb/ApothekeBerndUlmendorferTEST-ONLY_80276001011699902302/80276001011699902302-C_HCI_ENC_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000121166",
+    "type": "HBA",
+    "name": "Nullmayr, Finn-Louis",
+    "stores": [
+      "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_AUT_E256.p12",
+      "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_QES_E256.p12",
+      "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_QES_R2048.p12",
+      "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_ENC_R2048.p12",
+      "hba/Apotheker-Nullmayr/80276883110000121166-C_HP_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "8027600101169991010",
+    "type": "HBA",
+    "name": "Bernd, Claudius",
+    "stores": [
+      "hba/1-1-ARZT-BerndClaudius01/8027600101169991010-C_HP_QES_R2048.p12",
+      "hba/1-1-ARZT-BerndClaudius01/8027600101169991010-C_HP_QES_E256.p12",
+      "hba/1-1-ARZT-BerndClaudius01/8027600101169991010-C_HP_AUT_R2048.p12",
+      "hba/1-1-ARZT-BerndClaudius01/8027600101169991010-C_HP_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000095767",
+    "type": "HBA",
+    "name": "Sam Freiherr, Schraßer",
+    "stores": [
+      "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.QES.R2048.p12",
+      "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.AUT.R2048.p12",
+      "hba/1-2-ARZT-SamSchrasser01/80276883110000095767_C.HP.ENC.R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001081699900579",
+    "type": "HBA",
+    "name": "Amanda, Albrecht",
+    "stores": [
+      "hba/3-1-REZEPTOR-APO-01/c.hp.aut-erp-ecc-apoAlbrecht.p12",
+      "hba/3-1-REZEPTOR-APO-01/c.hp.qes-erp-ecc-apoAlbrecht.p12",
+      "hba/3-1-REZEPTOR-APO-01/c.hp.qes-erp-apoAlbrecht.p12",
+      "hba/3-1-REZEPTOR-APO-01/c.hp.aut-erp-apoAlbrecht.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001081699900578",
+    "type": "HBA",
+    "name": "Gunther, Gündüla",
+    "stores": [
+      "hba/1-1-ARZT-Gunther/c.hp.aut-erp-arztGunther.p12",
+      "hba/1-1-ARZT-Gunther/c.hp.qes-erp-arztGunther.p12",
+      "hba/1-1-ARZT-Gunther/c.hp.qes-erp-ecc-arztGunther.p12",
+      "hba/1-1-ARZT-Gunther/c.hp.aut-erp-ecc-arztGunther.p12"
+    ]
+  }
+]

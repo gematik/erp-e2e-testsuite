@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@
 package de.gematik.test.erezept.fhir.parser;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
@@ -127,6 +131,50 @@ class ParserTest extends ParsingTest {
           // profile cardinality is defined as 1..*
           assertTrue(entries.size() > 0);
         });
+  }
+
+  @Test
+  void shouldParseResourceWithoutExpectedClass() {
+    val id = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
+    val content =
+        ResourceUtils.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
+
+    val r1 = parser.decode(content, EncodingType.XML);
+    assertTrue(r1.getId().contains(id));
+
+    val r2 = parser.decode(content);
+    assertTrue(r2.getId().contains(id));
+  }
+
+  @Test
+  void shouldGetConcreteDavTypeFromTypeHints() {
+    val id = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
+    List.of(EncodingType.XML, EncodingType.JSON)
+        .forEach(
+            encoding -> {
+              val content =
+                  ResourceUtils.readFileFromResource(
+                      format("fhir/valid/dav/{0}.{1}", id, encoding.toFileExtension()));
+              val resource = parser.decode(content);
+              assertTrue(resource.getId().contains(id));
+              assertEquals(DavAbgabedatenBundle.class, resource.getClass());
+            });
+  }
+
+  @Test
+  void shouldGetConcreteKbvTypeFromTypeHints() {
+    val id = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
+    val content =
+        ResourceUtils.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
+    val resource = parser.decode(content);
+    assertTrue(resource.getId().contains(id));
+    assertEquals(KbvErpBundle.class, resource.getClass());
+
+    // now try json
+    val contentJson = EncodingUtil.reEncode(parser, resource, EncodingType.JSON);
+    val resource2 = parser.decode(contentJson);
+    assertTrue(resource.getId().contains(id));
+    assertEquals(KbvErpBundle.class, resource2.getClass());
   }
 
   @Test

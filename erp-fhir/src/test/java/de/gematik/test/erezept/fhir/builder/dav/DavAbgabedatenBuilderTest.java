@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,30 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.Country;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.util.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.valuesets.dav.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
-public class DavAbgabedatenBuilderTest extends ParsingTest {
+class DavAbgabedatenBuilderTest extends ParsingTest {
 
-  @Test
-  public void buildDavAbgabedatenBundleWithFixedValues() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build DAV Abgabedatenbundle with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#abdaErpPkvVersions")
+  void buildDavAbgabedatenBundleWithFixedValues(AbdaErpPkvVersion version) {
     val prescriptionId = PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_200);
 
     val pharmacy =
         PharmacyOrganizationBuilder.builder()
+            .version(version)
             .name("Adler-Apotheke")
             .iknr("757299999")
             .address(Country.D, "Berlin", "10623", "Wegelystraße 3")
@@ -43,6 +47,7 @@ public class DavAbgabedatenBuilderTest extends ParsingTest {
 
     val pc1 =
         PriceComponentBuilder.builder(KostenVersicherterKategorie.ZUZAHLUNG)
+            .version(version)
             .currency(Currency.EUR) // EUR by default
             .type("informational")
             .insurantCost(5.8f)
@@ -51,6 +56,7 @@ public class DavAbgabedatenBuilderTest extends ParsingTest {
 
     val invoice =
         DavInvoiceBuilder.builder()
+            .version(version)
             .currency(Currency.EUR) // EUR by default
             .status("issued")
             .vatRate(19.0f)
@@ -59,6 +65,7 @@ public class DavAbgabedatenBuilderTest extends ParsingTest {
 
     val dispensedMedication =
         DavDispensedMedicationBuilder.builder()
+            .version(version)
             .status("completed")
             .prescription(prescriptionId)
             .pharmacy(pharmacy)
@@ -67,6 +74,7 @@ public class DavAbgabedatenBuilderTest extends ParsingTest {
 
     val davBundle =
         DavAbgabedatenBuilder.builder(prescriptionId)
+            .version(version)
             .pharmacy(pharmacy)
             .medication(dispensedMedication)
             .invoice(invoice)
@@ -74,5 +82,14 @@ public class DavAbgabedatenBuilderTest extends ParsingTest {
 
     val result = ValidatorUtil.encodeAndValidate(parser, davBundle);
     assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldBuildValidWithFaker() {
+    for (var i = 0; i < 10; i++) {
+      val davBundle = DavAbgabedatenBuilder.faker().build();
+      val result = ValidatorUtil.encodeAndValidate(parser, davBundle);
+      assertTrue(result.isSuccessful());
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErpWorkflowCodeSystem implements ICodeSystem {
   FLOW_TYPE("https://gematik.de/fhir/CodeSystem/Flowtype"),
+  FLOW_TYPE_12("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType"),
   AVAILABILITY_STATUS("https://gematik.de/fhir/CodeSystem/AvailabilityStatus"),
+  AVAILABILITY_STATUS_12("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_AvailabilityStatus"),
   DOCUMENT_TYPE("https://gematik.de/fhir/CodeSystem/Documenttype"),
+  GEM_ERP_CS_DOCUMENT_TYPE("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType"),
   CONSENT_TYPE("https://gematik.de/fhir/CodeSystem/Consenttype"),
   ;
 

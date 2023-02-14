@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,22 @@ package de.gematik.test.erezept.fhir.parser.profiles;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.FhirProfileException;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpBasisVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.DavKbvCsVsVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.DeBasisVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.Hl7Version;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvBasisVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
 @SuppressWarnings({"java:S1192"}) // duplicating string literals here is perfectly fine!
 public enum CustomProfiles {
@@ -61,6 +69,13 @@ public enum CustomProfiles {
   CustomProfiles(
       String name, String canonicalClaim, Class<? extends ProfileVersion<?>> versionClass) {
     this(name, List.of(canonicalClaim), versionClass);
+  }
+
+  CustomProfiles(
+      String name, List<String> canonicalClaim, Class<? extends ProfileVersion<?>> versionClass) {
+    this.name = name;
+    this.canonicalClaims = canonicalClaim;
+    this.versionClass = versionClass;
   }
 
   public boolean matchesClaim(@NonNull String url) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,19 @@
 
 package de.gematik.test.erezept.client;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import de.gematik.idp.client.IdpClient;
-import de.gematik.idp.client.IdpClientRuntimeException;
-import de.gematik.idp.client.IdpTokenResult;
-import de.gematik.idp.token.JsonWebToken;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.ErpResponseFactory;
-import de.gematik.test.erezept.client.rest.MediaType;
-import de.gematik.test.erezept.client.usecases.TaskGetCommand;
-import de.gematik.test.erezept.client.vau.Response;
-import de.gematik.test.erezept.client.vau.VauClient;
-import de.gematik.test.smartcard.Smartcard;
-import java.security.cert.X509Certificate;
-import lombok.val;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import de.gematik.idp.client.*;
+import de.gematik.idp.token.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.client.vau.*;
+import de.gematik.test.smartcard.*;
+import java.security.cert.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class ErpClientTest {
 
@@ -91,6 +83,9 @@ class ErpClientTest {
     val mockSmartcard = mock(Smartcard.class);
     val mockToken = mock(IdpTokenResult.class);
     val mockJsonWebToken = mock(JsonWebToken.class);
+    val mockSmardCardCertificate = mock(SmartcardCertificate.class);
+
+    when(mockSmartcard.getAutCertificate()).thenReturn(mockSmardCardCertificate);
     when(mockIdp.login(any())).thenReturn(mockToken);
     when(mockToken.getAccessToken()).thenReturn(mockJsonWebToken);
     when(mockJsonWebToken.getRawString()).thenReturn("idptoken123");

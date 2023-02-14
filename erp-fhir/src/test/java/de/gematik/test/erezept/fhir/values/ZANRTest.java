@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,31 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ZANRTest {
+class ZANRTest {
 
   @Test
-  public void testFakerZanrLength() {
+  void testFakerZanrLength() {
     String testNum = ZANR.random().getValue();
     assertEquals(9, testNum.length());
   }
 
   @Test
-  public void testLastToDigits() {
+  void testLastToDigits() {
     String testNum = ZANR.random().toString().substring(6, 15);
     String docCategori = testNum.substring(7, 9);
     boolean testresult = docCategori.equals("50") | docCategori.equals("91");
     assertTrue(testresult);
   }
 
-  @Test(expected = Test.None.class)
-  public void testRandomFakerZanrRealisticEnd() {
+  @Test
+  void testRandomFakerZanrRealisticEnd() {
     String testLanr = LANR.random().getValue();
-    val testNo = Integer.parseInt(testLanr);
+    assertDoesNotThrow(() -> Integer.parseInt(testLanr));
   }
 }

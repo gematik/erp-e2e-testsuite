@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ import net.serenitybdd.screenplay.Actor;
 @RequiredArgsConstructor
 public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxReceipt> {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
 
   @Override
   public Class<ErxReceipt> expectedResponseBody() {
@@ -86,10 +86,10 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
   }
 
   public static ResponseOfReDispenseMedication fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static ResponseOfReDispenseMedication fromStack(DequeStrategyEnum deque) {
+  public static ResponseOfReDispenseMedication fromStack(DequeStrategy deque) {
     return new ResponseOfReDispenseMedication(deque);
   }
 }

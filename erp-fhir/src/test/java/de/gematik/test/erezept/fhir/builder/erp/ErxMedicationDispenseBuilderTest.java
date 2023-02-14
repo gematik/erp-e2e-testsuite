@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,26 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Date;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.parser.profiles.cfg.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.junitpioneer.jupiter.*;
 
 class ErxMedicationDispenseBuilderTest extends ParsingTest {
 
-  @Test
-  void buildMedicationDispenseFixedValues() {
+  @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildMedicationDispenseFixedValues(ErpWorkflowVersion version) {
     val pzn = "06313728";
-    val medication = KbvErpMedicationBuilder.faker(pzn).build();
+    val kbvItaVersion =
+        ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
+    val medication = KbvErpMedicationBuilder.faker(pzn).version(kbvItaVersion).build();
 
     val kvid = "X234567890";
     val telematikId = "606358757";
@@ -39,11 +45,13 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val lotNumber = "123456";
     val medicationDispense =
         ErxMedicationDispenseBuilder.forKvid(kvid)
+            .version(version)
             .performerId(telematikId)
             .prescriptionId(prescriptionId)
             .medication(medication)
             .status("completed") // default COMPLETED
             .whenPrepared(new Date())
+            .whenHandedOver(new Date())
             .batch(lotNumber, new Date())
             .build();
 
@@ -57,8 +65,13 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildMedicationDispenseWithFaker01() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void buildMedicationDispenseWithFaker01(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val kvid = "X234567890";
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.random();
@@ -75,11 +88,16 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildMedicationDispenseWithFaker02() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void buildMedicationDispenseWithFaker02(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val kvid = "X234567890";
     val performerId = "01234567890";
-    val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
+    val prescriptionId = new PrescriptionId("200.100.000.000.011.09");
     val medicationDispense =
         ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build();
 
@@ -92,12 +110,17 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildMedicationDispenseWithFaker03() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void buildMedicationDispenseWithFaker03(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val kvid = "X234567890";
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
-    val pzn = "000111222";
+    val pzn = "00111222";
     val medicationDispense =
         ErxMedicationDispenseBuilder.faker(kvid, performerId, pzn, prescriptionId).build();
 

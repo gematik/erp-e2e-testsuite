@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
+import de.gematik.test.erezept.fhir.resources.*;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
@@ -36,7 +37,7 @@ import org.hl7.fhir.r4.model.*;
 @Slf4j
 @ResourceDef(name = "Medication")
 @SuppressWarnings({"java:S110"})
-public class KbvErpMedication extends Medication {
+public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public List<MedicationCategory> getCatagory() {
     return this.getExtension().stream()
@@ -143,6 +144,16 @@ public class KbvErpMedication extends Medication {
         .map(ext -> StandardSize.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst()
         .orElse(StandardSize.KA);
+  }
+
+  @Override
+  public String getDescription() {
+    val medicationName = this.getMedicationName();
+    val pzn = this.getPznFirstRep();
+    val size = this.getStandardSize();
+    val category = this.getCategoryFirstRep();
+    return format(
+        "{0} {1} (PZN: {2}) / {3}", medicationName, size.getCode(), pzn, category.getDisplay());
   }
 
   public static KbvErpMedication fromMedication(Medication adaptee) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,23 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class KbvPractitionerTest {
+class KbvPractitionerTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/kbv/1.0.2/bundle/";
 
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void testEncodingLANRPractitionerFromKbvBundle() {
+  void testEncodingLANRPractitionerFromKbvBundle() {
     val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
     val fileName = kbvId + ".xml";
 
@@ -60,5 +52,7 @@ public class KbvPractitionerTest {
     assertEquals(expQualification, practitioner.getQualificationType());
     assertEquals(1, practitioner.getAdditionalQualifications().size());
     assertEquals(expAdditionalQualification, practitioner.getAdditionalQualifications().get(0));
+    // just for the sake of code-coverage
+    assertNotNull(practitioner.getDescription());
   }
 }

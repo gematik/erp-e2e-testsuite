@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ public class Main {
     Runtime.getRuntime().addShutdownHook(new GrizzlyServerShutdownHook(server));
     server.start();
 
+    log.info("======================");
     log.info("Press CTRL+C to exit..");
     Thread.currentThread().join();
   }
@@ -60,10 +61,10 @@ public class Main {
       // if parameter is given, handle this one as the path to the config file
       val yamlFile = Path.of(args[0]).toAbsolutePath().toFile();
       log.info("Initialize REST Service with Config from " + yamlFile.getAbsolutePath());
-      TestsuiteConfiguration.getInstance(
-          yamlFile); // NOSONAR Initialize config with a specific yaml File
+      TestsuiteConfiguration.getInstance(yamlFile); // NOSONAR
     }
 
+    log.info("======== PrimSys REST ========");
     ActorContext.getInstance();
     startGrizzly();
   }

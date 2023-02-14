@@ -58,7 +58,6 @@
             </coding>
           </code>
           <entry>
-            <!-- Referenz auf Verordnung (MedicationRequest) -->
             <reference value="MedicationRequest/43c2b7ae-ad11-4387-910a-e6b7a3c38d4f" />
           </entry>
         </section>
@@ -70,7 +69,6 @@
             </coding>
           </code>
           <entry>
-            <!-- Referenz auf Krankenkasse/KostentrĂ¤ger  -->
             <reference value="Coverage/1b89236c-ab14-4e92-937e-5af0b59d0cd4" />
           </entry>
         </section>
@@ -81,7 +79,6 @@
     <fullUrl value="http://pvs.praxis.local/fhir/MedicationRequest/43c2b7ae-ad11-4387-910a-e6b7a3c38d4f" />
     <resource>
       <MedicationRequest xmlns="http://hl7.org/fhir">
-        <!--Beispiel MedicationRequest für eine PZN-Verordnung -->
         <id value="43c2b7ae-ad11-4387-910a-e6b7a3c38d4f" />
         <meta>
           <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.0.2" />

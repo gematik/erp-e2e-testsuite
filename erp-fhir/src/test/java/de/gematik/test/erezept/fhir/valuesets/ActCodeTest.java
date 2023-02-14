@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ActCodeTest {
+class ActCodeTest {
 
   @Test
-  public void shouldParseValidActCodeFromCode() {
+  void shouldParseValidActCodeFromCode() {
     val codes = List.of("OPTIN", "OPTINR", "OPTOUT", "OPTOUTE");
     val expectedTypes = List.of(ActCode.OPTIN, ActCode.OPTINR, ActCode.OPTOUT, ActCode.OPTOUTE);
 
@@ -38,7 +39,7 @@ public class ActCodeTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidActCodeCodes() {
+  void shouldThrowExceptionOnInvalidActCodeCodes() {
     val codes = List.of("OPT", "ABCD", "OUT");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> ActCode.fromCode(code)));

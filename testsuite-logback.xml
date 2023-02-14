@@ -21,35 +21,15 @@
     </appender>
 
 
-    <logger name="de.gematik.test.erezept" level="INFO" additivity="false">
+    <logger name="de.gematik.test" level="TRACE" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="de.gematik.test" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="de.gematik.test.erezept" level="ALL" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="de.gematik.test.core" level="ALL" additivity="false">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="de.gematik.test.erezept.client" level="ALL" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="de.gematik.idp.client.IdpClient" level="ALL" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="de.gematik.test.erezept.primsys" level="ALL" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <logger name="de.gematik.test.erezept.integration" level="ALL" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
-    <logger name="de.gematik.test.erezept.pspwsclient" level="ALL" additivity="false">
+    <logger name="de.gematik.idp.client.IdpClient" level="TRACE" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,13 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.cfg.LocalKonnektorConfiguration;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.smartcard.*;
+import lombok.*;
+import org.junit.*;
 
 public class ExternalAuthenticateCommandTest {
 
@@ -43,26 +38,27 @@ public class ExternalAuthenticateCommandTest {
   @SneakyThrows
   @Test
   public void shouldCreateValidSignatureWithRSA() {
-    val smcb = sca.getSmcbByICCSN("8027600101169991010", Crypto.RSA_2048);
-    val cardHandle = mockKonnektor.execute(GetCardHandleCommand.forSmartcard(smcb));
+    val smcb = sca.getSmcbByICCSN("80276001011699910104");
+    val cardHandle = mockKonnektor.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
 
-    val externalAuthenticateCommand = new ExternalAuthenticateCommand(cardHandle);
+    val externalAuthenticateCommand =
+        new ExternalAuthenticateCommand(cardHandle, Crypto.RSA_PSS_2048);
     val toBeSignedData = new byte[0];
     externalAuthenticateCommand.setToBeSignedData(toBeSignedData);
-    val signedData = mockKonnektor.execute(externalAuthenticateCommand);
+    val signedData = mockKonnektor.execute(externalAuthenticateCommand).getPayload();
     assertNotNull(signedData);
     assertEquals(256, signedData.length);
   }
 
   @Test
   public void shouldCreateValidSignatureWithECC() {
-    val hba = sca.getHbaByICCSN("80276883110000121166", Crypto.ECC_256);
-    val cardHandle = mockKonnektor.execute(GetCardHandleCommand.forSmartcard(hba));
+    val hba = sca.getHbaByICCSN("80276883110000121166");
+    val cardHandle = mockKonnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
 
-    val externalAuthenticateCommand = new ExternalAuthenticateCommand(cardHandle);
+    val externalAuthenticateCommand = new ExternalAuthenticateCommand(cardHandle, Crypto.ECC_256);
     val toBeSignedData = new byte[0];
     externalAuthenticateCommand.setToBeSignedData(toBeSignedData);
-    assertNotNull(mockKonnektor.execute(externalAuthenticateCommand));
+    assertNotNull(mockKonnektor.execute(externalAuthenticateCommand).getPayload());
     // TODO: DocBrown: the signature validation still missing
     //  Marty: yeah..but we have reached the code coverage
   }

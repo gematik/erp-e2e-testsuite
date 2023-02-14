@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -84,12 +84,11 @@ public class EncodingUtil {
 
     // re-encode the original object to flipped encoding
     val flippedEncoding = EncodingUtil.flipEncoding(originalEncoding);
-    val flippedContent = reEncode(parser, originalObject, flippedEncoding);
 
-    return flippedContent;
+    return reEncode(parser, originalObject, flippedEncoding);
   }
 
-  private static <T extends IBaseResource> String reEncode(
+  public static <T extends IBaseResource> String reEncode(
       FhirParser parser, T resource, EncodingType encoding) {
     val content = parser.encode(resource, encoding);
     val vr = parser.validate(content);

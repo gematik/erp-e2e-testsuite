@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import ca.uhn.fhir.parser.DataFormatException;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.hl7.fhir.r4.model.Resource;
+import ca.uhn.fhir.parser.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import java.time.Duration;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 public class ErpResponseFactory {
@@ -36,20 +36,21 @@ public class ErpResponseFactory {
   }
 
   public <R extends Resource> ErpResponse createFrom(
-      int status, Map<String, String> headers, String content, Class<R> expect) {
+      int status, Duration duration, Map<String, String> headers, String content, Class<R> expect) {
     ErpResponse response;
 
     if (content.length() > 0) {
       val resource = decode(content, expect);
-      response = new ErpResponse(status, headers, resource);
+      response = new ErpResponse(status, duration, headers, resource);
     } else {
-      response = new ErpResponse(status, headers, null);
+      response = new ErpResponse(status, duration, headers, null);
     }
     return response;
   }
 
-  public ErpResponse createFrom(int status, Map<String, String> headers, Resource resource) {
-    return new ErpResponse(status, headers, resource);
+  public ErpResponse createFrom(
+      int status, Duration duration, Map<String, String> headers, Resource resource) {
+    return new ErpResponse(status, duration, headers, resource);
   }
 
   private Resource decode(String content, Class<? extends Resource> expect) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class UseAndroidAppTest {
     when(driver.findElement(any())).thenReturn(webElement);
 
     val driverAbility = new UseAndroidApp(driver, config);
-    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT));
+    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 
   @Test
@@ -85,7 +85,7 @@ class UseAndroidAppTest {
     when(driver.findElements(any())).thenReturn(List.of(webElement));
 
     val driverAbility = new UseAndroidApp(driver, config);
-    val elementList = driverAbility.getWebElementList(Onboarding.NEXT);
+    val elementList = driverAbility.getWebElementList(Onboarding.NEXT_BUTTON);
     assertEquals(1, elementList.size());
   }
 
@@ -106,7 +106,7 @@ class UseAndroidAppTest {
         .thenReturn(webElement);
 
     val driverAbility = new UseAndroidApp(driver, config);
-    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT));
+    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 
   @Test
@@ -127,6 +127,7 @@ class UseAndroidAppTest {
         .thenReturn(webElement);
 
     val driverAbility = new UseAndroidApp(driver, config);
-    assertThrows(NoSuchElementException.class, () -> driverAbility.getWebElement(Onboarding.NEXT));
+    assertThrows(
+        NoSuchElementException.class, () -> driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 }

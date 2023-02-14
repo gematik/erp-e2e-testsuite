@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package de.gematik.test.core;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.core.exceptions.ArgumentBuilderException;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.core.exceptions.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import java.util.stream.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class ArgumentComposerTest {
 
@@ -36,7 +35,7 @@ class ArgumentComposerTest {
             .arguments("B", 1, 0.1)
             .arguments("C", 2, 0.2)
             .create()
-            .collect(Collectors.toList());
+            .toList();
     val expectedRows = 3;
     assertEquals(expectedRows, arguments.size());
 
@@ -62,7 +61,7 @@ class ArgumentComposerTest {
             .arguments(0, 1, 2, 3)
             .arguments(0.0, 0.1, 0.2, 0.3)
             .rotated()
-            .collect(Collectors.toList());
+            .toList();
     val expectedRows = 4;
     assertEquals(expectedRows, arguments.size());
 
@@ -124,7 +123,7 @@ class ArgumentComposerTest {
             .append("XYZ", "ZYX")
             .add(2, 888, 999)
             .create()
-            .collect(Collectors.toList());
+            .toList();
     val expectedRows = 3;
     assertEquals(expectedRows, arguments.size());
     arguments.forEach(
@@ -153,7 +152,7 @@ class ArgumentComposerTest {
         ArgumentComposer.composeWith(existing)
             .multiply(List.of(TestEnum4.TEN, TestEnum4.ELEVEN))
             .create()
-            .collect(Collectors.toList());
+            .toList();
 
     val expectedRows = 3 * 2;
     assertEquals(expectedRows, arguments.size());
@@ -181,10 +180,7 @@ class ArgumentComposerTest {
             .create();
 
     val arguments =
-        ArgumentComposer.composeWith(existing)
-            .multiply(TestEnum4.class)
-            .create()
-            .collect(Collectors.toList());
+        ArgumentComposer.composeWith(existing).multiply(TestEnum4.class).create().toList();
 
     val expectedRows = 3 * TestEnum4.values().length;
     assertEquals(expectedRows, arguments.size());
@@ -208,8 +204,7 @@ class ArgumentComposerTest {
     val l2 = List.of(0, 1, 2, 3);
     val expectedRows = l1.size() * l2.size();
 
-    val cartesian =
-        ArgumentComposer.composeWith(l1).multiply(l2).create().collect(Collectors.toList());
+    val cartesian = ArgumentComposer.composeWith(l1).multiply(l2).create().toList();
 
     assertEquals(expectedRows, cartesian.size());
 
@@ -238,12 +233,7 @@ class ArgumentComposerTest {
     val l4 = List.of("abc", "def");
     val expectedRows = l1.size() * l2.size() * l3.size() * l4.size();
     val cartesian =
-        ArgumentComposer.composeWith(l4)
-            .multiply(l3)
-            .multiply(l2)
-            .multiply(l1)
-            .create()
-            .collect(Collectors.toList());
+        ArgumentComposer.composeWith(l4).multiply(l3).multiply(l2).multiply(l1).create().toList();
 
     assertEquals(expectedRows, cartesian.size());
 
@@ -269,10 +259,7 @@ class ArgumentComposerTest {
     val l1 = List.of("A", "B", "C", "D");
     val expectedRows = l1.size() * PrescriptionFlowType.values().length;
     val cartesian =
-        ArgumentComposer.composeWith(PrescriptionFlowType.class)
-            .multiply(l1)
-            .create()
-            .collect(Collectors.toList());
+        ArgumentComposer.composeWith(PrescriptionFlowType.class).multiply(l1).create().toList();
     assertEquals(expectedRows, cartesian.size());
 
     val firstArgs = cartesian.get(0).get();
@@ -293,7 +280,7 @@ class ArgumentComposerTest {
         ArgumentComposer.composeWith(PrescriptionFlowType.class)
             .multiplyAppend(l1)
             .create()
-            .collect(Collectors.toList());
+            .toList();
     assertEquals(expectedRows, cartesian.size());
 
     val firstArgs = cartesian.get(0).get();
@@ -308,10 +295,7 @@ class ArgumentComposerTest {
 
   @Test
   void shouldExcludeFromCreateEnumList() {
-    val l1 =
-        ArgumentComposer.composeWith(TestEnum.class, TestEnum.A, TestEnum.D)
-            .create()
-            .collect(Collectors.toList());
+    val l1 = ArgumentComposer.composeWith(TestEnum.class, TestEnum.A, TestEnum.D).create().toList();
     assertEquals(2, l1.size());
     assertEquals(TestEnum.B, l1.get(0).get()[0]);
     assertEquals(TestEnum.C, l1.get(1).get()[0]);
@@ -336,7 +320,7 @@ class ArgumentComposerTest {
             .multiplyAppend(TestEnum2.class, TestEnum2.X)
             .multiplyAppend(TestEnum.class)
             .create()
-            .collect(Collectors.toList());
+            .toList();
     val expectedRows =
         TestEnum.values().length
             * (TestEnum2.values().length - 1) // excluded TestEnum2.X

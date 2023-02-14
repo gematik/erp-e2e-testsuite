@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ public class ErxCommunication extends Communication {
   public boolean isSubstitutionAllowed() {
     return this.getPayload().get(0).getExtension().stream()
         .filter(
-            ext -> ext.getUrl().equals(ErpWorkflowStructDef.SUBSTITION_ALLOWED.getCanonicalUrl()))
+            ext -> ext.getUrl().equals(ErpWorkflowStructDef.SUBSTITUTION_ALLOWED.getCanonicalUrl()))
         .map(ext -> ext.castToBoolean(ext.getValue()).booleanValue())
         .findFirst()
         .orElse(true);

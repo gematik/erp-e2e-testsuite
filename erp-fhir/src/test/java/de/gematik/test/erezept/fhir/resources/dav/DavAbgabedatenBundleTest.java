@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,30 @@
 
 package de.gematik.test.erezept.fhir.resources.dav;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.sql.Date;
 import java.time.LocalDate;
 import lombok.val;
 import org.hl7.fhir.r4.model.Invoice;
 import org.hl7.fhir.r4.model.MedicationDispense;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DavAbgabedatenBundleTest {
+class DavAbgabedatenBundleTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/dav/";
 
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void testEncodeSingleValidBundle() {
+  void testEncodeSingleValidBundle() {
     val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
     val expectedPrescriptionId = new PrescriptionId("200.100.000.000.081.90");
+    val expectedFlowType = PrescriptionFlowType.FLOW_TYPE_200;
 
     val fileName = expectedID + ".xml";
 
@@ -53,6 +48,7 @@ public class DavAbgabedatenBundleTest {
 
     assertEquals(expectedID, bundle.getLogicalId());
     assertEquals(expectedPrescriptionId, bundle.getPrescriptionId());
+    assertNotNull(bundle.getDescription());
 
     val pharm = bundle.getPharmacy();
     assertNotNull(pharm);
@@ -61,6 +57,7 @@ public class DavAbgabedatenBundleTest {
     val dispensed = bundle.getDispensedMedication();
     assertNotNull(dispensed);
     assertEquals(expectedPrescriptionId, dispensed.getPrescriptionId());
+    assertEquals(expectedFlowType, bundle.getFlowType());
     assertEquals(
         "urn:uuid:5dc67a4f-c936-4c26-a7c0-967673a70740", dispensed.getPerformerReference());
     assertEquals(MedicationDispense.MedicationDispenseStatus.COMPLETED, dispensed.getStatus());
@@ -74,5 +71,15 @@ public class DavAbgabedatenBundleTest {
     assertEquals(0.0, invoice.getTotalCoPayment(), 0.001);
     assertEquals("EUR", invoice.getCurrency());
     assertEquals(19.0, invoice.getVAT(), 0.001);
+  }
+
+  @Test
+  void shouldCastFromResource() {
+    val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val bundleResource = parser.decode(content);
+    assertDoesNotThrow(() -> DavAbgabedatenBundle.fromBundle(bundleResource));
   }
 }

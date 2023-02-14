@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum Settings implements PageElement {
-  SHOW(
-      "Show",
-      () -> By.tagName("erx_btn_settings"),
+  MENU_BUTTON(
+      "Settings Menu Button",
+      () -> By.tagName("BottomNavigation.SettingsButton"),
       () -> AppiumBy.accessibilityId("Einstellungen")),
-  LEAVE(
-      "Leave",
-      () -> AppiumBy.accessibilityId("nav_btn_back"),
+  LEAVE_BUTTON(
+      "Leave Settings Menu Button",
+      () -> By.tagName("BottomNavigation.PrescriptionButton"),
       () -> AppiumBy.accessibilityId("Rezepte")),
   ;
 

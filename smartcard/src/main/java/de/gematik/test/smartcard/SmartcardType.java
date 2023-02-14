@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.smartcard;
 
-import de.gematik.test.smartcard.exceptions.InvalidSmartcardTypeException;
-import lombok.NonNull;
+import de.gematik.test.smartcard.exceptions.*;
+import lombok.*;
 
 public enum SmartcardType {
   EGK("eGK"),
@@ -36,7 +36,7 @@ public enum SmartcardType {
   }
 
   public static SmartcardType fromString(@NonNull String type) {
-    return switch (type.toLowerCase().strip().replace("-", "")) {
+    return switch (type.toLowerCase().strip().replaceAll("[-_]", "")) {
       case "egk" -> EGK;
       case "hba" -> HBA;
       case "smcb" -> SMC_B;

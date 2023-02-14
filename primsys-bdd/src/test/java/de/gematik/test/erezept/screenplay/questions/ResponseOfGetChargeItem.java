@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,25 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.lei.exceptions.InvalidActorRoleException;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.ActorRole;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
 @Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfGetChargeItem extends FhirResponseQuestion<ErxChargeItem> {
 
-  private final DequeStrategyEnum deque;
-
-  private ResponseOfGetChargeItem(DequeStrategyEnum deque) {
-    this.deque = deque;
-  }
+  private final DequeStrategy deque;
+  private final ActorRole role;
 
   @Override
   public Class<ErxChargeItem> expectedResponseBody() {
@@ -50,11 +53,16 @@ public class ResponseOfGetChargeItem extends FhirResponseQuestion<ErxChargeItem>
 
   @Override
   public ErpResponse answeredBy(Actor actor) {
-    val receivedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
-    val lastDispensedPrescriptionId = deque.chooseFrom(receivedDrugs.getDispensedDrugsList());
-    val cmd = new ChargeItemGetByIdCommand(lastDispensedPrescriptionId);
+    ChargeItemGetByIdCommand cmd;
+    if (role == ActorRole.PHARMACY) {
+      cmd = getPharmacyCommand(actor);
+    } else if (role == ActorRole.PATIENT) {
+      cmd = getPatientCommand(actor);
+    } else {
+      throw new InvalidActorRoleException(format("Get ChargeItem as {0}", role));
+    }
 
     log.info(
         format(
@@ -63,11 +71,44 @@ public class ResponseOfGetChargeItem extends FhirResponseQuestion<ErxChargeItem>
     return erpClientAbility.request(cmd);
   }
 
-  public static ResponseOfGetChargeItem forPrescription(DequeStrategyEnum deque) {
-    return new ResponseOfGetChargeItem(deque);
+  private ChargeItemGetByIdCommand getPatientCommand(Actor actor) {
+    val receivedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
+    val dispensed = deque.chooseFrom(receivedDrugs.getDispensedDrugsList());
+    return new ChargeItemGetByIdCommand(dispensed);
   }
 
-  public static ResponseOfGetChargeItem forLastPrescription() {
-    return forPrescription(DequeStrategyEnum.LIFO);
+  private ChargeItemGetByIdCommand getPharmacyCommand(Actor actor) {
+    val pharmacyStack = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
+    val dispensed = deque.chooseFrom(pharmacyStack.getDispensedPrescriptions());
+    return new ChargeItemGetByIdCommand(dispensed.getPrescriptionId());
+  }
+
+  public static Builder forPrescription(String order) {
+    return forPrescription(DequeStrategy.fromString(order));
+  }
+
+  public static Builder forPrescription(DequeStrategy deque) {
+    return new Builder(deque);
+  }
+
+  public static Builder forLastPrescription() {
+    return forPrescription(DequeStrategy.LIFO);
+  }
+
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class Builder {
+    private final DequeStrategy deque;
+
+    public ResponseOfGetChargeItem asPatient() {
+      return withRole(ActorRole.PATIENT);
+    }
+
+    public ResponseOfGetChargeItem asPharmacy() {
+      return withRole(ActorRole.PHARMACY);
+    }
+
+    public ResponseOfGetChargeItem withRole(ActorRole role) {
+      return new ResponseOfGetChargeItem(deque, role);
+    }
   }
 }

@@ -1,0 +1,85 @@
+
+== Anwendungsfälle
+Nachfolgend werden die gängigsten Anwendungsfälle beschrieben, die mit {APP} umgesetzt werden können.
+
+=== FHIR Ressourcen generieren
+Das {APP} ist in der Lage viele der im E-Rezept verwendeten FHIR Ressourcen über das CLI zu generieren. Nachfolgend werden exemplarisch die gebräuchlichsten Ressourcen generiert. Die Anzahl der Optionen und Parameter ist sehr vielfältig und kann daher nicht komplett demonstriert werden.
+
+[NOTE]
+Die meisten Optionen sind optional und werden, wenn sie fehlen, mit validen Default- bzw. Zufalls-Werten belegt.
+Die jeweiligen Optionen können der Hilfe (`erpf generate <CMD> --help`) bzw. der Manpages (`man erpf generate <CMD>`) entnommen werden. Hier werden in der Regel auch die Default-Werte aufgeführt. Führt eine optionale Option in der Hilfe keinen Defautl-Wert auf, so wird in den meisten Fällen hier ein valider Zufalls-Wert benutzt.
+
+==== KBV-Practitioner generieren
+Um einen link:https://simplifier.net/packages/kbv.ita.for/1.1.0/files/720095[KBV_PR_FOR_Practitioner] zu generieren, kann das Sub-Kommando `generate kbvpractitioner` verwendet werden. Im nachfolgendem Beispiel wird ein *Zahnarzt* mit dem Namen *Bernd Claudius* und einer zufälligen ZANR generiert.
+
+[source,shell]
+----
+erpf generate kbvpractitioner --doc="Bernd Claudius" --qualification=DENTIST
+----
+
+==== KBV-Organization generieren
+Um eine link:https://simplifier.net/packages/kbv.ita.for/1.1.0/files/720093[KBV_PF_FOR_Organization] zu generieren, kann das Sub-Kommando `generate kbvorganization` verwendet werden. Im nachfolgenden Beispiel wird eine *Arztpraxis Bernd Claudius* mit der BSNR *123456789* mit einer zufälligen Adresse generiert.
+
+[source,shell]
+----
+erpf generate kbvorganization --organization="Arztpraxis Bernd Claudius" --bsnr=123456789
+----
+
+==== KBV-Patient generieren
+Um eine link:https://simplifier.net/packages/kbv.ita.for/1.1.0/files/720094[KBV_PF_FOR_Patient] zu generieren, kann das Sub-Kommando `generate kbvpatient` verwendet werden. Im nachfolgenden Beispiel wird eine *PKV*-Versicherte mit dem Namen *Leonie Hütter* und der KVNR *X123456789* generiert.
+
+[source,shell]
+----
+erpf generate kbvpatient --patient="Leonie Hütter" --kvid=X123456789 --insurance-type=PKV
+----
+
+==== KBV-Coverage generieren
+Um eine link:https://simplifier.net/packages/kbv.ita.for/1.1.0/files/720092[KBV_PF_FOR_Coverage] zu generieren, kann das Sub-Kommando `generate kbvcoverage` verwendet werden. Im nachfolgenden Beispiel wird eine Krankenkasse mit dem Namen *ABC Nord* mit der IKNR *123456789* und WOP in *Berlin* generiert.
+
+[source,shell]
+----
+erpf generate kbvcoverage --insurance="ABC Nord" --iknr=123456789 --wop=BERLIN
+----
+
+==== KBV-Medication generieren
+Um eine link:https://simplifier.net/packages/kbv.ita.erp/1.1.0/files/720161[KBV_PR_ERP_Medication_PZN] zu generieren, kann das Sub-Kommando `generate kbvmedication` verwendet werden. Im nachfolgenden Beispiel wird eine Medikation für *Vitamin D3 Hevert 4.000 I.E. Tabletten - 90 St.* mit der PZN *11295470* und der Normgröße *N3* mit *90 Stk.* Inhalt generiert.
+
+[source,shell]
+----
+erpf generate kbvmedication --drugname="Vitamin D3 Hevert 4.000 I.E. Tabletten - 90 St." --pzn=11295470 --amount=90 --size=N3
+----
+
+==== KBV-Medication-Request generieren
+Um eine link:https://simplifier.net/packages/kbv.ita.erp/1.1.0/files/720163[KBV_PR_ERP_Prescription] zu generieren, kann das Sub-Kommando `generate kbvmedicationrequest` verwendet werden. Im nachfolgenden Beispiel wird eine *Verordnung* für *2* Packungen mit der Dosieranweisung *0-0-1-0* und der Möglichkeit für ein *Ersatzpräparat* (*Aut-idem*) generiert.
+
+[source,shell]
+----
+erpf generate kbvmedicationrequest --packages=2 --dosage=0-0-1-0 --aut-idem
+----
+
+==== KBV-Bundles generieren
+Um FHIR-Ressourcen zu generieren, wird das Sub-Kommando `generate kbvbundle` verwendet. Der nachfolgende Aufruf generiert 10 link:https://simplifier.net/packages/kbv.ita.erp/1.0.2[KBV_PR_ERP_Bundle] und legt diese im Pfad `./kbv_bundles` ab.
+
+[source,shell]
+----
+erpf generate kbvbundle -n10 ./kbv_bundles
+----
+
+[NOTE]
+Das KBV-Bundle setzt sich aus den vorherigen Ressourcen wie z.B. Patient und Practitioner zusammen. Hier können deshalb auch sämtliche Optionen aus den jeweiligen einzelnen Ressourcen wie z.B. `--doc` und `--kvid` verwendet werden.
+
+=== FHIR-Ressourcen transkodieren
+FHIR-Ressourcen können zwischen den Kodierungtypen `JSON` und `XML` _transkodiert_ werden. D.h. habe ich z.B. KBV-Bundles in `XML` vorliegen, benötige diese allerdings in `JSON`, dann kann ich diese über das Sub-Kommando `transcode` umwandeln lassen.
+
+[source,shell]
+----
+erpf transcode -r ./kbv_bundles ./kbv_bundles_json
+----
+
+=== FHIR-Ressourcen validieren
+FHIR-Ressourcen können gegen die FHIR-Profile mit dem Sub-Kommando `validate` validiert werden. Für die Validierung kommt link:https://hapifhir.io/[HAPI FHIR] zusammen mit der link:#list_profiles_cmd[Profilierung] für das E-Rezept zum Einsatz.
+
+[source,shell]
+----
+erpf validate -r ./kbv_bundles
+----

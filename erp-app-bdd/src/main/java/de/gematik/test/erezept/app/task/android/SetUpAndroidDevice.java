@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,19 @@
 
 package de.gematik.test.erezept.app.task.android;
 
-import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
-import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.CardWall;
-import de.gematik.test.erezept.app.mobile.elements.Debug;
-import de.gematik.test.erezept.app.mobile.elements.Onboarding;
-import de.gematik.test.erezept.app.mobile.elements.Prescriptions;
-import de.gematik.test.erezept.app.mobile.elements.Settings;
-import de.gematik.test.erezept.exceptions.TestcaseAbortedException;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.jwt.JWTDecoder;
-import de.gematik.test.erezept.operator.UIProvider;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.Base64;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Task;
+import de.gematik.test.erezept.app.abilities.*;
+import de.gematik.test.erezept.app.mobile.*;
+import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.exceptions.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.jwt.*;
+import de.gematik.test.erezept.operator.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,14 +44,14 @@ public class SetUpAndroidDevice implements Task {
     // walk through onboarding
     app.swipe(SwipeDirection.LEFT);
     app.swipe(SwipeDirection.LEFT);
-    app.input(actor.getName(), Onboarding.USER_PROFILE);
-    app.tap(Onboarding.NEXT);
-    app.inputPassword(password, Onboarding.PASSWORD_INPUT);
-    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION);
-    app.tap(4, Onboarding.NEXT);
-    app.tap(Onboarding.ACCEPT_PRIVACY);
-    app.tap(Onboarding.ACCEPT_TERMS_OF_USE);
-    app.tap(Onboarding.CONFIRM_LEGAL);
+    app.input(actor.getName(), Onboarding.USER_PROFILE_FIELD);
+    app.tap(Onboarding.NEXT_BUTTON);
+    app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
+    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
+    app.tap(4, Onboarding.NEXT_BUTTON);
+    app.tap(Onboarding.ACCEPT_PRIVACY_BUTTON);
+    app.tap(Onboarding.ACCEPT_TERMS_OF_USE_BUTTON);
+    app.tap(Onboarding.CONFIRM_TERMS_AND_PRIVACY_SELECTION_BUTTON);
 
     if (app.useVirtualeGK()) {
       performWithVirtualeGK(actor, app);
@@ -73,11 +64,11 @@ public class SetUpAndroidDevice implements Task {
 
   private void performWithRealeGK(UseTheApp<?> app) {
     // walk through cardwall
-    app.tap(Prescriptions.REFRESH);
-    app.tap(CardWall.NEXT);
-    app.input("123123", CardWall.CAN_INPUT); // TODO: find a way to configure
-    app.tap(CardWall.NEXT);
-    app.input("123456", CardWall.PIN_INPUT); // TODO: find a way to configure
+    app.tap(Prescriptions.REFRESH_BUTTON);
+    app.tap(CardWall.NEXT_BUTTON);
+    app.input("123123", CardWall.CAN_INPUT_FIELD); // TODO: find a way to configure
+    app.tap(CardWall.NEXT_BUTTON);
+    app.input("123456", CardWall.PIN_INPUT_FIELD); // TODO: find a way to configure
     //    app.tap(CardWall.NEXT); // seems to be not required??
 
     app.tap(CardWall.SIGN_IN);
@@ -87,26 +78,28 @@ public class SetUpAndroidDevice implements Task {
 
   @SneakyThrows
   private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app) {
-    app.tap(Settings.SHOW);
-    app.tap(Debug.SHOW);
+    app.tap(Settings.MENU_BUTTON);
+    app.tap(Debug.MENU_BUTTON);
 
     val egk = SafeAbility.getAbility(actor, ProvideEGK.class).getEgk();
-    val pkBase64 = Base64.getEncoder().encodeToString(egk.getAuthPrivateKey().getEncoded());
-    val cchBase64 = Base64.getEncoder().encodeToString(egk.getAuthCertificate().getEncoded());
+    val autCertificate = egk.getAutCertificate();
+    val pkBase64 = Base64.getEncoder().encodeToString(autCertificate.getPrivateKey().getEncoded());
+    val cchBase64 =
+        Base64.getEncoder().encodeToString(autCertificate.getX509Certificate().getEncoded());
     app.swipe(SwipeDirection.UP);
     app.swipe(SwipeDirection.UP); // one swipe is not enough to reach the bottom of the screen
     app.input(pkBase64, Debug.EGK_PRIVATE_KEY);
     app.input(cchBase64, Debug.EGK_CERTIFICATE_CHAIN);
-    app.tap(Debug.SET_VIRTUAL_EGK);
+    app.tap(Debug.SET_VIRTUAL_EGK_FIELD);
 
-    app.tap(Debug.LEAVE);
-    app.tap(Settings.LEAVE);
+    app.tap(Debug.LEAVE_BUTTON);
+    app.tap(Settings.LEAVE_BUTTON);
   }
 
   private <T extends Actor> void getBaseDataFromDebugMenu(T actor, UseTheApp<?> app) {
     // visit the settings screen: and fetch KVID and name from Bearer Token
-    app.tap(Settings.SHOW);
-    app.tap(Debug.SHOW);
+    app.tap(Settings.MENU_BUTTON);
+    app.tap(Debug.MENU_BUTTON);
     val rawToken = app.getWebElement(Debug.BEARER_TOKEN).getText();
     val token = JWTDecoder.decode(rawToken);
     val kvid = token.getPayload().getIdentifier();
@@ -114,8 +107,8 @@ public class SetUpAndroidDevice implements Task {
     val familyName = token.getPayload().getFamilyName();
     actor.can(ProvidePatientBaseData.forPatient(kvid, givenName, familyName, insuranceKind));
 
-    app.tap(Debug.LEAVE);
-    app.tap(Settings.LEAVE);
+    app.tap(Debug.LEAVE_BUTTON);
+    app.tap(Settings.LEAVE_BUTTON);
   }
 
   /**

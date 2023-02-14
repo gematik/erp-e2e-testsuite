@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.hl7.fhir.r4.model.Address;
 public class PharmacyOrganizationBuilder
     extends AbstractOrganizationBuilder<PharmacyOrganizationBuilder> {
 
+  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
   private IKNR iknr;
 
   public static PharmacyOrganizationBuilder builder() {
@@ -52,6 +53,11 @@ public class PharmacyOrganizationBuilder
     val builder = builder();
     builder.name(name).iknr(fakerIknr()).address(fakerCity(), fakerZipCode(), fakerStreetName());
     return builder;
+  }
+
+  public PharmacyOrganizationBuilder version(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersion = version;
+    return self();
   }
 
   public PharmacyOrganizationBuilder address(
@@ -81,7 +87,7 @@ public class PharmacyOrganizationBuilder
     checkRequired();
     return PharmacyOrganization.fromOrganization(
         buildOrganizationWith(
-            () -> AbdaErpPkvStructDef.APOTHEKE.asCanonicalType(AbdaErpPkvVersion.V1_1_0, true),
+            () -> AbdaErpPkvStructDef.APOTHEKE.asCanonicalType(abdaErpPkvVersion, true),
             iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID)));
   }
 

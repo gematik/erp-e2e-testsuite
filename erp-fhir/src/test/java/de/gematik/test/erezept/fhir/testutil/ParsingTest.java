@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.fhir.testutil;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import org.junit.jupiter.api.BeforeAll;
+import de.gematik.test.erezept.fhir.parser.*;
+import org.junit.jupiter.api.*;
 
 @SuppressWarnings({"java:S2187"})
 public class ParsingTest {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -53,21 +53,27 @@ public class ProfileExtractor {
       return Optional.empty();
     }
 
-    val meta = root.get("meta");
-    if (meta == null || meta.isNull() || meta.isEmpty()) {
+    // find the meta tags within the resource
+    val metas = root.findValues("meta");
+    if (metas.isEmpty()) {
       log.warn(
-          format("Given content does not have a meta-tag: {0}", shortenContentForLogging(content)));
+          format(
+              "Given content does not have any meta-tag: {0}", shortenContentForLogging(content)));
       return Optional.empty();
     }
 
-    val profile = meta.get("profile");
-    if (profile == null || profile.isNull() || profile.isEmpty()) {
+    // find the first meta tag with a defined profile
+    val firstProfileMeta = metas.stream().filter(m -> m.findValue("profile") != null).findFirst();
+    if (firstProfileMeta.isEmpty()) {
       log.warn(
           format(
-              "Given content does not have a profile-tag in meta: {0}",
-              shortenContentForLogging(meta.toString())));
+              "Given content does not contain any profiles: {0}",
+              shortenContentForLogging(content)));
       return Optional.empty();
     }
+
+    val meta = firstProfileMeta.get();
+    val profile = meta.get("profile");
 
     if (profile.isArray()) {
       val url = profile.get(0).asText();

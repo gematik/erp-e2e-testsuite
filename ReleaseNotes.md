@@ -1,5 +1,18 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.3.0
+
+Implemented features:
+
+- Fhir Profile Support for KBV, DAV, GKV, PKV and gematik for the generation of test data and
+  validation of fhir resources from July 1, 2023
+  - An overview of the Fhir profile versions can be found
+    at https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc#%C3%BCbersicht-timeline
+- Refactoring of the smartcard module
+- Expansion of test cases of the test preparation for the admission tests for the e-prescription
+  service
+  for version 1.9.0
+
 ## Release 0.2.0
 
 Implemented features:

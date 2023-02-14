@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,17 @@
 
 package de.gematik.test.konnektor.commands;
 
-import de.gematik.test.konnektor.PinType;
-import de.gematik.test.konnektor.cfg.KonnektorModuleConfiguration;
-import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.SmartcardFactory;
-import de.gematik.test.smartcard.SmcB;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.smartcard.*;
+import java.nio.charset.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class DecryptDocumentCommandTest {
 
-  private ContextType ctx;
-  private SmcB smcb;
-  private MockKonnektorServiceProvider mockKonnektor;
-
-  private byte[] data =
+  private final byte[] data =
       ("eyAKInZlcnNpb24iOiAiMiIsIAoic3VwcGx5T3B0aW9uc1R5cGUiOiAiZGVsaXZlcnki"
               + "LCAKIm5hbWUiOiAiRHIuIE1heGltaWxpYW4gdm9uIE11c3RlciIsIAoiYWRkcmVzcyI6IFsiQnVuZGVzY"
               + "WxsZWUiLCAiMzEyIiwgIjEyMzQ1IiwgIkJlcmxpbiJdLCAKImhpbnQiOiAiQml0dGUgaW0gTW9yc2Vjb2"
@@ -49,19 +37,12 @@ class DecryptDocumentCommandTest {
               + "ZjNjk5ZGIxMTVmNThmZTQyMzYwN2VhIgp9IA==")
           .replace("\n", "")
           .getBytes(StandardCharsets.UTF_8);
+  private SmcB smcb;
 
   @BeforeEach
   void setUp() {
     val smartCardArchive = SmartcardFactory.getArchive();
-    smcb = smartCardArchive.getSmcbByICCSN("80276883110000116873", Crypto.RSA_2048);
-
-    mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
-
-    ctx = new ContextType();
-    ctx.setClientSystemId("cs1");
-    ctx.setMandantId("m1");
-    ctx.setUserId("u1");
-    ctx.setWorkplaceId("w1");
+    smcb = smartCardArchive.getSmcbByICCSN("80276883110000116873");
   }
 
   @SneakyThrows
@@ -73,16 +54,18 @@ class DecryptDocumentCommandTest {
     val softKon = cfg.getKonnektorConfiguration("Soft-Konn").create();
     val konnektor = cfg.getKonnektorConfiguration("KOCO@kon7").create();
 
-    var smcbCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb));
+    var smcbCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
     konnektor.execute(new VerifyPinCommand(smcbCardHandle, PinType.PIN_SMC));
 
     val encryptedData =
-        konnektor.execute(
-            new EncryptDocumentCommand(smcbCardHandle, Base64.getDecoder().decode(data)));
+        konnektor
+            .execute(new EncryptDocumentCommand(smcbCardHandle, Base64.getDecoder().decode(data)))
+            .getPayload();
 
-    smcbCardHandle = softKon.execute(GetCardHandleCommand.forSmartcard(smcb));
+    smcbCardHandle = softKon.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
     softKon.execute(new VerifyPinCommand(smcbCardHandle, PinType.PIN_SMC));
-    val decrypted = softKon.execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData));
+    val decrypted =
+        softKon.execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData)).getPayload();
     Assertions.assertEquals(
         new String(Base64.getEncoder().encode(decrypted), StandardCharsets.UTF_8),
         new String(data, StandardCharsets.UTF_8));

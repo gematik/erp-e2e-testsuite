@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ Funktionalität: Hello World Demo Feature
 
   @Path=happy
   @Versicherung=GKV
+  @MainActor=Apotheke
   Szenario: Quittung für ein dispensiertes PKV Rezept abrufen
   Der Arzt Claudius verschreibt Fridolin ein E-Rezept, welches dieser bei der Apotheke "Am Flughafen" einlöst.
   Die Apotheke "Am Flughafen" hat daraufhin eine Quittung für das dispensierte Medikament.
@@ -46,6 +47,7 @@ Funktionalität: Hello World Demo Feature
   @Path=happy
   @Versicherung=GKV
   @Funktionalität=mehrereMedicationDispense
+  @MainActor=Apotheke
   Szenario: Dispensierung des E-Rezeptes mit mehreren Medikamenten
   Die Apotheke dispensiert das akzeptierte E-Rezept über mehrere Ersatzpräparate.
   In diesem Szenario verschreibt der Arzt eine große Packung (N3) mit 50 Stk Inhalt.
@@ -57,7 +59,7 @@ Funktionalität: Hello World Demo Feature
       | IBUFLAM akut | 11648419 | true         | N3        | FTA              | 1-0-0-1   | 50    |
     Und der Versicherte Fridolin Straßer sein letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
-    Und die Apotheke das letzte akzeptierte E-Rezept mit den folgenden Medikamenten korrekt dispensiert:
+    Und die Apotheke das letzte akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an Fridolin Straßer dispensiert:
       | Name         | PZN      | Nomgröße | Menge | Einheit | Darreichungsform |
       | IBUFLAM akut | 04100230 | N1       | 10    | Stk     | FTA              |
       | IBUFLAM akut | 04100218 | N2       | 20    | Stk     | FTA              |
@@ -66,6 +68,7 @@ Funktionalität: Hello World Demo Feature
 
   @Path=happy
   @Versicherung=GKV
+  @MainActor=Arztpraxis
   Szenario: Verschreibung eines E-Rezeptes nur über KVNR
     Wenn der Arzt Bernd Claudius folgendes E-Rezept an die KVNR X123456789 verschreibt:
       | Name          | PZN      | Substitution |
@@ -74,6 +77,7 @@ Funktionalität: Hello World Demo Feature
 
   @Path=bad
   @Versicherung=GKV
+  @MainActor=Apotheke
   Szenario: Dispensierung eines nicht akzeptierten E-Rezeptes
   Die Apotheke Am Flughafen versucht fälschlicherweise eine E-Rezept zu dispensieren.
   Das E-Rezept wurde der Apotheke zwar physisch bereits zugewiesen aber diese hat das E-Rezept beim Fachdienst
@@ -85,6 +89,7 @@ Funktionalität: Hello World Demo Feature
 
   @Path=bad
   @Versicherung=GKV
+  @MainActor=Apotheke
   Szenario: Dispensierung eines E-Rezeptes an einen anderen Versicherten
   Die Apotheke Am Flughafen versucht ein E-Rezept an einen Versicherten mit einer anderen KVNR zu dispensieren.
 
@@ -96,6 +101,7 @@ Funktionalität: Hello World Demo Feature
 
   @Path=bad
   @Versicherung=GKV
+  @MainActor=Apotheke
   Szenario: Mehrfache Dispensierung eines einzelnen E-Rezeptes
   Die Apotheke Am Flughafen versucht ein E-Rezept mehrfach falsch zu dispensieren.
 
@@ -108,6 +114,7 @@ Funktionalität: Hello World Demo Feature
 
   @Path=happy
   @Versicherung=All
+  @MainActor=Versicherter
   Szenario: E-Rezept an einen Vertreter senden
   Der Versicherte sendet sein E-Rezept an einen Vertreter
     Wenn der Arzt Bernd Claudius ein E-Rezept an den Versicherten Fridolin Straßer verschreibt

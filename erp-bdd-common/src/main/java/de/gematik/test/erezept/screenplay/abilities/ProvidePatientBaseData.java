@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,17 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.CoverageBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
-import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.Date;
-import java.util.Optional;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.val;
-import net.serenitybdd.screenplay.Ability;
-import org.hl7.fhir.r4.model.Coverage;
+import java.util.*;
+import lombok.*;
+import net.serenitybdd.screenplay.*;
 
 public class ProvidePatientBaseData implements Ability {
 
@@ -63,7 +56,7 @@ public class ProvidePatientBaseData implements Ability {
     this.birthDate = GemFaker.fakerBirthday();
     this.city = GemFaker.fakerCity();
     this.postal = GemFaker.fakerZipCode();
-    this.street = GemFaker.fullStreetName();
+    this.street = GemFaker.fakerStreetName();
 
     this.iknr = GemFaker.fakerIknr();
     this.insuranceName = GemFaker.insuranceName();
@@ -98,8 +91,8 @@ public class ProvidePatientBaseData implements Ability {
     return pb.build();
   }
 
-  public Coverage getInsuranceCoverage() {
-    return CoverageBuilder.insurance(iknr, insuranceName)
+  public KbvCoverage getInsuranceCoverage() {
+    return KbvCoverageBuilder.insurance(iknr, insuranceName)
         .beneficiary(this.getPatient())
         .wop(wop)
         .versichertenStatus(VersichertenStatus.MEMBERS)

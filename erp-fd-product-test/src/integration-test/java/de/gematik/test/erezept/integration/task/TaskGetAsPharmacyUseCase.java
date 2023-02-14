@@ -1,6 +1,6 @@
 /*
  *
- *  * Copyright (c) 2022 gematik GmbH
+ *  * Copyright (c) 2023 gematik GmbH
  *  * 
  *  * Licensed under the Apache License, Version 2.0 (the License);
  *  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ import org.junit.runner.*;
 @DisplayName("E-Rezept abrufen als Apotheker")
 @Tag("Feature:EGKinApotheke")
 @WithTag("Feature:EGKinApotheke")
+@Disabled("Feature is currently disabled")
 class TaskGetAsPharmacyUseCase extends ErpTest {
 
   private static List<TimeOfRequest> counterPharmacyRequests = new ArrayList<>();

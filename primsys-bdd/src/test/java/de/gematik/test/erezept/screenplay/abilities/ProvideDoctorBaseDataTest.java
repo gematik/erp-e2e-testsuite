@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,20 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.lei.cfg.DoctorConfiguration;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ProvideDoctorBaseDataTest {
+class ProvideDoctorBaseDataTest {
 
   @Test
-  public void shouldCreateDoctorBaseDataFromValidConfig() {
+  void shouldCreateDoctorBaseDataFromValidConfig() {
     val cfg = new DoctorConfiguration();
     cfg.setName("Bernd Claudius");
     cfg.setQualificationType("Arzt");
@@ -40,10 +42,12 @@ public class ProvideDoctorBaseDataTest {
     assertNotEquals("", doc.getPractitioner().getANR().getValue());
     assertEquals(BaseANR.ANRType.LANR, doc.getPractitioner().getANR().getType());
     assertEquals(QualificationType.DOCTOR, doc.getPractitioner().getQualificationType());
+    assertNotNull(doc.getPractitioner());
+    assertNotNull(doc.getMedicalOrganization());
   }
 
   @Test
-  public void shouldCreateDentistBaseDataFromValidConfig() {
+  void shouldCreateDentistBaseDataFromValidConfig() {
     val cfg = new DoctorConfiguration();
     cfg.setName("Bernd Claudius");
     cfg.setQualificationType("Zahnarzt");
@@ -56,10 +60,12 @@ public class ProvideDoctorBaseDataTest {
     assertNotEquals("", doc.getPractitioner().getANR().getValue());
     assertEquals(BaseANR.ANRType.ZANR, doc.getPractitioner().getANR().getType());
     assertEquals(QualificationType.DENTIST, doc.getPractitioner().getQualificationType());
+    assertNotNull(doc.getPractitioner());
+    assertNotNull(doc.getMedicalOrganization());
   }
 
   @Test
-  public void shouldCreateDoctorWithFakedName() {
+  void shouldCreateDoctorWithFakedName() {
     val cfg = new DoctorConfiguration();
     cfg.setName("");
     cfg.setQualificationType("Zahnarzt");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,17 @@ public interface IValueSet {
     return asCodeableConcept(false);
   }
 
+  default CodeableConcept asCodeableConcept(ICodeSystem codeSystem) {
+    return asCodeableConcept(codeSystem, false);
+  }
+
   default CodeableConcept asCodeableConcept(boolean withDisplay) {
     val coding = asCoding(withDisplay);
+    return new CodeableConcept().setCoding(List.of(coding));
+  }
+
+  default CodeableConcept asCodeableConcept(ICodeSystem codeSystem, boolean withDisplay) {
+    val coding = asCoding(codeSystem, withDisplay);
     return new CodeableConcept().setCoding(List.of(coding));
   }
 
@@ -45,10 +54,18 @@ public interface IValueSet {
     return asCoding(false);
   }
 
+  default Coding asCoding(ICodeSystem codeSystem) {
+    return asCoding(codeSystem, false);
+  }
+
   default Coding asCoding(boolean withDisplay) {
+    return asCoding(this.getCodeSystem(), withDisplay);
+  }
+
+  default Coding asCoding(ICodeSystem codeSystem, boolean withDisplay) {
     val coding = new Coding();
     coding.setCode(this.getCode());
-    coding.setSystem(this.getCodeSystem().getCanonicalUrl());
+    coding.setSystem(codeSystem.getCanonicalUrl());
     if (withDisplay) {
       coding.setDisplay(getDisplay());
     }

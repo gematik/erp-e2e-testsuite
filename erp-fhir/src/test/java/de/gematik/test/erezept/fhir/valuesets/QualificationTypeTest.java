@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import java.util.List;
-import java.util.Map;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
-public class QualificationTypeTest {
+class QualificationTypeTest {
 
   @Test
-  public void shouldParseFromCode() {
+  void shouldParseFromCode() {
     val testdata =
         Map.of(
             "00", QualificationType.DOCTOR,
@@ -41,7 +39,7 @@ public class QualificationTypeTest {
   }
 
   @Test
-  public void shouldThrowOnInvalidCode() {
+  void shouldThrowOnInvalidCode() {
     val codes = List.of("05", "0", "1", "");
     codes.forEach(
         code ->
@@ -49,7 +47,7 @@ public class QualificationTypeTest {
   }
 
   @Test
-  public void shouldParseFromValidDisplayValues() {
+  void shouldParseFromValidDisplayValues() {
     val testdata =
         Map.of(
             "Arzt", QualificationType.DOCTOR,
@@ -68,7 +66,7 @@ public class QualificationTypeTest {
   }
 
   @Test
-  public void shouldThrowOnInvalidDisplayValues() {
+  void shouldThrowOnInvalidDisplayValues() {
     val displays =
         List.of(
             "arz",

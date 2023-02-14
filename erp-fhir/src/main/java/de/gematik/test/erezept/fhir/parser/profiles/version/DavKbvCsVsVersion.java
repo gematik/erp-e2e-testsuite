@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -32,4 +32,8 @@ public enum DavKbvCsVsVersion implements ProfileVersion<DavKbvCsVsVersion> {
   private final LocalDate validFromDate;
   private final LocalDate validUntilDate;
   private final CustomProfiles customProfile = CustomProfiles.DAV_KBV_CS_VS;
+
+  public static DavKbvCsVsVersion getDefaultVersion() {
+    return ProfileVersion.getDefaultVersion(DavKbvCsVsVersion.class, CustomProfiles.DAV_KBV_CS_VS);
+  }
 }

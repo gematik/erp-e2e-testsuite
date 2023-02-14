@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,18 @@ package de.gematik.test.erezept.primsys.rest;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.primsys.model.AbortUseCase;
 import de.gematik.test.erezept.primsys.model.AcceptUseCase;
 import de.gematik.test.erezept.primsys.model.ActorContext;
+import de.gematik.test.erezept.primsys.model.CloseUseCase;
 import de.gematik.test.erezept.primsys.model.RejectUseCase;
+import de.gematik.test.erezept.primsys.model.ReplyUseCase;
 import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -56,7 +60,7 @@ public class PharmacyResource {
     return AcceptUseCase.acceptPrescription(pharmacy, taskId, accessCode);
   }
 
-  @PUT
+  @POST
   @Path("{id}/reject")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
@@ -80,5 +84,52 @@ public class PharmacyResource {
                     Response.status(404)
                         .entity(new ErrorResponse(format("No Pharmacy found with ID {0}", id)))
                         .build()));
+  }
+
+  @POST
+  @Path("{pharmaId}/reply")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response replyPrescription(
+      @PathParam("pharmaId") String pharmaId,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("kvnr") String kvnr,
+      @DefaultValue("onPremise") @QueryParam("supplyOption") String supplyOption,
+      String messageBody) {
+    val pharmacy = getPharmacy(pharmaId);
+    log.info(
+        format(
+            "POST/pharm/pharmaId/reply -- Pharmacy {0} will reply Task {1} on KVNR {2}",
+            pharmaId, taskId, kvnr));
+    return ReplyUseCase.replyPrescription(pharmacy, taskId, kvnr, supplyOption, messageBody);
+  }
+
+  @DELETE
+  @Path("{id}/abort")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response abortPrescriptionAsPharma(
+      @PathParam("id") String id,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("ac") String accessCode,
+      @QueryParam("secret") String secret) {
+    log.info(
+        format("DELETE/pharm/id/abort for Pharmacy with ID {0} the Task with Id {1}", id, taskId));
+    val pharma = getPharmacy(id);
+    return AbortUseCase.abortPrescription(pharma, taskId, accessCode, secret);
+  }
+
+  @DELETE
+  @Path("{id}/close")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response closePrescriptionAsPharma(
+      @PathParam("id") String id,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("secret") String secret) {
+    log.info(
+        format("DELETE/pharm/id/close for Pharmacy with ID {0} the Task with Id {1} ", id, taskId));
+    val pharma = getPharmacy(id);
+    return CloseUseCase.closePrescription(pharma, taskId, secret);
   }
 }

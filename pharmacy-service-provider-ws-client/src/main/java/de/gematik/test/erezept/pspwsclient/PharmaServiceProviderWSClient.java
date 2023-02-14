@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,40 @@
 
 package de.gematik.test.erezept.pspwsclient;
 
-import static java.lang.String.format;
+import static java.text.MessageFormat.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import de.gematik.test.erezept.pspwsclient.dataobjects.*;
+import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import javax.net.ssl.SSLContext;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.java_websocket.handshake.ServerHandshake;
-import org.jetbrains.annotations.Nullable;
+import java.util.concurrent.*;
+import javax.net.ssl.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.java_websocket.handshake.*;
+import org.jetbrains.annotations.*;
 
 @Slf4j
 public class PharmaServiceProviderWSClient extends org.java_websocket.client.WebSocketClient
     implements PSPClient {
 
-  @Getter private boolean isConnected = false;
-
+  static final int WAIT_MILLIS = 1000;
+  private static final String SYS_VAR_PROXY_HOST = "https.proxyHost";
+  private static final String SYS_VAR_PROXY_PORT = "https.proxyPort";
   @Getter private static final boolean MESSAGE_ARRIVED = false;
   private static final int WAITING_TIME_IN_MILLIS = 2000;
   private final List<PspMessage> pspMessages;
-  @Getter private String id;
+  @Getter private final String id;
+  @Getter private boolean isConnected = false;
 
   @SneakyThrows
   public PharmaServiceProviderWSClient(@NonNull String pspUrl, String id) {
     super(createUri(pspUrl, id));
     this.pspMessages = Collections.synchronizedList(new ArrayList<>());
     this.id = id;
+    checkProxySysProp();
     log.info("SubscriptionService Url: {} with id {}", pspUrl, id);
   }
 
@@ -66,6 +66,15 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
   private static URI createUri(String pspUrl, String id) {
     if (pspUrl.endsWith("/")) return URI.create(pspUrl + id);
     else return URI.create(pspUrl + "/" + id);
+  }
+
+  private void checkProxySysProp() {
+    val proxyAddress = System.getProperty(SYS_VAR_PROXY_HOST);
+    val proxyPort = Integer.parseInt(System.getProperty(SYS_VAR_PROXY_PORT, "3128"));
+    if (proxyAddress != null) {
+      log.info("proxy was set to address: " + proxyAddress + ":" + proxyPort);
+      this.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, proxyPort)));
+    }
   }
 
   @Override
@@ -175,9 +184,12 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
     return pspMessages.size();
   }
 
+  @SneakyThrows
   @Override
   public void callServerStoredMessages() {
     this.send("call stored messages");
+    // wait for serverResponse
+    Thread.currentThread().join(WAIT_MILLIS);
   }
 
   @SneakyThrows
@@ -188,7 +200,7 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
     // save current time plus WAITING_TIME_IN_MILLIS
     final long finishTime = System.currentTimeMillis() + WAITING_TIME_IN_MILLIS * 5;
     while (!this.isConnected() && System.currentTimeMillis() <= finishTime) {
-      log.info(format("wait for isNotConnected()... iterations in %s sec.", x));
+      log.info(format("wait for isNotConnected()... iterations in {0} sec.", x));
       Thread.currentThread().join(500);
       x = x + 0.5;
     }

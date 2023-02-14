@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,15 @@
 
 package de.gematik.test.erezept.primsys.cli;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import ca.uhn.fhir.validation.ValidationResult;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.hl7.fhir.r4.model.Coverage;
+import ca.uhn.fhir.validation.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import java.nio.file.*;
+import java.util.stream.*;
+import javax.annotation.*;
+import lombok.*;
 
 @AllArgsConstructor
 public class KbvBundleProvider {
@@ -74,9 +69,9 @@ public class KbvBundleProvider {
     return ret + "." + encodingType.toFileExtension();
   }
 
-  private Coverage readCoverage() {
+  private KbvCoverage readCoverage() {
     val content = readFile(coveragePath);
-    return parser.decode(Coverage.class, content);
+    return parser.decode(KbvCoverage.class, content);
   }
 
   @SneakyThrows

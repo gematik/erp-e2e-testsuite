@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,23 @@
 
 package de.gematik.test.erezept.actions;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.ErpInteraction;
-import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
-import de.gematik.test.erezept.screenplay.util.DmcPrescription;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.fuzzing.core.ByteArrayMutator;
-import de.gematik.test.fuzzing.core.StringMutator;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.val;
-import net.serenitybdd.core.Serenity;
-import net.serenitybdd.core.steps.Instrumented;
-import net.serenitybdd.screenplay.Actor;
-import net.thucydides.core.annotations.Step;
+import de.gematik.test.erezept.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import de.gematik.test.fuzzing.core.*;
+import java.nio.file.*;
+import java.util.*;
+import lombok.*;
+import net.serenitybdd.core.*;
+import net.serenitybdd.core.steps.*;
+import net.serenitybdd.screenplay.*;
+import net.thucydides.core.annotations.*;
 
 @RequiredArgsConstructor
 public class ActivatePrescription extends ErpAction<ErxTask> {
@@ -50,6 +43,18 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
 
   private final List<StringMutator> stringBundleMutators;
   private final List<ByteArrayMutator> signedBundleMutators;
+
+  public static Builder forGiven(ErpInteraction<ErxTask> interaction) {
+    return forGiven(interaction.getExpectedResponse());
+  }
+
+  public static Builder forGiven(ErxTask task) {
+    return withId(task.getUnqualifiedId()).andAccessCode(task.getAccessCode());
+  }
+
+  public static Builder withId(String taskId) {
+    return new Builder(taskId);
+  }
 
   @Override
   @Step("{0} aktiviert Task #taskId mit #accessCode und #kbvBundle")
@@ -62,7 +67,7 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
       encodedKbv = fuzzingStep.apply(encodedKbv);
     }
 
-    val signedKbv = konnektor.signDocument(encodedKbv);
+    val signedKbv = konnektor.signDocumentWithHba(encodedKbv).getPayload();
     signedBundleMutators.forEach(m -> m.accept(signedKbv));
 
     val cmd = new TaskActivateCommand(taskId, accessCode, signedKbv);
@@ -90,24 +95,12 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
         .fromFile(dmcPath);
   }
 
-  public static Builder forGiven(ErpInteraction<ErxTask> interaction) {
-    return forGiven(interaction.getExpectedResponse());
-  }
-
-  public static Builder forGiven(ErxTask task) {
-    return withId(task.getUnqualifiedId()).andAccessCode(task.getAccessCode());
-  }
-
-  public static Builder withId(String taskId) {
-    return new Builder(taskId);
-  }
-
   @RequiredArgsConstructor
   public static class Builder {
     private final String taskId;
-    private AccessCode accessCode;
     private final List<StringMutator> stringMutators = new LinkedList<>();
     private final List<ByteArrayMutator> signedBundleMutators = new LinkedList<>();
+    private AccessCode accessCode;
 
     public Builder andAccessCode(AccessCode accessCode) {
       this.accessCode = accessCode;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class RefreshPrescriptions implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
-    app.tap(Prescriptions.REFRESH);
+    app.tap(Prescriptions.REFRESH_BUTTON);
   }
 
   public static RefreshPrescriptions byTap() {

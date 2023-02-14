@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidCommunicationType;
-import java.util.Arrays;
-import java.util.List;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 class ICommunicationTypeTest {
 
@@ -37,8 +38,17 @@ class ICommunicationTypeTest {
         });
   }
 
+  @ParameterizedTest(name = "[{index}] -> Create CommunicationType from StructureDefinition {0}")
+  @EnumSource(
+      value = ErpWorkflowStructDef.class,
+      names = {"COM_INFO_REQ_12", "COM_DISP_REQ_12", "COM_REPLY_12", "COM_REPRESENTATIVE_12"})
+  void shouldGetNewCommunicationTypesFromUrl(ErpWorkflowStructDef structDef) {
+    val url = structDef.getCanonicalUrl();
+    assertDoesNotThrow(() -> ICommunicationType.fromUrl(url));
+  }
+
   @Test
-  void fromUrlshouldThrowOnInvalidUrl() {
+  void shouldThrowOnInvalidFromUrl() {
     assertThrows(InvalidCommunicationType.class, () -> ICommunicationType.fromUrl("invalid_url"));
   }
 }

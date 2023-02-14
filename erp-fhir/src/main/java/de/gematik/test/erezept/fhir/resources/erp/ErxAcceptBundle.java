@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,17 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.values.Secret;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.Binary;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.util.*;
+import de.gematik.test.erezept.fhir.values.*;
+import java.nio.charset.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @ResourceDef(name = "Bundle")
@@ -54,14 +51,18 @@ public class ErxAcceptBundle extends Bundle {
     return getTask()
         .getSecret()
         .orElseThrow(
-            () -> new MissingFieldException(ErxAcceptBundle.class, ErpWorkflowNamingSystem.SECRET));
+            () ->
+                new MissingFieldException(
+                    ErxAcceptBundle.class,
+                    ErpWorkflowNamingSystem.SECRET,
+                    ErpWorkflowNamingSystem.SECRET_12));
   }
 
   public String getKbvBundleId() {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Binary))
-        .map(Resource::getId)
+        .map(resource -> IdentifierUtil.getUnqualifiedId(resource.getId()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(ErxAcceptBundle.class, ResourceType.Binary));
   }

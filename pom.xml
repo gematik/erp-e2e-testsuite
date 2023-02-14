@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -49,10 +49,12 @@
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
 
         <skip.unittests/>
+        <skip.inttests/>
         <surefire.forkCount>1</surefire.forkCount>
         <sonar.exclusions>
             **/*Main.java,
             **/primsys/cli/*.java,
+            **/test/erezept/cli/cmd/*.java,
             **/primsys/rest/*Resource.java,
             **/test/erezept/operator/jframe/*.java
         </sonar.exclusions>
@@ -63,7 +65,7 @@
         <javadoc.footer>${javadoc.doctitle}</javadoc.footer>
         <javadoc.bottom>© gematik GmbH 2022</javadoc.bottom>
 
-        <version.serenity>3.2.5</version.serenity>
+        <version.serenity>3.6.12</version.serenity>
 
         <!-- gematik dependency version -->
         <version.idp-client>21.0.8</version.idp-client>
@@ -81,10 +83,13 @@
         <module>erp-bdd-common</module>
         <module>primsys-bdd</module>
         <module>erp-app-bdd</module>
-        <module>primsys-restserver</module>
         <module>erp-fd-product-test</module>
+        <module>primsys-restserver</module>
         <module>pharmacy-service-provider</module>
         <module>pharmacy-service-provider-ws-client</module>
+        <module>erp-tools</module>
+        <module>erp-tools/erp-cli-fhir</module>
+
     </modules>
 
     <build>
@@ -137,6 +142,7 @@
 <!--                    <failBuildOnCVSS>8</failBuildOnCVSS>--> <!-- activate once we've fixed all bad dependencies -->
                     <skipProvidedScope>true</skipProvidedScope>
                     <skipRuntimeScope>true</skipRuntimeScope>
+                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -158,9 +164,10 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>validate-code-format</id>
+                        <id>ensure-code-format</id>
                         <phase>validate</phase>
                         <goals>
+                            <goal>format-code</goal>
                             <goal>validate-code-format</goal>
                         </goals>
                     </execution>
@@ -190,6 +197,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
                 <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
                     <argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>
                     <excludes>
                         <exclude>**/*TestSuite.java</exclude>
@@ -275,10 +283,12 @@
     <distributionManagement>
         <repository>
             <id>releases</id>
+            <!--suppress UnresolvedMavenProperty -->
             <url>${releaseDeploymentRepository}</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
+            <!--suppress UnresolvedMavenProperty -->
             <url>${snapshotDeploymentRepository}</url>
         </snapshotRepository>
     </distributionManagement>
@@ -335,15 +345,19 @@
             <version>${version.mockito}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
             <version>1.0.0-rc1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>1.9.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
 
     <repositories>
         <!--  Nexus Repositories  -->

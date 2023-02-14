@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -21,23 +21,14 @@ import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
-import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
 import de.gematik.test.erezept.screenplay.task.AbortPrescription;
 import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.task.IssuePrescription;
 import de.gematik.test.erezept.screenplay.task.Negate;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.Before;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
@@ -45,60 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.PendingStepException;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.actors.OnlineCast;
 
 /** Testschritte die aus der Perspektive eines Arztes bzw. einer Ärztin ausgeführt werden */
 @Slf4j
 public class DoctorSteps {
-
-  private SmartcardArchive smartcards;
-  private TestsuiteConfiguration config;
-
-  @Before
-  public void setUp() {
-    smartcards = SmartcardFactory.getArchive();
-    config = TestsuiteConfiguration.getInstance();
-    OnStage.setTheStage(new OnlineCast());
-  }
-
-  /**
-   * Initialisiere einen Arzt mit den beiden Smartcards SMC-B und HBA
-   *
-   * <p><b>Notiz:</b> Der Name im ersten Parameter entspricht nicht dem echten Namen der auf HBA
-   * hinterlegt ist. Dieser Name wird lediglich für das Screenplay-Pattern benötigt
-   *
-   * @param docName der Name des Arztes, der innerhalb des Szenarios verwendet wird, um diesen zu
-   *     identifizieren
-   */
-  @Angenommen(
-      "^(?:der Arzt|die Ärztin) (.+) hat Zugriff auf (?:seinen|ihren) HBA und auf die SMC-B der Praxis$")
-  public void initDoc(String docName) {
-    log.trace(format("Initialize Doctor {0}", docName));
-    // fetch the chosen Smartcards
-    val docConfig = config.getDoctorConfig(docName);
-    val smcb = smartcards.getSmcbByICCSN(docConfig.getSmcbIccsn(), docConfig.getCryptoAlgorithm());
-    val hba = smartcards.getHbaByICCSN(docConfig.getHbaIccsn(), docConfig.getCryptoAlgorithm());
-
-    // create the abilities
-    val useKonnektor =
-        UseTheKonnektor.with(smcb).and(hba).on(config.instantiateDoctorKonnektor(docConfig));
-    val useErpClient =
-        UseTheErpClient.with(
-            docConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.PS));
-    useErpClient.authenticateWith(useKonnektor);
-
-    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig);
-    val manageIssuedPrescriptions = ManageDoctorsPrescriptions.sheIssued();
-
-    // assemble the screenplay
-    val theDoctor = OnStage.theActorCalled(docName);
-    theDoctor.describedAs("Eine 'E-Rezept-ready' Arzt der E-Rezepte verschreiben kann");
-    givenThat(theDoctor).can(useErpClient);
-    givenThat(theDoctor).can(useKonnektor);
-    givenThat(theDoctor).can(provideBaseData);
-    givenThat(theDoctor).can(manageIssuedPrescriptions);
-    log.trace(format("Doctor {0} initialized with SMC-B {1}", docName, smcb.getIccsn()));
-  }
 
   @Angenommen(
       "^(?:der Arzt|die Ärztin) (.+) verschreibt folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+):$")
@@ -349,6 +290,7 @@ public class DoctorSteps {
                         .from(medications.asMaps()))
                 .with(UnexpectedResponseResourceError.class));
   }
+
   /**
    * Ausstellen eines E-Rezeptes an einen Versicherten mittels dessen KVNR. Das E-Rezept kann über
    * die DataTable parametrisiert werden. Dabei sind grundsätzliche sämtliche Spalten optional und
@@ -507,7 +449,7 @@ public class DoctorSteps {
   }
 
   /**
-   * Dies ist eine temporäre Vorgabe gemäß A_22222 bei der sonstige Kostenträger vom E-Rezept
+   * Dies ist eine temporäre Vorgabe, gemäß A_22222 bei der sonstige Kostenträger vom E-Rezept
    * ausgeschlossen sind
    *
    * @param docName ist der Name des verschreibenden Arztes
@@ -538,7 +480,7 @@ public class DoctorSteps {
   }
 
   /**
-   * Dies ist eine temporäre Vorgabe gemäß A_22222 bei der sonstige Kostenträger vom E-Rezept
+   * Dies ist eine temporäre Vorgabe gemäß A_22222, bei der sonstige Kostenträger vom E-Rezept
    * ausgeschlossen sind
    *
    * @param docName ist der Name des verschreibenden Arztes
@@ -653,7 +595,7 @@ public class DoctorSteps {
    * @param insurantName ist der Name eines Versicherten
    */
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) GKV-Versicherten (.+) fäschlicherweise ein PKV-Rezept verschreibt$")
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) GKV-Versicherten (.+) fälschlicherweise ein PKV-Rezept verschreibt$")
   public void derArztADerGKVVersichertenAFaeschlicherweiseEinPKVRezeptVerschreibt(
       String docName, String insurantName) {
     throw new PendingStepException("Not yet implemented");
@@ -670,15 +612,4 @@ public class DoctorSteps {
             Negate.the(IssuePrescription.forPatient(thePatient).from(medications.asMaps()))
                 .with(UnexpectedResponseResourceError.class));
   }
-
-  /**
-   * @Dann( "^kann (?:der Arzt|die Ärztin) (.+) (?:der|dem) Versicherten (.+) kein E-Rezept
-   * verschreiben, weil die PZN eine falsche Länge hat$") public void thenPznIsNotAllowed2(String
-   * docName, String patientName, DataTable medications) { val theDoctor =
-   * OnStage.theActorCalled(docName); val thePatient = OnStage.theActorCalled(patientName);
-   *
-   * <p>then(theDoctor) .attemptsTo(
-   * CheckTheReturnCode.of(ResponseOfIssuePrescription.forPatient(thePatient).from(medications.asMaps()))
-   * .isEqualTo(410)); }
-   */
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,33 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import de.gematik.test.erezept.fhir.parser.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.util.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ErxAuditEventTest {
+import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
+import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.util.ResourceUtils;
+import java.util.Arrays;
+import lombok.val;
+import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+class ErxAuditEventTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
-  private FhirParser parser;
-
-  @BeforeEach
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void representationTextDoesNotThrow() {
+  void representationTextDoesNotThrow() {
     Arrays.stream(Representation.values()).forEach(r -> Assertions.assertDoesNotThrow(r::getText));
   }
 
   @Test
-  public void shouldEncodeSingleAuditEvent() {
+  void shouldEncodeSingleAuditEvent() {
     val fileName = "AuditEvent_01.json";
     val originalEncoding = EncodingType.JSON;
     val flippedEncoding = EncodingUtil.flipEncoding(originalEncoding);
@@ -80,5 +79,14 @@ public class ErxAuditEventTest {
     Assertions.assertEquals("Sample Text", auditEvent.getFirstText());
     Assertions.assertEquals("606358750", auditEvent.getAgentId());
     Assertions.assertEquals("Praxis Dr. Müller", auditEvent.getAgentName());
+  }
+
+  @Test
+  void shouldEncodeAuditEventWithoutProfile() {
+    val fileName = "AuditEventBundle.json";
+
+    val content = ResourceUtils.readFileFromResource(format("fhir/invalid/erp/{0}", fileName));
+    val bundle = parser.decode(content);
+    assertEquals(ResourceType.Bundle, bundle.getResourceType());
   }
 }

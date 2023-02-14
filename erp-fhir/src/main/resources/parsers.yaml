@@ -1,6 +1,6 @@
 
-parsers:
-- name: "OLD"
+profileSettings:
+- id: "1.1.1"
   note: "old profiles configuration"
   profiles:
     - name: "kbv.ita.erp"
@@ -17,8 +17,10 @@ parsers:
       version: "1.2.1"
     - name: "de.gematik.erezept-workflow"
       version: "1.1.1"
+  errorFilter:
+    - "^Found a reference to a CodeSystem \\(https://gematik.de/fhir/CodeSystem/Documenttype\\) where a ValueSet belongs"
 
-- name: "NEW"
+- id: "1.2.0"
   note: "new profiles configuration"
   profiles:
     - name: "kbv.ita.erp"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.values.*;
 import lombok.val;
 import org.junit.Test;
 
@@ -31,7 +32,14 @@ public class ProvidePatientBaseDataTest {
     assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
     assertEquals("Fridolin Straßer", patient.getFullName());
     assertTrue(patient.getPatient().hasGkvId());
+    assertTrue(patient.isGKV());
     assertEquals("X123456789", patient.getPatient().getKvid().orElseThrow());
+    assertNotNull(patient.getIknr());
+    assertFalse(patient.getIknr().isEmpty());
+    assertEquals(IKNR.from(patient.getIknr()), patient.getInsuranceIknr());
+    assertFalse(patient.getRememberedConsent().isPresent());
+    assertFalse(patient.hasRememberedConsent());
+    assertNotNull(patient.getInsuranceCoverage());
   }
 
   @Test
@@ -42,6 +50,19 @@ public class ProvidePatientBaseDataTest {
     assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
     assertEquals("Fridolin Straßer", patient.getFullName());
     assertTrue(patient.getPatient().hasPkvId());
+    assertTrue(patient.isPKV());
+    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow());
+  }
+
+  @Test
+  public void shouldCreatePkvPatient02() {
+    val patient = ProvidePatientBaseData.forPkvPatient("X123456789", "Fridolin", "Straßer");
+
+    assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
+    assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
+    assertEquals("Fridolin Straßer", patient.getFullName());
+    assertTrue(patient.getPatient().hasPkvId());
+    assertTrue(patient.isPKV());
     assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow());
   }
 

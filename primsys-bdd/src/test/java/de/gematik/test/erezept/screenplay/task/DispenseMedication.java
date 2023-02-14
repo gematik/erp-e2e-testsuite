@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,28 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfDispenseMedicationOperation;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
-import de.gematik.test.erezept.screenplay.strategy.PrescriptionToDispenseStrategy;
-import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import io.cucumber.datatable.DataTable;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import de.gematik.test.erezept.client.exceptions.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.builder.dav.*;
+import de.gematik.test.erezept.fhir.builder.erp.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.resources.dav.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.questions.*;
+import de.gematik.test.erezept.screenplay.strategy.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import io.cucumber.datatable.*;
+import java.util.*;
+import java.util.function.*;
+import lombok.*;
 import lombok.experimental.Delegate;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Task;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 @Slf4j
 public class DispenseMedication implements Task {
@@ -52,9 +48,46 @@ public class DispenseMedication implements Task {
     this.fhirResponseQuestion = fhirResponseQuestion;
   }
 
+  public static DispenseMedicationsBuilder withSecret(String dequeue, String wrongSecret) {
+    return withSecret(DequeStrategy.fromString(dequeue), wrongSecret);
+  }
+
+  public static DispenseMedicationsBuilder withSecret(DequeStrategy dequeue, String wrongSecret) {
+    return new DispenseMedicationsBuilder(
+        ResponseOfDispenseMedicationOperation.withSecret(dequeue, wrongSecret));
+  }
+
+  public static DispenseMedicationsBuilder toKvid(String dequeue, String kvid) {
+    return toKvid(DequeStrategy.fromString(dequeue), kvid);
+  }
+
+  public static DispenseMedicationsBuilder toKvid(DequeStrategy dequeue, String kvid) {
+    return new DispenseMedicationsBuilder(
+        ResponseOfDispenseMedicationOperation.toKvid(dequeue, kvid));
+  }
+
+  public static DispenseMedicationsBuilder toPatient(String dequeue, Actor patient) {
+    return toPatient(DequeStrategy.fromString(dequeue), patient);
+  }
+
+  public static DispenseMedicationsBuilder toPatient(DequeStrategy dequeue, Actor patient) {
+    return new DispenseMedicationsBuilder(
+        ResponseOfDispenseMedicationOperation.toPatient(dequeue, patient));
+  }
+
+  public static DispenseMedicationsBuilder fromStack(String dequeue) {
+    return fromStack(DequeStrategy.fromString(dequeue));
+  }
+
+  public static DispenseMedicationsBuilder fromStack(DequeStrategy dequeStrategy) {
+    return new DispenseMedicationsBuilder(
+        ResponseOfDispenseMedicationOperation.fromStack(dequeStrategy));
+  }
+
   @Override
   public <T extends Actor> void performAs(final T actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
+    val konnektorAbility = SafeAbility.getAbility(actor, UseTheKonnektor.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
 
@@ -72,13 +105,13 @@ public class DispenseMedication implements Task {
               strategy.getKvid(),
               strategy.getTaskId(),
               strategy.getPrescriptionId(),
+              strategy.getAccessCode(),
               strategy.getSecret(),
-              strategy.getKvid(),
               receipt));
 
-      if (kbvBundle.getInsuranceType() == VersicherungsArtDeBasis.PKV && strategy.hasConsent()) {
-        this.createChargeItem(strategy, erpClientAbility, smcb.getTelematikID());
-      }
+      /*if (kbvBundle.getInsuranceType() == VersicherungsArtDeBasis.PKV && strategy.hasConsent()) {
+        this.createChargeItem(strategy, erpClientAbility, konnektorAbility, smcb.getTelematikID());
+      }*/
 
       strategy
           .getPatient()
@@ -107,54 +140,29 @@ public class DispenseMedication implements Task {
   }
 
   private ErxChargeItem createChargeItem(
-      PrescriptionToDispenseStrategy strategy, UseTheErpClient client, String telematikId) {
+      PrescriptionToDispenseStrategy strategy,
+      UseTheErpClient client,
+      UseTheKonnektor konnektor,
+      String telematikId) {
+
+    // use a random faked DavBundle for now
+    val davBundle = DavAbgabedatenBuilder.faker(strategy.getPrescriptionId()).build();
+    Function<DavAbgabedatenBundle, byte[]> signer =
+        (b) -> {
+          val encoded = client.encode(b, EncodingType.XML);
+          return konnektor.signDocumentWithHba(encoded).getPayload();
+        };
+
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(strategy.getPrescriptionId())
             .enterer(telematikId)
-            .subject(strategy.getKvid())
+            .subject(strategy.getKvid(), GemFaker.insuranceName())
             .verordnung(strategy.getKbvBundleId())
-            .abgabedatensatz(UUID.randomUUID().toString()) // create a random ID for the ChargeItem
+            .abgabedatensatz(davBundle, signer)
             .build();
-    val cmd = new ChargeItemPostCommand(chargeItem);
+    val cmd = new ChargeItemPostCommand(chargeItem, strategy.getSecret());
     val response = client.request(cmd);
     return response.getResource(cmd.expectedResponseBody());
-  }
-
-  public static DispenseMedicationsBuilder withSecret(String dequeue, String wrongSecret) {
-    return withSecret(DequeStrategyEnum.fromString(dequeue), wrongSecret);
-  }
-
-  public static DispenseMedicationsBuilder withSecret(
-      DequeStrategyEnum dequeue, String wrongSecret) {
-    return new DispenseMedicationsBuilder(
-        ResponseOfDispenseMedicationOperation.withSecret(dequeue, wrongSecret));
-  }
-
-  public static DispenseMedicationsBuilder toKvid(String dequeue, String kvid) {
-    return toKvid(DequeStrategyEnum.fromString(dequeue), kvid);
-  }
-
-  public static DispenseMedicationsBuilder toKvid(DequeStrategyEnum dequeue, String kvid) {
-    return new DispenseMedicationsBuilder(
-        ResponseOfDispenseMedicationOperation.toKvid(dequeue, kvid));
-  }
-
-  public static DispenseMedicationsBuilder toPatient(String dequeue, Actor patient) {
-    return toPatient(DequeStrategyEnum.fromString(dequeue), patient);
-  }
-
-  public static DispenseMedicationsBuilder toPatient(DequeStrategyEnum dequeue, Actor patient) {
-    return new DispenseMedicationsBuilder(
-        ResponseOfDispenseMedicationOperation.toPatient(dequeue, patient));
-  }
-
-  public static DispenseMedicationsBuilder fromStack(String dequeue) {
-    return fromStack(DequeStrategyEnum.fromString(dequeue));
-  }
-
-  public static DispenseMedicationsBuilder fromStack(DequeStrategyEnum dequeStrategy) {
-    return new DispenseMedicationsBuilder(
-        ResponseOfDispenseMedicationOperation.fromStack(dequeStrategy));
   }
 
   public static class DispenseMedicationsBuilder {

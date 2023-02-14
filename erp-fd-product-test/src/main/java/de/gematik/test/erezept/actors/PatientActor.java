@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package de.gematik.test.erezept.actors;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.Optional;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.Coverage;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Slf4j
 @Getter
@@ -58,15 +56,18 @@ public class PatientActor extends ErpActor {
     return bd.getPatient();
   }
 
-  public Coverage getInsuranceCoverage() {
+  public KbvCoverage getInsuranceCoverage() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getInsuranceCoverage();
   }
 
   public Optional<AssignerOrganization> getAssignerOrganization() {
     Optional<AssignerOrganization> ret = Optional.empty();
-    if (this.getInsuranceType() == VersicherungsArtDeBasis.PKV) {
-      // for now, we do not have the AssignerOrganization (which was faked anyways for getting a
+    // an assigner Organization for PKV is only required for kbv.ita.erp == 1.0.2
+    if (this.getInsuranceType() == VersicherungsArtDeBasis.PKV
+        && KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+
+      // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
       // Reference + Name
       // build a faked one matching the Reference of the patient
       val fakedAssignerOrganization =

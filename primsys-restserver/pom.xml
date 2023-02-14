@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir-fuzzing</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
@@ -88,7 +88,7 @@
         <dependency>
             <artifactId>erp-fhir</artifactId>
             <groupId>de.gematik.test.erezept</groupId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -103,7 +103,9 @@
                 <version>3.0.0</version>
                 <configuration>
                     <resourceBundles>
-                        <resourceBundle>de.gematik.test.erezept:smartcard:0.2.0-SNAPSHOT</resourceBundle>
+                        <resourceBundle>
+                            de.gematik.test.erezept:smartcard:${project.parent.version}
+                        </resourceBundle>
                     </resourceBundles>
                 </configuration>
                 <executions>

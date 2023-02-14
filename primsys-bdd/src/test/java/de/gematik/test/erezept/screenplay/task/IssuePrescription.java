@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,41 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
-import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.client.exceptions.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.extensions.kbv.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhirdump.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nullable;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import net.serenitybdd.core.Serenity;
-import net.serenitybdd.screenplay.Actor;
+import java.nio.file.*;
+import java.util.*;
+import javax.annotation.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.core.*;
+import net.serenitybdd.screenplay.*;
 import net.serenitybdd.screenplay.Task;
-import net.thucydides.core.annotations.Step;
-import org.hl7.fhir.r4.model.Coverage;
-import org.hl7.fhir.r4.model.Practitioner;
+import net.thucydides.core.annotations.*;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 public class IssuePrescription implements Task {
 
-  private String patientKvnr;
   private final Actor patient;
   private final Actor pharmacy;
   private final List<Map<String, String>> medications;
   private final PrescriptionAssignmentKind type;
+  private String patientKvnr;
 
   private IssuePrescription(
       @Nullable String kvnr,
@@ -71,6 +67,14 @@ public class IssuePrescription implements Task {
     if (kvnr == null && patient != null) {
       this.patientKvnr = SafeAbility.getAbility(patient, ProvideEGK.class).getKvnr();
     }
+  }
+
+  public static IssuePrescriptionBuilder forKvnr(String kvnr) {
+    return new IssuePrescriptionBuilder(kvnr);
+  }
+
+  public static IssuePrescriptionBuilder forPatient(Actor patient) {
+    return new IssuePrescriptionBuilder(patient);
   }
 
   @Override
@@ -172,9 +176,9 @@ public class IssuePrescription implements Task {
 
       val end = medMap.getOrDefault("Gueltigkeitsende", "leer");
       if (!end.equalsIgnoreCase("leer")) {
-        mvo = mvoBuilder.validForDays(Integer.parseInt(end));
+        mvo = mvoBuilder.validForDays(Integer.parseInt(end), false);
       } else {
-        mvo = mvoBuilder.withoutEndDate();
+        mvo = mvoBuilder.withoutEndDate(false);
       }
     } else {
       mvo = MultiplePrescriptionExtension.asNonMultiple();
@@ -219,11 +223,14 @@ public class IssuePrescription implements Task {
             .medication(medication);
 
     if (patient.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
-      // for now, we do not have the AssignerOrganization (which was faked anyways for getting a
-      // Reference + Name
-      // build a faked one matching the Reference of the patient
-      val fakedAssignerOrganization = AssignerOrganizationBuilder.faker(patient);
-      kbvBuilder.assigner(fakedAssignerOrganization.build());
+      // assigner organization was only required in KbvItaFor 1.0.3
+      if (KbvItaForVersion.getDefaultVersion().compareTo(KbvItaForVersion.V1_0_3) == 0) {
+        // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
+        // Reference + Name
+        // build a faked one matching the Reference of the patient
+        val fakedAssignerOrganization = AssignerOrganizationBuilder.faker(patient);
+        kbvBuilder.assigner(fakedAssignerOrganization.build());
+      }
     }
 
     return kbvBuilder.build();
@@ -246,7 +253,7 @@ public class IssuePrescription implements Task {
     val accessCode = draftTask.getOptionalAccessCode().orElseThrow();
 
     val kbvXml = clientAbility.encode(kbvBundle, EncodingType.XML);
-    val signedKbv = konnektorAbility.signDocument(kbvXml);
+    val signedKbv = konnektorAbility.signDocumentWithHba(kbvXml).getPayload();
 
     // activate the task
     val activate = new TaskActivateCommand(taskId, accessCode, signedKbv);
@@ -299,12 +306,12 @@ public class IssuePrescription implements Task {
     return FlowTypeUtil.getFlowType(code, insuranceKind, type);
   }
 
-  private Coverage getPatientInsuranceCoverage() {
-    Coverage ret;
+  private KbvCoverage getPatientInsuranceCoverage() {
+    KbvCoverage ret;
     if (patient != null) {
       ret = SafeAbility.getAbility(patient, ProvidePatientBaseData.class).getInsuranceCoverage();
     } else {
-      ret = CoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
+      ret = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
     }
     return ret;
   }
@@ -349,12 +356,20 @@ public class IssuePrescription implements Task {
     // write the DMC to file and append to the Serenity Report
     val dmcPath =
         Path.of("target", "site", "serenity", "dmcs", format("dmc_{0}.png", dmc.getTaskId()));
-    DataMatrixCodeGenerator.writeToFile(dmc.getTaskId(), dmc.getAccessCode(), dmcPath.toFile());
+    val bitMatrix = DataMatrixCodeGenerator.generateDmc(dmc.getTaskId(), dmc.getAccessCode());
+    DataMatrixCodeGenerator.writeToFile(bitMatrix, dmcPath.toFile());
 
     Serenity.recordReportData()
         .withTitle("Data Matrix Code for " + dmc.getTaskId())
         .downloadable()
         .fromFile(dmcPath);
+
+    FhirDumper.getInstance()
+        .writeDump(
+            format(
+                "DMC for {0} with AccessCode {1}", dmc.getTaskId(), dmc.getAccessCode().getValue()),
+            format("dmc_{0}.png", dmc.getTaskId()),
+            file -> DataMatrixCodeGenerator.writeToFile(bitMatrix, file));
   }
 
   public static class IssuePrescriptionBuilder {
@@ -392,13 +407,5 @@ public class IssuePrescription implements Task {
       val medications = List.of(Map.of("prescription", "1"));
       return from(medications);
     }
-  }
-
-  public static IssuePrescriptionBuilder forKvnr(String kvnr) {
-    return new IssuePrescriptionBuilder(kvnr);
-  }
-
-  public static IssuePrescriptionBuilder forPatient(Actor patient) {
-    return new IssuePrescriptionBuilder(patient);
   }
 }

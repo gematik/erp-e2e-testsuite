@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.strategy.PrescriptionToDispenseStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.datatable.DataTable;
@@ -171,11 +171,11 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder fromStack(
-      DequeStrategyEnum dequeStrategy) {
+      DequeStrategy dequeStrategy) {
     return new ResponseOfDispenseMedicationOperationBuilder(
         PrescriptionToDispenseStrategy.withDequeue(dequeStrategy));
   }
@@ -207,32 +207,32 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
 
   public static ResponseOfDispenseMedicationOperationBuilder withSecret(
       String dequeue, String wrongSecret) {
-    return withSecret(DequeStrategyEnum.fromString(dequeue), wrongSecret);
+    return withSecret(DequeStrategy.fromString(dequeue), wrongSecret);
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder withSecret(
-      DequeStrategyEnum dequeue, String wrongSecret) {
+      DequeStrategy dequeue, String wrongSecret) {
     return new ResponseOfDispenseMedicationOperationBuilder(
         PrescriptionToDispenseStrategy.withDequeue(dequeue).secret(wrongSecret));
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder toKvid(String dequeue, String kvid) {
-    return toKvid(DequeStrategyEnum.fromString(dequeue), kvid);
+    return toKvid(DequeStrategy.fromString(dequeue), kvid);
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder toKvid(
-      DequeStrategyEnum dequeue, String kvid) {
+      DequeStrategy dequeue, String kvid) {
     return new ResponseOfDispenseMedicationOperationBuilder(
         PrescriptionToDispenseStrategy.withDequeue(dequeue).kvid(kvid));
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder toPatient(
       String dequeue, Actor patient) {
-    return toPatient(DequeStrategyEnum.fromString(dequeue), patient);
+    return toPatient(DequeStrategy.fromString(dequeue), patient);
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder toPatient(
-      DequeStrategyEnum dequeue, Actor patient) {
+      DequeStrategy dequeue, Actor patient) {
     return new ResponseOfDispenseMedicationOperationBuilder(
         PrescriptionToDispenseStrategy.withDequeue(dequeue).patient(patient));
   }

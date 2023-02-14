@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
+import de.gematik.test.erezept.client.exceptions.*;
+import java.time.Duration;
+import java.util.*;
+import javax.annotation.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
@@ -36,13 +33,21 @@ public class ErpResponse {
   /** The HTTP-Status Code */
   @Getter private final int statusCode;
 
+  @Getter private final Duration duration;
+
   private final Map<String, String> headers;
   private final Resource resource;
 
-  public ErpResponse(int statusCode, Map<String, String> headers, Resource resource) {
+  public ErpResponse(
+      int statusCode, Duration duration, Map<String, String> headers, Resource resource) {
     this.statusCode = statusCode;
     this.headers = fixHeaders(headers);
     this.resource = resource;
+    this.duration = duration;
+  }
+
+  public ErpResponse(int statusCode, Map<String, String> headers, Resource resource) {
+    this(statusCode, Duration.ZERO, headers, resource);
   }
 
   public Resource getResource() {
@@ -135,6 +140,8 @@ public class ErpResponse {
   public String toString() {
     val resourceType =
         this.getResourceType() != null ? this.getResourceType().getSimpleName() : "NULL";
-    return format("ErpResponse(rc={0}, payloadType={1})", this.getStatusCode(), resourceType);
+    return format(
+        "ErpResponse(rc={0}, payloadType={1}, duration={2})",
+        this.getStatusCode(), resourceType, duration.toMillis());
   }
 }

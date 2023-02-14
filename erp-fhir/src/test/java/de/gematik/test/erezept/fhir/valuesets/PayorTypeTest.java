@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import java.util.List;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
-public class PayorTypeTest {
+class PayorTypeTest {
 
   @Test
-  public void shouldParseValidPayorTypesFromCode() {
+  void shouldParseValidPayorTypesFromCode() {
     val codes = List.of("SKT", "UK");
     val expectedTypes = List.of(PayorType.SKT, PayorType.UK);
 
@@ -38,14 +39,14 @@ public class PayorTypeTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidPayorTypeCodes() {
+  void shouldThrowExceptionOnInvalidPayorTypeCodes() {
     val codes = List.of("KST", "UKK");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> PayorType.fromCode(code)));
   }
 
   @Test
-  public void shouldParseValidPayorTypesFromDisplay() {
+  void shouldParseValidPayorTypesFromDisplay() {
     val displayValues = List.of("Sonstige", "Unfallkassen");
     val expectedTypes = List.of(PayorType.SKT, PayorType.UK);
 
@@ -57,14 +58,14 @@ public class PayorTypeTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidPayorTypeDisplayValues() {
+  void shouldThrowExceptionOnInvalidPayorTypeDisplayValues() {
     val codes = List.of("Bürdenträger", "Krankenkassen");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> PayorType.fromCode(code)));
   }
 
   @Test
-  public void shouldEncodePayorTypeCoding() {
+  void shouldEncodePayorTypeCoding() {
     val payorTypes = List.of(PayorType.values());
     payorTypes.forEach(
         pt -> {
@@ -75,7 +76,15 @@ public class PayorTypeTest {
   }
 
   @Test
-  public void shouldEncodePayorTypeCodeableConcept() {
+  void shouldEncodePayorTypeCodingWithCustomCodeSystem() {
+    val pt = PayorType.UK;
+    val coding = pt.asCoding(ErpWorkflowCodeSystem.FLOW_TYPE);
+    assertEquals(pt.getCode(), coding.getCode());
+    assertEquals(ErpWorkflowCodeSystem.FLOW_TYPE.getCanonicalUrl(), coding.getSystem());
+  }
+
+  @Test
+  void shouldEncodePayorTypeCodeableConcept() {
     val payorTypes = List.of(PayorType.values());
     payorTypes.forEach(
         pt -> {

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 # language: de
 
 @Funktionalität=AlternZuweisung
-@Impl=open
+@Impl=done
+@MainActor=Versicherter
 Funktionalität: Alternative Zuweisung
   Der Versicherte soll ohne Anmeldung am Fachdienst sein per DMC in das FdV eingescanntes Rezept an die gewünschte Apotheke schicken können.
   Dabei wird vom E-Rezept-FdV eine Nachricht Referenz auf das einzulösende E-Rezept (Task-ID), die Zugriffsberechtigung (AccessCode) und Kontaktinformationen des Versicherten gebildet.

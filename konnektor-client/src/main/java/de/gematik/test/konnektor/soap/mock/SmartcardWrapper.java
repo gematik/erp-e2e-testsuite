@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,12 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.Smartcard;
-import de.gematik.test.smartcard.SmartcardType;
-import de.gematik.test.smartcard.exceptions.InvalidSmartcardTypeException;
-import de.gematik.ws.conn.cardservice.v8.CardInfoType;
-import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
-import lombok.Getter;
-import lombok.val;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.cardservice.v8.*;
+import de.gematik.ws.conn.cardservicecommon.v2.*;
+import lombok.*;
 
 public class SmartcardWrapper {
 
@@ -62,26 +58,14 @@ public class SmartcardWrapper {
   }
 
   private static CardTypeType mapSmartcardType(SmartcardType type) {
-    CardTypeType cardTypeType;
-    switch (type) {
-      case EGK:
-        cardTypeType = CardTypeType.EGK;
-        break;
-      case SMC_B:
-        cardTypeType = CardTypeType.SMC_B;
-        break;
-      case HBA:
-        cardTypeType = CardTypeType.HBA;
-        break;
-      default:
-        throw new InvalidSmartcardTypeException(type.toString());
-    }
-    return cardTypeType;
+    return switch (type) {
+      case EGK -> CardTypeType.EGK;
+      case SMC_B -> CardTypeType.SMC_B;
+      case HBA -> CardTypeType.HBA;
+    };
   }
 
   private static String createCardHandleString(Smartcard smartcard) {
-    return format(
-        "{0}_{1}_{2}",
-        smartcard.getType(), smartcard.getAlgorithm().getAlgorithm(), smartcard.getIccsn());
+    return format("{0}_{1}", smartcard.getType(), smartcard.getIccsn());
   }
 }

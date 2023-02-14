@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import java.util.List;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
-public class StatusCoPaymentTest {
+class StatusCoPaymentTest {
   @Test
-  public void shouldParseValidStatusCoPaymentFromCode() {
+  void shouldParseValidStatusCoPaymentFromCode() {
     val codes = List.of("0", "1", "2");
     val expectedTypes =
         List.of(StatusCoPayment.STATUS_0, StatusCoPayment.STATUS_1, StatusCoPayment.STATUS_2);
@@ -38,7 +38,7 @@ public class StatusCoPaymentTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidStatusCoPaymentCodes() {
+  void shouldThrowExceptionOnInvalidStatusCoPaymentCodes() {
     val codes = List.of("00", "12", "3", "ABCD", "");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> StatusCoPayment.fromCode(code)));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import static java.text.MessageFormat.format;
+
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.references.kbv.*;
+import de.gematik.test.erezept.fhir.resources.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 import org.hl7.fhir.r4.model.*;
 
 /** <a href="https://simplifier.net/base1x0/kbvprbasepatient">KBV Base Patient</a> */
@@ -36,7 +36,17 @@ import org.hl7.fhir.r4.model.*;
 @Getter
 @ResourceDef(name = "Patient")
 @SuppressWarnings({"java:S110"})
-public class KbvPatient extends Patient {
+public class KbvPatient extends Patient implements ErpFhirResource {
+
+  public static KbvPatient fromPatient(Patient adaptee) {
+    val kbvBasePatient = new KbvPatient();
+    adaptee.copyValues(kbvBasePatient);
+    return kbvBasePatient;
+  }
+
+  public static KbvPatient fromPatient(Resource adaptee) {
+    return fromPatient((Patient) adaptee);
+  }
 
   public String getLogicalId() {
     return this.id.getIdPart();
@@ -104,9 +114,12 @@ public class KbvPatient extends Patient {
   private Optional<Identifier> getKvidIdentifier() {
     return this.getIdentifier().stream()
         .filter(
-            identifier -> identifier.getSystem().equals(DeBasisNamingSystem.KVID.getCanonicalUrl()))
-        //                .filter(identifier ->
-        // identifier.getValue().equals(IdentifierTypeDe.GKV.getCode()))
+            identifier ->
+                identifier.getSystem().equals(DeBasisNamingSystem.KVID.getCanonicalUrl())
+                    || identifier.getSystem().equals(DeBasisNamingSystem.KVID_GKV.getCanonicalUrl())
+                    || identifier
+                        .getSystem()
+                        .equals(DeBasisNamingSystem.KVID_PKV.getCanonicalUrl()))
         .findFirst();
   }
 
@@ -138,13 +151,17 @@ public class KbvPatient extends Patient {
     return ret.get();
   }
 
-  public static KbvPatient fromPatient(Patient adaptee) {
-    val kbvBasePatient = new KbvPatient();
-    adaptee.copyValues(kbvBasePatient);
-    return kbvBasePatient;
+  public String getFullname() {
+    val hn = this.getNameFirstRep();
+    return format("{0}, {1}", hn.getFamily(), hn.getGivenAsSingleString());
   }
 
-  public static KbvPatient fromPatient(Resource adaptee) {
-    return fromPatient((Patient) adaptee);
+  @Override
+  public String getDescription() {
+    val kvid = new AtomicReference<String>();
+    this.getKvidIdentifier().ifPresentOrElse(id -> kvid.set(id.getValue()), () -> kvid.set("NULL"));
+    return format(
+        "{0} Versicherte/r {1} (KVNR: {2})",
+        this.getInsuranceKind(), this.getFullname(), kvid.get());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,21 @@
 
 package de.gematik.test.erezept.crypto.encryption.cms;
 
-import de.gematik.test.erezept.crypto.BC;
-import de.gematik.test.erezept.crypto.certificate.EncCertificate;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.security.spec.MGF1ParameterSpec;
-import java.util.List;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.val;
+import de.gematik.test.erezept.crypto.*;
+import de.gematik.test.erezept.crypto.certificate.*;
+import java.security.*;
+import java.security.cert.*;
+import java.security.spec.*;
+import java.util.*;
+import javax.crypto.spec.*;
+import lombok.*;
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.RecipientIdentifier;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.cert.jcajce.*;
 import org.bouncycastle.cms.*;
-import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
-import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
-import org.bouncycastle.operator.OutputAEADEncryptor;
-import org.bouncycastle.operator.jcajce.JceAsymmetricKeyWrapper;
+import org.bouncycastle.cms.jcajce.*;
+import org.bouncycastle.operator.*;
+import org.bouncycastle.operator.jcajce.*;
 
 @AllArgsConstructor
 public class CmsAuthEnvelopedData {
@@ -46,7 +38,7 @@ public class CmsAuthEnvelopedData {
   @SneakyThrows
   public byte[] encrypt(List<X509Certificate> recipientCertificates, byte[] plaintext) {
 
-    val certs = recipientCertificates.stream().map(EncCertificate::new).toList();
+    val certs = recipientCertificates.stream().map(X509CertificateWrapper::new).toList();
 
     val msg = new CMSProcessableByteArray(plaintext);
     val edGen = new CMSAuthEnvelopedDataGenerator();
@@ -59,8 +51,8 @@ public class CmsAuthEnvelopedData {
 
     val jcaConverter = new JcaX509CertificateConverter().setProvider(BC.getSecurityProvider());
 
-    for (EncCertificate cert : certs) {
-      val jcaCert = jcaConverter.getCertificate(cert.getCertHolder());
+    for (X509CertificateWrapper cert : certs) {
+      val jcaCert = jcaConverter.getCertificate(cert.toCertificateHolder());
       edGen.addRecipientInfoGenerator(
           new JceKeyTransRecipientInfoGenerator(
                   jcaCert,
@@ -79,15 +71,17 @@ public class CmsAuthEnvelopedData {
     return ed.toASN1Structure().getEncoded();
   }
 
-  private ASN1EncodableVector buildRecipientInfo(List<EncCertificate> recipientCertificates) {
+  private ASN1EncodableVector buildRecipientInfo(
+      List<X509CertificateWrapper> recipientCertificates) {
     val vector = new ASN1EncodableVector();
     recipientCertificates.forEach(
         recipientCert -> {
           val t = new ASN1EncodableVector();
-          t.add(new DERIA5String(recipientCert.getTelematikId().orElseThrow(), true));
+          t.add(new DERIA5String(recipientCert.getProfessionId().orElseThrow(), true));
           t.add(
               new RecipientIdentifier(
-                  new IssuerAndSerialNumber(recipientCert.getCertHolder().toASN1Structure())));
+                  new IssuerAndSerialNumber(
+                      recipientCert.toCertificateHolder().toASN1Structure())));
           vector.add(new DERSequence(t));
         });
     return vector;

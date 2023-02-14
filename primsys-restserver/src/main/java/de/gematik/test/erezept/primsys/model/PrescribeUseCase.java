@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ public class PrescribeUseCase {
   }
 
   private static Coverage getCoverageFromRequest(KbvPatient patient, CoverageData coverageData) {
-    return CoverageBuilder.insurance(coverageData.getIknr(), coverageData.getInsuranceName())
+    return KbvCoverageBuilder.insurance(coverageData.getIknr(), coverageData.getInsuranceName())
         .beneficiary(patient)
         .personGroup(coverageData.getEnumPersonGroup())
         .dmpKennzeichen(DmpKennzeichen.NOT_SET) // NOT SET YET

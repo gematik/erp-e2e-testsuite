@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.LinkedList;
@@ -63,10 +63,10 @@ public class HistSentCommunications implements Question<Boolean> {
   public static class Builder {
 
     public HistSentCommunications fromQueueStillExists(String order) {
-      return fromQueueStillExists(DequeStrategyEnum.fromString(order));
+      return fromQueueStillExists(DequeStrategy.fromString(order));
     }
 
-    public HistSentCommunications fromQueueStillExists(DequeStrategyEnum deque) {
+    public HistSentCommunications fromQueueStillExists(DequeStrategy deque) {
       return new HistSentCommunications(
           (sent, fetched) -> {
             val dequedExp = deque.chooseFrom(sent);

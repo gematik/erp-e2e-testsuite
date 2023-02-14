@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package de.gematik.test.konnektor;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.cfg.KonnektorType;
-import de.gematik.test.konnektor.commands.KonnektorCommand;
-import de.gematik.test.konnektor.exceptions.SOAPRequestException;
-import de.gematik.test.konnektor.profile.ProfileType;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import java.util.Optional;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.konnektor.commands.*;
+import de.gematik.test.konnektor.exceptions.*;
+import de.gematik.test.konnektor.profile.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import java.time.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Slf4j
 public class KonnektorImpl implements Konnektor {
@@ -51,15 +51,20 @@ public class KonnektorImpl implements Konnektor {
   }
 
   @Override
-  public final <R> R execute(KonnektorCommand<R> cmd) {
+  public final <R> KonnektorResponse<R> execute(KonnektorCommand<R> cmd) {
     log.info(format("Execute {0} on {1}", cmd.getClass().getSimpleName(), this));
+    val start = Instant.now();
     val response = cmd.execute(ctx, serviceProvider);
-    log.info(format("Received Response for {0} from {1}", cmd.getClass().getSimpleName(), this));
-    return response;
+    val duration = Duration.between(start, Instant.now());
+    log.info(
+        format(
+            "Received Response for {0} from {1} within ",
+            cmd.getClass().getSimpleName(), this, duration.toMillis()));
+    return new KonnektorResponse<>(response, duration);
   }
 
   @Override
-  public final <R> Optional<R> safeExecute(KonnektorCommand<R> cmd) {
+  public final <R> Optional<KonnektorResponse<R>> safeExecute(KonnektorCommand<R> cmd) {
     try {
       return Optional.of(execute(cmd));
     } catch (SOAPRequestException sre) {

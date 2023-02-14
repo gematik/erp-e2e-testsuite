@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum Prescriptions implements PageElement {
-  REFRESH(
+  REFRESH_BUTTON(
       "Refresh",
       () -> By.tagName("erx_btn_refresh"),
       () -> AppiumBy.accessibilityId("erx_btn_refresh")),

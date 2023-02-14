@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.GetReceivedCommunication;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ import net.serenitybdd.screenplay.Task;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AcceptDispenseRequest implements Task {
 
-  private final DequeStrategyEnum order;
+  private final DequeStrategy order;
   private final Actor sender;
 
   @Override
@@ -65,17 +65,17 @@ public class AcceptDispenseRequest implements Task {
   }
 
   public static Builder of(String order) {
-    return of(DequeStrategyEnum.fromString(order));
+    return of(DequeStrategy.fromString(order));
   }
 
-  public static Builder of(DequeStrategyEnum order) {
+  public static Builder of(DequeStrategy order) {
     return new Builder(order);
   }
 
   public static class Builder {
-    private final DequeStrategyEnum order;
+    private final DequeStrategy order;
 
-    private Builder(DequeStrategyEnum order) {
+    private Builder(DequeStrategy order) {
       this.order = order;
     }
 

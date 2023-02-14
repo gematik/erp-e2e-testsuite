@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.fhir.util;
 
 import lombok.val;
+import org.hl7.fhir.r4.model.*;
 
 public class IdentifierUtil {
 
@@ -33,5 +34,9 @@ public class IdentifierUtil {
   public static String getUnqualifiedId(String qualifiedId) {
     val idTokens = qualifiedId.split("/");
     return idTokens[idTokens.length - 1];
+  }
+
+  public static String getUnqualifiedId(IdType idType) {
+    return getUnqualifiedId(idType.getValue());
   }
 }

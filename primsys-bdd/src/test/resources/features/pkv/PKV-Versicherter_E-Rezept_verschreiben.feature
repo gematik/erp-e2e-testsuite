@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ Funktionalität: PKV-Rezepte verschreiben
 
   @TCID=ERP_EE_WF200_01
   @Path=happy
+  @MainActor=Arztpraxis
   Szenario: PKV E-Rezept verschreiben und dem Versicherten Anzeigen
   Die Ärztin verschreibt dem PKV-Versicherten Günther Angermänn  ein E-Rezept. Günther Angermänn soll dieses E-Rezept
   im FdV angezeigt werden
@@ -39,13 +40,14 @@ Funktionalität: PKV-Rezepte verschreiben
     Wenn die Ärztin Dr. Schraßer dem Versicherten Günther Angermänn folgendes apothekenpflichtiges Medikament verschreibt:
       | Name          | PZN      |
       | Schmerzmittel | 12345678 |
-    Dann wird dem Versicherten Günther Angermänn das neue E-Rezept im FdV angezeigt
+    Dann wird dem Versicherten Günther Angermänn das neue E-Rezept angezeigt
 
 
   @TCID=ERP_EE_WF200_02
   @Afo=A_22347-01
   @Path=bad
   @Impl=open
+  @MainActor=Fachdienst
   Szenario: PKV E-Rezept an GKV-Versicherten
   Eine GKV-Versicherte bekommt irrtümlich ein PKV-Rezept verschrieben. Der Fachdienst muss das ablehnen:
   Der E-Rezept-Fachdienst MUSS beim Zugriff auf einen Task des Flowtype 200 mittels HTTP-POST-Operation über

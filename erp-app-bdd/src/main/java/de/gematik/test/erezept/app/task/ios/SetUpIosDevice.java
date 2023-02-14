@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,19 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
-import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.Debug;
-import de.gematik.test.erezept.app.mobile.elements.Onboarding;
-import de.gematik.test.erezept.app.mobile.elements.Settings;
-import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.Base64;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Task;
+import de.gematik.test.erezept.app.abilities.*;
+import de.gematik.test.erezept.app.mobile.*;
+import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.exceptions.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,11 +44,11 @@ public class SetUpIosDevice implements Task {
     // walk through onboarding
     app.swipe(SwipeDirection.LEFT);
     app.swipe(SwipeDirection.LEFT);
-    app.inputPassword(password, Onboarding.PASSWORD_INPUT);
-    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION);
-    app.tap(Onboarding.NEXT);
-    app.tap(Onboarding.ACCEPT_TERMS_OF_USE);
-    app.tap(Onboarding.ACCEPT_PRIVACY);
+    app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
+    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
+    app.tap(Onboarding.NEXT_BUTTON);
+    app.tap(Onboarding.ACCEPT_TERMS_OF_USE_BUTTON);
+    app.tap(Onboarding.ACCEPT_PRIVACY_BUTTON);
 
     // go to cardwall
     if (app.useVirtualeGK()) {
@@ -73,15 +66,17 @@ public class SetUpIosDevice implements Task {
 
   @SneakyThrows
   private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app) {
-    app.tap(Settings.SHOW);
-    app.tap(Debug.SHOW);
+    app.tap(Settings.MENU_BUTTON);
+    app.tap(Debug.MENU_BUTTON);
 
     // first tap will scroll to the element, only the second tap will tap the switch
-    app.tap(2, Debug.ACTIVATE_VIRTUAL_EGK); // why do I need to tap twice here?
+    app.tap(2, Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON); // why do I need to tap twice here?
 
     val egk = SafeAbility.getAbility(actor, ProvideEGK.class).getEgk();
-    val pkBase64 = Base64.getEncoder().encodeToString(egk.getAuthPrivateKey().getEncoded());
-    val cchBase64 = Base64.getEncoder().encodeToString(egk.getAuthCertificate().getEncoded());
+    val autCertificate = egk.getAutCertificate();
+    val pkBase64 = Base64.getEncoder().encodeToString(autCertificate.getPrivateKey().getEncoded());
+    val cchBase64 =
+        Base64.getEncoder().encodeToString(autCertificate.getX509Certificate().getEncoded());
     app.input(pkBase64, Debug.EGK_PRIVATE_KEY);
     app.tap(2, Debug.EGK_CERTIFICATE_CHAIN); // make sure we change the textbox
     app.input(cchBase64, Debug.EGK_CERTIFICATE_CHAIN);
@@ -103,7 +98,7 @@ public class SetUpIosDevice implements Task {
             egk.getOwner().getSurname(),
             insuranceKind));
 
-    app.tap(Debug.LEAVE);
-    app.tap(Settings.LEAVE);
+    app.tap(Debug.LEAVE_BUTTON);
+    app.tap(Settings.LEAVE_BUTTON);
   }
 }

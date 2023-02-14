@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@ public enum ErpWorkflowNamingSystem implements INamingSystem {
   PRESCRIPTION_ID_121(
       "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"), // new NamingSystem
   ACCESS_CODE("https://gematik.de/fhir/NamingSystem/AccessCode"),
+  ACCESS_CODE_121("https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode"),
   SECRET("https://gematik.de/fhir/NamingSystem/Secret"),
+  SECRET_12("https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_Secret"),
   TELEMATIK_ID("https://gematik.de/fhir/NamingSystem/TelematikID"),
   // NOTE will be resolved/merged with TELEMATIK_ID later!
   TELEMATIK_ID_SID("https://gematik.de/fhir/sid/telematik-id"),

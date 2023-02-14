@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +35,7 @@ class ChargeItemPostCommandTest {
 
   private ChargeItemPostCommand getChargeItemPostCommand(PrescriptionId prescriptionId) {
     val erxChargeItem = ErxChargeItemBuilder.faker(prescriptionId).build();
-    return new ChargeItemPostCommand(erxChargeItem);
+    return new ChargeItemPostCommand(erxChargeItem, new Secret("123"));
   }
 
   @Test
@@ -46,12 +48,6 @@ class ChargeItemPostCommandTest {
   }
 
   @Test
-  void getRequestLocatorTestCorrectLengthTest() {
-    ChargeItemPostCommand chargeItemPostCommand = getChargeItemPostCommand();
-    assertEquals(34, chargeItemPostCommand.getRequestLocator().length());
-  }
-
-  @Test
   void getRequestLocatorTestCorrectLengthStartsWithSlashTest() {
     ChargeItemPostCommand chargeItemPostCommand = getChargeItemPostCommand();
     var requestString = chargeItemPostCommand.getRequestLocator();
@@ -59,20 +55,13 @@ class ChargeItemPostCommandTest {
   }
 
   @Test
-  void getRequestLocatorSecondEntryIsChargeItemTest() {
-    ChargeItemPostCommand chargeItemPostCommand = getChargeItemPostCommand();
-    var requestString = chargeItemPostCommand.getRequestLocator();
-    var requestStringArray = requestString.split("/");
-    assertEquals("ChargeItem", requestStringArray[1]);
-  }
-
-  @Test
-  void getRequestLocatorTestCorrectPrescriptionID() {
+  void getRequestLocatorTestCorrectRequestLocator() {
     val prescriptionId = PrescriptionId.random();
-    ChargeItemPostCommand chargeItemPostCommand = getChargeItemPostCommand(prescriptionId);
-    var requestString = chargeItemPostCommand.getRequestLocator();
-    var requestStringArray = requestString.split("/");
-    assertEquals(prescriptionId.getValue(), requestStringArray[2]);
+    val chargeItemPostCommand = getChargeItemPostCommand(prescriptionId);
+    val requestString = chargeItemPostCommand.getRequestLocator();
+    val expectedRequest =
+        format("/ChargeItem?task={0}&secret={1}", prescriptionId.getValue(), "123");
+    assertEquals(expectedRequest, requestString);
   }
 
   @Test

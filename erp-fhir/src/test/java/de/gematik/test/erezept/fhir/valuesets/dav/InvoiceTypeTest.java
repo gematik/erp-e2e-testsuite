@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,30 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class InvoiceTypeTest {
+class InvoiceTypeTest {
 
   @Test
-  public void testFromCode() {
+  void testFromCode() {
     assertEquals(InvoiceType.ABRECHNUNGSZEILEN, InvoiceType.fromCode("Abrechnungszeilen"));
     assertEquals(InvoiceType.ABRECHNUNGSZEILEN, InvoiceType.fromCode("abrechnungsZeilen"));
     assertEquals(InvoiceType.ZUSATZDATENEINHEIT, InvoiceType.fromCode("ZusatzdatenEinheit"));
     assertEquals(InvoiceType.ZUSATZDATENEINHEIT, InvoiceType.fromCode("zusatzdateneinheit"));
   }
 
-  @Test(expected = InvalidValueSetException.class)
-  public void testInvalidValueSetException() {
-    InvoiceType.fromCode("abcd");
+  @Test
+  void testInvalidValueSetException() {
+    assertThrows(InvalidValueSetException.class, () -> InvoiceType.fromCode("abcd"));
   }
 
   @Test
-  public void shouldHaveDefinition() {
+  void shouldHaveDefinition() {
     assertNotNull(InvoiceType.ABRECHNUNGSZEILEN.getDefinition());
   }
 }

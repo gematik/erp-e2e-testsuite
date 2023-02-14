@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.AcceptStrategy;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
@@ -116,10 +116,10 @@ public class ResponseOfAcceptOperation extends FhirResponseQuestion<ErxAcceptBun
   }
 
   public static ResponseOfAcceptOperation fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static ResponseOfAcceptOperation fromStack(DequeStrategyEnum dequeue) {
+  public static ResponseOfAcceptOperation fromStack(DequeStrategy dequeue) {
     return new ResponseOfAcceptOperation(AcceptStrategy.fromStack(dequeue));
   }
 }

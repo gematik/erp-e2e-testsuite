@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -39,5 +39,10 @@ public enum DeBasisVersion implements ProfileVersion<DeBasisVersion> {
 
   public static DeBasisVersion fromString(String input) {
     return ProfileVersion.fromString(DeBasisVersion.class, input);
+  }
+
+  public static DeBasisVersion getDefaultVersion() {
+    return ProfileVersion.getDefaultVersion(
+        DeBasisVersion.class, CustomProfiles.DE_BASIS_PROFIL_R4);
   }
 }

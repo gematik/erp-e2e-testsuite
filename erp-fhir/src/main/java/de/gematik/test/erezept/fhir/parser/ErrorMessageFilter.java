@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,73 +16,56 @@
 
 package de.gematik.test.erezept.fhir.parser;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import ca.uhn.fhir.validation.IValidationContext;
-import ca.uhn.fhir.validation.IValidatorModule;
-import ca.uhn.fhir.validation.SingleValidationMessage;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import ca.uhn.fhir.validation.*;
+import java.util.*;
+import javax.annotation.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.hl7.fhir.instance.model.api.*;
 
 /**
  * This module filters error messages which we know of and which are required to be ignored due to
  * e.g. inconsistencies within the profiles.
  *
- * <p>Note: It might be necessary to review the list of {@link ErrorMessageFilter#IGNORED_MESSAGES}
- * regularly and check if we can achieve an empty list someday in the future.
+ * <p>Note: It might be necessary to review the list of {@link
+ * ErrorMessageFilter#DEFAULT_IGNORED_MESSAGES} regularly and check if we can achieve an empty list
+ * someday in the future.
  */
 @Slf4j
 public class ErrorMessageFilter implements IValidatorModule {
 
-  private static final List<String> IGNORED_MESSAGES =
-      List.of(
-          "^Bundle entry missing fullUrl",
-          "^Relative Reference appears inside Bundle whose entry is missing a fullUrl",
-          "^docBundle-1: 'All referenced Resources must be contained in the Bundle'.*",
-          "^Entry  isn't reachable by traversing from first Bundle entry",
-          "^Can't find '\\w*?' in the bundle.*",
-          "^Except for transactions and batches, each entry in a Bundle must have a fullUrl which is the identity of the resource in the entry.*",
+  private static final List<String> DEFAULT_IGNORED_MESSAGES =
+      /* Note: comments in json are detected as errors but should be technically valid
+      for now we haven't seen @fhir_comments in the wild but only in some rare examples like
+      ParserTest.roundtripAllKbvBundles() */
+      List.of("^Unrecognised property '@fhir_comments'.*");
 
-          // The parser does not recognise JWS although sigFormat is given as application/jose
-          "^The value .[(]snip[)]. is not a valid Base64 value",
+  private final List<String> ignoreMessages;
 
-          // Relative references are valid with ResourceProfile/id. Additional information with URL
-          // parameter are not permitted
-          "^Relative URLs must be of the format \\[ResourceName\\]\\/\\[id\\].*",
-
-          // this error message is produced only on JSON, but accepted in XML: this most probably
-          // roots from { and } chars
-          "^UCUM Codes that contain human readable annotations like \\{.*\\} can be misleading.*",
-
-          // dom-6 is just a Guideline: https://www.hl7.org/fhir/domainresource-definitions.html
-          "^dom-6: Rule 'A resource should have narrative for robust management'.*",
-
-          // TODO: check if these are still required!
-          "^Dies scheint keine FHIR-Ressource zu sein \\(unbekannter Name \"Bundle\"\\)",
-          "^Found a reference to a CodeSystem \\(https://gematik.de/fhir/CodeSystem/Documenttype\\) where a ValueSet belongs",
-
-          // this issue occurs only on round-trips (xml -> json): XML-comments <!-- ... --> are
-          // converted to fhir_comments ["..."]
-          "^Unrecognised property '@fhir_comments'.*",
-          "^Nicht erkannte Property '@fhir_comments'"
-          // "^Slicing cannot be evaluated: Konnte nicht mit dem Diskriminator.*"
-          );
-
-  @Override
-  public void validateResource(final IValidationContext<IBaseResource> iValidationContext) {
-    val messages = iValidationContext.getMessages();
-    messages.removeIf(ErrorMessageFilter::ignoreMessage);
+  public ErrorMessageFilter(@Nullable List<String> ignoreMessages) {
+    if (ignoreMessages == null) {
+      this.ignoreMessages = DEFAULT_IGNORED_MESSAGES;
+    } else {
+      this.ignoreMessages = ignoreMessages;
+      this.ignoreMessages.addAll(DEFAULT_IGNORED_MESSAGES);
+    }
   }
 
-  private static boolean ignoreMessage(final SingleValidationMessage validationMessage) {
+  private boolean ignoreMessage(final SingleValidationMessage validationMessage) {
     val message = validationMessage.getMessage();
-    val ignore = IGNORED_MESSAGES.stream().anyMatch(message::matches);
+    val ignore = ignoreMessages.stream().anyMatch(message::matches);
     if (ignore) {
       log.trace(format("Ignoring parser error message: {0}", validationMessage));
     }
 
     return ignore;
+  }
+
+  @Override
+  public void validateResource(final IValidationContext<IBaseResource> iValidationContext) {
+    val messages = iValidationContext.getMessages();
+    messages.removeIf(this::ignoreMessage);
   }
 }

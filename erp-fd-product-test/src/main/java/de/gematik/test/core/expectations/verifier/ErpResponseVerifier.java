@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,16 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.core.expectations.requirements.Requirement;
-import de.gematik.test.core.expectations.requirements.RequirementsSet;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
-import org.openqa.selenium.InvalidArgumentException;
+import de.gematik.test.core.expectations.requirements.*;
+import de.gematik.test.erezept.client.rest.*;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.openqa.selenium.*;
 
 public class ErpResponseVerifier {
 

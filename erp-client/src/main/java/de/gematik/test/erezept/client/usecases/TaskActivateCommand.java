@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class TaskActivateCommand extends BaseCommand<ErxTask> {
   private final Parameters parameters;
 
   public TaskActivateCommand(String taskId, AccessCode accessCode, byte[] signedBundle) {
-    this(taskId, accessCode, PrescriptionBuilder.builder(signedBundle));
+    this(taskId, accessCode, PrescriptionBuilder.builder().build(signedBundle));
   }
 
   public TaskActivateCommand(String taskId, AccessCode accessCode, Parameters parameters) {

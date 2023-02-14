@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,25 @@
 
 package de.gematik.test.erezept.crypto.certificate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.security.KeyStore;
-import java.security.KeyStore.PasswordProtection;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.X509Certificate;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import java.security.*;
+import java.security.KeyStore.*;
+import java.security.cert.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class CertificateTest {
 
-  private X509Certificate autCertificate;
-  private X509Certificate encCertificate;
+  private X509CertificateWrapper smcbAutEccCert;
+  private X509CertificateWrapper smcbEncRsaCert;
 
   @BeforeEach
   void setUp() {
-    encCertificate = loadCertificateFrom("80276883110000116873-C_HCI_ENC_R2048.p12");
-    autCertificate = loadCertificateFrom("80276001011699900861-C_SMCB_AUT_E256_X509.p12");
+    smcbEncRsaCert = loadCertificateFrom("80276883110000116873-C_HCI_ENC_R2048.p12");
+    smcbAutEccCert = loadCertificateFrom("80276001011699900861-C_SMCB_AUT_E256_X509.p12");
   }
 
   @SneakyThrows
-  private X509Certificate loadCertificateFrom(@NonNull String p12File) {
+  private X509CertificateWrapper loadCertificateFrom(@NonNull String p12File) {
     val is = ClassLoader.getSystemResourceAsStream(p12File);
     val ks = KeyStore.getInstance("PKCS12");
     ks.load(is, "00".toCharArray());
@@ -49,18 +43,23 @@ class CertificateTest {
             .nextElement(); // use only the first element as each file has only a single alias
     val privateKeyEntry =
         (PrivateKeyEntry) ks.getEntry(alias, new PasswordProtection("00".toCharArray()));
-    return (X509Certificate) privateKeyEntry.getCertificate();
+    return new X509CertificateWrapper((X509Certificate) privateKeyEntry.getCertificate());
   }
 
   @Test
-  void readOutEncCertificate() {
-    val certificate = new EncCertificate(encCertificate);
-    assertEquals("3-SMC-B-Testkarte-883110000116873", certificate.getTelematikId().orElseThrow());
-  }
+  void validateCertificateInformations() {
+    Assertions.assertEquals(
+        "3-SMC-B-Testkarte-883110000116873", smcbEncRsaCert.getProfessionId().orElseThrow());
+    Assertions.assertEquals(
+        Oid.OID_SMC_B_ENC, smcbEncRsaCert.getCertificateTypeOid().orElseThrow());
+    Assertions.assertTrue(smcbEncRsaCert.isRsaEncryption());
+    Assertions.assertNotNull(smcbEncRsaCert.toCertificateHolder());
 
-  @Test
-  void readOutAutCertificate() {
-    val certificate = new AutCertificate(autCertificate);
-    assertEquals("5-2-KH-APO-Waldesrand-01", certificate.getProfessionItemValue().orElseThrow());
+    Assertions.assertEquals(
+        "5-2-KH-APO-Waldesrand-01", smcbAutEccCert.getProfessionId().orElseThrow());
+    Assertions.assertEquals(
+        Oid.OID_SMC_B_AUT, smcbAutEccCert.getCertificateTypeOid().orElseThrow());
+    Assertions.assertFalse(smcbAutEccCert.isRsaEncryption());
+    Assertions.assertNotNull(smcbAutEccCert.toCertificateHolder());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,13 @@ class DeBasisVersionTest {
           val version = DeBasisVersion.fromString(input);
           assertEquals(DeBasisVersion.V1_3_2, version);
         });
+  }
+
+  @Test
+  void shouldGetDefaultVersion() {
+    val defaultVersion = DeBasisVersion.getDefaultVersion();
+    assertEquals(DeBasisVersion.V0_9_13, defaultVersion);
+    assertEquals("0.9.13", defaultVersion.getVersion());
   }
 
   @Test

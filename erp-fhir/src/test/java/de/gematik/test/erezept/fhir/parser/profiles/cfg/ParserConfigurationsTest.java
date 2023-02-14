@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,54 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.cfg;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class ParserConfigurationsTest {
 
   @Test
   void shouldReadProfileConfiguration() {
     assertDoesNotThrow(ParserConfigurations::getInstance);
+  }
+
+  @Test
+  void shouldThrowOnInvalidProfileSettingsVersion() {
+    val c = ParserConfigurations.getInstance();
+    assertThrows(FhirProfileException.class, () -> c.getValidatorConfiguration("abc"));
+  }
+
+  @Test
+  void shouldThrowOnMissingAppropriateProfileInSet() {
+    val c = ParserConfigurations.getInstance();
+    assertThrows(
+        FhirProfileException.class,
+        () -> c.getAppropriateVersion(PatientenrechnungVersion.class, ErpWorkflowVersion.V1_1_1));
+  }
+
+  @Test
+  void shouldThrowOnUnknownAppropriateProfile() {
+    val c = ParserConfigurations.getInstance();
+    val unknownCustomProfile = mock(CustomProfiles.class);
+    val unknownVersion = mock(ErpWorkflowVersion.class);
+    when(unknownVersion.getCustomProfile()).thenReturn(unknownCustomProfile);
+    when(unknownCustomProfile.getName()).thenReturn("hello.world.profile");
+    assertThrows(
+        FhirProfileException.class,
+        () -> c.getAppropriateVersion(PatientenrechnungVersion.class, unknownVersion));
+  }
+
+  @Test
+  void shouldThrowOnFetchingInvalidProfile() {
+    val c = ParserConfigurations.getInstance();
+    val profileSetting = c.getProfileSettings().get(0);
+    assertThrows(
+        FhirProfileException.class, () -> profileSetting.getVersionedProfile("hello.world"));
   }
 }

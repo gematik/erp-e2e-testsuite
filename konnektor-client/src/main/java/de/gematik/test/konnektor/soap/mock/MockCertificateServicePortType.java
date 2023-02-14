@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,20 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.exceptions.SmartcardException;
-import de.gematik.ws.conn.certificateservice.v6.CertificateExpirationType;
-import de.gematik.ws.conn.certificateservice.v6.CryptType;
-import de.gematik.ws.conn.certificateservice.v6.ReadCardCertificate;
-import de.gematik.ws.conn.certificateservice.v6.VerifyCertificateResponse;
-import de.gematik.ws.conn.certificateservice.wsdl.v6.CertificateServicePortType;
-import de.gematik.ws.conn.certificateservice.wsdl.v6.FaultMessage;
-import de.gematik.ws.conn.certificateservicecommon.v2.CertRefEnum;
-import de.gematik.ws.conn.certificateservicecommon.v2.X509DataInfoListType;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import java.security.cert.CertificateEncodingException;
-import java.util.List;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.Holder;
-import lombok.val;
-import org.apache.commons.lang3.NotImplementedException;
+import de.gematik.test.konnektor.exceptions.*;
+import de.gematik.ws.conn.certificateservice.v6.*;
+import de.gematik.ws.conn.certificateservice.wsdl.v6.*;
+import de.gematik.ws.conn.certificateservicecommon.v2.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import java.security.cert.*;
+import java.util.*;
+import javax.xml.datatype.*;
+import javax.xml.ws.*;
+import lombok.*;
+import org.apache.commons.lang3.*;
 
 public class MockCertificateServicePortType extends AbstractMockService
     implements CertificateServicePortType {
@@ -49,8 +44,7 @@ public class MockCertificateServicePortType extends AbstractMockService
       ContextType context,
       CryptType crypt,
       Holder<Status> status,
-      Holder<List<CertificateExpirationType>> certificateExpiration)
-      throws FaultMessage {
+      Holder<List<CertificateExpirationType>> certificateExpiration) {
     throw new NotImplementedException("Check Certificate Expiration not implemented yet");
   }
 
@@ -108,7 +102,8 @@ public class MockCertificateServicePortType extends AbstractMockService
   private X509DataInfoListType.X509DataInfo.X509Data getX509AuthData(SmartcardWrapper scw) {
     val data = new X509DataInfoListType.X509DataInfo.X509Data();
     try {
-      data.setX509Certificate(scw.getSmartcard().getAuthCertificate().getEncoded());
+      data.setX509Certificate(
+          scw.getSmartcard().getAutCertificate().getX509Certificate().getEncoded());
     } catch (CertificateEncodingException e) {
       throw new SmartcardException(
           format("Smartcard {0} does not have Auth Certificate", scw.getSmartcard().getIccsn()), e);
@@ -123,8 +118,7 @@ public class MockCertificateServicePortType extends AbstractMockService
       XMLGregorianCalendar verificationTime,
       Holder<Status> status,
       Holder<VerifyCertificateResponse.VerificationStatus> verificationStatus,
-      Holder<VerifyCertificateResponse.RoleList> roleList)
-      throws FaultMessage {
+      Holder<VerifyCertificateResponse.RoleList> roleList) {
     throw new NotImplementedException("Verify Certificate not implemented yet");
   }
 }

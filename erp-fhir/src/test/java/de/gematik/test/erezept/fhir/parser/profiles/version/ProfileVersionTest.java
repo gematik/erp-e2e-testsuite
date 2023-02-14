@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.fhir.exceptions.FhirProfileException;
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
-import java.util.List;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import java.time.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class ProfileVersionTest {
 
@@ -59,6 +61,13 @@ class ProfileVersionTest {
   void shouldMatchNonSemantikVersion() {
     val version = PatientenrechnungVersion.V1_0_0;
     assertTrue(version.isEqual("1.0"));
+  }
+
+  @Test
+  void shouldCompareEqualsVersions() {
+    val left = ErpWorkflowVersion.V1_2_0;
+    val right = ErpWorkflowVersion.V1_2_0;
+    assertEquals(0, left.compareTo(right));
   }
 
   @Test
@@ -114,5 +123,27 @@ class ProfileVersionTest {
         () ->
             ProfileVersion.getDefaultVersion(
                 ErpWorkflowVersion.class, CustomProfiles.GEM_ERP_WORKFLOW));
+  }
+
+  @Test
+  void shouldThrowOnNoDefaultVersion() {
+    val m = mock(CustomProfiles.class);
+    doReturn(TestingVersion.class).when(m).getVersionClass();
+    doReturn("testing.profile").when(m).getName();
+
+    assertThrows(
+        RuntimeException.class, () -> ProfileVersion.getDefaultVersion(TestingVersion.class, m));
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  enum TestingVersion implements ProfileVersion<TestingVersion> {
+    V_0("0.0.0", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(1980, Month.JULY, 31)),
+    V_1("0.0.0", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(1980, Month.JULY, 31));
+
+    private final String version;
+    private final LocalDate validFromDate;
+    private final LocalDate validUntilDate;
+    private final CustomProfiles customProfile = null;
   }
 }

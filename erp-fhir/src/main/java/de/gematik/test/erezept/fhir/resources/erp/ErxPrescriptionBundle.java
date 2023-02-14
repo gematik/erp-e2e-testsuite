@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ public class ErxPrescriptionBundle extends Bundle {
                 new MissingFieldException(ErxPrescriptionBundle.class, ErpWorkflowStructDef.TASK));
   }
 
+  // TODO: KbvErpBundle is not always included!! make return Optional
   public KbvErpBundle getKbvBundle() {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
@@ -74,8 +75,11 @@ public class ErxPrescriptionBundle extends Bundle {
                 resource.getMeta().getProfile().stream()
                     .map(PrimitiveType::getValue)
                     // match the ErxPrescription by the unversioned Profile as the version is
-                    // checked by HAPI anyways
-                    .anyMatch(p -> p.contains(ErpWorkflowStructDef.RECEIPT.getCanonicalUrl())))
+                    // checked by HAPI anyway
+                    .anyMatch(
+                        p ->
+                            ErpWorkflowStructDef.RECEIPT.match(p)
+                                || ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE.match(p)))
         .map(ErxReceipt::fromBundle)
         .findFirst();
   }

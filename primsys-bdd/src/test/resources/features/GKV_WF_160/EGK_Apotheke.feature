@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ Funktionalität: eGK in der Apotheke
   @Path=happy
   @Afo=A_21558-1
   @Afo=A_22431
+  @MainActor=Apotheke
   Szenario: E-Rezept mit eGK und gültigem Prüfungsnachweis in der Apotheke einlösen
   Ein GKV Versicherter will seine E-Rezepte mit seiner EGK in einer
   öffentlichen Apotheke einlösen können
@@ -49,11 +50,13 @@ Funktionalität: eGK in der Apotheke
   @TCID=ERP_EE_WF160_EGK_APOTHEKE_02
   @Path=happy
   @Afo=A_22431
+  @MainActor=Apotheke
   Szenario: Eine Apotheke darf über die eGK nur E-Rezepte einsehen die noch nicht eingelöst sind
   Bei diesem Szenario werden der GKV Versicherten Aenna Gondern zwei E-Rezepte verschrieben.
   Das erste E-Rezepte wird über die Apotheke Am Flughafen mit der eGK eingelöst. Das zweite E-Rezept soll über die
   Apotheke NordApotheke abgerufen werden. Aenna Gondern will, dass die Apotheke NordApotheke beim Einlösen
   über die eGK nur Zugriff auf das noch nicht eingelöste E-Rezept bekommt.
+
     Angenommen die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
     Und die Apotheke NordApotheke hat Zugriff auf ihre SMC-B
     Wenn die Apotheke Am Flughafen die E-Rezepte mit der eGK von Aenna Gondern abruft
@@ -65,6 +68,7 @@ Funktionalität: eGK in der Apotheke
   @Path=happy
   @Afo=A_19284
   @Impl=open
+  @MainActor=Versicherter
   Szenario: Protokollierung von Einlösungen über eGK in der Apotheke
   Die GKV Versicherte Aenna Gondern will, dass das Einlösen über die eGK protokolliert
   und im FdV angezeigt wird.
@@ -73,12 +77,13 @@ Funktionalität: eGK in der Apotheke
     Wenn die Apotheke Am Flughafen die E-Rezepte mit der eGK von Aenna Gondern abruft
     Und die Apotheke Am Flughafen das letzte abgerufene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Aenna Gondern dispensiert
-    Dann hat die Versicherte Aenna Gondern für das letzte dispensiert E-Rezept im Zugriffsprotokoll des FdV einen Protokolleintrag
+    Dann hat die Versicherte Aenna Gondern für das letzte dispensiert E-Rezept im Zugriffsprotokoll einen Protokolleintrag
 
 
   @TCID=ERP_EE_WF160_EGK_APOTHEKE_04
   @Path=bad
   @Afo=A_21558
+  @MainActor=Apotheke
   Szenario: Einlösen von E-Rezepten über die eGK in Krankenhaus-Apotheke nicht möglich
   Die GKV Versicherte Aenna Gondern kann seine E-Rezept nicht in einer Krankenhaus-Apotheke
   mit seiner EGK einlösen, da die Krankenhaus-Apotheken nur mit der eGK keine E-Rezepte abrufen dürfen.
@@ -90,6 +95,7 @@ Funktionalität: eGK in der Apotheke
   @TCID=ERP_EE_WF160_EGK_APOTHEKE_04
   @Path=bad
   @Afo=A_22432
+  @MainActor=Apotheke
   Szenario: Das Abrufen von E-Rezepten ohne das zuvor ein aktueller Prüfungsnachweis abgerufen wurde, muss vom E-Rezept Fachdienst untersagt werden.
 
     Angenommen die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
@@ -100,6 +106,7 @@ Funktionalität: eGK in der Apotheke
   @TCID=ERP_EE_WF160_EGK_APOTHEKE_06
   @Path=bad
   @Afo=A_22432
+  @MainActor=Apotheke
   Szenario: E-Rezepte mit eGK in der Apotheke nur mit zeitlich gültigem Prüfungsnachweis
   Die Apotheke Am Flughafen bekommt nur mit einem aktuellen, innerhalb der letzten 30 Minuten erstellten Prüfungsnachweis
   Zugriff auf die E-Rezepte des Versicherten Günther Angermänn.

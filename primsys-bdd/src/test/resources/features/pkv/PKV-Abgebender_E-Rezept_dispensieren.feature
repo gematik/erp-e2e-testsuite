@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ Funktionalität: PKV-Rezepte dispensieren
 
   @TCID=ERP_EE_WF200_03
   @Path=happy
+  @MainActor=Apotheke
   Szenario: PKV E-Rezept dispensieren
   Die Ärztin Dr. Straßer verschreibt dem PKV-Versicherten Günther Angermänn ein E-Rezept, welches dieser bei der
   Apotheke "Am Flughafen" über einen QR-Code einlöst. Die Apotheke hat daraufhin eine Quittung für das dispensierte Medikament.

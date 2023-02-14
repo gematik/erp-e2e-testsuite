@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,21 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
-import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
-import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
-import de.gematik.test.erezept.fhir.util.IdentifierUtil;
-import de.gematik.test.erezept.fhir.values.BSNR;
-import de.gematik.test.erezept.fhir.values.BaseANR;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.references.kbv.*;
+import de.gematik.test.erezept.fhir.resources.*;
+import de.gematik.test.erezept.fhir.util.*;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import java.util.*;
+import java.util.stream.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 import org.hl7.fhir.r4.model.*;
 
 /** <a href="https://simplifier.net/erezept/kbvprerpbundle">KBV E-Rezept Bundle</a> */
@@ -46,10 +38,10 @@ import org.hl7.fhir.r4.model.*;
 @Getter
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
-public class KbvErpBundle extends Bundle {
+public class KbvErpBundle extends Bundle implements ErpFhirResource {
 
   public String getLogicalId() {
-    return this.id.getValue();
+    return IdentifierUtil.getUnqualifiedId(this.id);
   }
 
   public KbvBundleReference getReference() {
@@ -283,13 +275,24 @@ public class KbvErpBundle extends Bundle {
         .orElseThrow(() -> new MissingFieldException(this.getClass(), "Composition"));
   }
 
-  public Coverage getCoverage() {
-    return this.entry.stream()
-        .map(BundleEntryComponent::getResource)
-        .filter(resource -> resource.getResourceType().equals(ResourceType.Coverage))
-        .map(Coverage.class::cast)
-        .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
+  public KbvCoverage getCoverage() {
+    val coverageEntry =
+        this.entry.stream()
+            .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Coverage))
+            .findFirst()
+            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
+
+    KbvCoverage ret;
+    if (!coverageEntry.getResource().getClass().equals(KbvCoverage.class)) {
+      // not yet a KbvCoverage; make a KbvCoverage and replace the old instance
+      ret = KbvCoverage.fromCoverage(coverageEntry.getResource());
+      coverageEntry.setResource(ret);
+    } else {
+      // seems we have already replaced the entry: simply cast and return
+      ret = (KbvCoverage) coverageEntry.getResource();
+    }
+
+    return ret;
   }
 
   /**
@@ -300,7 +303,7 @@ public class KbvErpBundle extends Bundle {
    *
    * @param coverage which shall be set
    */
-  public void changeCoverage(Coverage coverage) {
+  public void changeCoverage(KbvCoverage coverage) {
     /* find the index of the coverage */
     val covIdx =
         IntStream.range(0, this.entry.size())
@@ -681,5 +684,14 @@ public class KbvErpBundle extends Bundle {
     return format(
         "{0} for {1} (Profile {2})",
         this.getClass().getSimpleName(), this.getPrescriptionId(), profile);
+  }
+
+  @Override
+  public String getDescription() {
+    val type = (this.isMultiple()) ? "MVO Verordnung" : "einfache Verordnung";
+    val workflow = this.getFlowType();
+    return format(
+        "{0} (Workflow {1}) {2} für {3}",
+        workflow.getDisplay(), workflow.getCode(), type, this.getPatient().getDescription());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,23 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import java.util.stream.Stream;
-import lombok.val;
-import org.hl7.fhir.r4.model.MedicationRequest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import de.gematik.test.erezept.fhir.extensions.kbv.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 class KbvErpMedicationRequestBuilderTest extends ParsingTest {
-
-  private static Stream<Arguments> kbvBundleVersions() {
-    return Stream.of(Arguments.of(KbvItaErpVersion.V1_0_2), Arguments.of(KbvItaErpVersion.V1_1_0));
-  }
 
   @ParameterizedTest(
       name =
           "[{index}] -> Build KBV MedicationRequest with Accident in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithAccident(KbvItaErpVersion version) {
     val medicationRequest =
         MedicationRequestBuilder.faker()
@@ -55,7 +47,7 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name =
           "[{index}] -> Build KBV MedicationRequest with Accident at Work in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithAccidentAtWork(KbvItaErpVersion version) {
     val medicationRequest =
         MedicationRequestBuilder.faker()
@@ -70,7 +62,7 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name =
           "[{index}] -> Build KBV MedicationRequest with Accident at Work in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithOccupationalDisease(KbvItaErpVersion version) {
     val medicationRequest =
         MedicationRequestBuilder.faker()
@@ -85,7 +77,7 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name =
           "[{index}] -> Build KBV MedicationRequest with random Accident in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithFakerAccident(KbvItaErpVersion version) {
     val medicationRequest =
         MedicationRequestBuilder.faker()
@@ -100,7 +92,7 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name =
           "[{index}] -> Build random KBV MedicationRequest with faker in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithFaker(KbvItaErpVersion version) {
     val medicationRequest = MedicationRequestBuilder.faker().version(version).build();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
@@ -108,7 +100,7 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   }
 
   @Test
-  void shouldUseUnkownStatusOnInvalidCode() {
+  void shouldUseUnknownStatusOnInvalidCode() {
     val medicationRequest = MedicationRequestBuilder.faker().status("abc").build();
     assertEquals(MedicationRequest.MedicationRequestStatus.UNKNOWN, medicationRequest.getStatus());
   }

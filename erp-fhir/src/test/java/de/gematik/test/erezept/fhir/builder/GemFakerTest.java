@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,16 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.FakerException;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.values.DoctorProfession;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +37,42 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class GemFakerTest {
+
+  @Test
+  void fakerProfessionWorks() {
+    val result = GemFaker.fakerProfession();
+    assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void fakerDocProfessionAsStringWorks() {
+    val result = GemFaker.fakerDoctorProfessionAsString();
+    assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void fakerDocProfessionWorks() {
+    val result = GemFaker.fakerDoctorProfession();
+    assertFalse(result.getNaming().isEmpty());
+  }
+
+  @Test
+  void fakerDoctorProfessionWorks() {
+    DoctorProfession doctorProfession = DoctorProfession.VISZERALCHIRURGIE;
+    assertEquals("Viszeral Chirurg:in", doctorProfession.getNaming());
+  }
+
+  @Test
+  void fakerDoctorProfessionGetDescriptionWorks() {
+    val descriptionOfDoctorProfession = DoctorProfession.ANGIOLOGIE.getDescription();
+    assertFalse(descriptionOfDoctorProfession.isEmpty());
+  }
+
+  @Test
+  void emptyDoctorProfessionDescriptionGivesAnswer() {
+    val description = DoctorProfession.ALLGEMEINMEDIZIN.getDescription();
+    assertFalse(description.isEmpty());
+  }
 
   @Test
   void fakerFutureExpirationShouldBetweenOneAndFourWeeks() {
@@ -152,5 +194,57 @@ class GemFakerTest {
 
     assertTrue(mvo.getStart().isPresent());
     assertNotNull(mvo.getEnd());
+  }
+
+  @Test
+  void shouldGenerateVatRateInRange() {
+    for (var i = 0; i < 10; i++) {
+      val vat = GemFaker.vatRate();
+      assertTrue(vat >= 10.0f);
+      assertTrue(vat <= 30.0f);
+    }
+  }
+
+  @Test
+  void shouldThrowOnInvalidVatRanges() {
+    assertThrows(BuilderException.class, () -> GemFaker.vatRate(-0.1f, 10f));
+    assertThrows(BuilderException.class, () -> GemFaker.vatRate(10.0f, 100.1f));
+    assertThrows(BuilderException.class, () -> GemFaker.vatRate(10.0f, 10f));
+    assertThrows(BuilderException.class, () -> GemFaker.vatRate(15.0f, 10f));
+  }
+
+  @Test
+  void shouldGenerateRandomCost() {
+    for (var i = 0; i < 10; i++) {
+      val cost = GemFaker.cost();
+      assertTrue(cost > 0.0f);
+    }
+  }
+
+  @Test
+  void shouldGenerateRandomMinCost() {
+    val min = 23.45f;
+    for (var i = 0; i < 10; i++) {
+      val cost = GemFaker.cost(min);
+      assertTrue(cost >= min);
+    }
+  }
+
+  @Test
+  void shouldGenerateRandomRangedCost() {
+    val min = 23.45f;
+    val max = 324.12f;
+    for (var i = 0; i < 10; i++) {
+      val cost = GemFaker.cost(min, max);
+      assertTrue(cost >= min);
+      assertTrue(cost <= max);
+    }
+  }
+
+  @Test
+  void shouldThrowOnInvalidCostRanges() {
+    assertThrows(BuilderException.class, () -> GemFaker.cost(-0.1f, 10f));
+    assertThrows(BuilderException.class, () -> GemFaker.cost(9.1f, -10f));
+    assertThrows(BuilderException.class, () -> GemFaker.cost(90.1f, 80f));
   }
 }

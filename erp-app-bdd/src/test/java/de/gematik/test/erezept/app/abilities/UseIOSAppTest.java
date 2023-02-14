@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ class UseIOSAppTest {
     when(driver.findElement(any())).thenReturn(webElement);
 
     val driverAbility = new UseIOSApp(driver, config);
-    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT));
+    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 
   @Test
@@ -90,7 +90,7 @@ class UseIOSAppTest {
     when(driver.findElements(any())).thenReturn(List.of(webElement));
 
     val driverAbility = new UseIOSApp(driver, config);
-    val elementList = driverAbility.getWebElementList(Onboarding.NEXT);
+    val elementList = driverAbility.getWebElementList(Onboarding.NEXT_BUTTON);
     assertEquals(1, elementList.size());
   }
 
@@ -111,7 +111,7 @@ class UseIOSAppTest {
         .thenReturn(webElement);
 
     val driverAbility = new UseIOSApp(driver, config);
-    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT));
+    assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 
   @Test
@@ -132,6 +132,7 @@ class UseIOSAppTest {
         .thenReturn(webElement);
 
     val driverAbility = new UseIOSApp(driver, config);
-    assertThrows(NoSuchElementException.class, () -> driverAbility.getWebElement(Onboarding.NEXT));
+    assertThrows(
+        NoSuchElementException.class, () -> driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 }

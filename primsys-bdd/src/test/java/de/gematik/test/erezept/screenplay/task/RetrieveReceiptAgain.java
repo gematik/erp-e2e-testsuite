@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.valuesets.DocumentType;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
@@ -32,9 +32,9 @@ import net.serenitybdd.screenplay.Task;
 
 public class RetrieveReceiptAgain implements Task {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
 
-  public RetrieveReceiptAgain(DequeStrategyEnum deque) {
+  public RetrieveReceiptAgain(DequeStrategy deque) {
     this.deque = deque;
   }
 
@@ -46,6 +46,7 @@ public class RetrieveReceiptAgain implements Task {
 
     val prescriptionId = receiptToRetrieve.getReceipt().getPrescriptionId();
     val taskId = receiptToRetrieve.getTaskId();
+    val accessCode = receiptToRetrieve.getAccessCode();
     val secret = receiptToRetrieve.getSecret();
 
     val cmd = new TaskGetByIdCommand(taskId, secret);
@@ -77,16 +78,16 @@ public class RetrieveReceiptAgain implements Task {
             DocumentType.RECEIPT, erxReceipt.getDocumentType()));
 
     // after checking the bundle, put the receipt on the stack
-    val subjectKvid = receiptToRetrieve.getSubjectKvid();
+    val subjectKvid = receiptToRetrieve.getReceiverKvid();
     pharmacyStack.appendDispensedPrescriptions(
-        new DispenseReceipt(subjectKvid, taskId, prescriptionId, secret, subjectKvid, erxReceipt));
+        new DispenseReceipt(subjectKvid, taskId, prescriptionId, accessCode, secret, erxReceipt));
   }
 
   public static RetrieveReceiptAgain fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static RetrieveReceiptAgain fromStack(DequeStrategyEnum deque) {
+  public static RetrieveReceiptAgain fromStack(DequeStrategy deque) {
     return new RetrieveReceiptAgain(deque);
   }
 }

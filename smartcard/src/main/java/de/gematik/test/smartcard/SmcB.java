@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,31 @@
 package de.gematik.test.smartcard;
 
 import de.gematik.test.erezept.crypto.certificate.*;
-import java.security.*;
-import java.security.cert.*;
-import java.security.cert.Certificate;
+import de.gematik.test.smartcard.exceptions.*;
+import java.util.*;
+import java.util.function.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode
-@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @Getter
-public class SmcB extends Smartcard {
+public class SmcB extends InstituteSmartcard {
 
-  private Certificate[] encCertificateChain;
-  private X509Certificate encCertificate;
-  private PrivateKey encPrivateKey;
+  public SmcB(List<Supplier<SmartcardCertificate>> certificates, String iccsn) {
+    super(certificates, iccsn, SmartcardType.SMC_B);
+  }
 
-  public String getTelematikId() {
-    val cert = new AutCertificate(getAuthCertificate());
-    return cert.getProfessionItemValue().orElse(this.getOwner().getOrganization());
+  public SmartcardCertificate getOSigCertificate(Crypto algorithm) {
+    return getKey(Oid.OID_SMC_B_OSIG, algorithm)
+        .orElseThrow(() -> new SmartCardKeyNotFoundException(this, Oid.OID_SMC_B_OSIG, algorithm));
+  }
+
+  @Override
+  public List<Oid> getAutOids() {
+    return List.of(Oid.OID_SMC_B_AUT);
+  }
+
+  @Override
+  protected Oid getEncOid() {
+    return Oid.OID_SMC_B_ENC;
   }
 }

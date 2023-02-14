@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.values.Secret;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -25,24 +27,11 @@ public class ChargeItemPostCommand extends BaseCommand<ErxChargeItem> {
 
   private final ErxChargeItem body;
 
-  public ChargeItemPostCommand(ErxChargeItem body) {
-    super(
-        ErxChargeItem.class,
-        HttpRequestMethod.POST,
-        "ChargeItem",
-        body.getPrescriptionId().getValue());
+  public ChargeItemPostCommand(ErxChargeItem body, Secret secret) {
+    super(ErxChargeItem.class, HttpRequestMethod.POST, "ChargeItem");
     this.body = body;
-  }
-
-  /**
-   * This method returns the last (tailing) part of the URL of the inner-HTTP Request e.g.
-   * /Task/[id] or /Communication?[queryParameter]
-   *
-   * @return the tailing part of the URL which combines to full URL like [baseUrl][tailing Part]
-   */
-  @Override
-  public String getRequestLocator() {
-    return this.getResourcePath();
+    this.queryParameters.add(new QueryParameter("task", body.getPrescriptionId().getValue()));
+    this.queryParameters.add(new QueryParameter("secret", secret.getValue()));
   }
 
   /**

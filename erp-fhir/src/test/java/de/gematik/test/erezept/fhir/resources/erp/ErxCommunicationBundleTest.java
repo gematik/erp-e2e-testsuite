@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,25 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ErxCommunicationBundleTest {
+class ErxCommunicationBundleTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void shouldEncodeSingleCommunicationBundle() {
+  void shouldEncodeSingleCommunicationBundle() {
     val fileName = "CommunicationReplyBundle_01.json";
 
     val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
     val communicationBundle = parser.decode(ErxCommunicationBundle.class, content);
-    assertNotNull("Valid ErxCommunicationBundle must be parseable", communicationBundle);
+    assertNotNull(communicationBundle, "Valid ErxCommunicationBundle must be parseable");
 
     assertEquals(1, communicationBundle.getCommunications().size());
 

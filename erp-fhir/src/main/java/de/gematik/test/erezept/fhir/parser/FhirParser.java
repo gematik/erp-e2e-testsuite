@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,12 @@ import org.hl7.fhir.r4.model.Resource;
 @Slf4j
 public class FhirParser {
 
+  private static final ErpFhirTypeHints typeHinter = new ErpFhirTypeHints();
+
   private final FhirContext ctx;
+  private final List<FhirProfiledValidator> validators;
   private IParser xmlParser;
   private IParser jsonParser;
-  private final List<FhirProfiledValidator> validators;
 
   public FhirParser() {
     this.ctx = FhirContext.forR4();
@@ -76,11 +78,13 @@ public class FhirParser {
   }
 
   public Resource decode(@NonNull final String content) {
-    return this.decode(Resource.class, content);
+    val encoding = EncodingType.guessFromContent(content);
+    return this.decode(content, encoding);
   }
 
   public Resource decode(@NonNull final String content, EncodingType encoding) {
-    return this.decode(Resource.class, content, encoding);
+    val type = typeHinter.getType(content);
+    return this.decode(type, content, encoding);
   }
 
   public String encode(@NonNull IBaseResource resource, EncodingType encoding) {
@@ -123,7 +127,10 @@ public class FhirParser {
           chosenParser.set(defaultParser);
         });
 
-    return chosenParser.get();
+    val validator = chosenParser.get();
+    val profileUrl = profileUrlOpt.orElse("no found profile");
+    log.trace(format("Choose Validator {0} for {1}", validator.getName(), profileUrl));
+    return validator;
   }
 
   private FhirProfiledValidator chooseProfileValidator(String profileUrl) {

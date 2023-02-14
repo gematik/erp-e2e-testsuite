@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,18 @@
 
 package de.gematik.test.erezept.primsys.model.actor;
 
-import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ICommand;
-import de.gematik.test.erezept.lei.cfg.ActorConfiguration;
-import de.gematik.test.erezept.lei.cfg.DoctorConfiguration;
-import de.gematik.test.erezept.lei.cfg.EnvironmentConfiguration;
-import de.gematik.test.erezept.lei.cfg.PharmacyConfiguration;
-import de.gematik.test.erezept.primsys.rest.data.ActorData;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmcB;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.test.erezept.client.*;
+import de.gematik.test.erezept.client.cfg.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.erezept.primsys.rest.data.*;
+import de.gematik.test.smartcard.*;
+import java.math.*;
+import java.nio.charset.*;
+import java.security.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
 
 public abstract class BaseActor {
 
@@ -47,7 +40,7 @@ public abstract class BaseActor {
   protected BaseActor(DoctorConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
     this(cfg, env);
     this.role = ActorRole.DOCTOR;
-    this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn(), cfg.getCryptoAlgorithm());
+    this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
     this.client.authenticateWith(smcb);
   }
 
@@ -55,7 +48,7 @@ public abstract class BaseActor {
       PharmacyConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
     this(cfg, env);
     this.role = ActorRole.PHARMACY;
-    this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn(), cfg.getCryptoAlgorithm());
+    this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
     this.client.authenticateWith(smcb);
   }
 

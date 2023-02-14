@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,9 @@ public class HandoverDataMatrixCode implements Task {
 
   private final DmcStack dmcStack;
   private final Actor pharmacy;
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
 
-  private HandoverDataMatrixCode(DmcStack dmcStack, DequeStrategyEnum deque, Actor pharmacy) {
+  private HandoverDataMatrixCode(DmcStack dmcStack, DequeStrategy deque, Actor pharmacy) {
     this.dmcStack = dmcStack;
     this.pharmacy = pharmacy;
     this.deque = deque;
@@ -69,17 +69,17 @@ public class HandoverDataMatrixCode implements Task {
 
   public static class Builder {
     private final DmcStack stack;
-    private DequeStrategyEnum dequeue;
+    private DequeStrategy dequeue;
 
     private Builder(DmcStack stack) {
       this.stack = stack;
     }
 
     public Builder with(String order) {
-      return with(DequeStrategyEnum.fromString(order));
+      return with(DequeStrategy.fromString(order));
     }
 
-    public Builder with(DequeStrategyEnum dequeue) {
+    public Builder with(DequeStrategy dequeue) {
       this.dequeue = dequeue;
       return this;
     }

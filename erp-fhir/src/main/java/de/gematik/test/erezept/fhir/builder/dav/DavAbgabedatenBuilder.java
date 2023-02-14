@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.fhir.builder.dav;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
@@ -27,21 +28,29 @@ import de.gematik.test.erezept.fhir.resources.dav.DavDispensedMedication;
 import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.util.Currency;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Invoice.InvoicePriceComponentType;
+import org.hl7.fhir.r4.model.Invoice.InvoiceStatus;
+import org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseStatus;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 
 public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedatenBuilder> {
 
-  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
   private static final String BASE_URL = "urn:uuid:";
-
   private final PrescriptionId prescriptionId;
   private final DavCompositionBuilder compositionBuilder;
-
+  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
   private PharmacyOrganization pharmacy;
   private DavDispensedMedication medication;
   private DavInvoice invoice;
@@ -49,6 +58,49 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
   private DavAbgabedatenBuilder(PrescriptionId prescriptionId) {
     this.prescriptionId = prescriptionId;
     this.compositionBuilder = DavCompositionBuilder.builder();
+  }
+
+  public static DavAbgabedatenBuilder faker() {
+    return faker(
+        PrescriptionId.random(
+            GemFaker.randomElement(
+                PrescriptionFlowType.FLOW_TYPE_200, PrescriptionFlowType.FLOW_TYPE_209)));
+  }
+
+  public static DavAbgabedatenBuilder faker(PrescriptionId prescriptionId) {
+    val b = builder(prescriptionId);
+    val pharmacy = PharmacyOrganizationBuilder.faker().build();
+
+    val invoiceBuilder =
+        DavInvoiceBuilder.builder()
+            .currency(Currency.EUR)
+            .status(InvoiceStatus.ISSUED)
+            .vatRate(GemFaker.vatRate());
+
+    val amountPriceComponents = GemFaker.fakerAmount(1, 5);
+    for (var i = 0; i < amountPriceComponents; i++) {
+      val insurantCost = GemFaker.cost();
+      val totalCost = GemFaker.cost(insurantCost);
+      invoiceBuilder.addPriceComponent(
+          PriceComponentBuilder.builder(KostenVersicherterKategorie.ZUZAHLUNG)
+              .currency(Currency.EUR)
+              .type(InvoicePriceComponentType.INFORMATIONAL)
+              .insurantCost(insurantCost)
+              .totalCost(totalCost)
+              .build(),
+          GemFaker.fakerPzn());
+    }
+
+    val invoice = invoiceBuilder.build();
+    val dispensedMedication =
+        DavDispensedMedicationBuilder.builder()
+            .status(MedicationDispenseStatus.COMPLETED)
+            .prescription(prescriptionId)
+            .pharmacy(pharmacy)
+            .invoice(invoice)
+            .build();
+
+    return b.pharmacy(pharmacy).medication(dispensedMedication).invoice(invoice);
   }
 
   public static DavAbgabedatenBuilder builder(KbvErpBundle bundle) {

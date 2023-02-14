@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,26 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
-import lombok.val;
-import org.junit.Test;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.util.*;
+import de.gematik.test.erezept.fhir.valuesets.dav.*;
+import lombok.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
-public class DavInvoiceBuilderTest extends ParsingTest {
+class DavInvoiceBuilderTest extends ParsingTest {
 
-  @Test
-  public void buildInvoiceWithFixedValues() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build DAV DispensedMedication with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#abdaErpPkvVersions")
+  void buildInvoiceWithFixedValues(AbdaErpPkvVersion version) {
     val pc1 =
         PriceComponentBuilder.builder(KostenVersicherterKategorie.ZUZAHLUNG)
+            .version(version)
             .currency(Currency.EUR) // EUR by default
             .type("informational")
             .insurantCost(5.8f)
@@ -41,6 +44,7 @@ public class DavInvoiceBuilderTest extends ParsingTest {
 
     val pc2 =
         PriceComponentBuilder.builder()
+            .version(version)
             .type("informational")
             .insurantCost(4.2f)
             .totalCost(10.01f)
@@ -49,6 +53,7 @@ public class DavInvoiceBuilderTest extends ParsingTest {
 
     val invoice =
         DavInvoiceBuilder.builder()
+            .version(version)
             .currency(Currency.EUR) // EUR by default
             .status("issued")
             .vatRate(19.0f)

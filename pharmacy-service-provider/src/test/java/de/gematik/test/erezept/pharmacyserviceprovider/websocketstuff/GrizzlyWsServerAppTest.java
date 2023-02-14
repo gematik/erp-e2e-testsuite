@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.pharmacyserviceprovider.websocketstuff;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.pspwsclient.dataobjects.DeliveryOption;
 import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;

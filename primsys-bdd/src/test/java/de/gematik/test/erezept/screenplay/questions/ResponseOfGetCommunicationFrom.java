@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -34,7 +34,7 @@ import net.serenitybdd.screenplay.Actor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxCommunication> {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
   private final Actor sender;
 
   @Override
@@ -74,10 +74,10 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
     private final Actor sender;
 
     public ResponseOfGetCommunicationFrom onStack(String order) {
-      return onStack(DequeStrategyEnum.fromString(order));
+      return onStack(DequeStrategy.fromString(order));
     }
 
-    public ResponseOfGetCommunicationFrom onStack(DequeStrategyEnum deque) {
+    public ResponseOfGetCommunicationFrom onStack(DequeStrategy deque) {
       return new ResponseOfGetCommunicationFrom(deque, sender);
     }
   }

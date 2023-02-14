@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,10 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.and;
-import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
-import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
-import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.questions.HasChargeItem;
 import de.gematik.test.erezept.screenplay.questions.HasDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
 import de.gematik.test.erezept.screenplay.questions.HasReceivedCommunication;
@@ -44,24 +31,16 @@ import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfGetCommunicationFrom;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
 import de.gematik.test.erezept.screenplay.questions.TheLastPrescription;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.task.AbortPrescription;
 import de.gematik.test.erezept.screenplay.task.AlternativelyAssign;
-import de.gematik.test.erezept.screenplay.task.BillingInformationConsent;
 import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.task.DeleteAllSentCommunications;
 import de.gematik.test.erezept.screenplay.task.DeleteSentCommunication;
 import de.gematik.test.erezept.screenplay.task.HandoverDataMatrixCode;
-import de.gematik.test.erezept.screenplay.task.HandoverDispenseRequestAsRepresentative;
 import de.gematik.test.erezept.screenplay.task.RedeemPrescription;
 import de.gematik.test.erezept.screenplay.task.RetrievePrescriptionFromServer;
 import de.gematik.test.erezept.screenplay.task.SendCommunication;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
-import io.cucumber.datatable.DataTable;
-import io.cucumber.java.Before;
-import io.cucumber.java.de.Aber;
-import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
@@ -69,7 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.PendingStepException;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.actors.OnlineCast;
 import net.serenitybdd.screenplay.ensure.Ensure;
 
 /**
@@ -77,71 +55,6 @@ import net.serenitybdd.screenplay.ensure.Ensure;
  */
 @Slf4j
 public class PatientSteps {
-
-  private SmartcardArchive smartcards;
-  private TestsuiteConfiguration config;
-
-  @Before
-  public void setUp() {
-    smartcards = SmartcardFactory.getArchive();
-    config = TestsuiteConfiguration.getInstance();
-    OnStage.setTheStage(new OnlineCast());
-  }
-
-  /**
-   * Initialisiere einen Versicherten mit einer eGK und der Versicherungsart aus {@code
-   * insuranceType}
-   *
-   * <p>Gültige Versicherungsarten sind:
-   *
-   * <ul>
-   *   <li>GKV: gesetzliche Krankenversicherung
-   *   <li>PKV: private Krankenversicherung
-   *   <li>BG: Berufsgenossenschaft
-   *   <li>SEL: Selbstzahler
-   *   <li>SOZ: Sozialamt
-   *   <li>GPV: gesetzliche Pflegeversicherung
-   *   <li>PPV: private Pflegeversicherung
-   *   <li>BEI: Beihilfe
-   * </ul>
-   *
-   * @param insuranceType ist eine der gültigen Versicherungsarten, mit der dieser Versicherte im
-   *     Laufe des Szenarios agieren wird
-   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um
-   *     diesen zu identifizieren
-   */
-  @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat Zugriff auf (?:seine|ihre) (?:digitale Identität|eGK)$")
-  public void initPatient(String insuranceType, String patientName) {
-    // fetch the chosen Smartcards
-    val patientConfig = config.getPatientConfig(patientName);
-    val egk =
-        smartcards.getEgkByICCSN(patientConfig.getEgkIccsn(), patientConfig.getCryptoAlgorithm());
-
-    // create the abilities
-    val useErpClient =
-        UseTheErpClient.with(
-            patientConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.FDV));
-    val receiveDrugs = new ReceiveDispensedDrugs();
-    val provideBaseData =
-        ProvidePatientBaseData.forPatient(egk.getKvnr(), patientName, insuranceType);
-
-    // assemble the screenplay
-    val thePatient = OnStage.theActorCalled(patientName);
-    thePatient.describedAs(
-        format(
-            "Ein {0} Krankenversicherter der E-Rezepte verschrieben bekommt und in Apotheken einlöst",
-            insuranceType));
-    givenThat(thePatient).can(ProvideEGK.sheOwns(egk));
-    givenThat(thePatient).can(ManageDataMatrixCodes.sheGetsPrescribed());
-    givenThat(thePatient).can(receiveDrugs);
-    givenThat(thePatient).can(useErpClient);
-    givenThat(thePatient).can(provideBaseData);
-    givenThat(thePatient).can(ManagePatientPrescriptions.itWorksWith());
-    givenThat(thePatient).can(ManageCommunications.sheExchanges());
-    givenThat(thePatient).can(DecideUserBehaviour.fromConfiguration(config));
-    useErpClient.authenticateWith(egk);
-  }
 
   /**
    * Prüfe, ob der angegebene Versicherte mit dem Namen aus {@code patientName} die angegebene
@@ -197,130 +110,6 @@ public class PatientSteps {
         .attemptsTo(HandoverDataMatrixCode.fromStack(dmcStack).with(order).to(thePharmacy));
   }
 
-  @Wenn(
-      "^(?:der Vertreter|die Vertreterin) (.+) (?:sein|ihr) (letztes|erstes) von (.+) zugewiesenes E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  public void whenAssignDispenseRequestPhysicallyAsRepresentative(
-      String representativeName, String order, String patientName, String pharmacyName) {
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmacyName);
-
-    when(theRepresentative)
-        .attemptsTo(
-            HandoverDispenseRequestAsRepresentative.fromStack(order)
-                .ofTheOwner(thePatient)
-                .to(thePharmacy));
-  }
-
-  /**
-   * Der ausgewählte Versicherte mit dem Namen {@code patientName} führt die Aktion {@code
-   * consentAction} auf dem Endpunkt <b>/Consent</b> des Fachdienstes aus. Damit wird
-   * sichergestellt, dass der Versicherte für den weiteren Testverlauf auf dem E-Rezept Fachdienst
-   * seine Einwilligung erteilt bzw. widerrufen hat.
-   *
-   * <p>Abhängig von dem angegebenen Parameter {@code consentAction} werden unterschiedliche
-   * Operationen ausgeführt:
-   *
-   * <ul>
-   *   <li>mit <b>erteilt</b> wird ein <code>POST /Consent</code> ausgeführt um eine Einwilligung zu
-   *       erteilen
-   *   <li>mit <b>widerrufen</b> wird ein <code>DELETE /Consent</code> ausgeführt, falls eine
-   *       Einwilligung vorliegt, um eine Einwilligung zu widerrufen. Liegt bislang keine
-   *       Einwilligung für diesen Versicherten beim E-Rezept Fachdienst vor, dann wird keine Aktion
-   *       ausgelöst
-   * </ul>
-   *
-   * @param patientName ist der Name des Versicherten der die Einwilligung erteilen bzw. widerrufen
-   *     soll
-   * @param consentAction gibt an, ob der Versicherte die Einwilligung erteilen, abrufen oder
-   *     widerrufen soll
-   */
-  @Angenommen(
-      "^(?:der|die) Versicherte (.+) hat (?:seine|ihre) Einwilligung zum Speichern der Abrechnungsinformationen (erteilt|widerrufen)$")
-  public void givenThatConsentIsGranted(String patientName, String consentAction) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    givenThat(thePatient).attemptsTo(BillingInformationConsent.forAction(consentAction));
-  }
-
-  /**
-   * Die <em>theActorInTheSpotlight</em>-Variante von {@link #givenThatConsentIsGranted(String,
-   * String)}
-   *
-   * @param consentAction gibt an, ob der Versicherte die Einwilligung erteilen, abrufen oder
-   *     widerrufen soll
-   */
-  @Angenommen(
-      "^(?:der|die) Versicherte hat (?:seine|ihre) Einwilligung zum Speichern der Abrechnungsinformationen (erteilt|widerrufen)$")
-  public void givenThatConsentIsGranted(String consentAction) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    givenThat(thePatient).attemptsTo(BillingInformationConsent.forAction(consentAction));
-  }
-
-  /**
-   * Die <em>Wenn</em>-Variante von {@link #givenThatConsentIsGranted(String, String)}
-   *
-   * @param patientName ist der Name des Versicherten der die Einwilligung erteilen bzw. widerrufen
-   *     soll
-   * @param consentAction gibt an, ob der Versicherte die Einwilligung erteilen, abrufen oder
-   *     widerrufen soll
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:seine|ihre) Einwilligung zur Speicherung der Abrechnungsinformationen (erteilt|widerruft)$")
-  public void whenGrantConsent(String patientName, String consentAction) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    when(thePatient).attemptsTo(BillingInformationConsent.forAction(consentAction));
-  }
-
-  /**
-   * Prüfe, ob auf dem E-Rezept Fachdienst für den Versicherten mit dem Namen {@code patientName}
-   * eine Einwilligung zur Speicherung der Abrechnungsinformationen hinterlegt hat.
-   *
-   * <p><b>Notiz:</b> aktuell wird hier lediglich eine <code>GET /Consent</code> ausgeführt und bei
-   * erfolgreicher Antwort, diese vom Versicherten gemerkt. Ein Prüfung findet aus dem folgenden
-   * Grund nicht statt: der E-Rezept Fachdienst antwortet nur mit einem gültigen Consent, wenn eine
-   * Einwilligung auch erteilt wurde. Wurde bislang keine Einwilligung erteilt (oder
-   * zwischenzeitlich), dann antwortet der FD mit einer OperationOutcome und wir bekommen hier eine
-   * <code>UnexpectedResponseResourceException</code>
-   *
-   * @param patientName ist der Name des Versicherten, der die Einwilligung abruft
-   */
-  @Dann(
-      "^hat (?:der|die) Versicherte (.+) eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
-  public void thenHasConsent(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    when(thePatient).attemptsTo(BillingInformationConsent.getConsent());
-  }
-
-  /**
-   * Die <em>Und</em>-Variante von {@link #thenHasConsent(String patientName)}
-   *
-   * @param patientName ist der Name des Versicherten, der die Einwilligung abruft
-   */
-  @Und(
-      "^(?:der|die) Versicherte (.+) hat eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
-  public void andHasConsent(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    and(thePatient).attemptsTo(BillingInformationConsent.getConsent());
-  }
-
-  /**
-   * Die <em>theActorInTheSpotlight</em>-Variante von {@link #thenHasConsent(String patientName)}
-   */
-  @Dann(
-      "^hat (?:der|die) Versicherte eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
-  public void thenHasConsent() {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    when(thePatient).attemptsTo(BillingInformationConsent.getConsent());
-  }
-
-  /** Die <em>theActorInTheSpotlight</em>-Variante von {@link #andHasConsent(String patientName)} */
-  @Und(
-      "^(?:der|die) Versicherte hat eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
-  public void andHasConsent() {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    and(thePatient).attemptsTo(BillingInformationConsent.getConsent());
-  }
-
   @Dann("^hat (?:der|die) Versicherte (.+) noch kein E-Rezept über DMC erhalten$")
   public void thenDidNotReceiveDmc(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -341,34 +130,6 @@ public class PatientSteps {
     and(thePatient).attemptsTo(Ensure.that(HasDispensedDrugs.of(adverb, amount)).isTrue());
   }
 
-  @Dann(
-      "^hat (?:der|die) Versicherte (.+) eine Abrechnungsinformation für das letzte dispensierte Medikament beim Fachdienst vorliegen$")
-  public void thenHasChargeItem(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient).attemptsTo(Ensure.that(HasChargeItem.forLastDispensedDrug()).isTrue());
-  }
-
-  @Und(
-      "^(?:der|die) Versicherte (.+) hat eine Abrechnungsinformation für das letzte dispensierte Medikament beim Fachdienst vorliegen$")
-  public void andHasChargeItem(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    and(thePatient).attemptsTo(Ensure.that(HasChargeItem.forLastDispensedDrug()).isTrue());
-  }
-
-  @Dann(
-      "^hat (?:der|die) Versicherte eine Abrechnungsinformation für das letzte dispensierte Medikament beim Fachdienst vorliegen$")
-  public void thenHasChargeItem() {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    then(thePatient).attemptsTo(Ensure.that(HasChargeItem.forLastDispensedDrug()).isTrue());
-  }
-
-  @Und(
-      "^(?:der|die) Versicherte hat eine Abrechnungsinformation für das letzte dispensierte Medikament beim Fachdienst vorliegen$")
-  public void andHasChargeItem() {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    and(thePatient).attemptsTo(Ensure.that(HasChargeItem.forLastDispensedDrug()).isTrue());
-  }
-
   @Wenn(
       "^(?:der|die) Versicherte (.+) das (letztes|erstes) (?:ihm|ihr) zugewiesene E-Rezept herunterlädt$")
   public void whenDownloadPrescription(String patientName, String order) {
@@ -382,7 +143,7 @@ public class PatientSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacist = OnStage.theActorCalled(pharmName);
     when(thePatient)
-        .attemptsTo(RedeemPrescription.assign(thePharmacist, DequeStrategyEnum.fromString(order)));
+        .attemptsTo(RedeemPrescription.assign(thePharmacist, DequeStrategy.fromString(order)));
   }
 
   @Wenn(
@@ -391,7 +152,7 @@ public class PatientSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacist = OnStage.theActorCalled(pharmName);
     when(thePatient)
-        .attemptsTo(RedeemPrescription.reserve(thePharmacist, DequeStrategyEnum.fromString(order)));
+        .attemptsTo(RedeemPrescription.reserve(thePharmacist, DequeStrategy.fromString(order)));
   }
 
   /**
@@ -400,19 +161,11 @@ public class PatientSteps {
    * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
    * @param patientName ist der Name des Versicherten
    */
-  @Dann("^wird (?:der Versicherten|dem Versicherten) (.+) das neue E-Rezept im FdV angezeigt$")
-  @Dann(
-      "^wird (?:der Versicherten|dem Versicherten) (.+) das neue E-Rezept im FdV angezeigt ohne AccessCode$")
+  @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept angezeigt$")
+  @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept ohne AccessCode angezeigt$")
   public void thenFetchPrescriptionFromBackend(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(TheLastPrescription.prescribed().existsInBackend()).isTrue());
-  }
-
-  @Dann("^wird (?:dem Vertreter|der Vertreterin) (.+) das neue E-Rezept im FdV angezeigt$")
-  public void thenFetchPrescriptionAsRepresentative(String representativeName) {
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    then(theRepresentative)
         .attemptsTo(Ensure.that(TheLastPrescription.prescribed().existsInBackend()).isTrue());
   }
 
@@ -421,7 +174,7 @@ public class PatientSteps {
    *
    * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
    */
-  @Dann("^wird (?:der Versicherten|dem Versicherten) das neue E-Rezept im FdV angezeigt$")
+  @Dann("^wird (?:der|dem) Versicherten das neue E-Rezept angezeigt$")
   public void thenFetchPrescriptionFromBackend() {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
@@ -434,7 +187,7 @@ public class PatientSteps {
    * @param patientName ist der Name des Versicherten
    */
   @Dann(
-      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) letztes (ausgestellte|gelöschte) E-Rezept nicht mehr im FdV angezeigt$")
+      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) letztes (ausgestellte|gelöschte) E-Rezept nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String patientName, String stack) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -442,7 +195,7 @@ public class PatientSteps {
   }
 
   @Dann(
-      "^wird (?:der|dem) Versicherten (?:sein|ihr) letztes (ausgestellte|gelöschte) E-Rezept nicht mehr im FdV angezeigt$")
+      "^wird das letzte (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String stack) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
@@ -473,30 +226,6 @@ public class PatientSteps {
         .attemptsTo(
             CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
                 .isEqualTo(400));
-  }
-
-  @Dann(
-      "^kann (?:der Vertreter|die Vertreterin) (.+) das (letzte|erste) von (.+) zugewiesene E-Rezept ohne AccessCode nicht löschen$")
-  public void thenRepresentativeCannotDeletePrescription(
-      String representativeName, String order, String patientName) {
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(theRepresentative)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(403));
-  }
-
-  @Aber(
-      "^(?:der Vertreter|die Vertreterin) (.+) kann das (letzte|erste) von (.+) zugewiesene E-Rezept mit AccessCode löschen$")
-  public void thenRepresentativeCanDeletePrescription(
-      String representativeName, String order, String patientName) {
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(theRepresentative)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asRepresentative().fromStack(order))
-                .isEqualTo(204));
   }
 
   @Dann("^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen$")
@@ -741,119 +470,6 @@ public class PatientSteps {
   }
 
   /**
-   * TMD-1649
-   *
-   * @param representativeName Name des Vertreters
-   * @param patientName Name des versicherten
-   */
-  @Dann(
-      "^hat (?:der Vertreter|die Vertreterin) (.+) die Nachricht mit dem Rezept (?:der Versicherten|des Versicherten) (.+) empfangen$")
-  @Und(
-      "^(?:der Vertreter|die Vertreterin) (.+) hat die Nachricht mit dem Rezept (?:der Versicherten|des Versicherten) (.+) empfangen$")
-  public void thenRepresentativeReceivedMessageFrom(String representativeName, String patientName) {
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(theRepresentative)
-        .attemptsTo(
-            Ensure.that(HasReceivedCommunication.representative().from(thePatient)).isTrue());
-  }
-
-  /**
-   * Der Step rüft, ob für das letzte dispensierte Rezept des Versicherten Abrechnungsinformationen
-   * beim Fachdienst vorliegen
-   *
-   * @param patientName
-   */
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) für das letzte E-Rezept die Abrechnungsinformationen im FdV abrufen$")
-  public void thenFdVgetsChargeItem(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) für das letzte E-Rezept die Abrechnungsinformationen im FdV abruft$")
-  public void whenFdVgetsChargeItem(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Der Step prüft, dass keine Abrechnungsinformationen beim Fachdienst vorliegen Erwartet wird
-   * eine leere Liste
-   *
-   * @param patientName
-   */
-  @Dann("^kann (?:der|die) Versicherte (.+) keine Abrechnungsinformationen im FdV abrufen$")
-  public void thenFdVgestsNoChargeItems(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-  /**
-   * Der Step prüft, dass keine Abrechnungsinformationen zum letzten dispensierten Rezept beim
-   * Fachdienst vorliegen Erwartet wird FehlerCode 404
-   *
-   * @param patientName
-   */
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) für das letzte E-Rezept keine Abrechnungsinformationen im FdV abrufen, weil sie nicht gefunden werden$")
-  public void thenFdVgestsNoChargeItemforPrescription(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Der Step prüft, dass der Versicherte seine Einwilligung abrufen kann
-   *
-   * @param patientName
-   */
-  @Dann("^kann (?:der|die) Versicherte (.+) seine Einwilligung im FdV abrufen$")
-  public void thenCangetConsent(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    when(thePatient).attemptsTo(BillingInformationConsent.getConsent());
-  }
-
-  /**
-   * Der Step löst das Löschen der Abrechnungsinformation zum letzten Rezept aus
-   *
-   * @param patientName
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) für das letzte E-Rezept die Abrechnungsinformationen im FdV löscht$")
-  public void whenDeleteChargeItem(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Der Step übergibt den AccessCode zum Ändern der Abrechnungsinformationen an die Apotheke
-   *
-   * @param patientName
-   * @param pharmName
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) die Apotheke (.+) via Data Matrix Code zum Ändern der Abrechnungsinformationen berechtigt$")
-  public void whenPharmacyGetsEnabledbyDMC(String patientName, String pharmName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Der Step übergibt den AccessCode zum Ändern der Abrechnungsinformationen an die Apotheke mit
-   * einer Communication vom Typ ChargChangeRequest
-   *
-   * @param patientName
-   * @param pharmName
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) die Apotheke (.+) per Nachricht zum Ändern der Abrechnungsinformationen berechtigt$")
-  public void whenPharmacyGetsEnabledByCommunication(String patientName, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    when(thePatient)
-        .attemptsTo(
-            SendCommunication.with(
-                ResponseOfPostCommunication.changeRequest()
-                    .forChargeItemFromBackend(DequeStrategyEnum.LIFO) // letzte | erste
-                    .sentTo(thePharmacy)
-                    .withRandomMessage()));
-  }
-
-  /**
    * Der Step prüft, dass für den Versicherten eine Nachricht vom Typ ChargChangeReplay von der
    * Apotheke vorliegt
    *
@@ -871,37 +487,7 @@ public class PatientSteps {
   }
 
   /**
-   * Der Step löst ein Setzen der Markierungsflags entsprechend der Datatable aus.
-   *
-   * @param patientName
-   * @param markingFlags
-   */
-  @Wenn(
-      "^(?:der Versicherte|die Versicherte) (.+) die Markierungen für Abrechnungsinformationen des letzten E-Rezept setzt:$")
-  public void whenSetMarkingFlags(String patientName, DataTable markingFlags) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Der Step überprüft, ob die Markierungsflags entsprechend der DataTable gesetzt sind
-   *
-   * @param patientName
-   * @param markingFlags
-   */
-  @Dann(
-      "^hat (?:der Versicherte|die Versicherte) (.+) die Abrechnungsinformationen des letzten E-Rezepts mit folgenden Markierungen:$")
-  public void thenHasMarkingFlags(String patientName, DataTable markingFlags) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  @Dann(
-      "^kann (?:der Versicherte|die Versicherte) (.+) für das letzte E-Rezept geänderte Abrechnungsinformationen im FdV abrufen$")
-  public void thenFdvGetsChangedChargeItems(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Der Step erzeugt und zeigt den DMC zum erzeugten E-Rezept, damit er mit der E-Rezept
+   * Der Step erzeugt und zeigt den DMC zum erzeugten E-Rezept, damit er mit dem E-Rezept
    * eingescannt werden kann
    *
    * @param patientName
@@ -982,9 +568,20 @@ public class PatientSteps {
   }
 
   @Dann(
-      "^hat (?:der Versicherte|die Versicherte) (.+) für das (.+) dispensiert E-Rezept im Zugriffsprotokoll des FdV einen Protokolleintrag$")
+      "^hat (?:der|die) Versicherte (.+) für das (letzte|erste) dispensiert E-Rezept im Zugriffsprotokoll einen Protokolleintrag$")
   public void thenPatientHasNewEntryInAccessProtocolForPrescription(
-      String patientName, String sort) {
+      String patientName, String order) {
+    throw new PendingStepException("Not yet implemented");
+  }
+
+  @Wenn("^(?:der Versicherte|die Versicherte) (.+) alle löschbaren E-Rezepte löscht$")
+  public void whenPatientDeletesAllPresciptions(String patientName) {
+    throw new PendingStepException("Not yet implemented");
+  }
+
+  @Dann(
+      "^werden (?:der Versicherten|dem Versicherten) (.+) keine löschbaren Rezepte mehr im FDV angezeigt$")
+  public void FdvShowsNoPresciptions(String patientName) {
     throw new PendingStepException("Not yet implemented");
   }
 }

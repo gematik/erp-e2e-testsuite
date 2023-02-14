@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class ProfilesIndexGeneratorMain {
     log.info("Create Profiles Index in " + configPath);
 
     try (val writer = new FileWriter(configPath.toString(), false)) {
-      val profileDirs = ResourceUtils.getResourceFilesInDirectory(PROFILES_DIR_NAME);
+      val profileDirs = ResourceUtils.getResourceFilesDirectoryStructure(PROFILES_DIR_NAME);
       val profilesList = new LinkedList<ProfileSourceDto>();
       profileDirs.stream()
           .filter(File::isDirectory)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,19 @@
 
 package de.gematik.test.erezept.fhir.references.erp;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import org.hl7.fhir.r4.model.Reference;
+import ca.uhn.fhir.model.api.annotation.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import org.hl7.fhir.r4.model.*;
 
 @DatatypeDef(name = "Reference")
 @SuppressWarnings({"java:S110"})
 public class ErxReceiptReference extends Reference {
 
-  private static final ErpWorkflowStructDef STRUCTURE_DEFINITION = ErpWorkflowStructDef.RECEIPT;
-  private static final String DISPLAY_VALUE = "Quittung";
+  private static final ErpWorkflowStructDef STRUCTURE_DEFINITION =
+      ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE;
 
-  public ErxReceiptReference(PrescriptionId id) {
-    this.setDisplay(DISPLAY_VALUE)
-        .setReference(id.getValue())
-        .setType(STRUCTURE_DEFINITION.getCanonicalUrl());
+  public ErxReceiptReference(ErxReceipt erxReceipt) {
+    this.setDisplay(STRUCTURE_DEFINITION.getCanonicalUrl()).setReference(erxReceipt.getId());
   }
 }

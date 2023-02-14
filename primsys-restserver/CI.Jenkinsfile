@@ -1,7 +1,7 @@
 @Library('gematik-jenkins-shared-library') _
 
-def CREDENTIAL_ID_GEMATIK_GIT = 'tst_tt_build_u_p'
-def REPO_URL = 'https://build.top.local/source/git/erezept/fachdienst/erp-e2e'
+def CREDENTIAL_ID_GEMATIK_GIT = 'GITLAB.tst_tt_build.Username_Password'
+def REPO_URL = 'https://gitlab.prod.ccs.gematik.solutions/git/erezept/fachdienst/erp-e2e'
 def BRANCH = 'Development_1.x'
 def JIRA_PROJECT_ID = 'TMD'
 def GITLAB_PROJECT_ID = '843'
@@ -11,14 +11,13 @@ def IMAGE_NAME = "erezept/primsys-rest"
 
 pipeline {
     options {
-        skipDefaultCheckout()
         disableConcurrentBuilds()
         buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
     }
     agent { label 'Docker-Maven' }
 
     tools {
-        maven 'Maven (Standard)'
+        maven 'Default'
     }
 
     parameters {
@@ -30,21 +29,20 @@ pipeline {
     stages {
         stage('Initialise') {
             steps {
+                useJdk('OPENJDK17')
                 checkVersion(params.NEW_VERSION)
                 gitSetIdentity()
-                //nur für die Testumgebung notwendig!
-                useTestBuildServer()
             }
         }
 
-        stage('Checkout') {
-            steps {
-                git branch: BRANCH,
-                        //nur für die Testumgebung notwendig!
-                        credentialsId: CREDENTIAL_ID_GEMATIK_GIT,
-                        url: REPO_URL
-            }
-        }
+//        stage('Checkout') {
+//            steps {
+//                git branch: BRANCH,
+//                        //nur für die Testumgebung notwendig!
+//                        credentialsId: CREDENTIAL_ID_GEMATIK_GIT,
+//                        url: REPO_URL
+//            }
+//        }
 
         stage('Build') {
             steps {

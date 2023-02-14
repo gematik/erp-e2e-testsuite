@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,22 @@
 package de.gematik.test.konnektor.soap;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.cfg.KonnektorModuleConfiguration;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
-import de.gematik.test.konnektor.commands.ReadCardCertificateCommand;
-import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
-import de.gematik.test.konnektor.commands.VerifyDocumentCommand;
-import de.gematik.test.konnektor.exceptions.SOAPRequestException;
-import de.gematik.ws.conn.cardservice.v8.CardInfoType;
-import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
-import de.gematik.ws.conn.certificateservicecommon.v2.CertRefEnum;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.konnektor.commands.*;
+import de.gematik.test.konnektor.exceptions.*;
+import de.gematik.ws.conn.cardservice.v8.*;
+import de.gematik.ws.conn.cardservicecommon.v2.*;
+import de.gematik.ws.conn.certificateservicecommon.v2.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.stream.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class RemoteKonnektorTest {
 
@@ -63,11 +56,12 @@ class RemoteKonnektorTest {
     val konnektor = cfg.instantiateKonnektorClient("Soft-Konn");
 
     // get a cardHandle
-    val cardHandle = konnektor.execute(GetCardHandleCommand.forIccsn("80276883110000095767"));
+    val cardHandle =
+        konnektor.execute(GetCardHandleCommand.forIccsn("80276883110000095767")).getPayload();
 
     // read the Auth certificate from card
     val cardAuthCertCmd = new ReadCardCertificateCommand(cardHandle, CertRefEnum.C_AUT);
-    val cardAuthCertificate = konnektor.execute(cardAuthCertCmd);
+    val cardAuthCertificate = konnektor.execute(cardAuthCertCmd).getPayload();
     assertNotNull(cardAuthCertificate);
 
     // read the Sig certificate from card
@@ -90,13 +84,13 @@ class RemoteKonnektorTest {
 
     // sign an exemplary XML document
     val signCmd = new SignXMLDocumentCommand(cardHandle, "<xml>TEST</xml>");
-    val signRsp = konnektor.execute(signCmd);
+    val signRsp = konnektor.execute(signCmd).getPayload();
     assertNotNull(signRsp);
     assertTrue(signRsp.length > 0);
 
     // verify the document from previous step
     val verifyCmd = new VerifyDocumentCommand(signRsp);
-    val verifyRsp = konnektor.execute(verifyCmd);
+    val verifyRsp = konnektor.execute(verifyCmd).getPayload();
     assertTrue(verifyRsp);
 
     //    val extAuthCmd = new ExternalAuthenticateCommand(cardHandle);
@@ -109,25 +103,26 @@ class RemoteKonnektorTest {
     val konnektor = cfg.instantiateKonnektorClient("Soft-Konn");
 
     // get a cardHandle
-    val cardHandle = konnektor.execute(GetCardHandleCommand.forIccsn("80276883110000095767"));
+    val cardHandle =
+        konnektor.execute(GetCardHandleCommand.forIccsn("80276883110000095767")).getPayload();
 
     // read the Auth certificate from card
     val cardAuthCertCmd = new ReadCardCertificateCommand(cardHandle);
-    val cardAuthCertificate = konnektor.execute(cardAuthCertCmd);
+    val cardAuthCertificate = konnektor.execute(cardAuthCertCmd).getPayload();
     assertNotNull(cardAuthCertificate);
 
     // sign an exemplary XML document
     val signCmd = new SignXMLDocumentCommand(cardHandle, "<xml>TEST</xml>");
-    val signRsp = konnektor.execute(signCmd);
+    val signRsp = konnektor.execute(signCmd).getPayload();
     assertNotNull(signRsp);
     assertTrue(signRsp.length > 0);
 
     val verifyCmd = new VerifyDocumentCommand(signRsp);
-    val verifyRsp = konnektor.execute(verifyCmd);
+    val verifyRsp = konnektor.execute(verifyCmd).getPayload();
     assertTrue(verifyRsp, "Signed Response shall be valid");
 
     val verifyInvalidCmd = new VerifyDocumentCommand("not valid".getBytes());
-    val verifyInvalidRsp = konnektor.execute(verifyInvalidCmd);
+    val verifyInvalidRsp = konnektor.execute(verifyInvalidCmd).getPayload();
     assertFalse(verifyInvalidRsp, "Invalid Document shall be invalid");
 
     //    val extAuthCmd = new ExternalAuthenticateCommand(cardHandle);
@@ -148,7 +143,7 @@ class RemoteKonnektorTest {
         .forEach(
             konnektorConfiguration -> {
               val konnektor = konnektorConfiguration.create();
-              val response = konnektor.execute(mockCmd);
+              val response = konnektor.execute(mockCmd).getPayload();
               assertEquals(cardHandle, response);
             });
   }
@@ -169,7 +164,7 @@ class RemoteKonnektorTest {
               val konnektor = konnektorConfiguration.create();
               val response = konnektor.safeExecute(mockCmd);
               assertTrue(response.isPresent());
-              assertEquals(cardHandle, response.orElseThrow());
+              assertEquals(cardHandle, response.orElseThrow().getPayload());
             });
   }
 

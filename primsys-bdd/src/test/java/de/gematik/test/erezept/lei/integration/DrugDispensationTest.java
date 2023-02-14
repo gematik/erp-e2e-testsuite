@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,27 @@
 
 package de.gematik.test.erezept.lei.integration;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.questions.HasChargeItem;
-import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
-import java.util.List;
-import java.util.Map;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.actors.Cast;
-import net.serenitybdd.screenplay.actors.OnStage;
-import org.hl7.fhir.r4.model.Narrative;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.junit.Before;
-import org.junit.Test;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.builder.erp.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.questions.*;
+import de.gematik.test.smartcard.*;
+import java.util.*;
+import lombok.*;
+import net.serenitybdd.screenplay.*;
+import net.serenitybdd.screenplay.actors.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.*;
 
 public class DrugDispensationTest {
 
@@ -49,6 +44,7 @@ public class DrugDispensationTest {
 
   private Actor patient;
   private UseTheErpClient useMockClientAbility;
+  private ProvideEGK egkAbility;
   private ReceiveDispensedDrugs dispensedDrugs;
 
   @Before
@@ -61,17 +57,36 @@ public class DrugDispensationTest {
     patient = OnStage.theActorCalled("Marty");
     patient.can(useMockClientAbility);
     givenThat(patient).can(dispensedDrugs);
+
+    val mockEgk = mock(Egk.class);
+    when(mockEgk.getKvnr()).thenReturn("X123456789");
+    egkAbility = ProvideEGK.sheOwns(mockEgk);
+    givenThat(patient).can(egkAbility);
+    givenThat(patient).can(ManageChargeItems.sheReceives());
   }
 
   @Test
   public void thenReceivedDrugsWithChargeItem() {
-    val chargeItem = ErxChargeItemBuilder.faker(prescriptionId).build();
-    val response = new ErpResponse(200, Map.of(), chargeItem);
+
+    val erxReceipt = mock(ErxReceipt.class);
+    when(erxReceipt.getId()).thenReturn("Bundle/12345");
+
+    val chargeItem =
+        ErxChargeItemBuilder.faker(prescriptionId)
+            .subject(egkAbility.getKvnr(), GemFaker.insuranceName())
+            .receipt(erxReceipt)
+            .build();
+    val chargeItemBundle = mock(ErxChargeItemBundle.class);
+    val response = new ErpResponse(200, Map.of(), chargeItemBundle);
+
+    when(chargeItemBundle.getChargeItem()).thenReturn(chargeItem);
+    when(chargeItemBundle.getReceipt()).thenReturn(Optional.of(erxReceipt));
+
     when(useMockClientAbility.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
 
     dispensedDrugs.append(prescriptionId);
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
-    assertTrue(then(patient).asksFor(HasChargeItem.forLastDispensedDrug()));
+    assertTrue(then(patient).asksFor(HasChargeItem.forLastDispensedDrug().asPatient()));
   }
 
   @Test
@@ -82,7 +97,7 @@ public class DrugDispensationTest {
 
     dispensedDrugs.append(prescriptionId);
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
-    assertFalse(then(patient).asksFor(HasChargeItem.forLastDispensedDrug()));
+    assertFalse(then(patient).asksFor(HasChargeItem.forLastDispensedDrug().asPatient()));
   }
 
   /**

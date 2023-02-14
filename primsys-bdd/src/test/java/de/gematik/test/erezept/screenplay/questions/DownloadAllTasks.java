@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -58,11 +58,11 @@ public class DownloadAllTasks implements Question<ErxTaskBundle> {
   }
 
   public static DownloadAllTasks sortedWith(String sortOrder) {
-    return sortedWith(DequeStrategyEnum.fromString(sortOrder));
+    return sortedWith(DequeStrategy.fromString(sortOrder));
   }
 
-  public static DownloadAllTasks sortedWith(DequeStrategyEnum dequeStrategy) {
-    if (dequeStrategy.equals(DequeStrategyEnum.FIFO)) {
+  public static DownloadAllTasks sortedWith(DequeStrategy dequeStrategy) {
+    if (dequeStrategy.equals(DequeStrategy.FIFO)) {
       return ascending();
     } else {
       return descending();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,29 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.extensions.erp.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import lombok.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.junitpioneer.jupiter.*;
 
 class ErxCommunicationBuilderTest extends ParsingTest {
 
-  @Test
-  void buildCommunicationInfoReqFixedValues() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationInfoReq with E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void buildCommunicationInfoReqFixedValues(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val medication = KbvErpMedicationBuilder.faker().build();
     val infoReq =
         ErxCommunicationBuilder.builder()
@@ -51,10 +55,14 @@ class ErxCommunicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void shouldThrowOnMissingMedicationForInfoReq() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationInfoReq with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void shouldThrowOnMissingMedicationForInfoReq(ErpWorkflowVersion version) {
     val builder =
         ErxCommunicationBuilder.builder()
+            .version(version)
             .basedOnTaskId("4711")
             .insurance(IKNR.from("104212059"))
             .recipient("606358757")
@@ -65,8 +73,13 @@ class ErxCommunicationBuilderTest extends ParsingTest {
         () -> builder.buildInfoReq("Hallo, das ist meine Request Nachricht!"));
   }
 
-  @Test
-  void shouldThrowOnMissingFlowTypeForInfoReq() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationInfoReq with E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void shouldThrowOnMissingFlowTypeForInfoReq(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val medication = KbvErpMedicationBuilder.faker().build();
     val builder =
         ErxCommunicationBuilder.builder()
@@ -80,10 +93,13 @@ class ErxCommunicationBuilderTest extends ParsingTest {
         () -> builder.buildInfoReq("Hallo, das ist meine Request Nachricht!"));
   }
 
-  @Test
-  void buildDispReqFixedValues() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationDispReq with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildDispReqFixedValues(ErpWorkflowVersion version) {
     val dispReq =
         ErxCommunicationBuilder.builder()
+            .version(version)
             .basedOnTask("4711", "777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea")
             .recipient("606358757")
             .buildDispReq("Bitte schicken Sie einen Boten.");
@@ -92,12 +108,16 @@ class ErxCommunicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildRepresentative() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationRepresentative with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildRepresentative(ErpWorkflowVersion version) {
     val representative =
         ErxCommunicationBuilder.builder()
+            .version(version)
             .basedOnTask("4711", "777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea")
             .recipient("X123456789")
+            .sender("X987654321")
             .flowType(PrescriptionFlowType.FLOW_TYPE_160)
             .buildRepresentative("Bitte für mich abholen");
 
@@ -105,20 +125,27 @@ class ErxCommunicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void shouldThrowOnMissingTaskForDispReq() {
-    val builder = ErxCommunicationBuilder.builder().recipient("606358757");
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build CommunicationDispReq with E-Rezept FHIR Profiles {0} and missing Task")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void shouldThrowOnMissingTaskForDispReq(ErpWorkflowVersion version) {
+    val builder = ErxCommunicationBuilder.builder().version(version).recipient("606358757");
 
     assertThrows(
         BuilderException.class, () -> builder.buildDispReq("Bitte schicken Sie einen Boten."));
   }
 
-  @Test
-  void buildCommunicationReplyFixedValues() {
+  @ParameterizedTest(name = "[{index}] -> Build CommunicationReply with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void buildCommunicationReplyFixedValues(ErpWorkflowVersion version) {
     val reply =
         ErxCommunicationBuilder.builder()
+            .version(version)
             .basedOnTaskId("4711")
             .recipient("X234567890")
+            .sender("606358757")
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(SupplyOptionsType.onPremise())
             .buildReply("Hallo, das ist meine Response Nachricht!");
@@ -127,11 +154,14 @@ class ErxCommunicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildCommunicationChargeChangeRequest() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationChangeRequest with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildCommunicationChargeChangeRequest(ErpWorkflowVersion version) {
     val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
     val changeReq =
         ErxChargeItemCommunicationBuilder.builder()
+            .version(version)
             .basedOnChargeItem(chargeItem)
             .recipient("606358757")
             .sender("X234567890")
@@ -141,11 +171,14 @@ class ErxCommunicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildCommunicationChargeChangeReply() {
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationChangeReply with E-Rezept FHIR Profiles {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildCommunicationChargeChangeReply(ErpWorkflowVersion version) {
     val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
     val changeReply =
         ErxChargeItemCommunicationBuilder.builder()
+            .version(version)
             .basedOnChargeItem(chargeItem)
             .recipient("X234567890")
             .sender("606358757")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package de.gematik.test.smartcard;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.smartcard.exceptions.CardNotFoundException;
-import java.util.List;
-import lombok.Getter;
-import lombok.val;
+import de.gematik.test.smartcard.exceptions.*;
+import java.util.*;
+import lombok.*;
 
-@Getter
 public class SmartcardArchive {
-
-  private final List<SmcB> smcbCards;
-  private final List<Hba> hbaCards;
-  private final List<Egk> egkCards;
+  @Getter private final List<SmcB> smcbCards;
+  @Getter private final List<Hba> hbaCards;
+  @Getter private final List<Egk> egkCards;
 
   protected SmartcardArchive(List<SmcB> smcbCards, List<Hba> hbaCards, List<Egk> egkCards) {
     this.smcbCards = smcbCards;
@@ -36,32 +33,16 @@ public class SmartcardArchive {
     this.egkCards = egkCards;
   }
 
-  public List<Hba> getHbaCards(Crypto crypto) {
-    return filter(hbaCards, crypto);
+  public Hba getHbaByICCSN(String iccsn) {
+    return getSmartcardByIccsn(getHbaCards(), iccsn);
   }
 
-  public Hba getHbaByICCSN(String iccsn, Crypto crypto) {
-    return getSmartcardByIccsn(getHbaCards(crypto), iccsn);
+  public SmcB getSmcbByICCSN(String iccsn) {
+    return getSmartcardByIccsn(getSmcbCards(), iccsn);
   }
 
-  public List<SmcB> getSmcbCards(Crypto crypto) {
-    return filter(smcbCards, crypto);
-  }
-
-  public SmcB getSmcbByICCSN(String iccsn, Crypto crypto) {
-    return getSmartcardByIccsn(getSmcbCards(crypto), iccsn);
-  }
-
-  public List<Egk> getEgkCards(Crypto crypto) {
-    return filter(egkCards, crypto);
-  }
-
-  public Egk getEgkByICCSN(String iccsn, Crypto crypto) {
-    return getSmartcardByIccsn(getEgkCards(crypto), iccsn);
-  }
-
-  private <T extends Smartcard> List<T> filter(List<T> cards, Crypto crypto) {
-    return cards.stream().filter(smartcard -> smartcard.getAlgorithm() == crypto).toList();
+  public Egk getEgkByICCSN(String iccsn) {
+    return getSmartcardByIccsn(getEgkCards(), iccsn);
   }
 
   private <T extends Smartcard> T getSmartcardByIccsn(List<T> cards, String iccsn) {
@@ -71,12 +52,10 @@ public class SmartcardArchive {
           format(
               "Cannot find smartcard with ICCSN {0} in an empty list of given smartcards", iccsn));
     }
-    val template = cards.get(0);
-    val type = template.getType();
-    val crypto = template.getAlgorithm();
+    val type = cards.get(0).getType();
     return cards.stream()
         .filter(smartcard -> smartcard.getIccsn().equals(iccsn))
         .findFirst()
-        .orElseThrow(() -> new CardNotFoundException(type, iccsn, crypto));
+        .orElseThrow(() -> new CardNotFoundException(type, iccsn));
   }
 }

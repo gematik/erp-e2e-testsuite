@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -22,14 +22,13 @@ Funktionalität: Längenprüfung der PZN
 
   Grundlage:
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
-
+    Angenommen die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
 
   @TCID=ERP_EE_PZN_01
   @Path=bad
   @Afo=A_22925
+  @MainActor=Fachdienst
   Szenariogrundriss:  Längenprüfung PZN: 7/9-stellig ist ungültig
-
-    Angenommen die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
 
     Dann kann die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann kein E-Rezept verschreiben, weil die PZN eine falsche Länge hat
       | Name          | PZN   |

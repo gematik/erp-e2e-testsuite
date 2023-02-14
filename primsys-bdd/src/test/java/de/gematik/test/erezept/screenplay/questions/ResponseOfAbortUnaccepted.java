@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ import org.hl7.fhir.r4.model.Resource;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
 
   @Override
   public Class<Resource> expectedResponseBody() {
@@ -72,10 +72,10 @@ public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
   public static class Builder {
 
     public ResponseOfAbortUnaccepted fromStack(String order) {
-      return fromStack(DequeStrategyEnum.fromString(order));
+      return fromStack(DequeStrategy.fromString(order));
     }
 
-    public ResponseOfAbortUnaccepted fromStack(DequeStrategyEnum deque) {
+    public ResponseOfAbortUnaccepted fromStack(DequeStrategy deque) {
       return new ResponseOfAbortUnaccepted(deque);
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,20 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import ca.uhn.fhir.parser.DataFormatException;
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import ca.uhn.fhir.parser.*;
+import de.gematik.test.erezept.client.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.util.*;
+import java.time.Duration;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
 
 class ErpResponseFactoryTest {
 
@@ -59,7 +57,8 @@ class ErpResponseFactoryTest {
         .forEach(
             content -> {
               val response =
-                  responseFactory.createFrom(STATUS_OK, HEADERS_JSON, content, ErxAuditEvent.class);
+                  responseFactory.createFrom(
+                      STATUS_OK, Duration.ZERO, HEADERS_JSON, content, ErxAuditEvent.class);
               val auditEvent = response.getResource();
               assertNotNull(
                   auditEvent,
@@ -70,7 +69,8 @@ class ErpResponseFactoryTest {
   @Test
   void unexpectedOperationOutcomeResponse() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    val response =
+        responseFactory.createFrom(STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testOperationOutcome);
     val resource = response.getResource();
     assertNotNull(
         resource, format("Response must contain a Resource of Type {0}", OperationOutcome.class));
@@ -88,7 +88,8 @@ class ErpResponseFactoryTest {
   @Test
   void expectedOperationOutcome() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    val response =
+        responseFactory.createFrom(STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testOperationOutcome);
     val outputOO = response.getResource();
     assertNotNull(
         outputOO, format("Response must contain a Resource of Type {0}", OperationOutcome.class));
@@ -110,13 +111,18 @@ class ErpResponseFactoryTest {
         DataFormatException.class,
         () ->
             responseFactory.createFrom(
-                STATUS_ERROR, HEADERS_JSON, auditEventContent, OperationOutcome.class));
+                STATUS_ERROR,
+                Duration.ZERO,
+                HEADERS_JSON,
+                auditEventContent,
+                OperationOutcome.class));
   }
 
   @Test
   void fetchUnexpectedResponseResource() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    val response =
+        responseFactory.createFrom(STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testOperationOutcome);
     assertThrows(
         UnexpectedResponseResourceError.class, () -> response.getResource(ErxAuditEvent.class));
   }
@@ -124,7 +130,8 @@ class ErpResponseFactoryTest {
   @Test
   void fetchUnexpectedResponseResourceOptional() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    val response =
+        responseFactory.createFrom(STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testOperationOutcome);
     val resource = response.getResourceOptional(ErxAuditEvent.class);
     assertTrue(resource.isEmpty());
   }
@@ -132,14 +139,16 @@ class ErpResponseFactoryTest {
   @Test
   void isResourceOfType() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    val response =
+        responseFactory.createFrom(STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testOperationOutcome);
     assertTrue(response.isResourceOfType(OperationOutcome.class));
   }
 
   @Test
   void isNotResourceOfType() {
     val testOperationOutcome = FhirTestResourceUtil.createOperationOutcome();
-    val response = responseFactory.createFrom(STATUS_ERROR, HEADERS_JSON, testOperationOutcome);
+    val response =
+        responseFactory.createFrom(STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testOperationOutcome);
     assertFalse(response.isResourceOfType(ErxAuditEvent.class));
   }
 }

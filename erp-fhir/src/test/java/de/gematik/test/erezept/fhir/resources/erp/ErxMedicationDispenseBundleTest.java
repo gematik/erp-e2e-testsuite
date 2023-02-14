@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,18 @@
 package de.gematik.test.erezept.fhir.resources.erp;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class ErxMedicationDispenseBundleTest {
+class ErxMedicationDispenseBundleTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
-
-  private static FhirParser parser;
-
-  @BeforeAll
-  static void setUp() {
-    parser = new FhirParser();
-  }
 
   @Test
   void shouldCastFromMedicationDispense() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ public class HasRetrieved implements Question<Boolean> {
             lastAcceptedPrescription.getTaskId(),
             lastAcceptedPrescription.getTask().getAccessCode());
 
-    return new HasRetrieved(
-        l -> l.getAssignedPrescriptions().getRawList().contains(dmcPrescription));
+    return new HasRetrieved(l -> l.getAssignedList().contains(dmcPrescription));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.core.expectations.requirements;
 
-import lombok.Getter;
+import lombok.*;
 
 public enum ErpAfos implements RequirementsSet {
   A_19018("A_19018", "Rollenprüfung Verordnender stellt Rezept ein"),
@@ -41,7 +41,9 @@ public enum ErpAfos implements RequirementsSet {
   A_22634("A_22634", "Mehrfachverordnung - Beginn Einlösefrist-Pflicht"),
   A_22704("A_22704", "Mehrfachverordnung - Numerator größer 0"),
   A_22927("A_22927", "Ausschluss unspezifizierter Extensions"),
-  A_19284("A_19284-04", "Versichertenprotokoll zu Operationen");
+  A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
+  A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
+  ;
   @Getter private final Requirement requirement;
 
   ErpAfos(String id, String description) {

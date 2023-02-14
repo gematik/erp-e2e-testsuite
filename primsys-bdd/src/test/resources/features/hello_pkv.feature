@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ Funktionalität: Demo Feature für PKV Tests
     Und die Versicherte hat ihre Einwilligung zum Speichern der Abrechnungsinformationen erteilt
 
   @Path=happy
+  @MainActor=Versicherter
   Szenario: Einwilligung zur Speicherung der Abrechnungsinformationen erteilen
   Fridolin erteilt seine Einwilligung zur Speicherung der Abrechnungsinformationen und Hanna hat die Einwilligung bereits aus
   der Vorbedingung
@@ -37,6 +38,7 @@ Funktionalität: Demo Feature für PKV Tests
     Und die Versicherte Hanna Bäcker hat eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst
 
   @Path=happy
+  @MainActor=Versicherter
   Szenario: Abrechnungsinformation für ein dispensiertes Medikament abrufen
   Die Apotheke dispensiert ein Medikament an einen PKV-Versicherten, der seine Einwilligung erteilt hat
     Wenn der Arzt Bernd Claudius folgendes E-Rezept an den Versicherten Fridolin Straßer verschreibt:

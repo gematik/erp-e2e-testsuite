@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ class DesiredCapabilitiesBuilderTest {
 
     val dc = DesiredCapabilitiesBuilder.init().device(config).create();
 
-    val platformName = dc.getCapability("platformName");
-    assertEquals("iOS", platformName);
+    val platform = dc.getCapability("platformName");
+    assertEquals("IOS", platform.toString());
 
     val platformVersion = dc.getCapability("platformVersion");
     assertEquals("16", platformVersion);
@@ -90,8 +90,8 @@ class DesiredCapabilitiesBuilderTest {
 
     val dc = DesiredCapabilitiesBuilder.init().device(config).create();
 
-    val platformName = dc.getCapability("platformName");
-    assertEquals("Android", platformName);
+    val platform = dc.getCapability("platformName");
+    assertEquals("ANDROID", platform.toString());
 
     val platformVersion = dc.getCapability("platformVersion");
     assertEquals("10", platformVersion);

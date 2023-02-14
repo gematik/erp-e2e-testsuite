@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.valuesets.ActCode;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
@@ -26,13 +28,11 @@ import de.gematik.test.erezept.fhir.valuesets.ConsentType;
 import java.util.Date;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.Consent;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 
 public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder> {
 
+  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private String kvid;
   private ActCode policyRule = ActCode.OPTIN;
   private Consent.ConsentState status = Consent.ConsentState.ACTIVE;
@@ -63,7 +63,20 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
   public ErxConsent build() {
     val consent = new ErxConsent();
 
-    val profile = ErpWorkflowStructDef.CONSENT.asCanonicalType();
+    CanonicalType profile;
+    INamingSystem kvidNamingSystem;
+    ICodeSystem consentTypeCodeSystem;
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
+      profile = ErpWorkflowStructDef.CONSENT.asCanonicalType();
+      kvidNamingSystem = DeBasisNamingSystem.KVID;
+      consentTypeCodeSystem = ErpWorkflowCodeSystem.CONSENT_TYPE;
+    } else {
+      profile =
+          PatientenrechnungStructDef.GEM_ERPCHRG_PR_CONSENT.asCanonicalType(
+              PatientenrechnungVersion.V1_0_0, true);
+      kvidNamingSystem = DeBasisNamingSystem.KVID_PKV;
+      consentTypeCodeSystem = PatientenrechnungCodeSystem.CONSENT_TYPE;
+    }
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
@@ -72,13 +85,11 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
     consent.setPatient(
         new Reference()
             .setIdentifier(
-                new Identifier()
-                    .setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl())
-                    .setValue(kvid)));
+                new Identifier().setSystem(kvidNamingSystem.getCanonicalUrl()).setValue(kvid)));
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);
     consent.setScope(scope.asCodeableConcept());
-    consent.setCategory(List.of(consentType.asCodeableConcept()));
+    consent.setCategory(List.of(consentType.asCodeableConcept(consentTypeCodeSystem)));
     consent.setDateTime(new Date());
 
     return consent;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -43,13 +43,36 @@ public class RedeemPrescription implements Task {
 
   private final ErxCommunicationBuilder communicationBuilder;
   private final boolean isAssignToPharmacist;
-  private final DequeStrategyEnum strategy;
+  private final DequeStrategy strategy;
+
+  public static RedeemPrescription reserve(Actor pharmacist, DequeStrategy strategy) {
+    val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
+
+    val communicationBuilder =
+        ErxCommunicationBuilder.builder()
+            .recipient(useSMCBAbility.getTelematikID())
+            .supplyOptions(new SupplyOptionsType(true, true, false))
+            // TODO replace this
+            .insurance(IKNR.from("104212059"))
+            .flowType(PrescriptionFlowType.FLOW_TYPE_160);
+    return new RedeemPrescription(communicationBuilder, false, strategy);
+  }
+
+  public static RedeemPrescription assign(Actor pharmacist, DequeStrategy strategy) {
+    val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
+
+    val communicationBuilder =
+        ErxCommunicationBuilder.builder().recipient(useSMCBAbility.getTelematikID());
+
+    return new RedeemPrescription(communicationBuilder, true, strategy);
+  }
 
   @Override
   public <T extends Actor> void performAs(T actor) {
     val managePatientPrescriptions =
         SafeAbility.getAbility(actor, ManagePatientPrescriptions.class);
-    val prescription = managePatientPrescriptions.getBy(strategy);
+    val prescription =
+        strategy.chooseFrom(managePatientPrescriptions.getFullDetailedPrescriptions());
 
     final ErxCommunication communication;
     if (!isAssignToPharmacist) {
@@ -82,27 +105,5 @@ public class RedeemPrescription implements Task {
               communication.getBasedOnReferenceId(), communication.getRecipientId()));
       throw urre;
     }
-  }
-
-  public static RedeemPrescription reserve(Actor pharmacist, DequeStrategyEnum strategy) {
-    val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
-
-    val communicationBuilder =
-        ErxCommunicationBuilder.builder()
-            .recipient(useSMCBAbility.getTelematikID())
-            .supplyOptions(new SupplyOptionsType(true, true, false))
-            // TODO replace this
-            .insurance(IKNR.from("104212059"))
-            .flowType(PrescriptionFlowType.FLOW_TYPE_160);
-    return new RedeemPrescription(communicationBuilder, false, strategy);
-  }
-
-  public static RedeemPrescription assign(Actor pharmacist, DequeStrategyEnum strategy) {
-    val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
-
-    val communicationBuilder =
-        ErxCommunicationBuilder.builder().recipient(useSMCBAbility.getTelematikID());
-
-    return new RedeemPrescription(communicationBuilder, true, strategy);
   }
 }

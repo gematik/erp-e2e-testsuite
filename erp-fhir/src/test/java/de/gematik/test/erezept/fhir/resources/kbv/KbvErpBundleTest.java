@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.fhir.builder.kbv.CoverageBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
@@ -85,6 +85,7 @@ class KbvErpBundleTest extends ParsingTest {
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
 
     assertEquals(expectedID, kbvBundle.getLogicalId());
+    assertNotNull(kbvBundle.getDescription());
     assertEquals(
         KbvItaErpStructDef.BUNDLE.getVersionedUrl(KbvItaErpVersion.V1_0_2),
         kbvBundle.getFullMetaProfile());
@@ -116,6 +117,10 @@ class KbvErpBundleTest extends ParsingTest {
         kbvBundle
             .getAssignerOrganization()
             .isPresent()); // GKV Prescription does not have an assigner Organization
+
+    val medication = kbvBundle.getMedication();
+    assertEquals(StandardSize.N1, medication.getStandardSize());
+    assertNotNull(medication.getDescription());
 
     val composition = kbvBundle.getComposition();
     val compProfile = composition.getMeta().getProfile().get(0).asStringValue();
@@ -324,7 +329,7 @@ class KbvErpBundleTest extends ParsingTest {
         .forEach(
             idx -> {
               val kbvBundle = parser.decode(KbvErpBundle.class, content);
-              val newCoverage = CoverageBuilder.faker().build();
+              val newCoverage = KbvCoverageBuilder.faker().build();
 
               val oldCoverage = kbvBundle.getCoverage();
               val oldIknr = oldCoverage.getPayorFirstRep().getIdentifier().getValue();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -30,9 +30,9 @@ import net.serenitybdd.screenplay.Task;
 
 public class DeleteSentCommunication implements Task {
 
-  private final DequeStrategyEnum deque;
+  private final DequeStrategy deque;
 
-  private DeleteSentCommunication(DequeStrategyEnum deque) {
+  private DeleteSentCommunication(DequeStrategy deque) {
     this.deque = deque;
   }
 
@@ -55,10 +55,10 @@ public class DeleteSentCommunication implements Task {
   }
 
   public static DeleteSentCommunication fromStack(String order) {
-    return fromStack(DequeStrategyEnum.fromString(order));
+    return fromStack(DequeStrategy.fromString(order));
   }
 
-  public static DeleteSentCommunication fromStack(DequeStrategyEnum deque) {
+  public static DeleteSentCommunication fromStack(DequeStrategy deque) {
     return new DeleteSentCommunication(deque);
   }
 }

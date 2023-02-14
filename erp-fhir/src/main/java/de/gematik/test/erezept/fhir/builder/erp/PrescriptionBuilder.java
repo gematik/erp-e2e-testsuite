@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import java.util.List;
+import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import lombok.val;
 import org.hl7.fhir.r4.model.Binary;
 import org.hl7.fhir.r4.model.Parameters;
 
-public class PrescriptionBuilder {
+public class PrescriptionBuilder extends AbstractResourceBuilder<PrescriptionBuilder> {
 
-  private PrescriptionBuilder() {
-    throw new AssertionError();
+  private PrescriptionBuilder() {}
+
+  public static PrescriptionBuilder builder() {
+    return new PrescriptionBuilder();
   }
 
-  public static Parameters builder(byte[] data) {
+  public Parameters build(byte[] data) {
     val b = new Binary();
-    b.getMeta().setProfile(List.of(ErpWorkflowStructDef.BINARY.asCanonicalType()));
     b.getContentTypeElement().setValue("application/pkcs7-mime");
     b.setData(data);
 

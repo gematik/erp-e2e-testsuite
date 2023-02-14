@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -61,21 +61,13 @@ class ValidatorTest extends ParsingTest {
 
   @Test
   void shouldPassValidErpResources() {
-    val validResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/erp/1.1.1");
+    val validResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/erp", true);
     ValidatorUtil.validateFiles(parser, validResources, Assertions::assertTrue, true);
   }
 
   @Test
-  void shouldPassOfficialKbvBundleResources102() {
-    val kbvBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
-    ValidatorUtil.validateFiles(parser, kbvBundleResources, Assertions::assertTrue, true);
-  }
-
-  @Test
-  void shouldPassOfficialKbvBundleResources110() {
-    val kbvBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.1.0/bundle");
+  void shouldPassOfficialKbvBundleResources() {
+    val kbvBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv", true);
     ValidatorUtil.validateFiles(parser, kbvBundleResources, Assertions::assertTrue, true);
   }
 
@@ -83,12 +75,6 @@ class ValidatorTest extends ParsingTest {
   void shouldPassOfficialAbdaBundleResources() {
     val davBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/dav");
     ValidatorUtil.validateFiles(parser, davBundleResources, Assertions::assertTrue, true);
-  }
-
-  @Test
-  void shouldPassOfficialKbvPatientResources() {
-    val kbvPatients = ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/patient");
-    ValidatorUtil.validateFiles(parser, kbvPatients, Assertions::assertTrue, true);
   }
 
   @Test

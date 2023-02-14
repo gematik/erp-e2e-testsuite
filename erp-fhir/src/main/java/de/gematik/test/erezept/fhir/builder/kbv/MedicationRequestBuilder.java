@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
             //            .intent(fakerValueSet(MedicationRequest.MedicationRequestIntent.class))
             .isBVG(fakerBool())
             .hasEmergencyServiceFee(fakerBool())
-            .insurance(CoverageBuilder.faker(patient.getInsuranceKind()).build())
+            .insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build())
             .requester(PractitionerBuilder.faker().build())
             .medication(KbvErpMedicationBuilder.faker().build())
             .substitution(substitution)

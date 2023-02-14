@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 # language: de
 
 @Funktionalität=MVO
-@Impl=open
+@Impl=done
 Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
   Eine Mehrfachverordnung besteht aus mindestens 2 bis maximal 4 Teilverordnungen.
   Jede Teilverordnung einer Mehrfachverordnung ist ein vollständiges E-Rezept mit QES-signierten Verordnungsdatensatz und E-Rezept-Token.
@@ -29,17 +29,18 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID=ERP_EE_MVO_01
-  @Path=happy
-  @Workflow=160
-  @Versicherung=GKV
-  @Afo=A_22627
+    @Path=happy
+    @Workflow=160
+    @Versicherung=GKV
+    @Afo=A_22627
+    @MainActor=Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für GKV-Versicherte
   Gutfall: E-Rezepte für GKV-Versicherte als Mehrfachverordnung (WF 160)
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | <Anzahl>    | <Nummer>  | <Start>           | leer             |
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
 
     Beispiele:
       | Anzahl | Nummer | Start |
@@ -50,18 +51,18 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID=ERP_EE_MVO_02
-  @Path=happy
-  @Workflow=200
-  @Versicherung=PKV
-  @Afo=A_22627
+    @Path=happy
+    @Workflow=200
+    @Versicherung=PKV
+    @Afo=A_22627
+    @MainActor=Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für PKV-Versicherte
   Gutfall: E-Rezepte für PKV-Versicherte als Mehrfachverordnung erstellen (WF 200)
 
     Wenn die Ärztin Dr. Schraßer dem Versicherten Günther Angermänn folgendes apothekenpflichtiges Medikament verschreibt:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | <Anzahl>    | <Nummer>  | <Start>           | <Ende>           |
-
-    Dann wird dem Versicherten Günther Angermänn das neue E-Rezept im FdV angezeigt
+    Dann wird dem Versicherten Günther Angermänn das neue E-Rezept angezeigt
 
     Beispiele:
       | Anzahl | Nummer | Start | Ende |
@@ -72,18 +73,18 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID=ERP_EE_MVO_03
-  @Path=happy
-  @Workflow=169
-  @Versicherung=GKV
-  @Afo=A_22627-01
+    @Path=happy
+    @Workflow=169
+    @Versicherung=GKV
+    @Afo=A_22627-01
+    @MainActor=Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für GKV-Versicherte als Direktzuweisung
   Gutfall: Direktzuweisung für GKV-Versicherte als Mehrfachverordnung (WF 169)
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | <Anzahl>    | <Nummer>  | <Start>           | <Ende>           |
-
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
 
     Beispiele:
       | Anzahl | Nummer | Start | Ende |
@@ -94,18 +95,18 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID=ERP_EE_MVO_04
-  @Path=happy
-  @Workflow=209
-  @Versicherung=PKV
-  @Afo=A_22627-01
+    @Path=happy
+    @Workflow=209
+    @Versicherung=PKV
+    @Afo=A_22627-01
+    @MainActor=Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für PKV-Versicherte als Direktzuweisung
   Gutfall: Direktzuweisung für PKV-Versicherte  als Mehrfachverordnung (WF 209)
 
     Wenn die Ärztin Dr. Schraßer dem Versicherten Günther Angermänn folgendes Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | <Anzahl>    | <Nummer>  | <Start>           | <Ende>           |
-
-    Dann wird dem Versicherten Günther Angermänn das neue E-Rezept im FdV angezeigt
+    Dann wird dem Versicherten Günther Angermänn das neue E-Rezept angezeigt
 
     Beispiele:
       | Anzahl | Nummer | Start | Ende |
@@ -116,9 +117,10 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID=ERP_EE_MVO_05
-  @Afo=A_22632
-  @Funktionalität=Entlassrezept
-  @Path=bad
+    @Afo=A_22632
+    @Funktionalität=Entlassrezept
+    @Path=bad
+    @MainActor=Arztpraxis
   Szenariogrundriss: Entlassrezept nicht als Mehrfachverordnung
     Dann darf die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann das folgende E-Rezept nicht ausstellen:
       | KBV_Statuskennzeichen | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
@@ -132,12 +134,12 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
   @TCID=ERP_EE_MVO_06
   @Path=happy
+  @MainActor=Apotheke
   Szenario: Erstes Teilrezept einer Mehrfachverordnung einlösen
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | 4           | 1         | 0                 | 90               |
-
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Sina Hüllmann dispensiert
@@ -146,26 +148,34 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID=ERP_EE_MVO_07
-  @Afo=A_22635
-  @Path=bad
-  Szenario: Teilrezept nicht einlösbar, wenn Start des Gütligkeitszeitraums noch nicht erreicht
+    @Afo=A_22635
+    @Path=bad
+    @MainActor=Apotheke
+  Szenariogrundriss: Teilrezept nicht einlösbar, wenn Start des Gütligkeitszeitraums noch nicht erreicht
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
-      | true | 4           | 1         | 90                | 180              |
+      | true | 4           | <Nummer>  | 90                | 180              |
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
     Dann kann die Apotheke Am Flughafen das letzte zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es noch nicht gültig ist
 
+    Beispiele:
+      | Nummer |
+      | 1      |
+      | 2      |
+      | 3      |
+      | 4      |
 
   @TCID=ERP_EE_MVO_08
-  @Afo=A_22704
-  @Afo=A_22628
-  @Afo=A_22629
-  @Afo=A_22630
-  @Afo=A_22632
-  @Afo=A_22634
-  @Path=bad
+    @Afo=A_22704
+    @Afo=A_22628
+    @Afo=A_22629
+    @Afo=A_22630
+    @Afo=A_22632
+    @Afo=A_22634
+    @Path=bad
+    @MainActor=Fachdienst
   Szenariogrundriss:  Unzulässige Denominatoren und Numeratoren
   1. Denominator muss größer 1 sein (A_22629)
   2. Denominator darf nicht größer 4 sein (A_22628)

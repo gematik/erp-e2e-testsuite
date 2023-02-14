@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 gematik GmbH
+# Copyright (c) 2023 gematik GmbH
 # 
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -38,17 +38,19 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
   @Anwendungsfall=AF_10114
   @Anwendungsfall=A_18822
   @Afo=A_21360
+  @MainActor=Versicherter
   Szenario: Anzeigen von direkt zugewiesenen E-Rezepten
   Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung. Diese Rezept soll im FdV angezeigt werden.
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist:
       | Name        |
       | Zytostatika |
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt ohne AccessCode
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept ohne AccessCode angezeigt
 
 
   @TCID=ERP_EE_WF169_02
   @Path=happy
+  @MainActor=Arztpraxis
   Szenario: Direktzuweisung an eine Apotheke durch den Arzt
   Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung und übermittelt es der Apotheke.
   Die Apotheke kann es erfolgreich dispensieren.
@@ -64,6 +66,7 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
   @TCID=ERP_EE_WF169_03
   @Path=bad
   @Afo=A_22102
+  @MainActor=Versicherter
   Szenario: Löschen nicht möglich bis nach der Dispensierung
   Der Versicherte kann E-Rezepte mit Direktzuweisung nicht löschen bis diese durch
   eine Apotheke dispensiert wurden
@@ -71,13 +74,14 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist:
       | Name        |
       | Zytostatika |
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
     Und die Versicherte kann ihr letztes E-Rezept nicht löschen, weil sie nicht das Recht dazu hat
 
 
   @TCID=ERP_EE_WF169_04
   @Path=bad
   @Afo=A_22102
+  @MainActor=Versicherter
   Szenario: Löschen nicht möglich während der Dispensierung
   Der Versicherte kann das E-Rezept nicht löschen während die Apotheke das Rezept dispensiert
 
@@ -85,13 +89,14 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
       | Name        |
       | Zytostatika |
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
-    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept im FdV angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
     Und die Versicherte kann ihr letztes E-Rezept nicht löschen, weil sie nicht das Recht dazu hat
 
 
   @TCID=ERP_EE_WF169_05
   @Path=happy
   @Afo=A_22102
+  @MainActor=Versicherter
   Szenario: Löschen möglich erst nach der Dispensierung
   Der Versicherte kann das E-Rezept erst löschen nachdem die Apotheke das Rezept dispensiert hat
 
@@ -101,4 +106,4 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensiert
     Und die Versicherte Sina Hüllmann ihr letztes E-Rezept löscht
-    Dann wird der Versicherten ihr letztes gelöschte E-Rezept nicht mehr im FdV angezeigt
+    Dann wird das letzte gelöschte E-Rezept der Versicherten nicht mehr angezeigt

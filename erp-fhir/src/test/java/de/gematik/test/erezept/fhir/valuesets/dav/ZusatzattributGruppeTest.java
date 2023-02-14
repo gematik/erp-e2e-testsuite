@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,16 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ZusatzattributGruppeTest {
+class ZusatzattributGruppeTest {
 
   @Test
-  public void testFromCode() {
+  void testFromCode() {
     assertEquals(ZusatzattributGruppe.MARKT, ZusatzattributGruppe.fromCode("1"));
     assertEquals(ZusatzattributGruppe.RABATT, ZusatzattributGruppe.fromCode("2"));
     assertEquals(ZusatzattributGruppe.FAM, ZusatzattributGruppe.fromCode("3"));
@@ -43,8 +44,8 @@ public class ZusatzattributGruppeTest {
     assertEquals(ZusatzattributGruppe.ZUZAHLUNGSSTATUS, ZusatzattributGruppe.fromCode("15"));
   }
 
-  @Test(expected = InvalidValueSetException.class)
-  public void testInvalidValueSetException() {
-    ZusatzattributGruppe.fromCode("16");
+  @Test
+  void testInvalidValueSetException() {
+    assertThrows(InvalidValueSetException.class, () -> ZusatzattributGruppe.fromCode("16"));
   }
 }

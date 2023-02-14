@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -54,14 +54,36 @@ public abstract class Value<T> {
   }
 
   public Identifier asIdentifier() {
+    return asIdentifier(this.system);
+  }
+
+  /**
+   * This method is required because depending on the version of the used profile the concrete
+   * system can vary This method might become obsolete in future once the systems of values settled
+   *
+   * @param system to be used to denote the identifier
+   * @return this value as an identifier
+   */
+  public Identifier asIdentifier(IWithSystem system) {
     return new Identifier()
-        .setSystem(this.getSystemAsString())
+        .setSystem(system.getCanonicalUrl())
         .setValue(this.getValue().toString());
   }
 
   public Reference asReference() {
+    return asReference(this.system);
+  }
+
+  /**
+   * This method is required because depending on the version of the used profile the concrete
+   * system can vary This method might become obsolete in future once the systems of values settled
+   *
+   * @param system to be used to denote the identifier
+   * @return this value as reference
+   */
+  public Reference asReference(IWithSystem system) {
     val ref = new Reference();
-    ref.setIdentifier(asIdentifier());
+    ref.setIdentifier(asIdentifier(system));
     return ref;
   }
 

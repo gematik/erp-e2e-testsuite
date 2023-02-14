@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,22 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.hl7.fhir.r4.model.Enumerations;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class KbvBasePatientTest {
+class KbvBasePatientTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/kbv/1.0.2/patient/";
 
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void encodeErwinFischer() {
+  void encodeErwinFischer() {
     val fileExtension = ".xml";
     val fileName = "erwin_fleischer" + fileExtension;
 
@@ -58,5 +52,8 @@ public class KbvBasePatientTest {
     assertTrue(erwin.hasPkvId());
     val expectedPkvId = "2345678900";
     assertEquals(expectedPkvId, erwin.getPkvId().orElseThrow());
+
+    assertEquals("Fleischer, Erwin", erwin.getFullname());
+    assertNotNull(erwin.getDescription());
   }
 }

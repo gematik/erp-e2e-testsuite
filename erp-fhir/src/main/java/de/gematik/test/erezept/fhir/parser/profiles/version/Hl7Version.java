@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -39,4 +39,8 @@ public enum Hl7Version implements ProfileVersion<Hl7Version> {
   private final LocalDate validFromDate;
   private final LocalDate validUntilDate;
   private final CustomProfiles customProfile = CustomProfiles.HL7;
+
+  public static Hl7Version getDefaultVersion() {
+    return ProfileVersion.getDefaultVersion(Hl7Version.class, CustomProfiles.HL7);
+  }
 }

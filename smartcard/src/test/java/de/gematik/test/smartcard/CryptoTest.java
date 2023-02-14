@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package de.gematik.test.smartcard;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.smartcard.Crypto.*;
+import de.gematik.test.smartcard.exceptions.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class CryptoTest {
 
@@ -41,5 +42,18 @@ class CryptoTest {
   void shouldThrowOnInvalidString() {
     val rsa = List.of("Ecc256", "ECC_512", "r256", "rsa_256");
     rsa.forEach(input -> assertThrows(AssertionError.class, () -> Crypto.fromString(input)));
+  }
+
+  @Test
+  void fromSpecificationUrn() {
+    Arrays.stream(CryptographySpecification.values())
+        .forEach(it -> assertDoesNotThrow(() -> Crypto.fromSpecificationUrn(it.getUrn())));
+  }
+
+  @Test
+  void shouldThrowInvalidCryptographySpecificationException() {
+    assertThrows(
+        InvalidCryptographySpecificationException.class,
+        () -> Crypto.fromSpecificationUrn("urn:unknown"));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,16 @@
 
 package de.gematik.test.erezept.primsys.model.actor;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.values.BaseANR;
-import de.gematik.test.erezept.lei.cfg.DoctorConfiguration;
-import de.gematik.test.erezept.lei.cfg.EnvironmentConfiguration;
-import de.gematik.test.erezept.primsys.rest.data.DoctorData;
-import de.gematik.test.erezept.primsys.rest.data.TelematikData;
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
-import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.SmartcardArchive;
-import lombok.val;
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.erezept.primsys.rest.data.*;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.commands.*;
+import de.gematik.test.smartcard.*;
+import lombok.*;
 
 public class Doctor extends BaseActor {
 
@@ -50,8 +45,8 @@ public class Doctor extends BaseActor {
     this.cfg = cfg;
 
     this.konnektor = konnektor;
-    this.hba = sca.getHbaByICCSN(cfg.getHbaIccsn(), cfg.getCryptoAlgorithm());
-    this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba));
+    this.hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
+    this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
 
     baseData = new DoctorData();
     baseData.setId(this.getIdentifier());
@@ -72,7 +67,7 @@ public class Doctor extends BaseActor {
     baseData.setEmail(GemFaker.eMail(cfg.getName()));
     baseData.setCity(GemFaker.fakerCity());
     baseData.setPostal(GemFaker.fakerZipCode());
-    baseData.setStreet(GemFaker.fullStreetName());
+    baseData.setStreet(GemFaker.fakerStreetName());
 
     val ti = new TelematikData();
     ti.setFachdienst(env.getTi().getFdBaseUrl());
@@ -83,7 +78,7 @@ public class Doctor extends BaseActor {
 
   public byte[] signDocument(String document) {
     val signCmd = new SignXMLDocumentCommand(hbaHandle, document);
-    return konnektor.execute(signCmd);
+    return konnektor.execute(signCmd).getPayload();
   }
 
   @Override

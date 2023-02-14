@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,22 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class KbvOrganizationTest {
+class KbvOrganizationTest extends ParsingTest {
 
   private final String BASE_PATH = "fhir/valid/kbv/1.0.2/bundle/";
 
-  private FhirParser parser;
-
-  @Before
-  public void setUp() {
-    this.parser = new FhirParser();
-  }
-
   @Test
-  public void testEncodingOrganizationFromKbvBundle() {
+  void testEncodingOrganizationFromKbvBundle() {
     val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
     val fileName = kbvId + ".xml";
 
@@ -64,5 +57,6 @@ public class KbvOrganizationTest {
     assertEquals(expPostal, organization.getPostalCode());
     assertEquals(expCountry, organization.getCountry());
     assertEquals(expStreet, organization.getStreet());
+    assertNotNull(organization.getDescription());
   }
 }

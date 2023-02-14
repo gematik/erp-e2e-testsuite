@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,30 @@
 
 package de.gematik.test.erezept.fhir.resources;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class IdentifierUtilTest {
+class IdentifierUtilTest {
 
   @Test
-  public void testResourcedId() {
+  void testResourcedId() {
     val id = "ef0db1ef-ed28-4d01-9b3c-599bcd9c7849";
     val input = "Coverage/" + id;
     assertEquals(id, IdentifierUtil.getUnqualifiedId(input));
   }
 
   @Test
-  public void testFullUrl() {
+  void testFullUrl() {
     val id = "ef0db1ef-ed28-4d01-9b3c-599bcd9c7849";
     val input = "http://pvs.praxis.local/fhir/Medication/" + id;
     assertEquals(id, IdentifierUtil.getUnqualifiedId(input));
   }
 
   @Test
-  public void testOnlyId() {
+  void testOnlyId() {
     val id = "ef0db1ef-ed28-4d01-9b3c-599bcd9c7849";
     assertEquals(id, IdentifierUtil.getUnqualifiedId(id));
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,21 @@
 
 package de.gematik.test.smartcard.exceptions;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.smartcard.Crypto;
-import de.gematik.test.smartcard.SmartcardType;
+import de.gematik.test.smartcard.*;
 
 public class CardNotFoundException extends RuntimeException {
 
-  public CardNotFoundException(SmartcardType type, String iccsn, Crypto crypto) {
-    super(
-        format("Card of type {0} with ICCSN {1} and Algorithm {2} not found", type, iccsn, crypto));
+  public CardNotFoundException(SmartcardType type, String iccsn) {
+    super(format("Card of type {0} with ICCSN {1} not found", type, iccsn));
   }
 
   public CardNotFoundException(String message) {
     super(message);
+  }
+
+  public CardNotFoundException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

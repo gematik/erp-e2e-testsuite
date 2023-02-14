@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+JAVA_ARGS=""
+APP_ARGS=""
+
+for arg in "$@"
+do
+  if [[ "$arg" == -D* ]]; then
+    JAVA_ARGS="$JAVA_ARGS $arg"
+  else
+    APP_ARGS="$APP_ARGS $arg"
+  fi
+done
+
+# trim args
+JAVA_ARGS=`echo $JAVA_ARGS | sed -e 's/^[[:space:]]*//'`
+APP_ARGS=`echo $APP_ARGS | sed -e 's/^[[:space:]]*//'`
+JAR_APP=~/erp-cli-fhir.jar
+
+#echo "EXECUTE: >> " java $JAVA_ARGS -jar $JAR_APP ${APP_ARGS}
+sh -c "java $JAVA_ARGS -jar $JAR_APP ${APP_ARGS}"

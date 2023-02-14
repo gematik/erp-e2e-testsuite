@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.erezept.fhir.extensions.dav;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import lombok.val;
-import org.junit.Test;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
-public class InvoiceIdTest {
+class InvoiceIdTest {
 
   @Test
-  public void fromId() {
+  void fromId() {
     val invoiceId = InvoiceId.fromId("123");
     assertEquals("123", invoiceId.primitiveValue());
   }

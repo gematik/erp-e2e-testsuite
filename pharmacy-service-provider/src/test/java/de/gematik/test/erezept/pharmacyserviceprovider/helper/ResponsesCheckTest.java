@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.pharmacyserviceprovider.helper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -91,6 +91,4 @@ public class ResponsesCheckTest {
         "200 erfolgreiche Datenübermittlung, no telematikID, no transactionID, body is to short",
         resp.getStatus() + " " + resp.getEntity());
   }
-
-  // todo mehr tests
 }

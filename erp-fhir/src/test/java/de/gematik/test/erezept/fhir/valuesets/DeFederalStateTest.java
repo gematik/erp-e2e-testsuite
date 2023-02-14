@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DeFederalStateTest {
+class DeFederalStateTest {
 
   @Test
-  public void shouldParseValidFederalStateFromCode() {
+  void shouldParseValidFederalStateFromCode() {
     val codes = List.of("DE-BW", "DE-BY", "DE-BE", "DE-BB");
     val expectedTypes =
         List.of(
@@ -40,14 +41,14 @@ public class DeFederalStateTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidFederalStateCodes() {
+  void shouldThrowExceptionOnInvalidFederalStateCodes() {
     val codes = List.of("BW", "ABCD", "DE-BAY");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> DeFederalState.fromCode(code)));
   }
 
   @Test
-  public void shouldParseValidFederalStateFromDisplay() {
+  void shouldParseValidFederalStateFromDisplay() {
     val displayValues =
         List.of("Baden-Württemberg", "Hamburg", "Sachsen", "Sachsen-Anhalt", "Niedersachsen");
     val expectedTypes =
@@ -66,7 +67,7 @@ public class DeFederalStateTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnInvalidFederalStateDisplayValues() {
+  void shouldThrowExceptionOnInvalidFederalStateDisplayValues() {
     val codes = List.of("Badenwürttemberg", "Mallorca", "ABC", "");
     codes.forEach(
         code -> assertThrows(InvalidValueSetException.class, () -> DeFederalState.fromCode(code)));

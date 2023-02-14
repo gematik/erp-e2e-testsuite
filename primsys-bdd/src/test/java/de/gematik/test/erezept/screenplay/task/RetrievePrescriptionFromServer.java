@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 gematik GmbH
+ * Copyright (c) 2023 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.questions.DownloadAllTasks;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategyEnum;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +54,7 @@ public class RetrievePrescriptionFromServer implements Task {
 
     val taskBundle = actor.asksFor(DownloadAllTasks.descending());
     val lastPrescription =
-        strategy.choose(taskBundle.getTasks(), Comparator.comparing(ErxTask::getAuthoredOn));
+        strategy.chooseFrom(taskBundle.getTasks(), Comparator.comparing(ErxTask::getAuthoredOn));
 
     val cmdGetTaskById = new TaskGetByIdCommand(lastPrescription.getUnqualifiedId());
     val fullDetailPrescription =
@@ -70,10 +69,10 @@ public class RetrievePrescriptionFromServer implements Task {
   }
 
   public static RetrievePrescriptionFromServer andChooseWith(String order) {
-    return andChooseWith(DequeStrategyEnum.fromString(order));
+    return andChooseWith(DequeStrategy.fromString(order));
   }
 
-  public static RetrievePrescriptionFromServer andChooseWith(DequeStrategyEnum dequeue) {
-    return new RetrievePrescriptionFromServer(new DequeStrategy(dequeue));
+  public static RetrievePrescriptionFromServer andChooseWith(DequeStrategy dequeue) {
+    return new RetrievePrescriptionFromServer(dequeue);
   }
 }
