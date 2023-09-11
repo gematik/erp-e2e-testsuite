@@ -15,15 +15,15 @@
 #
 # language: de
 
-@Workflow=160
-@Versicherung=All
-@Impl=done
+@PRODUKT:eRp_FD
+@Workflow:160
+@Versicherung:Sonstige
 Funktionalität: Sonstige Versicherungsarten
 
-  @TCID=ERP_EE_sonstVA_01
-    @Path=bad
-    @Afo=A_22222
-    @MainActor=Fachdienst
+  @TCID:ERP_EE_SONSTIGE_VERSICHERUNGSART_01
+  @TESTFALL:negativ
+  @AFO-ID:A_22222
+  @Hauptdarsteller:Fachdienst
   Szenariogrundriss: Sonstige Versicherungsarten sind nicht zulässig
   Der E-Rezept Fachdienst muss das Ausstellen von E-Rezepten unterbinden, wenn ein unzulässiger Kostenträger
   gemäß der Anforderung A_22222 im QES-Datensatz hinterlegt ist.

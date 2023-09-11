@@ -8,7 +8,7 @@ actors:
   doctors:
     - name: Bernd Claudius
       smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
-      hbaIccsn: 8027600101169991010  #Arzt Bernd Claudius
+      hbaIccsn: 80276001011699910100  #Arzt Bernd Claudius
       qualificationType: Arzt
       konnektor: Soft-Konn
 
@@ -25,6 +25,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Kein Arzt
+      description: "Akteur mit Apotheker-HBA und Arztpraxis SMC-B der sich als Arzt ausgibt"
       smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
       hbaIccsn: 80276883110000121166  #Apotheke
       algorithm: E256
@@ -32,6 +33,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Keine Arztpraxis
+      description: "Akteur mit Apotheker-HBA und Apotheken SMC-B der sich als Arzt ausgibt"
       smcbIccsn: 80276883110000116873 #Apotheke Am Flughafen
       hbaIccsn: 80276883110000121166  #Apotheker
       algorithm: E256
@@ -40,6 +42,7 @@ actors:
 
   pharmacies:
     - name: Am Flughafen
+      apoVzdName: Apotheke am FlughafenTEST-ONLY
       smcbIccsn: 80276883110000116873
       konnektor: Soft-Konn
 
@@ -52,6 +55,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Keine Apotheke
+      description: "Apotheke mit der SMC-B einer Arztpraxis"
       smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
       konnektor: Soft-Konn
 
@@ -97,9 +101,35 @@ actors:
     - name: Günther Angermänn
       egkIccsn: 80276883110000113323
 
-
     - name: Aenna Gondern
-      egkIccsn: 80276881025548431301
+      egkIccsn: 80276881040001935352
+
+    - name: Gerda 'kkh' Galle
+      egkIccsn: 80276881025548404901
+
+    - name: Fabian 'GKVI' Krause
+      egkIccsn: 80276882999999992121
+
+    - name: Juliane 'TK' Sommer
+      egkIccsn: 80276881040001935352
+
+    - name: Thomas 'Bitmarck' Gottschalk
+      egkIccsn: 80276883501400000011
+
+    - name: Martha 'ITS Care' Koch
+      egkIccsn: 80276883169999962222
+
+    - name: Maria 'Mobil ISC' Neumann
+      egkIccsn: 80276883309999982341
+
+    - name: Sofia 'Kubus' Herrmann
+      egkIccsn: 80276881299985314267
+
+    - name: Julian 'Arge AOK' Nagelsmann
+      egkIccsn: 80276881129999213224
+
+    - name: Lucius 'ITSC' Fox
+      egkIccsn: 80276882250000100221
 
 environments:
   - name: TU
@@ -129,7 +159,7 @@ environments:
       fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-dev.zentral.erp.splitdns.ti-dienste.de/subscription
     internet:
-      discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
 
 
@@ -163,6 +193,7 @@ konnektors:
       trustStore: konsim_truststore.jks
       trustStorePassword: "gematik"
 
+
   - name: Soft-Konn
     type: local
-
+    vsdmService:

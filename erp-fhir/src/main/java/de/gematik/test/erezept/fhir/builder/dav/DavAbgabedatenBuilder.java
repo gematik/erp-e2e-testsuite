@@ -88,7 +88,7 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
               .insurantCost(insurantCost)
               .totalCost(totalCost)
               .build(),
-          GemFaker.fakerPzn());
+          GemFaker.fakerPzn(), GemFaker.fakerDrugName());
     }
 
     val invoice = invoiceBuilder.build();

@@ -17,21 +17,25 @@
 package de.gematik.test.erezept.app.mobile.elements;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import de.gematik.test.erezept.app.cfg.PlatformType;
 import de.gematik.test.erezept.app.exceptions.UnavailablePageElementLocatorException;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import io.appium.java_client.AppiumBy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 
 class PageElementTest {
@@ -54,7 +58,7 @@ class PageElementTest {
   void shouldGetAllElementsCorrectly() {
     // add here the implementing class of PageElement to be automatically covered
     val pageElementEnums =
-        List.of(Onboarding.class, CardWall.class, Debug.class, Prescriptions.class, Settings.class);
+        List.of(Onboarding.class, CardWall.class, Debug.class, Mainscreen.class, Settings.class);
 
     val pageElements =
         pageElementEnums.stream()
@@ -90,6 +94,46 @@ class PageElementTest {
           element.forPlatform(platformType),
           format("The Locator of {0} is expected to be not null", element.getFullName()));
     }
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldExtractLabelFromAccessibilityId(PageElement pageElement, String expectation) {
+    val label = pageElement.extractSourceLabel(PlatformType.IOS);
+    assertEquals(expectation, label);
+  }
+
+  static Stream<Arguments> shouldExtractLabelFromAccessibilityId() {
+    return Stream.of(
+            arguments(Utility.TOOLTIPS, "ctl_tooltip_container"),
+            arguments(Receipt.RESERVE_IN_PHARMACY, "rdm_btn_delivery_tile")
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldExtractLabelFromName(PageElement pageElement, String expectation) {
+    val label = pageElement.extractSourceLabel(PlatformType.IOS);
+    assertEquals(expectation, label);
+  }
+
+  static Stream<Arguments> shouldExtractLabelFromName() {
+    return Stream.of(
+            arguments(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON, "sec_btn_system_pin_done"),
+            arguments(Receipt.INPUT_SEARCH_BOX, "Nach Name oder Adresse suchen"));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldExtractLabelFromXpath(PageElement pageElement, String expectation) {
+    val label = pageElement.extractSourceLabel(PlatformType.IOS);
+    assertEquals(expectation, label);
+  }
+
+  static Stream<Arguments> shouldExtractLabelFromXpath() {
+    return Stream.of(
+            arguments(CardWall.CARD_PARING_GO_BACK_BUTTON, "Zurück"),
+            arguments(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON, "debug_enable_virtual_egk"));
   }
 
   @Getter

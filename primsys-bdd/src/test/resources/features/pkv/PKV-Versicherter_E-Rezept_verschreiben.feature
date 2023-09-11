@@ -15,13 +15,13 @@
 #
 # language: de
 
-@Workflow=200
-@Versicherung=PKV
-@Anwendungsfall=A_18822
-@Anwendungsfall=A_18827
-@Anwendungsfall=A_18502
-@Anwendungsfall=A_18503
-@Impl=done
+@PRODUKT:eRp_FD
+@Workflow:200
+@Versicherung:PKV
+@AFO-ID:A_18822
+@AFO-ID:A_18827
+@AFO-ID:A_18502
+@AFO-ID:A_18503
 Funktionalität: PKV-Rezepte verschreiben
   Für eine PKV-Versicherte ein E-Rezept verschreiben
 
@@ -30,9 +30,9 @@ Funktionalität: PKV-Rezepte verschreiben
     Und der PKV Versicherte Günther Angermänn hat Zugriff auf seine eGK
     Und die GKV Versicherte Leonie Hütter hat Zugriff auf ihre eGK
 
-  @TCID=ERP_EE_WF200_01
-  @Path=happy
-  @MainActor=Arztpraxis
+  @TCID:ERP_EE_WF200_02
+  @TESTFALL:positiv
+  @Hauptdarsteller:Arztpraxis
   Szenario: PKV E-Rezept verschreiben und dem Versicherten Anzeigen
   Die Ärztin verschreibt dem PKV-Versicherten Günther Angermänn  ein E-Rezept. Günther Angermänn soll dieses E-Rezept
   im FdV angezeigt werden
@@ -43,11 +43,10 @@ Funktionalität: PKV-Rezepte verschreiben
     Dann wird dem Versicherten Günther Angermänn das neue E-Rezept angezeigt
 
 
-  @TCID=ERP_EE_WF200_02
-  @Afo=A_22347-01
-  @Path=bad
-  @Impl=open
-  @MainActor=Fachdienst
+  @TCID:ERP_EE_WF200_03
+  @AFO-ID:A_22347-01
+  @TESTFALL:negativ
+  @Hauptdarsteller:Fachdienst
   Szenario: PKV E-Rezept an GKV-Versicherten
   Eine GKV-Versicherte bekommt irrtümlich ein PKV-Rezept verschrieben. Der Fachdienst muss das ablehnen:
   Der E-Rezept-Fachdienst MUSS beim Zugriff auf einen Task des Flowtype 200 mittels HTTP-POST-Operation über

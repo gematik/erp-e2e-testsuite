@@ -18,6 +18,7 @@ package de.gematik.test.erezept.client.exceptions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import javax.annotation.Nullable;
 import lombok.val;
 import org.hl7.fhir.r4.model.OperationOutcome;
@@ -50,9 +51,7 @@ public class UnexpectedResponseResourceError extends AssertionError {
   private static String createOperationOutcomeMessage(
       Class<? extends Resource> expected, OperationOutcome operationOutcome) {
     return format(
-        "Request expected Response of type {0} but received OperationOutcome with issue {1} ({2})",
-        expected.getSimpleName(),
-        operationOutcome.getIssueFirstRep().getDetails().getText(),
-        operationOutcome.getIssueFirstRep().getDiagnostics());
+        "Request expected Response of type {0} but received OperationOutcome: {1}",
+        expected.getSimpleName(), OperationOutcomeWrapper.from(operationOutcome));
   }
 }

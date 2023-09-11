@@ -18,7 +18,7 @@ package de.gematik.test.erezept.app.exceptions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.serenitybdd.core.exceptions.TestCompromisedException;
@@ -37,5 +37,9 @@ public class UnsupportedPlatformException extends TestCompromisedException {
 
   public UnsupportedPlatformException(PlatformType platformType) {
     this(platformType.name());
+  }
+
+  public UnsupportedPlatformException(PlatformType platformType, String operation) {
+    super(format("Operation ''{0}'' not supported for {1}", operation, platformType));
   }
 }

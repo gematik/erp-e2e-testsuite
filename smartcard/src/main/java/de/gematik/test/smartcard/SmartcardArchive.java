@@ -16,13 +16,15 @@
 
 package de.gematik.test.smartcard;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.smartcard.exceptions.*;
-import java.util.*;
-import lombok.*;
+import de.gematik.test.smartcard.exceptions.CardNotFoundException;
+import java.util.List;
+import lombok.Getter;
+import lombok.val;
 
 public class SmartcardArchive {
+
   @Getter private final List<SmcB> smcbCards;
   @Getter private final List<Hba> hbaCards;
   @Getter private final List<Egk> egkCards;
@@ -45,17 +47,30 @@ public class SmartcardArchive {
     return getSmartcardByIccsn(getEgkCards(), iccsn);
   }
 
+  public Egk getEgkByKvnr(String kvnr) {
+    checkCards(getEgkCards());
+    return getEgkCards().stream()
+        .filter(smartcard -> smartcard.getKvnr().equals(kvnr))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new CardNotFoundException(
+                    format("Card of type {0} with KVNR {1} not found", SmartcardType.EGK, kvnr)));
+  }
+
   private <T extends Smartcard> T getSmartcardByIccsn(List<T> cards, String iccsn) {
-    // simply make a pre-check to ensure we can fetch a template from the list
-    if (cards.isEmpty()) {
-      throw new CardNotFoundException(
-          format(
-              "Cannot find smartcard with ICCSN {0} in an empty list of given smartcards", iccsn));
-    }
+    checkCards(cards);
     val type = cards.get(0).getType();
     return cards.stream()
         .filter(smartcard -> smartcard.getIccsn().equals(iccsn))
         .findFirst()
         .orElseThrow(() -> new CardNotFoundException(type, iccsn));
+  }
+
+  private <T extends Smartcard> void checkCards(List<T> cards) {
+    // simply make a pre-check to ensure we can fetch a template from the list
+    if (cards.isEmpty()) {
+      throw new CardNotFoundException("Cannot find smartcard in an empty list of given smartcards");
+    }
   }
 }

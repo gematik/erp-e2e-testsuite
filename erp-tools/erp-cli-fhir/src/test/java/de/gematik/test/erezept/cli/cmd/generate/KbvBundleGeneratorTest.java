@@ -16,13 +16,13 @@
 
 package de.gematik.test.erezept.cli.cmd.generate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
-import picocli.*;
-import picocli.CommandLine.*;
+import java.nio.file.Path;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+import picocli.CommandLine;
 
 class KbvBundleGeneratorTest {
 
@@ -32,7 +32,7 @@ class KbvBundleGeneratorTest {
     val bg = new KbvBundleGenerator();
     val cmdline = new CommandLine(bg);
     val ret = cmdline.execute("--invalidate", emptyTargetDir.toString());
-    assertEquals(ExitCode.OK, ret);
+    assertEquals(CommandLine.ExitCode.OK, ret);
     assertTrue(bg.shouldInvalidate());
   }
 }

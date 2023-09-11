@@ -21,17 +21,21 @@ import static java.text.MessageFormat.format;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import java.util.Date;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.val;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.StringType;
 
+@SuppressWarnings("java:S1192")
 public record AccidentExtension(
     AccidentCauseType accidentCauseType, @Nullable Date accidentDay, @Nullable String workplace) {
 
@@ -126,6 +130,49 @@ public record AccidentExtension(
 
   public static AccidentExtension occupationalDisease() {
     return new AccidentExtension(AccidentCauseType.OCCUPATIONAL_DISEASE, null, null);
+  }
+
+  public static AccidentExtension fromExtension(Extension extension) {
+    val causeType =
+        extension.getExtension().stream()
+            .filter(ext -> ext.getUrl().equalsIgnoreCase("Unfallkennzeichen"))
+            .map(ext -> ext.getValue().castToCoding(ext.getValue()))
+            .map(coding -> AccidentCauseType.fromCode(coding.getCode()))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new MissingFieldException(KbvErpMedicationRequest.class, "Unfallkennzeichen"));
+
+    val accidentDay =
+        extension.getExtension().stream()
+            .filter(ext -> ext.getUrl().equalsIgnoreCase("Unfalltag"))
+            .map(ext -> ext.getValue().castToDate(ext.getValue()).getValue())
+            .findFirst()
+            .orElse(null);
+
+    val workpalce =
+        extension.getExtension().stream()
+            .filter(ext -> ext.getUrl().equalsIgnoreCase("Unfallbetrieb"))
+            .map(ext -> ext.getValue().castToString(ext.getValue()).getValue())
+            .findFirst()
+            .orElse(null);
+
+    return new AccidentExtension(causeType, accidentDay, workpalce);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AccidentExtension that = (AccidentExtension) o;
+    return accidentCauseType == that.accidentCauseType
+        && Objects.equals(accidentDay, that.accidentDay)
+        && Objects.equals(workplace, that.workplace);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(accidentCauseType, accidentDay, workplace);
   }
 
   public record AccidentAtWorkBuilder(Date accidentDay) {

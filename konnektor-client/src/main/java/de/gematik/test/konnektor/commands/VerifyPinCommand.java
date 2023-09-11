@@ -16,24 +16,23 @@
 
 package de.gematik.test.konnektor.commands;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.PinType;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.ws.conn.cardservicecommon.v2.PinResponseType;
-import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import java.math.BigInteger;
-import javax.xml.ws.Holder;
-import lombok.val;
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.ws.conn.cardservicecommon.v2.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import java.math.*;
+import javax.xml.ws.*;
+import lombok.*;
 
 public class VerifyPinCommand extends AbstractKonnektorCommand<PinResponseType> {
 
-  private final CardHandle cardHandle;
+  private final CardInfo cardInfo;
   private final PinType pinType;
 
-  public VerifyPinCommand(CardHandle cardHandle, PinType pinType) {
-    this.cardHandle = cardHandle;
+  public VerifyPinCommand(CardInfo cardInfo, PinType pinType) {
+    this.cardInfo = cardInfo;
     this.pinType = pinType;
   }
 
@@ -47,7 +46,7 @@ public class VerifyPinCommand extends AbstractKonnektorCommand<PinResponseType> 
     this.executeAction(
         () ->
             servicePort.verifyPin(
-                ctx, cardHandle.getHandle(), pinType.toString(), status, pinResult, leftTries));
+                ctx, cardInfo.getHandle(), pinType.toString(), status, pinResult, leftTries));
 
     response.setLeftTries(leftTries.value);
     response.setPinResult(pinResult.value);

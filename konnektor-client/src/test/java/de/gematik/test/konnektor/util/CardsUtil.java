@@ -22,77 +22,109 @@ import de.gematik.ws.conn.cardservice.v8.Cards;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.eventservice.v7.GetCardsResponse;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.GregorianCalendar;
+import javax.xml.datatype.DatatypeFactory;
+import lombok.Builder;
+import lombok.SneakyThrows;
 import lombok.val;
 
+@Builder
 public class CardsUtil {
 
-  private static Faker faker = new Faker();
+  private static final Faker faker = new Faker();
 
   private CardsUtil() {
     throw new AssertionError("util class");
   }
 
-  private static String randomIccsn() {
-    return faker.regexify("[0-9]{20}");
+  public static CardInfoTypeBuilder builder() {
+    return new CardInfoTypeBuilder();
   }
 
-  public static CardInfoType createHba() {
-    return createHba(randomIccsn());
-  }
+  public static class CardInfoTypeBuilder {
+    private CardInfoTypeBuilder() {}
 
-  public static CardInfoType createHba(String iccsn) {
-    return create(CardTypeType.HBA, iccsn);
-  }
+    private CardTypeType type;
+    private int slot = Integer.parseInt(faker.regexify("[1-4]{1}"));
 
-  public static CardInfoType createSmcb() {
-    return createSmcb(randomIccsn());
-  }
+    private String iccsn = faker.regexify("[0-9]{20}");
 
-  public static CardInfoType createSmcb(String iccsn) {
-    return create(CardTypeType.SMC_B, iccsn);
-  }
+    private String ctId = "CT1";
 
-  public static CardInfoType createEgk() {
-    return createEgk(randomIccsn());
-  }
+    private String cardHandle = faker.regexify("[A-Za-z0-9]{15}");
 
-  public static CardInfoType createEgk(String icssn) {
-    return create(CardTypeType.EGK, icssn);
-  }
+    private String cardHolderName = faker.name().fullName();
 
-  public static List<CardInfoType> createRandomList(int numCards) {
-    return IntStream.range(0, numCards).mapToObj(i -> createRandom()).collect(Collectors.toList());
-  }
+    private GregorianCalendar insertTime = new GregorianCalendar();
 
-  public static Cards createRandomCards(int numCards) {
-    val cards = new Cards();
-    cards.getCard().addAll(createRandomList(numCards));
-    return cards;
-  }
+    public CardInfoTypeBuilder type(CardTypeType type) {
+      this.type = type;
+      return this;
+    }
 
-  public static CardInfoType createRandom() {
-    val types = List.of(CardTypeType.EGK, CardTypeType.HBA, CardTypeType.SMC_B);
-    val idx = faker.random().nextInt(0, types.size() - 1);
-    val type = types.get(idx);
-    return create(type, randomIccsn());
-  }
+    public CardInfoTypeBuilder slot(int slot) {
+      this.slot = slot;
+      return this;
+    }
 
-  public static CardInfoType create(CardTypeType type, String iccsn) {
-    val cit = new CardInfoType();
-    cit.setIccsn(iccsn);
-    cit.setCardType(type);
-    cit.setCardHandle(faker.regexify("[A-Za-z0-9]{15}"));
-    cit.setCardHolderName(faker.name().fullName());
-    return cit;
+    public CardInfoTypeBuilder iccsn(String iccsn) {
+      this.iccsn = iccsn;
+      return this;
+    }
+
+    public CardInfoTypeBuilder ctId(String ctId) {
+      this.ctId = ctId;
+      return this;
+    }
+
+    public CardInfoTypeBuilder cardHandle(String cardHandle) {
+      this.cardHandle = cardHandle;
+      return this;
+    }
+
+    public CardInfoTypeBuilder cardHolderName(String cardHolderName) {
+      this.cardHolderName = cardHolderName;
+      return this;
+    }
+
+    public CardInfoTypeBuilder insertTime(GregorianCalendar insertTime) {
+      this.insertTime = insertTime;
+      return this;
+    }
+
+    @SneakyThrows
+    public CardInfoType build() {
+      val cit = new CardInfoType();
+      cit.setIccsn(iccsn);
+      cit.setCardType(type);
+      cit.setCardHandle(cardHandle);
+      cit.setCardHolderName(cardHolderName);
+      cit.setInsertTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(insertTime));
+      cit.setCtId(ctId);
+      cit.setSlotId(BigInteger.valueOf(slot));
+      return cit;
+    }
   }
 
   public static GetCardsResponse createGetCardsResponse(Status status, int numCards) {
+    val cards = new ArrayList<CardInfoType>();
+    for (int i = 0; i < numCards; i++) {
+      cards.add(CardsUtil.builder().type(CardTypeType.EGK).slot(i).build());
+    }
+    return createGetCardsResponse(status, cards.toArray(new CardInfoType[cards.size()]));
+  }
+
+  public static GetCardsResponse createGetCardsResponse(Status status, CardInfoType... card) {
     val gcr = new GetCardsResponse();
     gcr.setStatus(status);
-    gcr.setCards(createRandomCards(numCards));
+
+    val cards = new Cards();
+    cards.getCard().addAll(Arrays.stream(card).toList());
+
+    gcr.setCards(cards);
     return gcr;
   }
 }

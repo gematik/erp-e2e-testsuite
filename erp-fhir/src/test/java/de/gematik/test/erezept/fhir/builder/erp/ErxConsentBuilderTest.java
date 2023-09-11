@@ -18,7 +18,9 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
@@ -35,9 +37,26 @@ class ErxConsentBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildConsentWithFixedValues(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val kvid = "X234567890";
+    val kvnr = KVNR.from("X234567890");
     val erxConsent =
-        ErxConsentBuilder.forKvid(kvid)
+        ErxConsentBuilder.forKvnr(kvnr)
+            .policyRule(ActCode.OPTIN) // by default Opt-in
+            .status(Consent.ConsentState.ACTIVE) // by default ACTIVE
+            .scope(ConsentScope.PATIENT_PRIVACY) // by default Patient-Privacy
+            .build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, erxConsent);
+    assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest(
+      name = "[{index}] -> Build CommunicationInfoReq with E-Rezept WorkflowVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildVersionedConsentWithFixedValues(ErpWorkflowVersion version) {
+    val kvid = KVNR.from("X234567890");
+    val erxConsent =
+        ErxConsentBuilder.forKvnr(kvid)
+            .version(version)
             .policyRule(ActCode.OPTIN) // by default Opt-in
             .status(Consent.ConsentState.ACTIVE) // by default ACTIVE
             .scope(ConsentScope.PATIENT_PRIVACY) // by default Patient-Privacy

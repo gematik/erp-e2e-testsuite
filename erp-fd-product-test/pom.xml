@@ -7,11 +7,11 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
-    <name>E-Rezept Produkttest</name>
+    <name>E-Rezept Produkt-Testsuite</name>
 
     <properties>
         <java.version>${version.java}</java.version>
@@ -28,21 +28,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${version.sl4j-api}</version>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-config-data</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
-            <version>0.3.0</version>
         </dependency>
 
         <!-- is required for the config only! -->
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
-            <version>0.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -57,7 +54,6 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
-            <version>0.3.0</version>
             <type>test-jar</type>
             <exclusions>
                 <exclusion>
@@ -73,32 +69,26 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir-fuzzing</artifactId>
-            <version>0.3.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>${version.fasterxml.jackson}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20220320</version>
         </dependency>
-
 
         <!-- this one is only required to mock FHIR resources from erp-fhir/util! can be removed in the future!! -->
         <dependency>
             <artifactId>erp-fhir</artifactId>
             <groupId>de.gematik.test.erezept</groupId>
-            <version>0.3.0</version>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-core</artifactId>
-            <version>${version.serenity}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -109,56 +99,20 @@
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-junit5</artifactId>
-            <version>${version.serenity}</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-junit</artifactId>
-            <version>${version.serenity}</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-ensure</artifactId>
-            <version>${version.serenity}</version>
-            <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <artifactId>junit-vintage-engine</artifactId>
-            <groupId>org.junit.vintage</groupId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${version.mockito}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>${version.junit}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
@@ -184,7 +138,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>add-integration-test-source</id>
@@ -214,7 +168,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.1.0</version>
                 <configuration>
                     <includes>
                         <!-- integration test against SUT everything in de.gematik.test.erezept -->
@@ -227,9 +181,11 @@
                     </systemPropertyVariables>
                     <groups>${junit.tags}</groups>
                     <parallel>all</parallel>
-                    <forkCount>1C</forkCount>
+                    <forkCount>0.5C</forkCount>
                     <reuseForks>true</reuseForks>
                     <useUnlimitedThreads>false</useUnlimitedThreads>
+                    <argLine>-Xmx10G</argLine>
+                    <skip>${skip.inttests}</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -279,21 +235,22 @@
                     <replacements>
                         <replacement>
                             <token>&lt;!-- Required Javascript --&gt;</token>
-                            <value>&lt;script type="text/javascript" src="coverage/coverage.js"&gt;&lt;/script&gt;
+                            <value>
+                                &lt;script type="text/javascript" src="coverage/coverage.js"&gt;&lt;/script&gt;
                             </value>
                         </replacement>
                     </replacements>
+                    <skip>${skip.inttests}</skip>
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>post-integration-test</phase>
                         <goals>
                             <goal>replace</goal>
                         </goals>
-                        <phase>post-integration-test</phase>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 </project>

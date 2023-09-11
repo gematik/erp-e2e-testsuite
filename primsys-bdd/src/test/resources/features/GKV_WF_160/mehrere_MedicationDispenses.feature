@@ -15,8 +15,9 @@
 #
 # language: de
 
-@Funktionalität=mehrereMedicationDispense
-@Impl=open
+@PRODUKT:eRp_FD
+@Funktionalität:mehrereMedicationDispense
+@Versicherung:GKV
 Funktionalität: Mehrere Medication Dispenses
   Der E-Rezept-Fachdienst MUSS beim Beenden eines Tasks mittels /Task/<id>/$close auch die Übergabe
   mehrerer MedicationDispense-Objekte in einem validen Standard-FHIR-Bundle im http-Body des Requests ermöglichen
@@ -30,11 +31,11 @@ Funktionalität: Mehrere Medication Dispenses
     Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
 
-  @TCID=ERP_EE_mehrereMedicationDispenses_01
-  @Path=happy
-  @Afo=A_22069
-  @Afo=A_22070
-  @MainActor=Apotheke
+  @TCID:ERP_EE_MEHRERE_MEDICATION_DISPENSES_01
+  @TESTFALL:positiv
+  @AFO-ID:A_22069
+  @AFO-ID:A_22070
+  @Hauptdarsteller:Apotheke
   Szenario: Dispensierung des E-Rezeptes mit unterschiedlichen Normgrößen
   Die Apotheke dispensiert das akzeptierte E-Rezept über mehrere Packungen unterschiedlicher Größe.
   In diesem Szenario verschreibt der Arzt eine große Packung (N3) mit 50 Stk Inhalt.

@@ -18,8 +18,11 @@ package de.gematik.test.erezept.app.cfg;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.app.exceptions.MissingRequiredConfigurationException;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
+import de.gematik.test.erezept.config.dto.app.AppConfiguration;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
+import de.gematik.test.erezept.config.dto.app.DeviceConfiguration;
+import de.gematik.test.erezept.config.exceptions.MissingRequiredConfigurationException;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.MobileCapabilityType;
 import lombok.val;
@@ -100,7 +103,7 @@ class DesiredCapabilitiesBuilderTest {
     assertNotNull(espressoBuildConfig);
 
     val automationName = dc.getCapability(MobileCapabilityType.AUTOMATION_NAME);
-    assertEquals("espresso", automationName);
+    assertEquals("Espresso", automationName);
   }
 
   @Test

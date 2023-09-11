@@ -16,11 +16,12 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.rest.param.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.values.*;
+import java.util.*;
+import org.hl7.fhir.r4.model.*;
 
 public class ChargeItemGetByIdCommand extends BaseCommand<ErxChargeItemBundle> {
 
@@ -29,15 +30,9 @@ public class ChargeItemGetByIdCommand extends BaseCommand<ErxChargeItemBundle> {
         ErxChargeItemBundle.class, HttpRequestMethod.GET, "ChargeItem", prescriptionId.getValue());
   }
 
-  /**
-   * This method returns the last (tailing) part of the URL of the inner-HTTP Request e.g.
-   * /Task/[id] or /Communication?[queryParameter]
-   *
-   * @return the tailing part of the URL which combines to full URL like [baseUrl][tailing Part]
-   */
-  @Override
-  public String getRequestLocator() {
-    return this.getResourcePath();
+  public ChargeItemGetByIdCommand(PrescriptionId prescriptionId, AccessCode accessCode) {
+    this(prescriptionId);
+    this.queryParameters.add(new QueryParameter("ac", accessCode.getValue()));
   }
 
   /**

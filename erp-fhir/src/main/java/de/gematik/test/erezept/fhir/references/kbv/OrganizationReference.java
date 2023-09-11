@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.fhir.references.kbv;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import lombok.NonNull;
+import de.gematik.test.erezept.fhir.references.CustomReferenceProvider;
 import org.hl7.fhir.r4.model.Reference;
 
-@DatatypeDef(name = "Reference")
-@SuppressWarnings({"java:S110"})
-public class OrganizationReference extends Reference {
+public class OrganizationReference extends CustomReferenceProvider {
 
-  private static final String CUSTODIAN_PREFIX = "Organization/";
+  public OrganizationReference(String referenceValue) {
+    super("Organization", referenceValue);
+  }
 
-  public OrganizationReference(@NonNull String id) {
-    super(id.startsWith(CUSTODIAN_PREFIX) ? id : CUSTODIAN_PREFIX + id);
+  public Reference asReference() {
+    return new Reference(this.referenceValue);
   }
 }

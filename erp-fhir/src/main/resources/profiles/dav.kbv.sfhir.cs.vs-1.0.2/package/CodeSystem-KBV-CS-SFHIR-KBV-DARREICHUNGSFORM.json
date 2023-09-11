@@ -321,6 +321,10 @@
       "display": "Injektionslösung zur intramuskulären Anwendung"
     },
     {
+      "code": "IJD",
+      "display": "Injektionsdispersion"
+    },
+    {
       "code": "IKA",
       "display": "INHALATIONS-KAPSELN"
     },
@@ -633,6 +637,10 @@
       "display": "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung"
     },
     {
+      "code": "PLD",
+      "display": "Pulver und Lösungsmittel zur Herstellung einer Depot-Injektionssuspension"
+    },
+    {
       "code": "PLE",
       "display": "PULVER ZUR HERSTELLUNG EINER LOESUNG ZUM EINNEHMEN"
     },
@@ -687,6 +695,10 @@
     {
       "code": "PUL",
       "display": "PULVER"
+    },
+    {
+      "code": "SUI",
+      "display": "Suspension zur Implantation"
     },
     {
       "code": "RED",

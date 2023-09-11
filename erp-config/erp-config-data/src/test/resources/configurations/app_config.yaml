@@ -1,0 +1,27 @@
+shouldLogCapabilityStatement: true
+
+users:
+  - name: Alice
+    device: Android 12 Emulator
+
+apps:
+  - platform: Android
+    appFile: appfilename
+    espressoServerUniqueName: orchestrator
+    packageName: de.gematik.ti.erp.app.test
+  - platform: iOS
+    appFile: ipafilename
+    packageName: de.gematik.erp4ios.eRezept
+
+appium:
+  - id: local
+    url: http://0.0.0.0:4723
+    maxWaitTimeout: 5000  # how many milliseconds to wait at maximum for an element
+    pollingInterval: 50   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
+
+devices:
+  - name: Android 12 Emulator
+    platform: Android
+    udid: emulator-5554
+    platformVersion: 12
+    appium: local

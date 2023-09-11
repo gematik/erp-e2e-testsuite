@@ -15,8 +15,8 @@
 #
 # language: de
 
-@Funktionalität=BenachrichtigungApotheke
-@Impl=done
+@PRODUKT:eRp_FD
+@Funktionalität:BenachrichtigungApotheke
 Funktionalität: Subscription Service für Apotheken
   Der Subscription Service informiert die Apotheker bei neuen Nachrichten durch die Versicherten.
   Hierfür werden die Ressourcen ErxCommunicationInfoReq und ErxCommunicationDispReq betrachtet.
@@ -26,11 +26,11 @@ Funktionalität: Subscription Service für Apotheken
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
     Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
 
-  @TCID=ERP_EE_Subscrp_01
-  @Path=happy
-  @Afo=A_22367-01
-  @Afo=A_22364
-  @MainActor=Apotheke
+  @TCID:ERP_EE_SUBSCRIPTION_01
+  @TESTFALL:positiv
+  @AFO-ID:A_22367-01
+  @AFO-ID:A_22364
+  @Hauptdarsteller:Apotheke
   Szenario: Benachrichtigung beim Eingang einer neuen Zuweisung
   Eine Apotheke wird durch den Subscription Service informiert, wenn ein Versicherter ein E-Rezept mit dem FdV an diese Apotheke zuweist.
 
@@ -42,11 +42,11 @@ Funktionalität: Subscription Service für Apotheken
     Und die Versicherte Sina Hüllmann ihr letztes E-Rezept der Apotheke Am Flughafen per Nachricht zuweist
     Dann wird die Apotheke Am Flughafen durch den Subscription Service informiert
 
-  @TCID=ERP_EE_Subscrp_02
-  @Path=happy
-  @Afo=A_22367-01
-  @Afo=A_22364
-  @MainActor=Apotheke
+  @TCID:ERP_EE_SUBSCRIPTION_02
+  @TESTFALL:positiv
+  @AFO-ID:A_22367-01
+  @AFO-ID:A_22364
+  @Hauptdarsteller:Apotheke
   Szenario: Benachrichtigung beim Eingang einer neuen Anfrage
   Eine Apotheke wird durch den Subscription Service informiert, wenn ein Versicherter für ein E-Rezept mit dem FdV eine Anfrage an diese Apotheke schickt
 

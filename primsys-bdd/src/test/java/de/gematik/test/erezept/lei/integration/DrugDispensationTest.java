@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.lei.integration;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
@@ -27,6 +27,7 @@ import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.erp.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.questions.*;
@@ -36,19 +37,18 @@ import lombok.*;
 import net.serenitybdd.screenplay.*;
 import net.serenitybdd.screenplay.actors.*;
 import org.hl7.fhir.r4.model.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
-public class DrugDispensationTest {
+class DrugDispensationTest {
 
   private PrescriptionId prescriptionId;
-
   private Actor patient;
   private UseTheErpClient useMockClientAbility;
   private ProvideEGK egkAbility;
   private ReceiveDispensedDrugs dispensedDrugs;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     this.prescriptionId = new PrescriptionId("123");
     this.useMockClientAbility = mock(UseTheErpClient.class);
     this.dispensedDrugs = new ReceiveDispensedDrugs();
@@ -66,8 +66,7 @@ public class DrugDispensationTest {
   }
 
   @Test
-  public void thenReceivedDrugsWithChargeItem() {
-
+  void thenReceivedDrugsWithChargeItem() {
     val erxReceipt = mock(ErxReceipt.class);
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
 
@@ -77,7 +76,11 @@ public class DrugDispensationTest {
             .receipt(erxReceipt)
             .build();
     val chargeItemBundle = mock(ErxChargeItemBundle.class);
-    val response = new ErpResponse(200, Map.of(), chargeItemBundle);
+    val response =
+        ErpResponse.forPayload(chargeItemBundle, ErxChargeItemBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(chargeItemBundle.getChargeItem()).thenReturn(chargeItem);
     when(chargeItemBundle.getReceipt()).thenReturn(Optional.of(erxReceipt));
@@ -86,37 +89,21 @@ public class DrugDispensationTest {
 
     dispensedDrugs.append(prescriptionId);
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
-    assertTrue(then(patient).asksFor(HasChargeItem.forLastDispensedDrug().asPatient()));
+    assertTrue(then(patient).asksFor(HasChargeItemBundle.forLastDispensedDrug().asPatient()));
   }
 
   @Test
-  public void thenReceivedDrugsWithoutChargeItem() {
-    val operationOutcome = createOperationOutcome();
-    val response = new ErpResponse(404, Map.of(), operationOutcome);
+  void thenReceivedDrugsWithoutChargeItem() {
+    val response =
+        ErpResponse.forPayload(
+                FhirTestResourceUtil.createOperationOutcome(), ErxChargeItemBundle.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(useMockClientAbility.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
 
     dispensedDrugs.append(prescriptionId);
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
-    assertFalse(then(patient).asksFor(HasChargeItem.forLastDispensedDrug().asPatient()));
-  }
-
-  /**
-   * Create a simple OperationOutcome for testing purposes
-   *
-   * <p><b>NOTE:</b> This method is a duplicate from [erp-fhir].FhirTestResourceUtil
-   *
-   * @return
-   */
-  private static OperationOutcome createOperationOutcome() {
-    val issue = new OperationOutcome.OperationOutcomeIssueComponent();
-    issue.setCode(OperationOutcome.IssueType.VALUE);
-    issue.setSeverity(OperationOutcome.IssueSeverity.ERROR);
-    val oo = new OperationOutcome();
-    oo.setIssue(List.of(issue));
-
-    oo.getText().setStatus(Narrative.NarrativeStatus.GENERATED);
-    oo.getText().setDivAsString("<div>narrative</div>");
-
-    return oo;
+    assertFalse(then(patient).asksFor(HasChargeItemBundle.forLastDispensedDrug().asPatient()));
   }
 }

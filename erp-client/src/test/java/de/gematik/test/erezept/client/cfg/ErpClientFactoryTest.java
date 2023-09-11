@@ -19,7 +19,10 @@ package de.gematik.test.erezept.client.cfg;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mockConstruction;
 
-import de.gematik.test.erezept.client.ClientType;
+import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -27,25 +30,42 @@ import org.mockito.MockedConstruction;
 
 class ErpClientFactoryTest {
 
+  private EnvironmentConfiguration createEnvironmentConfiguration() {
+    val env = new EnvironmentConfiguration();
+    env.setTslBaseUrl("not required!!");
+
+    val envRoute = new BackendRouteConfiguration();
+    env.setTi(envRoute);
+    env.setInternet(envRoute);
+    envRoute.setClientId("gematikTestPs");
+    envRoute.setRedirectUrl("https://gemtest.de");
+    envRoute.setDiscoveryDocumentUrl("https://idp.gemtest.de/.well-known/openid-configuration");
+    envRoute.setFdBaseUrl("https://gemtest.de");
+    envRoute.setUserAgent("Test-Agent");
+    envRoute.setXapiKey("123");
+
+    return env;
+  }
+
   @Test
-  void shouldCcreateErpClient() {
-    val cfg = new ErpClientConfiguration();
-    cfg.setClientId("gematikTestPs");
-    cfg.setRedirectUrl("https://gemtest.de");
-    cfg.setDiscoveryDocumentUrl("https://idp.gemtest.de/.well-known/openid-configuration");
-
-    cfg.setFdBaseUrl("https://gemtest.de");
-    cfg.setTslBaseUrl("not required!!"); // TODO: seems to be not required anymore
-    cfg.setClientType(ClientType.PS);
-    cfg.setXApiKey("123");
-    cfg.setUserAgent("Test-Agent");
-
-    cfg.setAcceptMime("application/fhir+xml;q=1.0");
-    cfg.setSendMime("application/fhir+json");
+  void shouldCreateDoctorErpClient() {
+    val env = createEnvironmentConfiguration();
+    val actor = new DoctorConfiguration();
 
     // mocking FhirParser-Constructor saves some execution time for reading Fhir-Profiles
     try (MockedConstruction<FhirParser> mocked = mockConstruction(FhirParser.class)) {
-      assertDoesNotThrow(() -> ErpClientFactory.createErpClient(cfg));
+      assertDoesNotThrow(() -> ErpClientFactory.createErpClient(env, actor));
+    }
+  }
+
+  @Test
+  void shouldCreatePatientErpClient() {
+    val env = createEnvironmentConfiguration();
+    val actor = new PatientConfiguration();
+
+    // mocking FhirParser-Constructor saves some execution time for reading Fhir-Profiles
+    try (MockedConstruction<FhirParser> mocked = mockConstruction(FhirParser.class)) {
+      assertDoesNotThrow(() -> ErpClientFactory.createErpClient(env, actor));
     }
   }
 }

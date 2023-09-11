@@ -16,12 +16,10 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
-import de.gematik.test.erezept.screenplay.util.ManagedList;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.screenplay.Ability;
+import de.gematik.test.erezept.screenplay.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 @Slf4j
 @Getter
@@ -31,10 +29,8 @@ public class ManageCommunications implements Ability {
   private final ManagedList<ExchangedCommunication> expectedCommunications;
 
   private ManageCommunications() {
-    this.sentCommunications =
-        new ManagedList<>(new MissingPreconditionError("No Communications were sent so far"));
-    this.expectedCommunications =
-        new ManagedList<>(new MissingPreconditionError("No Communications were expected so far"));
+    this.sentCommunications = new ManagedList<>(() -> "No Communications were sent so far");
+    this.expectedCommunications = new ManagedList<>(() -> "No Communications were expected so far");
   }
 
   public static ManageCommunications sheExchanges() {

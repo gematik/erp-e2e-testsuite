@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
+import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import lombok.val;
@@ -40,6 +41,7 @@ class ActorStageTest {
     actors.getDoctors().forEach(doc -> doc.setKonnektor("Soft-Konn"));
     actors.getPharmacies().forEach(pharm -> pharm.setKonnektor("Soft-Konn"));
     stage = new ActorStage();
+    StopwatchProvider.init();
   }
 
   @Test
@@ -47,7 +49,7 @@ class ActorStageTest {
     try (MockedStatic<UseTheErpClient> useTheErpClientMockedStatic =
         Mockito.mockStatic(UseTheErpClient.class)) {
       val ability = mock(UseTheErpClient.class);
-      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any())).thenReturn(ability);
+      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any(), any())).thenReturn(ability);
 
       val doctor = assertDoesNotThrow(() -> stage.getDoctorNamed("Bernd Claudius"));
       val doctor2 = stage.getDoctorNamed("Bernd Claudius");
@@ -62,7 +64,7 @@ class ActorStageTest {
     try (MockedStatic<UseTheErpClient> useTheErpClientMockedStatic =
         Mockito.mockStatic(UseTheErpClient.class)) {
       val ability = mock(UseTheErpClient.class);
-      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any())).thenReturn(ability);
+      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any(), any())).thenReturn(ability);
 
       val patient = assertDoesNotThrow(() -> stage.getPatientNamed("Fridolin Straßer"));
       val patient2 = stage.getPatientNamed("Fridolin Straßer");
@@ -77,7 +79,7 @@ class ActorStageTest {
     try (MockedStatic<UseTheErpClient> useTheErpClientMockedStatic =
         Mockito.mockStatic(UseTheErpClient.class)) {
       val ability = mock(UseTheErpClient.class);
-      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any())).thenReturn(ability);
+      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any(), any())).thenReturn(ability);
 
       val pharmacy = assertDoesNotThrow(() -> stage.getPharmacyNamed("Am Flughafen"));
       val pharmacy2 = stage.getPharmacyNamed("Am Flughafen");

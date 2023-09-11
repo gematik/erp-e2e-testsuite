@@ -32,11 +32,11 @@ import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
 import de.gematik.test.erezept.fhir.references.kbv.MedicationReference;
 import de.gematik.test.erezept.fhir.references.kbv.RequesterReference;
 import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +51,6 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
   private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
   private Reference medicationReference;
   private Reference subjectReference;
-  private VersicherungsArtDeBasis patientInsuranceKind;
   private Reference requesterReference;
   private Reference insuranceReference;
 
@@ -78,8 +77,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
 
   public static MedicationRequestBuilder forPatient(@NonNull KbvPatient patient) {
     val mrb = new MedicationRequestBuilder();
-    mrb.subjectReference = new SubjectReference(patient.getId());
-    mrb.patientInsuranceKind = patient.getInsuranceKind();
+    mrb.subjectReference = new SubjectReference(patient.getId()).asReference();
     return mrb;
   }
 
@@ -99,32 +97,19 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return faker(patient, new Date(), substitution);
   }
 
-  @SuppressWarnings({"java:S1764"}) // not an issue fakerBool returns random values
   public static MedicationRequestBuilder faker(
       @NonNull KbvPatient patient, Date authoredOn, boolean substitution) {
-    val builder =
-        forPatient(patient)
-            .dosage(fakerDosage())
-            .quantityPackages(fakerAmount())
-            //            .status(fakerValueSet(MedicationRequest.MedicationRequestStatus.class))
-            //            .intent(fakerValueSet(MedicationRequest.MedicationRequestIntent.class))
-            .isBVG(fakerBool())
-            .hasEmergencyServiceFee(fakerBool())
-            .insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build())
-            .requester(PractitionerBuilder.faker().build())
-            .medication(KbvErpMedicationBuilder.faker().build())
-            .substitution(substitution)
-            .authoredOn(authoredOn)
-            .coPaymentStatus(fakerValueSet(StatusCoPayment.class));
-
-    // randomly add some accident type
-    val randomlyAccident =
-        fakerBool() && fakerBool(); // two booleans to have less probability for accident types
-    if (randomlyAccident) {
-      builder.accident(AccidentExtension.faker());
-    }
-
-    return builder;
+    return forPatient(patient)
+        .dosage(fakerDosage())
+        .quantityPackages(fakerAmount())
+        .isBVG(fakerBool())
+        .hasEmergencyServiceFee(fakerBool())
+        .insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build())
+        .requester(PractitionerBuilder.faker().build())
+        .medication(KbvErpMedicationBuilder.faker().build())
+        .substitution(substitution)
+        .authoredOn(authoredOn)
+        .coPaymentStatus(fakerValueSet(StatusCoPayment.class));
   }
 
   /**
@@ -161,17 +146,17 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
   }
 
   public MedicationRequestBuilder medication(@NonNull KbvErpMedication medication) {
-    this.medicationReference = new MedicationReference(medication.getId());
+    this.medicationReference = new MedicationReference(medication.getId()).asReference();
     return self();
   }
 
   public MedicationRequestBuilder requester(@NonNull Practitioner practitioner) {
-    this.requesterReference = new RequesterReference(practitioner.getId());
+    this.requesterReference = new RequesterReference(practitioner.getId()).asReference();
     return self();
   }
 
-  public MedicationRequestBuilder insurance(@NonNull Coverage coverage) {
-    this.insuranceReference = new CoverageReference(coverage.getId());
+  public MedicationRequestBuilder insurance(@NonNull KbvCoverage coverage) {
+    this.insuranceReference = new CoverageReference(coverage.getId()).asReference();
     return self();
   }
 
@@ -284,7 +269,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     // set FHIR-specific values provided by HAPI
     medReq.setId(this.getResourceId()).setMeta(meta);
 
-    // check for 'default-able' and non set values
+    // check for 'default-able' and non-set values
     if (dispenseRequestQuantity == null) this.quantityPackages(1); // by default 1 package
 
     extensions.add(BuilderUtil.isBVG(bvg));
@@ -293,21 +278,15 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
 
     if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
       extensions.add(statusCoPayment.asExtension());
-
-      if (accident != null) {
-        // accident allowed for any in kbv.ita.erp < 1.1.0
-        extensions.add(accident.asExtension(kbvItaErpVersion));
-      }
     } else {
       extensions.add(
           statusCoPayment.asExtension(
               KbvItaForStructDef.STATUS_CO_PAYMENT, KbvCodeSystem.STATUS_CO_PAYMENT_FOR));
+    }
 
-      val isValidPayerType = patientInsuranceKind.equals(VersicherungsArtDeBasis.BG);
-      if (accident != null && isValidPayerType) {
-        // accident only allowed for BG and UK in kbv.ita.erp >= 1.1.0
-        extensions.add(accident.asExtension(kbvItaErpVersion));
-      }
+    if (accident != null) {
+      // accident only allowed for BG and UK in kbv.ita.erp >= 1.1.0
+      extensions.add(accident.asExtension(kbvItaErpVersion));
     }
 
     if (authoredOn == null) {

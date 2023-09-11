@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
-import org.openqa.selenium.NoSuchElementException;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -35,14 +34,8 @@ public class IsElementAvailable implements Question<Boolean> {
 
   @Override
   public Boolean answeredBy(Actor actor) {
-
     val driverAbility = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
-    try {
-      driverAbility.getWebElement(pageElement);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
-    }
+    return driverAbility.isPresent(pageElement);
   }
 
   public static IsElementAvailable withName(final PageElement pageElement) {

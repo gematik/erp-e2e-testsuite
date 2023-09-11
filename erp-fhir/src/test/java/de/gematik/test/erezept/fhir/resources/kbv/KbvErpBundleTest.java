@@ -18,6 +18,7 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,11 +28,12 @@ import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.Calendar;
@@ -39,6 +41,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
@@ -46,20 +49,23 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class KbvErpBundleTest extends ParsingTest {
 
-  private final String BASE_PATH_1_0_2 = "fhir/valid/kbv/1.0.2/bundle/";
-  private final String BASE_PATH_1_1_0 = "fhir/valid/kbv/1.1.0/bundle/";
+  private static final String BASE_PATH_1_0_2 = "fhir/valid/kbv/1.0.2/bundle/";
+  private static final String BASE_PATH_1_1_0 = "fhir/valid/kbv/1.1.0/bundle/";
 
   @Test
   @SuppressWarnings({"java:S5961"})
   void testEncodingCodingSingleValidKbvBundle() {
     val expectedID = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
     val expectedPrescriptionId = new PrescriptionId("160.100.000.000.037.28");
-    val expectedEmergencyFee = false;
+    val expectedMedicationRequestId = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
     val expectedInsuranceType = VersicherungsArtDeBasis.GKV;
-    val expectedKvid = "K220635158";
+    val expectedKvnr = "K220635158";
     val expectedGivenName = "Ludger";
     val expectedLastName = "Königsstein";
     val expectedFamilyName = "Königsstein";
@@ -79,7 +85,7 @@ class KbvErpBundleTest extends ParsingTest {
 
     val fileName = expectedID + ".xml";
     val originalEncoding = EncodingType.fromString(fileName);
-    val flippedEncoding = EncodingUtil.flipEncoding(originalEncoding);
+    val flippedEncoding = originalEncoding.flipEncoding();
 
     val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
@@ -93,9 +99,10 @@ class KbvErpBundleTest extends ParsingTest {
     assertEquals(expectedID, kbvBundle.getReference().getReference());
     assertEquals(expectedPrescriptionId, kbvBundle.getPrescriptionId());
     assertEquals(PrescriptionFlowType.FLOW_TYPE_160, kbvBundle.getFlowType());
-    assertEquals(expectedEmergencyFee, kbvBundle.hasEmergencyServicesFee());
-    assertEquals(expectedInsuranceType, kbvBundle.getInsuranceType());
-    assertEquals(expectedKvid, kbvBundle.getKvid());
+    assertEquals(expectedMedicationRequestId, kbvBundle.getMedicationRequest().getLogicalId());
+    assertFalse(kbvBundle.hasEmergencyServicesFee());
+    assertEquals(expectedInsuranceType, kbvBundle.getPatient().getInsuranceKind());
+    assertEquals(expectedKvnr, kbvBundle.getKvnr().getValue());
     assertEquals(expectedGivenName, kbvBundle.getPatientGivenName());
     assertEquals(expectedFamilyName, kbvBundle.getFamilyName());
     assertEquals(expectedLastName, kbvBundle.getPatientFamilyName());
@@ -121,6 +128,7 @@ class KbvErpBundleTest extends ParsingTest {
     val medication = kbvBundle.getMedication();
     assertEquals(StandardSize.N1, medication.getStandardSize());
     assertNotNull(medication.getDescription());
+    assertEquals(KbvItaErpVersion.V1_0_2, medication.getVersion());
 
     val composition = kbvBundle.getComposition();
     val compProfile = composition.getMeta().getProfile().get(0).asStringValue();
@@ -132,6 +140,27 @@ class KbvErpBundleTest extends ParsingTest {
     val flippedKbvBundle = parser.decode(KbvErpBundle.class, flippedContent);
 
     assertEquals(kbvBundle.getLogicalId(), flippedKbvBundle.getLogicalId());
+  }
+
+  @Test
+  void shouldValidateKbvBundle() {
+    val expectedID = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+    assertTrue(parser.isValid(kbvBundle));
+  }
+
+  @Test
+  void shouldGetMedicalOrganization() {
+    val expectedID = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+    assertDoesNotThrow(kbvBundle::getMedicalOrganization);
+    assertNotNull(kbvBundle.getMedicalOrganization());
   }
 
   @Test
@@ -155,7 +184,7 @@ class KbvErpBundleTest extends ParsingTest {
     // correctly
     assertEquals(expectedIknr, assignerOrg.getIknr());
     assertEquals(expectedName, assignerOrg.getName());
-    kbvBundle.getKvid();
+    kbvBundle.getKvnr();
   }
 
   @Test
@@ -262,6 +291,7 @@ class KbvErpBundleTest extends ParsingTest {
 
     val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_0 + fileName);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
+    assertEquals(KbvItaErpVersion.V1_1_0, kbvBundle.getMedication().getVersion());
 
     assertEquals(
         MedicationType.COMPOUNDING, kbvBundle.getMedication().getMedicationType().orElseThrow());
@@ -318,22 +348,25 @@ class KbvErpBundleTest extends ParsingTest {
     assertTrue(origLastUpdate.before(kbvBundle.getMeta().getLastUpdated()));
   }
 
-  @Test
-  void testChangeOfCoverage() {
-    val expectedID = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
+  @ParameterizedTest(name = "{index} Change existing Coverage with {1}")
+  @MethodSource
+  void shouldChangeCoverageOnExistingBundle(String fileName, KbvItaForVersion version) {
+    val content = ResourceUtils.readFileFromResource(fileName);
 
-    val fileName = expectedID + ".xml";
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
-
-    IntStream.range(0, 5)
+    IntStream.range(0, 2)
         .forEach(
             idx -> {
               val kbvBundle = parser.decode(KbvErpBundle.class, content);
-              val newCoverage = KbvCoverageBuilder.faker().build();
-
               val oldCoverage = kbvBundle.getCoverage();
               val oldIknr = oldCoverage.getPayorFirstRep().getIdentifier().getValue();
               val oldName = oldCoverage.getPayorFirstRep().getDisplay();
+
+              KbvCoverage newCoverage = null;
+              while(newCoverage == null || newCoverage.getIknr().getValue().equals(oldIknr)) {
+                // make sure the faker doesn't accidentally hit the same coverage (by IKNR)
+                // otherwise the assertion will fail afterward
+                newCoverage = KbvCoverageBuilder.faker(oldCoverage.getInsuranceKind()).version(version).build();
+              }
 
               kbvBundle.changeCoverage(newCoverage);
               val nc2 = kbvBundle.getCoverage();
@@ -350,8 +383,17 @@ class KbvErpBundleTest extends ParsingTest {
             });
   }
 
+  static Stream<Arguments> shouldChangeCoverageOnExistingBundle() {
+    return Stream.of(
+            arguments(BASE_PATH_1_0_2 + "1f339db0-9e55-4946-9dfa-f1b30953be9b.xml", KbvItaForVersion.V1_0_3),
+            arguments(BASE_PATH_1_0_2 + "sdf6s75f-d959-43f0-8ac4-sd6f7sd6.xml", KbvItaForVersion.V1_0_3),
+            arguments(BASE_PATH_1_1_0+ "1f339db0-9e55-4946-9dfa-f1b30953be9b.xml", KbvItaForVersion.V1_1_0),
+            arguments(BASE_PATH_1_1_0+ "328ad940-3fff-11ed-b878-0242ac120002.xml", KbvItaForVersion.V1_1_0)
+    );
+  }
+
   @Test
-  void shouldReplaceOriginalPatient() {
+  void shouldProvideOriginalPatientAsKbvErpPatient() {
     val expectedID = "sdf6s75f-d959-43f0-8ac4-sd6f7sd6";
     val fileName = expectedID + ".xml";
 
@@ -367,12 +409,38 @@ class KbvErpBundleTest extends ParsingTest {
 
     val kbvPatient1 = kbvBundle.getPatient();
     val kbvPatient2 = kbvBundle.getPatient();
-    assertNotEquals(originalPatient, kbvPatient1);
+    assertEquals(originalPatient, kbvPatient1);
     assertEquals(kbvPatient1, kbvPatient2);
 
     // now check if deep copy
     kbvPatient1.addExtension("abc", new StringType("xyz"));
     assertEquals(1, kbvPatient2.getExtensionsByUrl("abc").size());
+  }
+
+  @Test
+  void shouldDecodeWithoutExpectedType() {
+    val expectedID = "sdf6s75f-d959-43f0-8ac4-sd6f7sd6";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
+    val bundle = parser.decode(content);
+    assertEquals(ResourceType.Bundle, bundle.getResourceType());
+    assertEquals(KbvErpBundle.class, bundle.getClass());
+  }
+
+  @Test
+  void shouldCopyWithBundleEntries() {
+    val expectedID = "sdf6s75f-d959-43f0-8ac4-sd6f7sd6";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+
+    assertEquals(KbvErpMedicationRequest.class, kbvBundle.getMedicationRequest().getClass());
+
+    val copy = new KbvErpBundle();
+    kbvBundle.copyValues(copy);
+    assertEquals(KbvErpMedicationRequest.class, copy.getMedicationRequest().getClass());
   }
 
   @Test
@@ -406,7 +474,7 @@ class KbvErpBundleTest extends ParsingTest {
     extensionConsumer.forEach(
         c -> {
           val kbvBundle =
-              KbvErpBundleBuilder.faker("X123456789", new PrescriptionId("160.002.362.150.600.45"))
+              KbvErpBundleBuilder.faker(KVNR.random(), new PrescriptionId("160.002.362.150.600.45"))
                   .build();
 
           c.accept(kbvBundle);
@@ -428,13 +496,13 @@ class KbvErpBundleTest extends ParsingTest {
     private final String name;
     private final boolean expectedResult;
 
+    public void accept(T t) {
+      consumer.accept(t);
+    }
+
     public static <T> ConsumerExpectation<T> from(
         Consumer<T> consumer, String name, boolean expectedResult) {
       return new ConsumerExpectation<>(consumer, name, expectedResult);
-    }
-
-    public void accept(T t) {
-      consumer.accept(t);
     }
   }
 }

@@ -50,6 +50,7 @@ public final class LdapReader {
         case "GIVENNAME", "GN" -> builder.givenName(value);
         case "SURNAME" -> builder.surname(value);
         case "STREET" -> builder.street(value);
+        case "postalCode" -> builder.postalCode(value);
         case "O" -> builder.organization(value);
         case "OU" -> builder.organizationUnit(value);
         case "L" -> builder.locality(value);

@@ -15,8 +15,8 @@
 #
 # language: de
 
-@Funktionalität=MVO
-@Impl=done
+@PRODUKT:eRp_FD
+@Funktionalität:MVO
 Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
   Eine Mehrfachverordnung besteht aus mindestens 2 bis maximal 4 Teilverordnungen.
   Jede Teilverordnung einer Mehrfachverordnung ist ein vollständiges E-Rezept mit QES-signierten Verordnungsdatensatz und E-Rezept-Token.
@@ -28,12 +28,12 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
 
 
-  @TCID=ERP_EE_MVO_01
-    @Path=happy
-    @Workflow=160
-    @Versicherung=GKV
-    @Afo=A_22627
-    @MainActor=Arztpraxis
+  @TCID:ERP_EE_MVO_01
+    @AFO-ID:A_22627
+    @TESTFALL:positiv
+    @Workflow:160
+    @Versicherung:GKV
+    @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für GKV-Versicherte
   Gutfall: E-Rezepte für GKV-Versicherte als Mehrfachverordnung (WF 160)
 
@@ -50,12 +50,12 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | 4      | 4      | 270   |
 
 
-  @TCID=ERP_EE_MVO_02
-    @Path=happy
-    @Workflow=200
-    @Versicherung=PKV
-    @Afo=A_22627
-    @MainActor=Arztpraxis
+  @TCID:ERP_EE_MVO_02
+    @AFO-ID:A_22627
+    @TESTFALL:positiv
+    @Workflow:200
+    @Versicherung:PKV
+    @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für PKV-Versicherte
   Gutfall: E-Rezepte für PKV-Versicherte als Mehrfachverordnung erstellen (WF 200)
 
@@ -72,12 +72,12 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | 4      | 4      | 270   | 360  |
 
 
-  @TCID=ERP_EE_MVO_03
-    @Path=happy
-    @Workflow=169
-    @Versicherung=GKV
-    @Afo=A_22627-01
-    @MainActor=Arztpraxis
+  @TCID:ERP_EE_MVO_03
+    @AFO-ID:A_22627-01
+    @TESTFALL:positiv
+    @Workflow:169
+    @Versicherung:GKV
+    @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für GKV-Versicherte als Direktzuweisung
   Gutfall: Direktzuweisung für GKV-Versicherte als Mehrfachverordnung (WF 169)
 
@@ -94,12 +94,12 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | 4      | 4      | 270   | leer |
 
 
-  @TCID=ERP_EE_MVO_04
-    @Path=happy
-    @Workflow=209
-    @Versicherung=PKV
-    @Afo=A_22627-01
-    @MainActor=Arztpraxis
+  @TCID:ERP_EE_MVO_04
+    @AFO-ID:A_22627-01
+    @TESTFALL:positiv
+    @Workflow:209
+    @Versicherung:PKV
+    @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: Mehrfachverordnung für PKV-Versicherte als Direktzuweisung
   Gutfall: Direktzuweisung für PKV-Versicherte  als Mehrfachverordnung (WF 209)
 
@@ -116,11 +116,11 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | 4      | 4      | 270   | leer |
 
 
-  @TCID=ERP_EE_MVO_05
-    @Afo=A_22632
-    @Funktionalität=Entlassrezept
-    @Path=bad
-    @MainActor=Arztpraxis
+  @TCID:ERP_EE_MVO_05
+    @AFO-ID:A_22632
+    @Funktionalität:Entlassrezept
+    @TESTFALL:negativ
+    @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: Entlassrezept nicht als Mehrfachverordnung
     Dann darf die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann das folgende E-Rezept nicht ausstellen:
       | KBV_Statuskennzeichen | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
@@ -132,9 +132,9 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | 14          |
 
 
-  @TCID=ERP_EE_MVO_06
-  @Path=happy
-  @MainActor=Apotheke
+  @TCID:ERP_EE_MVO_06
+  @TESTFALL:positiv
+  @Hauptdarsteller:Apotheke
   Szenario: Erstes Teilrezept einer Mehrfachverordnung einlösen
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
@@ -147,10 +147,10 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
     Und hat der Versicherte Sina Hüllmann genau 1 Medikament erhalten
 
 
-  @TCID=ERP_EE_MVO_07
-    @Afo=A_22635
-    @Path=bad
-    @MainActor=Apotheke
+  @TCID:ERP_EE_MVO_07
+    @AFO-ID:A_22635
+    @TESTFALL:negativ
+    @Hauptdarsteller:Apotheke
   Szenariogrundriss: Teilrezept nicht einlösbar, wenn Start des Gütligkeitszeitraums noch nicht erreicht
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
@@ -167,16 +167,16 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | 3      |
       | 4      |
 
-  @TCID=ERP_EE_MVO_08
-    @Afo=A_22704
-    @Afo=A_22628
-    @Afo=A_22629
-    @Afo=A_22630
-    @Afo=A_22632
-    @Afo=A_22634
-    @Path=bad
-    @MainActor=Fachdienst
-  Szenariogrundriss:  Unzulässige Denominatoren und Numeratoren
+  @TCID:ERP_EE_MVO_08
+    @AFO-ID:A_22704
+    @AFO-ID:A_22628
+    @AFO-ID:A_22629
+    @AFO-ID:A_22630
+    @AFO-ID:A_22632
+    @AFO-ID:A_22634
+    @TESTFALL:negativ
+    @Hauptdarsteller:Fachdienst
+  Szenariogrundriss: Unzulässige Denominatoren und Numeratoren
   1. Denominator muss größer 1 sein (A_22629)
   2. Denominator darf nicht größer 4 sein (A_22628)
   3. Numerator darf nicht größer 4 sein (A_22628)
@@ -203,3 +203,20 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
       | true | 4      | 1      | leer  | 1    |
       | true | 4      | 1      | 180   | 90   |
 
+
+  @TCID:ERP_EE_MVO_09
+  @AFO-ID:A_22627
+  @TESTFALL:positiv
+  @Workflow:160
+  @Versicherung:GKV
+  @Hauptdarsteller:Arztpraxis
+  Szenario: Zusammenhängende Mehrfachverordnung für GKV-Versicherte
+  Alle vier Mehrfachverordnungen werden zusammenhängend (über eine gemeinsame ID verknüpft) auf einmal ausgestellt
+
+    Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
+      | MVO  | MVO-ID   | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
+      | true | 13061707 | 4           | 1         | 0                 | leer             |
+      | true |          | 4           | 2         | 90                | leer             |
+      | true |          | 4           | 3         | 180               | leer             |
+      | true |          | 4           | 4         | 270               | leer             |
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt

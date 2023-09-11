@@ -1,0 +1,10 @@
+
+== Testsuite Konfiguration
+
+Jede Software benötigt in einem gewissen Maße eine Konfiguration und das gilt auch für die {name-all-testsuites} und wird ausschließlich im `YAML`-Format definiert.
+
+include::primsys-bdd/configuration.adoc[]
+
+include::erp-app-bdd/configuration.adoc[]
+
+include::configuration_pcs.adoc[]

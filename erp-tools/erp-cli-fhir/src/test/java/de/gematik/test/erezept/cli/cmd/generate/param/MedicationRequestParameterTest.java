@@ -73,4 +73,19 @@ class MedicationRequestParameterTest {
               assertTrue(mr.allowSubstitution());
             });
   }
+
+  @Test
+  void shouldCreateAccident() {
+    val mrp = new MedicationRequestParameter();
+    val cmdline = new CommandLine(mrp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--accident", "ACCIDENT"));
+
+    IntStream.range(0, 5)
+        .forEach(
+            idx -> {
+              val mr = mrp.createMedicationRequest();
+              assertNotNull(mr);
+              assertTrue(mr.hasAccidentExtension());
+            });
+  }
 }

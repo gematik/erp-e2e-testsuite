@@ -22,6 +22,8 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -49,15 +51,24 @@ public class DispensePrescription extends ErpAction<ErxReceipt> {
     val kbvAsString = acceptBundle.getKbvBundleAsString();
     val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
     val medication = kbvBundle.getMedication();
-    val prescriptionId = acceptBundle.getTask().getPrescriptionId();
-    val kvid = acceptBundle.getTask().getForKvid().orElseThrow(); // why is this an optional at all?
+    val prescriptionId =
+        (PrescriptionId)
+            manipulator.getOrDefault("prescriptionId", acceptBundle.getTask().getPrescriptionId());
+    val kvnr =
+        (KVNR)
+            manipulator.getOrDefault(
+                "kvnr",
+                acceptBundle
+                    .getTask()
+                    .getForKvnr()
+                    .orElseThrow()); // why is this an optional at all?
     val telematikId =
         (String)
             manipulator.getOrDefault(
                 "telematikId", SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID());
 
     val medicationDispense =
-        ErxMedicationDispenseBuilder.forKvid(kvid)
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
             .prescriptionId(prescriptionId)
             .performerId(telematikId)
             .medication(medication)
@@ -84,6 +95,16 @@ public class DispensePrescription extends ErpAction<ErxReceipt> {
 
     public Builder performer(String telematikId) {
       alternatives.put("telematikId", telematikId);
+      return this;
+    }
+
+    public Builder prescriptionId(PrescriptionId prescriptionId) {
+      alternatives.put("prescriptionId", prescriptionId);
+      return this;
+    }
+
+    public Builder kvnr(KVNR kvnr) {
+      alternatives.put("kvnr", kvnr);
       return this;
     }
 

@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.*;
 
 @Getter
 @ResourceDef(name = "Bundle")
+@SuppressWarnings({"java:S110"})
 public class ErxChargeItemBundle extends Bundle {
 
   public ErxChargeItem getChargeItem() {

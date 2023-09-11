@@ -17,33 +17,28 @@
 package de.gematik.test.erezept.actions;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispenseMedicationCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.Secret;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
-import java.util.Optional;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.actors.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
+import org.mockito.stubbing.*;
 
 class DispensePrescriptionTest {
 
   @Test
-  void shouldDispenseWithManipulatedPerformer() {
+  void shouldDispenseWithManipulatedValues() {
     val pharmacy = new PharmacyActor("Am Flughafen");
     val useErpClient = mock(UseTheErpClient.class);
     val useSmcb = mock(UseSMCB.class);
@@ -52,38 +47,50 @@ class DispensePrescriptionTest {
     pharmacy.can(useSmcb);
 
     val manipulatedPerformerId = "I don't care";
+    val manipulatedPrescriptionId = PrescriptionId.random();
+    val manipulatedKvnr = KVNR.from("Z123123123");
 
     doAnswer(
-            (Answer<ErpResponse>)
+            (Answer<ErpResponse<ErxReceipt>>)
                 invovation -> {
                   val args = invovation.getArguments();
                   val cmd = (DispenseMedicationCommand) args[0];
                   assertTrue(cmd.getRequestBody().isPresent());
                   val medDisp = (ErxMedicationDispense) cmd.getRequestBody().orElseThrow();
                   assertEquals(manipulatedPerformerId, medDisp.getPerformerIdFirstRep());
+                  assertEquals(manipulatedKvnr, medDisp.getSubjectId());
+                  assertEquals(manipulatedPrescriptionId, medDisp.getPrescriptionId());
 
-                  return new ErpResponse(
-                      404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+                  return ErpResponse.forPayload(
+                          FhirTestResourceUtil.createOperationOutcome(), ErxReceipt.class)
+                      .withStatusCode(404)
+                      .withHeaders(Map.of())
+                      .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
                 })
         .when(useErpClient)
         .request(any(DispenseMedicationCommand.class));
 
     val mockAcceptBundle = mock(ErxAcceptBundle.class);
+    val mockResponse = (ErpResponse<ErxAcceptBundle>) mock(ErpResponse.class);
+    val mockAcceptInteraction = new ErpInteraction<>(mockResponse);
     val mockTask = mock(ErxTask.class);
 
-    when(mockAcceptBundle.getTaskId()).thenReturn("1234567890");
+    when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
+    when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
     when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
     when(mockAcceptBundle.getKbvBundleAsString()).thenReturn("EMPTY");
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
-    when(mockTask.getForKvid()).thenReturn(Optional.of("X123456789"));
+    when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     when(useErpClient.decode(eq(KbvErpBundle.class), any()))
-        .thenReturn(KbvErpBundleBuilder.faker("X123456789").build());
+        .thenReturn(KbvErpBundleBuilder.faker(KVNR.from("X123456789")).build());
     when(useSmcb.getTelematikID()).thenReturn("Telematik-ID");
 
     pharmacy.performs(
         DispensePrescription.alternative()
             .performer(manipulatedPerformerId)
-            .acceptedWith(mockAcceptBundle));
+            .kvnr(manipulatedKvnr)
+            .prescriptionId(manipulatedPrescriptionId)
+            .acceptedWith(mockAcceptInteraction));
   }
 }

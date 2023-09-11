@@ -19,6 +19,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,16 +32,20 @@ import net.serenitybdd.screenplay.Question;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FullPrescriptionBundle implements Question<ErxPrescriptionBundle> {
 
-  private final ErxTask task;
+  private final TaskId taskId;
 
   @Override
   public ErxPrescriptionBundle answeredBy(Actor actor) {
     val erpClient = actor.abilityTo(UseTheErpClient.class);
-    val cmd = new TaskGetByIdCommand(task.getUnqualifiedId());
-    return erpClient.request(cmd).getResource(cmd.expectedResponseBody());
+    val cmd = new TaskGetByIdCommand(taskId);
+    return erpClient.request(cmd).getExpectedResource();
   }
 
   public static FullPrescriptionBundle forTask(ErxTask task) {
-    return new FullPrescriptionBundle(task);
+    return forTask(task.getTaskId());
+  }
+
+  public static FullPrescriptionBundle forTask(TaskId taskId) {
+    return new FullPrescriptionBundle(taskId);
   }
 }

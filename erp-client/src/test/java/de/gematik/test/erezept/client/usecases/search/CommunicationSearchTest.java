@@ -18,11 +18,17 @@ package de.gematik.test.erezept.client.usecases.search;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class CommunicationSearchTest {
 
+  @Test
+  void shouldNotInstantiate() {
+    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(CommunicationSearch.class));
+  }
+  
   @Test
   void getNewCommunications() {
     val cmd = CommunicationSearch.getNewCommunications();
@@ -33,5 +39,12 @@ class CommunicationSearchTest {
   void getLatestCommunicationsTest() {
     val cmd = CommunicationSearch.getLatestCommunications();
     assertTrue(cmd.getRequestLocator().contains("_sort=-sent"));
+  }
+
+  @Test
+  void getLatestNewCommunicationsTest() {
+    val cmd = CommunicationSearch.getLatestNewCommunications();
+    assertTrue(cmd.getRequestLocator().contains("_sort=-sent"));
+    assertTrue(cmd.getRequestLocator().contains("?received=NULL"));
   }
 }

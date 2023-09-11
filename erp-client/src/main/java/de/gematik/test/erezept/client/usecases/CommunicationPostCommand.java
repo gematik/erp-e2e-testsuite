@@ -31,17 +31,6 @@ public class CommunicationPostCommand extends BaseCommand<ErxCommunication> {
   }
 
   /**
-   * This method returns the last (tailing) part of the URL of the inner-HTTP Request e.g.
-   * /Task/[id] or /Communication?[queryParameter]
-   *
-   * @return the tailing part of the URL which combines to full URL like [baseUrl][tailing Part]
-   */
-  @Override
-  public String getRequestLocator() {
-    return this.getResourcePath();
-  }
-
-  /**
    * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
    *
    * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body

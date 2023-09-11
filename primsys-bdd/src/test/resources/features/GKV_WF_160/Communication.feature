@@ -15,12 +15,13 @@
 #
 # language: de
 
-@Funktionalität=Cummunication
-@Anwendungsfall=A_18508
-@Anwendungsfall=A_18617
-@Anwendungsfall=A_18618
-@Anwendungsfall=A_19013
-@Impl=done
+@PRODUKT:eRp_FD
+@Funktionalität:Nachrichten
+@Versicherung:GKV
+@AFO-ID:A_18508
+@AFO-ID:A_18617
+@AFO-ID:A_18618
+@AFO-ID:A_19013
 Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
 
   Grundlage:
@@ -33,10 +34,10 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
       | Schmerzmittel | 12345678 |
 
 
-  @TCID=ERP_EE_Communication_01
-  @Path=happy
-  @MainActor=Versicherter
-   Szenario: Zuweisung per Nachricht
+  @TCID:ERP_EE_NACHRICHTEN_01
+  @TESTFALL:positiv
+  @Hauptdarsteller:Versicherter
+  Szenario: Zuweisung per Nachricht
   Der Versicherte weist das gerade erhaltene E-Rezept per Nachricht einer Apotheke zu.
   Diese kann das Rezept erfolgreich akzeptieren und einlösen.
 
@@ -47,9 +48,9 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Und die Versicherte Sina Hüllmann hat genau 1 Medikament erhalten
 
 
-  @TCID=ERP_EE_Communication_02
-  @Path=happy
-  @MainActor=Versicherter
+  @TCID:ERP_EE_NACHRICHTEN_02
+  @TESTFALL:positiv
+  @Hauptdarsteller:Versicherter
   Szenario: Anfrage zu einem E-Rezept und Antwort der Apotheke
   Der Versicherte stellt zum grad erhaltenen Rezept eine Anfrage an die Apotheke. Diese beantwortet die Anfrage.
 
@@ -58,10 +59,10 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Dann hat die Versicherte Sina Hüllmann eine Antwort von der Apotheke Am Flughafen erhalten
 
 
-  @TCID=ERP_EE_Communication_03
-  @Path=happy
-  @Anwendungsfall=A_18781
-  @MainActor=Versicherter
+  @TCID:ERP_EE_NACHRICHTEN_03
+  @TESTFALL:positiv
+  @AFO-ID:A_18781
+  @Hauptdarsteller:Versicherter
   Szenario: Zuweisung an einen Vertreter
   Der Versicherte weist das ausgestellte Rezept einem Vertreter zu. Dieser kann es erfolgreich in der Apotheke einlösen.
 
@@ -74,10 +75,10 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
 
 
 
-  @TCID=ERP_EE_Communication_04
-  @Path=bad
-  @Afo=A_20230
-  @MainActor=Versicherter
+  @TCID:ERP_EE_NACHRICHTEN_04
+  @TESTFALL:negativ
+  @AFO-ID:A_20230
+  @Hauptdarsteller:Versicherter
   Szenario: Zuweisung an einen Vertreter nicht möglich nach dem Einlösen
   Der Versicherte weist das ausgestellte Rezept einem Vertreter zu. Dieser kann es erfolgreich in der Apotheke einlösen.
 
@@ -87,20 +88,20 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Dann kann die Versicherte Sina Hüllmann ihr letztes E-Rezept nicht per Nachricht an den Vertreter Günther Angermänn schicken
 
 
-  @TCID=ERP_EE_Communication_05
-  @Path=bad
-  @Afo=A_20231
-  @MainActor=Versicherter
+  @TCID:ERP_EE_NACHRICHTEN_05
+  @TESTFALL:negativ
+  @AFO-ID:A_20231
+  @Hauptdarsteller:Versicherter
   Szenario: Zuweisung an sich selbst nicht möglich
   Der E-Rezept-Fachdienst muss eine Nachricht mit Empfänger gleich Absender ablehnen
 
     Dann kann die Versicherte Sina Hüllmann ihr letztes E-Rezept nicht per Nachricht an den Vertreter Sina Hüllmann schicken
 
 
-  @TCID=ERP_EE_Communication_06
-  @Path=happy
-  @Afo=A_20513
-  @MainActor=Fachdienst
+  @TCID:ERP_EE_NACHRICHTEN_06
+  @TESTFALL:positiv
+  @AFO-ID:A_20513
+  @Hauptdarsteller:Fachdienst
   Szenario: Fachdienst löscht alle Nachrichten zu einem E-Rezept nach dem Einlösen
   Der Testfall überprüft, ob alle Nachrichten, die sich auf ein E-Rezept beziehen, nach dem erfolgreichem Einlösen vom Fachdienst gelöscht wurden.
 
@@ -110,11 +111,11 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Dann kann die Versicherte Sina Hüllmann nicht mehr die Nachrichten zu ihrem letzten E-Rezept abrufen
 
 
-  @TCID=ERP_EE_Communication_07
-  @Path=happy
-  @Anwendungsfall=A_20260
-  @Afo=A_20258
-  @MainActor=Versicherter
+  @TCID:ERP_EE_NACHRICHTEN_07
+  @TESTFALL:positiv
+  @AFO-ID:A_20260
+  @AFO-ID:A_20258
+  @Hauptdarsteller:Versicherter
   Szenario: Versicherte löscht alle Nachrichten
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Und die Apotheke Am Flughafen die letzte Nachricht von Sina Hüllmann beantwortet
@@ -122,11 +123,11 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Dann kann die Versicherte Sina Hüllmann keine ihrer versendeten Nachrichten mehr abrufen
 
 
-  @TCID=ERP_EE_Communication_08
-  @Path=happy
-  @Anwendungsfall=A_20776
-  @Afo=A_20258
-  @MainActor=Apotheke
+  @TCID:ERP_EE_NACHRICHTEN_08
+  @TESTFALL:positiv
+  @AFO-ID:A_20776
+  @AFO-ID:A_20258
+  @Hauptdarsteller:Apotheke
   Szenario: Apotheke löscht Nachricht
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Und die Apotheke Am Flughafen die letzte Nachricht von Sina Hüllmann beantwortet
@@ -134,10 +135,10 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Dann hat die Versicherte Sina Hüllmann keine Antwort von der Apotheke Am Flughafen für das letzte E-Rezept erhalten
 
 
-  @TCID=ERP_EE_Communication_09
-  @Path=bad
-  @Afo=A_19446-01
-  @MainActor=Arztpraxis
+  @TCID:ERP_EE_NACHRICHTEN_09
+  @TESTFALL:negativ
+  @AFO-ID:A_19446-01
+  @Hauptdarsteller:Arztpraxis
   Szenario: Arztpraxis darf keine Nachricht versenden
   Der Versicherte schreibt eine Nachricht an eine Arztpraxis "Keine Apotheke". Der Fachdienst muss die Antwort ablehnen,
   weil nur Apotheken und Versicherte Nachrichten versenden dürfen.
@@ -147,11 +148,11 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
     Dann kann Keine Apotheke die letzte Nachricht von Sina Hüllmann nicht beantworten, weil sie keine Apotheke ist
 
 
-  @TCID=ERP_EE_Communication_10
-  @Path=happy
-  @Anwendungsfall=A_20260
-  @Afo=A_20258
-  @MainActor=Versicherter
+  @TCID:ERP_EE_NACHRICHTEN_10
+  @TESTFALL:positiv
+  @AFO-ID:A_20260
+  @AFO-ID:A_20258
+  @Hauptdarsteller:Versicherter
   Szenario: Versicherte löscht eine Nachricht
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
     Und die Versicherte Sina Hüllmann ihre letzte versendete Nachricht löscht

@@ -24,14 +24,7 @@ import de.gematik.test.erezept.primsys.model.PrescribeUseCase;
 import de.gematik.test.erezept.primsys.model.actor.Doctor;
 import de.gematik.test.erezept.primsys.rest.request.PrescribeRequest;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -47,20 +40,26 @@ public class DoctorsResource {
   @Path("{id}/prescribe")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response issuePrescription(@PathParam("id") String id, PrescribeRequest body) {
+  public Response issuePrescription(
+      @PathParam("id") String id,
+      @DefaultValue("false") @QueryParam("direct") boolean isDirectAssignment,
+      PrescribeRequest body) {
     log.info("POST/doc/{id}/prescribe with PrescribeRequest as json for Doctor with ID " + id);
     val doc = getDoctor(id);
-    return PrescribeUseCase.issuePrescription(doc, body);
+    return PrescribeUseCase.issuePrescription(doc, body, isDirectAssignment);
   }
 
   @POST
   @Path("{id}/xml/prescribe")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_XML)
-  public Response issuePrescription(@PathParam("id") String id, String kbvBundle) {
+  public Response issuePrescription(
+      @PathParam("id") String id,
+      @DefaultValue("false") @QueryParam("direct") boolean isDirectAssignment,
+      String kbvBundle) {
     log.info("POST doc/{id}/xml/prescribe with kbvBundle as XML /doc for Doctor with ID " + id);
     val doc = getDoctor(id);
-    return PrescribeUseCase.issuePrescription(doc, kbvBundle);
+    return PrescribeUseCase.issuePrescription(doc, kbvBundle, isDirectAssignment);
   }
 
   @DELETE

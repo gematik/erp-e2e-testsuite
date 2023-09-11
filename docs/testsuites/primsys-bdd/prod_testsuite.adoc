@@ -1,0 +1,10 @@
+
+=== Produkt-Testsuite
+Die {name-fd-prod-testsuite} fokussiert sich ebenfalls auf die Qualitätssicherung des E-Rezept-Fachdienstes jedoch aus der Perspektive der einzelnen Anforderungen. Aus der <<introduction,initialen Darstellung>> liegt der Fokus hier ganz klar auf der Teststufe der _Systemtests_ für den Fachdienst ab.
+
+==== Technologiestack
+Im Wesentlichen setzt die {name-primsys-testsuite} auf den folgenden Technologiestack auf:
+
+- link:https://openjdk.org/projects/jdk/17/[Java 17] mit link:https://maven.apache.org/download.cgi[Maven]
+- {link-serenity-bdd} mit {link-serenity-screenplay}
+- link:https://junit.org/junit5/[Junit 5]

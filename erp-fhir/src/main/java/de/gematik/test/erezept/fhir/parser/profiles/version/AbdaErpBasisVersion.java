@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AbdaErpBasisVersion implements ProfileVersion<AbdaErpBasisVersion> {
   V1_2_1("1.2.1", LocalDate.of(2022, Month.JULY, 1), LocalDate.of(2023, Month.JUNE, 30)),
-  V1_3_0("1.3.0", LocalDate.of(2023, Month.JULY, 1), LocalDate.of(2070, Month.DECEMBER, 31)),
+  V1_3_1("1.3.1", LocalDate.of(2023, Month.JULY, 1), LocalDate.of(2070, Month.DECEMBER, 31)),
   ;
 
   private final String version;

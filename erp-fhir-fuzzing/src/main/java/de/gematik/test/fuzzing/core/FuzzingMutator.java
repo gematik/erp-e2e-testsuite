@@ -21,5 +21,6 @@ import java.util.function.Consumer;
 @FunctionalInterface
 public interface FuzzingMutator<T> extends Consumer<T> {
 
-  void accept(T target);
+
+    void accept(T target);
 }

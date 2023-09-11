@@ -22,8 +22,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import java.util.List;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -34,6 +35,8 @@ import org.junit.jupiter.api.Test;
 
 class SkipOnboardingOnIOSTest {
 
+  private String userName;
+  
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
@@ -41,7 +44,7 @@ class SkipOnboardingOnIOSTest {
     when(appAbility.getPlatformType()).thenReturn(PlatformType.IOS);
 
     // assemble the screenplay
-    val userName = "Alice";
+    userName = GemFaker.fakerName();
     val theAppUser = OnStage.theActorCalled(userName);
     givenThat(theAppUser).can(appAbility);
   }
@@ -53,7 +56,7 @@ class SkipOnboardingOnIOSTest {
 
   @Test
   void shouldThrowNotImplementedException() {
-    val theAppUser = OnStage.theActorInTheSpotlight();
+    val theAppUser = OnStage.theActorCalled(userName);
     val task = new SkipOnboardingOnIOS(List.of());
     assertThrows(FeatureNotImplementedException.class, () -> task.performAs(theAppUser));
   }

@@ -54,7 +54,7 @@ public class LocalSigner {
   @SneakyThrows
   public byte[] signDocument(byte[] data) {
     val signingDate = new Date();
-    val mimeType = MimeType.XML; // Note: only XML for now!
+    val mimeType = MimeTypeEnum.XML; // Note: only XML for now!
     log.info(
         format(
             "Sign {0} with {1} Bytes at {2}",

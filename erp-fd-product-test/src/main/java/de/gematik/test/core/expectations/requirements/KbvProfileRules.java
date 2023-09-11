@@ -22,7 +22,9 @@ public enum KbvProfileRules implements RequirementsSet {
   AUTHORED_ON_DATEFORMAT(
       "AUTHORED_ON_DATEFORMAT", "Begrenzung der Datumsangabe auf 10 Zeichen JJJJ-MM-TT"),
   ACCIDENT_EXTENSION(
-      "UNFALLKENNZEICHEN", "Unfallkennzeichen müssen den Regeln der Profiling entsprechen");
+      "UNFALLKENNZEICHEN", "Unfallkennzeichen müssen den Regeln der Profiling entsprechen"),
+  EXTENDED_VALUE_SET_DARREICHUNGSFORMEN("EXTENDED_DARREICHUNG", "Aktualisierte Schlüsseltabelle für Darreichungsformen")
+  ;
 
   @Getter private final Requirement requirement;
 

@@ -21,6 +21,7 @@ import static java.text.MessageFormat.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
@@ -36,19 +37,29 @@ public class PatientActor extends ErpActor {
     super(ActorType.PATIENT, name);
   }
 
-  public String getKvnr() {
+  public KVNR getKvnr() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    return bd.getKvid();
+    return bd.getKvnr();
   }
 
-  public void changeInsuranceType(VersicherungsArtDeBasis insuranceType) {
+  public void changePatientInsuranceType(VersicherungsArtDeBasis insuranceType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    bd.setVersicherungsArt(insuranceType);
+    bd.setPatientInsuranceType(insuranceType);
   }
 
-  public VersicherungsArtDeBasis getInsuranceType() {
+  public void changeCoverageInsuranceType(VersicherungsArtDeBasis coverageType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    return bd.getVersicherungsArt();
+    bd.setCoverageInsuranceType(coverageType);
+  }
+
+  public VersicherungsArtDeBasis getPatientInsuranceType() {
+    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
+    return bd.getPatientInsuranceType();
+  }
+
+  public VersicherungsArtDeBasis getCoverageInsuranceType() {
+    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
+    return bd.getCoverageInsuranceType();
   }
 
   public KbvPatient getPatientData() {
@@ -64,7 +75,7 @@ public class PatientActor extends ErpActor {
   public Optional<AssignerOrganization> getAssignerOrganization() {
     Optional<AssignerOrganization> ret = Optional.empty();
     // an assigner Organization for PKV is only required for kbv.ita.erp == 1.0.2
-    if (this.getInsuranceType() == VersicherungsArtDeBasis.PKV
+    if (this.getPatientInsuranceType() == VersicherungsArtDeBasis.PKV
         && KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
 
       // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
@@ -79,6 +90,6 @@ public class PatientActor extends ErpActor {
 
   @Override
   public String toString() {
-    return format("{0} {1} {2}", this.getInsuranceType().getCode(), type, this.getName());
+    return format("{0} {1} {2}", this.getPatientInsuranceType().getCode(), type, this.getName());
   }
 }

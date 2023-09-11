@@ -61,7 +61,7 @@ class KbvBundleManipulatorFactoryTest extends ParsingTest {
                 m ->
                     (Executable)
                         () -> {
-                          val kbvBundle = KbvErpBundleBuilder.faker("X123456789").build();
+                          val kbvBundle = KbvErpBundleBuilder.faker().build();
                           assertDoesNotThrow(() -> m.getParameter().accept(kbvBundle));
                           val encoded = parser.encode(kbvBundle, EncodingType.XML);
                           val result = parser.validate(encoded);

@@ -31,7 +31,7 @@ class AbdaErpPkvVersionTest {
     val defaultVersion = AbdaErpPkvVersion.getDefaultVersion();
 
     // Note: this assertion will break in the future!
-    assertEquals(AbdaErpPkvVersion.V1_1_0, defaultVersion);
+    assertEquals(AbdaErpPkvVersion.V1_2_0, defaultVersion);
   }
 
   @Test

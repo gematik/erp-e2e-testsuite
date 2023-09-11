@@ -1,0 +1,63 @@
+
+== Installation
+Das Tool kann als Docker-Container direkt aus link:https://hub.docker.com/r/gematik1/erp-cli-fhir[gematik1/erp-cli-fhir@DockerHub] mit der nachfolgenden Anleitung installiert und gestartet werden.
+
+Docker-Image mit link:https://docs.docker.com/engine/reference/commandline/pull/[docker pull] aus dem DockerHub beziehen:
+
+[source,shell]
+----
+docker pull gematik1/erp-cli-fhir
+----
+
+Docker-Container mit link:https://docs.docker.com/engine/reference/commandline/run/[docker run] starten:
+
+[source,shell]
+----
+docker run --name ${CONTAINER_NAME} -v ${FULL_HOST_PATH}:/mnt/shared -dt gematik1/erp-cli-fhir
+----
+
+- `${CONTAINER_NAME}` frei wählbarer Name für den Container mit dem dieser später angesprochen werden kann. Empfohlen und in diesem Manual wird der Name {APP}
+- `${FULL_HOST_PATH}` ist der Pfad zum _shared directory_ auf dem host. {APP} wird dieses Verzeichnis nutzen, um FHIR Ressourcen hier abzulegen und von hier zu lesen
+
+[CAUTION]
+Sollte das Starten des Containers mit der Fehlermeldung `Error response from daemon: user declined directory sharing` fehlschlagen, benötigt Docker noch eine link:https://stackoverflow.com/questions/70877785/docker-error-response-from-daemon-user-declined-directory-sharing[Berechtigung um den Ordner zwischen dem Container und dem Host teilen zu dürfen]: In menu:Docker-Desktop[Settings > Resources > File sharing] muss `${FULL_HOST_PATH}` eingefügt werden
+
+[IMPORTANT]
+Das Mount-Verzeichnis `/mnt/shared` innerhalb des Containers ist als Arbeitsverzeichnis vordefiniert und sollte so direkt übernommen werden.
+
+Nach dem link:https://docs.docker.com/engine/reference/commandline/run/[docker run] Befehl ist der Container bereits hochgefahren und bereit für die Ausführung.
+Mit dem link:https://docs.docker.com/engine/reference/commandline/exec/[docker exec] Kommando kann nun eine interaktive Shell im Docker-Container geöffnet werden, aus der heraus {APP} ausgeführt werden kann:
+
+[source,shell]
+----
+docker exec -it ${CONTAINER_NAME} /bin/zsh
+----
+
+[NOTE]
+Grundsätzlich kann hier auch die normale `/bin/sh` Shell verwendet werden, die link:https://www.zsh.org/[zsh] (mit link:https://ohmyz.sh/[oh-my-zsh]) bietet hier allerdings wesentliche Vorteile wie z.B. _command-completion_ oder _command-suggestions_ und ist deshalb die empfohlene Shell.
+
+In der interaktiven Shell kann {APP} nun über `erpf` ausgeführt werden:
+
+[source,shell]
+----
+erpf lsp
+----
+
+=== Hilfe
+Dieses User Manual dient als ein Einstiegspunkt und Anleitung um dem Benutzer eine Übersicht über die gängigsten Anwendungsfälle, Kommandos, Argumente und Schalter von {APP} zu vermitteln. Es nicht das Ziel und auch nicht möglich den vollen Umfang mit allen Variationen zu dokumentieren. {APP} nutzt einen Linux-Unterbau und folgt in der Regel auch den Linux-Konventionen für CLI wie z.B. link:https://clig.dev/#guidelines[CLI Guidlines].
+
+Deshalb bietet {APP} zu sämtlichen Kommandos eine Hilfe über das `--help` Flag bzw. Man-Pages über link:https://wiki.ubuntuusers.de/man/[`man`] an. So kann der Benutzer über das folgende Kommando die Man-Page oder die Hilfe für das Haupt-Kommando `erpf` anzeigen lassen:
+
+[source,shell]
+----
+man erpf
+erpf --help
+----
+
+Sämtliche Sub-Kommandos haben ihre eigene Hilfe und auch eigene Man-Pages die folgendermaßen aufgerufen werden können:
+
+[source,shell]
+----
+man erpf validate
+erpf transcode --help
+----

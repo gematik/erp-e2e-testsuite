@@ -18,7 +18,6 @@ package de.gematik.test.erezept;
 
 import de.gematik.test.core.expectations.ErpResponseExpectation;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ICommand;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.OperationOutcome;
@@ -28,28 +27,26 @@ import org.hl7.fhir.r4.model.Resource;
 @Getter
 public class ErpInteraction<R extends Resource> {
 
-  private final Class<R> expectedBody;
-  private final ErpResponse response;
+  private final ErpResponse<R> response;
 
-  public ErpInteraction(ICommand<R> request, ErpResponse response) {
-    this(request.expectedResponseBody(), response);
-  }
-
-  public ErpInteraction(Class<R> expectedBody, ErpResponse response) {
-    this.expectedBody = expectedBody;
+  public ErpInteraction(ErpResponse<R> response) {
     this.response = response;
   }
 
+  public final Class<R> getExpectedType() {
+    return response.getExpectedType();
+  }
+
   public final boolean isOfExpectedType() {
-    return response.isResourceOfType(expectedBody);
+    return response.isOfExpectedType();
   }
 
   public final R getExpectedResponse() {
-    return response.getResource(expectedBody);
+    return response.getExpectedResource();
   }
 
   public final ErpResponseExpectation<R> expectation() {
-    return ErpResponseExpectation.expectFor(response, expectedBody);
+    return ErpResponseExpectation.expectFor(response, response.getExpectedType());
   }
 
   public final ErpResponseExpectation<Resource> asIndefiniteResource() {

@@ -21,6 +21,9 @@ import de.gematik.test.core.exceptions.NotAnActorException;
 import de.gematik.test.core.extensions.ErpTestExtension;
 import de.gematik.test.erezept.actors.*;
 import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
+import de.gematik.test.erezept.toggle.CucumberFeatureParser;
+import de.gematik.test.erezept.toggle.CucumberFeatureToggle;
+import de.gematik.test.erezept.toggle.FeatureConfiguration;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import lombok.SneakyThrows;
@@ -29,6 +32,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(ErpTestExtension.class)
 public abstract class ErpTest {
+
+  protected static final FeatureConfiguration featureConf = new FeatureConfiguration();
+  protected static final CucumberFeatureParser cucumberFeatures =
+      featureConf.getToggle(new CucumberFeatureToggle());
 
   protected final ActorStage stage;
 

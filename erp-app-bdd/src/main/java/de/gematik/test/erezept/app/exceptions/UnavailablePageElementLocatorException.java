@@ -18,7 +18,7 @@ package de.gematik.test.erezept.app.exceptions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PageElement;
 
 public class UnavailablePageElementLocatorException extends RuntimeException {

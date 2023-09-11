@@ -16,20 +16,16 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.cfg;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.gematik.test.erezept.fhir.exceptions.FhirProfileException;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
-import java.beans.Transient;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import lombok.Data;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.dataformat.yaml.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.*;
+import java.beans.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Data
 @Slf4j
@@ -89,7 +85,7 @@ public class ParserConfigurations {
 
   public Optional<ProfileSettingConfig> getDefaultConfiguration() {
     val envSetVersion = System.getProperty(SYS_PROP_TOGGLE, System.getenv(ENV_TOGGLE));
-    if (envSetVersion != null) {
+    if (envSetVersion != null && !envSetVersion.isEmpty()) {
       return Optional.of(getValidatorConfiguration(envSetVersion));
     } else {
       return Optional.empty();

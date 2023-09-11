@@ -18,7 +18,7 @@ package de.gematik.test.konnektor.commands;
 
 import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.*;
+import de.gematik.test.cardterminal.*;
 import de.gematik.test.konnektor.soap.*;
 import de.gematik.test.smartcard.*;
 import de.gematik.ws.conn.connectorcommon.v5.*;
@@ -34,16 +34,16 @@ import org.apache.commons.codec.digest.*;
 @Slf4j
 public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]> {
 
-  private final CardHandle cardHandle;
+  private final CardInfo cardInfo;
   private final Crypto algorithm;
   private byte[] toBeSignedData;
 
-  public ExternalAuthenticateCommand(CardHandle cardHandle) {
-    this(cardHandle, Crypto.RSA_PSS_2048);
+  public ExternalAuthenticateCommand(CardInfo cardInfo) {
+    this(cardInfo, Crypto.RSA_PSS_2048);
   }
 
-  public ExternalAuthenticateCommand(CardHandle cardHandle, Crypto algorithm) {
-    this.cardHandle = cardHandle;
+  public ExternalAuthenticateCommand(CardInfo cardInfo, Crypto algorithm) {
+    this.cardInfo = cardInfo;
     this.algorithm = algorithm;
   }
 
@@ -56,7 +56,7 @@ public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]
     log.trace(
         format(
             "External Authenticate with CardHandle {0} and challenge of length {1}",
-            cardHandle.getHandle(), toBeSignedData.length));
+            cardInfo.getHandle(), toBeSignedData.length));
     val servicePort = serviceProvider.getAuthSignatureService();
 
     val binaryDocument = new BinaryDocumentType();
@@ -81,7 +81,7 @@ public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]
     this.executeAction(
         () ->
             servicePort.externalAuthenticate(
-                cardHandle.getHandle(),
+                cardInfo.getHandle(),
                 ctx,
                 optionalInputs,
                 binaryDocument,

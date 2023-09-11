@@ -30,7 +30,12 @@ import java.util.concurrent.ConcurrentMap;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.glassfish.grizzly.http.HttpRequestPacket;
-import org.glassfish.grizzly.websockets.*;
+import org.glassfish.grizzly.websockets.DataFrame;
+import org.glassfish.grizzly.websockets.ProtocolHandler;
+import org.glassfish.grizzly.websockets.SimpleWebSocket;
+import org.glassfish.grizzly.websockets.WebSocket;
+import org.glassfish.grizzly.websockets.WebSocketApplication;
+import org.glassfish.grizzly.websockets.WebSocketListener;
 
 @Slf4j
 public class GrizzlyWsServerApp extends WebSocketApplication implements WsServerToUse {
@@ -110,22 +115,22 @@ public class GrizzlyWsServerApp extends WebSocketApplication implements WsServer
    */
   public void send(String receiver, String message) {
     var socket = this.socketsMap.get(receiver);
-    if (socket == null) {
-      throw new WebApplicationException(
-          "no fitted receiver connected", Response.status(404).build());
-    }
-    socket.send(message);
+    if (socket != null) socket.send(message);
+    else log.info("no receiver ");
   }
 
   public void send(String telemId, PspMessage pspMessage) {
     log.info(
         "@Send teleId: {}, pspMessage.getBlob().lenght: {}", telemId, pspMessage.getBlob().length);
-    if (telemId == null || pspMessage.getBlob() == null) {
+    if (pspMessage.getBlob().length < 1) {
       throw new WebApplicationException(
-          "no fitted receiver connected cause NO  Telematik Id received or blob == null",
-          Response.status(404)
-              .entity(
-                  "no fitted receiver connected cause NO  Telematik Id  received or blob == null")
+          "No payload has arrived", Response.status(404).entity("blob == null or empty").build());
+    }
+    if (telemId == null) {
+      throw new WebApplicationException(
+          "no fitted receiver connected cause NO  Telematik Id received",
+          Response.status(420)
+              .entity("no fitted receiver connected cause NO Telematik Id")
               .build());
 
     } else {
@@ -145,7 +150,7 @@ public class GrizzlyWsServerApp extends WebSocketApplication implements WsServer
       throw new WebApplicationException(
           format(
               "no fitted receiver connected @ specific TelematikId: %s", pspMessage.getClientId()),
-          Response.status(404)
+          Response.status(200)
               .entity(
                   format(
                       "no fitted receiver connected @ specific TelematikId: %s",

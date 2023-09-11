@@ -16,16 +16,25 @@
 
 package de.gematik.test.erezept.fhirdump;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.*;
-import java.io.*;
-import java.nio.file.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import io.cucumber.java.Scenario;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.function.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.thucydides.core.model.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.thucydides.core.model.TestOutcome;
 
 @Slf4j
 public class FhirDumper {
@@ -53,29 +62,28 @@ public class FhirDumper {
     basePath.toFile().mkdirs();
   }
 
-  public static FhirDumper getInstance() {
-    if (instance == null) {
-      instance = new FhirDumper(Path.of(System.getProperty("user.dir"), "target", "fhir_dumps"));
-    }
-    return instance;
-  }
-
-  public void startScenario(String id, String name) {
+  public void startScenario(Scenario scenario) {
     this.currentScenario = new ScenarioDump();
-    this.currentScenario.setId(id);
-    this.currentScenario.setName(name);
+    this.currentScenario.setId(scenario.getId());
+    this.currentScenario.setName(scenario.getName());
+    this.currentScenario.getTags().addAll(scenario.getSourceTagNames());
     this.scenarios.add(this.currentScenario);
     this.dumpCounter = 0;
   }
 
   public void finishScenario(TestOutcome testOutcome) {
+    log.info(
+        format(
+            "Finish Scenario {0} with result {1}",
+            this.currentScenario.getName(), testOutcome.getResult().getLabel()));
     val summary = new ScenarioSummary();
     summary.setName(this.currentScenario.getName());
     summary.setId(this.currentScenario.getId());
     summary.setDescription(this.currentScenario.getDescription());
     summary.setFeatureFile(this.currentScenario.getFeatureFile());
     summary.setFeature(this.currentScenario.getFeature());
-    summary.setResult(testOutcome.getResult().getLabel());
+    summary.setTags(this.currentScenario.getTags());
+
     this.currentScenario = null;
     this.index.getScenarios().add(summary);
   }
@@ -118,7 +126,7 @@ public class FhirDumper {
 
     val scenarioBasePath = getScenarioBasePath(this.currentScenario);
     val dumpIdx = dumpCounter++;
-    val idxFileName = format("{0}_{1}", dumpIdx, fileName);
+    val idxFileName = format("{0,number,000}_{1}", dumpIdx, fileName);
 
     val dumpFilePath = Path.of(scenarioBasePath, idxFileName);
     val dumpFile = dumpFilePath.toFile();
@@ -126,23 +134,38 @@ public class FhirDumper {
   }
 
   private String getScenarioBasePath(ScenarioDump scenario) {
-    //    val featureDir = scenario.getId().split(";")[0];  // should not be required
-    val scenarioId = scenario.getName().toLowerCase().replace(" ", "_");
-    return Path.of(basePath.toString(), scenarioId).toString();
+    val scenarioId = scenario.getName().toLowerCase().replaceAll("[^\\dA-Za-züÜöÖäÄß]", "_").trim();
+    val mainActor = scenario.getMainActor();
+
+    val path = new AtomicReference<Path>();
+    mainActor.ifPresentOrElse(
+        actor -> path.set(Path.of(basePath.toString(), actor, scenarioId)),
+        () -> path.set(Path.of(basePath.toString(), "Allgemein", scenarioId)));
+
+    return path.get().toString();
   }
 
   @SneakyThrows
   public void writeDumpSummary() {
-    val mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
+    val mapper = new ObjectMapper().registerModule(new Jdk8Module());
+    val objectWriter = mapper.writerWithDefaultPrettyPrinter();
     val indexFile = basePath.resolve("fhir_dump.json").toFile();
     this.index.setRecorded(new Date());
-    mapper.writeValue(indexFile, this.index);
+    objectWriter.writeValue(indexFile, this.index);
 
     for (val scenario : this.scenarios) {
-      val scenarioFile = Path.of(getScenarioBasePath(scenario), "index.json").toFile();
+      val scenarioFile =
+          Path.of(getScenarioBasePath(scenario), "index.json").toAbsolutePath().toFile();
       if (scenarioFile.getParentFile().exists() && scenarioFile.getParentFile().isDirectory()) {
-        mapper.writeValue(scenarioFile, scenario);
+        objectWriter.writeValue(scenarioFile, scenario);
       }
     }
+  }
+
+  public static FhirDumper getInstance() {
+    if (instance == null) {
+      instance = new FhirDumper(Path.of(System.getProperty("user.dir"), "target", "fhir_dumps"));
+    }
+    return instance;
   }
 }

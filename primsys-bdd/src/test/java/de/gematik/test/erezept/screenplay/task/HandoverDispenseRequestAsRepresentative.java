@@ -27,7 +27,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +52,7 @@ public class HandoverDispenseRequestAsRepresentative implements Task {
             .filter(exp -> exp.getReceiverName().equals(actor.getName()))
             .filter(exp -> exp.getSenderName().equals(owner.getName()))
             .filter(exp -> exp.getType().equals(CommunicationType.REPRESENTATIVE))
-            .collect(Collectors.toList());
+            .toList();
 
     if (expectedCommunications.isEmpty()) {
       throw new MissingPreconditionError(
@@ -62,9 +61,18 @@ public class HandoverDispenseRequestAsRepresentative implements Task {
               actor.getName(), owner.getName()));
     }
     val expected = deque.chooseFrom(expectedRepresentatives);
-    val getByIdCmd = new CommunicationGetByIdCommand(expected.getCommunicationId());
+    val id =
+        expected
+            .getCommunicationId()
+            .orElseThrow(
+                () ->
+                    new MissingPreconditionError(
+                        format(
+                            "Expected communication from {0} with Type {1} does not have an ID",
+                            expected.getSenderName(), expected.getType())));
+    val getByIdCmd = new CommunicationGetByIdCommand(id);
     val response = erpClient.request(getByIdCmd);
-    val com = response.getResource(getByIdCmd.expectedResponseBody());
+    val com = response.getExpectedResource();
 
     val taskId = com.getBasedOnReferenceId();
     val accessCode =

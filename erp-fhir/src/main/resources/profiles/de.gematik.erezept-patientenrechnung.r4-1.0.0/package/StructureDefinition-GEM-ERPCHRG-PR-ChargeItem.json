@@ -15,6 +15,8 @@
   "version": "1.0",
   "name": "GEM_ERPCHRG_PR_ChargeItem",
   "status": "draft",
+  "experimental": false,
+  "publisher": "gematik GmbH",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -51,11 +53,26 @@
         "min": 1
       },
       {
+        "id": "ChargeItem.meta.versionId",
+        "path": "ChargeItem.meta.versionId",
+        "max": "0"
+      },
+      {
+        "id": "ChargeItem.meta.source",
+        "path": "ChargeItem.meta.source",
+        "max": "0"
+      },
+      {
         "id": "ChargeItem.meta.profile",
         "path": "ChargeItem.meta.profile",
         "min": 1,
         "max": "1",
         "fixedCanonical": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_ChargeItem|1.0"
+      },
+      {
+        "id": "ChargeItem.meta.security",
+        "path": "ChargeItem.meta.security",
+        "max": "0"
       },
       {
         "id": "ChargeItem.extension",
@@ -110,15 +127,18 @@
         "short": "Prescription Identifier",
         "definition": "The prescription identifier is the main identifier for all the ePrecscription related ressources and the whole prescription workflow. This identifier is genereted by the \"E-Rezept Fachdienst\" and must not be changed manually.",
         "min": 1,
-        "max": "1",
-        "type": [
-          {
-            "code": "Identifier",
-            "profile": [
-              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PrescriptionId"
-            ]
-          }
-        ]
+        "max": "1"
+      },
+      {
+        "id": "ChargeItem.identifier:PrescriptionID.system",
+        "path": "ChargeItem.identifier.system",
+        "min": 1,
+        "fixedUri": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"
+      },
+      {
+        "id": "ChargeItem.identifier:PrescriptionID.value",
+        "path": "ChargeItem.identifier.value",
+        "min": 1
       },
       {
         "id": "ChargeItem.identifier:AccessCode",
@@ -190,9 +210,103 @@
       {
         "id": "ChargeItem.supportingInformation",
         "path": "ChargeItem.supportingInformation",
-        "definition": "holds references to the 3 relevant documents [prescription, receipt, dispensationInformation] ",
-        "max": "3",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "display"
+            }
+          ],
+          "rules": "closed"
+        },
+        "definition": "holds references to the 3 relevant documents [prescription, receipt, dispensationInformation]",
+        "min": 1,
+        "max": "4",
         "mustSupport": true
+      },
+      {
+        "id": "ChargeItem.supportingInformation:prescriptionItemBundle",
+        "path": "ChargeItem.supportingInformation",
+        "sliceName": "prescriptionItemBundle",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Bundle"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ChargeItem.supportingInformation:prescriptionItemBundle.display",
+        "path": "ChargeItem.supportingInformation.display",
+        "min": 1,
+        "fixedString": "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle"
+      },
+      {
+        "id": "ChargeItem.supportingInformation:dispenseItemBinary",
+        "path": "ChargeItem.supportingInformation",
+        "sliceName": "dispenseItemBinary",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Binary"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ChargeItem.supportingInformation:dispenseItemBinary.display",
+        "path": "ChargeItem.supportingInformation.display",
+        "min": 1,
+        "fixedString": "Binary"
+      },
+      {
+        "id": "ChargeItem.supportingInformation:dispenseItemBundle",
+        "path": "ChargeItem.supportingInformation",
+        "sliceName": "dispenseItemBundle",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Bundle"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ChargeItem.supportingInformation:dispenseItemBundle.display",
+        "path": "ChargeItem.supportingInformation.display",
+        "min": 1,
+        "fixedString": "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle"
+      },
+      {
+        "id": "ChargeItem.supportingInformation:receiptBundle",
+        "path": "ChargeItem.supportingInformation",
+        "sliceName": "receiptBundle",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Bundle"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ChargeItem.supportingInformation:receiptBundle.display",
+        "path": "ChargeItem.supportingInformation.display",
+        "min": 1,
+        "fixedString": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle"
       }
     ]
   }

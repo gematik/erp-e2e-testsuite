@@ -17,7 +17,6 @@
 package de.gematik.test.erezept.primsys.rest.data;
 
 import static de.gematik.test.erezept.primsys.rest.data.MedicationData.create;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,7 +53,7 @@ class MedicationDataTest {
 
   @Test
   void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
-    val kbvBundle = KbvErpBundleBuilder.faker("X123456789", "04773414").build();
+    val kbvBundle = KbvErpBundleBuilder.faker().build();
     val data = MedicationData.fromKbvBundle(kbvBundle);
     assertNotNull(data);
     Assertions.assertEquals(kbvBundle.getMedication().getMedicationName(), data.getName());

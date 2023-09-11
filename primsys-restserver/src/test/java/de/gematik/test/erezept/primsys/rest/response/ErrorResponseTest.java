@@ -23,11 +23,13 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Narrative;
 import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,9 +53,9 @@ public class ErrorResponseTest {
   @Test
   public void shouldEncodeOperationOutcomeErrorResponse() throws JsonProcessingException {
     val oo = createOperationOutcome();
-    val erpResponse = mock(ErpResponse.class);
+    ErpResponse<ErxCommunication> erpResponse = mock(ErpResponse.class);
     when(erpResponse.isOperationOutcome()).thenReturn(true);
-    when(erpResponse.getResource(OperationOutcome.class)).thenReturn(oo);
+    when(erpResponse.getAsOperationOutcome()).thenReturn(oo);
 
     val response = new ErrorResponse(erpResponse);
     assertNotNull(response.getMessage());
@@ -65,9 +67,9 @@ public class ErrorResponseTest {
   @Test
   public void shouldEncodeUnexpectedResourceErrorResponse() throws JsonProcessingException {
     val erxTask = mock(ErxTask.class);
-    val erpResponse = mock(ErpResponse.class);
+    ErpResponse<ErxTask> erpResponse = mock(ErpResponse.class);
     when(erpResponse.isOperationOutcome()).thenReturn(false);
-    when(erpResponse.getResource(ErxTask.class)).thenReturn(erxTask);
+    when(erpResponse.getExpectedResource()).thenReturn(erxTask);
 
     val response = new ErrorResponse(erpResponse);
     assertNotNull(response.getMessage());
@@ -78,7 +80,7 @@ public class ErrorResponseTest {
 
   @Test
   public void shouldEncodeErrorResponseFromEmptyResponse() throws JsonProcessingException {
-    val erpResponse = mock(ErpResponse.class);
+    ErpResponse<Resource> erpResponse = mock(ErpResponse.class);
     when(erpResponse.isEmptyBody()).thenReturn(true);
 
     val response = new ErrorResponse(erpResponse);

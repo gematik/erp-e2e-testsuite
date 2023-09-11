@@ -19,24 +19,20 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.PrimitiveType;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a>
@@ -47,45 +43,25 @@ import org.hl7.fhir.r4.model.Task;
 public class ErxTask extends Task {
 
   /**
-   * This constructor translates a Task into a ErxTask. For example if you receive an
-   * ErxPrescriptionBundle HAPI interprets the containing Task as plain HAPI-Task and not as a
-   * ErxTask. This constructor allows mapping to ErxTask
-   *
-   * @param adaptee
-   */
-  public static ErxTask fromTask(Task adaptee) {
-    val erxTask = new ErxTask();
-    adaptee.copyValues(erxTask);
-    return erxTask;
-  }
-
-  public static ErxTask fromTask(Resource adaptee) {
-    return fromTask((Task) adaptee);
-  }
-
-  /**
    * While ErxTask.getId() returns a qualified ID (Task/[ID]) this method will return only the
    * plain/unqualified ID
    *
    * @return the unqualified ID without the prefixed resource type
    */
-  public String getUnqualifiedId() {
+  private String getUnqualifiedId() {
     val taskIdTokens = this.getId().split("/");
     return taskIdTokens[taskIdTokens.length - 1];
   }
 
+  public TaskId getTaskId() {
+    return TaskId.from(this.getUnqualifiedId());
+  }
+
   public PrescriptionId getPrescriptionId() {
     return this.getIdentifier().stream()
-        .filter(
-            identifier ->
-                ErpWorkflowNamingSystem.PRESCRIPTION_ID
-                        .getCanonicalUrl()
-                        .equals(identifier.getSystem())
-                    || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121
-                        .getCanonicalUrl()
-                        .equals(identifier.getSystem()))
-        .map(identifier -> new PrescriptionId(identifier.getValue()))
-        .findFirst() // Prescription ID has cardinality of 1..1 anyway
+        .filter(PrescriptionId::isPrescriptionId)
+        .map(PrescriptionId::from)
+        .findFirst()
         .orElseThrow(
             () ->
                 new MissingFieldException(
@@ -95,7 +71,6 @@ public class ErxTask extends Task {
   }
 
   public PrescriptionFlowType getFlowType() {
-    //    return this.getExtensionsByUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl())
     return this.getExtension().stream()
         .filter(
             extension ->
@@ -164,8 +139,45 @@ public class ErxTask extends Task {
     return PerformerType.fromCode(this.getPerformerTypeFirstRep().getCodingFirstRep().getCode());
   }
 
-  public Optional<String> getForKvid() {
-    return Optional.ofNullable(this.getFor().getIdentifier().getValue());
+  public Optional<KVNR> getForKvnr() {
+    val kvnrValue = this.getFor().getIdentifier().getValue();
+    if (kvnrValue == null) {
+      return Optional.empty();
+    } else {
+      return Optional.of(KVNR.from(kvnrValue));
+    }
+  }
+
+  public Date getExpiryDate() {
+    return this.getExtension().stream()
+        .filter(
+            ext ->
+                ErpWorkflowStructDef.EXPIRY_DATE_12.match(ext.getUrl())
+                    || ErpWorkflowStructDef.EXPIRY_DATE.match(ext.getUrl()))
+        .map(ext -> DateConverter.getInstance().dateFromIso8601(ext.getValue().primitiveValue()))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new MissingFieldException(
+                    this.getClass(),
+                    ErpWorkflowStructDef.EXPIRY_DATE_12,
+                    ErpWorkflowStructDef.EXPIRY_DATE));
+  }
+
+  public Date getAcceptDate() {
+    return this.getExtension().stream()
+        .filter(
+            ext ->
+                ErpWorkflowStructDef.ACCEPT_DATE_12.match(ext.getUrl())
+                    || ErpWorkflowStructDef.ACCEPT_DATE.match(ext.getUrl()))
+        .map(ext -> DateConverter.getInstance().dateFromIso8601(ext.getValue().primitiveValue()))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new MissingFieldException(
+                    this.getClass(),
+                    ErpWorkflowStructDef.ACCEPT_DATE_12,
+                    ErpWorkflowStructDef.ACCEPT_DATE));
   }
 
   @Override
@@ -175,5 +187,26 @@ public class ErxTask extends Task {
             .map(PrimitiveType::asStringValue)
             .collect(Collectors.joining(", "));
     return format("{0} from Profile {1}", this.getClass().getSimpleName(), profile);
+  }
+
+  /**
+   * This constructor translates a Task into a ErxTask. For example if you receive an
+   * ErxPrescriptionBundle HAPI interprets the containing Task as plain HAPI-Task and not as a
+   * ErxTask. This constructor allows mapping to ErxTask
+   *
+   * @param adaptee
+   */
+  public static ErxTask fromTask(Task adaptee) {
+    if (adaptee instanceof ErxTask erxTask) {
+      return erxTask;
+    } else {
+      val erxTask = new ErxTask();
+      adaptee.copyValues(erxTask);
+      return erxTask;
+    }
+  }
+
+  public static ErxTask fromTask(Resource adaptee) {
+    return fromTask((Task) adaptee);
   }
 }

@@ -17,9 +17,7 @@
 package de.gematik.test.erezept.screenplay.util;
 
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -27,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DispenseReceipt {
 
-  private final String receiverKvid;
-  private final String taskId;
+  private final KVNR receiverKvnr;
+  private final TaskId taskId;
   private final PrescriptionId prescriptionId;
   private final AccessCode accessCode;
   private final Secret secret;

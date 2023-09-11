@@ -16,10 +16,6 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -27,6 +23,7 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.TheTask;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -39,40 +36,53 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructD
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.core.ParameterPair;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import net.thucydides.core.annotations.WithTag;
 import org.hl7.fhir.r4.model.Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
+import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleContainsAccident;
+import static java.text.MessageFormat.format;
+
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept mit Unfallkennzeichen ausstellen")
+@Tag("Feature:Unfallkennzeichen")
+@WithTag("Feature:Unfallkennzeichen")
 class ActivateAccidentPrescription extends ErpTest {
 
-  @Actor(name = "Bernd Claudius")
-  private DoctorActor bernd;
+    @Actor(name = "Bernd Claudius")
+    private DoctorActor bernd;
 
-  @Actor(name = "Sina Hüllmann")
-  private PatientActor sina;
+    @Actor(name = "Sina Hüllmann")
+    private PatientActor sina;
 
-  @TestcaseId("ERP_TASK_ACTIVATE_ACCIDENT_01")
-  @ParameterizedTest(
+    @TestcaseId("ERP_TASK_ACTIVATE_ACCIDENT_01")
+    @ParameterizedTest(
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Unfallkennzeichen {2} aus")
   @DisplayName("E-Rezept mit validem Unfallkennzeichen ausstellen")
@@ -82,7 +92,12 @@ class ActivateAccidentPrescription extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       AccidentExtension accident) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
+
+    if (!accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT)) {
+      // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a "Berufsgenossenschaft"
+      sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+    }
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
     val medicationRequest =
@@ -95,6 +110,7 @@ class ActivateAccidentPrescription extends ErpTest {
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.faker(sina.getKvnr())
+            .practitioner(bernd.getPractitioner())
             .medicationRequest(medicationRequest) // what is the medication
             .medication(medication);
 
@@ -108,34 +124,51 @@ class ActivateAccidentPrescription extends ErpTest {
             .withExpectedType(ErpAfos.A_19022)
             .hasResponseWith(returnCode(200))
             .isCorrect());
+
+    val taskGetInteraction = sina.asksFor(TheTask.fromBackend(activation.getExpectedResponse()));
+    sina.attemptsTo(
+            Verify.that(taskGetInteraction)
+                    .withExpectedType()
+                    .hasResponseWith(returnCodeIs(200))
+                    .and(bundleContainsAccident(accident))
+                    .isCorrect());
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_ACCIDENT_02")
   @ParameterizedTest(
-      name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit {2} aus")
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit {2} aus")
   @DisplayName("E-Rezept mit ungültigem Unfallkennzeichen ausstellen")
   @MethodSource("accidentTypesWithManipulators")
   void activatePrescriptionWithInvalidatedAccidentExtension(
       VersicherungsArtDeBasis insuranceType,
       PrescriptionAssignmentKind assignmentKind,
-      NamedEnvelope<ParameterPair<AccidentExtension, Consumer<KbvErpBundle>>> kbvBundleManipulator) {
+      NamedEnvelope<ParameterPair<AccidentExtension, Consumer<KbvErpBundle>>>
+          kbvBundleManipulator) {
 
-    sina.changeInsuranceType(insuranceType);
+    val accident = kbvBundleManipulator.getParameter().getFirst();
+    sina.changePatientInsuranceType(insuranceType);
+
+    if (!accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT)) {
+      // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a "Berufsgenossenschaft"
+      sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+    }
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
     val medicationRequest =
         MedicationRequestBuilder.faker(sina.getPatientData())
             .insurance(sina.getInsuranceCoverage())
             .requester(bernd.getPractitioner())
-            .accident(kbvBundleManipulator.getParameter().getFirst())
+            .accident(accident)
             .medication(medication)
             .build();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.faker(sina.getKvnr())
+            .practitioner(bernd.getPractitioner())
             .medicationRequest(medicationRequest) // what is the medication
-            .medication(medication);
+            .medication(medication)
+            .patient(sina.getPatientData())
+            .insurance(sina.getInsuranceCoverage());
 
     val activation =
         bernd.performs(
@@ -156,18 +189,22 @@ class ActivateAccidentPrescription extends ErpTest {
             AccidentExtension.accident(),
             AccidentExtension.accidentAtWork().atWorkplace(),
             AccidentExtension.occupationalDisease());
-    return ArgumentComposer.composeWith()
+
+    val composer = ArgumentComposer.composeWith()
         .arguments(
             VersicherungsArtDeBasis.GKV, // given insurance kind
             PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-        // not yet implemented
-        //        .of(
-        //            VersicherungsArtDeBasis.PKV,
-        //            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-        .multiplyAppend(accidentTypes)
-        .create();
+            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
+    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
+              composer.arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+              .arguments(
+                      VersicherungsArtDeBasis.PKV,
+                      PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+    }
+
+
+        return composer.multiplyAppend(accidentTypes).create();
   }
 
   static Stream<Arguments> accidentTypesWithManipulators() {
@@ -177,61 +214,79 @@ class ActivateAccidentPrescription extends ErpTest {
                 format("Unfallkennzeichen mit ungültigem Code 3"),
                 ParameterPair.of(
                     AccidentExtension.accident(),
-                    (Consumer<KbvErpBundle>) b -> {
-                      val outerAccidentExtension = getOuterAccidentExtension(b);
-                      val unfallKennzeichen = getInnerUnfallkennzeichenExtension(outerAccidentExtension);
-                      unfallKennzeichen.getValue().castToCoding(unfallKennzeichen.getValue()).setCode("3");
-                    })),
+                    (Consumer<KbvErpBundle>)
+                        b -> {
+                          val outerAccidentExtension = getOuterAccidentExtension(b);
+                          val unfallKennzeichen =
+                              getInnerUnfallkennzeichenExtension(outerAccidentExtension);
+                          unfallKennzeichen
+                              .getValue()
+                              .castToCoding(unfallKennzeichen.getValue())
+                              .setCode("3");
+                        })),
             NamedEnvelope.of(
                 format("Unfallkennzeichen 1 ohne Unfalltag"),
                 ParameterPair.of(
                     AccidentExtension.accident(),
-                    (Consumer<KbvErpBundle>) b -> {
-                      val outerAccidentExtension = getOuterAccidentExtension(b);
-                      val unfalltagExtension = getInnerUnfalltagExtension(outerAccidentExtension);
-                      outerAccidentExtension.getExtension().remove(unfalltagExtension);
-                    })),
+                    (Consumer<KbvErpBundle>)
+                        b -> {
+                          val outerAccidentExtension = getOuterAccidentExtension(b);
+                          val unfalltagExtension =
+                              getInnerUnfalltagExtension(outerAccidentExtension);
+                          outerAccidentExtension.getExtension().remove(unfalltagExtension);
+                        })),
             NamedEnvelope.of(
                 format("Unfallkennzeichen 2 ohne Unfalltag"),
                 ParameterPair.of(
                     AccidentExtension.accidentAtWork().atWorkplace(),
-                    (Consumer<KbvErpBundle>) b -> {
-                      val outerAccidentExtension = getOuterAccidentExtension(b);
-                      val unfalltagExtension = getInnerUnfalltagExtension(outerAccidentExtension);
-                      outerAccidentExtension.getExtension().remove(unfalltagExtension);
-                    })),
+                    (Consumer<KbvErpBundle>)
+                        b -> {
+                          val outerAccidentExtension = getOuterAccidentExtension(b);
+                          val unfalltagExtension =
+                              getInnerUnfalltagExtension(outerAccidentExtension);
+                          outerAccidentExtension.getExtension().remove(unfalltagExtension);
+                        })),
             NamedEnvelope.of(
                 format("Unfallkennzeichen 2 ohne Unfallbetrieb"),
                 ParameterPair.of(
                     AccidentExtension.accidentAtWork().atWorkplace(),
-                    (Consumer<KbvErpBundle>) b -> {
-                      val outerAccidentExtension = getOuterAccidentExtension(b);
-                      val unfallbetriebExtension = getInnerUnfallbetriebExtension(outerAccidentExtension);
-                      outerAccidentExtension.getExtension().remove(unfallbetriebExtension);
-                    }))
-        );
+                    (Consumer<KbvErpBundle>)
+                        b -> {
+                          val outerAccidentExtension = getOuterAccidentExtension(b);
+                          val unfallbetriebExtension =
+                              getInnerUnfallbetriebExtension(outerAccidentExtension);
+                          outerAccidentExtension.getExtension().remove(unfallbetriebExtension);
+                        })));
 
-    return ArgumentComposer.composeWith()
+    val composer = ArgumentComposer.composeWith()
         .arguments(
             VersicherungsArtDeBasis.GKV, // given insurance kind
             PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-        // not yet implemented
-        //        .of(
-        //            VersicherungsArtDeBasis.PKV,
-        //            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-        .multiplyAppend(accidentTypes)
-        .create();
+        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
+    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
+      composer
+              .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+              .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
+    }
+
+        return composer.multiplyAppend(accidentTypes).create();
   }
 
   private static Extension getOuterAccidentExtension(KbvErpBundle bundle) {
-    return bundle.getMedicationRequest().getExtension()
-        .stream()
-        .filter(ext -> ext.getUrl().equals(KbvItaErpStructDef.ACCIDENT.getCanonicalUrl())
-            || ext.getUrl().equals(KbvItaForStructDef.ACCIDENT.getCanonicalUrl()))
+    return bundle.getMedicationRequest().getExtension().stream()
+        .filter(
+            ext ->
+                ext.getUrl().equals(KbvItaErpStructDef.ACCIDENT.getCanonicalUrl())
+                    || ext.getUrl().equals(KbvItaForStructDef.ACCIDENT.getCanonicalUrl()))
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(KbvErpMedicationRequest.class, KbvItaForStructDef.ACCIDENT, KbvItaErpStructDef.ACCIDENT));
+        .orElseThrow(
+            () ->
+                new MissingFieldException(
+                    KbvErpMedicationRequest.class,
+                    KbvItaForStructDef.ACCIDENT,
+                    KbvItaErpStructDef.ACCIDENT));
   }
 
   private static Extension getInnerUnfallkennzeichenExtension(Extension outer) {
@@ -247,7 +302,8 @@ class ActivateAccidentPrescription extends ErpTest {
   }
 
   private static Extension getInnerAccidentExtension(Extension outer, String innerUrl) {
-    return outer.getExtension().stream().filter(ext -> ext.getUrl().equalsIgnoreCase(innerUrl))
+    return outer.getExtension().stream()
+        .filter(ext -> ext.getUrl().equalsIgnoreCase(innerUrl))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(KbvErpMedicationRequest.class, innerUrl));
   }

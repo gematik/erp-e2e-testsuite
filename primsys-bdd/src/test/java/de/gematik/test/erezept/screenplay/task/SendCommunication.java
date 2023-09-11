@@ -36,7 +36,7 @@ public class SendCommunication implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     val response = actor.asksFor(question);
-    val communication = response.getResource(question.expectedResponseBody());
+    val communication = response.getExpectedResource();
     val exchanged =
         ExchangedCommunication.from(actor.getName())
             .to(question.getReceiver().getName())

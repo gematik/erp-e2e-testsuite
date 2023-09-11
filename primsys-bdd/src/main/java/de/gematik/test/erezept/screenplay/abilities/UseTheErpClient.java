@@ -18,11 +18,13 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.*;
 
+import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
+import de.gematik.test.erezept.apimeasure.LoggingStopwatch;
 import de.gematik.test.erezept.client.*;
-import de.gematik.test.erezept.client.cfg.*;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhirdump.*;
+import de.gematik.test.erezept.jwt.JWTDecoder;
 import java.time.*;
 import java.time.format.*;
 import javax.annotation.*;
@@ -36,17 +38,21 @@ public class UseTheErpClient implements Ability {
 
   @Delegate(excludes = DelegateExclude.class)
   private final ErpClient client;
+  private final ApiCallStopwatch stopwatch;
+  private final JWTDecoder jwtDecoder;
 
-  private final ErpClientConfiguration config;
-
-  private UseTheErpClient(ErpClient client, ErpClientConfiguration config) {
+  private UseTheErpClient(ErpClient client, ApiCallStopwatch stopwatch) {
     this.client = client;
-    this.config = config;
+    this.stopwatch = stopwatch;
+    this.jwtDecoder = JWTDecoder.withPrettyPrinter();
   }
 
-  public static UseTheErpClient with(ErpClientConfiguration config) {
-    val client = ErpClientFactory.createErpClient(config);
-    return new UseTheErpClient(client, config);
+  public static UseTheErpClient with(ErpClient client) {
+    return with(client, new LoggingStopwatch());
+  }
+
+  public static UseTheErpClient with(ErpClient client, ApiCallStopwatch stopwatch) {
+    return new UseTheErpClient(client, stopwatch);
   }
 
   public void authenticateWith(UseTheKonnektor withKonnector) {
@@ -55,10 +61,12 @@ public class UseTheErpClient implements Ability {
         challenge -> withKonnector.externalAuthenticate(challenge).getPayload());
   }
 
-  public <R extends Resource> ErpResponse request(ICommand<R> command) {
+  public <R extends Resource> ErpResponse<R> request(ICommand<R> command) {
     reportRequest(command);
     val response = this.client.request(command);
+    reportJwt(command, response);
     reportResponse(response);
+    stopwatch.measurement(this.getClientType(), command, response);
     return response;
   }
 
@@ -75,8 +83,14 @@ public class UseTheErpClient implements Ability {
     }
   }
 
-  private void reportResponse(ErpResponse response) {
-    val resource = response.getResource();
+  private void reportJwt(ICommand<?> cmd, ErpResponse<?> response) {
+    val title = format("JWT for {0} {1}", cmd.getMethod(), cmd.getRequestLocator());
+    val content = jwtDecoder.decodeToJson(response.getUsedJwt());
+    Serenity.recordReportData().withTitle(title).andContents(content);
+  }
+
+  private void reportResponse(ErpResponse<?> response) {
+    val resource = response.getAsBaseResource();
     var title = format("Response {0}", response.getStatusCode());
     if (resource != null) {
       var identifier = resource.getId();
@@ -93,7 +107,7 @@ public class UseTheErpClient implements Ability {
       val fileName = format("Response_{0}.{1}", resource.getResourceType(), fileExtension);
       dumper.writeDump(title, fileName, content);
     } else {
-      reportFhirResource(title, resource);
+      reportFhirResource(title, null);
     }
   }
 
@@ -116,7 +130,7 @@ public class UseTheErpClient implements Ability {
   public String toString() {
     return format(
         "E-Rezept Client vom Typ {0} für die Kommunikation mit {1}",
-        config.getClientType(), config.getFdBaseUrl());
+        this.client.getClientType(), this.client.getBaseFdUrl());
   }
 
   /**
@@ -124,6 +138,6 @@ public class UseTheErpClient implements Ability {
    * different implementation
    */
   private interface DelegateExclude {
-    <R extends Resource> ErpResponse request(ICommand<R> command);
+    <R extends Resource> ErpResponse<R> request(ICommand<R> command);
   }
 }

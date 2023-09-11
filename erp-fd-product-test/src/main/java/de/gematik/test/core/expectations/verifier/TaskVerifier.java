@@ -21,10 +21,14 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
+import de.gematik.test.erezept.fhir.date.DateCalculator;
+import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.Date;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
 
@@ -77,6 +81,108 @@ public class TaskVerifier {
         new VerificationStep.StepBuilder<ErxTask>(
             ErpAfos.A_19019.getRequirement(),
             "Die Rezept-ID muss valide gemäß der Bildungsregel [gemSpec_DM_eRp#19217] sein");
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectMvoExpiryDate(Date mvoEndDate) {
+    return hasCorrectMvoExpiryDate(new Date(), mvoEndDate);
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectMvoExpiryDate(
+      Date signatureDate, @Nullable Date mvoEndDate) {
+    val dc = DateConverter.getInstance();
+    val calculator = new DateCalculator();
+    val expectedDate =
+        dc.truncate(
+            (mvoEndDate != null)
+                ? mvoEndDate
+                : calculator.getDateAfterCalendarDays(signatureDate, 365));
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val expiryDate = task.getExpiryDate();
+          return calculator.equalDates(expectedDate, expiryDate);
+        };
+
+    val step =
+        new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_19445.getRequirement(),
+            format("Das MVO E-Rezept muss als ExpiryDate den Wert {0} haben", expectedDate));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectMvoAcceptDate(Date mvoEndDate) {
+    return hasCorrectMvoAcceptDate(new Date(), mvoEndDate);
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectMvoAcceptDate(
+      Date signatureDate, @Nullable Date mvoEndDate) {
+    val dc = DateConverter.getInstance();
+    val calculator = new DateCalculator();
+    val expectedDate =
+        dc.truncate(
+            (mvoEndDate != null)
+                ? mvoEndDate
+                : calculator.getDateAfterCalendarDays(signatureDate, 365));
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val acceptDate = task.getAcceptDate();
+          return calculator.equalDates(expectedDate, acceptDate);
+        };
+
+    val step =
+        new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_19445.getRequirement(),
+            format("Das MVO E-Rezept muss als AcceptDate den Wert {0} haben", expectedDate));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectExpiryDate() {
+    return hasCorrectExpiryDate(new Date());
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectExpiryDate(Date signatureDate) {
+    val calculator = new DateCalculator();
+    val expectedDate = calculator.getDateAfterMonths(signatureDate, 3);
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val expiryDate = task.getExpiryDate();
+          return calculator.equalDates(expectedDate, expiryDate);
+        };
+
+    val step =
+        new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_19445.getRequirement(),
+            format("Das E-Rezept muss als ExpiryDate den Wert {0} haben", expectedDate));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectAcceptDate(PrescriptionFlowType flowType) {
+    return hasCorrectAcceptDate(new Date(), flowType);
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectAcceptDate(
+      Date signatureDate, PrescriptionFlowType flowType) {
+    val dc = DateConverter.getInstance();
+    val calculator = new DateCalculator();
+    val expectedDate =
+        dc.truncate(
+            flowType.isPkvType()
+                ? calculator.getDateAfterMonths(signatureDate, 3)
+                : calculator.getDateAfterCalendarDays(signatureDate, 28));
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val acceptDate = task.getAcceptDate();
+          return calculator.equalDates(expectedDate, acceptDate);
+        };
+
+    val step =
+        new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_19445.getRequirement(),
+            format("Das E-Rezept muss als AcceptDate den Wert {0} haben", expectedDate));
     return step.predicate(predicate).accept();
   }
 }

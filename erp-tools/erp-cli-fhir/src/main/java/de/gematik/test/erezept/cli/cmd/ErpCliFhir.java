@@ -27,9 +27,11 @@ import picocli.CommandLine.Command;
     mixinStandardHelpOptions = true,
     subcommands = {
       Generator.class,
+      Replacer.class,
       EncodingTranscoder.class,
       Validator.class,
       ListProfiles.class,
+      ListCoverages.class,
       Repl.class
     })
 public class ErpCliFhir {}

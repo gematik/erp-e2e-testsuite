@@ -47,7 +47,7 @@ public class ErxReceipt extends Bundle {
   }
 
   public PrescriptionId getPrescriptionId() {
-    return new PrescriptionId(this.getIdentifier().getValue());
+    return PrescriptionId.from(this.getIdentifier());
   }
 
   public DocumentType getDocumentType() {

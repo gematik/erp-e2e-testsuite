@@ -16,8 +16,7 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
@@ -25,6 +24,8 @@ import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import lombok.val;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class KbvPractitionerTest extends ParsingTest {
@@ -54,5 +55,26 @@ class KbvPractitionerTest extends ParsingTest {
     assertEquals(expAdditionalQualification, practitioner.getAdditionalQualifications().get(0));
     // just for the sake of code-coverage
     assertNotNull(practitioner.getDescription());
+  }
+
+  @Test
+  void shouldGetSamePractitioner() {
+    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
+    val fileName = kbvId + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+    val practitioner = kbvBundle.getPractitioner();
+
+    val practitioner2 = KbvPractitioner.fromPractitioner(practitioner);
+    assertEquals(practitioner, practitioner2);
+  }
+
+  @Test
+  void shouldGetPractitionerFromResource() {
+    val resource = new Practitioner();
+    val practitioner = KbvPractitioner.fromPractitioner((Resource) resource);
+    assertNotNull(practitioner);
+    assertNotEquals(resource, practitioner);
   }
 }

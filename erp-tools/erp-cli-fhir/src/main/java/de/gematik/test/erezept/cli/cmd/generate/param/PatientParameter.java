@@ -16,7 +16,8 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import de.gematik.test.erezept.cli.cmd.converter.*;
+import de.gematik.test.erezept.cli.converter.GermanDateConverter;
+import de.gematik.test.erezept.cli.converter.NameConverter;
 import de.gematik.test.erezept.cli.util.*;
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
@@ -25,6 +26,7 @@ import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.*;
 import lombok.*;
 import picocli.*;
+import picocli.CommandLine.Mixin;
 
 public class PatientParameter implements BaseResourceParameter {
 
@@ -44,21 +46,7 @@ public class PatientParameter implements BaseResourceParameter {
       description = "The birthdate of the patient with format dd.MM.yyyy")
   private Date birhtDate;
 
-  @CommandLine.Option(
-      names = {"--kvid"},
-      paramLabel = "<KVID>",
-      type = String.class,
-      description = "The KVID of the patient")
-  private String kvid;
-
-  @CommandLine.Option(
-      names = {"--insurance-type"},
-      paramLabel = "<TYPE>",
-      type = VersicherungsArtDeBasis.class,
-      description =
-          "The Type of the Insurance from ${COMPLETION-CANDIDATES} (default=${DEFAULT-VALUE})")
-  @Getter
-  private VersicherungsArtDeBasis versicherungsArt = VersicherungsArtDeBasis.GKV;
+  @Getter @Mixin private KvnrParameter kvnrParameter;
 
   private AssignerOrganization assignerOrganization;
 
@@ -79,22 +67,14 @@ public class PatientParameter implements BaseResourceParameter {
     return this.getOrDefault(birhtDate, GemFaker::fakerBirthday);
   }
 
-  public String getKvid() {
-    return this.getOrDefault(kvid, GemFaker::fakerKvid);
-  }
-
   public NameWrapper getFullName() {
     return this.getOrDefault(fullName, NameWrapper::randomName);
   }
 
   public KbvPatient createPatient() {
     val name = getFullName();
-    val patientIdentifierType =
-        versicherungsArt.equals(VersicherungsArtDeBasis.GKV)
-            ? IdentifierTypeDe.GKV
-            : IdentifierTypeDe.PKV;
     return PatientBuilder.builder()
-        .kvIdentifierDe(getKvid(), patientIdentifierType)
+        .kvnr(kvnrParameter.getKvnr(), kvnrParameter.getInsuranceType())
         .name(name.getFirstName(), name.getLastName())
         .assigner(getAssignerOrganization()) // will be used only for PKV patients
         .birthDate(getBirthDate())

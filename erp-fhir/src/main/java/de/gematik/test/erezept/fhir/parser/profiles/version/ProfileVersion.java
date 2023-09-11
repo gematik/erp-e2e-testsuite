@@ -85,8 +85,10 @@ public interface ProfileVersion<V extends ProfileVersion<V>> {
       return Arrays.stream(type.getEnumConstants())
           .filter(
               version ->
-                  version.getValidFromDate().isBefore(now)
-                      && version.getValidUntilDate().isAfter(now))
+                  (now.isAfter(version.getValidFromDate())
+                          && now.isBefore(version.getValidUntilDate()))
+                      || now.isEqual(version.getValidFromDate())
+                      || now.isEqual(version.getValidUntilDate()))
           .findFirst()
           .orElseThrow(
               () ->

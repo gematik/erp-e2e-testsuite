@@ -16,17 +16,14 @@
 
 package de.gematik.test.konnektor.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.exceptions.MissingKonnektorKonfigurationException;
-import java.io.File;
-import java.util.List;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.val;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.jsontype.*;
+import com.fasterxml.jackson.dataformat.yaml.*;
+import de.gematik.test.erezept.config.exceptions.MissingKonnektorKonfigurationException;
+import de.gematik.test.konnektor.*;
+import java.io.*;
+import java.util.*;
+import lombok.*;
 
 /** This class is intended to be used only if the konnektor-client module is used separately */
 @Data
@@ -35,7 +32,7 @@ public class KonnektorModuleConfiguration {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
 
   static {
-    OBJECT_MAPPER.registerSubtypes(new NamedType(RemoteKonnetorConfiguration.class, "remote"));
+    OBJECT_MAPPER.registerSubtypes(new NamedType(RemoteKonnektorConfiguration.class, "remote"));
     OBJECT_MAPPER.registerSubtypes(new NamedType(LocalKonnektorConfiguration.class, "local"));
   }
 

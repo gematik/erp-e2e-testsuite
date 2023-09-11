@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
 import lombok.val;
@@ -31,24 +32,26 @@ class ManageDataMatrixCodesTest {
   void shouldAddAndConsumeDmcs() {
     val manageDmcs = ManageDataMatrixCodes.sheGetsPrescribed();
 
-    manageDmcs.appendDmc(DmcPrescription.ownerDmc("taskId", AccessCode.random()));
-    manageDmcs.appendDmc(DmcPrescription.ownerDmc("taskId2", AccessCode.random()));
+    val first = TaskId.from("taskId");
+    val second = TaskId.from("taskId2");
+    manageDmcs.appendDmc(DmcPrescription.ownerDmc(first, AccessCode.random()));
+    manageDmcs.appendDmc(DmcPrescription.ownerDmc(second, AccessCode.random()));
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
     var dmc = manageDmcs.getFirstDmc();
-    assertEquals("taskId", dmc.getTaskId());
+    assertEquals(first, dmc.getTaskId());
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
     dmc = manageDmcs.getLastDmc();
-    assertEquals("taskId2", dmc.getTaskId());
+    assertEquals(second, dmc.getTaskId());
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
     dmc = manageDmcs.consumeFirstDmc();
-    assertEquals("taskId", dmc.getTaskId());
+    assertEquals(first, dmc.getTaskId());
     assertEquals(1, manageDmcs.getDmcs().getRawList().size());
 
     dmc = manageDmcs.consumeLastDmc();
-    assertEquals("taskId2", dmc.getTaskId());
+    assertEquals(second, dmc.getTaskId());
     assertEquals(0, manageDmcs.getDmcs().getRawList().size());
   }
 
@@ -56,8 +59,8 @@ class ManageDataMatrixCodesTest {
   void shouldChooseStacks() {
     val manageDmcs = ManageDataMatrixCodes.sheGetsPrescribed();
 
-    manageDmcs.appendDmc(DmcPrescription.ownerDmc("taskId", AccessCode.random()));
-    manageDmcs.appendDmc(DmcPrescription.ownerDmc("taskId2", AccessCode.random()));
+    manageDmcs.appendDmc(DmcPrescription.ownerDmc(TaskId.from("taskId"), AccessCode.random()));
+    manageDmcs.appendDmc(DmcPrescription.ownerDmc(TaskId.from("taskId2"), AccessCode.random()));
 
     val activeDmcs = manageDmcs.chooseStack(DmcStack.ACTIVE);
     assertEquals(2, activeDmcs.getRawList().size());
@@ -73,5 +76,11 @@ class ManageDataMatrixCodesTest {
 
     assertThrows(MissingPreconditionError.class, manageDmcs::getFirstDmc);
     assertThrows(MissingPreconditionError.class, manageDmcs::getLastDmc);
+  }
+  
+  @Test
+  void shouldHaveToString() {
+    assertTrue(DmcStack.ACTIVE.toString().contains("ausgestellt"));
+    assertTrue(DmcStack.DELETED.toString().contains("gelöscht"));
   }
 }

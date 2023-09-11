@@ -15,6 +15,8 @@
   "version": "1.0",
   "name": "GEM_ERPCHRG_PR_Consent",
   "status": "draft",
+  "experimental": false,
+  "publisher": "gematik GmbH",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -51,11 +53,26 @@
         "min": 1
       },
       {
+        "id": "Consent.meta.versionId",
+        "path": "Consent.meta.versionId",
+        "max": "0"
+      },
+      {
+        "id": "Consent.meta.source",
+        "path": "Consent.meta.source",
+        "max": "0"
+      },
+      {
         "id": "Consent.meta.profile",
         "path": "Consent.meta.profile",
         "min": 1,
         "max": "1",
         "fixedCanonical": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_Consent|1.0"
+      },
+      {
+        "id": "Consent.meta.security",
+        "path": "Consent.meta.security",
+        "max": "0"
       },
       {
         "id": "Consent.status",

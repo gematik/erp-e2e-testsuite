@@ -16,16 +16,17 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
-import static java.text.MessageFormat.*;
-
 import de.gematik.test.erezept.app.abilities.*;
 import de.gematik.test.erezept.app.mobile.*;
 import de.gematik.test.erezept.app.mobile.elements.*;
-import de.gematik.test.erezept.exceptions.*;
+import de.gematik.test.erezept.app.task.ChangeTheEnvironment;
+import de.gematik.test.erezept.app.task.NavigateThroughCardwall;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
-import java.util.*;
+import de.gematik.test.smartcard.SmartcardArchive;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import net.serenitybdd.screenplay.*;
@@ -34,71 +35,47 @@ import net.serenitybdd.screenplay.*;
 @RequiredArgsConstructor
 public class SetUpIosDevice implements Task {
 
+  private final EnvironmentConfiguration environment;
   private final VersicherungsArtDeBasis insuranceKind;
+  private final SmartcardArchive sca;
 
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
+    val userConfig = SafeAbility.getAbility(actor, UseAppUserConfiguration.class);
     val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
 
     // walk through onboarding
-    app.swipe(SwipeDirection.LEFT);
-    app.swipe(SwipeDirection.LEFT);
-    app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
-    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
     app.tap(Onboarding.NEXT_BUTTON);
-    app.tap(Onboarding.ACCEPT_TERMS_OF_USE_BUTTON);
-    app.tap(Onboarding.ACCEPT_PRIVACY_BUTTON);
+    app.tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
+    app.tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
+    app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
+    app.swipe(SwipeDirection.UP);
+    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
+    app.tap(Onboarding.ACCEPT_PASSWORD_BUTTON);
 
-    // go to cardwall
-    if (app.useVirtualeGK()) {
-      performWithVirtualeGK(actor, app);
-    } else {
-      performWithRealeGK(app);
+    app.tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
+    app.tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
+
+    app.tapIfDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON);
+    app.tapIfDisplayed(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON);
+
+    actor.attemptsTo(
+        ChangeTheEnvironment.bySwitchInTheDebugMenuTo(
+            Environment.fromString(environment.getName())));
+    
+    if (userConfig.useVirtualEgk()) {
+      val egk = sca.getEgkByICCSN(userConfig.getEgkIccsn());
+      actor.attemptsTo(SetVirtualEgkOnIOS.withEgk(egk));
     }
-  }
 
-  private void performWithRealeGK(UseTheApp<?> app) {
-    // walk through cardwall
-    throw new FeatureNotImplementedException(
-        format("real eGK on iPhone with {0}", app.getDriverName()));
-  }
-
-  @SneakyThrows
-  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app) {
-    app.tap(Settings.MENU_BUTTON);
-    app.tap(Debug.MENU_BUTTON);
-
-    // first tap will scroll to the element, only the second tap will tap the switch
-    app.tap(2, Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON); // why do I need to tap twice here?
-
-    val egk = SafeAbility.getAbility(actor, ProvideEGK.class).getEgk();
-    val autCertificate = egk.getAutCertificate();
-    val pkBase64 = Base64.getEncoder().encodeToString(autCertificate.getPrivateKey().getEncoded());
-    val cchBase64 =
-        Base64.getEncoder().encodeToString(autCertificate.getX509Certificate().getEncoded());
-    app.input(pkBase64, Debug.EGK_PRIVATE_KEY);
-    app.tap(2, Debug.EGK_CERTIFICATE_CHAIN); // make sure we change the textbox
-    app.input(cchBase64, Debug.EGK_CERTIFICATE_CHAIN);
-    // assume we are done now!
-
-    app.tap(2, Debug.LOGIN);
-
-    // TODO: here we should have the SSO Token, read the PatientBaseData from there!
-    //    val rawToken = app.getWebElement("Debug Menu Bearer Token").getText();
-    //    val token = JWTDecoder.decode(rawToken);
-    //    val kvid = token.getPayload().getIdentifier();
-    //    val givenName = token.getPayload().getGivenName();
-    //    val familyName = token.getPayload().getFamilyName();
-
-    actor.can(
-        ProvidePatientBaseData.forPatient(
-            egk.getKvnr(),
-            egk.getOwner().getGivenName(),
-            egk.getOwner().getSurname(),
-            insuranceKind));
-
-    app.tap(Debug.LEAVE_BUTTON);
-    app.tap(Settings.LEAVE_BUTTON);
+    actor.attemptsTo(NavigateThroughCardwall.byMappingVirtualEgkFrom(sca, insuranceKind));
+    
+    // now get the concrete eGK wich was chosen from the cardwall
+    val egk = actor.abilityTo(ProvideEGK.class).getEgk();
+    val erpClient = ErpClientFactory.createErpClient(environment, userConfig.getConfiguration());
+    val useErpClient = UseTheErpClient.with(erpClient);
+    useErpClient.authenticateWith(egk);
+    actor.can(useErpClient);
   }
 }

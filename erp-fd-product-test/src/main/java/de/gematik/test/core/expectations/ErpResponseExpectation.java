@@ -32,13 +32,14 @@ import org.hl7.fhir.r4.model.Resource;
 @Slf4j
 public class ErpResponseExpectation<T extends Resource> {
 
-  private final ErpResponse actual;
+  private final ErpResponse<? extends Resource> actual;
   private final Class<T> expectedPayloadType;
-  private final List<VerificationStep<ErpResponse>>
+  private final List<VerificationStep<ErpResponse<? extends Resource>>>
       responseSteps; // verifying the outer ErpResponse
   private final List<VerificationStep<T>> payloadSteps; // verifying the contained FHIR Resource
 
-  public ErpResponseExpectation(ErpResponse actual, Class<T> expectedPayloadType) {
+  public ErpResponseExpectation(
+      ErpResponse<? extends Resource> actual, Class<T> expectedPayloadType) {
     this.actual = actual;
     this.responseSteps = new LinkedList<>();
     this.payloadSteps = new LinkedList<>();
@@ -46,20 +47,23 @@ public class ErpResponseExpectation<T extends Resource> {
   }
 
   public static <T extends Resource> ErpResponseExpectation<T> expectFor(
-      ErpResponse actual, Class<T> expectedPayloadType) {
+      ErpResponse<? extends Resource> actual, Class<T> expectedPayloadType) {
     return new ErpResponseExpectation<>(actual, expectedPayloadType);
   }
 
-  public ErpResponseExpectation<T> responseWith(VerificationStep<ErpResponse> step) {
+  public ErpResponseExpectation<T> responseWith(
+      VerificationStep<ErpResponse<? extends Resource>> step) {
     this.responseSteps.add(step);
     return this;
   }
 
-  public ErpResponseExpectation<T> hasResponseWith(VerificationStep<ErpResponse> step) {
+  public ErpResponseExpectation<T> hasResponseWith(
+      VerificationStep<ErpResponse<? extends Resource>> step) {
     return responseWith(step);
   }
 
-  public ErpResponseExpectation<T> andResponse(VerificationStep<ErpResponse> step) {
+  public ErpResponseExpectation<T> andResponse(
+      VerificationStep<ErpResponse<? extends Resource>> step) {
     return responseWith(step);
   }
 
@@ -118,7 +122,7 @@ public class ErpResponseExpectation<T extends Resource> {
     return Stream.concat(responseReqs, payloadReqs).distinct().collect(Collectors.toList());
   }
 
-  private <R> Stream<String> getRequirementIdsOf(List<VerificationStep<R>> steps) {
+  private <P> Stream<String> getRequirementIdsOf(List<VerificationStep<P>> steps) {
     return steps.stream()
         .map(VerificationStep::getRequirement)
         .filter(req -> !req.isCustom())

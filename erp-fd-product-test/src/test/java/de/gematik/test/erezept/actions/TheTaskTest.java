@@ -24,11 +24,13 @@ import static org.mockito.Mockito.when;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
+import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.util.Map;
 import lombok.val;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
 
 class TheTaskTest {
@@ -42,7 +44,11 @@ class TheTaskTest {
     val erxTask = new ErxTask();
     erxTask.setId("123");
     val mockResponse =
-        new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+        ErpResponse.forPayload(
+                FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(useErpClient.request(any(TaskGetByIdCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(() -> doctor.performs(TheTask.fromBackend(erxTask)));

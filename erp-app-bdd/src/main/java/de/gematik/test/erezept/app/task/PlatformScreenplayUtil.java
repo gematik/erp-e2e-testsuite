@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.app.task;
 
-import de.gematik.test.erezept.app.cfg.PlatformType;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import java.util.function.Supplier;
 import net.serenitybdd.screenplay.Question;
 import net.serenitybdd.screenplay.Task;

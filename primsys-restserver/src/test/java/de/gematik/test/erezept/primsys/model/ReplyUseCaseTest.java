@@ -1,48 +1,42 @@
 /*
- *
- *  * Copyright (c) 2023 gematik GmbH
- *  * 
- *  * Licensed under the Apache License, Version 2.0 (the License);
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  * 
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  * 
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an 'AS IS' BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *
+ * Copyright (c) 2023 gematik GmbH
+ * 
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.primsys.model;
 
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static java.text.MessageFormat.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.values.TelematikID;
-import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
-import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
-import jakarta.ws.rs.WebApplicationException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import lombok.val;
-import org.hl7.fhir.r4.model.AuditEvent;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.MockedStatic;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.primsys.model.actor.*;
+import de.gematik.test.erezept.primsys.rest.response.*;
+import jakarta.ws.rs.*;
+import java.lang.reflect.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import org.mockito.*;
 
 class ReplyUseCaseTest {
 
@@ -73,8 +67,13 @@ class ReplyUseCaseTest {
       val resource =
           FhirTestResourceUtil.createErxAuditEvent(
               "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(204, Map.of(), resource));
+      val mockResponse =
+          ErpResponse.forPayload(resource, ErxCommunication.class)
+              .withStatusCode(204)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any(CommunicationPostCommand.class)))
+          .thenReturn(mockResponse);
       try (val response =
           ReplyUseCase.replyPrescription(
               mockPharmacyActor, "taskId", "KVNR", supplyType, "Hello World - Message")) {
@@ -88,10 +87,15 @@ class ReplyUseCaseTest {
     try (MockedStatic<ActorContext> mockedStaticActor = mockStatic(ActorContext.class)) {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
-      val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(500, Map.of(), operationOutcome));
+      val mockResponse =
+          ErpResponse.forPayload(
+                  FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
+              .withStatusCode(500)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any(CommunicationPostCommand.class)))
+          .thenReturn(mockResponse);
 
       try (val response =
           ReplyUseCase.replyPrescription(
@@ -114,7 +118,14 @@ class ReplyUseCaseTest {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any())).thenReturn(new ErpResponse(500, Map.of(), null));
+      val mockResponse =
+          ErpResponse.forPayload(
+                  FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
+              .withStatusCode(500)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any(CommunicationPostCommand.class)))
+          .thenReturn(mockResponse);
       try (val response =
           ReplyUseCase.replyPrescription(
               mockPharmacyActor, "taskId", "KVNR", "onPremise", "Hello World - Message")) {
@@ -135,10 +146,15 @@ class ReplyUseCaseTest {
     try (MockedStatic<ActorContext> mockedStaticActor = mockStatic(ActorContext.class)) {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
-      val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(400, Map.of(), operationOutcome));
+      val mockResponse =
+          ErpResponse.forPayload(
+                  FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
+              .withStatusCode(400)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any(CommunicationPostCommand.class)))
+          .thenReturn(mockResponse);
 
       try (val response =
           ReplyUseCase.replyPrescription(

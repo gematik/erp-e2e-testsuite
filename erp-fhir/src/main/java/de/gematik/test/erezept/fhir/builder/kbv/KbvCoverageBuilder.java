@@ -41,10 +41,16 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   private static final Coverage.CoverageStatus coverageStatus = Coverage.CoverageStatus.ACTIVE;
   private VersicherungsArtDeBasis versicherungsArt = VersicherungsArtDeBasis.GKV;
 
-  private SubjectReference beneficiary;
+  private Reference beneficiary;
   private IKNR iknr;
   private String insuranceName;
 
+  public static KbvCoverageBuilder insurance(InsuranceCoverageInfo coverage) {
+    val builder = insurance(coverage.getIknr(), coverage.getName());
+    builder.versicherungsArt = coverage.getInsuranceType();
+    return builder;
+  }
+  
   public static KbvCoverageBuilder insurance(String iknr, String insuranceName) {
     return insurance(new IKNR(iknr), insuranceName);
   }
@@ -61,35 +67,16 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   }
 
   public static KbvCoverageBuilder faker(VersicherungsArtDeBasis insuranceType) {
-    IdentifierTypeDe identifierTypeDe;
-    String iknr;
-    String insuranceName;
-
-    if (insuranceType.equals(VersicherungsArtDeBasis.GKV)) {
-      identifierTypeDe = IdentifierTypeDe.GKV;
-      val insurance = randomElement(InsuranceCoverageGKV.values());
-      iknr = insurance.getIknr();
-      insuranceName = insurance.getNaming();
-    } else if (insuranceType.equals(VersicherungsArtDeBasis.PKV)) {
-      identifierTypeDe = IdentifierTypeDe.PKV;
-      val insurance = randomElement(InsuranceCoveragePKV.values());
-      iknr = insurance.getIknr();
-      insuranceName = insurance.getNaming();
-    } else if (insuranceType.equals(VersicherungsArtDeBasis.BG)) {
-      identifierTypeDe = IdentifierTypeDe.PKV;
-      val insurance = randomElement(InsuranceCoverageBG.values());
-      iknr = insurance.getIknr();
-      insuranceName = insurance.getNaming();
-    } else {
-      iknr = fakerIknr();
-      insuranceName = fakerName();
-      identifierTypeDe = IdentifierTypeDe.GKV;
-    }
-    val builder = insurance(iknr, insuranceName);
-
+    val builder = switch (insuranceType) {
+      case GKV -> insurance(randomElement(GkvInsuranceCoverageInfo.values()));
+      case PKV -> insurance(randomElement(PkvInsuranceCoverageInfo.values()));
+      case BG -> insurance(randomElement(BGInsuranceCoverageInfo.values()));
+      default -> insurance(DynamicInsuranceCoverageInfo.random());
+    };
+    
     builder
         .personGroup(fakerValueSet(PersonGroup.class))
-        .beneficiary(PatientBuilder.faker(identifierTypeDe).build())
+        .beneficiary(PatientBuilder.faker(insuranceType).build())
         .dmpKennzeichen(fakerValueSet(DmpKennzeichen.class))
         .wop(fakerValueSet(Wop.class))
         .versichertenStatus(fakerValueSet(VersichertenStatus.class));
@@ -149,7 +136,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   }
 
   public KbvCoverageBuilder beneficiary(SubjectReference subject) {
-    this.beneficiary = subject;
+    this.beneficiary = subject.asReference();
     return self();
   }
 
@@ -168,21 +155,35 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
     extensions.add(wop.asExtension());
     extensions.add(versichertenStatus.asExtension());
 
+    // set the payor
+    val insuranceRef = new Reference().setDisplay(insuranceName);
+    Identifier mainIknrIdentifier;
+
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      mainIknrIdentifier = iknr.asIdentifier();
+    } else {
+      mainIknrIdentifier = iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID);
+    }
+    insuranceRef.setIdentifier(mainIknrIdentifier);
+
+    if (versicherungsArt.equals(VersicherungsArtDeBasis.BG)) {
+      val altIknr = IKNR.from("121191241"); // just a dummy for now!
+      Identifier alternativeIkIdentifier;
+      if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+        alternativeIkIdentifier = altIknr.asIdentifier();
+      } else {
+        alternativeIkIdentifier = altIknr.asIdentifier(DeBasisNamingSystem.IKNR_SID);
+      }
+      val altIkExtension = new Extension(KbvItaForStructDef.ALTERNATIVE_IK.getCanonicalUrl());
+      altIkExtension.setValue(alternativeIkIdentifier);
+      mainIknrIdentifier.setExtension(List.of(altIkExtension));
+    }
+
     coverage
         .setStatus(coverageStatus)
         .setType(versicherungsArt.asCodeableConcept())
         .setBeneficiary(beneficiary)
         .setExtension(extensions);
-
-    // set the payor
-    val insuranceRef = new Reference().setDisplay(insuranceName);
-
-    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
-      insuranceRef.setIdentifier(iknr.asIdentifier());
-    } else {
-      insuranceRef.setIdentifier(iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID));
-    }
-
     coverage.setPayor(List.of(insuranceRef));
 
     return coverage;

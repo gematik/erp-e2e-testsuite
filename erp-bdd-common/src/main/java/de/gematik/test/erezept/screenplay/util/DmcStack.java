@@ -23,6 +23,14 @@ public enum DmcStack {
   ACTIVE,
   DELETED;
 
+  @Override
+  public String toString() {
+    return switch (this) {
+      case ACTIVE -> "ausgestellte(n)";
+      case DELETED -> "gelöschte(n)";
+    };
+  }
+
   public static DmcStack fromString(@NonNull String value) {
     DmcStack ret;
     if (value.toLowerCase().contains("ausgestellt")) {

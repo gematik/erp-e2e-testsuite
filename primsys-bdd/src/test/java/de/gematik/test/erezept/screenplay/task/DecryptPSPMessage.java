@@ -55,7 +55,8 @@ public class DecryptPSPMessage implements Task {
             new String(decryptedRecipe.getPayload(), StandardCharsets.UTF_8));
     val dmc =
         DmcPrescription.ownerDmc(
-            prescriptionInfo.getTaskID(), new AccessCode(prescriptionInfo.getAccessCode()));
+            TaskId.from(prescriptionInfo.getTaskID()),
+            new AccessCode(prescriptionInfo.getAccessCode()));
     prescriptionStack.appendAssignedPrescription(dmc);
   }
 }

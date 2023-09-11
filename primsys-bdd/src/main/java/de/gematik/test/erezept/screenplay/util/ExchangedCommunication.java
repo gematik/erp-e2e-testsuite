@@ -16,8 +16,11 @@
 
 package de.gematik.test.erezept.screenplay.util;
 
+import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,10 +29,14 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExchangedCommunication {
 
-  private final String communicationId;
+  @Nullable private final String communicationId;
   private final ICommunicationType<?> type;
   private final String senderName;
   private final String receiverName;
+
+  public Optional<String> getCommunicationId() {
+    return Optional.ofNullable(this.communicationId);
+  }
 
   public static ExchangedCommunication.Builder from(String senderName) {
     return new Builder(senderName);
@@ -48,9 +55,21 @@ public class ExchangedCommunication {
       return this;
     }
 
-    public ExchangedCommunication sent(ErxCommunication communication) {
+    public ExchangedCommunication sent(ErxCommunication com) {
       return new ExchangedCommunication(
-          communication.getUnqualifiedId(), communication.getType(), senderName, receiverName);
+          com.getUnqualifiedId(), com.getType(), senderName, receiverName);
+    }
+
+    public ExchangedCommunication dispenseRequest() {
+      return ofType(CommunicationType.DISP_REQ);
+    }
+
+    public ExchangedCommunication infoRequest() {
+      return ofType(CommunicationType.INFO_REQ);
+    }
+
+    public <T extends ICommunicationType<?>> ExchangedCommunication ofType(T type) {
+      return new ExchangedCommunication(null, type, senderName, receiverName);
     }
   }
 }

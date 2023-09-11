@@ -40,7 +40,7 @@ public abstract class Smartcard {
     this.iccsn = iccsn;
     this.type = type;
 
-    log.info(format("Initialize smartcard {0} with iccsn={1}", type.name(), iccsn));
+    log.trace(format("Initialize smartcard {0} with iccsn={1}", type.name(), iccsn));
   }
 
   public SmartcardOwnerData getOwner() {
@@ -65,7 +65,7 @@ public abstract class Smartcard {
 
   public abstract List<Oid> getAutOids();
 
-  protected Optional<SmartcardCertificate> getKey(Oid oid, Crypto algorithm) {
+  public Optional<SmartcardCertificate> getKey(Oid oid, Crypto algorithm) {
     log.debug(
         format("Look for smartcard certificate with oid={0} and algorithm={1}", oid, algorithm));
     return certificates.stream()

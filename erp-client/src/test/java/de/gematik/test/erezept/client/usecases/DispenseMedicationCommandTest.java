@@ -25,8 +25,10 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -47,8 +49,8 @@ class DispenseMedicationCommandTest {
   @Test
   void getRequestLocator() {
     val md =
-        ErxMedicationDispenseBuilder.faker("kvid", "performerid", PrescriptionId.random()).build();
-    val taskId = "123456";
+        ErxMedicationDispenseBuilder.faker(KVNR.random(), "performerid", PrescriptionId.random()).build();
+    val taskId = TaskId.from("123456");
     val secret = "7890123";
     val cmd = new DispenseMedicationCommand(taskId, new Secret(secret), md);
 
@@ -61,11 +63,11 @@ class DispenseMedicationCommandTest {
   void createSingleDispense() {
     val md =
         ErxMedicationDispenseBuilder.faker(
-                GemFaker.fakerKvid(), GemFaker.fakerTelematikId(), PrescriptionId.random())
+                KVNR.random(), GemFaker.fakerTelematikId(), PrescriptionId.random())
             .build();
     val taskId = "123456";
     val secret = "7890123";
-    val cmd = new DispenseMedicationCommand(taskId, new Secret(secret), md);
+    val cmd = new DispenseMedicationCommand(TaskId.from(taskId), Secret.fromString(secret), md);
 
     val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret);
     assertEquals(expectedEndpoint, cmd.getRequestLocator());
@@ -81,18 +83,18 @@ class DispenseMedicationCommandTest {
   @Test
   void createMultipleDispenses() {
     val mds = new ArrayList<ErxMedicationDispense>();
-    val kvid = GemFaker.fakerKvid();
+    val kvnr = KVNR.random();
     val performerId = GemFaker.fakerTelematikId();
     val prescriptionId = PrescriptionId.random();
     IntStream.range(0, 3)
         .forEach(
             idx ->
                 mds.add(
-                    ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
 
     val taskId = "123456";
     val secret = "7890123";
-    val cmd = new DispenseMedicationCommand(taskId, new Secret(secret), mds);
+    val cmd = new DispenseMedicationCommand(TaskId.from(taskId), Secret.fromString(secret), mds);
 
     val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret);
     assertEquals(expectedEndpoint, cmd.getRequestLocator());

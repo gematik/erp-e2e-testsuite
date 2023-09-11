@@ -15,9 +15,9 @@
 #
 # language: de
 
-@Funktionalität=AlternZuweisung
-@Impl=done
-@MainActor=Versicherter
+@PRODUKT:eRp_FD
+@Funktionalität:AlternativeZuweisung
+@Hauptdarsteller:Versicherter
 Funktionalität: Alternative Zuweisung
   Der Versicherte soll ohne Anmeldung am Fachdienst sein per DMC in das FdV eingescanntes Rezept an die gewünschte Apotheke schicken können.
   Dabei wird vom E-Rezept-FdV eine Nachricht Referenz auf das einzulösende E-Rezept (Task-ID), die Zugriffsberechtigung (AccessCode) und Kontaktinformationen des Versicherten gebildet.
@@ -30,9 +30,9 @@ Funktionalität: Alternative Zuweisung
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
     Und die Apotheke Am Flughafen verbindet sich mit seinem Apothekendienstleister
 
-  @TCID=ERP_EE_altZuweisung_01
-  @Path=happy
-  Szenariogrundriss:  E-Rezept per alternative Zuweisung einlösen
+  @TCID:ERP_EE_ALTERNATIVE_ZUWEISUNG_01
+  @TESTFALL:positiv
+  Szenariogrundriss: E-Rezept per alternative Zuweisung einlösen
   Der Arzt verschreibt der GKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept.
   Der Versicherte weist das E-Rezept seiner Apotheke über den Apothekendienstleister zu.
 

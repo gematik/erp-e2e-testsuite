@@ -22,6 +22,7 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuild
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
@@ -31,13 +32,13 @@ public class DispenseMedicationCommand extends BaseCommand<ErxReceipt> {
   private final List<ErxMedicationDispense> medicationDispenses;
 
   public DispenseMedicationCommand(
-      String taskId, Secret secret, ErxMedicationDispense medicationDispense) {
+      TaskId taskId, Secret secret, ErxMedicationDispense medicationDispense) {
     this(taskId, secret, List.of(medicationDispense));
   }
 
   public DispenseMedicationCommand(
-      String taskId, Secret secret, List<ErxMedicationDispense> medicationDispenses) {
-    super(ErxReceipt.class, HttpRequestMethod.POST, "Task", taskId);
+      TaskId taskId, Secret secret, List<ErxMedicationDispense> medicationDispenses) {
+    super(ErxReceipt.class, HttpRequestMethod.POST, "Task", taskId.getValue());
     this.medicationDispenses = medicationDispenses;
 
     // TODO: check if we can/should provide the secret via HTTP-Header  // NOSONAR still needs to be

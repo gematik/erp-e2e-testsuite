@@ -56,7 +56,7 @@ public class TaskCreate extends ErpAction<ErxTask> {
     private final PatientActor patient;
 
     public TaskCreate ofAssignmentKind(PrescriptionAssignmentKind kind) {
-      val insurance = patient.getInsuranceType();
+      val insurance = patient.getCoverageInsuranceType();
       val flowType = FlowTypeUtil.getFlowType(null, insurance, kind);
       return TaskCreate.withFlowType(flowType);
     }

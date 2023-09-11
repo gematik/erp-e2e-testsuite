@@ -16,9 +16,6 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
-
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -38,11 +35,9 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.kbv.MvoExtensionManipulatorFactory;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -56,6 +51,16 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectMvoAcceptDate;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectMvoExpiryDate;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
+
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
@@ -64,14 +69,14 @@ import org.junit.runner.RunWith;
 @WithTag("Feature:MVO")
 class TaskActivateMvoUsecase extends ErpTest {
 
-  @Actor(name = "Bernd Claudius")
-  private DoctorActor bernd;
+    @Actor(name = "Bernd Claudius")
+    private DoctorActor bernd;
 
-  @Actor(name = "Sina Hüllmann")
-  private PatientActor sina;
+    @Actor(name = "Sina Hüllmann")
+    private PatientActor sina;
 
-  @TestcaseId("ERP_TASK_ACTIVATE_MVO_01")
-  @ParameterizedTest(
+    @TestcaseId("ERP_TASK_ACTIVATE_MVO_01")
+    @ParameterizedTest(
       name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO ({2}) aus")
   @DisplayName("Mehrfachverordnung als Verordnender Arzt an eine/n Versicherte/n ausstellen")
   @MethodSource("mvoPrescriptionTypesProvider")
@@ -80,7 +85,7 @@ class TaskActivateMvoUsecase extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<MultiplePrescriptionExtension> mvo) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
 
@@ -100,11 +105,15 @@ class TaskActivateMvoUsecase extends ErpTest {
             IssuePrescription.forPatient(sina)
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
+
+    val mvoEndDate = mvo.getParameter().getEnd().orElse(null);
     bernd.attemptsTo(
         Verify.that(activation)
             .withExpectedType(ErpAfos.A_22627_01)
             .hasResponseWith(returnCode(200))
             .and(isInReadyStatus())
+            .and(hasCorrectMvoExpiryDate(mvoEndDate))
+            .and(hasCorrectMvoAcceptDate(mvoEndDate))
             .isCorrect());
   }
 
@@ -120,7 +129,7 @@ class TaskActivateMvoUsecase extends ErpTest {
       NamedEnvelope<MultiplePrescriptionExtension> mvo,
       RequirementsSet req) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
 
@@ -158,7 +167,7 @@ class TaskActivateMvoUsecase extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<KbvErpBundle>> kbvBundleMutator) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
 
@@ -199,7 +208,7 @@ class TaskActivateMvoUsecase extends ErpTest {
       StatusKennzeichen statusKennzeichen,
       RequirementsSet req) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
 
@@ -236,8 +245,12 @@ class TaskActivateMvoUsecase extends ErpTest {
                     MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365)))
             .arguments(
                 NamedEnvelope.of(
-                    "4 von 4 ab sofort für ein Jahr gültig",
-                    MultiplePrescriptionExtension.asMultiple(4, 4).validThrough(0, 365)));
+                    "3 von 4 ab sofort für ein Jahr gültig",
+                    MultiplePrescriptionExtension.asMultiple(3, 4).validThrough(0, 365)))
+            .arguments(
+                NamedEnvelope.of(
+                    "4 von 4 ab sofort ohne EndDatum",
+                    MultiplePrescriptionExtension.asMultiple(4, 4).fromNow().withoutEndDate()));
 
     return multiplyWithFlowTypes(composer);
   }
@@ -291,7 +304,8 @@ class TaskActivateMvoUsecase extends ErpTest {
    */
   static Stream<Arguments> mvoExtensionManipulator() {
     val composer = ArgumentComposer.composeWith();
-    MvoExtensionManipulatorFactory.getMvoExtensionKennzeichenFalsifier().forEach(composer::arguments);
+    MvoExtensionManipulatorFactory.getMvoExtensionKennzeichenFalsifier()
+        .forEach(composer::arguments);
 
     return multiplyWithFlowTypes(composer);
   }
@@ -309,17 +323,16 @@ class TaskActivateMvoUsecase extends ErpTest {
   }
 
   private static Stream<Arguments> multiplyWithFlowTypes(ArgumentComposer composer) {
+    val insuranceArguments = new ArrayList<VersicherungsArtDeBasis>(2);
+    insuranceArguments.add(VersicherungsArtDeBasis.GKV);
+    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
+      insuranceArguments.add(VersicherungsArtDeBasis.PKV);
+    }
     composer.multiply(
         List.of(
             PrescriptionAssignmentKind.PHARMACY_ONLY,
             PrescriptionAssignmentKind.DIRECT_ASSIGNMENT));
-    composer.multiply(List.of(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV));
-    val stream = composer.create();
-
-    // filter Workflow 209 because this one is not supported yet
-    return stream.filter(
-        arg ->
-            !(arg.get()[0].equals(VersicherungsArtDeBasis.PKV)
-                && arg.get()[1].equals(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)));
+    composer.multiply(insuranceArguments);
+    return composer.create();
   }
 }

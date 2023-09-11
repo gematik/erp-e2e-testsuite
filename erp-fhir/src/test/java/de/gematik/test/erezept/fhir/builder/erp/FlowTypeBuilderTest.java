@@ -21,46 +21,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.uhn.fhir.validation.*;
 import de.gematik.test.erezept.fhir.parser.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.*;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class FlowTypeBuilderTest extends ParsingTest {
 
-  @Test
-  void buildParametersFlowType160() {
-    val params = FlowTypeBuilder.build(PrescriptionFlowType.FLOW_TYPE_160);
+  @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildParametersFlowType160(ErpWorkflowVersion version) {
+    val params =
+        FlowTypeBuilder.builder(PrescriptionFlowType.FLOW_TYPE_160).version(version).build();
 
     assertNotNull(params);
-    val result = encodeAndValidate(params);
+    val result = ValidatorUtil.encodeAndValidate(parser, params);
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildParametersForAllFlowTypes() {
+  @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildParametersForAllFlowTypes(ErpWorkflowVersion version) {
+    val isOldProfile = ErpWorkflowVersion.V1_1_1.compareTo(version) == 0;
     Arrays.stream(PrescriptionFlowType.values())
-        .filter(
-            flowType ->
-                !flowType.equals(PrescriptionFlowType.FLOW_TYPE_209)) // 209 not yet supported!
+        .filter(flowType -> !isOldProfile || !flowType.equals(PrescriptionFlowType.FLOW_TYPE_209))
         .forEach(
             flowType -> {
-              val params = FlowTypeBuilder.build(flowType);
+              val params = FlowTypeBuilder.builder(flowType).version(version).build();
 
               assertNotNull(params);
-              val result = encodeAndValidate(params);
+              val result = ValidatorUtil.encodeAndValidate(parser, params);
               assertTrue(result.isSuccessful());
             });
-  }
-
-  private ValidationResult encodeAndValidate(Parameters parameters) {
-    // encode and check if encoded content is valid
-    val xmlParameters = parser.encode(parameters, EncodingType.XML);
-    val result = parser.validate(xmlParameters);
-    ValidatorUtil.printValidationResult(result);
-
-    return result;
   }
 }

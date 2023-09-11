@@ -33,16 +33,6 @@ import org.hl7.fhir.r4.model.*;
 @SuppressWarnings({"java:S110"})
 public class KbvPractitioner extends Practitioner implements ErpFhirResource {
 
-  public static KbvPractitioner fromPractitioner(Practitioner adaptee) {
-    val kbvPractitioner = new KbvPractitioner();
-    adaptee.copyValues(kbvPractitioner);
-    return kbvPractitioner;
-  }
-
-  public static KbvPractitioner fromPractitioner(Resource adaptee) {
-    return fromPractitioner((Practitioner) adaptee);
-  }
-
   public String getFullName() {
     return this.getNameFirstRep().getNameAsSingleString();
   }
@@ -92,5 +82,19 @@ public class KbvPractitioner extends Practitioner implements ErpFhirResource {
     return format(
         "{0} {1} mit {2} {3}",
         qualificationType.getDisplay(), getFullName(), anr.getType(), anr.getValue());
+  }
+
+  public static KbvPractitioner fromPractitioner(Practitioner adaptee) {
+    if (adaptee instanceof KbvPractitioner kbvPractitioner) {
+      return kbvPractitioner;
+    } else {
+      val kbvPractitioner = new KbvPractitioner();
+      adaptee.copyValues(kbvPractitioner);
+      return kbvPractitioner;
+    }
+  }
+
+  public static KbvPractitioner fromPractitioner(Resource adaptee) {
+    return fromPractitioner((Practitioner) adaptee);
   }
 }

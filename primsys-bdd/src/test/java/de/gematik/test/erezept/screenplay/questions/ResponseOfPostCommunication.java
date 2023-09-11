@@ -19,39 +19,61 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemCommunicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.util.ChargeItemChangeAuthorization;
 import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Question;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
 @Slf4j
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommunication> {
 
   private final Builder builder;
 
-  @Override
-  public Class<ErxCommunication> expectedResponseBody() {
-    return ErxCommunication.class;
+  private ResponseOfPostCommunication(Builder builder) {
+    super(format("POST {0}", builder.type));
+    this.builder = builder;
   }
 
-  @Override
-  public String getOperationName() {
-    return format("POST {0}", builder.type);
+  public static Builder infoRequest() {
+    return new Builder(CommunicationType.INFO_REQ);
+  }
+
+  public static Builder representative() {
+    return new Builder(CommunicationType.REPRESENTATIVE);
+  }
+
+  public static Builder dispenseRequest() {
+    return new Builder(CommunicationType.DISP_REQ);
+  }
+
+  public static Builder reply() {
+    return new Builder(CommunicationType.REPLY);
+  }
+
+  public static Builder changeRequest() {
+    return new Builder(ChargeItemCommunicationType.CHANGE_REQ);
+  }
+
+  public static Builder changeReply() {
+    return new Builder(ChargeItemCommunicationType.CHANGE_REPLY);
   }
 
   public Actor getReceiver() {
@@ -59,7 +81,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
   }
 
   @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxCommunication> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     val communication = this.createCommunication(actor);
@@ -101,25 +123,14 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
    * @return ErxCommunication
    */
   private ErxCommunication createCommunication(Actor actor, CommunicationType type) {
-    ErxCommunication communication;
-    switch (type) {
-      case INFO_REQ:
-        communication = createInfoRequestAs(actor);
-        break;
-      case REPRESENTATIVE:
-        communication = createRepresentativeCommunicationAs(actor);
-        break;
-      case DISP_REQ:
-        communication = createDispenseRequestAs(actor);
-        break;
-      case REPLY:
-        communication = createReplyAs(actor);
-        break;
-      default:
-        throw new FeatureNotImplementedException(
-            format("Sending Communication of Type {0}", builder.type));
-    }
-    return communication;
+    return switch (type) {
+      case INFO_REQ -> createInfoRequestAs(actor);
+      case REPRESENTATIVE -> createRepresentativeCommunicationAs(actor);
+      case DISP_REQ -> createDispenseRequestAs(actor);
+      case REPLY -> createReplyAs(actor);
+      default -> throw new FeatureNotImplementedException(
+          format("Sending Communication of Type {0}", builder.type));
+    };
   }
 
   /**
@@ -130,19 +141,12 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
    * @return ErxCommunication
    */
   private ErxCommunication createCommunication(Actor actor, ChargeItemCommunicationType type) {
-    ErxCommunication communication;
-    switch (type) {
-      case CHANGE_REQ:
-        communication = createChangeReqAs(actor);
-        break;
-      case CHANGE_REPLY:
-        communication = createChangeReplyAs(actor);
-        break;
-      default:
-        throw new FeatureNotImplementedException(
-            format("Sending Communication of Type {0}", builder.type));
-    }
-    return communication;
+    return switch (type) {
+      case CHANGE_REQ -> createChangeReqAs(actor);
+      case CHANGE_REPLY -> createChangeReplyAs(actor);
+      default -> throw new FeatureNotImplementedException(
+          format("Sending Communication of Type {0}", builder.type));
+    };
   }
 
   private ErxCommunication createInfoRequestAs(Actor actor) {
@@ -156,7 +160,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
 
     return ErxCommunicationBuilder.builder()
         .recipient(receiverId)
-        .basedOnTaskId(prescription.getTask().getUnqualifiedId())
+        .basedOnTaskId(prescription.getTask().getTaskId())
         .medication(prescription.getKbvBundle().getMedication())
         .supplyOptions(SupplyOptionsType.onPremise())
         .insurance(baseData.getInsuranceIknr())
@@ -166,22 +170,22 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
 
   private ErxCommunication createDispenseRequestAs(Actor actor) {
     val receiverId = SafeAbility.getAbility(builder.receiver, UseSMCB.class).getTelematikID();
+    val dmcAbility = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
 
     // first make sure we download all tasks and fetch the corresponding prescription
-    val taskBundle = actor.asksFor(DownloadAllTasks.sortedWith(builder.basedOnDequeStrategy));
-    val task = taskBundle.getTasks().get(0);
-    val prescription = actor.asksFor(FullPrescriptionBundle.forTask(task));
+    val dmc = builder.basedOnDequeStrategy.chooseFrom(dmcAbility.getDmcs());
+    val prescription = actor.asksFor(FullPrescriptionBundle.forTask(dmc.getTaskId()));
 
     val accessCode = prescription.getTask().getAccessCode();
     return ErxCommunicationBuilder.builder()
         .recipient(receiverId)
-        .basedOnTask(prescription.getTask().getUnqualifiedId(), accessCode)
+        .basedOnTask(prescription.getTask().getTaskId(), accessCode)
         .buildDispReq(builder.message);
   }
 
   private ErxCommunication createRepresentativeCommunicationAs(Actor actor) {
     val receiverId =
-        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvid();
+        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvnr();
 
     // pick the DMC by DequeStrategy and download the complete Prescription first
     val dmcs = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class).getDmcList();
@@ -190,18 +194,18 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
 
     val accessCode = prescription.getTask().getAccessCode();
     return ErxCommunicationBuilder.builder()
-        .recipient(receiverId)
-        .basedOnTask(prescription.getTask().getUnqualifiedId(), accessCode)
+        .recipient(receiverId.getValue())
+        .basedOnTask(prescription.getTask().getTaskId(), accessCode)
         .flowType(prescription.getTask().getFlowType())
         .buildRepresentative(builder.message);
   }
 
   private ErxCommunication createReplyAs(Actor actor) {
     val receiverId =
-        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvid();
+        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvnr();
     val messageForResponse = this.fetchExpectedMessageFromBackend(actor);
     return ErxCommunicationBuilder.builder()
-        .recipient(receiverId)
+        .recipient(receiverId.getValue())
         .basedOnTaskId(messageForResponse.getBasedOnReferenceId())
         .availabilityStatus(AvailabilityStatus.AS_30)
         .supplyOptions(SupplyOptionsType.onPremise())
@@ -210,38 +214,88 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
 
   private ErxCommunication createChangeReqAs(Actor actor) {
     val receiverId = SafeAbility.getAbility(builder.receiver, UseSMCB.class).getTelematikID();
+    val sender = SafeAbility.getAbility(actor, ProvideEGK.class).getKvnr();
 
     val chargeItemResponse =
         actor.asksFor(
-            ResponseOfGetChargeItem.forPrescription(builder.basedOnDequeStrategy).asPatient());
-    val chargeItem = chargeItemResponse.getResource(ErxChargeItem.class);
+            ResponseOfGetChargeItemBundle.forPrescription(builder.basedOnDequeStrategy)
+                .asPatient());
+    val chargeItem = chargeItemResponse.getExpectedResource();
     return ErxChargeItemCommunicationBuilder.builder()
-        .basedOnChargeItem(chargeItem)
+        .basedOnChargeItem(chargeItem.getChargeItem())
         .recipient(receiverId)
+        .sender(sender.getValue())
         .buildReq(builder.message);
   }
 
   private ErxCommunication createChangeReplyAs(Actor actor) {
     val receiverId =
-        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvid();
+        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvnr();
+    val senderId = SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID();
     val messageForResponse = this.fetchExpectedMessageFromBackend(actor);
     val chargeItemId = messageForResponse.getBasedOnReferenceId();
+
+    storeChargeItemAuthorizedBy(actor, messageForResponse);
     return ErxChargeItemCommunicationBuilder.builder()
         .basedOnChargeItem(chargeItemId)
-        .recipient(receiverId)
-        .buildReq(builder.message);
+        .recipient(receiverId.getValue())
+        .sender(senderId)
+        .buildReply(builder.message);
+  }
+
+  private void storeChargeItemAuthorizedBy(Actor actor, ErxCommunication communication) {
+    val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+    val prescriptionStack = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
+
+    // fetch the taskID/prescriptionID and AccessCode from reference
+    val chargeItemId = communication.getBasedOnReferenceId();
+    val prescriptionId = PrescriptionId.from(chargeItemId);
+    val accessCode =
+        communication
+            .getBasedOnAccessCode()
+            .orElseThrow(() -> new MissingFieldException(ErxCommunication.class, "AccessCode"));
+
+    // fetch the chargeItem by the ID and store authorization for later use
+    val cmd = new ChargeItemGetByIdCommand(prescriptionId, accessCode);
+    val response = erpClient.request(cmd);
+    val chargeItemBundle = response.getExpectedResource();
+    val chargeItem = chargeItemBundle.getChargeItem();
+
+    // check A_22128
+    val acQuestion =
+        new Question<Boolean>() {
+          @Override
+          public Boolean answeredBy(Actor actor) {
+            return chargeItem.getAccessCode().isEmpty();
+          }
+        };
+
+    val receiptQuestion =
+        new Question<Boolean>() {
+          @Override
+          public Boolean answeredBy(Actor actor) {
+            return chargeItemBundle.getReceipt().isEmpty();
+          }
+        };
+
+    actor.attemptsTo(Ensure.that("Das ChargeItem keinen AccessCode enthält", acQuestion).isTrue());
+    actor.attemptsTo(
+        Ensure.that("Das ChargeItem keine Quittung enthält", receiptQuestion).isTrue());
+
+    val authorization = ChargeItemChangeAuthorization.forChargeItem(chargeItem, accessCode);
+    prescriptionStack.getChargeItemChangeAuthorizations().append(authorization);
   }
 
   private ErxCommunication fetchExpectedMessageFromBackend(Actor actor) {
     val receiverId =
-        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvid();
+        SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvnr();
     val expectedMessages =
         SafeAbility.getAbility(actor, ManageCommunications.class).getExpectedCommunications();
 
     val newMessages = actor.asksFor(DownloadNewMessages.fromServer());
 
     // ..fromSender(receiverId) -> we are replying to a message sent from the "receiver"
-    val fromRequestSender = newMessages.getCommunicationsFromSender(receiverId);
+    val fromRequestSender = newMessages.getCommunicationsFromSender(receiverId.getValue());
 
     if (expectedMessages.isEmpty() || fromRequestSender.isEmpty()) {
       throw new MissingPreconditionError(
@@ -256,7 +310,16 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     // map the received messages from Server against the expected message
     return fromRequestSender.stream()
         .filter(erxCom -> erxCom.getType().equals(expected.getType()))
-        .filter(erxCom -> erxCom.getUnqualifiedId().equals(expected.getCommunicationId()))
+        .filter(
+            erxCom ->
+                erxCom
+                    .getUnqualifiedId()
+                    .equals(
+                        expected
+                            .getCommunicationId()
+                            .orElse(
+                                "no_id"))) // in case ID is unknown use some default which will be
+        // invalid for sure
         .findFirst()
         .orElseThrow(
             () ->
@@ -268,31 +331,8 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
                         builder.receiver.getName())));
   }
 
-  public static Builder infoRequest() {
-    return new Builder(CommunicationType.INFO_REQ);
-  }
-
-  public static Builder representative() {
-    return new Builder(CommunicationType.REPRESENTATIVE);
-  }
-
-  public static Builder dispenseRequest() {
-    return new Builder(CommunicationType.DISP_REQ);
-  }
-
-  public static Builder reply() {
-    return new Builder(CommunicationType.REPLY);
-  }
-
-  public static Builder changeRequest() {
-    return new Builder(ChargeItemCommunicationType.CHANGE_REQ);
-  }
-
-  public static Builder changeReply() {
-    return new Builder(ChargeItemCommunicationType.CHANGE_REPLY);
-  }
-
   public static class Builder {
+
     private final ICommunicationType<?> type;
     private DequeStrategy basedOnDequeStrategy;
     private DequeStrategy requestDequeStrategy;

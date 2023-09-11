@@ -18,16 +18,21 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.parser.profiles.cfg.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.values.*;
-import java.util.*;
-import lombok.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junitpioneer.jupiter.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.util.Date;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
 class ErxMedicationDispenseBuilderTest extends ParsingTest {
 
@@ -39,12 +44,12 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
         ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
     val medication = KbvErpMedicationBuilder.faker(pzn).version(kbvItaVersion).build();
 
-    val kvid = "X234567890";
+    val kvnr = KVNR.from("X234567890");
     val telematikId = "606358757";
     val prescriptionId = "160.100.000.000.011.09";
     val lotNumber = "123456";
     val medicationDispense =
-        ErxMedicationDispenseBuilder.forKvid(kvid)
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
             .version(version)
             .performerId(telematikId)
             .prescriptionId(prescriptionId)
@@ -57,7 +62,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
 
     assertNotNull(medicationDispense.getId());
     assertEquals(1, medicationDispense.getErpMedication().size());
-    assertEquals(kvid, medicationDispense.getSubjectId());
+    assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(new PrescriptionId(prescriptionId), medicationDispense.getPrescriptionId());
     assertEquals(
         lotNumber, medicationDispense.getErpMedicationFirstRep().getBatch().getLotNumber());
@@ -72,15 +77,15 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildMedicationDispenseWithFaker01(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val kvid = "X234567890";
+    val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.random();
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build();
+        ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build();
 
     assertNotNull(medicationDispense.getId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
-    assertEquals(kvid, medicationDispense.getSubjectId());
+    assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
     assertNotNull(medicationDispense.getErpMedicationFirstRep().getBatch());
 
@@ -95,14 +100,14 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildMedicationDispenseWithFaker02(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val kvid = "X234567890";
+    val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("200.100.000.000.011.09");
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build();
+        ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build();
 
     assertNotNull(medicationDispense.getId());
-    assertEquals(kvid, medicationDispense.getSubjectId());
+    assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
 
@@ -117,20 +122,65 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildMedicationDispenseWithFaker03(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val kvid = "X234567890";
+    val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvid, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
 
     assertNotNull(medicationDispense.getId());
-    assertEquals(kvid, medicationDispense.getSubjectId());
+    assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
     assertEquals(pzn, medicationDispense.getErpMedicationFirstRep().getPznFirstRep());
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
     assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldBuildMedicationDispense120ByDefault() {
+    val kvnr = KVNR.from("X234567890");
+    val performerId = "01234567890";
+    val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
+    val pzn = "00111222";
+    val medicationDispense =
+        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+
+    val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
+    val profileVersion = profile.split("\\|")[1];
+    assertTrue(ErpWorkflowVersion.V1_2_0.isEqual(profileVersion));
+  }
+
+  @Test
+  @SetSystemProperty(key = "erp.fhir.medicationdispense.default", value="True")
+  void shouldTurnOffDefaultMedicationDispense120() {
+    val kvnr = KVNR.from("X234567890");
+    val performerId = "01234567890";
+    val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
+    val pzn = "00111222";
+    val medicationDispense =
+            ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+
+    val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
+    val profileVersion = profile.split("\\|")[1];
+    val defaultVersion = ErpWorkflowVersion.getDefaultVersion();
+    assertTrue(defaultVersion.isEqual(profileVersion));
+  }
+
+  @Test
+  @SetSystemProperty(key = "erp.fhir.medicationdispense.default", value="False")
+  void shouldTurnOnDefaultMedicationDispense120() {
+    val kvnr = KVNR.from("X234567890");
+    val performerId = "01234567890";
+    val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
+    val pzn = "00111222";
+    val medicationDispense =
+            ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+
+    val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
+    val profileVersion = profile.split("\\|")[1];
+    assertTrue(ErpWorkflowVersion.V1_2_0.isEqual(profileVersion));
   }
 }

@@ -9,28 +9,49 @@
     <variable name="date_format" value="%d{HH:mm:ss.SSS}"/>
 
     <appender name="STDOUT" class="ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>info</level>
+        </filter>
         <encoder class="PatternLayoutEncoder">
             <pattern>${date_format} [%thread] %highlight(%-5level) %logger{6} - %msg%n</pattern>
         </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>trace</level>
+        </filter>
         <file>target/site/testsuite.log</file>
+        <append>false</append>
         <encoder>
             <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
         </encoder>
     </appender>
 
-
-    <logger name="de.gematik.test" level="TRACE" additivity="false">
-        <appender-ref ref="FILE"/>
+    <!-- logging FHIR / HAPI related information separately -->
+    <appender name="FHIR" class="ch.qos.logback.core.FileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>trace</level>
+        </filter>
+        <file>target/site/fhir.log</file>
+        <encoder>
+            <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="ca.uhn.fhir" level="INFO" additivity="false">
+        <appender-ref ref="FHIR"/>
+        <append>false</append>
+    </logger>
+    <logger name="de.gematik.test.erezept.fhir.parser.profiles" level="TRACE" additivity="false">
+        <appender-ref ref="FHIR"/>
+    </logger>
+    <logger name="de.gematik.test.erezept.fhir.parser" level="TRACE">
+        <appender-ref ref="FHIR"/>
     </logger>
 
-    <logger name="de.gematik.test" level="INFO" additivity="false">
+
+    <logger name="de.gematik" level="TRACE" additivity="false">
+        <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <logger name="de.gematik.idp.client.IdpClient" level="TRACE" additivity="false">
-        <appender-ref ref="FILE"/>
     </logger>
 
     <root level="WARN">

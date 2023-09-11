@@ -28,6 +28,10 @@ public class SmartCardKeyNotFoundException extends RuntimeException {
     super(format("Key with {0} and Algorithm {1} not found for {2}", oids, algorithm, smartcard));
   }
 
+  public SmartCardKeyNotFoundException(Smartcard smartcard) {
+    this(smartcard, smartcard.getAutOids());
+  }
+  
   public SmartCardKeyNotFoundException(Smartcard smartcard, List<Oid> oids) {
     super(format("Key with {0} not found for {1}", oids, smartcard));
   }

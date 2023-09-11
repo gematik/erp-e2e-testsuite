@@ -38,7 +38,7 @@ class FhirVerifierTest {
 
   @Test
   void hasIdentifierTest() {
-    val resource = KbvErpBundleBuilder.faker("X12345673").build();
+    val resource = KbvErpBundleBuilder.faker().build();
     val step = hasIdentifier();
     step.apply(resource);
   }

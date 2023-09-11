@@ -22,6 +22,7 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.core.steps.Instrumented;
@@ -31,7 +32,7 @@ import net.thucydides.core.annotations.Step;
 @RequiredArgsConstructor
 public class AcceptPrescription extends ErpAction<ErxAcceptBundle> {
 
-  private final String taskId;
+  private final TaskId taskId;
   private final AccessCode accessCode;
 
   @Override
@@ -51,10 +52,10 @@ public class AcceptPrescription extends ErpAction<ErxAcceptBundle> {
   }
 
   public static AcceptPrescription forTheTask(ErxTask task) {
-    return with(task.getUnqualifiedId(), task.getAccessCode());
+    return with(task.getTaskId(), task.getAccessCode());
   }
 
-  public static AcceptPrescription with(String taskId, AccessCode accessCode) {
+  public static AcceptPrescription with(TaskId taskId, AccessCode accessCode) {
     Object[] params = {taskId, accessCode};
     return new Instrumented.InstrumentedBuilder<>(AcceptPrescription.class, params).newInstance();
   }

@@ -19,11 +19,10 @@ package de.gematik.test.erezept.app.cfg;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
-import java.lang.reflect.Field;
+import de.gematik.test.erezept.config.ConfigurationFactory;
+import de.gematik.test.erezept.config.dto.app.AppConfiguration;
 import java.util.stream.IntStream;
-import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.SessionNotCreatedException;
@@ -34,16 +33,7 @@ class AppiumDriverFactoryTest {
 
   @BeforeEach
   void setUp() {
-    config = ErpAppConfiguration.getInstance();
-  }
-
-  @SneakyThrows
-  @AfterEach
-  void tearDown() {
-    Field instance;
-    instance = ErpAppConfiguration.class.getDeclaredField("instance");
-    instance.setAccessible(true);
-    instance.set(null, null);
+    config = ConfigurationFactory.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
   }
 
   @Test
@@ -62,7 +52,7 @@ class AppiumDriverFactoryTest {
     config.getApps().add(desktopConfig);
 
     assertThrows(
-        UnsupportedPlatformException.class, () -> AppiumDriverFactory.forUser("Alice", config));
+        UnsupportedPlatformException.class, () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
   }
 
   @Test
@@ -80,7 +70,7 @@ class AppiumDriverFactoryTest {
 
     // must fail because no local appium should be running
     assertThrows(
-        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("Alice", config));
+        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
   }
 
   @Test
@@ -98,6 +88,6 @@ class AppiumDriverFactoryTest {
 
     // must fail because no local appium should be running
     assertThrows(
-        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("Alice", config));
+        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
   }
 }

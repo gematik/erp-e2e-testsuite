@@ -20,6 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +43,13 @@ public class ErxMedicationDispenseBundleBuilder
   }
 
   public static ErxMedicationDispenseBundleBuilder faker(
-      int amount, String kvid, String performerId, PrescriptionId prescriptionId) {
+          int amount, KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
     val medicationDispenses = new ArrayList<ErxMedicationDispense>();
     IntStream.range(0, amount)
         .forEach(
             idx ->
                 medicationDispenses.add(
-                    ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
     return of(medicationDispenses);
   }
 

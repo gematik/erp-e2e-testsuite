@@ -18,59 +18,90 @@ package de.gematik.test.erezept.app.abilities;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.app.cfg.AppConfiguration;
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PageElement;
+import de.gematik.test.erezept.app.mobile.elements.Utility;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.ios.IOSDriver;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 
 @Slf4j
 public class UseIOSApp extends UseTheApp<IOSDriver> {
 
-  public UseIOSApp(IOSDriver driver, AppConfiguration appConfiguration) {
-    super(driver, PlatformType.IOS, appConfiguration);
+  public UseIOSApp(IOSDriver driver, AppiumConfiguration appiumConfiguration) {
+    super(driver, PlatformType.IOS, appiumConfiguration);
+  }
+
+  @Override
+  protected Optional<WebElement> getOptionalWebElement(PageElement pageElement) {
+    return this.getOptionalWebElement(pageElement, driver.getPageSource());
+  }
+  
+  @Override
+  protected Optional<WebElement> getOptionalWebElement(PageElement pageElement, String pageSource) {
+    val label = pageElement.extractSourceLabel(this.getPlatformType());
+    val found = pageSource.contains(label);
+    if (found) {
+      return waitForElement(pageElement, ExpectedConditions::presenceOfElementLocated);
+    } else {
+      return Optional.empty();
+    }
   }
 
   @Override
   protected WebElement getWebElement(By locator) {
-    return waitForElement(locator, ExpectedConditions::presenceOfElementLocated);
+    return waitForElement(locator, ExpectedConditions::presenceOfElementLocated)
+        .orElseThrow(
+            () -> new NoSuchElementException(format("Element {0} could not be located", locator)));
   }
 
-  public List<WebElement> getWebElementList(PageElement pageElement) {
-    return waitForElement(pageElement, ExpectedConditions::presenceOfAllElementsLocatedBy);
+  public List<WebElement> getWebElements(PageElement pageElement) {
+    val r = waitForElement(pageElement, ExpectedConditions::presenceOfAllElementsLocatedBy);
+    return r.orElse(new ArrayList<>(0));
   }
 
-  private <T> T waitForElement(
+  private <T> Optional<T> waitForElement(
       PageElement pageElement, Function<By, ExpectedCondition<T>> expectation) {
-    return waitForElement(this.getLocator(pageElement), expectation);
+    if (pageElement.getClass().equals(Utility.class)) {
+      // use short polling for utility elements
+      return waitForElement(
+          this.getLocator(pageElement), expectation, this.getShortPollingFluentWaitDriver());
+    } else {
+      return waitForElement(this.getLocator(pageElement), expectation);
+    }
   }
 
-  private <T> T waitForElement(By locator, Function<By, ExpectedCondition<T>> expectation) {
-    log.info(format("Try to fetch element {0}", locator));
-    val wait = this.getFluentWaitDriver();
+  private <T> Optional<T> waitForElement(
+      By locator, Function<By, ExpectedCondition<T>> expectation) {
+    return waitForElement(locator, expectation, this.getFluentWaitDriver());
+  }
+
+  private <T> Optional<T> waitForElement(
+      By locator, Function<By, ExpectedCondition<T>> expectation, FluentWait<IOSDriver> wait) {
+    log.trace(format("Try to fetch element {0}", locator));
     val start = Instant.now();
     try {
       val el = wait.until(expectation.apply(locator));
       val duration = Duration.between(start, Instant.now());
-      log.info(format("Found element <{0}> after {1}ms", el, duration.toMillis()));
-      return el;
+      log.info(format("Found element for <{0}> after {1}ms", locator, duration.toMillis()));
+      return Optional.ofNullable(el);
     } catch (TimeoutException | NoSuchElementException e) {
       val duration = Duration.between(start, Instant.now());
-      val errorMsg =
+      val warnMessage =
           format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis());
-      log.error(errorMsg);
-      throw new NoSuchElementException(errorMsg, e);
+      log.info(warnMessage);
+      return Optional.empty();
     }
   }
 }

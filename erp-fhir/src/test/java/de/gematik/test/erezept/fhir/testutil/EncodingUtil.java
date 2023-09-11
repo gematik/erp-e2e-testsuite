@@ -36,16 +36,6 @@ public class EncodingUtil {
     throw new AssertionError();
   }
 
-  public static EncodingType flipEncoding(EncodingType orig) {
-    EncodingType ret;
-    if (orig == EncodingType.XML) {
-      ret = EncodingType.JSON;
-    } else {
-      ret = EncodingType.XML;
-    }
-    return ret;
-  }
-
   /**
    * Do the Round-Trip:
    *
@@ -83,7 +73,7 @@ public class EncodingUtil {
     val newOriginalContent = reEncode(parser, originalObject, originalEncoding);
 
     // re-encode the original object to flipped encoding
-    val flippedEncoding = EncodingUtil.flipEncoding(originalEncoding);
+    val flippedEncoding = originalEncoding.flipEncoding();
 
     return reEncode(parser, originalObject, flippedEncoding);
   }

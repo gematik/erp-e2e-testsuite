@@ -16,63 +16,63 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.*;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
+import de.gematik.test.erezept.client.usecases.TaskGetCommand;
+import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.strategy.ActorRole;
+import de.gematik.test.erezept.screenplay.util.DmcPrescription;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import org.hl7.fhir.r4.model.Task;
 
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.exceptions.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import java.util.Comparator;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+import static java.text.MessageFormat.format;
+
 @Slf4j
 public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
 
   private final ActorRole role;
   private final TaskGetCommand cmd;
 
-  @Override
-  public Class<ErxTaskBundle> expectedResponseBody() {
-    return ErxTaskBundle.class;
+  private ResponseOfGetTask(ActorRole role, TaskGetCommand cmd) {
+    super(format("GET /Task as {0}", role));
+    this.role = role;
+    this.cmd = cmd;
   }
 
   @Override
-  public String getOperationName() {
-    return "Task";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxTaskBundle> answeredBy(Actor actor) {
     if (ActorRole.PHARMACY.equals(role)) {
       return answeredByPharmacy(actor);
     }
     throw new FeatureNotImplementedException("Get /Task as patient");
   }
 
-  private ErpResponse answeredByPharmacy(Actor pharmacy) {
+  private ErpResponse<ErxTaskBundle> answeredByPharmacy(Actor pharmacy) {
     val erpClient = SafeAbility.getAbility(pharmacy, UseTheErpClient.class);
     val response = erpClient.request(cmd);
-    val erxTaskBundle = erpClient.request(cmd).getResourceOptional(cmd.expectedResponseBody());
-    if (erxTaskBundle.isPresent()) {
+    val erxTaskBundle = response.getResourceOptional();
+    erxTaskBundle.ifPresent(bundle -> {
       val prescriptionManager = SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class);
-      erxTaskBundle.get().getTasks().stream()
-          .map(t -> DmcPrescription.ownerDmc(t.getUnqualifiedId(), t.getAccessCode()))
-          .filter(dmc -> !prescriptionManager.getAssignedPrescriptions().getRawList().contains(dmc))
-          .forEachOrdered(prescriptionManager::appendAssignedPrescription);
-    }
-
+      bundle.getTasks().stream()
+              .sorted(Comparator.comparing(Task::getAuthoredOn))
+              .map(t -> DmcPrescription.ownerDmc(t.getTaskId(), t.getAccessCode()))
+              .filter(dmc -> !prescriptionManager.getAssignedPrescriptions().getRawList().contains(dmc))
+              .forEachOrdered(prescriptionManager::appendAssignedPrescription);
+    });
     return response;
   }
 
-  public static ResponseOfGetTask asPharmacy(String kvnr, String examEvidence) {
-    log.info(
-        format("Download all open task with kvnr {0} and exam evidence {1}", kvnr, examEvidence));
+  public static ResponseOfGetTask asPharmacy(String examEvidence) {
+    log.info(format("Download all open task with exam evidence {0}", examEvidence));
     return new ResponseOfGetTask(
-        ActorRole.PHARMACY, new TaskGetByExamEvidenceCommand(kvnr, examEvidence));
+        ActorRole.PHARMACY, new TaskGetByExamEvidenceCommand(examEvidence));
   }
 }

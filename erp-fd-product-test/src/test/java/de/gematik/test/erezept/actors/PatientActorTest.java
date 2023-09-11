@@ -19,6 +19,8 @@ package de.gematik.test.erezept.actors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
@@ -29,31 +31,52 @@ class PatientActorTest {
   @Test
   void shouldProvideCorrectGkvData() {
     val patient = new PatientActor("Sina Hüllmann");
-    patient.can(ProvidePatientBaseData.forGkvPatient("X123456789", patient.getName()));
-    assertEquals(VersicherungsArtDeBasis.GKV, patient.getInsuranceType());
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
+    assertEquals(VersicherungsArtDeBasis.GKV, patient.getPatientInsuranceType());
     assertTrue(patient.getAssignerOrganization().isEmpty());
   }
 
   @Test
   void shouldProvideCorrectPkvData() {
     val patient = new PatientActor("Sina Hüllmann");
-    patient.can(ProvidePatientBaseData.forPkvPatient("X123456789", patient.getName()));
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getInsuranceType());
-    assertTrue(patient.getAssignerOrganization().isPresent());
+    patient.can(ProvidePatientBaseData.forPkvPatient(KVNR.random(), patient.getName()));
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+
+    if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_0_2) == 0)
+      assertTrue(patient.getAssignerOrganization().isPresent());
   }
 
   @Test
   void shouldProvideCorrectDataAfterChange() {
     val patient = new PatientActor("Sina Hüllmann");
-    patient.can(ProvidePatientBaseData.forGkvPatient("X123456789", patient.getName()));
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     // initialised as GKV
-    assertEquals(VersicherungsArtDeBasis.GKV, patient.getInsuranceType());
+    assertEquals(VersicherungsArtDeBasis.GKV, patient.getPatientInsuranceType());
     assertTrue(patient.getAssignerOrganization().isEmpty());
 
     // now change to PKV
-    patient.changeInsuranceType(VersicherungsArtDeBasis.PKV);
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getInsuranceType());
-    assertTrue(patient.getAssignerOrganization().isPresent());
+    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getCoverageInsuranceType());
+
+    if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_0_2) == 0)
+      assertTrue(patient.getAssignerOrganization().isPresent());
+  }
+
+  @Test
+  void shouldProvideCorrectDataAfterChangeCoverageType() {
+    val patient = new PatientActor("Sina Hüllmann");
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
+
+    // initialised as GKV
+    assertEquals(VersicherungsArtDeBasis.GKV, patient.getPatientInsuranceType());
+    assertEquals(VersicherungsArtDeBasis.GKV, patient.getCoverageInsuranceType());
+
+    // now change to PKV and BG
+    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+    patient.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+    assertEquals(VersicherungsArtDeBasis.BG, patient.getCoverageInsuranceType());
   }
 }

@@ -1,0 +1,13 @@
+
+:jsltuz: pass:c,q[JSL^TuZ^]
+
+:module-app-testsuite: pass:c,q[_erp-app-bdd_]
+:module-primsys-testsuite: pass:c,q[_primsys-bdd_]
+:module-fd-prod-testsuite: pass:c,q[_erp-fd-product-test_]
+
+:name-primsys: E-Rezept PrimSys
+:name-complete-testsuite: E-Rezept End-2-End-Testsuite
+:name-all-testsuites: E-Rezepte Testsuiten
+:name-app-testsuite: E-Rezept App-Testsuite
+:name-primsys-testsuite: E-Rezept E2E-Testsuite
+:name-fd-prod-testsuite: E-Rezept Produkt-Testsuite

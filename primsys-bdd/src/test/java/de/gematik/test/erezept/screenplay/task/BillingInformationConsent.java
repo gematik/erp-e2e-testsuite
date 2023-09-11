@@ -16,18 +16,16 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.client.usecases.ConsentDeleteCommand;
-import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
-import de.gematik.test.erezept.client.usecases.ConsentPostCommand;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.NonNull;
-import lombok.val;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Task;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import lombok.*;
+import net.serenitybdd.screenplay.*;
 
 public class BillingInformationConsent implements Task {
 
@@ -35,52 +33,6 @@ public class BillingInformationConsent implements Task {
 
   private BillingInformationConsent(ConsentAction action) {
     this.action = action;
-  }
-
-  @Override
-  public <T extends Actor> void performAs(final T actor) {
-    val patientData = SafeAbility.getAbility(actor, ProvidePatientBaseData.class);
-    val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
-
-    switch (action) {
-      case GRANT:
-        grantConsentOnFD(erpClientAbility, patientData);
-        break;
-      case GET:
-        readConsentOnFD(erpClientAbility, patientData);
-        break;
-      case REVOKE:
-        deleteConsentOnFD(erpClientAbility, patientData);
-        break;
-    }
-  }
-
-  private void grantConsentOnFD(UseTheErpClient erpClient, ProvidePatientBaseData baseData) {
-    val cmd = new ConsentPostCommand(baseData.getKvid());
-    val response = erpClient.request(cmd);
-
-    // Note: this will ensure we've received the correct response from FD
-    val erxConsent = response.getResource(cmd.expectedResponseBody());
-    baseData.setErxConsent(erxConsent);
-  }
-
-  private void readConsentOnFD(UseTheErpClient erpClient, ProvidePatientBaseData baseData) {
-    val cmd = new ConsentGetCommand();
-    val response = erpClient.request(cmd);
-
-    val erxConsent = response.getResource(cmd.expectedResponseBody());
-    baseData.setErxConsent(erxConsent);
-  }
-
-  private void deleteConsentOnFD(UseTheErpClient erpClient, ProvidePatientBaseData baseData) {
-    readConsentOnFD(erpClient, baseData);
-    if (baseData.hasRememberedConsent()) {
-      val erxConsentId = baseData.getRememberedConsent().orElseThrow().getId();
-      val cmd = new ConsentDeleteCommand(erxConsentId);
-
-      val response = erpClient.request(cmd); // NOSONAR request is required, the response isn't yet!
-      // TODO: we should also assert here something!! // NOSONAR behaviour not fully defined yet
-    }
   }
 
   public static BillingInformationConsent grantConsent() {
@@ -103,34 +55,75 @@ public class BillingInformationConsent implements Task {
     return new BillingInformationConsent(action);
   }
 
+  @Override
+  public <T extends Actor> void performAs(final T actor) {
+    val patientData = SafeAbility.getAbility(actor, ProvidePatientBaseData.class);
+    val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
+
+    switch (action) {
+      case GRANT -> grantConsentOnFD(erpClientAbility, patientData);
+      case GET -> readConsentOnFD(erpClientAbility, patientData);
+      case REVOKE -> deleteConsentOnFD(erpClientAbility, patientData);
+    }
+  }
+
+  private void grantConsentOnFD(UseTheErpClient erpClient, ProvidePatientBaseData baseData) {
+    val optionalConsent = this.getConsent(erpClient);
+    optionalConsent.ifPresentOrElse(
+        baseData::setErxConsent,
+        () -> {
+          val cmd = new ConsentPostCommand(baseData.getKvnr());
+          val response = erpClient.request(cmd);
+          val erxConsent = response.getExpectedResource();
+          baseData.setErxConsent(erxConsent);
+        });
+  }
+
+  private void readConsentOnFD(UseTheErpClient erpClient, ProvidePatientBaseData baseData) {
+    val optionalConsent = this.getConsent(erpClient);
+    optionalConsent.ifPresent(baseData::setErxConsent);
+  }
+
+  private void deleteConsentOnFD(UseTheErpClient erpClient, ProvidePatientBaseData baseData) {
+    readConsentOnFD(erpClient, baseData);
+    baseData
+        .getRememberedConsent()
+        .ifPresent(
+            erxConsent -> {
+              val cmd = new ConsentDeleteCommand();
+              val response = erpClient.request(cmd);
+              assertTrue(response.getStatusCode() < 300);
+              baseData.setErxConsent(null); // also forget the given consent locally
+            });
+  }
+
+  private Optional<ErxConsent> getConsent(UseTheErpClient erpClient) {
+    val response = erpClient.request(new ConsentGetCommand());
+    val consentBundle = response.getResourceOptional();
+
+    return consentBundle
+        .filter(ErxConsentBundle::hasConsent)
+        .filter(cb -> cb.getConsent().isPresent())
+        .flatMap(ErxConsentBundle::getConsent);
+  }
+
   private enum ConsentAction {
     GRANT,
     REVOKE,
     GET;
 
     public static ConsentAction fromString(@NonNull final String action) {
-      ConsentAction ret;
-      switch (action.toLowerCase()) {
-        case "erteilt":
-        case "erteilen":
-          ret = ConsentAction.GRANT;
-          break;
-        case "zurückgezogen":
-        case "widerrufen":
-        case "zurückziehen":
-        case "zurückzieht":
-        case "widerruft":
-          ret = ConsentAction.REVOKE;
-          break;
-        case "abrufen":
-        case "abgerufen":
-          ret = ConsentAction.GET;
-          break;
-        default:
-          throw new UnsupportedOperationException(
-              format("{0} is an invalid action for Consent", action));
-      }
-      return ret;
+      return switch (action.toLowerCase()) {
+        case "erteilt", "erteilen" -> ConsentAction.GRANT;
+        case "zurückgezogen",
+            "widerrufen",
+            "zurückziehen",
+            "zurückzieht",
+            "widerruft" -> ConsentAction.REVOKE;
+        case "abrufen", "abgerufen" -> ConsentAction.GET;
+        default -> throw new UnsupportedOperationException(
+            format("{0} is an invalid action for Consent", action));
+      };
     }
   }
 }

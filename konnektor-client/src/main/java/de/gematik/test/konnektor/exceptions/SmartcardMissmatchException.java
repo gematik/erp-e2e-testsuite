@@ -16,9 +16,9 @@
 
 package de.gematik.test.konnektor.exceptions;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.soap.ServicePortProvider;
+import de.gematik.test.konnektor.soap.*;
 
 public class SmartcardMissmatchException extends SOAPRequestException {
 
@@ -26,5 +26,9 @@ public class SmartcardMissmatchException extends SOAPRequestException {
       Class<?> cmdClass, String givenIccsn, ServicePortProvider serviceProvider) {
     super(
         cmdClass, format("No Smartcard with ICCSN {0} on {1} found", givenIccsn, serviceProvider));
+  }
+
+  public SmartcardMissmatchException(Class<?> cmdClass, String givenIccsn) {
+    super(cmdClass, format("No Smartcard with ICCSN {0} found", givenIccsn));
   }
 }

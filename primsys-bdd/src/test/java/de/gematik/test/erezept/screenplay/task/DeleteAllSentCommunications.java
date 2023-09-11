@@ -39,17 +39,20 @@ public class DeleteAllSentCommunications implements Task {
         .getRawList()
         .forEach(
             com -> {
-              val id = com.getCommunicationId();
-              val cmd = new CommunicationDeleteCommand(id);
-              val response = erpClient.request(cmd);
+              com.getCommunicationId()
+                  .ifPresent(
+                      id -> {
+                        val cmd = new CommunicationDeleteCommand(id);
+                        val response = erpClient.request(cmd);
 
-              // make sure the FD signaled correct deletion: A_19514-03
-              assertEquals(
-                  204,
-                  response.getStatusCode(),
-                  format(
-                      "Communication with ID {0} was not deleted as the backend answered with return code {1}",
-                      id, response.getStatusCode()));
+                        // make sure the FD signaled correct deletion: A_19514-03
+                        assertEquals(
+                            204,
+                            response.getStatusCode(),
+                            format(
+                                "Communication with ID {0} was not deleted as the backend answered with return code {1}",
+                                id, response.getStatusCode()));
+                      });
             });
   }
 

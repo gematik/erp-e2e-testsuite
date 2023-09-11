@@ -27,8 +27,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import de.gematik.test.erezept.pspwsclient.PSPClient;
-import de.gematik.test.erezept.pspwsclient.config.PSPClientConfig;
 import de.gematik.test.erezept.pspwsclient.dataobjects.DeliveryOption;
 import java.util.Arrays;
 import lombok.val;

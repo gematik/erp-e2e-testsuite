@@ -16,11 +16,19 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDosage;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPzn;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.primsys.utils.Strings.getOrDefault;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
@@ -174,6 +182,21 @@ public class MedicationData {
     m.dosage = bundle.getDosageInstruction();
     m.substitutionAllowed = bundle.isSubstitutionAllowed();
     m.note = bundle.getMedicationRequest().getNoteTextOrEmpty();
+    if (bundle.getMedicationRequest().isMultiple()) {
+      m.mvoData = new MvoData();
+      bundle.getMedicationRequest().getNumerator().ifPresent(m.mvoData::setNumerator);
+      bundle.getMedicationRequest().getDemoninator().ifPresent(m.mvoData::setDenominator);
+      bundle
+          .getMedicationRequest()
+          .getMvoStart()
+          .ifPresent(
+              date -> m.mvoData.setStartDate(DateConverter.getInstance().dateToLocalDate(date)));
+      bundle
+          .getMedicationRequest()
+          .getMvoEnd()
+          .ifPresent(
+              date -> m.mvoData.setEndDate(DateConverter.getInstance().dateToLocalDate(date)));
+    }
     return m;
   }
 

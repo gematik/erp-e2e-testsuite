@@ -20,20 +20,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import java.util.Map;
 import lombok.val;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
 
 class ErpInteractionTest {
 
   @Test
   void shouldBuildExpectation() {
-    val cmd = new TaskCreateCommand();
-    val response = new ErpResponse(201, Map.of(), new ErxTask());
-    val interaction = new ErpInteraction<>(cmd, response);
+    val response =
+        ErpResponse.forPayload(new ErxTask(), ErxTask.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
 
     assertDoesNotThrow(interaction::expectation);
     assertNotNull(interaction.expectation());
@@ -41,9 +44,12 @@ class ErpInteractionTest {
 
   @Test
   void shouldProvideExpectedRessource() {
-    val cmd = new TaskCreateCommand();
-    val response = new ErpResponse(201, Map.of(), new ErxTask());
-    val interaction = new ErpInteraction<>(cmd, response);
+    val response =
+        ErpResponse.forPayload(new ErxTask(), ErxTask.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
 
     assertDoesNotThrow(interaction::getExpectedResponse);
     assertNotNull(interaction.getExpectedResponse());
@@ -51,9 +57,12 @@ class ErpInteractionTest {
 
   @Test
   void shouldProvideOperationOutcomeExpectation() {
-    val cmd = new TaskCreateCommand();
-    val response = new ErpResponse(201, Map.of(), new ErxTask());
-    val interaction = new ErpInteraction<>(cmd, response);
+    val response =
+        ErpResponse.forPayload(new ErxTask(), ErxTask.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
 
     assertDoesNotThrow(interaction::asOperationOutcome);
     assertNotNull(interaction.asOperationOutcome());
@@ -61,9 +70,12 @@ class ErpInteractionTest {
 
   @Test
   void shouldThrowOnUnexpected() {
-    val cmd = new TaskCreateCommand();
-    val response = new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
-    val interaction = new ErpInteraction<>(cmd, response);
+    val response =
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
 
     assertThrows(UnexpectedResponseResourceError.class, interaction::getExpectedResponse);
   }

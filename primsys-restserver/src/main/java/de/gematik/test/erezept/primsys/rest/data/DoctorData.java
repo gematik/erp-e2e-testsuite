@@ -21,9 +21,11 @@ import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.primsys.model.actor.Doctor;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.val;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @XmlRootElement
 public class DoctorData extends ActorData {
 
@@ -47,7 +49,6 @@ public class DoctorData extends ActorData {
     d.setName(doc.getFullName());
     d.setType(signingDoc.getBaseData().getType());
     d.setId(signingDoc.getBaseData().getId());
-    d.setTi(signingDoc.getBaseData().getTi());
 
     d.officeName = org.getName();
     d.hba = signingDoc.getBaseData().getHba();

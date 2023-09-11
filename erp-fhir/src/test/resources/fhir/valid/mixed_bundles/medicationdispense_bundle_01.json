@@ -1,0 +1,89 @@
+{
+  "resourceType": "Bundle",
+  "id": "cece7a05-5114-406e-94ea-de7a284dc2f9",
+  "type": "searchset",
+  "timestamp": "2023-06-05T12:24:12.626+00:00",
+  "total": 0,
+  "link": [ {
+    "relation": "self",
+    "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense?identifier=160.000.006.334.513.79"
+  } ],
+  "entry": [ {
+    "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/160.000.006.334.513.79",
+    "resource": {
+      "resourceType": "MedicationDispense",
+      "id": "160.000.006.334.513.79",
+      "meta": {
+        "profile": [ "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.2" ]
+      },
+      "contained": [ {
+        "resourceType": "Medication",
+        "id": "a1daa3fa-f3f2-4aae-a819-9a98292694b9",
+        "meta": {
+          "profile": [ "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.0.2" ]
+        },
+        "extension": [ {
+          "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Category",
+          "valueCoding": {
+            "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Medication_Category",
+            "code": "00"
+          }
+        }, {
+          "url": "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Vaccine",
+          "valueBoolean": false
+        }, {
+          "url": "http://fhir.de/StructureDefinition/normgroesse",
+          "valueCode": "NB"
+        } ],
+        "code": {
+          "coding": [ {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "code": "12345678"
+          } ],
+          "text": "Schmerzmittel"
+        },
+        "form": {
+          "coding": [ {
+            "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM",
+            "code": "TAB"
+          } ]
+        },
+        "amount": {
+          "numerator": {
+            "value": 1,
+            "unit": "Stk"
+          },
+          "denominator": {
+            "value": 1
+          }
+        }
+      } ],
+      "identifier": [ {
+        "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+        "value": "160.000.006.334.513.79"
+      } ],
+      "status": "completed",
+      "medicationReference": {
+        "reference": "#a1daa3fa-f3f2-4aae-a819-9a98292694b9"
+      },
+      "subject": {
+        "identifier": {
+          "system": "http://fhir.de/sid/gkv/kvid-10",
+          "value": "X110498565"
+        }
+      },
+      "performer": [ {
+        "actor": {
+          "identifier": {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "3-SMC-B-Testkarte-883110000116873"
+          }
+        }
+      } ],
+      "whenHandedOver": "2023-06-05"
+    },
+    "search": {
+      "mode": "match"
+    }
+  } ]
+}

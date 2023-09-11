@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.Resource;
 @Slf4j
 public class TaskCreateCommand extends BaseCommand<ErxTask> {
 
-  private PrescriptionFlowType flowType;
+  private final PrescriptionFlowType flowType;
 
   /** Create a Task with the "default" FlowType 160 */
   public TaskCreateCommand() {

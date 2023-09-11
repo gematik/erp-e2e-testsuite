@@ -47,11 +47,14 @@ public class HistSentCommunications implements Question<Boolean> {
 
     val fetchedCommunications = new LinkedList<ErxCommunication>();
     for (val sc : sentCommunications) {
-      val id = sc.getCommunicationId();
-      val cmd = new CommunicationGetByIdCommand(id);
-      val response = erpClient.request(cmd);
-      val optionalBody = response.getResourceOptional(cmd.expectedResponseBody());
-      optionalBody.ifPresent(fetchedCommunications::add);
+      sc.getCommunicationId()
+          .ifPresent(
+              id -> {
+                val cmd = new CommunicationGetByIdCommand(id);
+                val response = erpClient.request(cmd);
+                val optionalBody = response.getResourceOptional(cmd.expectedResponseBody());
+                optionalBody.ifPresent(fetchedCommunications::add);
+              });
     }
     return checker.apply(sentCommunications, fetchedCommunications);
   }

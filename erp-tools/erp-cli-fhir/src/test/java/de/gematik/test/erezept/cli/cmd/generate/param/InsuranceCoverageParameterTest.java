@@ -19,8 +19,11 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import picocli.*;
 
 class InsuranceCoverageParameterTest {
@@ -30,9 +33,7 @@ class InsuranceCoverageParameterTest {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs());
-
-    assertNotNull(icp.getIknr());
-    assertNotNull(icp.getInsuranceName());
+    
     assertNotNull(icp.getPersonGroup());
     assertNotNull(icp.getDmp());
     assertNotNull(icp.getWop());
@@ -52,5 +53,78 @@ class InsuranceCoverageParameterTest {
     // only possible to check if insurance kind is the same as we don't have a getter for patient
     // reference
     assertEquals(patient.getInsuranceKind(), coverage.getInsuranceKind());
+  }
+  
+  @Test
+  void shouldCreateWithRealCoverageFromIknr() {
+    val icp = new InsuranceCoverageParameter();
+    val cmdline = new CommandLine(icp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692"));
+    
+    val coverage = icp.createCoverage();
+    assertEquals("104127692", coverage.getIknr().getValue());
+    assertEquals("actimonda krankenkasse", coverage.getName());
+  }
+
+  @Test
+  void shouldCreateWithRealCoverageFromIknrWithType() {
+    val icp = new InsuranceCoverageParameter();
+    val cmdline = new CommandLine(icp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "950585030", "--coverage-type", "PKV"));
+    
+    val coverage = icp.createCoverage();
+    assertEquals("950585030", coverage.getIknr().getValue());
+    assertEquals("PBeaKK Postbeamtenkrankenkasse", coverage.getName());
+    assertEquals(VersicherungsArtDeBasis.PKV, coverage.getInsuranceKind());
+  }
+
+  @Test
+  void shouldCreateWithRealCoverageFromIknrWitCustomName() {
+    val icp = new InsuranceCoverageParameter();
+    val cmdline = new CommandLine(icp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692", "--insurance-name", "ABC"));
+    
+    val coverage = icp.createCoverage();
+    assertEquals("104127692", coverage.getIknr().getValue());
+    assertEquals("ABC", coverage.getName());
+  }
+
+  @Test
+  void shouldCreateWithRealCoverageFromTypeWitCustomName() {
+    val icp = new InsuranceCoverageParameter();
+    val cmdline = new CommandLine(icp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--coverage-type", "PKV", "--insurance-name", "ABC"));
+
+    val coverage = icp.createCoverage();
+    assertNotNull(coverage.getIknr());
+    assertEquals("ABC", coverage.getName());
+    assertEquals(VersicherungsArtDeBasis.PKV, coverage.getInsuranceKind());
+  }
+
+  @ParameterizedTest(name = "Create random Coverage of Type {0}")
+  @ValueSource(strings = {"GKV", "PKV", "BG"})
+  void shouldCreateRealCoverageFromType(String type) {
+    val icp = new InsuranceCoverageParameter();
+    val cmdline = new CommandLine(icp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--coverage-type", type));
+    
+    val coverage = icp.createCoverage();
+    assertNotNull(coverage.getIknr().getValue());
+    assertNotNull(coverage.getName());
+    assertEquals(VersicherungsArtDeBasis.fromCode(type), coverage.getInsuranceKind());
+  }
+
+  @Test
+  void shouldCreateWithRealCoverageFromIknrEvenOnDifferentInsuranceKind() {
+    val icp = new InsuranceCoverageParameter();
+    val cmdline = new CommandLine(icp);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692"));
+
+    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.PKV).build();
+    icp.setPatient(patient);
+    val coverage = icp.createCoverage();
+    assertEquals("104127692", coverage.getIknr().getValue());
+    // should not equal because patient is PKV though actimondia is a GKV insurance: -> random default name
+    assertEquals("actimonda krankenkasse", coverage.getName());
   }
 }

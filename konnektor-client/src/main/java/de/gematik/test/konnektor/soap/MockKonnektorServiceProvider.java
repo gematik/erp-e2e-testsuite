@@ -16,34 +16,34 @@
 
 package de.gematik.test.konnektor.soap;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.profile.MockProfile;
-import de.gematik.test.konnektor.soap.mock.MockAuthSignatureServicePortType;
-import de.gematik.test.konnektor.soap.mock.MockCardServicePortType;
-import de.gematik.test.konnektor.soap.mock.MockCertificateServicePortType;
-import de.gematik.test.konnektor.soap.mock.MockEncryptionPortType;
-import de.gematik.test.konnektor.soap.mock.MockEventServicePortType;
-import de.gematik.test.konnektor.soap.mock.MockKonnektor;
-import de.gematik.test.konnektor.soap.mock.MockSignatureServicePortType;
-import de.gematik.test.konnektor.soap.mock.MockVSDServicePortType;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureServicePortType;
-import de.gematik.ws.conn.cardservice.wsdl.v8.CardServicePortType;
-import de.gematik.ws.conn.cardterminalservice.wsdl.v1.CardTerminalServicePortType;
-import de.gematik.ws.conn.certificateservice.wsdl.v6.CertificateServicePortType;
-import de.gematik.ws.conn.encryptionservice.wsdl.v6.EncryptionServicePortType;
-import de.gematik.ws.conn.eventservice.wsdl.v7.EventServicePortType;
-import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureServicePortType;
-import de.gematik.ws.conn.vsds.vsdservice.v5.VSDServicePortType;
+import de.gematik.test.konnektor.profile.*;
+import de.gematik.test.konnektor.soap.mock.*;
+import de.gematik.test.konnektor.soap.mock.vsdm.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.*;
+import de.gematik.ws.conn.cardservice.wsdl.v8.*;
+import de.gematik.ws.conn.cardterminalservice.wsdl.v1.*;
+import de.gematik.ws.conn.certificateservice.wsdl.v6.*;
+import de.gematik.ws.conn.encryptionservice.wsdl.v6.*;
+import de.gematik.ws.conn.eventservice.wsdl.v7.*;
+import de.gematik.ws.conn.signatureservice.wsdl.v7.*;
+import de.gematik.ws.conn.vsds.vsdservice.v5.*;
 
 public class MockKonnektorServiceProvider extends ServicePortProvider {
 
   private final MockKonnektor mockKonnektor;
+  private final VsdmService vsdmService;
 
-  public MockKonnektorServiceProvider(SmartcardArchive smartcardArchive) {
+  public MockKonnektorServiceProvider(SmartcardArchive smartcardArchive, VsdmService service) {
     super(new MockProfile());
     this.mockKonnektor = new MockKonnektor(smartcardArchive);
+    this.vsdmService = service;
+  }
+
+  public MockKonnektorServiceProvider(SmartcardArchive smartcardArchive) {
+    this(smartcardArchive, new VsdmService(new byte[32], 'S', '1'));
   }
 
   @Override
@@ -78,7 +78,7 @@ public class MockKonnektorServiceProvider extends ServicePortProvider {
 
   @Override
   public VSDServicePortType getVSDServicePortType() {
-    return new MockVSDServicePortType(this.mockKonnektor);
+    return new MockVSDServicePortType(this.mockKonnektor, this.vsdmService);
   }
 
   @Override

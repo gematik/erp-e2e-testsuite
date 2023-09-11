@@ -16,18 +16,21 @@
 
 package de.gematik.test.erezept.primsys.cli;
 
-import static java.text.MessageFormat.*;
+import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
+import de.gematik.test.smartcard.SmartcardFactory;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.val;
+import picocli.CommandLine;
 
-import de.gematik.test.erezept.lei.cfg.*;
-import de.gematik.test.smartcard.*;
-import java.io.*;
-import java.math.*;
-import java.net.*;
-import java.nio.charset.*;
-import java.security.*;
-import java.util.concurrent.*;
-import lombok.*;
-import picocli.*;
+import java.io.PrintStream;
+import java.math.BigInteger;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.concurrent.Callable;
+
+import static java.text.MessageFormat.format;
 
 /**
  * This subcommand will generate the full urls for the pharmacy service provider to be put into
@@ -35,14 +38,14 @@ import picocli.*;
  * specific pharmacy via the pharmacy service provider. Instead of using the plain Telematik-ID to
  * identify the concrete pharmacy, we are using a simple SHA-1 of the Telematik-ID.
  */
-@SuppressWarnings({"java:S106"}) // System.out.println is not logging here!
+@SuppressWarnings({"java:S106"})
 public class PharmacyIdentifiers implements Callable<Integer> {
 
   @CommandLine.Option(
       names = "--url",
       type = URL.class,
       description = "Base-URL of the Pharmacy Service Provider")
-  private URL url = getDefaultUrl();
+  private final URL url = getDefaultUrl();
 
   private final PrintStream out;
 

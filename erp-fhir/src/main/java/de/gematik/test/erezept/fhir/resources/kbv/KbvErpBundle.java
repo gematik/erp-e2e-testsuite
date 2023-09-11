@@ -16,22 +16,49 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
-import static java.text.MessageFormat.*;
+import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
+import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
+import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
+import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
+import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
+import de.gematik.test.erezept.fhir.util.IdentifierUtil;
+import de.gematik.test.erezept.fhir.values.BSNR;
+import de.gematik.test.erezept.fhir.values.BaseANR;
+import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PrimitiveType;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 
-import ca.uhn.fhir.model.api.annotation.*;
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.references.kbv.*;
-import de.gematik.test.erezept.fhir.resources.*;
-import de.gematik.test.erezept.fhir.util.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import java.util.stream.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.text.MessageFormat.format;
 
 /** <a href="https://simplifier.net/erezept/kbvprerpbundle">KBV E-Rezept Bundle</a> */
 @Slf4j
@@ -88,15 +115,15 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
   }
 
   public Date getAuthoredOn() {
-    return this.getKbvErpMedicationRequestAsCopy().getAuthoredOn();
-  }
-
-  public void setCompositionDate(Date date) {
-    this.getComposition().setDate(date);
+    return this.getMedicationRequest().getAuthoredOn();
   }
 
   public Date getCompositionDate() {
     return this.getComposition().getDate();
+  }
+
+  public void setCompositionDate(Date date) {
+    this.getComposition().setDate(date);
   }
 
   /**
@@ -109,11 +136,7 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
     if (!PrescriptionId.isPrescriptionId(this.getIdentifier())) {
       throw new MissingFieldException(KbvErpBundle.class, PrescriptionId.NAMING_SYSTEM);
     }
-    return new PrescriptionId(this.getIdentifier().getValue());
-  }
-
-  public PrescriptionFlowType getFlowType() {
-    return PrescriptionFlowType.fromPrescriptionId(this.getPrescriptionId());
+    return PrescriptionId.from(this.getIdentifier());
   }
 
   public KbvErpBundle setPrescriptionId(PrescriptionId prescriptionId) {
@@ -126,10 +149,20 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
     return this;
   }
 
+  public PrescriptionFlowType getFlowType() {
+    return PrescriptionFlowType.fromPrescriptionId(this.getPrescriptionId());
+  }
+
   public List<KbvErpMedicationRequest> getMedicationRequests() {
     return this.entry.stream()
-        .filter(entry -> entry.getResource().getClass().equals(MedicationRequest.class))
-        .map(entry -> KbvErpMedicationRequest.fromMedicationRequest(entry.getResource()))
+        .filter(
+            entry -> entry.getResource().getResourceType().equals(ResourceType.MedicationRequest))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    KbvErpMedicationRequest.class,
+                    entry,
+                    KbvErpMedicationRequest::fromMedicationRequest))
         .toList();
   }
 
@@ -162,25 +195,18 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
   }
 
   public KbvPatient getPatient() {
-    val patientEntry =
-        this.entry.stream()
-            .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Patient))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Patient));
-
-    KbvPatient ret;
-    if (!patientEntry.getResource().getClass().equals(KbvPatient.class)) {
-      // not yet a KbvPatient; make a KbvPatient and replace the old instance
-      ret = KbvPatient.fromPatient(patientEntry.getResource());
-      patientEntry.setResource(ret);
-    } else {
-      // seems we have already replaced the entry: simply cast and return
-      ret = (KbvPatient) patientEntry.getResource();
-    }
-
-    return ret;
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Patient))
+        .map(entry -> FhirEntryReplacer.cast(KbvPatient.class, entry, KbvPatient::fromPatient))
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Patient));
   }
 
+  /**
+   * @deprecated use the patient instead!
+   * @return
+   */
+  @Deprecated(forRemoval = true)
   public VersicherungsArtDeBasis getInsuranceType() {
     val patient = this.getPatient();
 
@@ -203,10 +229,10 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
                     this.getClass(), DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
   }
 
-  public String getKvid() {
+  public KVNR getKvnr() {
     val patient = this.getPatient();
 
-    return patient.getIdentifier().stream()
+    val kvnrValue = patient.getIdentifier().stream()
         .filter(
             identifier ->
                 identifier
@@ -220,6 +246,7 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
             () ->
                 new MissingFieldException(
                     this.getClass(), DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()));
+    return KVNR.from(kvnrValue);
   }
 
   public String getFamilyName() {
@@ -276,23 +303,11 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
   }
 
   public KbvCoverage getCoverage() {
-    val coverageEntry =
-        this.entry.stream()
-            .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Coverage))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
-
-    KbvCoverage ret;
-    if (!coverageEntry.getResource().getClass().equals(KbvCoverage.class)) {
-      // not yet a KbvCoverage; make a KbvCoverage and replace the old instance
-      ret = KbvCoverage.fromCoverage(coverageEntry.getResource());
-      coverageEntry.setResource(ret);
-    } else {
-      // seems we have already replaced the entry: simply cast and return
-      ret = (KbvCoverage) coverageEntry.getResource();
-    }
-
-    return ret;
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Coverage))
+        .map(entry -> FhirEntryReplacer.cast(KbvCoverage.class, entry, KbvCoverage::fromCoverage))
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
   }
 
   /**
@@ -427,31 +442,20 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
   }
 
   public KbvPractitioner getPractitioner() {
-    val practitionerEntry =
-        this.entry.stream()
-            .filter(
-                entry -> entry.getResource().getResourceType().equals(ResourceType.Practitioner))
-            .filter(
-                orgEntry ->
-                    ((Practitioner) orgEntry.getResource())
-                        .getIdentifier().stream()
-                            .map(identifier -> identifier.getType().getCodingFirstRep())
-                            .anyMatch(BaseANR::isPractitioner))
-            .findFirst()
-            .orElseThrow(
-                () -> new MissingFieldException(this.getClass(), ResourceType.Practitioner));
-
-    KbvPractitioner ret;
-    if (!practitionerEntry.getResource().getClass().equals(KbvPractitioner.class)) {
-      // not yet a MedicalOrganization; make a MedicalOrganization and replace the old instance
-      ret = KbvPractitioner.fromPractitioner(practitionerEntry.getResource());
-      practitionerEntry.setResource(ret);
-    } else {
-      // seems we have already replaced the entry: simply cast and return
-      ret = (KbvPractitioner) practitionerEntry.getResource();
-    }
-
-    return ret;
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Practitioner))
+        .filter(
+            orgEntry ->
+                ((Practitioner) orgEntry.getResource())
+                    .getIdentifier().stream()
+                        .map(identifier -> identifier.getType().getCodingFirstRep())
+                        .anyMatch(BaseANR::isPractitioner))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    KbvPractitioner.class, entry, KbvPractitioner::fromPractitioner))
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Practitioner));
   }
 
   /**
@@ -464,89 +468,51 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
    * @return the KbvMedicalOrganization
    */
   public MedicalOrganization getMedicalOrganization() {
-    val organizationEntry =
-        this.entry.stream()
-            .filter(
-                entry -> entry.getResource().getResourceType().equals(ResourceType.Organization))
-            .filter(
-                orgEntry ->
-                    ((Organization) orgEntry.getResource())
-                        .getIdentifier().stream()
-                            .map(identifier -> identifier.getType().getCodingFirstRep())
-                            .anyMatch(
-                                coding ->
-                                    coding.getSystem().equals(BSNR.getCodeSystemUrl())
-                                        && coding.getCode().equals(BSNR.getCode())))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), "Medical Organization"));
-
-    MedicalOrganization ret;
-    if (!organizationEntry.getResource().getClass().equals(MedicalOrganization.class)) {
-      // not yet a MedicalOrganization; make a MedicalOrganization and replace the old instance
-      ret = MedicalOrganization.fromOrganization(organizationEntry.getResource());
-      organizationEntry.setResource(ret);
-    } else {
-      // seems we have already replaced the entry: simply cast and return
-      ret = (MedicalOrganization) organizationEntry.getResource();
-    }
-
-    return ret;
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Organization))
+        .filter(
+            orgEntry ->
+                ((Organization) orgEntry.getResource())
+                    .getIdentifier().stream()
+                        .map(identifier -> identifier.getType().getCodingFirstRep())
+                        .anyMatch(
+                            coding ->
+                                coding.getSystem().equals(BSNR.getCodeSystemUrl())
+                                    && coding.getCode().equals(BSNR.getCode())))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    MedicalOrganization.class, entry, MedicalOrganization::fromOrganization))
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), "Medical Organization"));
   }
 
   public Optional<AssignerOrganization> getAssignerOrganization() {
-    val optionalOrganizationEntry =
-        this.entry.stream()
-            .filter(
-                entry -> entry.getResource().getResourceType().equals(ResourceType.Organization))
-            .filter(
-                orgEntry ->
-                    ((Organization) orgEntry.getResource())
-                        .getIdentifier().stream()
-                            .anyMatch(
-                                identifier ->
-                                    identifier
-                                        .getSystem()
-                                        .equals(IKNR.getSystem().getCanonicalUrl())))
-            .findFirst();
-
-    Optional<AssignerOrganization> ret = Optional.empty();
-
-    if (optionalOrganizationEntry.isPresent()) {
-      AssignerOrganization org;
-      val entry = optionalOrganizationEntry.orElseThrow();
-      if (!entry.getResource().getClass().equals(AssignerOrganization.class)) {
-        // not yet an AssignerOrganization; make an AssignerOrganization and replace the old
-        // instance
-        org = AssignerOrganization.fromOrganization(entry.getResource());
-        entry.setResource(org);
-      } else {
-        // seems we have already replaced the entry: simply cast and return
-        org = (AssignerOrganization) entry.getResource();
-      }
-      ret = Optional.of(org);
-    }
-
-    return ret;
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Organization))
+        .filter(
+            orgEntry ->
+                ((Organization) orgEntry.getResource())
+                    .getIdentifier().stream()
+                        .anyMatch(
+                            identifier ->
+                                identifier.getSystem().equals(IKNR.getSystem().getCanonicalUrl())))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    AssignerOrganization.class, entry, AssignerOrganization::fromOrganization))
+        .findFirst();
   }
 
   public KbvErpMedication getMedication() {
-    val medicationEntry =
-        this.entry.stream()
-            .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Medication))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Medication));
-
-    KbvErpMedication ret;
-    if (!medicationEntry.getResource().getClass().equals(KbvErpMedication.class)) {
-      // not yet a KbvPatient; make a KbvPatient and replace the old instance
-      ret = KbvErpMedication.fromMedication(medicationEntry.getResource());
-      medicationEntry.setResource(ret);
-    } else {
-      // seems we have already replaced the entry: simply cast and return
-      ret = (KbvErpMedication) medicationEntry.getResource();
-    }
-
-    return ret;
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Medication))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    KbvErpMedication.class, entry, KbvErpMedication::fromMedication))
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Medication));
   }
 
   public MedicationCategory getMedicationCategory() {
@@ -583,62 +549,35 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
     return medication.getMedicationName();
   }
 
-  /**
-   * <b>Note:</b> This method returns a copy the MedicationRequest wrapped as
-   * KbvErpMedicationRequest with some convenience methods. The return-value is only intended to be
-   * read. Manipulating this object or writing on it won't affect the original object. If you need
-   * the original object use {@link #getMedicationRequest()} instead
-   *
-   * @deprecated not required anymore, as {@link #getMedicationRequest()} handles already this case
-   * @return a copy of the MedicationRequest
-   */
-  @Deprecated(forRemoval = true)
-  public KbvErpMedicationRequest getKbvErpMedicationRequestAsCopy() {
+  public KbvErpMedicationRequest getMedicationRequest() {
     return this.entry.stream()
-        .map(BundleEntryComponent::getResource)
-        .filter(resource -> resource.getResourceType().equals(ResourceType.MedicationRequest))
-        .map(KbvErpMedicationRequest::fromMedicationRequest)
+        .filter(
+            entry -> entry.getResource().getResourceType().equals(ResourceType.MedicationRequest))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    KbvErpMedicationRequest.class,
+                    entry,
+                    KbvErpMedicationRequest::fromMedicationRequest))
         .findFirst()
         .orElseThrow(
             () -> new MissingFieldException(this.getClass(), ResourceType.MedicationRequest));
   }
 
-  public KbvErpMedicationRequest getMedicationRequest() {
-    val medicationRequestEntry =
-        this.entry.stream()
-            .filter(
-                entry ->
-                    entry.getResource().getResourceType().equals(ResourceType.MedicationRequest))
-            .findFirst()
-            .orElseThrow(
-                () -> new MissingFieldException(this.getClass(), ResourceType.MedicationRequest));
-
-    KbvErpMedicationRequest ret;
-    if (!medicationRequestEntry.getResource().getClass().equals(KbvErpMedicationRequest.class)) {
-      // not yet a KbvPatient; make a KbvPatient and replace the old instance
-      ret = KbvErpMedicationRequest.fromMedicationRequest(medicationRequestEntry.getResource());
-      medicationRequestEntry.setResource(ret);
-    } else {
-      // seems we have already replaced the entry: simply cast and return
-      ret = (KbvErpMedicationRequest) medicationRequestEntry.getResource();
-    }
-
-    return ret;
-  }
-
   public int getDispenseQuantity() {
-    val request = this.getKbvErpMedicationRequestAsCopy();
+    val request = this.getMedicationRequest();
     return request.getDispenseRequest().getQuantity().getValue().intValue();
   }
 
   public String getDosageInstruction() {
-    val request = this.getKbvErpMedicationRequestAsCopy();
+    val request = this.getMedicationRequest();
     return request.getDosageInstructionFirstRep().getText();
   }
 
   public boolean isSubstitutionAllowed() {
-    val request = this.getKbvErpMedicationRequestAsCopy();
-    return request.getSubstitution().getAllowedBooleanType().booleanValue();
+    val request = this.getMedicationRequest();
+    val allowedType = request.getSubstitution().getAllowedBooleanType();
+    return !allowedType.isEmpty() && allowedType.booleanValue();
   }
 
   /**
@@ -665,16 +604,6 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
     return profile.split("\\|")[1];
   }
 
-  public static KbvErpBundle fromBundle(Bundle adaptee) {
-    val kbvBundle = new KbvErpBundle();
-    adaptee.copyValues(kbvBundle);
-    return kbvBundle;
-  }
-
-  public static KbvErpBundle fromBundle(Resource adaptee) {
-    return fromBundle((Bundle) adaptee);
-  }
-
   @Override
   public String toString() {
     val profile =
@@ -682,8 +611,8 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
             .map(PrimitiveType::asStringValue)
             .collect(Collectors.joining(", "));
     return format(
-        "{0} for {1} (Profile {2})",
-        this.getClass().getSimpleName(), this.getPrescriptionId(), profile);
+            "{0} for {1} (Profile {2})",
+            this.getClass().getSimpleName(), this.getIdentifier(), profile);
   }
 
   @Override
@@ -693,5 +622,19 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
     return format(
         "{0} (Workflow {1}) {2} für {3}",
         workflow.getDisplay(), workflow.getCode(), type, this.getPatient().getDescription());
+  }
+
+  public static KbvErpBundle fromBundle(Bundle adaptee) {
+    if (adaptee instanceof KbvErpBundle kbvBundle) {
+      return kbvBundle;
+    } else {
+      val kbvBundle = new KbvErpBundle();
+      adaptee.copyValues(kbvBundle);
+      return kbvBundle;
+    }
+  }
+
+  public static KbvErpBundle fromBundle(Resource adaptee) {
+    return fromBundle((Bundle) adaptee);
   }
 }

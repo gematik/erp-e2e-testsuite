@@ -20,6 +20,7 @@ import de.gematik.test.erezept.client.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.PrescriptionBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
@@ -29,12 +30,12 @@ public class TaskActivateCommand extends BaseCommand<ErxTask> {
   private final AccessCode accessCode;
   private final Parameters parameters;
 
-  public TaskActivateCommand(String taskId, AccessCode accessCode, byte[] signedBundle) {
+  public TaskActivateCommand(TaskId taskId, AccessCode accessCode, byte[] signedBundle) {
     this(taskId, accessCode, PrescriptionBuilder.builder().build(signedBundle));
   }
 
-  public TaskActivateCommand(String taskId, AccessCode accessCode, Parameters parameters) {
-    super(ErxTask.class, HttpRequestMethod.POST, "Task", taskId);
+  public TaskActivateCommand(TaskId taskId, AccessCode accessCode, Parameters parameters) {
+    super(ErxTask.class, HttpRequestMethod.POST, "Task", taskId.getValue());
     this.accessCode = accessCode;
     this.parameters = parameters;
 

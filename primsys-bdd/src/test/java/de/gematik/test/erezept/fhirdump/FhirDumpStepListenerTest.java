@@ -16,19 +16,28 @@
 
 package de.gematik.test.erezept.fhirdump;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
-import java.time.*;
-import java.util.*;
-import lombok.*;
-import net.thucydides.core.model.*;
-import net.thucydides.core.steps.*;
-import org.junit.jupiter.api.*;
+import io.cucumber.java.Scenario;
+import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import lombok.val;
+import net.thucydides.core.model.DataTable;
+import net.thucydides.core.model.Story;
+import net.thucydides.core.model.TestOutcome;
+import net.thucydides.core.model.TestResult;
+import net.thucydides.core.model.features.ApplicationFeature;
+import net.thucydides.core.steps.ExecutedStepDescription;
+import net.thucydides.core.steps.StepFailure;
+import org.junit.jupiter.api.Test;
 
 class FhirDumpStepListenerTest {
 
   @Test
+  @SuppressWarnings({"java:S5961"})
   void shouldNotFailOnUnimplementedMethods() {
     // mainly for reaching code coverage, no real value from these tests anyway
     val listener = new FhirDumpStepListener(FhirDumper.getInstance());
@@ -38,18 +47,16 @@ class FhirDumpStepListenerTest {
     assertDoesNotThrow(() -> listener.testStarted("hello"));
     assertDoesNotThrow(() -> listener.testStarted("hello", "world"));
     assertDoesNotThrow(() -> listener.testStarted("hello", "world", ZonedDateTime.now()));
-    assertDoesNotThrow(
-        () -> listener.testFinished(mock(TestOutcome.class), false, ZonedDateTime.now()));
     assertDoesNotThrow(listener::testRetried);
     assertDoesNotThrow(() -> listener.skippedStepStarted(mock(ExecutedStepDescription.class)));
     assertDoesNotThrow(() -> listener.stepFailed(mock(StepFailure.class)));
+    assertDoesNotThrow(() -> listener.stepFailed(mock(StepFailure.class), List.of()));
     assertDoesNotThrow(() -> listener.lastStepFailed(mock(StepFailure.class)));
     assertDoesNotThrow(listener::stepIgnored);
     assertDoesNotThrow(() -> listener.stepPending());
     assertDoesNotThrow(() -> listener.stepPending("hello"));
     assertDoesNotThrow(() -> listener.stepFinished());
     assertDoesNotThrow(() -> listener.stepFinished(List.of()));
-    assertDoesNotThrow(() -> listener.testFailed(mock(TestOutcome.class), new Exception("")));
     assertDoesNotThrow(listener::testIgnored);
     assertDoesNotThrow(listener::testSkipped);
     assertDoesNotThrow(listener::testPending);
@@ -59,7 +66,58 @@ class FhirDumpStepListenerTest {
     assertDoesNotThrow(() -> listener.addNewExamplesFrom(DataTable.withHeaders(List.of()).build()));
     assertDoesNotThrow(() -> listener.exampleStarted(Map.of()));
     assertDoesNotThrow(listener::exampleFinished);
+    assertDoesNotThrow(listener::testRunFinished);
     assertDoesNotThrow(() -> listener.assumptionViolated("hello"));
     assertDoesNotThrow(() -> listener.takeScreenshots(List.of()));
+    assertDoesNotThrow(() -> listener.takeScreenshots(TestResult.SUCCESS, List.of()));
+  }
+
+  @Test
+  void shouldForwardZonedTestFinished() {
+    val d = FhirDumper.getInstance();
+
+    val scenarioName = "hello_world_scenario";
+    val scenario = mock(Scenario.class);
+    when(scenario.getId()).thenReturn("123");
+    when(scenario.getName()).thenReturn(scenarioName);
+    when(scenario.getSourceTagNames()).thenReturn(Collections.emptyList());
+    d.startScenario(scenario);
+
+    val listener = spy(new FhirDumpStepListener(d));
+
+    val appFeature = new ApplicationFeature("id", "name");
+    val userStory =
+        new Story("id", "name", "storyclassname", "display_name", "a/b/c", appFeature);
+    val testOutcome = new TestOutcome("testname");
+    testOutcome.setDescription("description");
+    testOutcome.setUserStory(userStory);
+    val zdt = ZonedDateTime.now();
+
+    assertDoesNotThrow(() -> listener.testFinished(testOutcome, false, zdt));
+    verify(listener, times(1)).testFinished(testOutcome);
+  }
+
+  @Test
+  void shouldForwardTestFailed() {
+    val d = FhirDumper.getInstance();
+
+    val scenarioName = "hello_world_scenario";
+    val scenario = mock(Scenario.class);
+    when(scenario.getId()).thenReturn("123");
+    when(scenario.getName()).thenReturn(scenarioName);
+    when(scenario.getSourceTagNames()).thenReturn(Collections.emptyList());
+    d.startScenario(scenario);
+
+    val listener = spy(new FhirDumpStepListener(d));
+
+    val appFeature = new ApplicationFeature("id", "name");
+    val userStory =
+        new Story("id", "name", "storyclassname", "display_name", "a/b/c", appFeature);
+    val testOutcome = new TestOutcome("testname");
+    testOutcome.setDescription("description");
+    testOutcome.setUserStory(userStory);
+
+    assertDoesNotThrow(() -> listener.testFailed(testOutcome, new NullPointerException()));
+    verify(listener, times(1)).testFinished(testOutcome);
   }
 }

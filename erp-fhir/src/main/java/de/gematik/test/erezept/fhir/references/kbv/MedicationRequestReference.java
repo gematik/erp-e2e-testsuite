@@ -16,19 +16,17 @@
 
 package de.gematik.test.erezept.fhir.references.kbv;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
+import de.gematik.test.erezept.fhir.references.CustomReferenceProvider;
 import org.hl7.fhir.r4.model.Reference;
 
-@DatatypeDef(name = "Reference")
-@SuppressWarnings({"java:S110"})
-public class MedicationRequestReference extends Reference {
+public class MedicationRequestReference extends CustomReferenceProvider {
 
-  private static final String MEDICATION_REQUEST_PREFIX = "MedicationRequest/";
+  public MedicationRequestReference(String referenceValue) {
+    super("MedicationRequest", referenceValue);
+  }
 
-  public MedicationRequestReference(String referenceId) {
-    super(
-        referenceId.startsWith(MEDICATION_REQUEST_PREFIX)
-            ? referenceId
-            : MEDICATION_REQUEST_PREFIX + referenceId);
+  @Override
+  public Reference asReference() {
+    return new Reference(this.referenceValue);
   }
 }

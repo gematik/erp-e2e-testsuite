@@ -23,6 +23,9 @@ import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
+/**
+ * <a href="https://de.wikipedia.org/wiki/Pharmazentralnummer">Pharmazentralnummer</a>
+ */
 public class PZN extends Value<String> {
 
   private PZN(String value) {

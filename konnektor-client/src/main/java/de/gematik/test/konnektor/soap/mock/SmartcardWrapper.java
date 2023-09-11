@@ -16,12 +16,16 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.smartcard.*;
-import de.gematik.ws.conn.cardservice.v8.*;
-import de.gematik.ws.conn.cardservicecommon.v2.*;
-import lombok.*;
+import de.gematik.test.smartcard.Egk;
+import de.gematik.test.smartcard.Smartcard;
+import de.gematik.test.smartcard.SmartcardType;
+import de.gematik.ws.conn.cardservice.v8.CardInfoType;
+import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
+import java.math.BigInteger;
+import lombok.Getter;
+import lombok.val;
 
 public class SmartcardWrapper {
 
@@ -53,7 +57,8 @@ public class SmartcardWrapper {
     cit.setCardType(mapSmartcardType(smartcard.getType()));
     cit.setIccsn(smartcard.getIccsn());
     cit.setCardHandle(createCardHandleString(smartcard));
-
+    cit.setSlotId(BigInteger.valueOf(1));
+    cit.setCtId("SoftKonKT");
     return cit;
   }
 
@@ -62,6 +67,7 @@ public class SmartcardWrapper {
       case EGK -> CardTypeType.EGK;
       case SMC_B -> CardTypeType.SMC_B;
       case HBA -> CardTypeType.HBA;
+      case SMC_KT -> CardTypeType.SMC_KT;
     };
   }
 

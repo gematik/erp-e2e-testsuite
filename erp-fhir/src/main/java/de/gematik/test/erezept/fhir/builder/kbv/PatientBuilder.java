@@ -32,8 +32,10 @@ import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
 import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -41,57 +43,22 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.*;
 
 public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
 
-  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
-
   private final List<Identifier> identifiers = new LinkedList<>();
-
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
   private String givenName;
   private String familyName;
   private String namePrefix;
   private Date birthDate;
   private Address address;
 
-  private String kvIdentifier;
+  private KVNR kvnr;
   private IdentifierTypeDe identifierTypeDe;
-  private OrganizationReference assignerRef;
-
-  public static PatientBuilder builder() {
-    return new PatientBuilder();
-  }
-
-  public static PatientBuilder faker() {
-    return faker(fakerKvid());
-  }
-
-  public static PatientBuilder faker(IdentifierTypeDe identifierTypeDe) {
-    return faker(fakerKvid(), identifierTypeDe);
-  }
-
-  public static PatientBuilder faker(String kvid) {
-    return faker(kvid, randomElement(IdentifierTypeDe.GKV, IdentifierTypeDe.PKV));
-  }
-
-  public static PatientBuilder faker(String kvid, IdentifierTypeDe identifierTypeDe) {
-    val builder = builder();
-    builder
-        .kvIdentifierDe(kvid, identifierTypeDe)
-        .name(fakerFirstName(), fakerLastName())
-        .birthDate(fakerBirthday())
-        .address(fakerCountry(), fakerCity(), fakerZipCode(), fakerStreetName());
-
-    if (identifierTypeDe == IdentifierTypeDe.PKV) {
-      builder.assigner(AssignerOrganizationBuilder.faker().build());
-    }
-
-    return builder;
-  }
+  private VersicherungsArtDeBasis insuranceType;
+  private Reference assignerRef;
 
   /**
    * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
@@ -106,10 +73,14 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
     return this;
   }
 
-  public PatientBuilder kvIdentifierDe(
-      @NonNull String kvIdentifier, @NonNull IdentifierTypeDe identifierTypeDe) {
-    this.kvIdentifier = kvIdentifier;
-    this.identifierTypeDe = identifierTypeDe;
+  public PatientBuilder kvnr(
+          @NonNull KVNR kvnr, @NonNull VersicherungsArtDeBasis insuranceType) {
+    this.kvnr = kvnr;
+    this.identifierTypeDe =
+        insuranceType.equals(VersicherungsArtDeBasis.GKV)
+            ? IdentifierTypeDe.GKV
+            : IdentifierTypeDe.PKV;
+    this.insuranceType = insuranceType;
     return self();
   }
 
@@ -175,7 +146,7 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
   }
 
   private PatientBuilder assigner(@NonNull OrganizationReference assigner, String displayValue) {
-    this.assignerRef = assigner;
+    this.assignerRef = assigner.asReference();
     this.assignerRef.setDisplay(displayValue);
     return self();
   }
@@ -189,11 +160,6 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
 
     // set FHIR-specific values provided by HAPI
     patient.setId(this.getResourceId()).setMeta(meta);
-
-    setIdentifier();
-    if (identifierTypeDe == IdentifierTypeDe.PKV) {
-      setPkvAssigner();
-    }
 
     val humanNameBuilder =
         HumanNameBuilder.official()
@@ -221,8 +187,11 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
     this.checkRequired(identifierTypeDe, "Patient requires an identifierTypeDe");
     this.checkValueSet(identifierTypeDe, IdentifierTypeDe.PKV, IdentifierTypeDe.GKV);
 
-    if (identifierTypeDe == IdentifierTypeDe.PKV) {
+    setIdentifier();
+    if (insuranceType == VersicherungsArtDeBasis.PKV
+        && kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
       checkRequired(assignerRef, "PKV Patient requires an assigner");
+      setPkvAssigner();
     }
 
     this.checkRequired(givenName, "Patient requires a given name");
@@ -232,52 +201,82 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
   }
 
   private void setPkvAssigner() {
-    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
-      val pkvIdentifier =
-          this.identifiers.stream()
-              .filter(
-                  identifier ->
-                      identifier.getType().getCoding().stream()
-                          .anyMatch(
-                              coding ->
-                                  coding
-                                      .getCode()
-                                      .equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
-              .findFirst()
-              .orElseThrow(() -> new MissingFieldException(KbvPatient.class, "PKV Identifier"));
+    val pkvIdentifier =
+        this.identifiers.stream()
+            .filter(
+                identifier ->
+                    identifier.getType().getCoding().stream()
+                        .anyMatch(
+                            coding ->
+                                coding.getCode().equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
+            .findFirst()
+            .orElseThrow(() -> new MissingFieldException(KbvPatient.class, "PKV Identifier"));
 
-      val assigner = pkvIdentifier.getAssigner();
-      assigner.setReference(assignerRef.getReference());
-      assigner.setDisplay(assignerRef.getDisplay());
-    }
-    // TODO: what about the assigner in kbv.ita.for >= 1.1.0 ?
+    val assigner = pkvIdentifier.getAssigner();
+    assigner.setReference(assignerRef.getReference());
+    assigner.setDisplay(assignerRef.getDisplay());
   }
 
   private void setIdentifier() {
-    INamingSystem kvidNamingSystem = null;
+    INamingSystem kvnrNamingSystem = null;
     if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
       if (identifierTypeDe == IdentifierTypeDe.GKV) {
-        kvidNamingSystem = DeBasisNamingSystem.KVID;
+        kvnrNamingSystem = DeBasisNamingSystem.KVID;
       } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
-        kvidNamingSystem = CommonNamingSystem.ACME_IDS_PATIENT;
+        kvnrNamingSystem = CommonNamingSystem.ACME_IDS_PATIENT;
       }
     } else {
       if (identifierTypeDe == IdentifierTypeDe.GKV) {
-        kvidNamingSystem = DeBasisNamingSystem.KVID_GKV;
+        kvnrNamingSystem = DeBasisNamingSystem.KVID_GKV;
       } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
-        kvidNamingSystem = DeBasisNamingSystem.KVID_PKV;
+        kvnrNamingSystem = DeBasisNamingSystem.KVID_PKV;
       }
     }
 
-    if (kvidNamingSystem == null) {
+    if (kvnrNamingSystem == null) {
       throw new BuilderException(
           format("Patient-Builder contains unsupported IdentifierType {0}", identifierTypeDe));
     }
 
     val identifier = new Identifier();
     identifier.setType(identifierTypeDe.asCodeableConcept());
-    identifier.setSystem(kvidNamingSystem.getCanonicalUrl());
-    identifier.setValue(kvIdentifier);
+    identifier.setSystem(kvnrNamingSystem.getCanonicalUrl());
+    identifier.setValue(kvnr.getValue());
     this.identifiers.add(identifier);
+  }
+
+  public static PatientBuilder builder() {
+    return new PatientBuilder();
+  }
+
+  public static PatientBuilder faker() {
+    return faker(KVNR.random());
+  }
+
+  public static PatientBuilder faker(VersicherungsArtDeBasis insuranceType) {
+    return faker(KVNR.random(), insuranceType);
+  }
+
+  public static PatientBuilder faker(KVNR kvnr) {
+    return faker(kvnr, randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV));
+  }
+
+  public static PatientBuilder faker(KVNR kvnr, VersicherungsArtDeBasis insuranceType) {
+    val builder = builder();
+    builder
+        .kvnr(kvnr, insuranceType)
+        .name(fakerFirstName(), fakerLastName())
+        .birthDate(fakerBirthday())
+        .address(fakerCountry(), fakerCity(), fakerZipCode(), fakerStreetName());
+
+    builder.identifierTypeDe =
+        insuranceType.equals(VersicherungsArtDeBasis.GKV)
+            ? IdentifierTypeDe.GKV
+            : IdentifierTypeDe.PKV;
+    if (builder.identifierTypeDe == IdentifierTypeDe.PKV) {
+      builder.assigner(AssignerOrganizationBuilder.faker().build());
+    }
+
+    return builder;
   }
 }

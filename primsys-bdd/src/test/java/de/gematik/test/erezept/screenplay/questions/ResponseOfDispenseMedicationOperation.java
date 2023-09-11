@@ -23,10 +23,12 @@ import de.gematik.test.erezept.client.usecases.DispenseMedicationCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
@@ -52,32 +54,23 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
   private final PrescriptionToDispenseStrategy.Builder strategyBuilder;
 
   @Getter private PrescriptionToDispenseStrategy executedStrategy;
-  private DispenseMedicationCommand executedCommand;
 
   private ResponseOfDispenseMedicationOperation(
       PrescriptionToDispenseStrategy.Builder strategyBuilder,
       List<Map<String, String>> replacementMedications) {
+    super("Task/$close");
     this.replacementMedications = replacementMedications;
     this.strategyBuilder = strategyBuilder;
   }
 
   @Override
-  public Class<ErxReceipt> expectedResponseBody() {
-    return this.executedCommand.expectedResponseBody();
-  }
-
-  @Override
-  public String getOperationName() {
-    return "Task/$close";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxReceipt> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     executedStrategy = strategyBuilder.initialize(prescriptionManager);
 
+    DispenseMedicationCommand executedCommand;
     if (replacementMedications.isEmpty()) {
       // if no replacements given, dispense the original medication
       val kbvAsString = executedStrategy.getKbvBundleAsString();
@@ -95,7 +88,7 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
     log.info(
         format(
             "Actor {0} is asking for the response of {1}",
-            actor.getName(), this.executedCommand.getRequestLocator()));
+            actor.getName(), executedCommand.getRequestLocator()));
     return erpClientAbility.request(executedCommand);
   }
 
@@ -104,10 +97,17 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
     val prescriptionId = strategy.getPrescriptionId();
-    val kvid = strategy.getKvid();
+    val kvnr = strategy.getKvnr();
+
+    if (medication.getVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+      log.info(
+          format(
+              "Creating a MedicationDispense containing an old Medication with version {0}",
+              medication.getVersion().getVersion()));
+    }
 
     val medicationDispense =
-        ErxMedicationDispenseBuilder.forKvid(kvid)
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
             .prescriptionId(prescriptionId)
             .performerId(telematikId)
             .medication(medication)
@@ -156,8 +156,15 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
                   .normgroesse(StandardSize.fromCode(sizeCode))
                   .build();
 
+          if (medication.getVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+            log.info(
+                format(
+                    "Creating a MedicationDispense containing an old Medication with version {0}",
+                    medication.getVersion().getVersion()));
+          }
+
           val medicationDispense =
-              ErxMedicationDispenseBuilder.forKvid(strategy.getKvid())
+              ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
                   .prescriptionId(strategy.getPrescriptionId())
                   .performerId(performerId)
                   .medication(medication)
@@ -216,14 +223,14 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
         PrescriptionToDispenseStrategy.withDequeue(dequeue).secret(wrongSecret));
   }
 
-  public static ResponseOfDispenseMedicationOperationBuilder toKvid(String dequeue, String kvid) {
-    return toKvid(DequeStrategy.fromString(dequeue), kvid);
+  public static ResponseOfDispenseMedicationOperationBuilder toKvnr(String dequeue, String kvnr) {
+    return toKvnr(DequeStrategy.fromString(dequeue), KVNR.from(kvnr));
   }
 
-  public static ResponseOfDispenseMedicationOperationBuilder toKvid(
-      DequeStrategy dequeue, String kvid) {
+  public static ResponseOfDispenseMedicationOperationBuilder toKvnr(
+      DequeStrategy dequeue, KVNR kvnr) {
     return new ResponseOfDispenseMedicationOperationBuilder(
-        PrescriptionToDispenseStrategy.withDequeue(dequeue).kvid(kvid));
+        PrescriptionToDispenseStrategy.withDequeue(dequeue).kvnr(kvnr));
   }
 
   public static ResponseOfDispenseMedicationOperationBuilder toPatient(

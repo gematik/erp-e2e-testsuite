@@ -20,6 +20,7 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
+import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -41,7 +42,15 @@ public class DeleteSentCommunication implements Task {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val communicationsOracle = SafeAbility.getAbility(actor, ManageCommunications.class);
     val forDeletion = deque.chooseFrom(communicationsOracle.getSentCommunications());
-    val id = forDeletion.getCommunicationId();
+    val id =
+        forDeletion
+            .getCommunicationId()
+            .orElseThrow(
+                () ->
+                    new MissingPreconditionError(
+                        format(
+                            "Expected communication from {0} with Type {1} does not have an ID",
+                            forDeletion.getSenderName(), forDeletion.getType())));
     val cmd = new CommunicationDeleteCommand(id);
     val response = erpClient.request(cmd);
 

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
 import lombok.val;
@@ -39,11 +40,11 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildFakedBundle(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val kvid = GemFaker.fakerKvid();
+    val kvnr = KVNR.random();
     val performerId = GemFaker.fakerTelematikId();
     val prescriptionId = PrescriptionId.random();
     val bundle =
-        ErxMedicationDispenseBundleBuilder.faker(3, kvid, performerId, prescriptionId).build();
+        ErxMedicationDispenseBundleBuilder.faker(3, kvnr, performerId, prescriptionId).build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
     assertEquals(3, bundle.getEntry().size());
@@ -51,7 +52,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
 
   @Test
   void buildEmptyWithAddedFakedDispenses() {
-    val kvid = GemFaker.fakerKvid();
+    val kvnr = KVNR.random();
     val performerId = GemFaker.fakerTelematikId();
     val prescriptionId = PrescriptionId.random();
     val builder = ErxMedicationDispenseBundleBuilder.empty();
@@ -60,7 +61,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
 
     val bundle = builder.build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
@@ -70,16 +71,16 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
 
   @Test
   void buildFakedBundleWithAddedFakedDispenses() {
-    val kvid = GemFaker.fakerKvid();
+    val kvnr = KVNR.random();
     val performerId = GemFaker.fakerTelematikId();
     val prescriptionId = PrescriptionId.random();
-    val builder = ErxMedicationDispenseBundleBuilder.faker(3, kvid, performerId, prescriptionId);
+    val builder = ErxMedicationDispenseBundleBuilder.faker(3, kvnr, performerId, prescriptionId);
 
     IntStream.range(0, 3)
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseBuilder.faker(kvid, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
 
     val bundle = builder.build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);

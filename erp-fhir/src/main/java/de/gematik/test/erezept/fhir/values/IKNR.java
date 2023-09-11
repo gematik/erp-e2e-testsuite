@@ -21,7 +21,7 @@ import java.util.Objects;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.Identifier;
 
-/** https://de.wikipedia.org/wiki/Institutionskennzeichen */
+/** <a href="https://de.wikipedia.org/wiki/Institutionskennzeichen">Institutionskennzeichen</a> */
 public class IKNR {
 
   @Getter private final String value;

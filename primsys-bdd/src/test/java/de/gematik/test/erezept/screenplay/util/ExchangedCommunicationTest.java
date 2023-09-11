@@ -35,6 +35,6 @@ class ExchangedCommunicationTest {
 
     assertEquals("Marty McFly", exc.getSenderName());
     assertEquals("Doc Brown", exc.getReceiverName());
-    assertEquals(com.getUnqualifiedId(), exc.getCommunicationId());
+    assertEquals(com.getUnqualifiedId(), exc.getCommunicationId().get());
   }
 }

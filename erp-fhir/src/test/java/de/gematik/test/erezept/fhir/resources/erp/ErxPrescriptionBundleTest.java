@@ -81,6 +81,26 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   }
 
   @Test
+  void shouldGetKbvBundleFromPrescriptionBundle120() {
+    val fileName = "51fe2824-aed7-4f6a-803b-3e351137d998.json";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
+    assertNotNull(prescriptionBundle, "Valid ErxPrescriptionBundle must be parseable");
+
+    // make sure no ClassCastExceptions are thrown: see TSERP-120
+    assertDoesNotThrow(prescriptionBundle::getKbvBundle);
+    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getPatient);
+    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getMedication);
+    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getMedicationRequest);
+    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getMedicalOrganization);
+    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getCoverage);
+    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getPractitioner);
+    assertDoesNotThrow(prescriptionBundle::getTask);
+    assertDoesNotThrow(prescriptionBundle.getTask()::getAcceptDate);
+  }
+
+  @Test
   void shouldEncodeSinglePrescriptionBundleXml120() {
     val fileName = "d95b3ece-cdd7-439d-a062-17bdc2253962.xml";
 

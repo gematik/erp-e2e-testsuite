@@ -54,7 +54,7 @@ class ErxMedicationDispenseTest extends ParsingTest {
     assertEquals(Darreichungsform.TAB, medication.getDarreichungsformFirstRep().orElseThrow());
     // TODO: implement tests for further convenience methods on demand
 
-    assertEquals("X234567890", medicationDispense.getSubjectId());
+    assertEquals("X234567890", medicationDispense.getSubjectId().getValue());
     assertEquals("606358757", medicationDispense.getPerformerIdFirstRep());
 
     // Note: expectedHandedOver might change at winter time (written at 05.10.2021)

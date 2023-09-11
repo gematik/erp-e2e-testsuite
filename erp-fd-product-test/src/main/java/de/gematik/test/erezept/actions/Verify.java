@@ -58,7 +58,7 @@ public class Verify<T extends Resource> implements Performable {
 
     public Builder<R> withExpectedType(Requirement req) {
       val exp = withExpectedType();
-      exp.andResponse(payloadIsOfType(interaction.getExpectedBody(), req));
+      exp.andResponse(payloadIsOfType(interaction.getExpectedType(), req));
       return exp;
     }
 
@@ -88,16 +88,16 @@ public class Verify<T extends Resource> implements Performable {
       this.expectation = expectation;
     }
 
-    public Builder<R> responseWith(VerificationStep<ErpResponse> step) {
+    public Builder<R> responseWith(VerificationStep<ErpResponse<? extends Resource>> step) {
       this.expectation.responseWith(step);
       return this;
     }
 
-    public Builder<R> hasResponseWith(VerificationStep<ErpResponse> step) {
+    public Builder<R> hasResponseWith(VerificationStep<ErpResponse<? extends Resource>> step) {
       return responseWith(step);
     }
 
-    public Builder<R> andResponse(VerificationStep<ErpResponse> step) {
+    public Builder<R> andResponse(VerificationStep<ErpResponse<? extends Resource>> step) {
       return responseWith(step);
     }
 

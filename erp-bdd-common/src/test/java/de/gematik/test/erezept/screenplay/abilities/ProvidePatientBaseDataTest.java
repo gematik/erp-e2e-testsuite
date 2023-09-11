@@ -19,72 +19,120 @@ package de.gematik.test.erezept.screenplay.abilities;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import org.junit.Test;
 
 public class ProvidePatientBaseDataTest {
 
   @Test
-  public void shouldCreateGkvPatient() {
-    val patient = ProvidePatientBaseData.forGkvPatient("X123456789", "Fridolin Straßer");
+  public void shouldCreateGkvPatientFullName() {
+    val patient = ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin Schraßer");
 
     assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
-    assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
-    assertEquals("Fridolin Straßer", patient.getFullName());
-    assertTrue(patient.getPatient().hasGkvId());
+    assertEquals("Schraßer", patient.getPatient().getNameFirstRep().getFamily());
+    assertEquals("Fridolin Schraßer", patient.getFullName());
+    assertTrue(patient.getPatient().hasGkvKvnr());
     assertTrue(patient.isGKV());
-    assertEquals("X123456789", patient.getPatient().getKvid().orElseThrow());
+    assertFalse(patient.isPKV());
+    assertFalse(patient.hasRememberedConsent());
+    assertEquals("X123456789", patient.getPatient().getKvnr().getValue());
     assertNotNull(patient.getIknr());
     assertFalse(patient.getIknr().isEmpty());
     assertEquals(IKNR.from(patient.getIknr()), patient.getInsuranceIknr());
     assertFalse(patient.getRememberedConsent().isPresent());
     assertFalse(patient.hasRememberedConsent());
     assertNotNull(patient.getInsuranceCoverage());
+    assertNotNull(patient.getCoverageInsuranceType());
+  }
+
+  @Test
+  public void shouldCreateGkvPatient() {
+    val patient = ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin", "Straßer");
+
+    assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
+    assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
+    assertEquals("Fridolin Straßer", patient.getFullName());
+    assertTrue(patient.getPatient().hasGkvKvnr());
+    assertTrue(patient.isGKV());
+    assertFalse(patient.isPKV());
+    assertFalse(patient.hasRememberedConsent());
+    assertEquals("X123456789", patient.getPatient().getKvnr().getValue());
+    assertNotNull(patient.getIknr());
+    assertFalse(patient.getIknr().isEmpty());
+    assertEquals(IKNR.from(patient.getIknr()), patient.getInsuranceIknr());
+    assertFalse(patient.getRememberedConsent().isPresent());
+    assertFalse(patient.hasRememberedConsent());
+    assertNotNull(patient.getInsuranceCoverage());
+    assertNotNull(patient.getCoverageInsuranceType());
   }
 
   @Test
   public void shouldCreatePkvPatient() {
-    val patient = ProvidePatientBaseData.forPkvPatient("X123456789", "Fridolin Straßer");
+    val patient = ProvidePatientBaseData.forPkvPatient(KVNR.from("X123456789"), "Fridolin Straßer");
 
     assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
     assertEquals("Fridolin Straßer", patient.getFullName());
-    assertTrue(patient.getPatient().hasPkvId());
+    assertTrue(patient.getPatient().hasPkvKvnr());
     assertTrue(patient.isPKV());
-    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow());
+    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow().getValue());
+    assertEquals("X123456789", patient.getPatient().getKvnr().getValue());
   }
 
   @Test
   public void shouldCreatePkvPatient02() {
-    val patient = ProvidePatientBaseData.forPkvPatient("X123456789", "Fridolin", "Straßer");
+    val patient = ProvidePatientBaseData.forPkvPatient(KVNR.from("X123456789"), "Fridolin", "Straßer");
 
     assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
     assertEquals("Fridolin Straßer", patient.getFullName());
-    assertTrue(patient.getPatient().hasPkvId());
+    assertTrue(patient.getPatient().hasPkvKvnr());
     assertTrue(patient.isPKV());
-    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow());
+    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow().getValue());
+    assertEquals("X123456789", patient.getPatient().getKvnr().getValue());
   }
 
   @Test
   public void shouldCreatePkvWithFakedName() {
-    val patient = ProvidePatientBaseData.forPatient("X123456789", "", "PKV");
+    val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
 
     assertNotEquals("", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertNotEquals("", patient.getPatient().getNameFirstRep().getFamily());
     assertNotEquals("", patient.getFullName());
-    assertTrue(patient.getPatient().hasPkvId());
-    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow());
+    assertTrue(patient.getPatient().hasPkvKvnr());
+    assertEquals("X123456789", patient.getPatient().getPkvId().orElseThrow().getValue());
+  }
+
+  @Test
+  public void shouldGetCoverageInsuranceType() {
+    val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
+
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getCoverageInsuranceType());
+    assertTrue(patient.getPatient().hasPkvKvnr());
+  }
+
+  @Test
+  public void shouldGetChangedCoverageInsuranceType() {
+    val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
+    patient.setCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+
+    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+    assertEquals(VersicherungsArtDeBasis.BG, patient.getCoverageInsuranceType());
+    assertTrue(patient.isPKV());
+    assertFalse(patient.isGKV());
+    assertTrue(patient.getPatient().hasPkvKvnr());
   }
 
   @Test
   public void shouldCreateGkvWithFakedName() {
-    val patient = ProvidePatientBaseData.forPatient("X123456789", "", "GKV");
+    val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "GKV");
 
     assertNotEquals("", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertNotEquals("", patient.getPatient().getNameFirstRep().getFamily());
     assertNotEquals("", patient.getFullName());
-    assertTrue(patient.getPatient().hasGkvId());
-    assertEquals("X123456789", patient.getPatient().getKvid().orElseThrow());
+    assertTrue(patient.getPatient().hasGkvKvnr());
+    assertEquals("X123456789", patient.getPatient().getGkvId().orElseThrow().getValue());
   }
 }

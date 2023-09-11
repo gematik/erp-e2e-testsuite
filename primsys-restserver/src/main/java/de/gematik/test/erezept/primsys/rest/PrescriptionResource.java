@@ -16,8 +16,12 @@
 
 package de.gematik.test.erezept.primsys.rest;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.primsys.model.ActorContext;
+import de.gematik.test.erezept.primsys.rest.data.AcceptData;
+import de.gematik.test.erezept.primsys.rest.data.DispensedData;
 import de.gematik.test.erezept.primsys.rest.data.PrescriptionData;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
 import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
@@ -37,14 +41,27 @@ public class PrescriptionResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public List<PrescriptionData> getPrescriptions() {
-    log.info("GET /prescription");
-    return ctx.getPrescriptions();
+    return getPrescribed();
   }
 
   @GET
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public PrescriptionData getPrescription(@PathParam("id") String id) {
+    return getPrescribed(id);
+  }
+
+  @GET
+  @Path("prescribed")
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<PrescriptionData> getPrescribed() {
+    return ctx.getPrescriptions();
+  }
+
+  @GET
+  @Path("prescribed/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public PrescriptionData getPrescribed(@PathParam("id") String id) {
     log.info("GET /prescription/" + id);
     return ctx.getPrescriptions().stream()
         .filter(p -> p.getTaskId().equals(id))
@@ -53,7 +70,54 @@ public class PrescriptionResource {
             () ->
                 new WebApplicationException(
                     Response.status(404)
-                        .entity(new ErrorResponse("No Prescription found with ID " + id))
+                        .entity(new ErrorResponse(format("No Prescription found with ID {0}", id)))
+                        .build()));
+  }
+
+  @GET
+  @Path("accepted")
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<AcceptData> getAccepted() {
+    return ctx.getAcceptedPrescriptions();
+  }
+
+  @GET
+  @Path("accepted/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public AcceptData getAccepted(@PathParam("id") String id) {
+    return ctx.getAcceptedPrescriptions().stream()
+        .filter(p -> p.getTaskId().equals(id))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new WebApplicationException(
+                    Response.status(404)
+                        .entity(
+                            new ErrorResponse(format("Prescription {0} has not been accepted", id)))
+                        .build()));
+  }
+
+  @GET
+  @Path("dispensed")
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<DispensedData> getDispensed() {
+    return ctx.getDispensedMedications();
+  }
+
+  @GET
+  @Path("dispensed/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public DispensedData getDispensed(@PathParam("id") String id) {
+    return ctx.getDispensedMedications().stream()
+        .filter(p -> p.getTaskId().equals(id))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new WebApplicationException(
+                    Response.status(404)
+                        .entity(
+                            new ErrorResponse(
+                                format("Prescription {0} has not been dispensed", id)))
                         .build()));
   }
 

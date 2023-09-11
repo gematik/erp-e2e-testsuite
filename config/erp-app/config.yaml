@@ -2,27 +2,18 @@ shouldLogCapabilityStatement: true
 
 users:
   - name: Alice
-    #device: Alexander Samsung Galaxy A50
-    #device: Android 12 Emulator
-#    device: iPhone 13 Emulator
-    #device: iPhone 14 Emulator
-#    device: T-Systems Samsung Galaxy S20
-    device: T-Systems iPhone 12 Pro
+    egkIccsn: 80276883110000115197
+    useVirtualEgk: false
+    device: T-Systems iPhone 14
 
 apps:
+  - platform: iOS
+    appFile: cloud:uniqueName=20230509_1.13.0-18
+    packageName: de.gematik.erp4ios.eRezept
   - platform: Android
     appFile: cloud:uniqueName=debug-tsystems0001
     espressoServerUniqueName: initialOchestratorTestAPK
     packageName: de.gematik.ti.erp.app.test
-    useVirtualeGK: false
-    maxWaitTimeout: 5000  # how many milliseconds to wait at maximum for an element
-    pollingInterval: 50   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
-  - platform: iOS
-    appFile: cloud:uniqueName=202111260543
-    packageName: de.gematik.erp4ios.eRezept
-    useVirtualeGK: true
-    maxWaitTimeout: 5000 # how many milliseconds to wait at maximum for an element
-    pollingInterval: 50   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
 
 appium:
   - id: local
@@ -30,41 +21,19 @@ appium:
   - id: t-systems
     url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
     version: 2.0.0.beta.23
-    accessKey: eyJhbGciOiJIUzI1NiJ9.eyJ4cC51IjoyNDM3MzQ1LCJ4cC5wIjoyMzYwNzExLCJ4cC5tIjoxNjE5MDAzOTcxNjI1LCJleHAiOjE5MzQzNzA4NzQsImlzcyI6ImNvbS5leHBlcml0ZXN0In0.8_wBj9UWDAy-AqK2zjyW3aGlHHb89QiqDqdCyVy7mdw
+    maxWaitTimeout: 12000 # how many milliseconds to wait at maximum for an element
+    pollingInterval: 100   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
 
 devices:
-  - name: Android 12 Emulator
-    platform: Android
-    udid: emulator-5554
-    platformVersion: 12
-    appium: local
-
-  - name: iPhone 13 Emulator
+  - name: iPhone 14 Pro Max Simulator
     platform: iOS
-    udid: 5EDA0E1F-07BB-45BF-96DE-B93024370ED9
-    platformVersion: 16.0
+    udid: CF5BE8A7-CBAE-4855-8E29-AFF4CFD45C6D
+    platformVersion: 16.4
     appium: local
 
-  - name: iPhone 14 Pro Max Emulator
+  - name: iPhone 7 Plus Simulator
     platform: iOS
-    udid: CA3C537A-A421-4D91-8E69-789C11ADA744
-    platformVersion: 16.0
+    udid: F5209097-BA96-41CC-8D58-D225C9E9CFB9
+    platformVersion: 16.4
     appium: local
 
-  - name: Alexander Samsung Galaxy A50
-    platform: Android
-    udid: R58N51KBFWN
-    platformVersion: 11
-    appium: local
-
-  - name: T-Systems iPhone 12 Pro
-    platform: iOS
-    udid: 00008101-001469393A91001E
-    platformVersion: 14.4
-    appium: t-systems
-
-  - name: T-Systems Samsung Galaxy S20
-    platform: Android
-    udid: RF8N21RJBFT
-    platformVersion: 12
-    appium: t-systems

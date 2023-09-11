@@ -53,7 +53,7 @@ public class ErxPrescriptionBundle extends Bundle {
                 resource.getMeta().getProfile().stream()
                     .map(PrimitiveType::getValue)
                     .anyMatch(KbvItaErpStructDef.BUNDLE::match))
-        .map(KbvErpBundle::fromBundle)
+        .map(KbvErpBundle.class::cast)
         .findFirst()
         .orElseThrow(
             () ->

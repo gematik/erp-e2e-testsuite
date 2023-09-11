@@ -17,7 +17,6 @@
 package de.gematik.test.erezept.integration.task;
 
 import de.gematik.test.core.ArgumentComposer;
-import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
@@ -27,6 +26,8 @@ import de.gematik.test.erezept.actors.ActorStage;
 import de.gematik.test.erezept.actors.ActorType;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.toggle.E2ECucumberTag;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -44,93 +45,96 @@ import java.util.stream.Stream;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsIn;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Task für ein E-Rezept erstellen")
+
 class TaskCreateUsecase extends ErpTest {
 
-  @TestcaseId("ERP_TASK_CREATE_01")
-  @ParameterizedTest(name = "[{index}] -> Verordnender Arzt erstellt Task mit WorkFlow {0}")
-  @DisplayName("Erstelle einen E-Rezept Task als Verordnender Arzt")
-  @EnumSource(
-      value = PrescriptionFlowType.class,
-      mode = EXCLUDE,
-      names = {"FLOW_TYPE_209"})
-  void createTask(PrescriptionFlowType flowType) {
-    val doctor = this.getDoctorNamed("Bernd Claudius");
-    val creation = doctor.performs(TaskCreate.withFlowType(flowType));
-    doctor.attemptsTo(
-        Verify.that(creation)
-            .withExpectedType(ErpAfos.A_19018)
-            .hasResponseWith(returnCode(201))
-            .and(hasWorkflowType(flowType))
-            .and(isInDraftStatus())
-            .and(hasValidPrescriptionId())
-            .isCorrect());
-  }
+    @TestcaseId("ERP_TASK_CREATE_01")
+    @ParameterizedTest(name = "[{index}] -> Verordnender Arzt erstellt Task mit WorkFlow {0}")
+    @DisplayName("Erstelle einen E-Rezept Task als Verordnender Arzt")
+    @EnumSource(value = PrescriptionFlowType.class)
+    void createTask(PrescriptionFlowType flowType) {
+        val doctor = this.getDoctorNamed("Bernd Claudius");
+        val creation = doctor.performs(TaskCreate.withFlowType(flowType));
+        doctor.attemptsTo(
+                Verify.that(creation)
+                        .withExpectedType(ErpAfos.A_19018)
+                        .hasResponseWith(returnCode(201))
+                        .and(hasWorkflowType(flowType))
+                        .and(isInDraftStatus())
+                        .and(hasValidPrescriptionId())
+                        .isCorrect());
+    }
 
-  @TestcaseId("ERP_TASK_CREATE_02")
-  @ParameterizedTest(name = "[{index}] -> {0} erstellt Task mit WorkFlow {1}")
-  @DisplayName("Nur ein Verordnender Arzt darf E-Rezepte aktivieren")
-  @MethodSource("taskCreateProvider")
-  void createTaskAsImproperActor(
-      NamedEnvelope<Function<ActorStage, ErpActor>> actorGetter, PrescriptionFlowType flowType) {
-    val actor = actorGetter.getParameter().apply(this.stage);
-    val creation = actor.performs(TaskCreate.withFlowType(flowType));
-    actor.attemptsTo(
-        Verify.that(creation)
-            .withOperationOutcome(ErpAfos.A_19018)
-            .responseWith(returnCodeIsIn(403, 410))
-            .isCorrect());
-  }
+    @TestcaseId("ERP_TASK_CREATE_02")
+    @ParameterizedTest(name = "[{index}] -> {0} erstellt Task mit WorkFlow {1}")
+    @DisplayName("Nur ein Verordnender Arzt darf E-Rezepte aktivieren")
+    @MethodSource("taskCreateProvider")
+    void createTaskAsImproperActor(
+            NamedEnvelope<Function<ActorStage, ErpActor>> actorGetter, PrescriptionFlowType flowType) {
+        val actor = actorGetter.getParameter().apply(this.stage);
+        val creation = actor.performs(TaskCreate.withFlowType(flowType));
+        actor.attemptsTo(
+                Verify.that(creation)
+                        .withOperationOutcome(ErpAfos.A_19018)
+                        .responseWith(returnCodeIsIn(403, 410))
+                        .isCorrect());
+    }
 
-  static Stream<Arguments> taskCreateProvider() {
-    return ArgumentComposer.composeWith()
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Sina Hüllmann", ActorType.PATIENT),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-            PrescriptionFlowType.FLOW_TYPE_160)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Sina Hüllmann", ActorType.PATIENT),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-            PrescriptionFlowType.FLOW_TYPE_169)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Sina Hüllmann", ActorType.PATIENT),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-            PrescriptionFlowType.FLOW_TYPE_200)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Sina Hüllmann", ActorType.PATIENT),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-            PrescriptionFlowType.FLOW_TYPE_209)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Am Flughafen", ActorType.PHARMACY),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-            PrescriptionFlowType.FLOW_TYPE_160)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Am Flughafen", ActorType.PHARMACY),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-            PrescriptionFlowType.FLOW_TYPE_169)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Am Flughafen", ActorType.PHARMACY),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-            PrescriptionFlowType.FLOW_TYPE_200)
-        .arguments(
-            NamedEnvelope.of(
-                format("{0} Am Flughafen", ActorType.PHARMACY),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-            PrescriptionFlowType.FLOW_TYPE_209)
-        .create();
-  }
+    static Stream<Arguments> taskCreateProvider() {
+        val composer = ArgumentComposer.composeWith()
+                .arguments(
+                        NamedEnvelope.of(
+                                format("{0} Sina Hüllmann", ActorType.PATIENT),
+                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+                        PrescriptionFlowType.FLOW_TYPE_160)
+                .arguments(
+                        NamedEnvelope.of(
+                                format("{0} Sina Hüllmann", ActorType.PATIENT),
+                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+                        PrescriptionFlowType.FLOW_TYPE_169)
+                .arguments(
+                        NamedEnvelope.of(
+                                format("{0} Am Flughafen", ActorType.PHARMACY),
+                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+                        PrescriptionFlowType.FLOW_TYPE_160)
+                .arguments(
+                        NamedEnvelope.of(
+                                format("{0} Am Flughafen", ActorType.PHARMACY),
+                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+                        PrescriptionFlowType.FLOW_TYPE_169);
+
+        if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
+            composer.arguments(
+                            NamedEnvelope.of(
+                                    format("{0} Sina Hüllmann", ActorType.PATIENT),
+                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+                            PrescriptionFlowType.FLOW_TYPE_200)
+                    .arguments(
+                            NamedEnvelope.of(
+                                    format("{0} Sina Hüllmann", ActorType.PATIENT),
+                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+                            PrescriptionFlowType.FLOW_TYPE_209)
+                    .arguments(
+                            NamedEnvelope.of(
+                                    format("{0} Am Flughafen", ActorType.PHARMACY),
+                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+                            PrescriptionFlowType.FLOW_TYPE_200)
+                    .arguments(
+                            NamedEnvelope.of(
+                                    format("{0} Am Flughafen", ActorType.PHARMACY),
+                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+                            PrescriptionFlowType.FLOW_TYPE_209);
+        }
+
+        return composer.create();
+    }
 }

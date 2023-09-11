@@ -26,10 +26,10 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
-import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Coding;
@@ -54,13 +54,20 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     return new ErxCommunicationBuilder();
   }
 
-  public ErxCommunicationBuilder basedOnTaskId(@NonNull final String taskId) {
+  public ErxCommunicationBuilder basedOnTaskId(final TaskId taskId) {
+    return basedOnTaskId(taskId.getValue());
+  }
+
+  public ErxCommunicationBuilder basedOnTaskId(final String taskId) {
     this.taskReference = taskId.startsWith("Task/") ? taskId : "Task/" + taskId;
     return self();
   }
 
-  public ErxCommunicationBuilder basedOnTask(
-      @NonNull final String taskId, @NonNull final String accessCode) {
+  public ErxCommunicationBuilder basedOnTask(final TaskId taskId, final AccessCode accessCode) {
+    return basedOnTask(taskId.getValue(), accessCode.getValue());
+  }
+
+  public ErxCommunicationBuilder basedOnTask(final String taskId, final String accessCode) {
     basedOnTaskId(taskId + "/$accept?ac=" + accessCode);
     //    due to the AccessCode HAPI will cut Task/ (the leading resource)
     //    trick HAPI by providing '/' in front of the leading resource
@@ -68,18 +75,13 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     return self();
   }
 
-  public ErxCommunicationBuilder basedOnTask(
-      @NonNull final String taskId, @NonNull final AccessCode accessCode) {
-    return basedOnTask(taskId, accessCode.getValue());
-  }
-
-  public ErxCommunicationBuilder medication(@NonNull final KbvErpMedication medication) {
+  public ErxCommunicationBuilder medication(final KbvErpMedication medication) {
     this.medication = medication;
     this.aboutReference = "#" + medication.getIdElement().getIdPart(); // about contained resource
     return self();
   }
 
-  public ErxCommunicationBuilder insurance(@NonNull final IKNR iknr) {
+  public ErxCommunicationBuilder insurance(final IKNR iknr) {
     this.insuranceIknr = iknr;
     return self();
   }
@@ -104,7 +106,7 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     return self();
   }
 
-  public ErxCommunication buildInfoReq(@NonNull final String message) {
+  public ErxCommunication buildInfoReq(String message) {
     checkRequiredForInfoReq();
     val type = CommunicationType.INFO_REQ;
 
@@ -154,7 +156,7 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     return com;
   }
 
-  public ErxCommunication buildRepresentative(@NonNull final String message) {
+  public ErxCommunication buildRepresentative(String message) {
     checkRequiredForRepresentative();
     val type = CommunicationType.REPRESENTATIVE;
     ErxCommunication com;
@@ -193,7 +195,7 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     return com;
   }
 
-  public ErxCommunication buildDispReq(@NonNull final String message) {
+  public ErxCommunication buildDispReq(String message) {
     checkRequiredForDispReq();
     val type = CommunicationType.DISP_REQ;
 
@@ -212,7 +214,7 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     return com;
   }
 
-  public ErxCommunication buildReply(@NonNull final String message) {
+  public ErxCommunication buildReply(String message) {
     checkRequiredForReply();
     val type = CommunicationType.REPLY;
     ErxCommunication com;

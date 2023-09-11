@@ -18,6 +18,7 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
@@ -31,17 +32,17 @@ import net.serenitybdd.screenplay.Question;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DownloadTaskById implements Question<ErxPrescriptionBundle> {
 
-  private final String taskId;
+  private final TaskId taskId;
 
   @Override
   public ErxPrescriptionBundle answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val cmd = new TaskGetByIdCommand(taskId);
     val response = erpClient.request(cmd);
-    return response.getResource(cmd.expectedResponseBody());
+    return response.getExpectedResource();
   }
 
-  public static DownloadTaskById withId(String taskId) {
+  public static DownloadTaskById withId(TaskId taskId) {
     return new DownloadTaskById(taskId);
   }
 }

@@ -19,8 +19,8 @@ package de.gematik.test.konnektor.soap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import de.gematik.test.konnektor.cfg.BasicAuthConfiguration;
-import de.gematik.test.konnektor.cfg.TLSConfiguration;
+import de.gematik.test.erezept.config.dto.konnektor.BasicAuthConfiguration;
+import de.gematik.test.erezept.config.dto.konnektor.TLSConfiguration;
 import de.gematik.test.konnektor.profile.KonSimProfile;
 import de.gematik.test.konnektor.profile.ProfileType;
 import java.net.URL;

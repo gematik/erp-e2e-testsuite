@@ -16,17 +16,14 @@
 
 package de.gematik.test.konnektor.cfg;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import de.gematik.test.konnektor.Konnektor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.*;
+import de.gematik.test.konnektor.*;
+import lombok.*;
 
 @Getter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = RemoteKonnetorConfiguration.class, name = "remote"),
+  @JsonSubTypes.Type(value = RemoteKonnektorConfiguration.class, name = "remote"),
   @JsonSubTypes.Type(value = LocalKonnektorConfiguration.class, name = "local"),
 })
 public abstract class KonnektorConfiguration {

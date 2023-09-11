@@ -19,6 +19,7 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -26,8 +27,8 @@ public class TaskRejectCommand extends BaseCommand<Resource> {
 
   private final Secret secret;
 
-  public TaskRejectCommand(String taskId, AccessCode accessCode, Secret secret) {
-    super(Resource.class, HttpRequestMethod.POST, "Task", taskId);
+  public TaskRejectCommand(TaskId taskId, AccessCode accessCode, Secret secret) {
+    super(Resource.class, HttpRequestMethod.POST, "Task", taskId.getValue());
     this.secret = secret;
     this.headerParameters.put("X-AccessCode", accessCode.getValue());
   }

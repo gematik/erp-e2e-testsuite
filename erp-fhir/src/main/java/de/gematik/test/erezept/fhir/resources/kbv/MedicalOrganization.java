@@ -44,9 +44,13 @@ public class MedicalOrganization extends AbstractOrganization implements ErpFhir
   }
 
   public static MedicalOrganization fromOrganization(Organization adaptee) {
-    val kbvOrganization = new MedicalOrganization();
-    adaptee.copyValues(kbvOrganization);
-    return kbvOrganization;
+    if (adaptee instanceof MedicalOrganization medicalOrganization) {
+      return medicalOrganization;
+    } else {
+      val kbvOrganization = new MedicalOrganization();
+      adaptee.copyValues(kbvOrganization);
+      return kbvOrganization;
+    }
   }
 
   public static MedicalOrganization fromOrganization(Resource adaptee) {

@@ -31,6 +31,7 @@ public enum KbvItaForStructDef implements IStructureDefinition<KbvItaForVersion>
   BASIS("https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Legal_basis"),
   TARIFF("https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_PKV_Tariff"),
   STATUS_CO_PAYMENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_StatusCoPayment"),
+  ALTERNATIVE_IK("https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Alternative_IK"),
   ACCIDENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident"),
   ;
 

@@ -33,8 +33,6 @@ import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -43,45 +41,33 @@ import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
 
   private final ActorRole role;
   private final DequeStrategy deque;
   private final Map<String, String> replacementMap;
 
-  @Override
-  public Class<Resource> expectedResponseBody() {
-    return Resource.class;
+  private ResponseOfAbortOperation(
+      ActorRole role, DequeStrategy deque, Map<String, String> replacementMap) {
+    super("Task/$abort");
+    this.role = role;
+    this.deque = deque;
+    this.replacementMap = replacementMap;
   }
 
   @Override
-  public String getOperationName() {
-    return "Task/$abort";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<Resource> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
-    TaskAbortCommand cmd;
-    switch (role) {
-      case DOCTOR:
-        cmd = abortAsDoctor(actor);
-        break;
-      case PATIENT:
-        cmd = abortAsPatient(actor);
-        break;
-      case PHARMACY:
-        cmd = abortAsPharmacy(actor);
-        break;
-      case REPRESENTATIVE:
-        cmd = abortAsRepresentative(actor);
-        break;
-      default:
-        throw new FeatureNotImplementedException(
-            format("You cannot abort a prescription as {0}", role));
-    }
+    TaskAbortCommand cmd =
+        switch (role) {
+          case DOCTOR -> abortAsDoctor(actor);
+          case PATIENT -> abortAsPatient(actor);
+          case PHARMACY -> abortAsPharmacy(actor);
+          case REPRESENTATIVE -> abortAsRepresentative(actor);
+          default -> throw new FeatureNotImplementedException(
+              format("You cannot abort a prescription as {0}", role));
+        };
     return erpClientAbility.request(cmd);
   }
 
@@ -89,7 +75,7 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     val issuedPrescriptions =
         SafeAbility.getAbility(actor, ManageDoctorsPrescriptions.class).getPrescriptions();
     val toDelete = deque.chooseFrom(issuedPrescriptions);
-    val taskId = toDelete.getUnqualifiedId();
+    val taskId = toDelete.getTaskId();
     val accessCode = toDelete.getAccessCode();
     val cmd = new TaskAbortCommand(taskId, accessCode);
     log.info(

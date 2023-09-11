@@ -16,13 +16,16 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import lombok.val;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Reference;
+import static java.text.MessageFormat.*;
+
+import de.gematik.test.erezept.fhir.builder.*;
+import de.gematik.test.erezept.fhir.exceptions.*;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.valuesets.*;
+import java.util.stream.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
 
 public class PrescriptionId extends Value<String> {
 
@@ -30,11 +33,24 @@ public class PrescriptionId extends Value<String> {
       ErpWorkflowNamingSystem.PRESCRIPTION_ID;
 
   public PrescriptionId(final String value) {
-    super(NAMING_SYSTEM, value);
+    this(
+        "1.2.0".equalsIgnoreCase(System.getProperty("erp.fhir.profile"))
+            ? ErpWorkflowNamingSystem.PRESCRIPTION_ID_121
+            : ErpWorkflowNamingSystem.PRESCRIPTION_ID,
+        value);
+  }
+
+  public PrescriptionId(final ErpWorkflowNamingSystem system, final String value) {
+    super(system, value);
   }
 
   public boolean check() {
     return checkId(this.getValue());
+  }
+
+  public PrescriptionFlowType getFlowType() {
+    val firstChunk = this.getValue().split("\\.")[0];
+    return PrescriptionFlowType.fromCode(firstChunk);
   }
 
   /**
@@ -68,6 +84,28 @@ public class PrescriptionId extends Value<String> {
 
   public static PrescriptionId random(PrescriptionFlowType flowType) {
     return GemFaker.fakerPrescriptionId(flowType);
+  }
+
+  public static PrescriptionId from(Identifier identifier) {
+    val system =
+        Stream.of(
+                ErpWorkflowNamingSystem.PRESCRIPTION_ID,
+                ErpWorkflowNamingSystem.PRESCRIPTION_ID_121)
+            .filter(ns -> ns.match(identifier.getSystem()))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new BuilderException(
+                        format("Cannot build PrescriptionId from {0}", identifier.getSystem())));
+    return new PrescriptionId(system, identifier.getValue());
+  }
+
+  public static PrescriptionId from(TaskId id) {
+    return from(id.getValue());
+  }
+
+  public static PrescriptionId from(String id) {
+    return new PrescriptionId(id);
   }
 
   public static boolean checkId(PrescriptionId prescriptionId) {

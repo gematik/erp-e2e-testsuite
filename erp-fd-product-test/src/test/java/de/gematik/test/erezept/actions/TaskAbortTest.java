@@ -28,6 +28,7 @@ import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import java.util.*;
 import lombok.*;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.*;
 
 class TaskAbortTest {
@@ -40,7 +41,10 @@ class TaskAbortTest {
     val erxTask = new ErxTask();
     erxTask.setId("123");
     val mockResponse =
-        new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(() -> patient.performs(TaskAbort.asPatient(erxTask)));

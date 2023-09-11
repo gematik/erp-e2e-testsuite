@@ -52,6 +52,11 @@ public class ErxConsent extends Consent {
             () -> new MissingFieldException(this.getClass(), ErpWorkflowCodeSystem.CONSENT_TYPE));
   }
 
+  public String getConsentId() {
+    val idTokens = this.getId().split("/");
+    return idTokens[idTokens.length - 1];
+  }
+
   public ConsentScope getConsentScope() {
     return ConsentScope.fromCode(this.getScope().getCodingFirstRep().getCode());
   }

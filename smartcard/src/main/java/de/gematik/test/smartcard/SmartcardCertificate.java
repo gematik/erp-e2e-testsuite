@@ -34,8 +34,7 @@ import org.bouncycastle.cert.*;
 @Slf4j
 public class SmartcardCertificate {
 
-  @Getter(AccessLevel.MODULE)
-  private final X509CertificateWrapper certWrapper;
+  @Getter private final X509CertificateWrapper certWrapper;
 
   @Getter private final PrivateKey privateKey;
   @Getter private final Crypto algorithm;

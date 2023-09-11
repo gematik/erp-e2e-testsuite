@@ -23,7 +23,6 @@ import de.gematik.idp.crypto.model.*;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.client.vau.*;
-import de.gematik.test.erezept.fhir.exceptions.*;
 import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.smartcard.*;
 import java.security.cert.*;
@@ -40,13 +39,14 @@ import org.hl7.fhir.r4.model.*;
 @Builder
 public class ErpClient {
 
+  private final ClientType clientType;
+
   // configuration
   private final String baseFdUrl;
   private final String acceptCharset;
   private final MediaType acceptMime;
   private final MediaType sendMime;
   private final boolean validateRequest;
-  private final boolean validateResponse;
 
   // client capabilities
   private final IdpClient idpClient;
@@ -150,7 +150,7 @@ public class ErpClient {
   }
 
   @SneakyThrows
-  public <R extends Resource> ErpResponse request(ICommand<R> command) {
+  public <R extends Resource> ErpResponse<R> request(ICommand<R> command) {
     this.refreshIdpToken(); // make sure before each request that the IDP token is not outdated
     // Request-Body is optional: encode as FHIR if available, otherwise keep empty body
     val bodyBuilder = new StringBuilder();
@@ -159,7 +159,7 @@ public class ErpClient {
         .ifPresent(b -> bodyBuilder.append(fhir.encode(b, sendMime.toFhirEncoding())));
 
     val reqBody = bodyBuilder.toString();
-    this.validateFhirContent(reqBody, validateRequest);
+    this.validateRequestFhirContent(reqBody, validateRequest);
 
     val accessToken = idpToken.getAccessToken().getRawString();
 
@@ -170,24 +170,20 @@ public class ErpClient {
     val duration = Duration.between(start, Instant.now());
     log.info(format("Request against {0} took {1} msec", baseFdUrl, duration.toMillis()));
 
-    // validate and decode the Response and wrap into an ErpResponse
-    this.validateFhirContent(response.getBody(), validateResponse);
     return responseFactory.createFrom(
         response.getStatusCode(),
         duration,
         response.getHeader(),
+        accessToken,
         response.getBody(),
         command.expectedResponseBody());
   }
 
-  private void validateFhirContent(String content, boolean shouldValidate) {
-    if (shouldValidate) {
+  private void validateRequestFhirContent(String content, boolean shouldValidate) {
+    if (shouldValidate && content != null && !content.isEmpty()) {
       log.info(format("Validate FHIR Content with length {0}", content.length()));
       val vr = fhir.validate(content);
-      if (!vr.isSuccessful()) {
-        log.error(format("FHIR Content is invalid"));
-        throw new FhirValidationException(vr);
-      }
+      ValidationResultHelper.throwOnInvalidValidationResult(vr);
     }
   }
 

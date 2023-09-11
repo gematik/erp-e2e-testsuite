@@ -23,10 +23,11 @@ import static org.mockito.Mockito.*;
 import de.gematik.test.erezept.actors.*;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.konnektor.commands.options.*;
+import de.gematik.test.konnektor.soap.mock.vsdm.*;
 import java.util.*;
 import lombok.*;
 import org.junit.jupiter.api.*;
@@ -38,19 +39,25 @@ class DownloadAuditEventTest {
     val useErpClient = mock(UseTheErpClient.class);
 
     val patient = new PatientActor("sina");
-    patient.can(ProvidePatientBaseData.forGkvPatient("X123456789", patient.getName()));
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), patient.getName()));
     patient.can(useErpClient);
 
     val agentName = "Am Flughafen";
     val agentId = TelematikID.from("3-SMC-B-Testkarte-883110000116873");
-    val checksum = ExamEvidence.NO_UPDATES.getChecksum().orElseThrow();
+    val checksum =
+        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
+            .checksum(VsdmChecksum.builder("X12345678").build())
+            .build()
+            .getChecksum()
+            .orElseThrow();
 
-    val mockResponse =
-        new ErpResponse(
-            200,
-            Map.of(),
-            FhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName, checksum));
-    when(useErpClient.request(any(AuditEventGetCommand.class))).thenReturn(mockResponse);
+    val resource = FhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName, checksum);
+    val response =
+        ErpResponse.forPayload(resource, ErxAuditEventBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    when(useErpClient.request(any(AuditEventGetCommand.class))).thenReturn(response);
 
     assertDoesNotThrow(() -> patient.performs(DownloadAuditEvent.orderByDateDesc()));
   }

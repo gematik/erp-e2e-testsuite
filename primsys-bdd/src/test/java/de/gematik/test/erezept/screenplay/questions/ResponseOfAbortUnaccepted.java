@@ -24,8 +24,6 @@ import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -34,23 +32,17 @@ import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
 
   private final DequeStrategy deque;
 
-  @Override
-  public Class<Resource> expectedResponseBody() {
-    return Resource.class;
+  private ResponseOfAbortUnaccepted(DequeStrategy deque) {
+    super("Task/$abort");
+    this.deque = deque;
   }
 
   @Override
-  public String getOperationName() {
-    return "Task/$abort";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<Resource> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val accepted =
         SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class).getAssignedPrescriptions();

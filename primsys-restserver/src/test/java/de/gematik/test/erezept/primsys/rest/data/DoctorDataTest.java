@@ -41,19 +41,14 @@ class DoctorDataTest {
   @Test
   void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
     val doc = mock(Doctor.class);
-    val tiData = new TelematikData();
-    tiData.setFachdienst("http://localhost");
-    tiData.setTsl("tsl");
-    tiData.setDiscoveryDocument("discovery");
 
     val baseData = new DoctorData();
     baseData.setType("Doctor");
     baseData.setId("123");
-    baseData.setTi(tiData);
 
     when(doc.getBaseData()).thenReturn(baseData);
 
-    val kbvBundle = KbvErpBundleBuilder.faker("X123456789", "04773414").build();
+    val kbvBundle = KbvErpBundleBuilder.faker().build();
     val data = DoctorData.fromKbvBundle(doc, kbvBundle);
     assertNotNull(data);
     assertEquals(kbvBundle.getPractitioner().getFullName(), data.getName());

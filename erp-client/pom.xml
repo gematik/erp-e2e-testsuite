@@ -5,72 +5,61 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>erp-client</artifactId>
     <packaging>jar</packaging>
+    <name>E-Rezept Client</name>
     <description>
         This Module implements the client for E-Rezept FD.
     </description>
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${version.sl4j-api}</version>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-config-data</artifactId>
         </dependency>
-
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
-            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
-            <version>0.3.0</version>
+        </dependency>
+        <!-- get the test-jar dependency to reuse test-resources and test-utils from erp-fhir -->
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>konnektor-client</artifactId>
-            <version>0.3.0</version>
             <scope>test</scope> <!-- required for the integration test -->
         </dependency>
 
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-crypto</artifactId>
-            <version>0.3.0</version>
         </dependency>
 
-        <!-- TODO: why jackson not shipped with erp-fhir? -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${version.fasterxml.jackson}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${version.fasterxml.jackson}</version>
-        </dependency>
-
-        <!-- get the test-jar dependency to reuse test-resources and test-utils from erp-fhir -->
-        <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>erp-fhir</artifactId>
-            <type>test-jar</type>
-            <version>0.3.0</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-cades</artifactId>
-            <version>${version.dss}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -81,23 +70,19 @@
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-token</artifactId>
-            <version>${version.dss}</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sd-dss</groupId>
             <artifactId>dss-utils-apache-commons</artifactId>
-            <version>${version.dss}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
-            <version>${version.bouncycastle}</version>
         </dependency>
 
         <dependency>
             <groupId>de.gematik.idp</groupId>
             <artifactId>idp-client</artifactId>
-            <version>${version.idp-client}</version>
             <exclusions>
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
@@ -112,16 +97,10 @@
         <dependency>
             <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>${version.unirest}</version>
         </dependency>
         <dependency>
             <groupId>org.java-websocket</groupId>
             <artifactId>Java-WebSocket</artifactId>
-            <version>1.5.2</version>
-            <scope>compile</scope>
         </dependency>
-
-
-
     </dependencies>
 </project>

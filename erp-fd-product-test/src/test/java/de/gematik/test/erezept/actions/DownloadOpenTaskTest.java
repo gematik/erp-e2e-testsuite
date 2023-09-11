@@ -16,19 +16,25 @@
 
 package de.gematik.test.erezept.actions;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.konnektor.commands.options.*;
-import java.util.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
+import java.util.Map;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class DownloadOpenTaskTest {
 
@@ -39,21 +45,19 @@ class DownloadOpenTaskTest {
     pharmacist.can(useErpClient);
 
     val sina = new PatientActor("sina");
-    val providePatientBaseData = ProvidePatientBaseData.forGkvPatient("X12345678", "sina");
+    val providePatientBaseData = ProvidePatientBaseData.forGkvPatient(KVNR.random(), "sina");
     sina.can(providePatientBaseData);
 
-    val examEvidence = ExamEvidence.NO_UPDATES.encodeAsBase64();
+    val examEvidence =
+        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES).build().encodeAsBase64();
 
     val mockResponse =
-        new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTaskBundle.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(useErpClient.request(any(TaskGetByExamEvidenceCommand.class))).thenReturn(mockResponse);
 
-    assertDoesNotThrow(
-        () ->
-            pharmacist.performs(
-                DownloadOpenTask.builder()
-                    .kvnr(sina.getKvnr())
-                    .examEvidence(examEvidence)
-                    .build()));
+    assertDoesNotThrow(() -> pharmacist.performs(DownloadOpenTask.withExamEvidence(examEvidence)));
   }
 }

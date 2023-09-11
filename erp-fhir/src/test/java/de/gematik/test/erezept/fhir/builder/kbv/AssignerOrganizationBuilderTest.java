@@ -81,23 +81,23 @@ class AssignerOrganizationBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void shouldFailOnFakerWithGkvPatient(KbvItaForVersion version) {
-    val patient = PatientBuilder.faker(IdentifierTypeDe.GKV).version(version).build();
+    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.GKV).version(version).build();
     assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(patient));
   }
 
   @Test
   void shouldFailOnFakerWithInvalidPkvPatient01() {
     val mockPatient = mock(KbvPatient.class);
-    when(mockPatient.hasPkvId()).thenReturn(true);
+    when(mockPatient.hasPkvKvnr()).thenReturn(true);
     when(mockPatient.getPkvAssigner()).thenReturn(Optional.empty());
     assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(mockPatient));
   }
 
   @Test
   void shouldFailOnFakerWithInvalidPkvPatient02() {
-    val patient = PatientBuilder.faker(IdentifierTypeDe.PKV).build();
+    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.PKV).build();
     val mockPatient = mock(KbvPatient.class);
-    when(mockPatient.hasPkvId()).thenReturn(true);
+    when(mockPatient.hasPkvKvnr()).thenReturn(true);
     when(mockPatient.getPkvAssigner()).thenReturn(patient.getPkvAssigner());
     when(mockPatient.getPkvAssignerName()).thenReturn(Optional.empty());
     assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(mockPatient));

@@ -16,31 +16,16 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.and;
-import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
-import de.gematik.test.erezept.screenplay.questions.ChargeItemHasChanged;
-import de.gematik.test.erezept.screenplay.questions.ChargeItemHasExpectedMarkingFlags;
-import de.gematik.test.erezept.screenplay.questions.HasChargeItem;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfDeleteChargeItem;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetChargeItem;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.task.BillingInformationConsent;
-import de.gematik.test.erezept.screenplay.task.ChangeChargeItemMarkingFlags;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
-import de.gematik.test.erezept.screenplay.task.SendCommunication;
-import io.cucumber.datatable.DataTable;
-import io.cucumber.java.de.Angenommen;
-import io.cucumber.java.de.Dann;
-import io.cucumber.java.de.Und;
-import io.cucumber.java.de.Wenn;
-import lombok.val;
-import net.serenitybdd.core.PendingStepException;
-import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.ensure.Ensure;
+import de.gematik.test.erezept.screenplay.questions.*;
+import de.gematik.test.erezept.screenplay.strategy.*;
+import de.gematik.test.erezept.screenplay.task.*;
+import io.cucumber.datatable.*;
+import io.cucumber.java.de.*;
+import lombok.*;
+import net.serenitybdd.screenplay.actors.*;
+import net.serenitybdd.screenplay.ensure.*;
 
 public class PatientChargeItemSteps {
 
@@ -68,7 +53,7 @@ public class PatientChargeItemSteps {
    *     widerrufen soll
    */
   @Angenommen(
-      "^(?:der|die) Versicherte (.+) hat (?:seine|ihre) Einwilligung zum Speichern der Abrechnungsinformationen (erteilt|widerrufen)$")
+      "^(?:der|die) Versicherte (.+) hat (?:seine|ihre) Einwilligung zum Speichern der PKV-Abrechnungsinformationen (erteilt|widerrufen)$")
   public void givenThatConsentIsGranted(String patientName, String consentAction) {
     val thePatient = OnStage.theActorCalled(patientName);
     givenThat(thePatient).attemptsTo(BillingInformationConsent.forAction(consentAction));
@@ -82,7 +67,7 @@ public class PatientChargeItemSteps {
    *     widerrufen soll
    */
   @Angenommen(
-      "^(?:der|die) Versicherte hat (?:seine|ihre) Einwilligung zum Speichern der Abrechnungsinformationen (erteilt|widerrufen)$")
+      "^(?:der|die) Versicherte hat (?:seine|ihre) Einwilligung zum Speichern der PKV-Abrechnungsinformationen (erteilt|widerrufen)$")
   public void givenThatConsentIsGranted(String consentAction) {
     val thePatient = OnStage.theActorInTheSpotlight();
     givenThat(thePatient).attemptsTo(BillingInformationConsent.forAction(consentAction));
@@ -97,7 +82,7 @@ public class PatientChargeItemSteps {
    *     widerrufen soll
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:seine|ihre) Einwilligung zur Speicherung der Abrechnungsinformationen (erteilt|widerruft)$")
+      "^(?:der|die) Versicherte (.+) (?:seine|ihre) Einwilligung zur Speicherung der PKV-Abrechnungsinformationen (erteilt|widerruft)$")
   public void whenGrantConsent(String patientName, String consentAction) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient).attemptsTo(BillingInformationConsent.forAction(consentAction));
@@ -105,7 +90,7 @@ public class PatientChargeItemSteps {
 
   /**
    * Prüfe, ob auf dem E-Rezept Fachdienst für den Versicherten mit dem Namen {@code patientName}
-   * eine Einwilligung zur Speicherung der Abrechnungsinformationen hinterlegt hat.
+   * eine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen hinterlegt hat.
    *
    * <p><b>Notiz:</b> aktuell wird hier lediglich eine <code>GET /Consent</code> ausgeführt und bei
    * erfolgreicher Antwort, diese vom Versicherten gemerkt. Eine Prüfung findet aus dem folgenden
@@ -117,7 +102,7 @@ public class PatientChargeItemSteps {
    * @param patientName ist der Name des Versicherten, der die Einwilligung abruft
    */
   @Dann(
-      "^hat (?:der|die) Versicherte (.+) eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
+      "^hat (?:der|die) Versicherte (.+) eine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen beim E-Rezept Fachdienst$")
   public void thenHasConsent(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient).attemptsTo(BillingInformationConsent.getConsent());
@@ -129,7 +114,7 @@ public class PatientChargeItemSteps {
    * @param patientName ist der Name des Versicherten, der die Einwilligung abruft
    */
   @Und(
-      "^(?:der|die) Versicherte (.+) hat eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
+      "^(?:der|die) Versicherte (.+) hat eine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen beim E-Rezept Fachdienst$")
   public void andHasConsent(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     and(thePatient).attemptsTo(BillingInformationConsent.getConsent());
@@ -139,7 +124,7 @@ public class PatientChargeItemSteps {
    * Die <em>theActorInTheSpotlight</em>-Variante von {@link #thenHasConsent(String patientName)}
    */
   @Dann(
-      "^hat (?:der|die) Versicherte eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
+      "^hat (?:der|die) Versicherte eine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen beim E-Rezept Fachdienst$")
   public void thenHasConsent() {
     val thePatient = OnStage.theActorInTheSpotlight();
     when(thePatient).attemptsTo(BillingInformationConsent.getConsent());
@@ -147,56 +132,58 @@ public class PatientChargeItemSteps {
 
   /** Die <em>theActorInTheSpotlight</em>-Variante von {@link #andHasConsent(String patientName)} */
   @Und(
-      "^(?:der|die) Versicherte hat eine Einwilligung zur Speicherung der Abrechnungsinformationen beim E-Rezept Fachdienst$")
+      "^(?:der|die) Versicherte hat eine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen beim E-Rezept Fachdienst$")
   public void andHasConsent() {
     val thePatient = OnStage.theActorInTheSpotlight();
     and(thePatient).attemptsTo(BillingInformationConsent.getConsent());
   }
 
   @Wenn(
-      "^(?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept die Abrechnungsinformationen abruft$")
+      "^(?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept die PKV-Abrechnungsinformationen abruft$")
   public void whenFdVGetsChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItem.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
   }
 
   /**
-   * Der Step prüft, dass keine Abrechnungsinformationen beim Fachdienst vorliegen. Erwartet wird
-   * eine leere Liste
+   * Der Step prüft, dass keine PKV-Abrechnungsinformationen beim Fachdienst vorliegen. Erwartet
+   * wird eine leere Liste
    *
-   * @param patientName
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
    */
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept keine Abrechnungsinformationen abrufen$")
-  public void thenFdVGetsNoChargeItems(String patientName, String order) {
+      "^kann (?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept keine PKV-Abrechnungsinformationen (?:mehr abrufen|abrufen)$")
+  @Und(
+      "^(?:der|die) Versicherte (.+) kann für das (letzte|erste) E-Rezept keine PKV-Abrechnungsinformationen (?:mehr abrufen|abrufen)$")
+  public void andThenPatientGetsNoChargeItemBundle(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfGetChargeItem.forPrescription(order).asPatient())
+            CheckTheReturnCode.of(ResponseOfGetChargeItemBundle.forPrescription(order).asPatient())
                 .isGreaterEqual(400));
   }
 
   /**
-   * Der Step prüft, dass keine Abrechnungsinformationen zum letzten dispensierten Rezept beim
+   * Der Step prüft, dass keine PKV-Abrechnungsinformationen zum letzten dispensierten Rezept beim
    * Fachdienst vorliegen. Erwartet wird FehlerCode 404
    *
-   * @param patientName
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
    */
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept keine Abrechnungsinformationen abrufen, weil sie nicht gefunden werden$")
+      "^kann (?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept keine PKV-Abrechnungsinformationen abrufen, weil sie nicht gefunden werden$")
   public void thenFdvGetsNoChargeItemForPrescription(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfGetChargeItem.forPrescription(order).asPatient())
+            CheckTheReturnCode.of(ResponseOfGetChargeItemBundle.forPrescription(order).asPatient())
                 .isEqualTo(404));
   }
 
   /**
    * Der Step prüft, dass der Versicherte seine Einwilligung abrufen kann
    *
-   * @param patientName
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
    */
   @Dann("^kann (?:der|die) Versicherte (.+) seine Einwilligung abrufen$")
   public void thenCanGetConsent(String patientName) {
@@ -207,39 +194,43 @@ public class PatientChargeItemSteps {
   /**
    * Der Step löst das Löschen der Abrechnungsinformation zum letzten Rezept aus
    *
-   * @param patientName
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept die Abrechnungsinformationen löscht$")
+      "^(?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept die PKV-Abrechnungsinformationen löscht$")
   public void whenDeleteChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient)
         .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfDeleteChargeItem.fromStack(order))
-                .matching(rc -> rc == 202 || rc == 204));
+            CheckTheReturnCode.of(ResponseOfDeleteChargeItem.fromStack(order)).isEqualTo(204));
   }
 
   /**
-   * Der Step übergibt den AccessCode zum Ändern der Abrechnungsinformationen an die Apotheke
+   * Der Step übergibt den AccessCode und die ID des ChargeItems zum Ändern der
+   * PKV-Abrechnungsinformationen an die Apotheke
    *
-   * @param patientName
-   * @param pharmName
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
+   * @param pharmName der Name der Apotheke, die den DMC erhalten soll
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) die Apotheke (.+) via Data Matrix Code zum Ändern der Abrechnungsinformationen berechtigt$")
-  public void whenPharmacyGetsEnabledByDMC(String patientName, String pharmName) {
-    throw new PendingStepException("Not yet implemented");
+      "^(?:der|die) Versicherte (.+) die Apotheke (.+) via Data Matrix Code zum Ändern des (ersten|letzten) PKV-Abgabedatensatzes berechtigt$")
+  public void whenPharmacyGetsEnabledByDMC(String patientName, String pharmName, String order) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+
+    when(thePatient)
+        .attemptsTo(HandoverChargeItemAuthorization.forChargeItem(order).to(thePharmacy));
   }
 
   /**
-   * Der Step übergibt den AccessCode zum Ändern der Abrechnungsinformationen an die Apotheke mit
-   * einer Communication vom Typ ChargChangeRequest
+   * Der Step übergibt den AccessCode zum Ändern der PKV-Abrechnungsinformationen an die Apotheke
+   * mit einer Communication vom Typ ChargeChangeRequest
    *
-   * @param patientName
-   * @param pharmName
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
+   * @param pharmName der Name der Apotheke, welche die Communication erhalten soll
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) die Apotheke (.+) per Nachricht zum Ändern der Abrechnungsinformationen berechtigt$")
+      "^(?:der|die) Versicherte (.+) die Apotheke (.+) per Nachricht zum Ändern der PKV-Abrechnungsinformationen berechtigt$")
   public void whenPharmacyGetsEnabledByCommunication(String patientName, String pharmName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -255,12 +246,12 @@ public class PatientChargeItemSteps {
   /**
    * Der Step löst ein Setzen der Markierungsflags entsprechend der Datatable aus.
    *
-   * @param patientName
-   * @param order
-   * @param markingFlags
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
+   * @param order die Reihenfolge auf dem Rezept-Stack
+   * @param markingFlags die Markierungsflags für die Operation
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) die Markierungen für Abrechnungsinformationen des (letzten|erste) E-Rezept setzt:$")
+      "^(?:der|die) Versicherte (.+) die Markierungen für die PKV-Abrechnungsinformationen des (letzten|erste) E-Rezept setzt:$")
   public void whenSetMarkingFlags(String patientName, String order, DataTable markingFlags) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient)
@@ -271,58 +262,60 @@ public class PatientChargeItemSteps {
   /**
    * Der Step überprüft, ob die Markierungsflags entsprechend der DataTable gesetzt sind
    *
-   * @param patientName
-   * @param order
-   * @param markingFlags
+   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um diesen zu identifizieren
+   * @param order die Reihenfolge auf dem Rezept-Stack
+   * @param markingFlags die Markierungsflags für die Operation
    */
   @Dann(
-      "^hat (?:der|die) Versicherte (.+) die Abrechnungsinformationen des (letzten|ersten) E-Rezepts mit folgenden Markierungen:$")
+      "^hat (?:der|die) Versicherte (.+) die PKV-Abrechnungsinformationen des (letzten|ersten) E-Rezepts mit folgenden Markierungen:$")
   public void thenHasMarkingFlags(String patientName, String order, DataTable markingFlags) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
             Ensure.that(
-                    ChargeItemHasExpectedMarkingFlags.fromDataTable(markingFlags)
+                    ChargeItemBundleHasExpectedMarkingFlags.fromDataTable(markingFlags)
                         .forPrescription(order))
                 .isTrue());
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept die geänderte Abrechnungsinformationen abrufen$")
-  public void thenFdvGetsChangedChargeItems(String patientName, String order) {
+      "^kann (?:der|die) Versicherte (.+) für das (letzte|erste) E-Rezept die geänderte PKV-Abrechnungsinformationen abrufen$")
+  @Und(
+      "^(?:der|die) Versicherte (.+) kann für das (letzte|erste) E-Rezept die geänderte PKV-Abrechnungsinformationen abrufen$")
+  public void andThenFdvGetsChangedChargeItems(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient).attemptsTo(Ensure.that(ChargeItemHasChanged.forPrescription(order)).isTrue());
   }
 
   @Dann(
-      "^hat (?:der|die) Versicherte (.+) eine Abrechnungsinformation für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
+      "^hat (?:der|die) Versicherte (.+) die PKV-Abrechnungsinformationen für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
   public void thenHasChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItem.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
   }
 
   @Und(
-      "^(?:der|die) Versicherte (.+) hat eine Abrechnungsinformation für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
+      "^(?:der|die) Versicherte (.+) hat die PKV-Abrechnungsinformationen für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
   public void andHasChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     and(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItem.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
   }
 
   @Dann(
-      "^hat (?:der|die) Versicherte eine Abrechnungsinformation für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
+      "^hat (?:der|die) Versicherte die PKV-Abrechnungsinformationen für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
   public void thenHasChargeItem(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItem.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
   }
 
   @Und(
-      "^(?:der|die) Versicherte hat eine Abrechnungsinformation für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
+      "^(?:der|die) Versicherte hat die PKV-Abrechnungsinformationen für das (letzte|erste) dispensierte Medikament beim Fachdienst vorliegen$")
   public void andHasChargeItem(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     and(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItem.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
   }
 }

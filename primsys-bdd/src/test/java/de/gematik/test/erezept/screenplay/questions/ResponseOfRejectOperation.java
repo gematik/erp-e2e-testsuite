@@ -28,32 +28,25 @@ import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfRejectOperation extends FhirResponseQuestion<Resource> {
 
   private final DequeStrategy deque;
   private final Map<String, String> replacementMap;
 
-  @Override
-  public Class<Resource> expectedResponseBody() {
-    return Resource.class;
+  private ResponseOfRejectOperation(DequeStrategy deque, Map<String, String> replacementMap) {
+    super("Task/$reject");
+    this.deque = deque;
+    this.replacementMap = replacementMap;
   }
 
   @Override
-  public String getOperationName() {
-    return "Task/$reject";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<Resource> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val pharmacyStacks = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val toReject = deque.chooseFrom(pharmacyStacks.getAcceptedPrescriptions());

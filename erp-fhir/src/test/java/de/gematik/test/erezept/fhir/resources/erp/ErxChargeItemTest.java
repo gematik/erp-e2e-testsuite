@@ -28,6 +28,7 @@ import java.util.*;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.*;
+import org.junitpioneer.jupiter.*;
 
 class ErxChargeItemTest extends ParsingTest {
 
@@ -48,8 +49,9 @@ class ErxChargeItemTest extends ParsingTest {
           assertEquals(
               new PrescriptionId("160.123.456.789.123.58"), chargeItem.getPrescriptionId());
           assertEquals(ChargeItem.ChargeItemStatus.BILLABLE, chargeItem.getStatus());
-          assertEquals("X234567890", chargeItem.getSubjectKvid());
+          assertEquals("X234567890", chargeItem.getSubjectKvnr().getValue());
           assertEquals("606358757", chargeItem.getEntererTelematikId());
+          assertFalse(chargeItem.isFromNewProfiles());
         });
   }
 
@@ -61,16 +63,17 @@ class ErxChargeItemTest extends ParsingTest {
         fileName -> {
           val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
           val chargeItem = parser.decode(content);
-          assertNotNull(chargeItem, "Valid ErxMedicationDispense must be parseable");
+          assertNotNull(chargeItem, "Valid ChargeItem must be parseable");
           assertEquals(ResourceType.ChargeItem, chargeItem.getResourceType());
+          assertEquals(ErxChargeItem.class, chargeItem.getClass());
         });
   }
 
   @Test
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.2.0")
   void shouldFindNewProfilePrescriptionId() {
     val content = ResourceUtils.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
     val chargeItem = parser.decode(ErxChargeItem.class, content);
-
     // change system of the prescription id
     chargeItem.getIdentifier().stream()
         .filter(
@@ -82,7 +85,9 @@ class ErxChargeItemTest extends ParsingTest {
             identifier ->
                 identifier.setSystem(
                     ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.getCanonicalUrl()));
-    assertEquals(new PrescriptionId("160.123.456.789.123.58"), chargeItem.getPrescriptionId());
+    assertEquals(
+        new PrescriptionId(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, "160.123.456.789.123.58"),
+        chargeItem.getPrescriptionId());
   }
 
   @Test

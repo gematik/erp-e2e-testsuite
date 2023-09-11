@@ -1,0 +1,33 @@
+
+:url-ct: https://wiki.gematik.de/display/TST/Leitbild+-+Continuous+Testing
+:link-ct: {url-ct}[Continuous-Testing]
+
+:url-jsltuz: https://gitlab.prod.ccs.gematik.solutions/git/Verwaltung/Entwicklungsumgebung/jenkins-shared-library-tuz
+:link-jsltuz: {url-jsltuz}[{jsltuz}]
+
+:url-serenity-bdd: https://github.com/serenity-bdd
+:link-serenity-bdd: {url-serenity-bdd}[Serenity-BDD]
+
+:url-serenity-guide: https://serenity-bdd.github.io/docs/guide/user_guide_intro
+:link-serenity-guide: {url-serenity-bdd}[Serenity-BDD User-Guide]
+
+:url-serenity-guide-reports: https://serenity-bdd.github.io/docs/reporting/the_serenity_reports
+:link-serenity-guide-reports: {url-serenity-guide-reports}[Serenity Reports]
+
+:url-serenity-screenplay: https://serenity-bdd.github.io/docs/screenplay/screenplay_fundamentals
+:link-serenity-screenplay: {url-serenity-screenplay}[Screenplay Pattern]
+
+:url-bdd: https://www.testautomatisierung.org/lexikon/behavior-driven-development/
+:link-bdd: {url-bdd}[Behaviour Driven Development]
+
+:url-cucumber: https://cucumber.io/
+:link-cucumber: {url-cucumber}[Cucumber]
+
+:url-gherkin: https://cucumber.io/docs/gherkin/
+:link-gherkin: {url-cucumber}[Gherkin]
+
+:url-maven-failsafe: https://maven.apache.org/surefire/maven-failsafe-plugin/
+:link-maven-failsafe: {url-maven-failsafe}[Maven Failsafe Plugin]
+
+:url-jenkins-bdd-pipeline: https://jenkins.prod.ccs.gematik.solutions/view/ERX/job/erp-bdd-testsuites/
+:link-jenkins-bdd-pipeline: {url-jenkins-bdd-pipeline}[E-Rezept E2E Pipeline]

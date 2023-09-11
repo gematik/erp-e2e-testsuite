@@ -25,10 +25,10 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.primsys.model.actor.Doctor;
 import de.gematik.test.erezept.primsys.rest.data.*;
@@ -40,7 +40,6 @@ import jakarta.ws.rs.core.Response;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Coverage;
 import org.hl7.fhir.r4.model.Practitioner;
 
 @Slf4j
@@ -51,19 +50,23 @@ public class PrescribeUseCase {
   }
 
   public static Response issuePrescription(Doctor doctor, String kbvBundleXmlBody) {
-    KbvErpBundle kbvBundle;
-    try {
-      kbvBundle = doctor.getClient().getFhir().decode(KbvErpBundle.class, kbvBundleXmlBody);
-    } catch (DataFormatException dfe) {
-      throw new WebApplicationException(
-          Response.status(400)
-              .entity(new ErrorResponse("Given KBV Bundle cannot be parsed"))
-              .build());
-    }
-    return issuePrescription(doctor, kbvBundle);
+    val kbvBundle = decodeKbvBundle(doctor, kbvBundleXmlBody);
+    val originalFlowType = PrescriptionFlowType.fromPrescriptionId(kbvBundle.getPrescriptionId());
+    return issuePrescription(doctor, kbvBundle, originalFlowType.isDirectAssignment());
+  }
+
+  public static Response issuePrescription(
+      Doctor doctor, String kbvBundleXmlBody, boolean isDirectAssignment) {
+    val kbvBundle = decodeKbvBundle(doctor, kbvBundleXmlBody);
+    return issuePrescription(doctor, kbvBundle, isDirectAssignment);
   }
 
   public static Response issuePrescription(Doctor doctor, PrescribeRequest body) {
+    return issuePrescription(doctor, body, false);
+  }
+
+  public static Response issuePrescription(
+      Doctor doctor, PrescribeRequest body, boolean isDirectAssignment) {
     if (body.getPatient() == null || Strings.isNullOrEmpty(body.getPatient().getKvnr())) {
       throw new WebApplicationException(
           Response.status(400)
@@ -71,19 +74,27 @@ public class PrescribeUseCase {
               .build());
     }
     val kbvBundle = getKbvBundleFromRequest(doctor.getName(), body);
-    return issuePrescription(doctor, kbvBundle);
+    return issuePrescription(doctor, kbvBundle, isDirectAssignment);
   }
 
   public static Response issuePrescription(Doctor doctor, KbvErpBundle kbvBundle) {
-    val flowType =
-        kbvBundle.getInsuranceType().equals(VersicherungsArtDeBasis.GKV)
-            ? PrescriptionFlowType.FLOW_TYPE_160
-            : PrescriptionFlowType.FLOW_TYPE_200;
+    return issuePrescription(doctor, kbvBundle, false);
+  }
+
+  public static Response issuePrescription(
+      Doctor doctor, KbvErpBundle kbvBundle, boolean isDirectAssignment) {
+
+    val insuranceKind = kbvBundle.getCoverage().getInsuranceKind();
+    val flowType = PrescriptionFlowType.fromInsuranceKind(insuranceKind, isDirectAssignment);
     val create = new TaskCreateCommand(flowType);
+    log.info(
+        format(
+            "Doctor {0} creates new ''{1}'' Task wit FlowType {2}",
+            doctor.getName(), flowType.toString(), flowType.getCode()));
     val createResponse = doctor.erpRequest(create);
     val draftTask =
         createResponse
-            .getResourceOptional(create.expectedResponseBody())
+            .getResourceOptional()
             .orElseThrow(
                 () ->
                     new WebApplicationException(
@@ -91,25 +102,35 @@ public class PrescribeUseCase {
                             .entity(new ErrorResponse(createResponse))
                             .build()));
 
-    val prescriptionId = draftTask.getPrescriptionId();
-    val taskId = draftTask.getUnqualifiedId();
+    // make sure we get the value of the prescription ID but still remain the system from the
+    // original kbv bundle because otherwise we will have a version mixture
+    val draftPrescriptionId = draftTask.getPrescriptionId();
+    val kbvBundlePrescriptionIdentifier = kbvBundle.getPrescriptionId().asIdentifier();
+    kbvBundlePrescriptionIdentifier.setValue(draftPrescriptionId.getValue());
+    val prescriptionId = PrescriptionId.from(kbvBundlePrescriptionIdentifier);
+
+    val taskId = draftTask.getTaskId();
     kbvBundle.setPrescriptionId(prescriptionId);
-    kbvBundle.setId(taskId);
-    kbvBundle
-        .setAllDates(); // will update all dates contained within the KBV Bundle to current date
+    kbvBundle.setId(taskId.getValue());
+    // will update all dates contained within the KBV Bundle to current date
+    kbvBundle.setAllDates();
+    if (kbvBundle.isMultiple()) {
+      val mr = kbvBundle.getMedicationRequest();
+      mr.updateMvoDates();
+    }
 
     val kbvXml = doctor.getClient().encode(kbvBundle, EncodingType.XML);
     val signedKbv = doctor.signDocument(kbvXml);
 
     log.info(format("Activate Task (authoredOn {0}", kbvBundle.getAuthoredOn()));
     val accessCode = draftTask.getOptionalAccessCode().orElseThrow();
-    val activate = new TaskActivateCommand(draftTask.getUnqualifiedId(), accessCode, signedKbv);
+    val activate = new TaskActivateCommand(draftTask.getTaskId(), accessCode, signedKbv);
     val activateResponse = doctor.erpRequest(activate);
     log.info(format("FD answered on $activate with: {0}", activateResponse.getResourceType()));
 
     val activatedTask =
         activateResponse
-            .getResourceOptional(activate.expectedResponseBody())
+            .getResourceOptional()
             .orElseThrow(
                 () ->
                     new WebApplicationException(
@@ -117,7 +138,7 @@ public class PrescribeUseCase {
                             .entity(new ErrorResponse(activateResponse))
                             .build()));
 
-    val kvnr = kbvBundle.getKvid();
+    val kvnr = kbvBundle.getKvnr();
     val patientData = PatientData.fromKbvBundle(kbvBundle);
     val coverageData = CoverageData.fromKbvBundle(kbvBundle);
     val medication = MedicationData.fromKbvBundle(kbvBundle);
@@ -141,31 +162,59 @@ public class PrescribeUseCase {
   private static KbvErpBundle getKbvBundleFromRequest(String docName, PrescribeRequest body) {
     val practitioner = PractitionerBuilder.faker(docName).build();
     val organization = MedicalOrganizationBuilder.faker().build();
-    val patient = getPatientFromRequest(body.getPatient());
+    val patient =
+        getPatientFromRequest(body.getPatient(), body.getCoverage().getEnumInsuranceKind());
     val coverage = getCoverageFromRequest(patient, body.getCoverage());
     val medication = getMedicationFromRequest(body.getMedication());
     val medicationRequest =
         getMedicationRequest(patient, coverage, practitioner, medication, body.getMedication());
-    return KbvErpBundleBuilder.forPrescription(GemFaker.fakerPrescriptionId())
-        .practitioner(practitioner)
-        .custodian(organization)
-        .patient(patient)
-        .insurance(coverage)
-        .medicationRequest(medicationRequest) // what is the medication
-        .medication(medication)
-        .build();
+
+    val kbvBuilder =
+        KbvErpBundleBuilder.forPrescription(GemFaker.fakerPrescriptionId())
+            .practitioner(practitioner)
+            .custodian(organization)
+            .patient(patient)
+            .insurance(coverage)
+            .medicationRequest(medicationRequest) // what is the medication
+            .medication(medication);
+
+    val isPkv = coverage.getInsuranceKind() == VersicherungsArtDeBasis.PKV;
+    val isOldProfile = KbvItaForVersion.getDefaultVersion().compareTo(KbvItaForVersion.V1_0_3) == 0;
+    if (isPkv && isOldProfile) {
+      // assigner organization was only required in KbvItaFor 1.0.3
+      // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
+      // Reference + Name
+      // build a faked one matching the Reference of the patient
+      val fakedAssignerOrganization = AssignerOrganizationBuilder.faker(patient);
+      kbvBuilder.assigner(fakedAssignerOrganization.build());
+    }
+
+    return kbvBuilder.build();
   }
 
-  private static KbvPatient getPatientFromRequest(PatientData patientData) {
-    return PatientBuilder.builder()
-        .kvIdentifierDe(patientData.getKvnr(), IdentifierTypeDe.GKV) // Only GKV here for now!
-        .name(patientData.getFirstName(), patientData.getLastName())
-        .birthDate(patientData.getBirthDate())
-        .address(Country.D, patientData.getCity(), patientData.getPostal(), patientData.getStreet())
-        .build();
+  private static KbvPatient getPatientFromRequest(
+      PatientData patientData, VersicherungsArtDeBasis insuranceKind) {
+    val patientBuilder =
+        PatientBuilder.builder()
+            .kvnr(KVNR.from(patientData.getKvnr()), insuranceKind)
+            .name(patientData.getFirstName(), patientData.getLastName())
+            .birthDate(patientData.getBirthDate())
+            .address(
+                Country.D, patientData.getCity(), patientData.getPostal(), patientData.getStreet());
+
+    val isPkv = insuranceKind == VersicherungsArtDeBasis.PKV;
+    val isOldProfile = KbvItaForVersion.getDefaultVersion().compareTo(KbvItaForVersion.V1_0_3) == 0;
+    if (isPkv && isOldProfile) {
+      // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
+      // Reference + Name
+      // build a faked one matching the Reference of the patient
+      patientBuilder.assigner(AssignerOrganizationBuilder.faker().build());
+    }
+
+    return patientBuilder.build();
   }
 
-  private static Coverage getCoverageFromRequest(KbvPatient patient, CoverageData coverageData) {
+  private static KbvCoverage getCoverageFromRequest(KbvPatient patient, CoverageData coverageData) {
     return KbvCoverageBuilder.insurance(coverageData.getIknr(), coverageData.getInsuranceName())
         .beneficiary(patient)
         .personGroup(coverageData.getEnumPersonGroup())
@@ -189,7 +238,7 @@ public class PrescribeUseCase {
 
   private static KbvErpMedicationRequest getMedicationRequest(
       KbvPatient patient,
-      Coverage insurance,
+      KbvCoverage insurance,
       Practitioner practitioner,
       KbvErpMedication medication,
       MedicationData medicationData) {
@@ -222,5 +271,16 @@ public class PrescribeUseCase {
       builder.mvo(MultiplePrescriptionExtension.asNonMultiple());
     }
     return builder.build();
+  }
+
+  private static KbvErpBundle decodeKbvBundle(Doctor doctor, String kbvBundleXmlBody) {
+    try {
+      return doctor.getClient().getFhir().decode(KbvErpBundle.class, kbvBundleXmlBody);
+    } catch (DataFormatException dfe) {
+      throw new WebApplicationException(
+          Response.status(400)
+              .entity(new ErrorResponse("Given KBV Bundle cannot be parsed"))
+              .build());
+    }
   }
 }

@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.pspwsclient.config;
 
+import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import de.gematik.test.erezept.pspwsclient.PSPClient;
 import de.gematik.test.erezept.pspwsclient.PharmaServiceProviderWSClient;
 

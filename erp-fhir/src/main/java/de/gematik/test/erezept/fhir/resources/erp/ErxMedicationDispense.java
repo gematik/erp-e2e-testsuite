@@ -21,6 +21,7 @@ import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -54,8 +55,8 @@ public class ErxMedicationDispense extends MedicationDispense {
                     KbvErpMedication.class, KbvItaErpStructDef.MEDICATION_PZN));
   }
 
-  public String getSubjectId() {
-    return this.getSubject().getIdentifier().getValue();
+  public KVNR getSubjectId() {
+    return KVNR.from(this.getSubject().getIdentifier().getValue());
   }
 
   public List<String> getPerformerIds() {

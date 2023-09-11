@@ -18,6 +18,7 @@ package de.gematik.test.core.extensions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.exceptions.MissingAnnotationException;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
@@ -35,17 +36,13 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.thucydides.core.steps.StepEventBus;
 import org.json.JSONObject;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 
 @Slf4j
 public class ErpTestExtension
-    implements BeforeTestExecutionCallback, AfterTestExecutionCallback, AfterAllCallback {
+    implements BeforeTestExecutionCallback, AfterTestExecutionCallback, BeforeAllCallback, AfterAllCallback {
 
   private static final String START_TIME = "start time";
 
@@ -54,9 +51,8 @@ public class ErpTestExtension
     getStore(context).put(START_TIME, System.currentTimeMillis());
     val testMethod = context.getRequiredTestMethod();
     val id = getRequiredAnnotation(testMethod, TestcaseId.class).value();
-    val display = getRequiredAnnotation(testMethod, DisplayName.class).value();
-
-    log.info(format("# Start Testcase {0} / {1} #", id, display));
+    
+    log.info(format("# Start Testcase {0} / {1} #", id, context.getDisplayName()));
 
     CoverageReporter.getInstance().startTestcase(id);
     StepEventBus.getEventBus().enableSoftAsserts();
@@ -73,6 +69,11 @@ public class ErpTestExtension
     log.info(format("# Finished Testcase {0} after {1} ms. #", id, duration));
   }
 
+  @Override
+  public void beforeAll(ExtensionContext extensionContext) throws Exception {
+    StopwatchProvider.init();
+  }
+  
   @Override
   @SneakyThrows
   @SuppressWarnings({"java:S6300"}) // writing to File by intention; not an issue!
@@ -95,6 +96,8 @@ public class ErpTestExtension
     } else {
       throw new IOException(format("Unable to write File {0} ", rawJsonOutput));
     }
+    
+    StopwatchProvider.close();
   }
 
   @SneakyThrows

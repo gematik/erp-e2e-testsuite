@@ -22,8 +22,8 @@ import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
-import de.gematik.test.erezept.screenplay.strategy.AcceptStrategy;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.strategy.pharmacy.AcceptStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +48,11 @@ public class AcceptPrescription implements Task {
     strategy.initialize(prescriptionManager);
     DmcPrescription prescriptionToAccept = strategy.getDmcPrescription();
 
-    val responseOfAcceptOperation = ResponseOfAcceptOperation.forPrescription(prescriptionToAccept);
-    val acceptedResponse = actor.asksFor(responseOfAcceptOperation);
+    val acceptedResponse =
+        actor.asksFor(ResponseOfAcceptOperation.forPrescription(prescriptionToAccept));
 
     try {
-      val acceptedTask =
-          acceptedResponse.getResource(responseOfAcceptOperation.expectedResponseBody());
+      val acceptedTask = acceptedResponse.getExpectedResource();
       konnektor.verifyDocument(acceptedTask.getSignedKbvBundle());
       prescriptionManager.appendAcceptedPrescription(acceptedTask);
     } catch (UnexpectedResponseResourceError urre) {

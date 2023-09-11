@@ -16,47 +16,44 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.commands.options.SignDocumentOptions;
-import de.gematik.test.konnektor.exceptions.SOAPRequestException;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.konnektor.commands.options.*;
+import de.gematik.test.konnektor.exceptions.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
 import de.gematik.ws.conn.signatureservice.v7.ObjectFactory;
 import de.gematik.ws.conn.signatureservice.v7.SignRequest;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import oasis.names.tc.dss._1_0.core.schema.Base64Data;
+import java.nio.charset.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import oasis.names.tc.dss._1_0.core.schema.*;
 
 @Slf4j
 public class SignXMLDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 
-  private final CardHandle cardHandle;
+  private final CardInfo cardInfo;
   private final SignRequest signRequest;
   private final SignDocumentOptions options;
 
-  public SignXMLDocumentCommand(CardHandle cardHandle, String content) {
-    this(cardHandle, content, SignDocumentOptions.getDefaultOptions());
+  public SignXMLDocumentCommand(CardInfo cardInfo, String content) {
+    this(cardInfo, content, SignDocumentOptions.getDefaultOptions());
   }
 
-  public SignXMLDocumentCommand(
-      CardHandle cardHandle, String content, SignDocumentOptions options) {
-    this(cardHandle, content.getBytes(StandardCharsets.UTF_8), options);
+  public SignXMLDocumentCommand(CardInfo cardInfo, String content, SignDocumentOptions options) {
+    this(cardInfo, content.getBytes(StandardCharsets.UTF_8), options);
   }
 
-  public SignXMLDocumentCommand(CardHandle cardHandle, byte[] content) {
-    this(cardHandle, content, SignDocumentOptions.getDefaultOptions());
+  public SignXMLDocumentCommand(CardInfo cardInfo, byte[] content) {
+    this(cardInfo, content, SignDocumentOptions.getDefaultOptions());
   }
 
-  public SignXMLDocumentCommand(
-      CardHandle cardHandle, byte[] content, SignDocumentOptions options) {
+  public SignXMLDocumentCommand(CardInfo cardInfo, byte[] content, SignDocumentOptions options) {
     val factory = new ObjectFactory();
     this.options = options;
-    this.cardHandle = cardHandle;
+    this.cardInfo = cardInfo;
     this.signRequest = factory.createSignRequest();
     val doctype = factory.createDocumentType();
     doctype.setID("CMS-Doc1"); // what about this one?
@@ -92,7 +89,7 @@ public class SignXMLDocumentCommand extends AbstractKonnektorCommand<byte[]> {
         this.executeSupplier(
             () ->
                 servicePort.signDocument(
-                    cardHandle.getHandle(),
+                    cardInfo.getHandle(),
                     options.getCryptoType().getValue(),
                     ctx,
                     options.getTvMode(),

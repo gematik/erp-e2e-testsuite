@@ -22,6 +22,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
@@ -112,27 +113,32 @@ public class CoverageData {
 
   public static CoverageData create() {
     val c = new CoverageData();
-    c.iknr = fakerIknr();
     var tmpWop = fakerValueSet(Wop.class);
     while (tmpWop.equals(Wop.DUMMY)) {
       tmpWop = fakerValueSet(Wop.class); // prevent DUMMY Wop
     }
+    val insuranceKind = VersicherungsArtDeBasis.GKV;
+    c.insuranceKind = insuranceKind.getCode();
     c.wop = tmpWop.getCode();
-    c.insuranceName = insuranceName(tmpWop);
+    
+    val ici = InsuranceCoverageInfo.randomFor(insuranceKind);
+    c.iknr = ici.getIknr();
+    c.insuranceName = ici.getName();
     c.insuranceState = fakerValueSet(VersichertenStatus.class).getCode();
-    c.insuranceKind = VersicherungsArtDeBasis.GKV.getCode();
     c.personGroup = fakerValueSet(PersonGroup.class).getCode();
     return c;
   }
 
   public CoverageData fakeMissing() {
-    this.iknr = getOrDefault(this.iknr, fakerIknr());
+    this.insuranceKind = getOrDefault(this.insuranceKind, VersicherungsArtDeBasis.GKV.getCode());
+    val ici = InsuranceCoverageInfo.randomFor(VersicherungsArtDeBasis.fromCode(this.insuranceKind));
+    this.iknr = getOrDefault(this.iknr, ici.getIknr());
+    this.insuranceName = getOrDefault(this.insuranceName, ici.getName());
     var tmpWop = fakerValueSet(Wop.class);
     this.wop = getOrDefault(this.wop, tmpWop.getCode());
-    this.insuranceName = getOrDefault(this.insuranceName, insuranceName(tmpWop));
     this.insuranceState =
         getOrDefault(this.insuranceState, fakerValueSet(VersichertenStatus.class).getCode());
-    this.insuranceKind = getOrDefault(this.insuranceKind, VersicherungsArtDeBasis.GKV.getCode());
+    
     this.payorType = getOrDefault(this.payorType, fakerValueSet(PayorType.class).getCode());
     this.personGroup = getOrDefault(this.personGroup, fakerValueSet(PersonGroup.class).getCode());
     return this;

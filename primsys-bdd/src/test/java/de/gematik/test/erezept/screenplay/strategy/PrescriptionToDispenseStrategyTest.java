@@ -24,9 +24,7 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import java.util.Optional;
@@ -42,25 +40,25 @@ class PrescriptionToDispenseStrategyTest {
     val erxBundle = mock(ErxAcceptBundle.class);
     val erxTask = mock(ErxTask.class);
     when(erxBundle.getTask()).thenReturn(erxTask);
-    when(erxTask.getForKvid()).thenReturn(Optional.of("X123456789"));
+    when(erxTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     val accessCode = new AccessCode("123");
     when(erxTask.getAccessCode()).thenReturn(accessCode);
     val secret = new Secret("123");
     when(erxTask.getSecret()).thenReturn(Optional.of(secret));
     val prescriptionId = PrescriptionId.random();
     when(erxTask.getPrescriptionId()).thenReturn(prescriptionId);
-    when(erxBundle.getTaskId()).thenReturn("890");
+    when(erxBundle.getTaskId()).thenReturn(TaskId.from("890"));
     when(erxBundle.hasConsent()).thenReturn(false);
     when(erxBundle.getKbvBundleId()).thenReturn("678");
     when(erxBundle.getKbvBundleAsString()).thenReturn("<xml>bundle</xml>");
 
     stack.appendAcceptedPrescription(erxBundle);
     val strategy = PrescriptionToDispenseStrategy.withDequeue(DequeStrategy.FIFO).initialize(stack);
-    assertEquals("X123456789", strategy.getKvid());
+    assertEquals("X123456789", strategy.getKvnr().getValue());
     assertEquals(prescriptionId, strategy.getPrescriptionId());
     assertEquals(secret, strategy.getSecret());
     assertEquals(accessCode, strategy.getAccessCode());
-    assertEquals("890", strategy.getTaskId());
+    assertEquals(TaskId.from("890"), strategy.getTaskId());
     assertEquals("678", strategy.getKbvBundleId());
     assertEquals("<xml>bundle</xml>", strategy.getKbvBundleAsString());
     assertFalse(strategy.hasPatient());
@@ -77,29 +75,29 @@ class PrescriptionToDispenseStrategyTest {
     val erxBundle = mock(ErxAcceptBundle.class);
     val erxTask = mock(ErxTask.class);
     when(erxBundle.getTask()).thenReturn(erxTask);
-    when(erxTask.getForKvid()).thenReturn(Optional.of("X123456789"));
+    when(erxTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     val accessCode = new AccessCode("123");
     when(erxTask.getAccessCode()).thenReturn(accessCode);
     val secret = new Secret("123");
     when(erxTask.getSecret()).thenReturn(Optional.of(secret));
     val prescriptionId = PrescriptionId.random();
     when(erxTask.getPrescriptionId()).thenReturn(prescriptionId);
-    when(erxBundle.getTaskId()).thenReturn("890");
+    when(erxBundle.getTaskId()).thenReturn(TaskId.from("890"));
     when(erxBundle.hasConsent()).thenReturn(true);
     when(erxBundle.getKbvBundleId()).thenReturn("678");
 
     stack.appendAcceptedPrescription(erxBundle);
     val strategy =
         PrescriptionToDispenseStrategy.withDequeue(DequeStrategy.FIFO)
-            .kvid("M123456789")
+            .kvnr(KVNR.from("M123456789"))
             .secret("456")
             .taskId("098")
             .initialize(stack);
-    assertEquals("M123456789", strategy.getKvid());
+    assertEquals("M123456789", strategy.getKvnr().getValue());
     assertEquals(prescriptionId, strategy.getPrescriptionId());
     assertEquals(new Secret("456"), strategy.getSecret());
     assertEquals(accessCode, strategy.getAccessCode());
-    assertEquals("098", strategy.getTaskId());
+    assertEquals(TaskId.from("098"), strategy.getTaskId());
     assertEquals("678", strategy.getKbvBundleId());
     assertFalse(strategy.hasPatient());
     assertTrue(strategy.getPatient().isEmpty());
@@ -107,24 +105,24 @@ class PrescriptionToDispenseStrategyTest {
   }
 
   @Test
-  void shouldUseManipulatedPrescriptionKvidFromActor() {
+  void shouldUseManipulatedPrescriptionKvnrFromActor() {
     val stack = ManagePharmacyPrescriptions.itWorksWith();
     val erxBundle = mock(ErxAcceptBundle.class);
     val erxTask = mock(ErxTask.class);
     when(erxBundle.getTask()).thenReturn(erxTask);
-    when(erxTask.getForKvid()).thenReturn(Optional.of("X123456789"));
+    when(erxTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     val mockActor = mock(Actor.class);
     val mockPatientData = mock(ProvidePatientBaseData.class);
     when(mockActor.abilityTo(ProvidePatientBaseData.class)).thenReturn(mockPatientData);
-    when(mockPatientData.getKvid()).thenReturn("B123456789");
+    when(mockPatientData.getKvnr()).thenReturn(KVNR.from("B123456789"));
 
     stack.appendAcceptedPrescription(erxBundle);
     val strategy =
         PrescriptionToDispenseStrategy.withDequeue(DequeStrategy.FIFO)
-            .kvid("M123456789")
+            .kvnr(KVNR.from("M123456789"))
             .patient(mockActor)
             .initialize(stack);
-    assertEquals("B123456789", strategy.getKvid());
+    assertEquals("B123456789", strategy.getKvnr().getValue());
     assertTrue(strategy.hasPatient());
     assertTrue(strategy.getPatient().isPresent());
   }

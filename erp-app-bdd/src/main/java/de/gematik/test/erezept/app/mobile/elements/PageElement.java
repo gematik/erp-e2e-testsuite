@@ -18,15 +18,19 @@ package de.gematik.test.erezept.app.mobile.elements;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.app.cfg.PlatformType;
 import de.gematik.test.erezept.app.exceptions.UnavailablePageElementLocatorException;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import lombok.val;
 import org.openqa.selenium.By;
 
 public interface PageElement {
 
+  Pattern XPATH_PATTERN = Pattern.compile("@\\w+\\='(.+)'", Pattern.CASE_INSENSITIVE);
+  
   default String getPage() {
     return this.getClass().getSimpleName();
   }
@@ -54,6 +58,21 @@ public interface PageElement {
     }
 
     return locator;
+  }
+  
+  default String extractSourceLabel(PlatformType platform) {
+    val locator = this.forPlatform(platform);
+
+    if (locator instanceof By.ByXPath xpathLocator) {
+      val matcher = XPATH_PATTERN.matcher(xpathLocator.toString());
+      if (matcher.find()) {
+        return matcher.group(1);
+      } else {
+        return UUID.randomUUID().toString();  // ensure nothing is found in the page source
+      }
+    } else {
+      return locator.toString().split(": ")[1];
+    }
   }
 
   String getElementName();

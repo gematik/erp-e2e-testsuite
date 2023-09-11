@@ -18,7 +18,7 @@ package de.gematik.test.konnektor.soap;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.konnektor.cfg.TLSConfiguration;
+import de.gematik.test.erezept.config.dto.konnektor.TLSConfiguration;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;

@@ -48,8 +48,12 @@ public class KbvBundleGenerator extends BaseResourceGenerator {
     return this.create(
         "KBV",
         this::createPrescription,
-        KbvBundleManipulatorFactory.getAllKbvBundleManipulators(),
-        KbvErpBundle::fromBundle);
+        KbvBundleManipulatorFactory.getAllKbvBundleManipulators(medReqParam.isMvoOnly()),
+        original -> {
+          val copy = new KbvErpBundle();
+          original.copyValues(copy);
+          return copy;
+        });
   }
 
   private KbvErpBundle createPrescription() {
@@ -75,7 +79,7 @@ public class KbvBundleGenerator extends BaseResourceGenerator {
     val medicationRequest = medReqParam.createMedicationRequest();
 
     val flowType =
-        patientParam.getVersicherungsArt() == VersicherungsArtDeBasis.GKV
+        patientParam.getKvnrParameter().getInsuranceType() == VersicherungsArtDeBasis.GKV
             ? GemFaker.randomElement(
                 PrescriptionFlowType.FLOW_TYPE_160, PrescriptionFlowType.FLOW_TYPE_169)
             : PrescriptionFlowType.FLOW_TYPE_200;

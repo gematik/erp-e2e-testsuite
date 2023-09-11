@@ -20,50 +20,100 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.validation.FhirValidator;
+import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.test.erezept.fhir.parser.profiles.FhirProfiledValidator;
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 public class FhirParser {
 
-  private static final ErpFhirTypeHints typeHinter = new ErpFhirTypeHints();
-
-  private final FhirContext ctx;
+  @Getter private final FhirContext ctx;
   private final List<FhirProfiledValidator> validators;
+  private final FhirProfiledValidator defaultProfileValidator;
+  private final @Nullable FhirValidator genericValidator;
   private IParser xmlParser;
   private IParser jsonParser;
 
   public FhirParser() {
-    this.ctx = FhirContext.forR4();
+    this.ctx = ProfileFhirParserFactory.createDecoderContext();
     this.validators = ProfileFhirParserFactory.getProfiledValidators();
+    this.defaultProfileValidator = this.validators.get(0);
+    this.genericValidator = ProfileFhirParserFactory.createGenericFhirValidator(this.ctx);
   }
 
   /**
    * Check beforehand if the given content is valid
    *
    * @param content to be validated
-   * @return true if content represents a valid FHIR-Resource and false otherwise
+   * @return successful ValidationResult if content represents a valid FHIR-Resource and a
+   *     unsuccessful ValidationResult otherwise
    */
   public ValidationResult validate(@NonNull final String content) {
-    val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
-    return p.validate(content);
+    if (ProfileExtractor.isSearchSetOrCollection(content)) {
+      val bundle = decode(Bundle.class, content);
+      return validate(bundle);
+    } else {
+      val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
+      return p.validate(content);
+    }
+  }
+
+  public ValidationResult validate(@NonNull final Bundle bundle) {
+    // 1. validate the whole bundle without any profiles
+    val validationMessages = new LinkedList<SingleValidationMessage>();
+    if (this.genericValidator != null) {
+      val vrBundle = this.genericValidator.validateWithResult(bundle);
+      validationMessages.addAll(vrBundle.getMessages());
+    }
+
+    // 2. now validate each entry with a profiled validator
+    bundle
+        .getEntry()
+        .forEach(
+            entry -> {
+              val resource = entry.getResource();
+
+              // this hack here is required because HAPI uses here still the fullUrl from the entry
+              // by splitting the fullUrl and taking the last part we get the correct ID of this
+              // resource
+              val originalId = resource.getId();
+              val idTokens = originalId.split("[/|:]");
+              val idPart = idTokens[idTokens.length - 1];
+              resource.setId(idPart);
+
+              val profile = resource.getMeta().getProfile();
+              val profileUrl = profile.isEmpty() ? "" : profile.get(0).asStringValue();
+              val validator = chooseProfileValidator(profileUrl);
+              val result = validator.validate(resource);
+
+              validationMessages.addAll(result.getMessages());
+            });
+    return new ValidationResult(this.getCtx(), validationMessages);
   }
 
   public boolean isValid(@NonNull final String content) {
-    val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
-    return p.isValid(content);
+    return validate(content).isSuccessful();
+  }
+
+  public boolean isValid(@NonNull final Bundle bundle) {
+    return validate(bundle).isSuccessful();
   }
 
   public <T extends Resource> T decode(Class<T> expectedClass, @NonNull final String content) {
@@ -73,8 +123,8 @@ public class FhirParser {
 
   public synchronized <T extends Resource> T decode(
       Class<T> expectedClass, @NonNull final String content, EncodingType encoding) {
-    val parser = encoding.chooseAppropriateParser(ctx::newXmlParser, ctx::newJsonParser);
-    return parser.parseResource(expectedClass, content);
+    val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
+    return parser.parseResource(expectedClass, fixBeforeDecode(content));
   }
 
   public Resource decode(@NonNull final String content) {
@@ -83,8 +133,8 @@ public class FhirParser {
   }
 
   public Resource decode(@NonNull final String content, EncodingType encoding) {
-    val type = typeHinter.getType(content);
-    return this.decode(type, content, encoding);
+    // simply put null as expected class and let HAPI do the mapping
+    return this.decode(null, content, encoding);
   }
 
   public String encode(@NonNull IBaseResource resource, EncodingType encoding) {
@@ -119,7 +169,7 @@ public class FhirParser {
     profileUrlOpt.ifPresentOrElse(
         url -> chosenParser.set(chooseProfileValidator(url)),
         () -> {
-          val defaultParser = this.validators.get(0);
+          val defaultParser = this.defaultProfileValidator;
           log.debug(
               format(
                   "Could not determine the Profile from given content! Use default parser ''{0}''",
@@ -127,10 +177,10 @@ public class FhirParser {
           chosenParser.set(defaultParser);
         });
 
-    val validator = chosenParser.get();
+    val chosenValidator = chosenParser.get();
     val profileUrl = profileUrlOpt.orElse("no found profile");
-    log.trace(format("Choose Validator {0} for {1}", validator.getName(), profileUrl));
-    return validator;
+    log.debug(format("Choose Validator {0} for {1}", chosenValidator.getName(), profileUrl));
+    return chosenValidator;
   }
 
   private FhirProfiledValidator chooseProfileValidator(String profileUrl) {
@@ -142,10 +192,10 @@ public class FhirParser {
       log.debug(
           format(
               "No supporting Parser found for {0}, use Parser ''{1}'' as default",
-              profileUrl, this.validators.get(0).getName()));
+              profileUrl, this.defaultProfileValidator.getName()));
     }
 
-    return parserOpt.orElse(this.validators.get(0));
+    return parserOpt.orElse(this.defaultProfileValidator);
   }
 
   /**
@@ -162,5 +212,21 @@ public class FhirParser {
       ret = encoded.replace("/Task/", "Task/");
     }
     return ret;
+  }
+
+  /**
+   * Well, this method is mainly used to fix "the bug" basedOn-References with contained AccessCodes
+   * in ErxCommunicationDispReq messages
+   *
+   * @param content is the encoded resource content
+   * @return the fixed encoded String
+   */
+  private String fixBeforeDecode(String content) {
+    if (ProfileExtractor.isSearchSetOrCollection(content)) {
+      return content.replace("\"Task/", "\"/Task/");
+    } else {
+      // no need to change anything if it's not a searchset collection
+      return content;
+    }
   }
 }

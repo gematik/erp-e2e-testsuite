@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.values.KVNR;
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,32 +31,32 @@ class ConsentPostCommandTest {
 
   @BeforeEach
   void setupBefore() {
-    String kvId = "G995030567";
-    this.consentPostCommand = new ConsentPostCommand(kvId);
+    val kvnr = KVNR.from("G995030567");
+    this.consentPostCommand = new ConsentPostCommand(kvnr);
   }
 
   @Test
   void getRequestLocatorStartsWithSlash() {
-    var request = consentPostCommand.getRequestLocator();
+    val request = consentPostCommand.getRequestLocator();
     assertTrue(request.startsWith("/"));
   }
 
   @Test
   void getRequestLocatorFirstPartIsConsent() {
-    var request = consentPostCommand.getRequestLocator();
-    var requestStringArray = request.split("/");
+    val request = consentPostCommand.getRequestLocator();
+    val requestStringArray = request.split("/");
     assertEquals("Consent", requestStringArray[1]);
   }
 
   @Test
   void getRequestBodyNotNull() {
-    var request = consentPostCommand.getRequestBody();
+    val request = consentPostCommand.getRequestBody();
     assertNotNull(request);
   }
 
   @Test
   void getRequestBodyIsOptionalPresent() {
-    var request = consentPostCommand.getRequestBody();
+    val request = consentPostCommand.getRequestBody();
     assertTrue(request.isPresent());
   }
 }

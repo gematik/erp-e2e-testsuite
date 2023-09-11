@@ -31,7 +31,9 @@ public class CommunicationSearch {
   }
 
   public static CommunicationGetCommand getNewCommunications() {
-    return getNewCommunications(SortOrder.DESCENDING);
+    val searchParams = new ArrayList<IQueryParameter>();
+    searchParams.add(new QueryParameter("received", "NULL"));
+    return new CommunicationGetCommand(searchParams);
   }
 
   public static CommunicationGetCommand getNewCommunications(SortOrder order) {
@@ -43,6 +45,10 @@ public class CommunicationSearch {
 
   public static CommunicationGetCommand getLatestCommunications() {
     return getAllCommunications(SortOrder.DESCENDING);
+  }
+
+  public static CommunicationGetCommand getLatestNewCommunications() {
+    return getNewCommunications(SortOrder.DESCENDING);
   }
 
   public static CommunicationGetCommand getAllCommunications(SortOrder order) {

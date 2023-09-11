@@ -26,6 +26,7 @@ import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import net.serenitybdd.screenplay.ensure.Ensure;
+import net.serenitybdd.screenplay.questions.NamedPredicate;
 import net.thucydides.core.annotations.Step;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -41,7 +42,7 @@ public class CheckTheReturnCode implements Task {
   }
 
   @Override
-  @Step("{0} prüft, ob der ReturnCode von #fhirResponseQuestion dem erwarteten Wert entspricht")
+  @Step("{0} prüft, ob der ReturnCode von #fhirResponseQuestion dem Wert #predicate entspricht")
   public <T extends Actor> void performAs(T actor) {
     val response = actor.asksFor(fhirResponseQuestion);
     val returnCode = response.getStatusCode();
@@ -61,27 +62,39 @@ public class CheckTheReturnCode implements Task {
     }
 
     public CheckTheReturnCode isEqualTo(int returnCode) {
-      return matching(rc -> rc == returnCode);
+      Predicate<Integer> predicate = rc -> rc == returnCode;
+      val name = format("genau {0}", returnCode);
+      return matching(new NamedPredicate<>(name, predicate));
     }
 
     public CheckTheReturnCode isGreaterThan(int returnCode) {
-      return matching(rc -> rc > returnCode);
+      Predicate<Integer> predicate = rc -> rc > returnCode;
+      val name = format("größer {0}", returnCode);
+      return matching(new NamedPredicate<>(name, predicate));
     }
 
     public CheckTheReturnCode isGreaterEqual(int returnCode) {
-      return matching(rc -> rc >= returnCode);
+      Predicate<Integer> predicate = rc -> rc >= returnCode;
+      val name = format("größer-gleich {0}", returnCode);
+      return matching(new NamedPredicate<>(name, predicate));
     }
 
     public CheckTheReturnCode isLowerThan(int returnCode) {
-      return matching(rc -> rc < returnCode);
+      Predicate<Integer> predicate = rc -> rc < returnCode;
+      val name = format("kleiner {0}", returnCode);
+      return matching(new NamedPredicate<>(name, predicate));
     }
 
     public CheckTheReturnCode isLowerEqual(int returnCode) {
-      return matching(rc -> rc <= returnCode);
+      Predicate<Integer> predicate = rc -> rc <= returnCode;
+      val name = format("kleiner-gleich {0}", returnCode);
+      return matching(new NamedPredicate<>(name, predicate));
     }
 
     public CheckTheReturnCode isInBetween(int min, int max) {
-      return matching(rc -> rc >= min && rc <= max);
+      Predicate<Integer> predicate = rc -> rc >= min && rc <= max;
+      val name = format("größer-gleich {0} und kleiner-gleich {1}", min, max);
+      return matching(new NamedPredicate<>(name, predicate));
     }
 
     public CheckTheReturnCode matching(Predicate<Integer> predicate) {

@@ -18,66 +18,30 @@ package de.gematik.test.erezept.client.cfg;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.idp.field.IdpScope;
 import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.exceptions.ConfigurationException;
 import de.gematik.test.erezept.client.rest.MediaType;
+import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import java.util.Set;
-import lombok.Data;
-import lombok.val;
+import lombok.*;
+import lombok.experimental.Delegate;
 
-@Data
-public class ErpClientConfiguration implements INamedConfiguration {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+class ErpClientConfiguration {
 
-  /** Just an identifier to distinguish from other clients within config.yaml */
-  private String name;
+  private interface DelegateExclude {
+    // exclude native getClientType()-method because we want to override this one here!
+    String getClientType();
+  }
 
-  /** Client ID required by the IDP Client */
-  private String clientId = "gematikTestPs";
-
-  private String userAgent;
-
-  private String xApiKey;
-
-  /** Redirect URL required by the IDP Client */
-  private String redirectUrl;
-
-  /** URL to the Discovery Document on the IDP Server is required by the IDP Client */
-  private String discoveryDocumentUrl;
-
-  /** E-Rezept FD URL/FQDN which shall be used by the E-Rezept Client */
-  private String fdBaseUrl;
-
-  /**
-   * URL/FQDN for downloading the TSL for example from <a
-   * href="https://download.tsl.ti-dienste.de/">TI Dienste</a>
-   */
-  private String tslBaseUrl;
-
-  private String clientType;
-  private String acceptMime;
-  private String sendMime;
-  private String acceptCharset = "utf-8";
-
-  // TODO: get from cfg: validation does not work yet, though!  // NOSONAR still needs to be checked
-  // validator throws: java.lang.NoClassDefFoundError: org/apache/commons/codec/Charsets
-  private boolean validateRequest = false;
-  private boolean validateResponse = false;
+  @Delegate(excludes = DelegateExclude.class)
+  private final de.gematik.test.erezept.config.dto.erpclient.ErpClientConfiguration dto;
 
   public ClientType getClientType() {
-    return ClientType.fromString(clientType);
-  }
-
-  public void setClientType(String type) {
-    this.clientType = type;
-  }
-
-  public void setClientType(ClientType type) {
-    this.setClientType(type.toString());
+    return ClientType.fromString(this.dto.getClientType());
   }
 
   public MediaType getAcceptMimeType() {
-    var ret = MediaType.fromString(acceptMime);
+    var ret = MediaType.fromString(dto.getAcceptMime());
 
     // fromString generates only send-types but not accept-types!
     if (ret == MediaType.FHIR_JSON) {
@@ -85,24 +49,30 @@ public class ErpClientConfiguration implements INamedConfiguration {
     } else if (ret == MediaType.FHIR_XML) {
       ret = MediaType.ACCEPT_FHIR_XML;
     } else {
-      throw new ConfigurationException(format("Given Accept-Mime ''{0}'' is invalid", acceptMime));
+      throw new ConfigurationException(
+          format("Given Accept-Mime ''{0}'' is invalid", dto.getAcceptMime()));
     }
     return ret;
   }
 
   public MediaType getSendMimeType() {
-    val ret = MediaType.fromString(sendMime);
+    val ret = MediaType.fromString(dto.getSendMime());
 
     // check for invalid send mime-types
     if (ret != MediaType.FHIR_JSON && ret != MediaType.FHIR_XML) {
-      throw new ConfigurationException(format("Given Send-Mime ''{0}'' is invalid", sendMime));
+      throw new ConfigurationException(
+          format("Given Send-Mime ''{0}'' is invalid", dto.getSendMime()));
     }
     return ret;
   }
 
-  public Set<IdpScope> getErpScopes() {
+  public Set<String> getErpScopes() {
     return Set.of(
-        IdpScope.OPENID,
-        getFdBaseUrl().startsWith("https://erp-dev.") ? IdpScope.EREZEPTDEV : IdpScope.EREZEPT);
+        "openid", dto.getFdBaseUrl().startsWith("https://erp-dev.") ? "e-rezept-dev" : "e-rezept");
+  }
+
+  protected static ErpClientConfiguration fromDto(
+      de.gematik.test.erezept.config.dto.erpclient.ErpClientConfiguration dto) {
+    return new ErpClientConfiguration(dto);
   }
 }

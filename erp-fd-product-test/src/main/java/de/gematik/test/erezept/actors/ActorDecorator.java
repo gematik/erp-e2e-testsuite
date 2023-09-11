@@ -16,9 +16,11 @@
 
 package de.gematik.test.erezept.actors;
 
+import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.*;
 import de.gematik.test.erezept.client.*;
 import de.gematik.test.erezept.client.cfg.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -43,8 +45,8 @@ public class ActorDecorator {
     val useSmcb = UseSMCB.itHasAccessTo(smcb);
     val useKonnektor =
         UseTheKonnektor.with(smcb).and(hba).on(config.instantiateDoctorKonnektor(docConfig));
-    val erpClientConfig = docConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.PS);
-    val useErpClient = decorateWithErpClient(actor, erpClientConfig);
+    val erpClient = ErpClientFactory.createErpClient(config.getActiveEnvironment(), docConfig);
+    val useErpClient = decorateWithErpClient(actor, erpClient);
     useErpClient.authenticateWith(useKonnektor);
 
     val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig);
@@ -66,9 +68,8 @@ public class ActorDecorator {
     val useSmcb = UseSMCB.itHasAccessTo(smcb);
     val useKonnektor =
         UseTheKonnektor.with(smcb).on(config.instantiatePharmacyKonnektor(pharmacyConfig));
-    val erpClientConfig =
-        pharmacyConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.PS);
-    val useErpClient = decorateWithErpClient(actor, erpClientConfig);
+    val erpClient = ErpClientFactory.createErpClient(config.getActiveEnvironment(), pharmacyConfig);
+    val useErpClient = decorateWithErpClient(actor, erpClient);
     useErpClient.authenticateWith(useKonnektor);
 
     actor.can(useKonnektor);
@@ -83,16 +84,16 @@ public class ActorDecorator {
     val smartcards = config.getSmartcards();
     val egk = smartcards.getEgkByICCSN(patientConfig.getEgkIccsn());
 
-    val erpClientConfig =
-        patientConfig.toErpClientConfig(config.getActiveEnvironment(), ClientType.FDV);
-    val useTheErpClient = decorateWithErpClient(actor, erpClientConfig);
+    val erpClient = ErpClientFactory.createErpClient(config.getActiveEnvironment(), patientConfig);
+    val useTheErpClient = decorateWithErpClient(actor, erpClient);
     useTheErpClient.authenticateWith(egk);
-    actor.can(ProvidePatientBaseData.forGkvPatient(egk.getKvnr(), actor.getName()));
+    actor.can(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), actor.getName()));
   }
 
   private static <A extends Actor> UseTheErpClient decorateWithErpClient(
-      A actor, ErpClientConfiguration config) {
-    val useTheErpClient = UseTheErpClient.with(config);
+      A actor, ErpClient erpClient) {
+    val stopwatchProvider = StopwatchProvider.getInstance();
+    val useTheErpClient = UseTheErpClient.with(erpClient, stopwatchProvider.getStopwatch());
     actor.can(useTheErpClient);
     return useTheErpClient;
   }

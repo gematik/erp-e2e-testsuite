@@ -16,54 +16,61 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.extensions.erp.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.references.dav.*;
-import de.gematik.test.erezept.fhir.references.erp.*;
-import de.gematik.test.erezept.fhir.references.kbv.*;
-import de.gematik.test.erezept.fhir.resources.dav.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.*;
+import static java.text.MessageFormat.format;
+
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.test.erezept.fhir.builder.BuilderUtil;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
+import de.gematik.test.erezept.fhir.references.erp.ErxReceiptReference;
+import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
+import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.*;
-import java.util.function.*;
-import lombok.*;
+import java.util.function.Function;
+import lombok.NonNull;
+import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
 public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemBuilder> {
 
-  private PatientenrechnungVersion version;
   private final PrescriptionId prescriptionId;
-  private ErxReceiptReference receiptReference;
+  private PatientenrechnungVersion version;
+  private Reference receiptReference;
   private AccessCode accessCode;
   private ChargeItem.ChargeItemStatus status = ChargeItem.ChargeItemStatus.BILLABLE;
-  private KVID kvid;
-  private String kvidAssignerName;
+  private KVNR kvnr;
+  private String kvnrAssignerName;
   private TelematikID telematikId;
   private AbgabedatensatzReference davReference;
   private byte[] signedDavBundle;
-  private KbvBundleReference kbvReference;
+  private Reference kbvReference;
   private MarkingFlag markingFlag;
+
+  private DateTimeType enteredDate;
 
   private ErxChargeItemBuilder(PrescriptionId prescriptionId) {
     this.prescriptionId = prescriptionId;
-  }
 
-  public static ErxChargeItemBuilder faker(PrescriptionId prescriptionId) {
-    val b = forPrescription(prescriptionId);
-    b.subject(GemFaker.fakerKvid(), GemFaker.insuranceName())
-        .enterer(GemFaker.fakerTelematikId())
-        .markingFlag(true, false, false)
-        .verordnung(b.getResourceId())
-        .abgabedatensatz(b.getResourceId(), "faked binary content".getBytes());
-    return b;
-  }
-
-  public static ErxChargeItemBuilder forPrescription(PrescriptionId prescriptionId) {
-    return new ErxChargeItemBuilder(prescriptionId);
+    // should be fixed later!
+    val fhirProfile = System.getProperty("erp.fhir.profile");
+    if ("1.2.0".equalsIgnoreCase(fhirProfile)) {
+      this.version = PatientenrechnungVersion.V1_0_0;
+    }
   }
 
   public ErxChargeItemBuilder version(PatientenrechnungVersion version) {
@@ -89,8 +96,10 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
     return self();
   }
 
-  public ErxChargeItemBuilder subject(String kvid, String kvidAssignerName) {
-    return subject(KVID.from(kvid), kvidAssignerName);
+  public ErxChargeItemBuilder subject(KVNR kvnr, String kvnrAssignerName) {
+    this.kvnr = kvnr;
+    this.kvnrAssignerName = kvnrAssignerName;
+    return self();
   }
 
   public ErxChargeItemBuilder receipt(ErxReceipt receipt) {
@@ -99,14 +108,8 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
   }
 
   public ErxChargeItemBuilder receiptReference(ErxReceiptReference reference) {
-    this.receiptReference = reference;
+    this.receiptReference = reference.asReference();
     return this;
-  }
-
-  public ErxChargeItemBuilder subject(KVID kvid, String kvidAssignerName) {
-    this.kvid = kvid;
-    this.kvidAssignerName = kvidAssignerName;
-    return self();
   }
 
   public ErxChargeItemBuilder enterer(String telematikId) {
@@ -115,6 +118,15 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
 
   public ErxChargeItemBuilder enterer(TelematikID telematikId) {
     this.telematikId = telematikId;
+    return self();
+  }
+
+  public ErxChargeItemBuilder entered(Date date) {
+    return entered(date, TemporalPrecisionEnum.SECOND);
+  }
+
+  public ErxChargeItemBuilder entered(Date date, TemporalPrecisionEnum precision) {
+    this.enteredDate = new DateTimeType(date, precision);
     return self();
   }
 
@@ -129,18 +141,15 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
   }
 
   /**
-   * @deprecated use the KbvErpBundle directly if you have one or create a KbvBundleReference from
-   *     your ID
    * @param id referencing a KBV-ERP-Bundle
    * @return this Builder
    */
-  @Deprecated(forRemoval = true)
   public ErxChargeItemBuilder verordnung(String id) {
     return verordnung(new KbvBundleReference(id));
   }
 
   public ErxChargeItemBuilder verordnung(KbvBundleReference reference) {
-    this.kbvReference = reference;
+    this.kbvReference = reference.asReference();
     return self();
   }
 
@@ -176,8 +185,10 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
     val meta = new Meta().setProfile(List.of(profile));
 
     // set FHIR-specific values provided by HAPI
-    chargeItem.setMeta(meta);
-    chargeItem.setEnteredDate(new Date());
+    chargeItem.setId(this.prescriptionId.getValue()).setMeta(meta);
+
+    if (enteredDate == null) this.entered(new Date());
+    chargeItem.setEnteredDateElement(enteredDate);
 
     chargeItem.setStatus(status);
     chargeItem.setCode(BuilderUtil.dataAbsent());
@@ -187,22 +198,30 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
     containedDavBundle.setId(davReference.getReference(false));
 
     if (version != null) {
-      val identifiers =
-          List.of(
-              prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121),
-              accessCode.asIdentifier(ErpWorkflowNamingSystem.ACCESS_CODE_121));
-      chargeItem.setIdentifier(identifiers);
+      val identifiers = new ArrayList<Identifier>(2);
+      identifiers.add(prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
+      Optional.ofNullable(accessCode)
+          .ifPresent(
+              ac -> identifiers.add(ac.asIdentifier(ErpWorkflowNamingSystem.ACCESS_CODE_121)));
 
+      chargeItem.setIdentifier(identifiers);
       containedDavBundle
           .getMeta()
           .addProfile(
               ErpWorkflowStructDef.BINARY_12.getVersionedUrl(ErpWorkflowVersion.V1_2_0, true));
 
-      val kvidIdentifier = kvid.asIdentifier(DeBasisNamingSystem.KVID_PKV);
-      kvidIdentifier.getAssigner().setDisplay(kvidAssignerName);
-      chargeItem.setSubject(new Reference().setIdentifier(kvidIdentifier));
-      chargeItem.setEnterer(telematikId.asReference(ErpWorkflowNamingSystem.TELEMATIK_ID_SID));
-      chargeItem.setExtension(List.of(markingFlag.asExtension(version)));
+      val kvnrIdentifier = kvnr.asIdentifier(DeBasisNamingSystem.KVID_PKV);
+      kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
+      chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));
+
+      Optional.ofNullable(telematikId)
+          .ifPresent(
+              tid ->
+                  chargeItem.setEnterer(tid.asReference(ErpWorkflowNamingSystem.TELEMATIK_ID_SID)));
+      Optional.ofNullable(markingFlag)
+          .ifPresent(mf -> chargeItem.setExtension(List.of(mf.asExtension(version))));
+
+      this.fixSupportingInformationReferences();
     } else {
       chargeItem.setIdentifier(List.of(prescriptionId.asIdentifier()));
 
@@ -210,18 +229,51 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
           .getMeta()
           .addProfile(ErpWorkflowStructDef.BINARY.getVersionedUrl(ErpWorkflowVersion.V1_1_1));
 
-      val kvidIdentifier = kvid.asIdentifier();
-      kvidIdentifier.getAssigner().setDisplay(kvidAssignerName);
-      chargeItem.setSubject(new Reference().setIdentifier(kvidIdentifier));
-      chargeItem.setEnterer(telematikId.asReference());
-      chargeItem.setExtension(List.of(markingFlag.asExtension()));
+      val kvnrIdentifier = kvnr.asIdentifier();
+      kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
+      chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));
+      Optional.ofNullable(telematikId).ifPresent(tid -> chargeItem.setEnterer(tid.asReference()));
+      Optional.ofNullable(markingFlag)
+          .ifPresent(mf -> chargeItem.setExtension(List.of(mf.asExtension())));
     }
 
     chargeItem.addContained((Resource) containedDavBundle);
     chargeItem.addSupportingInformation(receiptReference);
-    chargeItem.addSupportingInformation(davReference);
     chargeItem.addSupportingInformation(kbvReference);
+    chargeItem.addSupportingInformation(davReference);
 
     return chargeItem;
+  }
+
+  /**
+   * These fixes on references are required because supporting information on newer profiles look
+   * differently
+   */
+  private void fixSupportingInformationReferences() {
+    if (kbvReference != null) {
+      kbvReference.setDisplay(kbvReference.getType()).setType(null);
+      if (!kbvReference.getReference().startsWith("Bundle/")) {
+        kbvReference.setReference(format("Bundle/{0}", kbvReference.getReference()));
+      }
+    }
+
+    if (davReference != null) {
+      davReference.setDisplay(davReference.getType()).setType(null);
+    }
+  }
+
+  public static ErxChargeItemBuilder faker(PrescriptionId prescriptionId) {
+    val b = forPrescription(prescriptionId);
+    b.subject(de.gematik.test.erezept.fhir.values.KVNR.random(), GemFaker.insuranceName())
+        .enterer(GemFaker.fakerTelematikId())
+        .markingFlag(true, false, false)
+        .accessCode(AccessCode.random())
+        .verordnung(UUID.randomUUID().toString())
+        .abgabedatensatz(b.getResourceId(), "faked binary content".getBytes());
+    return b;
+  }
+
+  public static ErxChargeItemBuilder forPrescription(PrescriptionId prescriptionId) {
+    return new ErxChargeItemBuilder(prescriptionId);
   }
 }

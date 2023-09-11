@@ -26,15 +26,16 @@ import org.openqa.selenium.By;
 @RequiredArgsConstructor
 @SuppressWarnings({"java:S1192"}) // it's okay to duplicate string literals here
 public enum CardWall implements PageElement {
+  SIGN_IN_SCREEN(
+      "Sign in",
+      () -> By.tagName("cardWall/next"),
+      () -> AppiumBy.accessibilityId("cdw_txt_intro_description")),
   NEXT_BUTTON(
       "Next Button",
       () -> By.tagName("CardWall.ContinueButton"),
       () -> AppiumBy.accessibilityId("cdw_btn_intro_later")),
-  @Deprecated // Don't know which Screen that should be
-  SIGN_IN(
-      "Sign in",
-      () -> By.tagName("cardWall/next"),
-      () -> AppiumBy.accessibilityId("erx_btn_show_settings")),
+  ADD_HEALTH_CARD_BUTTON(
+      "Next Button", () -> null, () -> AppiumBy.accessibilityId("Gesundheitskarte")),
   CAN_INPUT_FIELD(
       "CAN Input Field",
       () -> By.tagName("CardWall.CAN.CANField"),
@@ -51,6 +52,23 @@ public enum CardWall implements PageElement {
       "PIN Accept Button",
       () -> By.tagName("CardWall.ContinueButton"),
       () -> AppiumBy.accessibilityId("cdw_btn_pin_done")),
+  DONT_SAVE_CREDENTIAL_BUTTON(
+      "Dont save the credentials button",
+      () -> null,
+      () -> AppiumBy.accessibilityId("cdw_txt_loginOption_without_biometry")),
+  CONTINUE_AFTER_BIOMETRY_CHECK_BUTTON(
+      "Continue after the biometry decision button",
+      () -> null,
+      () -> AppiumBy.accessibilityId("cdw_btn_loginOption_continue")),
+  START_NFC_READOUT_BUTTON(
+      "Start the NFC readout Button",
+      () -> null,
+      () -> AppiumBy.accessibilityId("cdw_btn_rc_next")),
+
+  CARD_PARING_GO_BACK_BUTTON(
+      "Go back button in card paring screen",
+      null,
+      () -> AppiumBy.xpath("//*[@label='Zurück']")),
   ;
 
   private final String elementName;

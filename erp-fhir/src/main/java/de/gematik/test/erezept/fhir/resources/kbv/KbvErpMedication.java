@@ -19,11 +19,14 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.test.erezept.fhir.exceptions.FhirProfileException;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
-import de.gematik.test.erezept.fhir.resources.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
+import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
@@ -156,10 +159,36 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
         "{0} {1} (PZN: {2}) / {3}", medicationName, size.getCode(), pzn, category.getDisplay());
   }
 
+  public KbvItaErpVersion getVersion() {
+    return this.getMeta().getProfile().stream()
+        .findFirst()
+        .map(
+            profile -> {
+              val profileTokens = profile.asStringValue().split("\\|");
+              if (profileTokens.length > 1) {
+                return ProfileVersion.fromString(KbvItaErpVersion.class, profileTokens[1]);
+              } else {
+                return KbvItaErpVersion.getDefaultVersion();
+              }
+            })
+        .stream()
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new FhirProfileException(
+                    format(
+                        "Unable to retrieve {0} for {1}",
+                        KbvItaErpVersion.class.getSimpleName(), this.getClass().getSimpleName())));
+  }
+
   public static KbvErpMedication fromMedication(Medication adaptee) {
-    val kbvMedication = new KbvErpMedication();
-    adaptee.copyValues(kbvMedication);
-    return kbvMedication;
+    if (adaptee instanceof KbvErpMedication erpMedication) {
+      return erpMedication;
+    } else {
+      val kbvMedication = new KbvErpMedication();
+      adaptee.copyValues(kbvMedication);
+      return kbvMedication;
+    }
   }
 
   public static KbvErpMedication fromMedication(Resource adaptee) {

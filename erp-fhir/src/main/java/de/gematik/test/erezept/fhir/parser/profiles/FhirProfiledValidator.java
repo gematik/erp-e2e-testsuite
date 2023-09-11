@@ -19,7 +19,6 @@ package de.gematik.test.erezept.fhir.parser.profiles;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport;
 import ca.uhn.fhir.context.support.IValidationSupport;
 import ca.uhn.fhir.parser.StrictErrorHandler;
 import ca.uhn.fhir.validation.FhirValidator;
@@ -39,6 +38,7 @@ import org.hl7.fhir.common.hapi.validation.support.InMemoryTerminologyServerVali
 import org.hl7.fhir.common.hapi.validation.support.SnapshotGeneratingValidationSupport;
 import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
 import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 @Slf4j
 public class FhirProfiledValidator {
@@ -69,7 +69,6 @@ public class FhirProfiledValidator {
     // create support validators for custom profiles
     val validationSupports = new ArrayList<>(customProfileSupports);
     validationSupports.add(ctx.getValidationSupport());
-    validationSupports.add(new DefaultProfileValidationSupport(ctx));
     validationSupports.add(new InMemoryTerminologyServerValidationSupport(ctx));
     validationSupports.add(new SnapshotGeneratingValidationSupport(ctx));
     validationSupports.add(
@@ -112,7 +111,8 @@ public class FhirProfiledValidator {
    * Check beforehand if the given content is valid
    *
    * @param content to be validated
-   * @return true if content represents a valid FHIR-Resource and false otherwise
+   * @return successful ValidationResult if content represents a valid FHIR-Resource and a
+   *     unsuccessful ValidationResult otherwise
    */
   public ValidationResult validate(final String content) {
     ValidationResult ret;
@@ -124,7 +124,34 @@ public class FhirProfiledValidator {
       /*
       some sort of error led to an Exception: handle this case via ValidationResult=ERROR
        */
-      log.error("Error while validating FHIR content");
+      log.error("Error while validating FHIR content", e);
+      val svm = new SingleValidationMessage();
+      svm.setMessage(e.getMessage());
+      svm.setSeverity(ResultSeverityEnum.ERROR);
+      ret = new ValidationResult(ctx, List.of(svm));
+    }
+
+    if (!ret.isSuccessful()) {
+      log.trace(
+          format(
+              "Validation unsuccessful with parser ''{0}'' producing {1} ValidationMessages",
+              this.getName(), ret.getMessages().size()));
+    }
+
+    return ret;
+  }
+
+  public ValidationResult validate(final IBaseResource resource) {
+    ValidationResult ret;
+    try {
+      synchronized (this.hapiValidator) {
+        ret = this.hapiValidator.validateWithResult(resource);
+      }
+    } catch (Exception e) {
+      /*
+      some sort of error led to an Exception: handle this case via ValidationResult=ERROR
+       */
+      log.error("Error while validating FHIR content", e);
       val svm = new SingleValidationMessage();
       svm.setMessage(e.getMessage());
       svm.setSeverity(ResultSeverityEnum.ERROR);

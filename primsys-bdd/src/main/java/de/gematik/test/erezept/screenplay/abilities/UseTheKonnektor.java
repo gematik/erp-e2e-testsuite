@@ -16,24 +16,31 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static java.text.MessageFormat.*;
-
-import de.gematik.test.erezept.fhirdump.*;
-import de.gematik.test.erezept.lei.exceptions.*;
-import de.gematik.test.konnektor.*;
-import de.gematik.test.konnektor.cfg.*;
+import de.gematik.test.cardterminal.CardInfo;
+import de.gematik.test.erezept.fhirdump.FhirDumper;
+import de.gematik.test.erezept.lei.exceptions.MissingSmartcardException;
+import de.gematik.test.erezept.lei.exceptions.VerifyPinFailed;
+import de.gematik.test.konnektor.Konnektor;
+import de.gematik.test.konnektor.KonnektorResponse;
+import de.gematik.test.konnektor.PinType;
+import de.gematik.test.konnektor.cfg.KonnektorConfiguration;
 import de.gematik.test.konnektor.commands.*;
 import de.gematik.test.smartcard.*;
-import de.gematik.ws.conn.cardservicecommon.v2.*;
-import de.gematik.ws.conn.vsds.vsdservice.v5.*;
-import java.nio.charset.*;
-import java.security.cert.*;
-import java.util.*;
-import javax.annotation.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.core.*;
-import net.serenitybdd.screenplay.*;
+import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
+import de.gematik.ws.conn.vsds.vsdservice.v5.ReadVSDResponse;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.core.Serenity;
+import net.serenitybdd.screenplay.Ability;
+
+import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Objects;
+
+import static java.text.MessageFormat.format;
 
 @Slf4j
 public class UseTheKonnektor implements Ability {
@@ -41,14 +48,25 @@ public class UseTheKonnektor implements Ability {
   @Nullable private final SmcB smcb;
   @Nullable private final Hba hba;
   private final Konnektor konnektor;
-  @Nullable private CardHandle smcbHandle;
-  @Nullable private CardHandle hbaHandle;
+  @Nullable private CardInfo smcbHandle;
+  @Nullable private CardInfo hbaHandle;
 
   private UseTheKonnektor(Konnektor konnektor, @Nullable SmcB smcb, @Nullable Hba hba) {
     this.konnektor = konnektor;
     this.smcb = smcb;
     this.hba = hba;
+    this.insertCards(smcb, hba);
     this.initCardHandles();
+  }
+
+  public void insertCards(Smartcard... cards) {
+    if (konnektor.getCardTerminalManager() == null) {
+      return;
+    }
+
+    Arrays.stream(cards)
+        .filter(Objects::nonNull)
+        .forEach(card -> konnektor.getCardTerminalManager().insertCard(card));
   }
 
   public static KonnektorAbilityBuilder with(SmcB smcb) {
@@ -60,10 +78,12 @@ public class UseTheKonnektor implements Ability {
   }
 
   private void initCardHandles() {
-    if (smcb != null)
+    if (smcb != null) {
       this.smcbHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
-    if (hba != null)
+    }
+    if (hba != null) {
       this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
+    }
   }
 
   public KonnektorResponse<byte[]> decrypt(byte[] data) {
@@ -88,7 +108,7 @@ public class UseTheKonnektor implements Ability {
   }
 
   private KonnektorResponse<byte[]> signDocument(
-      Smartcard smartcard, CardHandle handle, String document) {
+      Smartcard smartcard, CardInfo handle, String document) {
     val title = format("Sign Document with {0} (Cardhandle: {1})", smartcard, handle);
     Serenity.recordReportData().withTitle(title).andContents(document);
     val signCmd = new SignXMLDocumentCommand(handle, document);
@@ -137,12 +157,17 @@ public class UseTheKonnektor implements Ability {
     return konnektor.execute(externalAuthenticateCmd);
   }
 
-  public Optional<KonnektorResponse<ReadVSDResponse>> requestEvidenceForEgk(Egk egk) {
+  public KonnektorResponse<ReadVSDResponse> requestEvidenceForEgk(Egk egk) {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "Request EGK Evidence");
+    this.insertCards(egk);
+    val pinResponseType =
+        konnektor.execute(new VerifyPinCommand(smcbHandle, PinType.PIN_SMC)).getPayload();
+    if (pinResponseType.getPinResult() != PinResultEnum.OK) {
+      throw new VerifyPinFailed(smcbHandle.getIccsn());
+    }
     val egkCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(egk)).getPayload();
     val readVsdCommand = new ReadVsdCommand(egkCardHandle, smcbHandle, true, true);
-    val response = konnektor.execute(readVsdCommand);
-    return Optional.ofNullable(response);
+    return konnektor.execute(readVsdCommand);
   }
 
   public KonnektorResponse<X509Certificate> getSmcbAuthCertificate() {
@@ -151,7 +176,7 @@ public class UseTheKonnektor implements Ability {
     return konnektor.execute(readCardCertificateCommand);
   }
 
-  private void checkCardHandle(SmartcardType type, CardHandle handle, String operationName) {
+  private void checkCardHandle(SmartcardType type, CardInfo handle, String operationName) {
     if (handle == null) {
       throw new MissingSmartcardException(type, operationName);
     }

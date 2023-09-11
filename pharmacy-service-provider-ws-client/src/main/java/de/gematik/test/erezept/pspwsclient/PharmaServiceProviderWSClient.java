@@ -16,20 +16,20 @@
 
 package de.gematik.test.erezept.pspwsclient;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
-import de.gematik.test.erezept.pspwsclient.dataobjects.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;
 import java.net.*;
-import java.nio.charset.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.*;
-import javax.net.ssl.*;
+import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLContext;
 import lombok.*;
-import lombok.extern.slf4j.*;
-import org.java_websocket.handshake.*;
-import org.jetbrains.annotations.*;
+import lombok.extern.slf4j.Slf4j;
+import org.java_websocket.handshake.ServerHandshake;
+import org.jetbrains.annotations.Nullable;
 
 @Slf4j
 public class PharmaServiceProviderWSClient extends org.java_websocket.client.WebSocketClient

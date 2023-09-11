@@ -16,10 +16,12 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +49,12 @@ class PrescriptionIdTest {
   }
 
   @Test
+  void shouldCreatePrescriptionIdFromString() {
+    val p = PrescriptionId.from("123");
+    assertFalse(p.check());
+  }
+
+  @Test
   void shouldDetectOldPrescriptionId() {
     val identifier = PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
     assertTrue(PrescriptionId.isPrescriptionId(identifier));
@@ -57,5 +65,28 @@ class PrescriptionIdTest {
     val identifier =
         PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
     assertTrue(PrescriptionId.isPrescriptionId(identifier));
+  }
+
+  @Test
+  void shouldGetFlowTypeFromPrescriptionId() {
+    Stream.of(PrescriptionFlowType.values())
+        .forEach(
+            ft -> {
+              val prescriptionId = PrescriptionId.random(ft);
+              assertEquals(ft, prescriptionId.getFlowType());
+            });
+  }
+
+  @Test
+  void shouldThrowOnPrescriptionIdOfInvalidFlowType() {
+    val prescriptionId = PrescriptionId.from("127.0.0.1");
+    assertThrows(InvalidValueSetException.class, prescriptionId::getFlowType);
+  }
+
+  @Test
+  void shouldCreateFromTaskId() {
+    val taskId = TaskId.from("123");
+    val prescriptionId = PrescriptionId.from(taskId);
+    assertEquals("123", prescriptionId.getValue());
   }
 }

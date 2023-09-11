@@ -16,19 +16,27 @@
 
 package de.gematik.test.erezept.fhir.references.erp;
 
-import ca.uhn.fhir.model.api.annotation.*;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.references.CustomReferenceProvider;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import org.hl7.fhir.r4.model.*;
 
-@DatatypeDef(name = "Reference")
-@SuppressWarnings({"java:S110"})
-public class ErxReceiptReference extends Reference {
+public class ErxReceiptReference extends CustomReferenceProvider {
 
   private static final ErpWorkflowStructDef STRUCTURE_DEFINITION =
       ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE;
 
+
   public ErxReceiptReference(ErxReceipt erxReceipt) {
-    this.setDisplay(STRUCTURE_DEFINITION.getCanonicalUrl()).setReference(erxReceipt.getId());
+    this(erxReceipt.getId());
+  }
+
+  public ErxReceiptReference(String erxReceiptId) {
+    super("Bundle", erxReceiptId);
+  }
+
+  @Override
+  public Reference asReference() {
+    return new Reference().setDisplay(STRUCTURE_DEFINITION.getCanonicalUrl()).setReference(this.referenceValue);
   }
 }

@@ -21,8 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.app.cfg.AppConfiguration;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.android.AndroidDriver;
 import java.util.List;
 import lombok.val;
@@ -34,70 +34,48 @@ class UseAndroidAppTest {
 
   @Test
   void shouldGetStaticValues() {
-    val config = new AppConfiguration();
-    config.setAppFile("test-app-file");
-    config.setPlatform("Android");
-    config.setUseVirtualeGK(true);
-    config.setPackageName("de.gematik.erezept");
-    config.setMaxWaitTimeout(10);
-    config.setPollingInterval(5);
-
+    val appiumConfig = new AppiumConfiguration();
+    appiumConfig.setMaxWaitTimeout(10); // poll 10 times at maximum
+    appiumConfig.setPollingInterval(5);
+    
     val driver = mock(AndroidDriver.class);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertTrue(driverAbility.getDriverName().toLowerCase().contains("android"));
     assertNotNull(driverAbility.toString());
     assertEquals(10, driverAbility.getMaxWaitTimeout());
     assertEquals(5, driverAbility.getPollingInterval());
-    assertTrue(driverAbility.useVirtualeGK());
 
     assertDoesNotThrow(driverAbility::tearDown);
   }
 
   @Test
   void shouldGetElement() {
-    val config = new AppConfiguration();
-    config.setAppFile("test-app-file");
-    config.setPlatform("Android");
-    config.setPackageName("de.gematik.erezept");
-    config.setMaxWaitTimeout(50);
-    config.setPollingInterval(5);
-
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.findElement(any())).thenReturn(webElement);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, new AppiumConfiguration());
     assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 
   @Test
   void shouldGetElementsAsList() {
-    val config = new AppConfiguration();
-    config.setAppFile("test-app-file");
-    config.setPlatform("Android");
-    config.setPackageName("de.gematik.erezept");
-    config.setMaxWaitTimeout(50);
-    config.setPollingInterval(5);
-
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.findElements(any())).thenReturn(List.of(webElement));
 
-    val driverAbility = new UseAndroidApp(driver, config);
-    val elementList = driverAbility.getWebElementList(Onboarding.NEXT_BUTTON);
+    val driverAbility = new UseAndroidApp(driver, new AppiumConfiguration());
+    val elementList = driverAbility.getWebElements(Onboarding.NEXT_BUTTON);
     assertEquals(1, elementList.size());
   }
 
   @Test
   void shouldGetSlowElement() {
-    val config = new AppConfiguration();
-    config.setAppFile("test-app-file");
-    config.setPlatform("Android");
-    config.setPackageName("de.gematik.erezept");
-    config.setMaxWaitTimeout(50);
-    config.setPollingInterval(5);
-
+    val appiumConfig = new AppiumConfiguration();
+    appiumConfig.setMaxWaitTimeout(50); // poll 10 times at maximum
+    appiumConfig.setPollingInterval(5);
+    
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.findElement(any()))
@@ -105,19 +83,16 @@ class UseAndroidAppTest {
         .thenThrow(new NoSuchElementException("Not found 2")) // throw on second call
         .thenReturn(webElement);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertEquals(webElement, driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }
 
   @Test
   void shouldFailOnTooSlowElement() {
-    val config = new AppConfiguration();
-    config.setAppFile("test-app-file");
-    config.setPlatform("Android");
-    config.setPackageName("de.gematik.erezept");
-    config.setMaxWaitTimeout(10);
-    config.setPollingInterval(5);
-
+    val appiumConfig = new AppiumConfiguration();
+    appiumConfig.setMaxWaitTimeout(10);
+    appiumConfig.setPollingInterval(5);
+    
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.findElement(any()))
@@ -126,7 +101,7 @@ class UseAndroidAppTest {
         .thenThrow(new NoSuchElementException("Not found 3")) // throw on third call
         .thenReturn(webElement);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertThrows(
         NoSuchElementException.class, () -> driverAbility.getWebElement(Onboarding.NEXT_BUTTON));
   }

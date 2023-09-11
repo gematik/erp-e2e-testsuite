@@ -48,11 +48,11 @@ public class AssignerOrganizationBuilder
   }
 
   public static AssignerOrganizationBuilder faker() {
-    return faker(new OrganizationReference(UUID.randomUUID().toString()), GemFaker.insuranceName());
+    return faker(new OrganizationReference(UUID.randomUUID().toString()).asReference(), GemFaker.insuranceName());
   }
 
   public static AssignerOrganizationBuilder faker(@NonNull KbvPatient pkvPatient) {
-    if (!pkvPatient.hasPkvId()) {
+    if (!pkvPatient.hasPkvKvnr()) {
       throw new BuilderException(
           format(
               "Cannot build AssignerOrganization from Patient with {0} Insurance",
@@ -81,6 +81,10 @@ public class AssignerOrganizationBuilder
     return faker(assignerRef, assignerName);
   }
 
+  public static AssignerOrganizationBuilder faker(@NonNull OrganizationReference reference, String name) {
+    return faker(reference.asReference(), name);
+  }
+  
   public static AssignerOrganizationBuilder faker(@NonNull Reference reference, String name) {
     val builder = builder();
 

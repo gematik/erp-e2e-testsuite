@@ -16,217 +16,262 @@
 
 package de.gematik.test.erezept.actions;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.erezept.ErpConfiguration;
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.rest.MediaType;
+import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
+import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.Task;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.stubbing.Answer;
 
-import de.gematik.test.core.expectations.requirements.*;
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.parser.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import java.util.*;
-import java.util.function.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
-import org.mockito.stubbing.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@Slf4j
 class IssuePrescriptionTest {
 
-  private static FhirParser fhir;
-  private static DoctorActor doctor;
-  private static PatientActor patient;
-  private static UseTheErpClient useErpClient;
+    private static FhirParser fhir;
+    private static DoctorActor doctor;
+    private static PatientActor patient;
+    private static UseTheErpClient useErpClient;
 
-  @BeforeAll
-  static void setup() {
-    CoverageReporter.getInstance().startTestcase("don't care");
-    fhir = new FhirParser();
+    @BeforeAll
+    static void setup() {
+        CoverageReporter.getInstance().startTestcase("don't care");
+        fhir = new FhirParser();
 
-    // init doctor
-    doctor = new DoctorActor("Bernd Claudius");
+        // init doctor
+        doctor = new DoctorActor("Bernd Claudius");
 
-    val config = ErpConfiguration.create();
-    val docConfig = config.getDoctorConfig(doctor.getName());
-    docConfig.setKonnektor("Soft-Konn");
-    useErpClient = mock(UseTheErpClient.class);
-    val smartcards = config.getSmartcards();
-    val smcb = smartcards.getSmcbByICCSN(docConfig.getSmcbIccsn());
-    val hba = smartcards.getHbaByICCSN(docConfig.getHbaIccsn());
+        val config = ErpConfiguration.create();
+        val docConfig = config.getDoctorConfig(doctor.getName());
+        docConfig.setKonnektor("Soft-Konn");
+        useErpClient = mock(UseTheErpClient.class);
+        val smartcards = config.getSmartcards();
+        val smcb = smartcards.getSmcbByICCSN(docConfig.getSmcbIccsn());
+        val hba = smartcards.getHbaByICCSN(docConfig.getHbaIccsn());
 
-    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig);
-    val useKonnektor =
-        UseTheKonnektor.with(smcb).and(hba).on(config.instantiateDoctorKonnektor(docConfig));
-    doctor.can(useErpClient);
-    doctor.can(provideBaseData);
-    doctor.can(useKonnektor);
+        val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig);
+        val useKonnektor =
+                UseTheKonnektor.with(smcb).and(hba).on(config.instantiateDoctorKonnektor(docConfig));
+        doctor.can(useErpClient);
+        doctor.can(provideBaseData);
+        doctor.can(useKonnektor);
 
-    // init patient
-    patient = new PatientActor("Sina Hüllmann");
-    patient.can(ProvidePatientBaseData.forGkvPatient("X123456789", patient.getName()));
-  }
+        // init patient
+        patient = new PatientActor("Sina Hüllmann");
+        patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
+    }
 
-  @Test
-  void shouldCreateValidPrescriptionFromRandomKbvBundleBuilder() {
-    List.of(
-            (Supplier<ErpInteraction<ErxTask>>)
-                () ->
-                    doctor.performs(
-                        IssuePrescription.forPatient(patient)
-                            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                            .withRandomKbvBundle()),
-            () ->
-                doctor.performs(
-                    IssuePrescription.forPatient(patient)
-                        .ofAssignmentKind(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-                        .withKbvBundleFrom(
-                            KbvErpBundleBuilder.faker(patient.getKvnr(), new Date()))))
-        .forEach(
-            supplier -> {
-              val draftTask = mock(ErxTask.class);
-              when(draftTask.getUnqualifiedId())
-                  .thenReturn(
-                      PrescriptionId.random().getValue()); // don't care about concrete value
-              when(draftTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
-              when(draftTask.getAccessCode()).thenReturn(AccessCode.random());
-              when(draftTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
-              val createResponse = new ErpResponse(201, Map.of(), draftTask);
+    static Stream<Arguments> shouldCreateValidPrescriptionFromRandomKbvBundleBuilder() {
+        return Stream.of(
+                arguments(
+                        "Pharmacy Only with random KbvBundle-Builder",
+                        (Function<DoctorActor, ErpInteraction<ErxTask>>)
+                                doctor ->
+                                        doctor.performs(
+                                                IssuePrescription.forPatient(patient)
+                                                        .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                                                        .withRandomKbvBundle())),
+                arguments(
+                        "Direct Assignment with given random KbvBundle-Builder",
+                        (Function<DoctorActor, ErpInteraction<ErxTask>>)
+                                doctor ->
+                                        doctor.performs(
+                                                IssuePrescription.forPatient(patient)
+                                                        .ofAssignmentKind(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+                                                        .withKbvBundleFrom(
+                                                                KbvErpBundleBuilder.faker(patient.getKvnr(), new Date())))));
+    }
 
-              when(useErpClient.getSendMime()).thenReturn(MediaType.FHIR_XML);
-              when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
-              when(useErpClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+    @ParameterizedTest(name = "{index}: {0}")
+    @MethodSource
+    void shouldCreateValidPrescriptionFromRandomKbvBundleBuilder(
+            String label, Function<DoctorActor, ErpInteraction<ErxTask>> function) {
 
-              doAnswer(
-                      (Answer<String>)
-                          invocation -> {
+        log.trace(format("Execute {0}", label));
+        val draftTask = mock(ErxTask.class);
+        when(draftTask.getTaskId())
+                .thenReturn(TaskId.from(PrescriptionId.random())); // don't care about concrete value
+        when(draftTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
+        when(draftTask.getAccessCode()).thenReturn(AccessCode.random());
+        when(draftTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
+        val createResponse = createErpResponse(draftTask);
+
+        when(useErpClient.getSendMime()).thenReturn(MediaType.FHIR_XML);
+        when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+        when(useErpClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+
+        doAnswer(
+                (Answer<String>)
+                        invocation -> {
                             final Object[] args = invocation.getArguments();
-                            val encoded =
-                                fhir.encode((Resource) args[0], (EncodingType) args[1], true);
+                            val encoded = fhir.encode((Resource) args[0], (EncodingType) args[1], true);
 
                             // make sure the resource provided is valid
                             val result = fhir.validate(encoded);
 
                             if (!result.isSuccessful()) {
-                              System.out.println(encoded);
-                              result.getMessages().forEach(System.out::println);
+                                System.out.println(encoded);
+                                result.getMessages().forEach(System.out::println);
                             }
 
                             assertTrue(result.isSuccessful());
 
                             return encoded;
-                          })
-                  .when(useErpClient)
-                  .encode(any(), any());
+                        })
+                .when(useErpClient)
+                .encode(any(), any());
 
-              // produces valid Kbv Bundle from random Builder
-              assertDoesNotThrow(supplier::get);
-            });
-  }
+        // produces valid Kbv Bundle from random Builder
+        assertDoesNotThrow(() -> function.apply(doctor));
+    }
 
-  @Test
-  void shouldCreateInvalidPrescriptionWithExtensions() {
-    val draftTask = mock(ErxTask.class);
-    when(draftTask.getUnqualifiedId())
-        .thenReturn(PrescriptionId.random().getValue()); // don't care about concrete value
-    when(draftTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
-    when(draftTask.getAccessCode()).thenReturn(AccessCode.random());
-    when(draftTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
-    val createResponse = new ErpResponse(201, Map.of(), draftTask);
+    @Test
+    void shouldCreateInvalidPrescriptionWithExtensions() {
+        val draftTask = mock(ErxTask.class);
+        when(draftTask.getTaskId())
+                .thenReturn(TaskId.from(PrescriptionId.random())); // don't care about concrete value
+        when(draftTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
+        when(draftTask.getAccessCode()).thenReturn(AccessCode.random());
+        when(draftTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
+        val createResponse = createErpResponse(draftTask);
 
-    when(useErpClient.getSendMime()).thenReturn(MediaType.FHIR_XML);
-    when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
-    when(useErpClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+        when(useErpClient.getSendMime()).thenReturn(MediaType.FHIR_XML);
+        when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+        when(useErpClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
 
-    val extensionUrl = "https://test.erp.gematik.de";
-    val extension = new Extension(extensionUrl).setValue(new StringType("Testvalue"));
+        val extensionUrl = "https://test.erp.gematik.de";
+        val extension = new Extension(extensionUrl).setValue(new StringType("Testvalue"));
 
-    doAnswer(
-            (Answer<String>)
-                invocation -> {
-                  final Object[] args = invocation.getArguments();
-                  val kbvBundle = (KbvErpBundle) args[0];
+        doAnswer(
+                (Answer<String>)
+                        invocation -> {
+                            final Object[] args = invocation.getArguments();
+                            val kbvBundle = (KbvErpBundle) args[0];
 
-                  // make sure the extensions were set correctly
-                  List.of(
-                          kbvBundle.getCoverage(),
-                          kbvBundle.getPatient(),
-                          kbvBundle.getComposition(),
-                          kbvBundle.getMedication(),
-                          kbvBundle.getMedicationRequest())
-                      .forEach(
-                          resource ->
-                              assertEquals(1, resource.getExtensionsByUrl(extensionUrl).size()));
+                            // make sure the extensions were set correctly
+                            List.of(
+                                            kbvBundle.getCoverage(),
+                                            kbvBundle.getPatient(),
+                                            kbvBundle.getComposition(),
+                                            kbvBundle.getMedication(),
+                                            kbvBundle.getMedicationRequest())
+                                    .forEach(
+                                            resource ->
+                                                    assertEquals(1, resource.getExtensionsByUrl(extensionUrl).size()));
 
-                  return fhir.encode(kbvBundle, (EncodingType) args[1], true);
-                })
-        .when(useErpClient)
-        .encode(any(), any());
+                            return fhir.encode(kbvBundle, (EncodingType) args[1], true);
+                        })
+                .when(useErpClient)
+                .encode(any(), any());
 
-    doctor.performs(
-        IssuePrescription.forPatient(patient)
-            .withCoverageExtension(extension)
-            .withPatientExtension(extension)
-            .withCompositionExtension(extension)
-            .withMedicationExtension(extension)
-            .withMedicationRequestExtension(extension)
-            .withRandomKbvBundle());
-  }
+        doctor.performs(
+                IssuePrescription.forPatient(patient)
+                        .withCoverageExtension(extension)
+                        .withPatientExtension(extension)
+                        .withCompositionExtension(extension)
+                        .withMedicationExtension(extension)
+                        .withMedicationRequestExtension(extension)
+                        .withRandomKbvBundle());
+    }
 
-  @Test
-  void shouldManipulateKbvBundle() {
-    val draftTask = mock(ErxTask.class);
-    when(draftTask.getUnqualifiedId())
-        .thenReturn(PrescriptionId.random().getValue()); // don't care about concrete value
-    when(draftTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
-    when(draftTask.getAccessCode()).thenReturn(AccessCode.random());
-    when(draftTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
-    val createResponse = new ErpResponse(201, Map.of(), draftTask);
+    @Test
+    void shouldManipulateKbvBundle() {
+        val draftTask = mock(ErxTask.class);
+        when(draftTask.getTaskId())
+                .thenReturn(TaskId.from(PrescriptionId.random())); // don't care about concrete value
+        when(draftTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
+        when(draftTask.getAccessCode()).thenReturn(AccessCode.random());
+        when(draftTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
+        val createResponse = createErpResponse(draftTask);
 
-    when(useErpClient.getSendMime()).thenReturn(MediaType.FHIR_XML);
-    when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
-    when(useErpClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+        when(useErpClient.getSendMime()).thenReturn(MediaType.FHIR_XML);
+        when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+        when(useErpClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
 
-    doAnswer(
-            (Answer<String>)
-                invocation -> {
-                  final Object[] args = invocation.getArguments();
-                  val kbvBundle = (KbvErpBundle) args[0];
+        doAnswer(
+                (Answer<String>)
+                        invocation -> {
+                            final Object[] args = invocation.getArguments();
+                            val kbvBundle = (KbvErpBundle) args[0];
 
-                  val dmpExtension =
-                      kbvBundle
-                          .getCoverage()
-                          .getExtensionByUrl(
-                              DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
-                  val codingValue = dmpExtension.getValue().castToCoding(dmpExtension.getValue());
-                  assertEquals("42", codingValue.getCode());
-                  assertEquals(
-                      DmpKennzeichen.CODE_SYSTEM.getCanonicalUrl(), codingValue.getSystem());
+                            val dmpExtension =
+                                    kbvBundle
+                                            .getCoverage()
+                                            .getExtensionByUrl(
+                                                    DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
+                            val codingValue = dmpExtension.getValue().castToCoding(dmpExtension.getValue());
+                            assertEquals("42", codingValue.getCode());
+                            assertEquals(
+                                    DmpKennzeichen.CODE_SYSTEM.getCanonicalUrl(), codingValue.getSystem());
 
-                  return fhir.encode(kbvBundle, (EncodingType) args[1], true);
-                })
-        .when(useErpClient)
-        .encode(any(), any());
+                            return fhir.encode(kbvBundle, (EncodingType) args[1], true);
+                        })
+                .when(useErpClient)
+                .encode(any(), any());
 
-    doctor.performs(
-        IssuePrescription.forPatient(patient)
-            .withResourceManipulator(
-                b -> {
-                  val ext =
-                      b.getCoverage()
-                          .getExtensionByUrl(
-                              DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
-                  ext.getValue().castToCoding(ext.getValue()).setCode("42");
-                })
-            .withRandomKbvBundle());
-  }
+        doctor.performs(
+                IssuePrescription.forPatient(patient)
+                        .withResourceManipulator(
+                                b -> {
+                                    val ext =
+                                            b.getCoverage()
+                                                    .getExtensionByUrl(
+                                                            DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
+                                    ext.getValue().castToCoding(ext.getValue()).setCode("42");
+                                })
+                        .withRandomKbvBundle());
+    }
+
+    private ErpResponse createErpResponse(ErxTask draftTask) {
+        return ErpResponse.forPayload(draftTask, ErxTask.class)
+                .withStatusCode(201)
+                .withHeaders(Map.of())
+                .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    }
 }

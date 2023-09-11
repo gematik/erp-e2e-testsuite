@@ -16,10 +16,6 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
-
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -31,15 +27,24 @@ import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.ByteArrayMutator;
 import de.gematik.test.fuzzing.core.StringMutator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Consumer;
+import de.gematik.test.fuzzing.fhirfuzz.FhirResourceFuzz;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Extension;
+
+import javax.annotation.Nullable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
+import static java.text.MessageFormat.format;
 
 @RequiredArgsConstructor
 public class IssuePrescription extends ErpAction<ErxTask> {
@@ -50,16 +55,18 @@ public class IssuePrescription extends ErpAction<ErxTask> {
   private final List<Consumer<KbvErpBundle>> manipulator;
   private final List<StringMutator> stringMutators;
   private final List<ByteArrayMutator> signedBundleMutators;
+  @Nullable
+  private final FhirResourceFuzz<Bundle> smartFuzzer;
 
   @Override
   public ErpInteraction<ErxTask> answeredBy(Actor actor) {
     val creation = actor.asksFor(TaskCreate.forPatient(patient).ofAssignmentKind(assignmentKind));
     actor.attemptsTo(
-        Verify.that(creation)
-            .withExpectedType(ErpAfos.A_19018)
-            .hasResponseWith(returnCode(201))
-            .and(isInDraftStatus())
-            .and(hasValidPrescriptionId())
+            Verify.that(creation)
+                    .withExpectedType(ErpAfos.A_19018)
+                    .hasResponseWith(returnCode(201))
+                    .and(isInDraftStatus())
+                    .and(hasValidPrescriptionId())
             .isCorrect());
 
     val docBaseData = SafeAbility.getAbility(actor, ProvideDoctorBaseData.class);
@@ -67,23 +74,33 @@ public class IssuePrescription extends ErpAction<ErxTask> {
     val prescriptionId = draftTask.getPrescriptionId();
 
     bundleBuilder
-        .prescriptionId(prescriptionId)
-        .practitioner(docBaseData.getPractitioner())
-        .custodian(docBaseData.getMedicalOrganization())
-        .patient(patient.getPatientData())
-        .insurance(patient.getInsuranceCoverage());
+            .prescriptionId(prescriptionId)
+            .practitioner(docBaseData.getPractitioner())
+            .custodian(docBaseData.getMedicalOrganization())
+            .patient(patient.getPatientData())
+            .insurance(patient.getInsuranceCoverage());
 
     patient.getAssignerOrganization().ifPresent(bundleBuilder::assigner);
     val kbvBundle = bundleBuilder.build();
+
+    // when built via withRandomKbvBundle, the practitioner reference does not match and needs to be fixed
+    kbvBundle
+        .getMedicationRequest()
+        .getRequester()
+        .setReference(format("Practitioner/{0}", docBaseData.getPractitioner().getId()));
+
+    if (smartFuzzer != null) {
+      smartFuzzer.fuzz(kbvBundle);
+    }
 
     // now add optional extensions
     manipulator.forEach(extConsumer -> extConsumer.accept(kbvBundle));
 
     return actor.asksFor(
-        ActivatePrescription.forGiven(draftTask)
-            .withStringMutator(stringMutators)
-            .withByteArrayMutator(signedBundleMutators)
-            .withKbvBundle(kbvBundle));
+            ActivatePrescription.forGiven(draftTask)
+                    .withStringMutator(stringMutators)
+                    .withByteArrayMutator(signedBundleMutators)
+                    .withKbvBundle(kbvBundle));
   }
 
   public static Builder forPatient(PatientActor patient) {
@@ -97,6 +114,9 @@ public class IssuePrescription extends ErpAction<ErxTask> {
     private final List<Consumer<KbvErpBundle>> fhirActivateMutators = new LinkedList<>();
     private final List<StringMutator> stringMutators = new LinkedList<>();
     private final List<ByteArrayMutator> signedBundleMutators = new LinkedList<>();
+    @Nullable
+    private FhirResourceFuzz<Bundle> smartFuzzer;
+
 
     public Builder ofAssignmentKind(PrescriptionAssignmentKind assignmentKind) {
       this.assignmentKind = assignmentKind;
@@ -144,13 +164,18 @@ public class IssuePrescription extends ErpAction<ErxTask> {
       return this;
     }
 
+    public Builder withSmartFuzzer(FhirResourceFuzz<Bundle> smartFuzzer) {
+      this.smartFuzzer = smartFuzzer;
+      return this;
+    }
+
     public IssuePrescription withRandomKbvBundle() {
       return withKbvBundleFrom(KbvErpBundleBuilder.faker(patient.getKvnr()));
     }
 
     public IssuePrescription withKbvBundleFrom(KbvErpBundleBuilder builder) {
       Object[] params = {
-        patient, assignmentKind, builder, fhirActivateMutators, stringMutators, signedBundleMutators
+              patient, assignmentKind, builder, fhirActivateMutators, stringMutators, signedBundleMutators, smartFuzzer
       };
       return new Instrumented.InstrumentedBuilder<>(IssuePrescription.class, params).newInstance();
     }

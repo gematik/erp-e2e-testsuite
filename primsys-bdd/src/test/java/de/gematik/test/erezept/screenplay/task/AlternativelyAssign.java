@@ -95,7 +95,7 @@ public class AlternativelyAssign implements Task {
     val dmcPrescription = deque.chooseFrom(dmcStack.getDmcs());
     val dmcImage =
         DataMatrixCodeGenerator.getBufferedImage(
-            dmcPrescription.getTaskId(), dmcPrescription.getAccessCode());
+            dmcPrescription.getTaskId().getValue(), dmcPrescription.getAccessCode());
     UIProvider.getInstructionResult(
         dmcImage,
         format(
@@ -109,7 +109,7 @@ public class AlternativelyAssign implements Task {
 
     val pspInfo = new PharmacyPrescriptionInformation();
     pspInfo.setVersion("1"); // TODO: check for correct version and/or create setter with enum
-    pspInfo.setTaskID(dmcPrescription.getTaskId());
+    pspInfo.setTaskID(dmcPrescription.getTaskId().getValue());
     pspInfo.setAccessCode(dmcPrescription.getAccessCode().getValue());
     pspInfo.setSupplyOptionsType(option.name());
     pspInfo.setName(patientData.getFullName());

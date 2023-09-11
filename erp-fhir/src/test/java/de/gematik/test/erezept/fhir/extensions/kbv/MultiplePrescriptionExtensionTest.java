@@ -18,6 +18,7 @@ package de.gematik.test.erezept.fhir.extensions.kbv;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import lombok.val;
@@ -142,5 +143,26 @@ class MultiplePrescriptionExtensionTest {
     val period = zeitraum.getValue().castToPeriod(zeitraum.getValue());
     assertNull(period.getStartElement().getValue());
     assertNull(period.getEndElement().getValue());
+  }
+
+  @Test
+  void shouldCreateWithId() {
+    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4)
+            .withId("123").withoutEndDate(false);
+    val ext = mvo.asExtension(KbvItaErpVersion.V1_1_0);
+    
+    val idExt = ext.getExtensionByUrl("ID");
+    val mvoId = idExt.getValue().castToIdentifier(idExt.getValue()).getValue();
+    assertTrue(mvoId.contains("123"));
+  }
+
+  @Test
+  void shouldIgnoreIdOnOldProfiles() {
+    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4)
+            .withId("123").withoutEndDate(false);
+    val ext = mvo.asExtension(KbvItaErpVersion.V1_0_2);
+
+    val idExt = ext.getExtensionByUrl("ID");
+    assertNull(idExt);
   }
 }

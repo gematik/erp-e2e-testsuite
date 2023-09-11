@@ -18,6 +18,8 @@ package de.gematik.test.konnektor.cfg;
 
 import static java.text.MessageFormat.format;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.KonnektorImpl;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
@@ -29,6 +31,10 @@ import lombok.val;
 @Data
 public class LocalKonnektorConfiguration extends KonnektorConfiguration {
 
+  @JsonAlias({"vsdmService"})
+  private VsdmServiceConfiguration vsdmServiceConfiguration;
+
+  @JsonCreator
   public LocalKonnektorConfiguration() {
     this.setType(KonnektorType.LOCAL);
   }
@@ -43,9 +49,13 @@ public class LocalKonnektorConfiguration extends KonnektorConfiguration {
 
   @Override
   public Konnektor create() {
+    if (vsdmServiceConfiguration == null) {
+      vsdmServiceConfiguration = VsdmServiceConfiguration.createCfg();
+    }
     val smartcards = SmartcardFactory.getArchive();
     val ctx = getDefaultContextType();
-    val serviceProvider = new MockKonnektorServiceProvider(smartcards);
+    val serviceProvider =
+        new MockKonnektorServiceProvider(smartcards, vsdmServiceConfiguration.createDefault());
     return new KonnektorImpl(ctx, this.getName(), KonnektorType.LOCAL, serviceProvider);
   }
 

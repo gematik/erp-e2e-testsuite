@@ -17,8 +17,22 @@
 package de.gematik.test.erezept.screenplay.abilities;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
+import java.util.Map;
 import lombok.val;
+import net.serenitybdd.screenplay.actors.Cast;
+import net.serenitybdd.screenplay.actors.OnStage;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class ManagePharmacyPrescriptionsTest {
@@ -30,5 +44,37 @@ class ManagePharmacyPrescriptionsTest {
     assertTrue(ability.getAssignedPrescriptions().isEmpty());
     assertTrue(ability.getDispensedPrescriptions().isEmpty());
     assertDoesNotThrow(ability::toString);
+  }
+  
+  @Test
+  void shouldTeardown() {
+    OnStage.setTheStage(new Cast() {});
+
+    val actor = OnStage.theActor("Alice");
+    val ability = spy(ManagePharmacyPrescriptions.itWorksWith());
+    actor.can(ability);
+    
+    val task = mock(ErxTask.class);
+    val acceptBundle = mock(ErxAcceptBundle.class);
+    when(acceptBundle.getTaskId()).thenReturn(TaskId.from(PrescriptionId.random()));
+    when(acceptBundle.getSecret()).thenReturn(Secret.fromString("123"));
+    when(acceptBundle.getTask()).thenReturn(task);
+    when(task.getAccessCode()).thenReturn(AccessCode.random());
+    
+    ability.appendAcceptedPrescription(acceptBundle);
+    
+    val erpClient = mock(UseTheErpClient.class);
+    actor.can(erpClient);
+
+    val mockResponse =
+            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+                    .withStatusCode(404)
+                    .withHeaders(Map.of())
+                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    when(erpClient.request(any(TaskRejectCommand.class))).thenReturn(mockResponse);
+    
+    OnStage.drawTheCurtain();
+    
+    verify(ability, times(1)).tearDown();
   }
 }

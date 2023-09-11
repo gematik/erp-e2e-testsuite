@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
-import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.Arrays;
@@ -45,7 +44,7 @@ class ErxAuditEventTest extends ParsingTest {
   void shouldEncodeSingleAuditEvent() {
     val fileName = "AuditEvent_01.json";
     val originalEncoding = EncodingType.JSON;
-    val flippedEncoding = EncodingUtil.flipEncoding(originalEncoding);
+    val flippedEncoding = originalEncoding.flipEncoding();
 
     val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
     val auditEvent = parser.decode(ErxAuditEvent.class, content);
@@ -82,7 +81,7 @@ class ErxAuditEventTest extends ParsingTest {
   }
 
   @Test
-  void shouldEncodeAuditEventWithoutProfile() {
+  void shouldDecodeAuditEventWithoutProfile() {
     val fileName = "AuditEventBundle.json";
 
     val content = ResourceUtils.readFileFromResource(format("fhir/invalid/erp/{0}", fileName));

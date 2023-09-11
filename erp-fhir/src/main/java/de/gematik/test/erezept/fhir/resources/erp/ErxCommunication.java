@@ -22,10 +22,12 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStruc
 import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.Value;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Communication;
@@ -46,27 +48,26 @@ public class ErxCommunication extends Communication {
     return IdentifierUtil.getUnqualifiedId(this.getId());
   }
 
-  public String getBasedOnReferenceId() {
+  public TaskId getBasedOnReferenceId() {
     val reference = this.getFixedBasedOnReference();
-    return reference.split("/")[1];
+    val idToken = reference.split("/")[1];
+    return TaskId.from(idToken.split("\\?")[0]);
+  }
+
+  public Optional<AccessCode> getBasedOnAccessCode() {
+    val pattern = Pattern.compile("ac=(.+)");
+    val ref = this.getBasedOnFirstRep().getReference();
+    val matcher = pattern.matcher(ref);
+    if (matcher.find()) {
+      val ac = AccessCode.fromString(matcher.group(1));
+      return Optional.of(ac);
+    } else {
+      return Optional.empty();
+    }
   }
 
   public LocalDateTime getSentDate() {
     return this.getSent().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-  }
-
-  public Optional<AccessCode> getBasedOnAccessCode() {
-    val reference = this.getFixedBasedOnReference();
-    // second: split the reference
-    val tokens = reference.split("/");
-    // if we have 3 tokens, the last one contains the AccessCode
-    if (tokens.length >= 3) {
-      val acToken = tokens[2];
-      val accessCode = acToken.split("=")[1];
-      return Optional.of(new AccessCode(accessCode));
-    } else {
-      return Optional.empty();
-    }
   }
 
   /**

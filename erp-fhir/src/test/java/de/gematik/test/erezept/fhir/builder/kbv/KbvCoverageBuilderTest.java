@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.*;
 import lombok.*;
@@ -36,7 +37,7 @@ class KbvCoverageBuilderTest extends ParsingTest {
   void buildCoverageWithFixedValues(KbvItaForVersion version) {
     val patient = PatientBuilder.faker().version(version).build();
     val coverage =
-        KbvCoverageBuilder.insurance("101377508", "Techniker-Krankenkasse")
+        KbvCoverageBuilder.insurance(GkvInsuranceCoverageInfo.TK)
             .version(version)
             .beneficiary(patient)
             .personGroup(PersonGroup.NOT_SET) // default NOT_SET
@@ -49,8 +50,8 @@ class KbvCoverageBuilderTest extends ParsingTest {
 
     // check the getters here because we do not yet have static files for coverages
     assertEquals(patient.getInsuranceKind(), coverage.getInsuranceKind());
-    assertEquals("101377508", coverage.getIknr().getValue());
-    assertEquals("Techniker-Krankenkasse", coverage.getName());
+    assertEquals("101575519", coverage.getIknr().getValue());
+    assertEquals("Techniker Krankenkasse", coverage.getName());
     assertNotNull(coverage.getDescription());
   }
 
@@ -65,10 +66,15 @@ class KbvCoverageBuilderTest extends ParsingTest {
   }
 
   @ParameterizedTest(
-      name = "[{index}] -> Build faker KBV Coverage for GKV/PKV with KbvItaForVersion {0}")
+      name = "[{index}] -> Build faker KBV Coverage for GKV/PKV/BG/BEI with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFaker02(KbvItaForVersion version) {
-    val insuranceKinds = List.of(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV);
+    val insuranceKinds =
+            List.of(
+                    VersicherungsArtDeBasis.GKV,
+                    VersicherungsArtDeBasis.PKV,
+                    VersicherungsArtDeBasis.BG,
+                    VersicherungsArtDeBasis.BEI);
 
     insuranceKinds.forEach(
         ik -> {

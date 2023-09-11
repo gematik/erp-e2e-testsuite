@@ -34,7 +34,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 @Slf4j
 public class Main {
 
-  public static final double VERSIONNUMBER = 1.0;
+  public static final double VERSIONNUMBER = 1.1;
   // Base URI the Grizzly HTTP server will listen on
   public static final String BASE_URI = "http://0.0.0.0:9095/";
 

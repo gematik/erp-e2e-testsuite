@@ -18,8 +18,10 @@ package de.gematik.test.erezept.primsys.rest.data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @XmlRootElement
 public class PharmacyData extends ActorData {
 

@@ -26,14 +26,14 @@ public class ManagedListTest {
 
   @Test
   public void shouldDetectEmptyManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     assertTrue(ml.isEmpty());
     assertEquals(0, ml.getRawList().size());
   }
 
   @Test
   public void shouldDetectNonEmptyManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("Hello World");
     assertFalse(ml.isEmpty());
     assertEquals(1, ml.getRawList().size());
@@ -41,7 +41,7 @@ public class ManagedListTest {
 
   @Test
   public void shouldGetLastFirstWithoutConsumeFromManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("first");
     ml.append("last");
 
@@ -55,7 +55,7 @@ public class ManagedListTest {
 
   @Test
   public void shouldConsumeFirstLastFromManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("first");
     ml.append("last");
 
@@ -68,7 +68,7 @@ public class ManagedListTest {
 
   @Test
   public void shouldConsumeLastFirstFromManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("first");
     ml.append("last");
 
@@ -81,7 +81,7 @@ public class ManagedListTest {
 
   @Test
   public void shouldPrependOnManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("last");
     ml.prepend("first");
 
@@ -91,7 +91,7 @@ public class ManagedListTest {
 
   @Test
   public void shouldThrowOnEmptyManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("nothing here yet"));
+    val ml = new ManagedList<String>(() -> "nothing here yet");
     assertTrue(ml.isEmpty());
     assertThrows(MissingPreconditionError.class, ml::getFirst);
     assertThrows(MissingPreconditionError.class, ml::getLast);

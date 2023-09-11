@@ -16,42 +16,34 @@
 
 package de.gematik.test.erezept.app.abilities;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.app.cfg.AppConfiguration;
+import de.gematik.test.erezept.app.exceptions.AppErrorException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mocker.WebElementMockFactory;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.FluentWait;
 
 class UseTheAppTest {
-
-  private static AppConfiguration config;
+  
+  private static AppiumConfiguration appiumConfig;
+  
 
   @BeforeAll
   static void setup() {
-    config = new AppConfiguration();
-    config.setAppFile("test-app-file");
-    config.setPlatform("Android");
-    config.setUseVirtualeGK(true);
-    config.setPackageName("de.gematik.erezept");
-    config.setMaxWaitTimeout(500);
-    config.setPollingInterval(5);
+    appiumConfig = new AppiumConfiguration();
   }
 
   @Test
@@ -60,48 +52,86 @@ class UseTheAppTest {
     val webElement = mock(WebElement.class);
     when(driver.findElements(any())).thenReturn(List.of(webElement, webElement));
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertEquals(2, driverAbility.getWebElementListLen(Onboarding.NEXT_BUTTON));
   }
 
   @Test
-  void shouldTapOnElement() {
-    val driver = mock(AndroidDriver.class);
+  void shouldTapOnElementByLabel() {
+    val driver = mock(IOSDriver.class);
     val webElement = mock(WebElement.class);
+    val elements = List.of(webElement);
     when(driver.findElement(any())).thenReturn(webElement);
+    when(webElement.isEnabled()).thenReturn(true);
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
 
-    val driverAbility = new UseAndroidApp(driver, config);
-    driverAbility.tap(Onboarding.NEXT_BUTTON);
+    when(driver.findElements(any(By.class))).thenReturn(elements);
+    when(elements.get(0).getText()).thenReturn("label");
+
+    driverAbility.tapByLabel(Onboarding.NEXT_BUTTON, "label");
     verify(webElement).click();
   }
 
   @Test
-  void shouldTapMultipleOnElement() {
-    val driver = mock(AndroidDriver.class);
-    val webElement = mock(WebElement.class);
-    when(driver.findElement(any())).thenReturn(webElement);
+  void shouldTapByOrder() {
+    val driver = mock(IOSDriver.class);
+    val first = mock(WebElement.class);
+    val second = mock(WebElement.class);
+    when(second.isDisplayed()).thenReturn(true);
+    when(second.isEnabled()).thenReturn(true);
+    val elements = List.of(first, second);
+    when(driver.findElements(any())).thenReturn(elements);
 
-    val driverAbility = new UseAndroidApp(driver, config);
-    driverAbility.tap(2, Onboarding.NEXT_BUTTON);
-    verify(webElement, times(2)).click();
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
+    driverAbility.tap(Onboarding.NEXT_BUTTON, 1);
+    verify(first, times(0)).click();
+    verify(second, times(1)).click();
   }
 
   @Test
-  void shouldTapOnByLocator() {
-    val driver = mock(AndroidDriver.class);
-    val webElement = mock(WebElement.class);
-    when(driver.findElement(any())).thenReturn(webElement);
+  void shouldThrowByTappingExceedingOrder() {
+    val driver = mock(IOSDriver.class);
+    val first = mock(WebElement.class);
+    val second = mock(WebElement.class);
+    val elements = List.of(first, second);
+    when(driver.findElements(any())).thenReturn(elements);
 
-    val driverAbility = new UseAndroidApp(driver, config);
-    driverAbility.tap(By.ById.name("identifier"));
-    verify(webElement).click();
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
+    assertThrows(NoSuchElementException.class, () -> driverAbility.tap(Onboarding.NEXT_BUTTON, 2));
+    verify(first, times(0)).click();
+    verify(second, times(0)).click();
+  }
+
+  @Test
+  void shouldThrowByTappingNegativeOrder() {
+    val driver = mock(IOSDriver.class);
+    val first = mock(WebElement.class);
+    val second = mock(WebElement.class);
+    val elements = List.of(first, second);
+    when(driver.findElements(any())).thenReturn(elements);
+
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
+    assertThrows(NoSuchElementException.class, () -> driverAbility.tap(Onboarding.NEXT_BUTTON, -1));
+    verify(first, times(0)).click();
+    verify(second, times(0)).click();
+  }
+
+  @Test
+  void shouldThrowOnTappingDisabledElement() {
+    val driver = mock(IOSDriver.class);
+    val mockElement = WebElementMockFactory.getDisplayableMockElement(true, false);
+    val pageElement = Onboarding.NEXT_BUTTON;
+    when(driver.findElement(pageElement.forPlatform(PlatformType.IOS))).thenReturn(mockElement);
+    when(driver.getPageSource()).thenReturn("");
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
+    assertThrows(ElementNotInteractableException.class, () -> driverAbility.tap(pageElement));
   }
 
   @Test
   void shouldTapOnPoint() {
     val driver = mock(AndroidDriver.class);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     val point = new Point(200, 300);
     driverAbility.tap(point);
     verify(driver, times(1)).perform(any());
@@ -111,10 +141,45 @@ class UseTheAppTest {
   void shouldDoubleTapOnPoint() {
     val driver = mock(AndroidDriver.class);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     val point = new Point(200, 300);
     driverAbility.tap(2, point);
     verify(driver, times(2)).perform(any());
+  }
+
+  @Test
+  void shouldCheckElementPresent() {
+    val driver = mock(AndroidDriver.class);
+    val webElement = mock(WebElement.class);
+    when(driver.findElement(any())).thenReturn(webElement);
+    when(webElement.isEnabled()).thenReturn(true);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
+    assertTrue(driverAbility.isPresent(Onboarding.NEXT_BUTTON));
+  }
+
+  @Test
+  void shouldCheckElementEnabled() {
+    val driver = mock(AndroidDriver.class);
+    val webElement = mock(WebElement.class);
+    when(driver.findElement(any())).thenReturn(webElement);
+    when(webElement.isEnabled()).thenReturn(true);
+    when(webElement.isDisplayed()).thenReturn(true);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
+    val isEnabled = driverAbility.isEnabled(Onboarding.NEXT_BUTTON);
+    assertTrue(isEnabled);
+  }
+
+  @Test
+  void shouldCheckIsElementPresentByXpath() {
+    val driver = mock(IOSDriver.class);
+    val webElement = mock(WebElement.class);
+    when(driver.findElement(any())).thenReturn(webElement);
+    when(driver.getPageSource()).thenReturn("XPATH");
+    when(webElement.isEnabled()).thenReturn(true);
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
+    
+    val element = driverAbility.isPresent(XpathPageElement.xPathPageElement("@name='XPATH'"));
+    assertTrue(element);
   }
 
   @Test
@@ -122,9 +187,9 @@ class UseTheAppTest {
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(webElement.isDisplayed()).thenReturn(true);
-    when(driver.findElements(any())).thenReturn(List.of(webElement));
+    when(driver.findElement(any())).thenReturn(webElement);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertTrue(driverAbility.isDisplayed(Onboarding.NEXT_BUTTON));
   }
 
@@ -135,7 +200,7 @@ class UseTheAppTest {
     when(webElement.isDisplayed()).thenReturn(false); // element found but not displayed
     when(driver.findElements(any())).thenReturn(List.of(webElement));
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertFalse(driverAbility.isDisplayed(Onboarding.NEXT_BUTTON));
   }
 
@@ -144,7 +209,7 @@ class UseTheAppTest {
     val driver = mock(AndroidDriver.class);
     when(driver.findElements(any())).thenReturn(List.of()); // no elements found
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertFalse(driverAbility.isDisplayed(Onboarding.NEXT_BUTTON));
   }
 
@@ -157,7 +222,7 @@ class UseTheAppTest {
     when(options.window()).thenReturn(window);
     when(window.getSize()).thenReturn(new Dimension(300, 400));
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
 
     // swipe once in each direction
     val directions = SwipeDirection.values();
@@ -176,7 +241,7 @@ class UseTheAppTest {
     when(driver.findElement(any())).thenReturn(webElement);
     when(webElement.getText()).thenReturn(inputText);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     driverAbility.input(inputText, Onboarding.USER_PROFILE_FIELD);
     verify(webElement).sendKeys(inputText);
   }
@@ -189,11 +254,110 @@ class UseTheAppTest {
     when(driver.findElement(any())).thenReturn(webElement);
     when(webElement.getText()).thenReturn(password);
 
-    val driverAbility = new UseAndroidApp(driver, config);
+    val driverAbility = new UseAndroidApp(driver, appiumConfig);
     driverAbility.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
     verify(webElement).clear();
     verify(webElement).sendKeys("1"); // char by char
     verify(webElement).sendKeys("2");
     verify(webElement).sendKeys("3");
+  }
+
+  @Test
+  void shouldNotTapOnElementIfNotPresent() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Onboarding.PASSWORD_INPUT_FIELD;
+
+    when(driver.findElements(any())).thenReturn(List.of());
+    when(driver.getPageSource()).thenReturn("");
+
+    driverAbility.tapIfDisplayed(pageElement);
+    verify(driverAbility, never()).tap(pageElement);
+  }
+
+  @Test
+  void shouldTapIfPresent() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Onboarding.PASSWORD_INPUT_FIELD;
+
+    val webElement = mock(WebElement.class);
+    when(webElement.isDisplayed()).thenReturn(true);
+    when(webElement.isEnabled()).thenReturn(true);
+    when(driver.findElement(pageElement.forPlatform(PlatformType.IOS))).thenReturn(webElement);
+    when(driver.getPageSource()).thenReturn(pageElement.forPlatform(PlatformType.IOS).toString());
+
+    driverAbility.tapIfDisplayed(pageElement);
+    verify(driverAbility, times(1)).tap(pageElement);
+  }
+
+  @Test
+  void shouldWaitUntilElementIsVisibleAndEnabled() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Onboarding.PASSWORD_INPUT_FIELD;
+
+    val webElement = mock(WebElement.class);
+    when(webElement.isDisplayed()).thenReturn(true);
+    when(webElement.isEnabled()).thenReturn(true);
+    when(driver.findElements(pageElement.forPlatform(driverAbility.getPlatformType())))
+        .thenReturn(List.of(webElement));
+    val mockFluentDriver = (FluentWait<IOSDriver>) mock(FluentWait.class);
+    when(driverAbility.getFluentWaitDriver()).thenReturn(mockFluentDriver);
+    when(mockFluentDriver.until(any())).thenReturn(webElement);
+
+    driverAbility.waitUntilElementIsVisible(pageElement);
+    driverAbility.waitUntilElementIsClickable(pageElement);
+    verify(driverAbility, times(1)).waitUntilElementIsVisible(pageElement);
+    verify(driverAbility, times(1)).waitUntilElementIsClickable(pageElement);
+  }
+
+  @Test
+  void checkIfTapWithTooltipAndDrawerIsWorkingForIOS() {
+    val driver = mock(IOSDriver.class);
+    UseIOSApp useIOSApp = new UseIOSApp(driver, appiumConfig);
+
+    val loginButton = WebElementMockFactory.getDisplayableMockElement(true, true);
+    val bottomDrawerDecline = WebElementMockFactory.getDisplayableMockElement(true, true);
+    val tooltip = WebElementMockFactory.getDisplayableMockElement(true, true);
+
+    when(driver.findElement(Mainscreen.LOGIN_BUTTON.forPlatform(PlatformType.IOS)))
+        .thenReturn(loginButton);
+    when(driver.findElement(Utility.DECLINE_LOGIN.forPlatform(PlatformType.IOS)))
+        .thenReturn(bottomDrawerDecline);
+    when(driver.getPageSource())
+        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())
+        .thenReturn("");
+    when(driver.findElement(Utility.TOOLTIPS.forPlatform(PlatformType.IOS)))
+        .thenReturn(tooltip)
+        .thenReturn(null); // show tooltips only one time
+
+    useIOSApp.tap(Mainscreen.LOGIN_BUTTON);
+  }
+
+  @Test
+  void checkIfScrollIntoViewIsWorking() {
+    val driver = mock(IOSDriver.class);
+    val useIOSApp = new UseIOSApp(driver, appiumConfig);
+
+    val loginButton = WebElementMockFactory.getDisplayableMockElement(true, true);
+    when(driver.findElement(Mainscreen.LOGIN_BUTTON.forPlatform(PlatformType.IOS)))
+        .thenReturn(loginButton);
+    when(driver.getPageSource()).thenReturn("");
+
+    useIOSApp.scrollIntoView(ScrollDirection.DOWN, Mainscreen.LOGIN_BUTTON);
+  }
+  
+  @Test
+  void shouldDetectErrorAlert() {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+    
+    when(driver.getPageSource()).thenReturn(format("type=\"XCUIElementTypeAlert\" name=\"Fehler"));
+    
+    val mockElement = mock(WebElement.class);
+    when(driver.findElement(ErrorAlert.GENERIC.getIosLocator().get())).thenReturn(mockElement);
+    
+    assertThrows(AppErrorException.class, () -> app.tap(Onboarding.NEXT_BUTTON));
   }
 }

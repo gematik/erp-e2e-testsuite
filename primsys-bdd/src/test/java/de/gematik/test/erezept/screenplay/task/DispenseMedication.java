@@ -19,21 +19,13 @@ package de.gematik.test.erezept.screenplay.task;
 import static java.text.MessageFormat.*;
 
 import de.gematik.test.erezept.client.exceptions.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.dav.*;
-import de.gematik.test.erezept.fhir.builder.erp.*;
-import de.gematik.test.erezept.fhir.parser.*;
-import de.gematik.test.erezept.fhir.resources.dav.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.strategy.*;
 import de.gematik.test.erezept.screenplay.util.*;
 import io.cucumber.datatable.*;
 import java.util.*;
-import java.util.function.*;
 import lombok.*;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.*;
@@ -57,13 +49,13 @@ public class DispenseMedication implements Task {
         ResponseOfDispenseMedicationOperation.withSecret(dequeue, wrongSecret));
   }
 
-  public static DispenseMedicationsBuilder toKvid(String dequeue, String kvid) {
-    return toKvid(DequeStrategy.fromString(dequeue), kvid);
+  public static DispenseMedicationsBuilder toKvnr(String dequeue, String kvnr) {
+    return toKvnr(DequeStrategy.fromString(dequeue), KVNR.from(kvnr));
   }
 
-  public static DispenseMedicationsBuilder toKvid(DequeStrategy dequeue, String kvid) {
+  public static DispenseMedicationsBuilder toKvnr(DequeStrategy dequeue, KVNR kvnr) {
     return new DispenseMedicationsBuilder(
-        ResponseOfDispenseMedicationOperation.toKvid(dequeue, kvid));
+        ResponseOfDispenseMedicationOperation.toKvnr(dequeue, kvnr));
   }
 
   public static DispenseMedicationsBuilder toPatient(String dequeue, Actor patient) {
@@ -86,32 +78,21 @@ public class DispenseMedication implements Task {
 
   @Override
   public <T extends Actor> void performAs(final T actor) {
-    val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
-    val konnektorAbility = SafeAbility.getAbility(actor, UseTheKonnektor.class);
-    val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
 
     try {
       val response = actor.asksFor(fhirResponseQuestion);
-      val receipt = response.getResource(fhirResponseQuestion.expectedResponseBody());
-
+      val receipt = response.getExpectedResource();
       val strategy = fhirResponseQuestion.getExecutedStrategy();
-
-      val kbvAsString = strategy.getKbvBundleAsString();
-      val kbvBundle = erpClientAbility.decode(KbvErpBundle.class, kbvAsString);
 
       prescriptionManager.appendDispensedPrescriptions(
           new DispenseReceipt(
-              strategy.getKvid(),
+              strategy.getKvnr(),
               strategy.getTaskId(),
               strategy.getPrescriptionId(),
               strategy.getAccessCode(),
               strategy.getSecret(),
               receipt));
-
-      /*if (kbvBundle.getInsuranceType() == VersicherungsArtDeBasis.PKV && strategy.hasConsent()) {
-        this.createChargeItem(strategy, erpClientAbility, konnektorAbility, smcb.getTelematikID());
-      }*/
 
       strategy
           .getPatient()
@@ -133,36 +114,10 @@ public class DispenseMedication implements Task {
       log.warn(
           format(
               "Dispensing Prescription {0} to {1} failed",
-              strategy.getPrescriptionId(), strategy.getKvid()));
+              strategy.getPrescriptionId(), strategy.getKvnr()));
       // re-throw for potential decorators
       throw urre;
     }
-  }
-
-  private ErxChargeItem createChargeItem(
-      PrescriptionToDispenseStrategy strategy,
-      UseTheErpClient client,
-      UseTheKonnektor konnektor,
-      String telematikId) {
-
-    // use a random faked DavBundle for now
-    val davBundle = DavAbgabedatenBuilder.faker(strategy.getPrescriptionId()).build();
-    Function<DavAbgabedatenBundle, byte[]> signer =
-        (b) -> {
-          val encoded = client.encode(b, EncodingType.XML);
-          return konnektor.signDocumentWithHba(encoded).getPayload();
-        };
-
-    val chargeItem =
-        ErxChargeItemBuilder.forPrescription(strategy.getPrescriptionId())
-            .enterer(telematikId)
-            .subject(strategy.getKvid(), GemFaker.insuranceName())
-            .verordnung(strategy.getKbvBundleId())
-            .abgabedatensatz(davBundle, signer)
-            .build();
-    val cmd = new ChargeItemPostCommand(chargeItem, strategy.getSecret());
-    val response = client.request(cmd);
-    return response.getResource(cmd.expectedResponseBody());
   }
 
   public static class DispenseMedicationsBuilder {

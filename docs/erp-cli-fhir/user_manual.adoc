@@ -1,0 +1,31 @@
+:author: Gematik
+:doctype: book
+
+// Captures
+:caution-caption: Achtung
+:important-caption: Wichtig
+:note-caption: Hinweis
+:tip-caption: Tip
+:warning-caption: Warnung
+
+// Settings:
+:experimental:
+:reproducible:
+:icons: font
+:imagesdir: ../images
+:hide-uri-scheme:
+:linkattrs:
+
+:toc: macro
+:toclevels: 3
+:toc-title: Inhaltsverzeichnis
+:sectnums:
+:chapter-signifier:
+
+= erp-cli-fhir : User Manual
+:toc:
+:APP: pass:c,q[_erp-cli-fhir_]
+
+include::usage.adoc[]
+include::usecases.adoc[]
+include::profile_versions.adoc[]

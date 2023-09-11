@@ -18,13 +18,14 @@ package de.gematik.test.erezept.app.abilities;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.app.cfg.AppConfiguration;
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PageElement;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.android.AndroidDriver;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
@@ -37,8 +38,8 @@ import org.openqa.selenium.WebElement;
 @Slf4j
 public class UseAndroidApp extends UseTheApp<AndroidDriver> {
 
-  public UseAndroidApp(AndroidDriver driver, AppConfiguration appConfiguration) {
-    super(driver, PlatformType.ANDROID, appConfiguration);
+  public UseAndroidApp(AndroidDriver driver, AppiumConfiguration appiumConfiguration) {
+    super(driver, PlatformType.ANDROID, appiumConfiguration);
   }
 
   @Override
@@ -53,12 +54,35 @@ public class UseAndroidApp extends UseTheApp<AndroidDriver> {
     } catch (NoSuchElementException nsee) {
       val duration = Duration.between(start, Instant.now());
       log.error(
-          format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis()));
+              format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis()));
       throw nsee;
     }
   }
 
-  public List<WebElement> getWebElementList(PageElement pageElement) {
+  @Override
+  protected Optional<WebElement> getOptionalWebElement(PageElement pageelement) {
+    return this.getOptionalWebElement(pageelement, ""); // currently pagesoure is not used on android
+  }
+
+  @Override
+  protected Optional<WebElement> getOptionalWebElement(PageElement pageelement, String pageSource) {
+    val locator = pageelement.forPlatform(this.getPlatformType());
+    log.info(format("Try to fetch element <{0}>", locator));
+    val start = Instant.now();
+    try {
+      val element = probeWebElements(locator, () -> driver.findElement(locator));
+      val duration = Duration.between(start, Instant.now());
+      log.info(format("Found element <{0}> after {1}ms", element, duration.toMillis()));
+      return Optional.ofNullable(element);
+    } catch (NoSuchElementException nsee) {
+      val duration = Duration.between(start, Instant.now());
+      log.warn(
+          format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis()));
+      return Optional.empty();
+    }
+  }
+
+  public List<WebElement> getWebElements(PageElement pageElement) {
     val locator = this.getLocator(pageElement);
     log.info(format("Try to fetch element <{0}> via {1}", pageElement.getFullName(), locator));
     return probeWebElements(locator, () -> driver.findElements(locator));

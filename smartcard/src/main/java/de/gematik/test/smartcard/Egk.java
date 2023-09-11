@@ -16,10 +16,19 @@
 
 package de.gematik.test.smartcard;
 
-import de.gematik.test.erezept.crypto.certificate.*;
-import java.util.*;
-import java.util.function.*;
-import lombok.*;
+import de.gematik.test.erezept.crypto.certificate.Oid;
+import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.val;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.util.encoders.Base64;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -30,6 +39,30 @@ public class Egk extends Smartcard {
   public Egk(List<Supplier<SmartcardCertificate>> certificates, String iccsn, String kvnr) {
     super(certificates, iccsn, SmartcardType.EGK);
     this.kvnr = kvnr;
+  }
+
+  public Optional<SmartcardCertificate> getKey(Crypto algorithm) {
+    return this.getKey(Oid.OID_EGK_AUT, algorithm);
+  }
+
+  @SneakyThrows
+  public String getPrivateKeyBase64() {
+    val certificate =
+        this.getAutCertificate(Crypto.ECC_256)
+            .orElseThrow(() -> new SmartCardKeyNotFoundException(this));
+    val pk = certificate.getPrivateKey();
+
+    String pkBase64;
+    try (val input = new ASN1InputStream(pk.getEncoded())) {
+      val asn1Object = input.readObject();
+      val asn1Sequence = ASN1Sequence.getInstance(asn1Object);
+      val encapsulated = ASN1OctetString.getInstance(asn1Sequence.getObjectAt(2));
+      val encapsulatedAsn1Sequence = ASN1Sequence.getInstance(encapsulated.getOctets());
+      val encapsulatedPrivateKey = ASN1OctetString.getInstance(encapsulatedAsn1Sequence.getObjectAt(1));
+      pkBase64 = Base64.toBase64String(encapsulatedPrivateKey.getOctets());
+    }
+
+    return pkBase64;
   }
 
   @Override

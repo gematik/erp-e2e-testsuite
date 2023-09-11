@@ -1,0 +1,139 @@
+:author: Gematik
+:doctype: article
+
+// Captures
+:caution-caption: Achtung
+:important-caption: Wichtig
+:note-caption: Hinweis
+:tip-caption: Tip
+:warning-caption: Warnung
+
+// Settings:
+:experimental:
+:reproducible:
+:icons: font
+:imagesdir: ./images
+//:hide-uri-scheme:
+:linkattrs:
+
+:toc: macro
+:toclevels: 3
+:toc-title: Inhaltsverzeichnis
+:sectnums:
+:chapter-signifier:
+
+= E-Rezept PrimSys
+:toc:
+:PS: pass:c,q[_PrimSys_]
+
+
+== Einleitung
+{PS} ist ein internes Tool, basierend auf der link:https://github.com/gematik/erp-e2e-testsuite[E-Rezept E2E Testsuite], für die Unterstützung der internen Testaktivitäten innerhalb der Gematik.
+
+Wir sehen allerdings auch den Bedarf der Hersteller nach Test-Rezepten und wir wollen die Erprobung des E-Rezeptes durch die Hersteller fördern!
+
+[qanda]
+Besteht der Wunsch {PS} außerhalb der Gematik zu nutzen?::
+Vermutlich ist der Bedarf auf der AVS Seite und für die Abrechnungszentren
+
+== Features
+
+image::usecases.png[width=100%, align="center"]
+
+=== REST-Schnittstelle
+Die REST-Schnittstelle kann relativ bequem über HTTP (z.B. _cURL_, _Postman_ oder eigene Skripte) bedient werden. Hier wird kein VAU und im einfachsten Fall kein FHIR benötigt.
+
+Für das Ausstellen von E-Rezepten haben wir zwei Optionen: _"pure FHIR-Ressourcen"_ oder _"vereinfachtes JSON-Format"_
+
+==== FHIR XML
+Die _"pure FHIR-Ressourcen"_-Variante bietet die größte Kontrolle über den Verordnungsdatensatz.
+
+Hierbei wird der Verordnungsdatensatz als KBV-Bundle in XML im Request-Body übergeben und {PS} erstellt und signiert das E-Rezept.
+
+Im einfachsten Fall: `curl -H <header> -X POST https://<url>/doc/<id>/prescribe -d "@/home/user/kbv_bundle.xml"`
+
+[NOTE]
+Beispiele für KBV-Bundles gibt es z.B. unter link:https://github.com/gematik/eRezept-Examples[eRezept-Examples@GitHub] und link:https://simplifier.net/erezept/~resources?category=Example&exampletype=Bundle&sortBy=RankScore_desc[KBV-Examples@Simplifier] oder diese können mit unserem Generator link:https://hub.docker.com/r/gematik1/erp-cli-fhir[erp-cli-fhir] erzeugt werden.
+
+==== Vereinfachtes JSON-Format
+Das _"vereinfachtes JSON-Format"_ ist ein eigenes (kein FHIR!) Format.
+Hierbei wird im Request-Body ein JSON-Objekt übergeben aus der dann der Verordnungsdatensatz generiert wird. Anschließend wird dieser Verodnungsdatensatz dann als E-Rezepte erstellt und signiert:
+
+- im einfachsten Fall: `curl -H <headers> -X POST https://<url>/doc/<id>/prescribe -d '{"patient": {"kvnr": "X123456789"}, "medication": {"pzn": "00571748"}}'`
+
+Das JSON-Objekt ist in etwas folgendermaßen aufgebaut. Hierbei werden dann immer nur Werte übergeben, die für die jeweilige Verordnung von Interesse sind.
+Die restlichen Werte werden von {PS} dann zufällig ergänzt. Durch die zufällige Ergänzung wird sichergestellt, dass die Verordnung _syntaktisch_ korrekt ist.
+Eine fachliche Korrektheit der Verordnung kann durch den Zufallsgenerator allerdings nicht sichergestellt werden.
+
+[source,json]
+----
+{
+  "patient": {
+    "kvnr": "X123456789"
+  },
+  "medication": {
+    "pzn": "00571748",
+    "name": "Grippostad C Hartkapseln (24 St)",
+    "supplyForm": "HKP"
+  },
+  "coverage": {
+    "iknr": "103119199",
+    "insuranceName": "AOK Bremen / Bremerhaven",
+    "wop": "03"
+  }
+}
+----
+
+
+
+[NOTE]
+Die Transformation des vereinfachten JSON-Objektes in einen validen Verordnungsdatensatz basiert auf link:https://hub.docker.com/r/gematik1/erp-cli-fhir[erp-cli-fhir]
+
+=== PVS-Anwendungsfälle
+1. `$create + $activate` - E-Rezepte ausstellen
+2. `$abort` - E-Rezepte löschen
+
+=== AVS-Anwendungsfälle
+1. `$accept` - E-Rezepte annehmen
+2. `$reject` - E-Rezepte wieder zurückgeben
+3. `$abort` - E-Rezepte löschen
+4. `$close` - E-Rezepte dispensieren
+5. `POST CommunicationReply` - Antwort-Nachrichten auf Basis eines bestehenden E-Rezeptes an einen Versicherten versenden
+6. `POST ChargeItem` - Abrechnungsinformationen für E-Rezepte von PKV-Versicherten erstellen
+
+=== Geplante Features
+- Aktuell werden nur im Anwendungsfall `$create + $activate` beide link:https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc[FHIR Profilversionen] unterstützt. Bis zum Versionsübergang auf die neuen Profile sollen alle Anwendungsfälle in der Lage sein mit beiden Profilversionen umgehen zu können.
+- Bessere Unterstützung von PKV-Rezepten
+- Unterstützung von Direktzuweisungen (Workflows 169 und 209)
+
+== Bereitstellung
+Wir haben folgende Option für die Bereitstellung identifiziert:
+
+
+=== Open Source
+Die Testsuite und damit {PS} sind grundsätzlich _Open Source_ und können theoretisch von jedem unter der link:http://www.apache.org/licenses/LICENSE-2.0[Apache License] genutzt, angepasst und erweitert werden
+
+image::restservice_source.png[width=100%, align="center"]
+
+[NOTE]
+Aktuell auf GitHub veröffentlicht allerdings noch nicht öffentlich zugänglich. Veröffentlichung ist allerdings bereits geplant.
+
+Für diese Option wird jedoch beim Anwender ein TI-Gateway/Konnektor benötigt und es bedarf weitere manueller Konfigurationen um die Kommunikation in die TI über den Konnektor zu routen
+
+=== Docker Image
+Wir haben die Möglichkeit {PS} als DockerImage auf DockerHub zu veröffentlichen.
+
+image::restservice_docker.png[width=100%, align="center"]
+
+Für diese Option wird jedoch beim Anwender ein TI-Gateway/Konnektor benötigt und es bedarf weitere manueller Konfigurationen um die Kommunikation in die TI über den Konnektor zu routen
+
+=== Unmanaged Service
+Innerhalb der Gematik hosten wir {PS} auf einem internen Server. Der Service ist aus dem Internet erreichbar, wird jedoch über API-Keys autorisiert.
+
+image::restservice.png[width=100%, align="center"]
+
+[NOTE]
+Dieser Ansatz kann theoretisch auch außerhalb der Gematik in dieser Konfiguration betrieben werden. Die Heruasforderung mit dem Routing über den Konnektor gilt dann allerdings auch hier. Zusätzlich würden dann hier drei Konnektoren - jeweils ein separater Konnektor pro TI-Umgebung - benötigt.
+
+[CAUTION]
+Der Service ist aktuell nicht mandantenfähig und auch nicht für eine große Anzahl an Benutzern ausgelegt!

@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.screenplay.strategy;
 
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,11 +25,11 @@ import lombok.val;
 
 public class ContainsReceiptForStrategy implements Predicate<List<DispenseReceipt>> {
 
-  private final String kvid;
+  private final KVNR kvnr;
   private final AmountStrategy<ErxReceipt> strategy;
 
-  public ContainsReceiptForStrategy(AmountAdverb adverb, long amount, String kvid) {
-    this.kvid = kvid;
+  public ContainsReceiptForStrategy(AmountAdverb adverb, long amount, KVNR kvnr) {
+    this.kvnr = kvnr;
     this.strategy = new AmountStrategy<>(adverb, amount);
   }
 
@@ -40,11 +41,11 @@ public class ContainsReceiptForStrategy implements Predicate<List<DispenseReceip
    */
   @Override
   public boolean test(final List<DispenseReceipt> erxReceipts) {
-    val forKvid =
+    val forKvnr =
         erxReceipts.stream()
-            .filter(dispensed -> dispensed.getReceiverKvid().equals(kvid))
+            .filter(dispensed -> dispensed.getReceiverKvnr().equals(kvnr))
             .map(DispenseReceipt::getReceipt)
             .toList();
-    return strategy.test(forKvid);
+    return strategy.test(forKvnr);
   }
 }

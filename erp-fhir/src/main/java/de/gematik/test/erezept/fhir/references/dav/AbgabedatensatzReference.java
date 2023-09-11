@@ -20,10 +20,12 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.Reference;
 
 @DatatypeDef(name = "Reference")
+@NoArgsConstructor
 @SuppressWarnings({"java:S110"})
 public class AbgabedatensatzReference extends Reference {
 

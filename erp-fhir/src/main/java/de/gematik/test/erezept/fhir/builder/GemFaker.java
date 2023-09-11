@@ -16,8 +16,6 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static java.text.MessageFormat.format;
-
 import com.github.javafaker.Faker;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.FakerException;
@@ -31,6 +29,8 @@ import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
+import lombok.val;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import lombok.val;
+
+import static java.text.MessageFormat.format;
 
 public class GemFaker {
   private static final String DATE_FORMAT_SIMPLE = "dd.MM.yyyy";
@@ -62,6 +63,10 @@ public class GemFaker {
 
   private GemFaker() {
     throw new AssertionError();
+  }
+
+  public static Faker getFaker() {
+    return faker;
   }
 
   public static String fakerPzn() {
@@ -90,10 +95,7 @@ public class GemFaker {
   public static String fakerTelematikId() {
     return faker.regexify("[0-9]{8}");
   }
-
-  public static String fakerKvid() {
-    return faker.regexify("[A-Z]{1}[0-9]{9}");
-  }
+  
 
   public static String fakerName() {
     return faker.funnyName().name();
@@ -490,7 +492,7 @@ public class GemFaker {
   }
 
   public static float cost(float min, float max) {
-    if (min <= 0.0f || max < 0.0f || min >= max) {
+    if (min < 0.0f || max < 0.0f || min >= max) {
       throw new BuilderException(format("Invalid cost range {0}..{1}", min, max));
     }
 

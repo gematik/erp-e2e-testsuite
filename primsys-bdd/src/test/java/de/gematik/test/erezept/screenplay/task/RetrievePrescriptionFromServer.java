@@ -19,7 +19,6 @@ package de.gematik.test.erezept.screenplay.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -56,9 +55,8 @@ public class RetrievePrescriptionFromServer implements Task {
     val lastPrescription =
         strategy.chooseFrom(taskBundle.getTasks(), Comparator.comparing(ErxTask::getAuthoredOn));
 
-    val cmdGetTaskById = new TaskGetByIdCommand(lastPrescription.getUnqualifiedId());
-    val fullDetailPrescription =
-        erpClientAbility.request(cmdGetTaskById).getResource(ErxPrescriptionBundle.class);
+    val cmdGetTaskById = new TaskGetByIdCommand(lastPrescription.getTaskId());
+    val fullDetailPrescription = erpClientAbility.request(cmdGetTaskById).getExpectedResource();
 
     managePatientPrescriptions.appendFullDetailedPrescription(fullDetailPrescription);
 

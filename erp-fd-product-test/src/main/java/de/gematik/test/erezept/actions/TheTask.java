@@ -20,6 +20,7 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.steps.Instrumented;
@@ -29,9 +30,9 @@ import net.thucydides.core.annotations.Step;
 @Slf4j
 public class TheTask extends ErpAction<ErxPrescriptionBundle> {
 
-  private final String taskId;
+  private final TaskId taskId;
 
-  public TheTask(String taskId) {
+  public TheTask(TaskId taskId) {
     this.taskId = taskId;
   }
 
@@ -43,10 +44,10 @@ public class TheTask extends ErpAction<ErxPrescriptionBundle> {
   }
 
   public static TheTask fromBackend(ErxTask task) {
-    return withId(task.getUnqualifiedId());
+    return withId(task.getTaskId());
   }
 
-  public static TheTask withId(String id) {
+  public static TheTask withId(TaskId id) {
     Object[] params = {id};
     return new Instrumented.InstrumentedBuilder<>(TheTask.class, params).newInstance();
   }

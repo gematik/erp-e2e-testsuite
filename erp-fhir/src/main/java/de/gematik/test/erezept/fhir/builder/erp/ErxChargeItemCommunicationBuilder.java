@@ -16,10 +16,13 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
 import lombok.NonNull;
 import lombok.val;
@@ -37,7 +40,11 @@ public class ErxChargeItemCommunicationBuilder
     return new ErxChargeItemCommunicationBuilder();
   }
 
-  public ErxChargeItemCommunicationBuilder basedOnChargeItem(@NonNull final String chargeItemId) {
+  public ErxChargeItemCommunicationBuilder basedOnChargeItem(TaskId taskId) {
+    return basedOnChargeItem(taskId.getValue());
+  }
+
+  public ErxChargeItemCommunicationBuilder basedOnChargeItem(String chargeItemId) {
     this.chargeItemReference =
         chargeItemId.startsWith("ChargeItem/") ? chargeItemId : "ChargeItem/" + chargeItemId;
     return self();
@@ -45,7 +52,9 @@ public class ErxChargeItemCommunicationBuilder
 
   public ErxChargeItemCommunicationBuilder basedOnChargeItem(
       @NonNull final ErxChargeItem chargeItem) {
-    return basedOnChargeItem(chargeItem.getPrescriptionId().getValue());
+    val idBuilder = new StringBuilder(chargeItem.getPrescriptionId().getValue());
+    chargeItem.getAccessCode().ifPresent(ac -> idBuilder.append(format("?ac={0}", ac.getValue())));
+    return basedOnChargeItem(idBuilder.toString());
   }
 
   public ErxCommunication buildReq(String message) {

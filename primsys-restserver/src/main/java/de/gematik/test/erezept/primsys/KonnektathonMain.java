@@ -43,6 +43,8 @@ public class KonnektathonMain {
             .addSubcommand("dispense", new MedicationDispenser())
             .addSubcommand("validate", new KthonValidator())
             .addSubcommand("pspids", new PharmacyIdentifiers())
+            .addSubcommand("delete", new PrescriptionDeleter())
+            .addSubcommand("consent", new ConsentManipulator())
             .setSubcommandsCaseInsensitive(true)
             .setAbbreviatedSubcommandsAllowed(true)
             .setColorScheme(CommandLine.Help.defaultColorScheme(CommandLine.Help.Ansi.AUTO));

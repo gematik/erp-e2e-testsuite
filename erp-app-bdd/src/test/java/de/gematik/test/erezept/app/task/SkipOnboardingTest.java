@@ -23,9 +23,10 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.abilities.UseAndroidApp;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -35,24 +36,25 @@ import org.junit.jupiter.api.Test;
 
 class SkipOnboardingTest {
 
-  private final String androidUserName = "Alice";
-  private UseAndroidApp androidAbility;
-  private final String iosUserName = "Bob";
-  private UseIOSApp iosAbility; // will be required later, once the feature is implemented on iOS
+  private String androidUserName;
+  private String iosUserName;
+
 
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
-    androidAbility = mock(UseAndroidApp.class);
+    val androidAbility = mock(UseAndroidApp.class);
     when(androidAbility.getPlatformType()).thenReturn(PlatformType.ANDROID);
 
-    iosAbility = mock(UseIOSApp.class);
+    val iosAbility = mock(UseIOSApp.class);
     when(iosAbility.getPlatformType()).thenReturn(PlatformType.IOS);
 
     // assemble the screenplay
+    androidUserName = GemFaker.fakerName();
     val aliceAndroid = OnStage.theActorCalled(androidUserName);
     givenThat(aliceAndroid).can(androidAbility);
 
+    iosUserName = GemFaker.fakerName();
     val bobIos = OnStage.theActorCalled(iosUserName);
     givenThat(bobIos).can(iosAbility);
   }
@@ -64,33 +66,35 @@ class SkipOnboardingTest {
 
   @Test
   void shouldProxyToAndroidWithSwipes() {
-    val theAppUser = OnStage.theActorCalled(androidUserName);
-
-    theAppUser.attemptsTo(SkipOnboarding.bySwiping());
-    verify(androidAbility, times(4)).swipe(any());
-    verify(androidAbility, times(1)).tap(Onboarding.SKIP_BUTTON);
+    val actor = OnStage.theActorCalled(androidUserName);
+    val app = actor.abilityTo(UseAndroidApp.class);
+    
+    actor.attemptsTo(SkipOnboarding.bySwiping());
+    verify(app, times(4)).swipe(any());
+    verify(app, times(1)).tap(Onboarding.SKIP_BUTTON);
   }
 
   @Test
   void shouldProxyToAndroidWithoutSwipes() {
-    val theAppUser = OnStage.theActorCalled(androidUserName);
-
-    theAppUser.attemptsTo(SkipOnboarding.directly());
-    verify(androidAbility, times(0)).swipe(any());
-    verify(androidAbility, times(1)).tap(Onboarding.SKIP_BUTTON);
+    val actor = OnStage.theActorCalled(androidUserName);
+    val app = actor.abilityTo(UseAndroidApp.class);
+    
+    actor.attemptsTo(SkipOnboarding.directly());
+    verify(app, times(0)).swipe(any());
+    verify(app, times(1)).tap(Onboarding.SKIP_BUTTON);
   }
 
   @Test
   void shouldProxyToIosWithSwipes() {
-    val theAppUser = OnStage.theActorCalled(iosUserName);
+    val actor = OnStage.theActorCalled(iosUserName);
     val task = SkipOnboarding.bySwiping();
-    assertThrows(FeatureNotImplementedException.class, () -> task.performAs(theAppUser));
+    assertThrows(FeatureNotImplementedException.class, () -> task.performAs(actor));
   }
 
   @Test
   void shouldProxyToIosWithoutSwipes() {
-    val theAppUser = OnStage.theActorCalled(iosUserName);
+    val actor = OnStage.theActorCalled(iosUserName);
     val task = SkipOnboarding.bySwiping();
-    assertThrows(FeatureNotImplementedException.class, () -> task.performAs(theAppUser));
+    assertThrows(FeatureNotImplementedException.class, () -> task.performAs(actor));
   }
 }

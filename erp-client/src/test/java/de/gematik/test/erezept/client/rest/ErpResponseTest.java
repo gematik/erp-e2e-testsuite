@@ -22,7 +22,7 @@ import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import java.util.*;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
@@ -32,54 +32,129 @@ class ErpResponseTest {
 
   @Test
   void getOptionalResourceType() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
-    assertTrue(response.getResourceOptional(KbvErpBundle.class).isPresent());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertTrue(response.getResourceOptional().isPresent());
   }
 
   @Test
   void getEmptyOptionalResourceType() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertTrue(response.getResourceOptional(OperationOutcome.class).isEmpty());
   }
 
   @Test
   void shouldThrowOnUnexpectedResource() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
-    assertThrows(UnexpectedResponseResourceError.class, () -> response.getResource(ErxTask.class));
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), ErxTask.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertThrows(UnexpectedResponseResourceError.class, response::getExpectedResource);
   }
 
   @Test
   void shouldReturnNullableResourceType() {
-    val response = new ErpResponse(200, Map.of(), null);
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertNull(response.getResourceType());
   }
 
   @Test
   void shouldDetectOperationOutcome() {
-    val response = new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+    val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
+    val response =
+        ErpResponse.forPayload(operationOutcome, OperationOutcome.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertTrue(response.isOperationOutcome());
+    assertDoesNotThrow(response::getAsOperationOutcome);
   }
 
   @Test
   void shouldAlsoReturnGenericResource() {
-    val response = new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+    val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
+    val response =
+        ErpResponse.forPayload(operationOutcome, OperationOutcome.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertTrue(response.isOperationOutcome());
     assertTrue(response.isResourceOfType(Resource.class));
-    assertTrue(response.getResourceOptional(Resource.class).isPresent());
+    assertTrue(response.getResourceOptional().isPresent());
+  }
+
+  @Test
+  void shouldHaveDefaultContentLengthOfZero() {
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(500)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertTrue(response.isEmptyBody());
+    assertEquals(0L, response.getContentLength());
+    assertNull(response.getAsBaseResource());
+  }
+
+  @Test
+  void shouldHaveDefaultContentLengthOfZero2() {
+    val headers = Map.of("content-length", "");
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(500)
+            .withHeaders(headers)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertTrue(response.isEmptyBody());
+    assertEquals(0L, response.getContentLength());
+    assertNull(response.getAsBaseResource());
   }
 
   @Test
   void shouldDetectEmptyBody() {
     val headers = Map.of("content-length", "0");
-    val response = new ErpResponse(500, headers, null);
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(500)
+            .withHeaders(headers)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertTrue(response.isEmptyBody());
     assertEquals(0L, response.getContentLength());
+    assertNull(response.getAsBaseResource());
+  }
+
+  @Test
+  void shouldDetectBodyContent() {
+    val headers = Map.of("content-length", "10");
+    val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
+    val response =
+        ErpResponse.forPayload(operationOutcome, OperationOutcome.class)
+            .withStatusCode(404)
+            .withHeaders(headers)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertFalse(response.isEmptyBody());
+    assertEquals(10L, response.getContentLength());
+    assertEquals("10", response.getHeaderValue("content-length"));
   }
 
   @Test
   void shouldDetectJson() {
     val headers = Map.of("content-type", "application/fhir+json; fhirVersion=4.0; charset=utf-8");
-    val response = new ErpResponse(500, headers, null);
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(500)
+            .withHeaders(headers)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertTrue(response.isJson());
     assertFalse(response.isXML());
   }
@@ -87,14 +162,53 @@ class ErpResponseTest {
   @Test
   void shouldDetectXml() {
     val headers = Map.of("content-type", "application/fhir+xml; fhirVersion=4.0");
-    val response = new ErpResponse(500, headers, null);
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(500)
+            .withHeaders(headers)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertTrue(response.isXML());
     assertFalse(response.isJson());
   }
 
   @Test
-  void doesNotThrowExceptionToString() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+  void doesNotThrowExceptionOnToString() {
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     assertDoesNotThrow(response::toString);
+  }
+
+  @Test
+  void shouldHaveValidPayloadOnEmptyValidationResult() {
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertTrue(response.isValidPayload());
+  }
+
+  @Test
+  void shouldThrowOnInvalidPayload() {
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createFailingValidationResult());
+    assertFalse(response.isValidPayload());
+    assertThrows(FhirValidationException.class, response::getExpectedResource);
+  }
+
+  @Test
+  void shouldGetEmptyOptionalOnNullResource() {
+    val response =
+        ErpResponse.forPayload(null, KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createFailingValidationResult());
+    assertTrue(response.getResourceOptional().isEmpty());
   }
 }

@@ -31,7 +31,7 @@ class KbvItaErpVersionTest {
     val defaultVersion = KbvItaErpVersion.getDefaultVersion();
 
     // Note: this assertion will break in the future!
-    assertEquals(KbvItaErpVersion.V1_0_2, defaultVersion);
+    assertEquals(KbvItaErpVersion.V1_1_0, defaultVersion);
   }
 
   @Test

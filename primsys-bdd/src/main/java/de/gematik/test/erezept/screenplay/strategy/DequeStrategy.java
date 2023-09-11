@@ -67,6 +67,14 @@ public enum DequeStrategy {
     managedList.getRawList().remove(item);
   }
 
+  @Override
+  public String toString() {
+    return switch (this) {
+      case LIFO -> "letzte(n)";
+      case FIFO -> "erste(n)";
+    };
+  }
+  
   public static DequeStrategy fromString(String value) {
     return switch (value.toLowerCase()) {
       case "letzte", "letzten", "letztes", "jüngstes" -> LIFO;

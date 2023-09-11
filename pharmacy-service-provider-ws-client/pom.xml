@@ -5,54 +5,49 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pharmacy-service-provider-ws-client</artifactId>
+    <name>Pharmacy Service Provider Client</name>
+    <description>
+        The PSP-client enables pharmacies to connect to the PSP and subscribe for their alternative assignment messages
+    </description>
 
     <properties>
         <java.version>${version.java}</java.version>
         <maven.compiler.target>${version.java}</maven.compiler.target>
         <maven.compiler.source>${version.java}</maven.compiler.source>
-        <version.jersey>3.0.5</version.jersey>
         <main.class>de.gematik.test.erezept.pspwsclient.Main</main.class>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${version.sl4j-api}</version>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-config-data</artifactId>
         </dependency>
         <dependency>
             <groupId>org.java-websocket</groupId>
             <artifactId>Java-WebSocket</artifactId>
-            <version>1.5.2</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>3.13.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>20.1.0</version>
-            <scope>compile</scope>
+            <version>24.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.6</version>
         </dependency>
-
     </dependencies>
     
 </project>

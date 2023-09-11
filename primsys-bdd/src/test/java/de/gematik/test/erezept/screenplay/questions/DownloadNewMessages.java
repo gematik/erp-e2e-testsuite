@@ -33,8 +33,8 @@ public class DownloadNewMessages implements Question<ErxCommunicationBundle> {
   @Override
   public ErxCommunicationBundle answeredBy(Actor actor) {
     val erpClient = actor.abilityTo(UseTheErpClient.class);
-    val cmd = CommunicationSearch.getNewCommunications();
-    return erpClient.request(cmd).getResource(cmd.expectedResponseBody());
+    val cmd = CommunicationSearch.getLatestNewCommunications();
+    return erpClient.request(cmd).getExpectedResource();
   }
 
   public static DownloadNewMessages fromServer() {

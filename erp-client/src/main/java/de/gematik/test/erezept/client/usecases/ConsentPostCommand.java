@@ -19,6 +19,7 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.ErxConsentBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -26,8 +27,8 @@ public class ConsentPostCommand extends BaseCommand<ErxConsent> {
 
   private final ErxConsent requestBody;
 
-  public ConsentPostCommand(String kvid) {
-    this(ErxConsentBuilder.forKvid(kvid).build());
+  public ConsentPostCommand(KVNR kvnr) {
+    this(ErxConsentBuilder.forKvnr(kvnr).build());
   }
 
   public ConsentPostCommand(ErxConsent requestBody) {

@@ -36,7 +36,7 @@ public class HandleAppAuthentication implements Ability {
 
   public static HandleAppAuthentication withStrongPassword() {
     val faker = new Faker();
-    val password = faker.regexify("[ -~]{15}");
+    val password = faker.regexify("[ -~]{8}");
     return withGivenPassword(password);
   }
 

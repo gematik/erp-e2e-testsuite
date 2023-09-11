@@ -178,9 +178,7 @@ public class ValidationSupport implements IValidationSupport {
     val matched = resource != null;
     if (matched) {
       val em = exactVersionMatch ? "with exact version" : "without version";
-      log.debug(format("Matched {0} in profile {1} {2}", resourceUrl, this.profile, em));
-    } else {
-      log.debug(format("Could not find Resource {0} in {1}", resourceUrl, this.profile));
+      log.trace(format("Matched {0} in profile {1} {2}", resourceUrl, this.profile, em));
     }
 
     return resource;

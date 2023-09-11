@@ -16,12 +16,11 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
-import de.gematik.test.erezept.screenplay.util.ManagedList;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.screenplay.Ability;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 @Slf4j
 public class ManagePatientPrescriptions implements Ability {
@@ -30,8 +29,7 @@ public class ManagePatientPrescriptions implements Ability {
 
   private ManagePatientPrescriptions() {
     fullDetailedPrescriptions =
-        new ManagedList<>(
-            new MissingPreconditionError("No full-detailed prescriptions were downloaded so far"));
+        new ManagedList<>(() -> "No full-detailed prescriptions were downloaded so far");
   }
 
   public void appendFullDetailedPrescription(ErxPrescriptionBundle fullDetailedPrescription) {

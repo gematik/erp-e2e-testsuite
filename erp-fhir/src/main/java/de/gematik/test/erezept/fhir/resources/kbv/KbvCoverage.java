@@ -34,16 +34,6 @@ import org.hl7.fhir.r4.model.*;
 @SuppressWarnings({"java:S110"})
 public class KbvCoverage extends Coverage implements ErpFhirResource {
 
-  public static KbvCoverage fromCoverage(Coverage adaptee) {
-    val kbvCoverage = new KbvCoverage();
-    adaptee.copyValues(kbvCoverage);
-    return kbvCoverage;
-  }
-
-  public static KbvCoverage fromCoverage(Resource adaptee) {
-    return fromCoverage((Coverage) adaptee);
-  }
-
   public VersicherungsArtDeBasis getInsuranceKind() {
     return this.getType().getCoding().stream()
         .filter(
@@ -84,5 +74,19 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
     val type = this.getInsuranceKind().getDisplay();
     val iknr = this.getIknr().getValue();
     return format("{0} {1} (IKNR: {2})", getName(), type, iknr);
+  }
+
+  public static KbvCoverage fromCoverage(Coverage adaptee) {
+    if (adaptee instanceof KbvCoverage kbvCoverage) {
+      return kbvCoverage;
+    } else {
+      val kbvCoverage = new KbvCoverage();
+      adaptee.copyValues(kbvCoverage);
+      return kbvCoverage;
+    }
+  }
+
+  public static KbvCoverage fromCoverage(Resource adaptee) {
+    return fromCoverage((Coverage) adaptee);
   }
 }

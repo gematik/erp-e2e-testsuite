@@ -16,15 +16,21 @@
 
 package de.gematik.test.erezept.fhirdump;
 
+import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.nio.file.*;
-import lombok.*;
-import net.thucydides.core.model.*;
-import net.thucydides.core.steps.*;
-import org.junit.jupiter.api.*;
+import io.cucumber.java.Scenario;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import lombok.val;
+import net.thucydides.core.model.Story;
+import net.thucydides.core.model.TestOutcome;
+import net.thucydides.core.model.TestResult;
+import net.thucydides.core.steps.ExecutedStepDescription;
+import org.junit.jupiter.api.Test;
 
 class FhirDumperTest {
 
@@ -39,7 +45,11 @@ class FhirDumperTest {
   void shouldHaveCurrentScenarioAfterStart() {
     val basePath = Path.of("target", "fhir_dumps", "with_scenario_test");
     val d = new FhirDumper(basePath);
-    d.startScenario("123", "hello-world-scenario");
+    val scenario = mock(Scenario.class);
+    when(scenario.getId()).thenReturn("123");
+    when(scenario.getName()).thenReturn("hello-world-scenario");
+    when(scenario.getSourceTagNames()).thenReturn(Collections.emptyList());
+    d.startScenario(scenario);
     assertTrue(d.getCurrentScenario().isPresent());
   }
 
@@ -49,8 +59,13 @@ class FhirDumperTest {
     val d = new FhirDumper(basePath);
     val stepListener = new FhirDumpStepListener(d);
 
-    val scenarioName = "hello-world-scenario";
-    d.startScenario("123", scenarioName);
+    val scenarioName = "hello_world_scenario";
+    val scenario = mock(Scenario.class);
+    when(scenario.getId()).thenReturn("123");
+    when(scenario.getName()).thenReturn(scenarioName);
+    when(scenario.getSourceTagNames()).thenReturn(Collections.emptyList());
+
+    d.startScenario(scenario);
     val stepDescription = ExecutedStepDescription.withTitle("Sample Step description");
     stepListener.stepStarted(stepDescription);
 
@@ -69,7 +84,52 @@ class FhirDumperTest {
     stepListener.testFinished(to);
 
     val summaryFile = basePath.resolve("fhir_dump.json").toFile();
-    val indexFile = basePath.resolve(Path.of(scenarioName, "index.json")).toFile();
+    val indexFile = basePath.resolve(Path.of("Allgemein", scenarioName, "index.json")).toFile();
+    assertFalse(summaryFile.exists());
+    assertFalse(indexFile.exists());
+    d.writeDumpSummary();
+    assertTrue(summaryFile.exists());
+    assertTrue(indexFile.exists());
+  }
+
+  @Test
+  void shouldWriteScenarioFileWithMainActor() {
+    val basePath = Path.of("target", "fhir_dumps", "positive_test");
+    val d = new FhirDumper(basePath);
+    val stepListener = new FhirDumpStepListener(d);
+
+    val scenarioName = "hello_world_scenario";
+    val scenario = mock(Scenario.class);
+    when(scenario.getId()).thenReturn("123");
+    when(scenario.getName()).thenReturn(scenarioName);
+    when(scenario.getSourceTagNames())
+        .thenReturn(
+            List.of(
+                "@Hauptdarsteller:Versicherter",
+                "@AFO-ID:A_19019",
+                "@AF-ID:A_18506",
+                "@AF-ID:A_18822"));
+
+    d.startScenario(scenario);
+    val stepDescription = ExecutedStepDescription.withTitle("Sample Step description");
+    stepListener.stepStarted(stepDescription);
+
+    d.writeDump("TEST", "hello_world.txt", "some content");
+
+    val to = mock(TestOutcome.class);
+    val story = mock(Story.class);
+    val result = mock(TestResult.class);
+    when(to.getDescription()).thenReturn("Test description");
+    when(to.getName()).thenReturn(scenarioName);
+    when(to.getUserStory()).thenReturn(story);
+    when(to.getResult()).thenReturn(result);
+    when(story.getPath()).thenReturn(format("Versicherter/{0}", scenarioName));
+    when(result.getLabel()).thenReturn("Passed");
+
+    stepListener.testFinished(to);
+
+    val summaryFile = basePath.resolve("fhir_dump.json").toFile();
+    val indexFile = basePath.resolve(Path.of("Versicherter", scenarioName, "index.json")).toFile();
     assertFalse(summaryFile.exists());
     assertFalse(indexFile.exists());
     d.writeDumpSummary();
@@ -81,11 +141,18 @@ class FhirDumperTest {
   void shouldNotWriteScenarioIndexFileWithoutSteps() {
     val basePath = Path.of("target", "fhir_dumps", "test_no_steps");
     val d = new FhirDumper(basePath);
-    d.startScenario("123", "hello-world-scenario");
+
+    val scenarioName = "hello-world-scenario";
+    val scenario = mock(Scenario.class);
+    when(scenario.getId()).thenReturn("123");
+    when(scenario.getName()).thenReturn(scenarioName);
+    when(scenario.getSourceTagNames()).thenReturn(Collections.emptyList());
+
+    d.startScenario(scenario);
     d.getCurrentScenario()
         .ifPresent(
-            scenario -> {
-              scenario.setDescription("Hello World is a sample scenario");
+            s -> {
+              s.setDescription("Hello World is a sample scenario");
             });
     val scenarioPath = basePath.resolve("hello-world-scenario");
 

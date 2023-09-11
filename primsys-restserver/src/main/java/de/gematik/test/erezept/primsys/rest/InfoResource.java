@@ -17,13 +17,11 @@
 package de.gematik.test.erezept.primsys.rest;
 
 import de.gematik.test.erezept.primsys.model.ActorContext;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import de.gematik.test.erezept.primsys.rest.response.InfoResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 @Slf4j
 @Path("info")
@@ -33,10 +31,10 @@ public class InfoResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public Map<String, String> getInfo() {
+  @ApiResponse(description = "Information about the service")
+  public InfoResponse getInfo() {
     log.info("GET /info");
-    val numDocs = String.valueOf(actors.getDoctors().size());
-    val numPharmacies = String.valueOf(actors.getPharmacies().size());
-    return Map.of("doctors", numDocs, "pharmacies", numPharmacies);
+    return InfoResponse.getInfo(actors);
   }
+
 }

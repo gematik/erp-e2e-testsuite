@@ -15,9 +15,10 @@
 #
 # language: de
 
-@Funktionalität=Entlassrezept
-@Path=happy
-@Impl=open
+@PRODUKT:eRp_FD
+@Funktionalität:Entlassrezept
+@Versicherung:GKV
+@STATUS:InBearbeitung
 Funktionalität:  Entlassrezept
   Abweichender Wert für Task.AcceptDate der Rezepts, wenn die Entlassmanagement-Kennzeichen "04" oder "14" gesetzt sind (C_10721)
   Das in der http-POST-Operation /Task/<id>/$activate übergebene, gültig signierte E-Rezept-Bundle muss in der
@@ -30,10 +31,10 @@ Funktionalität:  Entlassrezept
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
 
-  @TCID=ERP_IOP_C_10721_01
-  @Path=happy
-  @Afo=A_19517-02
-  @MainActor=Arztpraxis
+  @TCID:ERP_EE_ENTLASSREZEPT_01
+  @TESTFALL:positiv
+  @AFO-ID:A_19517-02
+  @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: Korrektes AcceptDate für Entlassrezepte
   GF Im Entlassrezept ist das Task-AcceptDate bei Entlassmanagement-Kennzeichen "04" oder "14" richtig gesetzt
 
@@ -48,10 +49,10 @@ Funktionalität:  Entlassrezept
       | 14          |
 
 
-  @TCID=ERP_IOP_C_10721_02
-  @Path=happy
-  @Afo=A_19517-02
-  @MainActor=Arztpraxis
+  @TCID:ERP_EE_ENTLASSREZEPT_02
+  @TESTFALL:positiv
+  @AFO-ID:A_19517-02
+  @Hauptdarsteller:Arztpraxis
   Szenariogrundriss: AcceptDate ist identisch zum Signatur-Datum für Entlassrezepte
   Im E-Rezept entspricht das Task-AcceptDate dem Datum der QES-Erstellung, wenn weder Entlassmanagement-Kennzeichen "04" oder "14" gesetzt wurde.
 

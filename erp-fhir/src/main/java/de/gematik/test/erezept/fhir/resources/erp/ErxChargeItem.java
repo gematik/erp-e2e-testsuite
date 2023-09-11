@@ -35,16 +35,17 @@ import org.hl7.fhir.r4.model.Extension;
 @SuppressWarnings({"java:S110"})
 public class ErxChargeItem extends ChargeItem {
 
+  /**
+   * @return true if this ChargeItem is from newer Profiles and false otherwise
+   */
+  public boolean isFromNewProfiles() {
+    return this.getMeta().getProfile().stream()
+        .anyMatch(PatientenrechnungStructDef.CHARGE_ITEM::match);
+  }
+
   public PrescriptionId getPrescriptionId() {
     return this.getIdentifier().stream()
-        .filter(
-            identifier ->
-                ErpWorkflowNamingSystem.PRESCRIPTION_ID
-                        .getCanonicalUrl()
-                        .equals(identifier.getSystem())
-                    || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121
-                        .getCanonicalUrl()
-                        .equals(identifier.getSystem()))
+        .filter(PrescriptionId::isPrescriptionId)
         .map(identifier -> new PrescriptionId(identifier.getValue()))
         .findFirst() // Prescription ID has cardinality of 1..1 anyway
         .orElseThrow(
@@ -57,19 +58,17 @@ public class ErxChargeItem extends ChargeItem {
 
   public Optional<AccessCode> getAccessCode() {
     return this.getIdentifier().stream()
-        .filter(
-            identifier ->
-                ErpWorkflowNamingSystem.ACCESS_CODE.getCanonicalUrl().equals(identifier.getSystem())
-                    || ErpWorkflowNamingSystem.ACCESS_CODE_121
-                        .getCanonicalUrl()
-                        .equals(identifier.getSystem()))
+        .filter(AccessCode::isAccessCode)
         .map(identifier -> new AccessCode(identifier.getValue()))
         .findFirst(); // AccessCode has cardinality of 0..1 anyway
   }
 
-  public String getSubjectKvid() {
-    // TODO: implement KVID as its own Type // NOSONAR still needs to be implemented
-    return this.getSubject().getIdentifier().getValue();
+  public KVNR getSubjectKvnr() {
+    return KVNR.from(this.getSubject().getIdentifier().getValue());
+  }
+
+  public String getAssigner() {
+    return this.getSubject().getIdentifier().getAssigner().getDisplay();
   }
 
   public String getEntererTelematikId() {
@@ -122,6 +121,23 @@ public class ErxChargeItem extends ChargeItem {
                     this.getClass(),
                     ErpWorkflowStructDef.MARKING_FLAG,
                     PatientenrechnungStructDef.MARKING_FLAG));
+  }
+
+  public void removeContainedResources() {
+    this.getContained().clear();
+    this.supportingInformation.stream()
+        .filter(ref -> ref.getReference().startsWith("#"))
+        .forEach(
+            ref ->
+                ref.setReference(ref.getReference().replace("#", "Bundle/"))
+                    .setDisplay(
+                        AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ
+                            .getCanonicalUrl()) // hardcoded for now
+                    .setType(null));
+  }
+
+  public void removeAccessCode() {
+    this.getIdentifier().removeIf(AccessCode::isAccessCode);
   }
 
   public static ErxChargeItem fromChargeItem(ChargeItem adaptee) {

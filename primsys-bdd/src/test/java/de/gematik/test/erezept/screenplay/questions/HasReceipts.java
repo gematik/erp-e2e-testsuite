@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.strategy.AmountAdverb;
 import de.gematik.test.erezept.screenplay.strategy.AmountStrategy;
@@ -70,11 +71,15 @@ public class HasReceipts implements Question<Boolean> {
     return new HasReceipts(new AmountStrategy<>(adverb, amount));
   }
 
-  public static HasReceipts forPatient(String adverb, long amount, String kvid) {
-    return forPatient(AmountAdverb.fromString(adverb), amount, kvid);
+  public static HasReceipts forPatient(String adverb, long amount, String kvnr) {
+    return forPatient(AmountAdverb.fromString(adverb), amount, KVNR.from(kvnr));
+  }
+  
+  public static HasReceipts forPatient(String adverb, long amount, KVNR kvnr) {
+    return forPatient(AmountAdverb.fromString(adverb), amount, kvnr);
   }
 
-  public static HasReceipts forPatient(AmountAdverb adverb, long amount, String kvid) {
-    return new HasReceipts(new ContainsReceiptForStrategy(adverb, amount, kvid));
+  public static HasReceipts forPatient(AmountAdverb adverb, long amount, KVNR kvnr) {
+    return new HasReceipts(new ContainsReceiptForStrategy(adverb, amount, kvnr));
   }
 }

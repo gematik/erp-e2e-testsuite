@@ -1,9 +1,6 @@
 {
   "resourceType": "StructureDefinition",
   "id": "GEM-ERPCHRG-PR-Communication-ChargChangeReq",
-  "meta": {
-    "lastUpdated": "2022-04-16T13:43:30.128+00:00"
-  },
   "extension": [
     {
       "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
@@ -19,6 +16,8 @@
   "name": "GEM_ERPCHRG_PR_Communication_ChargChangeReq",
   "title": "Request for Modification on ChargeItem",
   "status": "draft",
+  "experimental": false,
+  "publisher": "gematik GmbH",
   "description": "Ressource used for the communication of Change Request on an existing ChargeItem between patient and pharmacy",
   "fhirVersion": "4.0.1",
   "mapping": [
@@ -51,11 +50,26 @@
         "min": 1
       },
       {
+        "id": "Communication.meta.versionId",
+        "path": "Communication.meta.versionId",
+        "max": "0"
+      },
+      {
+        "id": "Communication.meta.source",
+        "path": "Communication.meta.source",
+        "max": "0"
+      },
+      {
         "id": "Communication.meta.profile",
         "path": "Communication.meta.profile",
         "min": 1,
         "max": "1",
         "fixedCanonical": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_Communication_ChargChangeReq|1.0"
+      },
+      {
+        "id": "Communication.meta.security",
+        "path": "Communication.meta.security",
+        "max": "0"
       },
       {
         "id": "Communication.basedOn",

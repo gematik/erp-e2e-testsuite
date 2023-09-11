@@ -43,18 +43,11 @@ public class AbortPrescription implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     switch (question.getRole()) {
-      case DOCTOR:
-        abortAsDoctor(actor);
-        break;
-      case PATIENT:
-        abortAsPatient(actor);
-        break;
-      case PHARMACY:
-        abortAsPharmacy(actor);
-        break;
-      default:
-        throw new FeatureNotImplementedException(
-            format("You cannot abort a prescription as {0}", question.getRole()));
+      case DOCTOR -> abortAsDoctor(actor);
+      case PATIENT -> abortAsPatient(actor);
+      case PHARMACY -> abortAsPharmacy(actor);
+      default -> throw new FeatureNotImplementedException(
+          format("You cannot abort a prescription as {0}", question.getRole()));
     }
   }
 

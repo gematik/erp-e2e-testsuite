@@ -23,6 +23,7 @@ import lombok.Data;
 @XmlRootElement
 public class TelematikData {
 
+  private String environment;
   private String fachdienst;
   private String discoveryDocument;
   private String tsl;

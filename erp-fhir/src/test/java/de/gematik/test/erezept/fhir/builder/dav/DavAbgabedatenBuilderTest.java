@@ -60,7 +60,7 @@ class DavAbgabedatenBuilderTest extends ParsingTest {
             .currency(Currency.EUR) // EUR by default
             .status("issued")
             .vatRate(19.0f)
-            .addPriceComponent(pc1, "12345678")
+            .addPriceComponent(pc1, "12345678", "Test-Medikament")
             .build();
 
     val dispensedMedication =

@@ -96,8 +96,8 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
   }
 
   public DavInvoiceBuilder addPriceComponent(
-      @NonNull Invoice.InvoiceLineItemPriceComponentComponent component, @NonNull String pzn) {
-    this.priceComponents.add(new PriceComponentData(component, PZN.from(pzn), null));
+      Invoice.InvoiceLineItemPriceComponentComponent component, String pzn, String text) {
+    this.priceComponents.add(new PriceComponentData(component, PZN.from(pzn), text, null));
     return self();
   }
 
@@ -124,6 +124,7 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
       lineItemComponent.addPriceComponent(item.getPc());
       val chargeItem = lineItemComponent.getChargeItemCodeableConcept();
       chargeItem.addCoding(item.pzn.asCoding());
+      chargeItem.setText(item.text);
 
       if (item.hasBatch()) {
         lineItemComponent
@@ -176,6 +177,7 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
   private static class PriceComponentData {
     private final Invoice.InvoiceLineItemPriceComponentComponent pc;
     private final PZN pzn;
+    private final String text;
     @Nullable private final String batchDesignation; // NOTE: batch not yet allowed for PKV
 
     public boolean hasBatch() {

@@ -20,11 +20,14 @@ import de.gematik.test.erezept.app.abilities.*;
 import de.gematik.test.erezept.app.mobile.*;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.exceptions.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.jwt.*;
 import de.gematik.test.erezept.operator.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
+import de.gematik.test.smartcard.Egk;
+import de.gematik.test.smartcard.SmartcardArchive;
 import java.util.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -35,10 +38,12 @@ import net.serenitybdd.screenplay.*;
 public class SetUpAndroidDevice implements Task {
 
   private final VersicherungsArtDeBasis insuranceKind;
+  private final SmartcardArchive sca;
 
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
+    val userConfig = SafeAbility.getAbility(actor, UseAppUserConfiguration.class);
     val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
 
     // walk through onboarding
@@ -53,35 +58,44 @@ public class SetUpAndroidDevice implements Task {
     app.tap(Onboarding.ACCEPT_TERMS_OF_USE_BUTTON);
     app.tap(Onboarding.CONFIRM_TERMS_AND_PRIVACY_SELECTION_BUTTON);
 
-    if (app.useVirtualeGK()) {
-      performWithVirtualeGK(actor, app);
-      getBaseDataFromDebugMenu(actor, app);
+    if (userConfig.useVirtualEgk()) {
+      val egk = sca.getEgkByICCSN(userConfig.getEgkIccsn());
+      performWithVirtualeGK(actor, app, egk);
     } else {
       performWithRealeGK(app);
-      getBaseDataFromUser(actor);
+      getBaseDataFromDebugMenu(actor, app);
     }
   }
 
   private void performWithRealeGK(UseTheApp<?> app) {
     // walk through cardwall
-    app.tap(Prescriptions.REFRESH_BUTTON);
+    app.tap(Mainscreen.REFRESH_BUTTON);
     app.tap(CardWall.NEXT_BUTTON);
     app.input("123123", CardWall.CAN_INPUT_FIELD); // TODO: find a way to configure
     app.tap(CardWall.NEXT_BUTTON);
     app.input("123456", CardWall.PIN_INPUT_FIELD); // TODO: find a way to configure
     //    app.tap(CardWall.NEXT); // seems to be not required??
 
-    app.tap(CardWall.SIGN_IN);
+    app.tap(CardWall.NEXT_BUTTON);
     UIProvider.getInstructionResult(
         "Get your eGK ready and follow the Instructions on the Screen of your device");
   }
 
   @SneakyThrows
-  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app) {
-    app.tap(Settings.MENU_BUTTON);
+  private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app, Egk egk) {
+    app.tap(BottomNav.SETTINGS_BUTTON);
     app.tap(Debug.MENU_BUTTON);
+    
+    val provideEgk = ProvideEGK.sheOwns(egk);
+    actor.can(provideEgk);
+    actor.can(
+            ProvidePatientBaseData.forPatient(
+                    provideEgk.getKvnr(),
+                    egk.getOwner().getGivenName(),
+                    egk.getOwner().getSurname(),
+                    insuranceKind));
 
-    val egk = SafeAbility.getAbility(actor, ProvideEGK.class).getEgk();
+
     val autCertificate = egk.getAutCertificate();
     val pkBase64 = Base64.getEncoder().encodeToString(autCertificate.getPrivateKey().getEncoded());
     val cchBase64 =
@@ -97,15 +111,15 @@ public class SetUpAndroidDevice implements Task {
   }
 
   private <T extends Actor> void getBaseDataFromDebugMenu(T actor, UseTheApp<?> app) {
-    // visit the settings screen: and fetch KVID and name from Bearer Token
-    app.tap(Settings.MENU_BUTTON);
+    // visit the settings screen: and fetch KVNR and name from Bearer Token
+    app.tap(BottomNav.SETTINGS_BUTTON);
     app.tap(Debug.MENU_BUTTON);
-    val rawToken = app.getWebElement(Debug.BEARER_TOKEN).getText();
-    val token = JWTDecoder.decode(rawToken);
-    val kvid = token.getPayload().getIdentifier();
+    val rawToken = app.getText(Debug.BEARER_TOKEN);
+    val token = JWTDecoder.withCompactWriter().decode(rawToken);
+    val kvnrValue = token.getPayload().getIdentifier();
     val givenName = token.getPayload().getGivenName();
     val familyName = token.getPayload().getFamilyName();
-    actor.can(ProvidePatientBaseData.forPatient(kvid, givenName, familyName, insuranceKind));
+    actor.can(ProvidePatientBaseData.forPatient(KVNR.from(kvnrValue), givenName, familyName, insuranceKind));
 
     app.tap(Debug.LEAVE_BUTTON);
     app.tap(Settings.LEAVE_BUTTON);
@@ -119,13 +133,13 @@ public class SetUpAndroidDevice implements Task {
    * @param <T>
    */
   private <T extends Actor> void getBaseDataFromUser(T actor) {
-    val kvid = UIProvider.getQuestionResult("What is the KVID of the eGK you have used?");
+    val kvnrValue = UIProvider.getQuestionResult("What is the KVNR of the eGK you have used?");
     val name = UIProvider.getQuestionResult("What is the Name on the eGK?");
 
-    if (kvid == null || name == null) {
-      throw new TestcaseAbortedException("Given KVID or Name is null");
+    if (kvnrValue == null || name == null) {
+      throw new TestcaseAbortedException("Given KVNR or Name is null");
     }
 
-    actor.can(ProvidePatientBaseData.forPatient(kvid, name, insuranceKind));
+    actor.can(ProvidePatientBaseData.forPatient(KVNR.from(kvnrValue), name, insuranceKind));
   }
 }

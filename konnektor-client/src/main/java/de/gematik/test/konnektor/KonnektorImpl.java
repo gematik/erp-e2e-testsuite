@@ -18,6 +18,7 @@ package de.gematik.test.konnektor;
 
 import static java.text.MessageFormat.*;
 
+import de.gematik.test.cardterminal.*;
 import de.gematik.test.konnektor.cfg.*;
 import de.gematik.test.konnektor.commands.*;
 import de.gematik.test.konnektor.exceptions.*;
@@ -26,6 +27,7 @@ import de.gematik.test.konnektor.soap.*;
 import de.gematik.ws.conn.connectorcontext.v2.*;
 import java.time.*;
 import java.util.*;
+import java.util.stream.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 
@@ -37,12 +39,33 @@ public class KonnektorImpl implements Konnektor {
   @Getter private final KonnektorType type;
   protected final ServicePortProvider serviceProvider;
 
+  @Getter private final CardTerminalManager cardTerminalManager;
+
   public KonnektorImpl(
-      ContextType ctx, String name, KonnektorType type, ServicePortProvider serviceProvider) {
+      ContextType ctx,
+      String name,
+      KonnektorType type,
+      ServicePortProvider serviceProvider,
+      Collection<CardTerminalClient> cardTerminalClients) {
     this.name = name;
     this.ctx = ctx;
     this.type = type;
     this.serviceProvider = serviceProvider;
+    this.cardTerminalManager = new CardTerminalManager(this, cardTerminalClients);
+  }
+
+  public KonnektorImpl(
+      ContextType ctx,
+      String name,
+      KonnektorType type,
+      ServicePortProvider serviceProvider,
+      CardTerminalClient... cardTerminalClients) {
+    this(
+        ctx,
+        name,
+        type,
+        serviceProvider,
+        Arrays.stream(cardTerminalClients).collect(Collectors.toSet()));
   }
 
   @Override

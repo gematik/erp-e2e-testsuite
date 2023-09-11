@@ -18,10 +18,13 @@ package de.gematik.test.erezept.lei.hooks;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhirdump.*;
-import io.cucumber.java.*;
-import lombok.extern.slf4j.*;
-import net.thucydides.core.steps.*;
+import de.gematik.test.erezept.fhirdump.FhirDumpStepListener;
+import de.gematik.test.erezept.fhirdump.FhirDumper;
+import io.cucumber.java.AfterAll;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import lombok.extern.slf4j.Slf4j;
+import net.thucydides.core.steps.StepEventBus;
 
 @Slf4j
 public class FhirDumperHooks {
@@ -51,6 +54,6 @@ public class FhirDumperHooks {
     log.info(format("Initialize FHIR Dumper for Scenario {0}", scenario.getName()));
     StepEventBus.getEventBus()
         .registerListener(stepListener); // won't add multiple times because always the same object
-    fhirDumper.startScenario(scenario.getId(), scenario.getName());
+    fhirDumper.startScenario(scenario);
   }
 }

@@ -67,7 +67,7 @@ public class GetMedicationDispense implements Question<ErxMedicationDispenseBund
 
     val cmd = new MedicationDispenseSearchCommand(prescriptionId);
     val response = erpClient.request(cmd);
-    return response.getResource(cmd.expectedResponseBody());
+    return response.getExpectedResource();
   }
 
   public static Builder asPatient() {

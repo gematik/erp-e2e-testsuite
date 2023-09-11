@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,8 +44,20 @@ class PatientDataTest {
   }
 
   @Test
+  void shouldSerializeWithKvid() {
+    val json = """
+    {
+      "kvid": "X1231230"
+    }
+    """;
+    // avoid breaking changes
+    //required because originally we've been using kvid and switched to kvnr
+    assertDoesNotThrow(() -> mapper.readValue(json, PatientData.class));
+  }
+
+  @Test
   void roundTripSerializeFromKbvBundle() throws JsonProcessingException {
-    val kbvBundle = KbvErpBundleBuilder.faker("X123456789", "04773414").build();
+    val kbvBundle = KbvErpBundleBuilder.faker(KVNR.from("X123456789"), "04773414").build();
     val data = PatientData.fromKbvBundle(kbvBundle);
     assertNotNull(data);
     assertEquals("X123456789", data.getKvnr());

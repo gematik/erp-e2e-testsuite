@@ -18,10 +18,10 @@ package de.gematik.test.erezept.app.cfg;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.DatabindException;
-import de.gematik.test.erezept.app.exceptions.ActorConfigurationNotFoundException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.config.ConfigurationFactory;
+import de.gematik.test.erezept.config.exceptions.ActorConfigurationNotFoundException;
 import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
-import java.nio.file.Path;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,19 +33,13 @@ class ErpAppConfigurationTest {
 
   @BeforeAll
   static void readConfig() {
-    config = ErpAppConfiguration.getInstance();
+    config = ConfigurationFactory.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
   }
 
   @Test
-  void shouldHaveSingleInstance() {
-    val c2 = ErpAppConfiguration.getInstance();
-    assertEquals(config, c2);
-  }
-
-  @Test
-  void shouldThrowOnInvalidConfigurationFile() {
-    val path = Path.of("..", "config", "primsys", "config.yaml"); // primsys config!
-    assertThrows(DatabindException.class, () -> ErpAppConfiguration.getInstance(path.toFile()));
+  void shouldNotHaveSingleInstance() {
+    val c2 = ConfigurationFactory.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
+    assertNotEquals(config, c2);
   }
 
   @Test
@@ -61,14 +55,14 @@ class ErpAppConfigurationTest {
 
   @Test
   void shouldGetDeviceByName() {
-    val device = config.getDeviceByName("Android 12 Emulator");
+    val device = config.getDeviceByName("iPhone 7 Plus Simulator");
     assertNotNull(device);
   }
 
   @Test
   void shouldThrowOnUnknownDevice() {
     assertThrows(
-        ActorConfigurationNotFoundException.class, () -> config.getDeviceByName("Bad Device Name"));
+        ConfigurationMappingException.class, () -> config.getDeviceByName("Bad Device Name"));
   }
 
   @Test
@@ -92,8 +86,10 @@ class ErpAppConfigurationTest {
   void shouldGetAppConfigurationForUser() {
     val appConfig = config.getAppConfigurationForUser("Alice");
     val userDevice = config.getAppUserByName("Alice").getDevice();
-    val expected = config.getDeviceByName(userDevice).getPlatformType();
-    assertEquals(expected, appConfig.getPlatformType());
+    val expected = config.getDeviceByName(userDevice).getPlatform();
+    assertEquals(expected, appConfig.getPlatform());
+    assertEquals(
+        PlatformType.fromString(expected), PlatformType.fromString(appConfig.getPlatform()));
   }
 
   @Test

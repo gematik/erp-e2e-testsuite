@@ -1,54 +1,73 @@
 /*
- *
- *  * Copyright (c) 2023 gematik GmbH
- *  * 
- *  * Licensed under the Apache License, Version 2.0 (the License);
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  * 
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  * 
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an 'AS IS' BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *
+ * Copyright (c) 2023 gematik GmbH
+ * 
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.awaitility.Awaitility.*;
+import de.gematik.test.core.ArgumentComposer;
+import de.gematik.test.core.annotations.Actor;
+import de.gematik.test.core.annotations.TestcaseId;
+import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.verifier.AuditEventVerifier;
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.ErpTest;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.DownloadOpenTask;
+import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmChecksum;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmErrorMessage;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmUpdateReason;
+import de.gematik.test.smartcard.Egk;
+import de.gematik.test.smartcard.SmartcardArchive;
+import de.gematik.test.smartcard.SmartcardFactory;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import net.thucydides.core.annotations.WithTag;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runner.RunWith;
 
-import de.gematik.test.core.*;
-import de.gematik.test.core.annotations.*;
-import de.gematik.test.core.expectations.verifier.*;
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.actions.*;
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.konnektor.commands.options.*;
-import java.time.*;
-import java.time.temporal.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.*;
-import javax.annotation.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.junit.runners.*;
-import net.serenitybdd.junit5.*;
-import net.thucydides.core.annotations.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junit.runner.*;
+import javax.annotation.Nullable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
@@ -56,233 +75,232 @@ import org.junit.runner.*;
 @DisplayName("E-Rezept abrufen als Apotheker")
 @Tag("Feature:EGKinApotheke")
 @WithTag("Feature:EGKinApotheke")
-@Disabled("Feature is currently disabled")
+
 class TaskGetAsPharmacyUseCase extends ErpTest {
 
-  private static List<TimeOfRequest> counterPharmacyRequests = new ArrayList<>();
-  @Data
-  private static class TimeOfRequest {
-    private final PharmacyActor actor;
-    private final Instant timestamp = Instant.now();
-  }
-
-  private static final boolean isRu = !System
-      .getProperty("erp.config.activeEnvironment", "TU")
-      .equals("TU");
-
-  @Actor(name = "Bernd Claudius")
-  private DoctorActor bernd;
+  private static SmartcardArchive smartCards;
+  private static final VsdmService vsdmService = TestsuiteConfiguration.getInstance()
+          .getVsdmServiceConfiguration().createDefault();
 
   @Actor(name = "Hanna Bäcker")
   private PatientActor hanna;
 
+  private Egk hannasEgk;
+
   @Actor(name = "Am Flughafen")
   private PharmacyActor flughafen;
 
-  @Actor(name = "Stadtapotheke")
-  private PharmacyActor stadtapotheke;
 
-
-  private ErxTask erxTask;
-
+  @BeforeAll
+  static void init() {
+    smartCards = SmartcardFactory.getArchive();
+  }
 
   @SneakyThrows
   @BeforeEach
   void setup() {
+    hannasEgk = smartCards.getEgkByICCSN(
+        TestsuiteConfiguration.getInstance().getPatientConfig(hanna.getName()).getEgkIccsn());
     givenThat(flughafen).can(ManagePharmacyPrescriptions.itWorksWith());
   }
 
-  private static boolean hasPharmacyToManyRequests(PharmacyActor actor) {
-    counterPharmacyRequests.removeIf(c -> c.getActor().equals(actor) && c.getTimestamp()
-        .isBefore(Instant.now().minus(1, ChronoUnit.MINUTES)));
-    return counterPharmacyRequests.size() >= 5;
-  }
 
   private static ErpInteraction<ErxTaskBundle> performDownloadOpenTask(PharmacyActor pharmacy,
-      @Nullable PatientActor patient,
-      @Nullable ExamEvidence evidence) {
-    // wait if a pharmacist has tried to retrieve Task more than 5 times in one minute
-    await().atMost(1, TimeUnit.MINUTES).until(() -> !hasPharmacyToManyRequests(pharmacy));
-    var actionBuilder = DownloadOpenTask.builder();
-    if(patient != null) {
-      actionBuilder.kvnr(patient.getKvnr());
-    }
-    if(evidence != null) {
-      actionBuilder.examEvidence(evidence.encodeAsBase64());
-    }
-    counterPharmacyRequests.add(new TimeOfRequest(pharmacy));
-    return pharmacy.performs(actionBuilder.build());
+      @Nullable VsdmExamEvidence evidence) {
+    return pharmacy.performs(evidence != null ?
+            DownloadOpenTask.withExamEvidence(evidence.encodeAsBase64()) :
+            DownloadOpenTask.withoutExamEvidence());
   }
 
-  @AfterEach
-  void postcondition() {
-    val acception = flughafen.performs(AcceptPrescription.forTheTask(erxTask));
-    flughafen.performs(DispensePrescription.acceptedWith(acception));
-  }
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_01")
-  @ParameterizedTest(name = "[{index}] -> Abrufen von Tasks als Apotheker mit Prüfungsnachweis {0}")
-  @DisplayName("Abrufen von Tasks als Apotheker mit einem Prüfungsnachweis und prüfen des Versichertenprotokolls")
-  @MethodSource("examEvidenceWithExpectedStatusCode")
-  void downloadTaskAsPharmcyForAllExamEvidences(
-      ExamEvidence examEvidence, int expectedStatusCode) {
+  @ParameterizedTest(name = "[{index}] -> Abrufen von Tasks als Apotheker mit Prüfungsnachweis {1}")
+  @DisplayName("Abrufen von Tasks als Apotheker mit Prüfungsnachweis {1}")
+  @MethodSource("validExamEvidence")
+  void validExamEvidences(
+      VsdmUpdateReason reason, VsdmExamEvidenceResult examEvidenceResult) {
 
-    erxTask = bernd.performs(
-        IssuePrescription.forPatient(hanna)
-            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .withRandomKbvBundle()).getExpectedResponse();
+    val checksum = vsdmService.requestFor(hannasEgk, reason);
+    val examEvidence = VsdmExamEvidence.builder(examEvidenceResult)
+            .checksum(checksum);
 
-    val response = performDownloadOpenTask(flughafen, hanna, examEvidence);
+    val response = performDownloadOpenTask(flughafen, examEvidence.build());
 
-    Verify.Builder<?> builder;
-    if(expectedStatusCode == 200) {
-      builder = Verify.that(response).withExpectedType();
-    } else {
-      builder = Verify.that(response).withOperationOutcome();
-    }
-    flughafen.attemptsTo(builder.hasResponseWith(returnCode(expectedStatusCode)).isCorrect());
+    flughafen.attemptsTo(Verify.that(response)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .isCorrect());
+
+    val auditEventVerifier = new AuditEventVerifier.Builder()
+            .pharmacy(flughafen)
+            .checksum(checksum.generate())
+            .build();
+
+    val downloadedAuditEvents = hanna.performs(
+            DownloadAuditEvent.orderByDateDesc());
+
+    hanna.attemptsTo(Verify.that(downloadedAuditEvents)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(auditEventVerifier.firstCorrespondsTo(ErxAuditEvent.Representation.PHARMACY_GET_TASK_SUCCESSFUL))
+            .isCorrect());
   }
 
-  @SneakyThrows
   @TestcaseId("ERP_TASK_GET_PHARMACY_02")
-  @Test
-  @DisplayName("Mehrfaches Abrufen von Tasks als Apotheker innerhalb einer Minute")
-  void downloadSeveralTaskWithinAMinute() {
-    givenThat(stadtapotheke).can(ManagePharmacyPrescriptions.itWorksWith());
-    erxTask = bernd.performs(
-        IssuePrescription.forPatient(hanna)
-            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .withRandomKbvBundle()).getExpectedResponse();
-    // A_23160: dass durch die abgebende LEI die Operation nicht häufiger als 5 mal (konfigurierbar)
-    // pro Minute aufgerufen wurde und bei Überschreiten des Limits den http-Request mit dem
-    // http-Status-Code 429 ablehnen.
+  @ParameterizedTest(name = "[{index}] -> Abrufen von Tasks als Apotheker mit Prüfungsnachweis {0}")
+  @DisplayName("Abrufen von Tasks als Apotheker mit Prüfungsnachweis {0}")
+  @MethodSource("invalidExamEvidence")
+  void invalidExamEvidences(VsdmExamEvidenceResult examEvidenceResult) {
 
-    val examEvidence = ExamEvidence.UPDATES_SUCCESSFUL;
+    var examEvidence = VsdmExamEvidence.builder(examEvidenceResult);
 
-    for(int i = 1; i<=5; i++) {
-      stadtapotheke.performs(DownloadOpenTask.builder()
-          .kvnr(hanna.getKvnr())
-          .examEvidence(examEvidence.encodeAsBase64()).build());
-    }
-    val erxTaskBundleErpInteraction = stadtapotheke.performs(DownloadOpenTask.builder()
-        .kvnr(hanna.getKvnr())
-        .examEvidence(examEvidence.encodeAsBase64()).build());
-    stadtapotheke.attemptsTo(
-        Verify.that(erxTaskBundleErpInteraction)
+    val response = performDownloadOpenTask(flughafen, examEvidence.build());
+
+    flughafen.attemptsTo(Verify.that(response)
             .withOperationOutcome()
-            .hasResponseWith(returnCode(429))
+            .hasResponseWith(returnCode(403))
+            .isCorrect());
+
+    val auditEventVerifier = new AuditEventVerifier.Builder()
+            .pharmacy(flughafen)
+            .build();
+
+    val downloadedAuditEvents = hanna.performs(
+            DownloadAuditEvent.orderByDateDesc());
+
+    hanna.attemptsTo(Verify.that(downloadedAuditEvents)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(auditEventVerifier.firstCorrespondsTo(ErxAuditEvent.Representation.PHARMACY_GET_TASK_UNSUCCESSFUL))
             .isCorrect());
   }
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_03")
-  @Test
-  @DisplayName("Abruf Task als Aoptheker ohne KVNR")
-  void downloadTaskWithoutKVNR() {
-    val examEvidence = ExamEvidence.UPDATES_SUCCESSFUL;
-    erxTask = bernd.performs(
-        IssuePrescription.forPatient(hanna)
-            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .withRandomKbvBundle()).getExpectedResponse();
+  @ParameterizedTest(name = "[{index}] ->Abrufen von Tasks als Apotheker mit Prüfungsnachweis {0} mit ungültiger Prüfziffer {1}")
+  @DisplayName("Abrufen von Tasks als Apotheker mit Prüfungsnachweis {0} mit ungültiger Prüfziffer")
+  @MethodSource("invalidChecksums")
+  void invalidChecksum(VsdmExamEvidenceResult examEvidenceResult, VsdmChecksum checksum, VsdmErrorMessage expectedErrorMessage) {
 
-    val response = performDownloadOpenTask(flughafen, null, examEvidence);
+    val examEvidence = VsdmExamEvidence.builder(examEvidenceResult).checksum(checksum);
+
+    val response = performDownloadOpenTask(flughafen, examEvidence.build());
 
     flughafen.attemptsTo(Verify.that(response)
-        .withOperationOutcome()
-        .hasResponseWith(returnCode(400))
-        .isCorrect());
+            .withOperationOutcome()
+            .hasResponseWith(returnCode(403))
+            .and(operationOutcomeHasDetailsText(expectedErrorMessage.getText(), ErpAfos.A_23454))
+            .isCorrect());
+
+    val auditEventVerifier = new AuditEventVerifier.Builder()
+            .pharmacy(flughafen)
+            .build();
+
+    val downloadedAuditEvents = hanna.performs(
+            DownloadAuditEvent.orderByDateDesc());
+
+    hanna.attemptsTo(Verify.that(downloadedAuditEvents)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(auditEventVerifier.firstCorrespondsTo(ErxAuditEvent.Representation.PHARMACY_GET_TASK_UNSUCCESSFUL))
+            .isCorrect());
   }
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_04")
   @Test
-  @DisplayName("Abruf Task als Aoptheker ohne Prüfungsnachweis")
-  void downloadTaskWithoutExamEvidence() {
-    erxTask = bernd.performs(
-        IssuePrescription.forPatient(hanna)
-            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .withRandomKbvBundle()).getExpectedResponse();
+  @DisplayName("Abrufen von Tasks als Apotheker mit Prüfungsnachweis 2 ohne Prüfziffer")
+  void withoutChecksum() {
 
-    val response = performDownloadOpenTask(flughafen, hanna, null);
-
+    val examEvidence = VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES);
+    val response = performDownloadOpenTask(flughafen, examEvidence.build());
     flughafen.attemptsTo(Verify.that(response)
-        .withOperationOutcome()
-        .hasResponseWith(returnCode(403))
-        .isCorrect());
+            .withOperationOutcome()
+            .hasResponseWith(returnCode(403))
+            .and(operationOutcomeHasDetailsText(VsdmErrorMessage.PROOF_OF_PRESENCE_WITHOUT_CHECKSUM.getText(), ErpAfos.A_23455))
+            .isCorrect());
 
     val auditEventVerifier = new AuditEventVerifier.Builder()
-        .pharmacy(flughafen)
-        .build();
+            .pharmacy(flughafen)
+            .build();
 
     val downloadedAuditEvents = hanna.performs(
-        DownloadAuditEvent.orderByDateDesc());
+            DownloadAuditEvent.orderByDateDesc());
 
     hanna.attemptsTo(Verify.that(downloadedAuditEvents)
-        .withExpectedType()
-        .hasResponseWith(returnCode(200))
-        .and(auditEventVerifier.firstCorrespondsTo(Representation.PHARMACY_GET_TASK_UNSUCCESSFUL))
-        .isCorrect());
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(auditEventVerifier.firstCorrespondsTo(ErxAuditEvent.Representation.PHARMACY_GET_TASK_UNSUCCESSFUL))
+            .isCorrect());
   }
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_05")
-  @ParameterizedTest(name = "[{index}] -> Protokolleintrag für Prüfungsnachweis {0}")
-  @DisplayName("Erzeugen von Protokolleinträgen bei Abruf von Tasks als Apotheker mit einem Prüfungsnachweis")
-  @MethodSource("possibleAuditEvents")
-  void verifyAuditEvent(
-      ExamEvidence examEvidence, ErxAuditEvent.Representation auditEventRepresentation, int expectedStatusCode) {
-    erxTask = bernd.performs(
-        IssuePrescription.forPatient(hanna)
-            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .withRandomKbvBundle()).getExpectedResponse();
+  @Test
+  @DisplayName("Abrufen von Tasks als Apotheker ohne Prüfungsnachweis")
+  void withoutExamEvidence() {
 
-    val response = performDownloadOpenTask(flughafen,
-        hanna, examEvidence);
-
+    val response = performDownloadOpenTask(flughafen, null);
     flughafen.attemptsTo(Verify.that(response)
-        .withIndefiniteType()
-        .hasResponseWith(returnCode(expectedStatusCode))
-        .isCorrect());
+            .withOperationOutcome()
+            .hasResponseWith(returnCode(403))
+            .and(operationOutcomeHasDetailsText(VsdmErrorMessage.INVALID_PNW.getText(), ErpAfos.A_23450))
+            .isCorrect());
 
     val auditEventVerifier = new AuditEventVerifier.Builder()
-        .pharmacy(flughafen)
-        .checksum(examEvidence.getChecksum().orElse(""))
-        .build();
+            .pharmacy(flughafen)
+            .build();
 
     val downloadedAuditEvents = hanna.performs(
-        DownloadAuditEvent.orderByDateDesc());
+            DownloadAuditEvent.orderByDateDesc());
 
     hanna.attemptsTo(Verify.that(downloadedAuditEvents)
-        .withExpectedType()
-        .hasResponseWith(returnCode(200))
-        .and(auditEventVerifier.firstCorrespondsTo(auditEventRepresentation))
-        .isCorrect());
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(auditEventVerifier.firstCorrespondsTo(ErxAuditEvent.Representation.PHARMACY_GET_TASK_UNSUCCESSFUL))
+            .isCorrect());
 
   }
 
-
-  static Stream<Arguments> examEvidenceWithExpectedStatusCode() {
+  static Stream<Arguments> validExamEvidence() {
     return ArgumentComposer.composeWith()
-        .arguments(ExamEvidence.UPDATES_SUCCESSFUL, isRu? 200 : 403)
-        .arguments(ExamEvidence.NO_UPDATES, isRu? 200 : 403)
-        .arguments(ExamEvidence.ERROR_EGK, isRu? 200 : 403)
-        .arguments(ExamEvidence.ERROR_AUTH_CERT_INVALID,403)
-        .arguments(ExamEvidence.ERROR_ONLINECHECK_NOT_POSSIBLE,403)
-        .arguments(ExamEvidence.ERROR_OFFLINE_PERIOD_EXCEEDED, 403)
-        .arguments(ExamEvidence.INVALID_EVIDENCE_NUMBER, 403)
-        .arguments(ExamEvidence.NO_UPDATE_WITH_EXPIRED_TIMESTAMP,  403)
-        .arguments(ExamEvidence.NO_WELL_FORMED_XML, 403)
+        .arguments(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL)
+        .arguments(VsdmExamEvidenceResult.NO_UPDATES)
+            .multiply(Arrays.stream(VsdmUpdateReason.values()).toList())
         .create();
   }
 
-  static Stream<Arguments> possibleAuditEvents() {
+  static Stream<Arguments> invalidExamEvidence() {
     return ArgumentComposer.composeWith()
-        .arguments(ExamEvidence.UPDATES_SUCCESSFUL,
-            isRu? Representation.PHARMACY_GET_TASK_SUCCESSFUL_WITH_CHECKSUM : Representation.PHARMACY_GET_TASK_UNSUCCESSFUL,
-            isRu? 200 : 403)
-        .arguments(ExamEvidence.ERROR_EGK, isRu ? Representation.PHARMACY_GET_TASK_SUCCESSFUL_WITHOUT_CHECKSUM : Representation.PHARMACY_GET_TASK_UNSUCCESSFUL,
-            isRu ? 200 : 403)
-        .arguments(ExamEvidence.NO_WELL_FORMED_XML,Representation.PHARMACY_GET_TASK_UNSUCCESSFUL, 403)
-        .create();
+            .arguments(VsdmExamEvidenceResult.ERROR_EGK)
+            .arguments(VsdmExamEvidenceResult.ERROR_AUTH_CERT_INVALID)
+            .arguments(VsdmExamEvidenceResult.ERROR_ONLINECHECK_NOT_POSSIBLE)
+            .arguments(VsdmExamEvidenceResult.ERROR_OFFLINE_PERIOD_EXCEEDED)
+            .create();
   }
 
-
+  static Stream<Arguments> invalidChecksums() {
+    val hMacKey = vsdmService.getHMacKey();
+    val hannaKvnr = "X110499478";
+    return ArgumentComposer.composeWith()
+            // invalid identifier
+            .arguments(VsdmChecksum.builder(hannaKvnr).identifier('y').key(hMacKey).build(),
+                    VsdmErrorMessage.PROOF_OF_PRESENCE_ERROR_SIG)
+            // invalid version
+            .arguments(VsdmChecksum.builder(hannaKvnr).version('0').key(hMacKey).build(),
+                    VsdmErrorMessage.PROOF_OF_PRESENCE_ERROR_SIG)
+            // invalid kvnr
+            .arguments(VsdmChecksum.builder("ABC").key(hMacKey).build(),
+                    VsdmErrorMessage.FAILED_PARSING_PNW)
+            .arguments(VsdmChecksum.builder(hannaKvnr).version('0').key(hMacKey).build(),
+                    VsdmErrorMessage.PROOF_OF_PRESENCE_ERROR_SIG)
+            // invalid hMacKey - A_23546 is tested with this test date
+            .arguments(VsdmChecksum.builder(hannaKvnr).build(),
+                    VsdmErrorMessage.PROOF_OF_PRESENCE_ERROR_SIG)
+            // invalid timestamp
+            .arguments(VsdmChecksum.builder(hannaKvnr).timestamp(Instant.now().minus(30, ChronoUnit.MINUTES)).key(hMacKey).build(),
+                    VsdmErrorMessage.PROOF_OF_PRESENCE_INVALID_TIMESTAMP)
+            .arguments(VsdmChecksum.builder(hannaKvnr).timestamp(Instant.now().plus(40, ChronoUnit.MINUTES)).key(hMacKey).build(),
+                    VsdmErrorMessage.PROOF_OF_PRESENCE_INVALID_TIMESTAMP)
+            .multiply(List.of(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL, VsdmExamEvidenceResult.NO_UPDATES))
+            .create();
+  }
 
 }

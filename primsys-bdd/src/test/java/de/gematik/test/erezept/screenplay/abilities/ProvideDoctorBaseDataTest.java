@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.lei.cfg.DoctorConfiguration;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +30,11 @@ class ProvideDoctorBaseDataTest {
 
   @Test
   void shouldCreateDoctorBaseDataFromValidConfig() {
-    val cfg = new DoctorConfiguration();
-    cfg.setName("Bernd Claudius");
-    cfg.setQualificationType("Arzt");
+    val cfgDto = new DoctorConfiguration();
+    cfgDto.setName("Bernd Claudius");
+    cfgDto.setQualificationType("Arzt");
 
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfg);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
 
     assertEquals("Bernd", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Claudius", doc.getPractitioner().getNameFirstRep().getFamily());
@@ -48,11 +48,11 @@ class ProvideDoctorBaseDataTest {
 
   @Test
   void shouldCreateDentistBaseDataFromValidConfig() {
-    val cfg = new DoctorConfiguration();
-    cfg.setName("Bernd Claudius");
-    cfg.setQualificationType("Zahnarzt");
+    val cfgDto = new DoctorConfiguration();
+    cfgDto.setName("Bernd Claudius");
+    cfgDto.setQualificationType("Zahnarzt");
 
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfg);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
 
     assertEquals("Bernd", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Claudius", doc.getPractitioner().getNameFirstRep().getFamily());
@@ -66,11 +66,11 @@ class ProvideDoctorBaseDataTest {
 
   @Test
   void shouldCreateDoctorWithFakedName() {
-    val cfg = new DoctorConfiguration();
-    cfg.setName("");
-    cfg.setQualificationType("Zahnarzt");
+    val cfgDto = new DoctorConfiguration();
+    cfgDto.setName("");
+    cfgDto.setQualificationType("Zahnarzt");
 
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfg);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
 
     assertNotEquals("", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertNotEquals("", doc.getPractitioner().getNameFirstRep().getFamily());

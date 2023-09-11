@@ -20,6 +20,7 @@ import de.gematik.test.erezept.fhir.builder.dav.*;
 import de.gematik.test.erezept.fhir.resources.dav.*;
 import de.gematik.test.fuzzing.dav.*;
 import lombok.extern.slf4j.*;
+import lombok.val;
 import picocli.CommandLine.*;
 
 @Slf4j
@@ -35,7 +36,11 @@ public class DavBundleGenerator extends BaseResourceGenerator {
         "DAV-ABDA",
         this::createDavAbgabedaten,
         DavBundleManipulatorFactory.getAllDavBundleManipulators(),
-        DavAbgabedatenBundle::fromBundle);
+        original -> {
+          val copy = new DavAbgabedatenBundle();
+          original.copyValues(copy);
+          return copy;
+        });
   }
 
   private DavAbgabedatenBundle createDavAbgabedaten() {

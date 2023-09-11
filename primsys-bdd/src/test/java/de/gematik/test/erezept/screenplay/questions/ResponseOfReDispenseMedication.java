@@ -28,7 +28,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -41,23 +40,17 @@ import net.serenitybdd.screenplay.Actor;
  * medications which shall not be allowed
  */
 @Slf4j
-@RequiredArgsConstructor
 public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxReceipt> {
 
   private final DequeStrategy deque;
 
-  @Override
-  public Class<ErxReceipt> expectedResponseBody() {
-    return ErxReceipt.class;
+  private ResponseOfReDispenseMedication(DequeStrategy deque) {
+    super("Task/$close");
+    this.deque = deque;
   }
 
   @Override
-  public String getOperationName() {
-    return "Task/$close";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxReceipt> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
@@ -72,12 +65,12 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
     val taskId = receipt.getTaskId();
     val secret = receipt.getSecret();
     val prescriptionId = receipt.getPrescriptionId();
-    val kvid = receipt.getReceiverKvid();
+    val kvnr = receipt.getReceiverKvnr();
 
     val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
 
     val medicationDispense =
-        ErxMedicationDispenseBuilder.forKvid(kvid)
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
             .prescriptionId(prescriptionId)
             .performerId(telematikId)
             .medication(medication)

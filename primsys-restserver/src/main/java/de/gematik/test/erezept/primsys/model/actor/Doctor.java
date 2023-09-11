@@ -18,9 +18,12 @@ package de.gematik.test.erezept.primsys.model.actor;
 
 import static java.text.MessageFormat.*;
 
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.primsys.rest.data.*;
 import de.gematik.test.konnektor.*;
 import de.gematik.test.konnektor.commands.*;
@@ -29,10 +32,9 @@ import lombok.*;
 
 public class Doctor extends BaseActor {
 
-  private final DoctorConfiguration cfg;
   private final Konnektor konnektor;
   private final Hba hba;
-  private final CardHandle hbaHandle;
+  private final CardInfo hbaHandle;
 
   private final DoctorData baseData;
 
@@ -42,7 +44,6 @@ public class Doctor extends BaseActor {
       Konnektor konnektor,
       SmartcardArchive sca) {
     super(cfg, env, sca);
-    this.cfg = cfg;
 
     this.konnektor = konnektor;
     this.hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
@@ -55,7 +56,7 @@ public class Doctor extends BaseActor {
     baseData.setType(ActorRole.DOCTOR.getReadable());
     baseData.setName(cfg.getName());
 
-    val qualificationType = cfg.getQualificationType();
+    val qualificationType = QualificationType.fromDisplay(cfg.getQualificationType());
     val docNumber = BaseANR.randomFromQualification(qualificationType);
     baseData.setDocQualificationType(qualificationType.getDisplay());
     baseData.setOfficeName(format("{0}raxis {1}", qualificationType.getDisplay(), cfg.getName()));
@@ -68,12 +69,6 @@ public class Doctor extends BaseActor {
     baseData.setCity(GemFaker.fakerCity());
     baseData.setPostal(GemFaker.fakerZipCode());
     baseData.setStreet(GemFaker.fakerStreetName());
-
-    val ti = new TelematikData();
-    ti.setFachdienst(env.getTi().getFdBaseUrl());
-    ti.setDiscoveryDocument(env.getTi().getDiscoveryDocumentUrl());
-    ti.setTsl(env.getTslBaseUrl());
-    baseData.setTi(ti);
   }
 
   public byte[] signDocument(String document) {

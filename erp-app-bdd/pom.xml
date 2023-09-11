@@ -6,11 +6,11 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
-    <name>E-Rezept App</name>
+    <name>E-Rezept App-Testsuite</name>
 
     <properties>
         <java.version>${version.java}</java.version>
@@ -18,49 +18,70 @@
         <maven.compiler.source>${version.java}</maven.compiler.source>
 
         <tags/>
+        <appFailRerun>0</appFailRerun>
         <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${version.sl4j-api}</version>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>smartcard</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>smartcard</artifactId>
-            <version>0.3.0</version>
+            <artifactId>erp-bdd-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>primsys-bdd</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>primsys-bdd</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-junit5</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${version.fasterxml.jackson}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${version.fasterxml.jackson}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${version.fasterxml.jackson}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>erp-bdd-common</artifactId>
-            <version>0.3.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
-            <version>${version.faker}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.plist</groupId>
+            <artifactId>dd-plist</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -87,7 +108,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.1.0</version>
                 <configuration>
                     <includes>
                         <include>**/${bdd.testsuite}.java</include>
@@ -96,6 +117,8 @@
                     <forkCount>1</forkCount>
                     <threadCount>1</threadCount>
                     <reuseForks>true</reuseForks>
+                    <rerunFailingTestsCount>${appFailRerun}</rerunFailingTestsCount>
+                    <skip>${skip.inttests}</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -114,7 +137,7 @@
                     <tags>${tags}</tags>
                     <reports>single-page-html,navigator</reports>
                     <systemPropertyVariables>
-                        <report.customfields.Testsuite>TestSuite v${project.version}</report.customfields.Testsuite>
+                        <report.customfields.Testsuite>App-TestSuite v${project.version}</report.customfields.Testsuite>
                         <report.customfields.Tester>${user.name}</report.customfields.Tester>
                     </systemPropertyVariables>
                 </configuration>
@@ -137,6 +160,48 @@
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <artifactId>erp-bdd-common</artifactId>
+                                    <groupId>de.gematik.test.erezept</groupId>
+                                    <version>${project.parent.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/classes</outputDirectory>
+                                    <includes>**/*.class</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>primsys-bdd</artifactId>
+                                    <groupId>de.gematik.test.erezept</groupId>
+                                    <version>${project.parent.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/classes</outputDirectory>
+                                    <includes>**/*.class</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>primsys-bdd</artifactId>
+                                    <groupId>de.gematik.test.erezept</groupId>
+                                    <version>${project.parent.version}</version>
+                                    <type>test-jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/classes</outputDirectory>
+                                    <includes>**/*.class</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

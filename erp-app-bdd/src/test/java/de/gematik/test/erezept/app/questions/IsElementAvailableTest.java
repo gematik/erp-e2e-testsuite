@@ -18,7 +18,6 @@ package de.gematik.test.erezept.app.questions;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,8 +29,6 @@ import net.serenitybdd.screenplay.actors.OnStage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
 
 class IsElementAvailableTest {
 
@@ -48,8 +45,7 @@ class IsElementAvailableTest {
   @Test
   void shouldDetectAvailableElement() {
     val useMockAppAbility = mock(UseAndroidApp.class);
-    val mockElement = mock(WebElement.class);
-    when(useMockAppAbility.getWebElement(any())).thenReturn(mockElement); // pretend to find one
+    when(useMockAppAbility.isPresent(Onboarding.SKIP_BUTTON)).thenReturn(true); // pretend to find one
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
     assertTrue(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP_BUTTON)));
   }
@@ -57,8 +53,7 @@ class IsElementAvailableTest {
   @Test
   void shouldDetectUnAvailableElement() {
     val useMockAppAbility = mock(UseAndroidApp.class);
-    when(useMockAppAbility.getWebElement(any()))
-        .thenThrow(NoSuchElementException.class); // pretend element not found
+    when(useMockAppAbility.isPresent(Onboarding.SKIP_BUTTON)).thenReturn(false); // pretend the element not found
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
     assertFalse(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP_BUTTON)));
   }

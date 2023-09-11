@@ -1,0 +1,104 @@
+
+==== iOS Simulator Build
+Die {name-app-testsuite} kann gegen einen iOS-Simulator ausgeführt werden. Hierfür sind allerdings einige Vorbereitungen nötig.
+
+===== Appium
+Um eine iOS-App im Simulator zu testen wird lokal eine Appium-Instanz mit dem `xcuitest` driver benötigt. In der Appium Dokumentation wird ausführlich beschrieben, wie Appium 2.x link:https://appium.io/docs/en/2.0/quickstart/install/[installiert] werden kann.
+
+Anschließend sollte man prüfen, ob der `xcuitest` driver installiert ist und gegebenenfalls installieren:
+
+[source,shell]
+----
+appium driver list
+----
+
+Falls der `xcuitest` driver nicht unter den _available drivers_ angezeigt wird, muss der driver installiert werden:
+
+[source,shell]
+----
+appium driver install xcuitest
+----
+
+Nun muss Appium nur noch gestartet werden:
+
+[source,shell]
+----
+cd <WORKDIR>
+appium server
+----
+
+[NOTE]
+Der Pfad `<WORKDIR>` ist zunächst frei wählbar. Appium verwendet den aktuellen Pfad als Arbeitsverzeichnis und wird später von diesem Pfad ausgehend die App für die Installation im Simulator suchen.
+
+===== Simulator App
+Im Gegensatz zu Echt-Geräten benötigt der Simulator einen gesonderten Build. Das heißt, dass `ipa`-Files nur auf Echt-Geräten installiert werden können. Glücklicherweise generiert die link:https://jenkins.prod.ccs.gematik.solutions/job/eRezeptApp-iOS/[eRezept-App-iOS Jenkins-Pipeline] auch die nötigen Simulator-Builds. Dieser kann für den jeweiligen Build aus dem link:https://jenkins.prod.ccs.gematik.solutions/job/eRezeptApp-iOS/[Jenkins] heruntergeladen und entpackt werden.
+
+image::ios_app_simulator_archive.png[width=45%, align="center"]
+
+Der entpackte Inhalt sollte in etwa den Namen `eRPApp_simulator_3.xcarchive` haben. Diese Datei muss nun in das Appium-Arbeitsverzeichnis (`<WORKDIR>`) abgelegt werden.
+
+===== iOS Simulator vorbereiten
+Natürlich muss auch lokal ein iOS Simulator verfügbar sein.
+
+[CAUTION]
+Die Ausführung eines iOS Simulators benötigt ein macOS-Betriebssystem und link:https://apps.apple.com/us/app/xcode/id497799835?mt=12[Xcode]
+
+Hierzu kann man sich zunächst die verfügbaren Simulatoren mit dem folgenden Befehl anzeigen lassen:
+
+[source,shell]
+----
+xcrun xctrace list devices
+----
+
+Wir werden im nächsten Schritt die UDID des Simulators, auf dem die iOS-App ausgeführt werden soll benötigen.
+
+===== Konfiguration
+Im letzten Schritt muss nur noch die Konfiguration der Testsuite für den Lauf im Simulator angepasst werden.
+
+Zunächst muss der gewünschte Akteur einen Simulator verwenden:
+
+[source,yaml]
+----
+users:
+  - name: Alice
+    virtualEgkIccsn: 80276883110000113298
+    useVirtualEgk: true
+    device: iPhone 14 Pro Max Simulator
+----
+
+Mit der Konfiguration `virtualEgkIccsn` wird die ICCSN der virtuellen eGK konfiguriert. Verfügbare virtuelle eGKs und die dazugehörigen ICCSNs können im `smartcard`-Module in `src/main/resources/cardimages/images.json` eingesehen werden.
+
+Hier is im Wesentlichen ein Punkt zu beachten:
+- `useVirtualEGK: true` muss gesetzt werden, da ein Simulator **nicht** auf die NFC-Schnittstelle und eine echte eGK zugreifen kann
+
+Darüber hinaus verweist die Konfiguration `device` auf die tatsächliche Konfiguration des jeweiligen Endgerätes, welches für die Ausführung der App verwendet werden soll.
+
+[source,yaml]
+----
+devices:
+  - name: iPhone 14 Pro Max Simulator
+    platform: iOS
+    udid: CF5BE8A7-CBAE-4855-8E29-AFF4CFD45C6D
+    platformVersion: 16.0
+    appium: local
+----
+
+Unter dem Feld `udid` muss die korrekte UDID (und eventuell die `platformVersion`) aus dem vorherigen Schritt angepasst werden.
+
+Und, _last but not least_ muss noch die App selbst konfiguriert werden:
+
+[source,yaml]
+----
+apps:
+  - platform: iOS
+    appFile: eRPApp_simulator_3.xcarchive/Products/Applications/eRpApp.app
+    packageName: de.gematik.erp4ios.eRezept
+    maxWaitTimeout: 12000
+    pollingInterval: 50
+----
+
+Hier is im Wesentlichen ein Punkt zu beachten:
+- `appFile` setzt sich aus dem Namen der entpackten Simulator-App (in diesem Fall `eRPApp_simulator_3.xcarchive`) und dem Zusatz `Products/Applications/eRpApp.app` zusammen
+
+[CAUTION]
+Die Konfiguration des `appFile` ist hier im Grunde eine relative Pfad-Angabe, die an Appium von der Testsuite so weitergegeben wird. Deshalb sollte die Simulator-App `eRPApp_simulator_3.xcarchive` im Appium-Arbeitsverzeichnis (`<WORKDIR>`) liegen. Alternativ könnte man die Pfad-Angabe für das `appFile` auch absolut angeben.

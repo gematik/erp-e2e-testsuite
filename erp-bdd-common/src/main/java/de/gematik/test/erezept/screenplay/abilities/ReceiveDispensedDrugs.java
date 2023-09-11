@@ -16,19 +16,17 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.screenplay.util.ManagedList;
-import java.util.List;
-import net.serenitybdd.screenplay.Ability;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import net.serenitybdd.screenplay.*;
 
 public class ReceiveDispensedDrugs implements Ability {
 
   private final ManagedList<PrescriptionId> dispensedDrugs;
 
   public ReceiveDispensedDrugs() {
-    this.dispensedDrugs =
-        new ManagedList<>(new MissingPreconditionError("No Drugs were dispensed so far"));
+    this.dispensedDrugs = new ManagedList<>(() -> "No Drugs were dispensed so far");
   }
 
   public void append(PrescriptionId forPrescription) {

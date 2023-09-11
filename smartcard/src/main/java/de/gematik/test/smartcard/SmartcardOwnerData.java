@@ -34,6 +34,7 @@ public class SmartcardOwnerData {
   private String organizationUnit;
   private String street;
   private String locality;
+  private String postalCode;
   private String country;
 
   public String getOwnerName() {

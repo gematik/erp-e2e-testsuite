@@ -19,6 +19,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -39,5 +40,12 @@ class ManagePatientPrescriptionsTest {
     val mockBundle = mock(ErxPrescriptionBundle.class);
     ability.appendFullDetailedPrescription(mockBundle);
     assertFalse(ability.getFullDetailedPrescriptions().isEmpty());
+  }
+
+  @Test
+  void shouldThrowOnAccessingEmptyList() {
+    val ability = ManagePatientPrescriptions.itWorksWith();
+    val list = ability.getFullDetailedPrescriptions();
+    assertThrows(MissingPreconditionError.class, list::getFirst);
   }
 }

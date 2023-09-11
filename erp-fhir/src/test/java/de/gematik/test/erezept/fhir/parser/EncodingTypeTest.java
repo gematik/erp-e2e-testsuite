@@ -62,4 +62,10 @@ class EncodingTypeTest {
         input ->
             assertThrows(UnsupportedEncodingException.class, () -> EncodingType.fromString(input)));
   }
+
+  @Test
+  void shouldFlipEncoding() {
+    assertEquals(EncodingType.XML, EncodingType.JSON.flipEncoding());
+    assertEquals(EncodingType.JSON, EncodingType.XML.flipEncoding());
+  }
 }

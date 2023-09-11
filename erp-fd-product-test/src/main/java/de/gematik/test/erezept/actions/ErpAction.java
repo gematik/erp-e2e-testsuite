@@ -30,6 +30,6 @@ public abstract class ErpAction<R extends Resource> implements Question<ErpInter
   protected final ErpInteraction<R> performCommandAs(ICommand<R> cmd, Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val response = erpClient.request(cmd);
-    return new ErpInteraction<>(cmd, response);
+    return new ErpInteraction<>(response);
   }
 }

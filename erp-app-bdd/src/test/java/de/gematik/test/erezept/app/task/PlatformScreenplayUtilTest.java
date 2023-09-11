@@ -16,35 +16,40 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
 
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.questions.android.HasReceivedPrescriptionOnAndroid;
 import de.gematik.test.erezept.app.questions.ios.HasReceivedPrescriptionOnIos;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class PlatformScreenplayUtilTest {
+class PlatformScreenplayUtilTest {
 
   @Test
-  public void chooseTaskForPlatform() {
+  void chooseTaskForPlatform() {
+    val environment = new EnvironmentConfiguration();
+    environment.setName("RU");
+    
     val androidTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             PlatformType.ANDROID,
-            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV),
-            () -> new SetUpIosDevice(VersicherungsArtDeBasis.BG));
+            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV, null),
+            () -> new SetUpIosDevice(environment, VersicherungsArtDeBasis.BG, null));
     assertSame(androidTask.getClass(), SetUpAndroidDevice.class);
 
     val iosTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             PlatformType.IOS,
-            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV),
-            () -> new SetUpIosDevice(VersicherungsArtDeBasis.BG));
+            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV, null),
+            () -> new SetUpIosDevice(environment, VersicherungsArtDeBasis.BG, null));
     assertSame(iosTask.getClass(), SetUpIosDevice.class);
 
     assertThrows(
@@ -52,12 +57,12 @@ public class PlatformScreenplayUtilTest {
         () ->
             PlatformScreenplayUtil.chooseTaskForPlatform(
                 PlatformType.DESKTOP,
-                () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV),
-                () -> new SetUpIosDevice(VersicherungsArtDeBasis.BG)));
+                () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV, null),
+                () -> new SetUpIosDevice(environment, VersicherungsArtDeBasis.BG, null)));
   }
 
   @Test
-  public void chooseQuestionForPlatform() {
+  void chooseQuestionForPlatform() {
     val androidQuestion =
         PlatformScreenplayUtil.chooseQuestionForPlatform(
             PlatformType.ANDROID,

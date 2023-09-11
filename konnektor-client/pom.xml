@@ -5,11 +5,12 @@
   <parent>
     <artifactId>erezept-testsuite</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>konnektor-client</artifactId>
+  <name>Konnektor Client</name>
 
   <properties>
     <java.version>${version.java}</java.version>
@@ -19,66 +20,58 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${version.sl4j-api}</version>
+      <groupId>de.gematik.test.erezept</groupId>
+      <artifactId>erp-config-data</artifactId>
     </dependency>
     <dependency>
       <groupId>de.gematik.test.erezept</groupId>
       <artifactId>smartcard</artifactId>
-      <version>0.3.0</version>
       <type>jar</type>
     </dependency>
     <dependency>
       <groupId>de.gematik.test.erezept</groupId>
       <artifactId>erp-crypto</artifactId>
-      <version>0.3.0</version>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.ws</groupId>
       <artifactId>jaxws-ri</artifactId>
-      <version>2.3.5</version>
       <type>pom</type>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>${version.fasterxml.jackson}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${version.fasterxml.jackson}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.fasterxml.jackson}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>${version.fasterxml.jackson}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
-      <version>${version.bouncycastle}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-${artefact.bouncycastle}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcutil-${artefact.bouncycastle}</artifactId>
-      <version>${version.bouncycastle}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-${artefact.bouncycastle}</artifactId>
-      <version>${version.bouncycastle}</version>
     </dependency>
     <dependency>
       <groupId>eu.europa.ec.joinup.sd-dss</groupId>
       <artifactId>dss-cades</artifactId>
-      <version>${version.dss}</version>
       <exclusions>
         <exclusion>
           <groupId>org.bouncycastle</groupId>
@@ -89,27 +82,21 @@
     <dependency>
       <groupId>eu.europa.ec.joinup.sd-dss</groupId>
       <artifactId>dss-token</artifactId>
-      <version>${version.dss}</version>
     </dependency>
     <dependency>
       <groupId>eu.europa.ec.joinup.sd-dss</groupId>
       <artifactId>dss-utils-apache-commons</artifactId>
-      <version>${version.dss}</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.javafaker</groupId>
       <artifactId>javafaker</artifactId>
-      <version>${version.faker}</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- yes, I know: don't reference build-numbers... waiting for first release! -->
-    <!--        <dependency>-->
-    <!--            <groupId>de.gematik</groupId>-->
-    <!--            <artifactId>tiger-cats-extensions</artifactId>-->
-    <!--            <version>1.0.0-6</version>-->
-    <!--        </dependency>-->
+    <dependency>
+      <groupId>com.konghq</groupId>
+      <artifactId>unirest-java</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -136,7 +123,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>add-source</id>
@@ -164,8 +151,11 @@
             </goals>
             <configuration>
               <wsdlDirectory>
-                ${project.basedir}/../${project.artifactId}/src/main/resources/gematik_schemes
+                src/main/resources/gematik_schemes
               </wsdlDirectory>
+              <wsdlLocation>
+                /gematik_schemes/*
+              </wsdlLocation>
               <wsdlFiles>
                 <wsdlFile>conn/SignatureService_V7_5_5.wsdl</wsdlFile>
                 <wsdlFile>conn/EventService.wsdl</wsdlFile>
@@ -201,21 +191,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${version.maven-source-plugin}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
-
 </project>

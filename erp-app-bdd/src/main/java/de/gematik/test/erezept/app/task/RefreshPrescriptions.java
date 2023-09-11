@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.app.task;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.elements.Prescriptions;
+import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -28,7 +28,7 @@ public class RefreshPrescriptions implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
-    app.tap(Prescriptions.REFRESH_BUTTON);
+    app.tap(Mainscreen.REFRESH_BUTTON);
   }
 
   public static RefreshPrescriptions byTap() {

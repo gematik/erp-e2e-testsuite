@@ -18,6 +18,7 @@ package de.gematik.test.erezept.pspwsclient.config;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class PSPClientFactoryTest {
 
   @Test
   void shouldCreatePSPClient() {
-    PSPClientConfig pspClientConfig = new PSPClientConfig();
+    val pspClientConfig = new PSPClientConfig();
     pspClientConfig.setAuth("testAuth");
     pspClientConfig.setUrl("ws://TestUri");
     val pspClient = PSPClientFactory.create(pspClientConfig, "123");
@@ -34,7 +35,7 @@ class PSPClientFactoryTest {
 
   @Test
   void shouldCreatePSPClientWithoutAuth() {
-    PSPClientConfig pspClientConfig = new PSPClientConfig();
+    val pspClientConfig = new PSPClientConfig();
     pspClientConfig.setAuth("");
     pspClientConfig.setUrl("ws://TestUri");
     val pspClient = PSPClientFactory.create(pspClientConfig, "123");
@@ -43,7 +44,7 @@ class PSPClientFactoryTest {
 
   @Test
   void shouldCreatePSPClientWithoutAuth2() {
-    PSPClientConfig pspClientConfig = new PSPClientConfig();
+    val pspClientConfig = new PSPClientConfig();
     pspClientConfig.setUrl("ws://TestUri");
     val pspClient = PSPClientFactory.create(pspClientConfig, "123");
     assertFalse(pspClient.hasMessage());

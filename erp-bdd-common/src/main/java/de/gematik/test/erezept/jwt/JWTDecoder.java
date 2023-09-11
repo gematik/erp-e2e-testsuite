@@ -16,29 +16,59 @@
 
 package de.gematik.test.erezept.jwt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import de.gematik.test.erezept.exceptions.JWTDecoderException;
 import java.util.Base64;
 import lombok.SneakyThrows;
 import lombok.val;
 
 public class JWTDecoder {
 
-  private JWTDecoder() {
-    throw new AssertionError("Do not instantiate this utility-class");
+  private final ObjectMapper objectMapper;
+  private final ObjectWriter writer;
+
+  private JWTDecoder(boolean pretty) {
+    this.objectMapper = new ObjectMapper();
+    if (pretty) {
+      this.writer = this.objectMapper.writerWithDefaultPrettyPrinter();
+    } else {
+      this.writer = this.objectMapper.writer();
+    }
   }
 
-  @SneakyThrows
-  public static Token decode(String token) {
-    String[] chunks = token.split("\\.");
-    Base64.Decoder decoder = Base64.getUrlDecoder();
+  public static JWTDecoder withPrettyPrinter() {
+    return new JWTDecoder(true);
+  }
+
+  public static JWTDecoder withCompactWriter() {
+    return new JWTDecoder(false);
+  }
+
+  public Token decode(String token) {
+    val chunks = token.split("\\.");
+    val decoder = Base64.getUrlDecoder();
+
+    if (chunks.length != 3) {
+      throw new JWTDecoderException(token);
+    }
 
     String header = new String(decoder.decode(chunks[0]));
     String payload = new String(decoder.decode(chunks[1]));
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    val jwtHeader = objectMapper.readValue(header, JWTHeader.class);
-    val jwtPayload = objectMapper.readValue(payload, JWTPayload.class);
+    try {
+      val jwtHeader = objectMapper.readValue(header, JWTHeader.class);
+      val jwtPayload = objectMapper.readValue(payload, JWTPayload.class);
+      return new Token(jwtHeader, jwtPayload);
+    } catch (JsonProcessingException jpe) {
+      throw new JWTDecoderException(token, jpe);
+    }
+  }
 
-    return new Token(jwtHeader, jwtPayload);
+  @SneakyThrows
+  public String decodeToJson(String token) {
+    val tokenObj = decode(token);
+    return writer.writeValueAsString(tokenObj);
   }
 }

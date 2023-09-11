@@ -20,6 +20,22 @@
         <extension url="Kennzeichen">
             <valueBoolean value="true" />
         </extension>
+        <extension url="Nummerierung">
+            <valueRatio>
+                <numerator>
+                    <value value="4" />
+                </numerator>
+                <denominator>
+                    <value value="4" />
+                </denominator>
+            </valueRatio>
+        </extension>
+        <extension url="Zeitraum">
+            <valuePeriod>
+                <start value="2021-10-01" />
+                <end value="2022-11-02" />
+            </valuePeriod>
+        </extension>
     </extension>
     <status value="active" />
     <intent value="order" />

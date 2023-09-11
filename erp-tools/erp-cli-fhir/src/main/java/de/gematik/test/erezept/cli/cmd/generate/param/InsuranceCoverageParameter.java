@@ -18,10 +18,12 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.references.kbv.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.DynamicInsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import lombok.*;
 import picocli.*;
 
@@ -36,11 +38,19 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
   private String iknr;
 
   @CommandLine.Option(
-      names = {"--insurance"},
+      names = {"--insurance", "--insurance-name"},
       paramLabel = "<NAME>",
       type = String.class,
       description = "The name of the health insurance organization")
   private String insuranceName;
+
+  @CommandLine.Option(
+      names = {"--coverage-type"},
+      paramLabel = "<TYPE>",
+      type = VersicherungsArtDeBasis.class,
+      description =
+          "The Type of the Insurance from ${COMPLETION-CANDIDATES} for the Coverage-Section")
+  private VersicherungsArtDeBasis versicherungsArt;
 
   @CommandLine.Option(
       names = {"--group", "--pg"},
@@ -74,8 +84,35 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
 
   @Setter private KbvPatient patient;
 
-  public String getIknr() {
-    return getOrDefault(iknr, GemFaker::fakerIknr);
+  private Optional<InsuranceCoverageInfo> getInsuranceInfoFor() {
+    Optional<InsuranceCoverageInfo> ret = Optional.empty();
+
+    val typeOption = Optional.ofNullable(versicherungsArt).flatMap(VersicherungsArtDeBasis::getCoverageOptions);
+
+    if (iknr != null && insuranceName == null && typeOption.isEmpty()) {
+      // when only IKNR given, try to guess the name from all known
+      ret = InsuranceCoverageInfo.getByIknr(iknr);
+    } else if (iknr != null && typeOption.isPresent()) {
+      // when IKNR and insurance type is known
+      ret = InsuranceCoverageInfo.getByIknr(typeOption.get(), iknr);
+    } else if (iknr != null) {
+      // when IKNR and insuranceName are given simply use this information
+      ret =
+          Optional.of(
+              DynamicInsuranceCoverageInfo.named(getInsuranceName())
+                  .ofType(getInsuranceType())
+                  .withIknr(iknr));
+    } else if (typeOption.isPresent()) {
+      // when only the type is given choose a random one
+      var rndCov = GemFaker.randomElement(typeOption.get().getEnumConstants());
+      if (insuranceName != null) {
+        // overwrite the name if one was given
+        rndCov = DynamicInsuranceCoverageInfo.named(insuranceName).ofType(versicherungsArt).withIknr(rndCov.getIknr());
+      }
+      ret = Optional.of(rndCov);
+    }
+      
+      return ret;
   }
 
   public String getInsuranceName() {
@@ -84,6 +121,18 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
 
   public PersonGroup getPersonGroup() {
     return getOrDefault(personGroup, () -> GemFaker.fakerValueSet(PersonGroup.class));
+  }
+
+  public VersicherungsArtDeBasis getInsuranceType() {
+    return getOrDefault(
+        versicherungsArt,
+        () ->
+            GemFaker.fakerValueSet(
+                VersicherungsArtDeBasis.class,
+                List.of(
+                    VersicherungsArtDeBasis.PPV,
+                    VersicherungsArtDeBasis.SEL,
+                    VersicherungsArtDeBasis.SOZ)));
   }
 
   public DmpKennzeichen getDmp() {
@@ -98,22 +147,22 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
     return getOrDefault(status, () -> GemFaker.fakerValueSet(VersichertenStatus.class));
   }
 
+  private KbvPatient getPatient() {
+    return getOrDefault(patient, () -> PatientBuilder.faker(this.getInsuranceType()).build());
+  }
+
   public KbvCoverage createCoverage() {
-    val builder =
-        KbvCoverageBuilder.insurance(getIknr(), getInsuranceName())
-            .personGroup(getPersonGroup())
-            .dmpKennzeichen(getDmp())
-            .wop(getWop())
-            .versichertenStatus(getStatus());
-
-    if (patient != null) {
-      builder.beneficiary(patient);
-    } else {
-      builder.beneficiary(new SubjectReference(UUID.randomUUID().toString()));
-      builder.versicherungsArt(
-          GemFaker.randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV));
-    }
-
-    return builder.build();
+    val thePatient = getPatient();
+    val givenInsuranceType =
+        versicherungsArt != null ? versicherungsArt : thePatient.getInsuranceKind();
+    val determinedInsuranceType =
+        getInsuranceInfoFor().orElse(InsuranceCoverageInfo.randomFor(givenInsuranceType));
+    return KbvCoverageBuilder.insurance(determinedInsuranceType)
+        .personGroup(getPersonGroup())
+        .dmpKennzeichen(getDmp())
+        .wop(getWop())
+        .versichertenStatus(getStatus())
+        .beneficiary(thePatient.getReference())
+        .build();
   }
 }

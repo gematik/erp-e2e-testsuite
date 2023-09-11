@@ -16,14 +16,12 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
-import java.util.Objects;
-import lombok.Getter;
-import lombok.val;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Reference;
+import de.gematik.test.erezept.fhir.parser.profiles.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
 
 @Getter
 public abstract class Value<T> {
@@ -67,7 +65,7 @@ public abstract class Value<T> {
   public Identifier asIdentifier(IWithSystem system) {
     return new Identifier()
         .setSystem(system.getCanonicalUrl())
-        .setValue(this.getValue().toString());
+        .setValue(format("{0}", this.getValue()));
   }
 
   public Reference asReference() {
@@ -89,6 +87,8 @@ public abstract class Value<T> {
 
   @Override
   public String toString() {
-    return format("{0}({1})", this.getClass().getSimpleName(), this.value);
+    return format(
+        "{0}(System: {1} Value: {2})",
+        this.getClass().getSimpleName(), this.system.getCanonicalUrl(), this.value);
   }
 }

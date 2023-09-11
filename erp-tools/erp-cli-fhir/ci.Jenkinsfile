@@ -9,7 +9,7 @@ String DOCKER_LATEST_TAG = 'latest'
 
 // Project-specific
 String IMAGE_NAME = 'erezept/erp-cli-fhir'
-String DOCKER_TAG = '0.3.0-SNAPSHOT'    // TODO: retrieve from JIRA/GitLab
+String APP_VERSION = '0.4.0-SNAPSHOT'    // TODO: retrieve from JIRA/GitLab
 
 pipeline {
     options {
@@ -40,17 +40,16 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                dockerBuild(IMAGE_NAME, DOCKER_TAG, params.IMAGE_VERSION, '', DOCKER_FILE, dockerGetGematikRegistry(), DOCKER_BUILD_DIR)
+                dockerBuild(IMAGE_NAME, DOCKER_LATEST_TAG, APP_VERSION, '', DOCKER_FILE, dockerGetGematikRegistry(), DOCKER_BUILD_DIR)
             }
         }
 
         stage('Docker Push') {
             steps {
-                dockerPushImage(IMAGE_NAME, DOCKER_TAG)
-                // Retag as 'latest'
-                dockerReTagImage(IMAGE_NAME, DOCKER_LATEST_TAG, DOCKER_TAG)
                 dockerPushImage(IMAGE_NAME, DOCKER_LATEST_TAG)
-                dockerRemoveLocalImage(IMAGE_NAME, DOCKER_LATEST_TAG)
+                // Retag as 'latest'
+                dockerReTagImage(IMAGE_NAME, params.IMAGE_VERSION, DOCKER_LATEST_TAG)
+                dockerPushImage(IMAGE_NAME, params.IMAGE_VERSION)
             }
         }
         stage('Publish Documentation') {
@@ -79,7 +78,8 @@ pipeline {
     post {
         always {
             sh 'docker rm erpf-doc'
-            dockerRemoveLocalImage(IMAGE_NAME, DOCKER_TAG)
+            dockerRemoveLocalImage(IMAGE_NAME, params.IMAGE_VERSION)
+            dockerRemoveLocalImage(IMAGE_NAME, DOCKER_LATEST_TAG)
         }
     }
 }

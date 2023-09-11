@@ -16,42 +16,31 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ConsentDeleteCommandTest {
 
-  private String resourceId;
   private ConsentDeleteCommand consentDeleteCommand;
 
   @BeforeEach
   void setupResourceId() {
-    this.resourceId = "123456123123";
-    this.consentDeleteCommand = new ConsentDeleteCommand(resourceId);
+    this.consentDeleteCommand = new ConsentDeleteCommand();
   }
 
   @Test
   void requestLocatorStartsWithSlash() {
-    var requestString = consentDeleteCommand.getRequestLocator();
+    val requestString = consentDeleteCommand.getRequestLocator();
     assertTrue(requestString.startsWith("/"));
   }
 
   @Test
-  void requestLocatorCorrectID() {
-    var requestString = consentDeleteCommand.getRequestLocator();
-    var requestStringArray = requestString.split("/");
-    assertEquals(resourceId, requestStringArray[2]);
-  }
-
-  @Test
-  void getRequestLocatorSecondEntryIsConsentTest() {
-    var requestString = consentDeleteCommand.getRequestLocator();
-    var requestStringArray = requestString.split("/");
-    assertEquals("Consent", requestStringArray[1]);
+  void shouldContainCategory() {
+    assertTrue(consentDeleteCommand.getRequestLocator().contains("?category=CHARGCONS"));
+    assertTrue(consentDeleteCommand.getRequestLocator().contains("/Consent"));
   }
 
   @Test

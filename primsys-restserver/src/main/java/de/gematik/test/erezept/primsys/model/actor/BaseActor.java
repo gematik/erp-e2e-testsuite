@@ -20,7 +20,9 @@ import de.gematik.test.erezept.client.*;
 import de.gematik.test.erezept.client.cfg.*;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.primsys.rest.data.*;
 import de.gematik.test.smartcard.*;
 import java.math.*;
@@ -29,43 +31,45 @@ import java.security.*;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
 
+@Getter
 public abstract class BaseActor {
 
-  @Getter private final String name;
-  @Getter private final String identifier;
-  @Getter private ActorRole role;
-  @Getter private final ErpClient client;
-  @Getter private SmcB smcb;
+  private final String name;
+  private final String identifier;
+  private final ErpClient client;
+  private final ActorRole role;
+  private final SmcB smcb;
 
   protected BaseActor(DoctorConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
-    this(cfg, env);
+    this.name = cfg.getName();
+    this.identifier = createIdentifier(this.name);
     this.role = ActorRole.DOCTOR;
     this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+
+    this.client = ErpClientFactory.createErpClient(env, cfg);
     this.client.authenticateWith(smcb);
   }
 
   protected BaseActor(
       PharmacyConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
-    this(cfg, env);
+    this.name = cfg.getName();
+    this.identifier = createIdentifier(this.name);
     this.role = ActorRole.PHARMACY;
     this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+
+    this.client = ErpClientFactory.createErpClient(env, cfg);
     this.client.authenticateWith(smcb);
   }
 
-  @SneakyThrows
-  private BaseActor(ActorConfiguration cfg, EnvironmentConfiguration env) {
-    this.name = cfg.getName();
-    val erpClientConfig = cfg.toErpClientConfig(env, ClientType.PS);
-    this.client = ErpClientFactory.createErpClient(erpClientConfig);
-
-    val md = MessageDigest.getInstance("MD5"); // NOSONAR no cryptography involved here!
-    this.identifier =
-        new BigInteger(1, md.digest(this.name.getBytes(StandardCharsets.UTF_8))).toString(16);
-  }
-
-  public final <R extends Resource> ErpResponse erpRequest(final ICommand<R> command) {
+  public final <R extends Resource> ErpResponse<R> erpRequest(final ICommand<R> command) {
     return this.client.request(command);
   }
 
   public abstract ActorData getBaseData();
+
+  @SneakyThrows
+  private static String createIdentifier(String name) {
+    val md = MessageDigest.getInstance("MD5"); // NOSONAR no cryptography involved here!
+    return new BigInteger(1, md.digest(name.getBytes(StandardCharsets.UTF_8))).toString(16);
+  }
 }

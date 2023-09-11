@@ -16,19 +16,19 @@
 
 package de.gematik.test.erezept.fhir.references.kbv;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
+import de.gematik.test.erezept.fhir.references.CustomReferenceProvider;
 import org.hl7.fhir.r4.model.Reference;
 
-@DatatypeDef(name = "Reference")
-@SuppressWarnings({"java:S110"})
-public class RequesterReference extends Reference {
+public class RequesterReference extends CustomReferenceProvider {
 
   public static final String REQUESTER_PREFIX = "Practitioner";
 
-  public RequesterReference(String referenceId) {
-    super(
-        referenceId.startsWith(REQUESTER_PREFIX)
-            ? referenceId
-            : REQUESTER_PREFIX + "/" + referenceId);
+  public RequesterReference(String referenceValue) {
+    super(REQUESTER_PREFIX, referenceValue);
+  }
+
+  @Override
+  public Reference asReference() {
+    return new Reference(this.referenceValue);
   }
 }

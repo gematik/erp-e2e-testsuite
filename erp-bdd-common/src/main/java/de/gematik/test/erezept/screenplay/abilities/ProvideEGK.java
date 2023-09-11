@@ -18,6 +18,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.smartcard.Egk;
 import lombok.Getter;
 import net.serenitybdd.screenplay.Ability;
@@ -30,8 +31,8 @@ public class ProvideEGK implements Ability {
     this.egk = egk;
   }
 
-  public String getKvnr() {
-    return egk.getKvnr();
+  public KVNR getKvnr() {
+    return KVNR.from(egk.getKvnr());
   }
 
   public static ProvideEGK sheOwns(Egk egk) {
@@ -45,7 +46,7 @@ public class ProvideEGK implements Ability {
   @Override
   public String toString() {
     return format(
-        "Elektronische Gesundheitskarte (ICCSN {0}) für die KVID {1}",
+        "Elektronische Gesundheitskarte (ICCSN {0}) für die KVNR {1}",
         egk.getIccsn(), egk.getKvnr());
   }
 }

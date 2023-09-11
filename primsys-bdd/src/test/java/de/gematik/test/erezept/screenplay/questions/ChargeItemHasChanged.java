@@ -18,7 +18,6 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -38,13 +37,20 @@ public class ChargeItemHasChanged implements Question<Boolean> {
     val chargeItemAbility = SafeAbility.getAbility(actor, ManageChargeItems.class);
     val myChargeItem = deque.chooseFrom(chargeItemAbility.getChargeItems());
 
-    val getResponse = ResponseOfGetChargeItem.forPrescription(deque).asPatient().answeredBy(actor);
-    val fdChargeItem = getResponse.getResource(ErxChargeItem.class);
+    val question = ResponseOfGetChargeItemBundle.forPrescription(deque).asPatient();
+    val getResponse = question.answeredBy(actor);
+    val fdChargeItemBundle = getResponse.getExpectedResource();
+    val fdChargeItem = fdChargeItemBundle.getChargeItem();
     assertEquals(myChargeItem.getPrescriptionId(), fdChargeItem.getPrescriptionId());
 
-    return !((myChargeItem.hasSubsidy() == fdChargeItem.hasSubsidy())
-        && (myChargeItem.hasTaxOffice() == fdChargeItem.hasTaxOffice())
-        && (myChargeItem.hasInsuranceProvider() == fdChargeItem.hasInsuranceProvider()));
+    // for now, check only if the accesscode has changed!
+    return !(myChargeItem.getAccessCode().orElse(null)
+        == fdChargeItem.getAccessCode().orElse(null));
+  }
+
+  @Override
+  public String getSubject() {
+    return "Prüfe, ob das ChargeItem geändert wurde";
   }
 
   public static ChargeItemHasChanged forPrescription(String order) {

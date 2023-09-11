@@ -19,7 +19,9 @@ package de.gematik.test.erezept.primsys.rest.data;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static de.gematik.test.erezept.primsys.utils.Strings.getOrDefault;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.primsys.utils.Strings;
 import java.text.SimpleDateFormat;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,7 +34,9 @@ public class PatientData {
 
   private static final String DATE_FORMAT = "dd.MM.yyyy";
 
+  @JsonAlias(value = "kvid")
   private String kvnr;
+
   private String firstName;
   private String lastName;
   private String birthDate;
@@ -84,7 +88,7 @@ public class PatientData {
 
   public static PatientData create() {
     val p = new PatientData();
-    p.kvnr = fakerKvid();
+    p.kvnr = KVNR.random().getValue();
     p.firstName = fakerFirstName();
     p.lastName = fakerLastName();
     p.birthDate = new SimpleDateFormat(DATE_FORMAT).format(fakerBirthday());
@@ -95,7 +99,7 @@ public class PatientData {
   }
 
   public void fakeMissing() {
-    this.kvnr = getOrDefault(this.kvnr, fakerKvid());
+    this.kvnr = getOrDefault(this.kvnr, KVNR.random().getValue());
     this.firstName = getOrDefault(this.firstName, fakerFirstName());
     this.lastName = getOrDefault(this.lastName, fakerLastName());
     this.birthDate =
@@ -107,7 +111,7 @@ public class PatientData {
 
   public static PatientData fromKbvBundle(KbvErpBundle bundle) {
     val p = new PatientData();
-    p.kvnr = bundle.getKvid();
+    p.kvnr = bundle.getKvnr().getValue();
     p.firstName = bundle.getPatientGivenName();
     p.lastName = bundle.getPatientFamilyName();
     p.birthDate = new SimpleDateFormat(DATE_FORMAT).format(bundle.getPatientBirthDate());

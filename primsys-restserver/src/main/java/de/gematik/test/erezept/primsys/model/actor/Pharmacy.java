@@ -16,21 +16,27 @@
 
 package de.gematik.test.erezept.primsys.model.actor;
 
-import de.gematik.test.erezept.lei.cfg.EnvironmentConfiguration;
-import de.gematik.test.erezept.lei.cfg.PharmacyConfiguration;
-import de.gematik.test.erezept.primsys.rest.data.PharmacyData;
-import de.gematik.test.erezept.primsys.rest.data.TelematikData;
-import de.gematik.test.smartcard.SmartcardArchive;
-import lombok.val;
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.primsys.rest.data.*;
+import de.gematik.test.konnektor.*;
+import de.gematik.test.konnektor.commands.*;
+import de.gematik.test.smartcard.*;
+import lombok.*;
 
 public class Pharmacy extends BaseActor {
 
-  private final PharmacyConfiguration cfg;
+  private final Konnektor konnektor;
+  private final CardInfo smcbHandle;
   private final PharmacyData baseData;
 
-  public Pharmacy(PharmacyConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
+  public Pharmacy(
+      PharmacyConfiguration cfg,
+      EnvironmentConfiguration env,
+      Konnektor konnektor,
+      SmartcardArchive sca) {
     super(cfg, env, sca);
-    this.cfg = cfg;
 
     baseData = new PharmacyData();
     baseData.setId(this.getIdentifier());
@@ -38,11 +44,14 @@ public class Pharmacy extends BaseActor {
     baseData.setType(ActorRole.PHARMACY.getReadable());
     baseData.setName(cfg.getName());
 
-    val ti = new TelematikData();
-    ti.setFachdienst(env.getTi().getFdBaseUrl());
-    ti.setDiscoveryDocument(env.getTi().getDiscoveryDocumentUrl());
-    ti.setTsl(env.getTslBaseUrl());
-    baseData.setTi(ti);
+    this.konnektor = konnektor;
+    this.smcbHandle =
+        konnektor.execute(GetCardHandleCommand.forSmartcard(this.getSmcb())).getPayload();
+  }
+
+  public byte[] signDocument(String document) {
+    val signCmd = new SignXMLDocumentCommand(smcbHandle, document);
+    return konnektor.execute(signCmd).getPayload();
   }
 
   @Override

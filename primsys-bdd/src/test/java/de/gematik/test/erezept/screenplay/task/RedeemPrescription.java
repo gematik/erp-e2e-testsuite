@@ -80,7 +80,7 @@ public class RedeemPrescription implements Task {
       val message = "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
 
       communicationBuilder.medication(prescription.getKbvBundle().getMedication());
-      communicationBuilder.basedOnTaskId(prescription.getTask().getUnqualifiedId());
+      communicationBuilder.basedOnTaskId(prescription.getTask().getTaskId());
       communication = communicationBuilder.buildInfoReq(message);
     } else {
       // TODO replace values
@@ -89,7 +89,7 @@ public class RedeemPrescription implements Task {
               + "\"address\": [ \"wohnhaft bei Emilia Fischer\", \"Bundesallee 312\", \"123. OG\", \"12345 Berlin\" ], "
               + "\"hint\": \"Bitte im Morsecode klingeln: -.-.\", \"phone\": \"004916094858168\" }";
       communicationBuilder.basedOnTask(
-          prescription.getTask().getUnqualifiedId(), prescription.getTask().getAccessCode());
+          prescription.getTask().getTaskId(), prescription.getTask().getAccessCode());
       communication = communicationBuilder.buildDispReq(message);
     }
 
@@ -97,7 +97,7 @@ public class RedeemPrescription implements Task {
     val communicationCmd = new CommunicationPostCommand(communication);
 
     try {
-      erpClientAbility.request(communicationCmd).getResource(ErxCommunication.class);
+      erpClientAbility.request(communicationCmd).getExpectedResource();
     } catch (UnexpectedResponseResourceError urre) {
       log.warn(
           format(

@@ -26,5 +26,4 @@ public class ActorData {
   private String type;
   private String name;
   private String id;
-  private TelematikData ti;
 }

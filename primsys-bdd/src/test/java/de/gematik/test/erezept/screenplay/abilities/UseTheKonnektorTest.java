@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import de.gematik.test.cardterminal.*;
 import de.gematik.test.erezept.lei.exceptions.*;
 import de.gematik.test.konnektor.*;
 import de.gematik.test.konnektor.cfg.*;
@@ -49,10 +50,11 @@ class UseTheKonnektorTest {
     val hba = sca.getHbaCards().get(0);
     val konnektor = mock(Konnektor.class);
     val hbaHandle =
-        CardHandle.builder()
+        CardInfo.builder()
             .type(SmartcardType.SMC_B)
             .handle("handle")
             .iccsn(hba.getIccsn())
+            .ctId("Ct01")
             .build();
     when(konnektor.execute(any(GetCardHandleCommand.class)))
         .thenReturn(new KonnektorResponse<>(hbaHandle));
@@ -69,9 +71,10 @@ class UseTheKonnektorTest {
     val konnektor = mock(Konnektor.class);
 
     val smcbHandle =
-        CardHandle.builder()
+        CardInfo.builder()
             .type(SmartcardType.SMC_B)
             .handle("handle")
+            .ctId("Ct01")
             .iccsn(smcb.getIccsn())
             .build();
     val pinResponse = new PinResponseType();
@@ -92,9 +95,10 @@ class UseTheKonnektorTest {
     val konnektor = mock(Konnektor.class);
 
     val smcbHandle =
-        CardHandle.builder()
+        CardInfo.builder()
             .type(SmartcardType.SMC_B)
             .handle("handle")
+            .ctId("Ct01")
             .iccsn(smcb.getIccsn())
             .build();
     val pinResponse = new PinResponseType();
@@ -146,7 +150,7 @@ class UseTheKonnektorTest {
     val ability = UseTheKonnektor.with(smcb).on(konnektor);
 
     val evidence = ability.requestEvidenceForEgk(egk);
-    assertTrue(evidence.isPresent());
+    assertNotNull(evidence);
   }
 
   @Test

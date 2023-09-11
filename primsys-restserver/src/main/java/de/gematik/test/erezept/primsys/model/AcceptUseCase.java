@@ -18,6 +18,7 @@ package de.gematik.test.erezept.primsys.model;
 
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
 import de.gematik.test.erezept.primsys.rest.data.AcceptData;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
@@ -33,15 +34,15 @@ public class AcceptUseCase {
   }
 
   public static Response acceptPrescription(Pharmacy actor, String taskId, String accessCode) {
-    return acceptPrescription(actor, taskId, new AccessCode(accessCode));
+    return acceptPrescription(actor, TaskId.from(taskId), new AccessCode(accessCode));
   }
 
-  public static Response acceptPrescription(Pharmacy actor, String taskId, AccessCode accessCode) {
+  public static Response acceptPrescription(Pharmacy actor, TaskId taskId, AccessCode accessCode) {
     val acceptCommand = new TaskAcceptCommand(taskId, accessCode);
     val acceptResponse = actor.erpRequest(acceptCommand);
     val acceptedTask =
         acceptResponse
-            .getResourceOptional(acceptCommand.expectedResponseBody())
+            .getResourceOptional()
             .orElseThrow(
                 () ->
                     new WebApplicationException(
@@ -50,7 +51,7 @@ public class AcceptUseCase {
                             .build()));
 
     val acceptData = new AcceptData();
-    acceptData.setTaskId(acceptedTask.getTask().getUnqualifiedId());
+    acceptData.setTaskId(acceptedTask.getTask().getTaskId().getValue());
     acceptData.setAccessCode(acceptedTask.getTask().getAccessCode().getValue());
     acceptData.setSecret(acceptedTask.getSecret().getValue());
     acceptData.setKbvBundle(acceptedTask.getKbvBundleAsString());

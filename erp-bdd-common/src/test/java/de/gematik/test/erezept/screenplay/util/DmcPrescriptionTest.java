@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -27,13 +28,13 @@ class DmcPrescriptionTest {
 
   @Test
   void shouldGenerateDmcAsOwner() {
-    val dmc = DmcPrescription.ownerDmc("taskId", AccessCode.random());
+    val dmc = DmcPrescription.ownerDmc(TaskId.from("taskId"), AccessCode.random());
     assertFalse(dmc.isRepresentative());
   }
 
   @Test
   void shouldGenerateDmcAsRepresentative() {
-    val dmc = DmcPrescription.representativeDmc("taskId", AccessCode.random());
+    val dmc = DmcPrescription.representativeDmc(TaskId.from("taskId"), AccessCode.random());
     assertTrue(dmc.isRepresentative());
   }
 }

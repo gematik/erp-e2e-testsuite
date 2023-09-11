@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.screenplay.util;
 
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -24,7 +25,7 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class DmcPrescription {
 
-  private final String taskId;
+  private final TaskId taskId;
   private final AccessCode accessCode;
   private final boolean representative;
 
@@ -35,17 +36,17 @@ public class DmcPrescription {
    * @param accessCode is the AccessCode of the Prescription
    * @param representative indicates if the owner of this object has this DMC as representative
    */
-  private DmcPrescription(String taskId, AccessCode accessCode, boolean representative) {
+  private DmcPrescription(TaskId taskId, AccessCode accessCode, boolean representative) {
     this.taskId = taskId;
     this.accessCode = accessCode;
     this.representative = representative;
   }
 
-  public static DmcPrescription ownerDmc(String taskId, AccessCode accessCode) {
+  public static DmcPrescription ownerDmc(TaskId taskId, AccessCode accessCode) {
     return new DmcPrescription(taskId, accessCode, false);
   }
 
-  public static DmcPrescription representativeDmc(String taskId, AccessCode accessCode) {
+  public static DmcPrescription representativeDmc(TaskId taskId, AccessCode accessCode) {
     return new DmcPrescription(taskId, accessCode, true);
   }
 }

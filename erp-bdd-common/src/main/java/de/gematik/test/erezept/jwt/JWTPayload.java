@@ -17,8 +17,9 @@
 package de.gematik.test.erezept.jwt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class JWTPayload {
@@ -32,9 +33,6 @@ public class JWTPayload {
 
   private List<String> amr;
   private String iss;
-
-  @JsonProperty("given_name")
-  private String givenName;
 
   @JsonProperty("client_id")
   private String clientId;
@@ -51,6 +49,11 @@ public class JWTPayload {
 
   @JsonProperty("family_name")
   private String familyName;
+  @JsonProperty("given_name")
+  private String givenName;
+
+  @JsonProperty("display_name")
+  private String displayName;
 
   private long iat;
   private String jti;

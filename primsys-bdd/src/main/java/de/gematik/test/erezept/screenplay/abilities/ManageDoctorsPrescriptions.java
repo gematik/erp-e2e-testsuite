@@ -16,13 +16,12 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.screenplay.util.ManagedList;
-import lombok.Getter;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import lombok.*;
 import lombok.experimental.Delegate;
-import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.screenplay.Ability;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 /**
  * This ability is intended to be used by the Doctor-Actor for managing it's issued Prescriptions
@@ -33,8 +32,7 @@ public class ManageDoctorsPrescriptions implements Ability {
   @Getter @Delegate private final ManagedList<ErxTask> prescriptions;
 
   private ManageDoctorsPrescriptions() {
-    this.prescriptions =
-        new ManagedList<>(new MissingPreconditionError("No Prescriptions were issued so far"));
+    this.prescriptions = new ManagedList<>(() -> "No Prescriptions were issued so far");
   }
 
   public static ManageDoctorsPrescriptions sheIssued() {

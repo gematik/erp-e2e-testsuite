@@ -19,13 +19,14 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 public class TaskAcceptCommand extends BaseCommand<ErxAcceptBundle> {
 
-  public TaskAcceptCommand(String taskId, AccessCode accessCode) {
-    super(ErxAcceptBundle.class, HttpRequestMethod.POST, "Task", taskId);
+  public TaskAcceptCommand(TaskId taskId, AccessCode accessCode) {
+    super(ErxAcceptBundle.class, HttpRequestMethod.POST, "Task", taskId.getValue());
 
     this.headerParameters.put("X-AccessCode", accessCode.getValue());
   }

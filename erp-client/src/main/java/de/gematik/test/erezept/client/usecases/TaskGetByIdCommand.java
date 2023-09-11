@@ -21,27 +21,28 @@ import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.hl7.fhir.r4.model.Resource;
 
 public class TaskGetByIdCommand extends BaseCommand<ErxPrescriptionBundle> {
 
-  public TaskGetByIdCommand(String taskId) {
+  public TaskGetByIdCommand(TaskId taskId) {
     this(taskId, null, null);
   }
 
-  public TaskGetByIdCommand(String taskId, AccessCode accessCode) {
+  public TaskGetByIdCommand(TaskId taskId, AccessCode accessCode) {
     this(taskId, accessCode, null);
   }
 
-  public TaskGetByIdCommand(String taskId, Secret secret) {
+  public TaskGetByIdCommand(TaskId taskId, Secret secret) {
     this(taskId, null, secret);
   }
 
   private TaskGetByIdCommand(
-      String taskId, @Nullable AccessCode accessCode, @Nullable Secret secret) {
-    super(ErxPrescriptionBundle.class, HttpRequestMethod.GET, "Task", taskId);
+      TaskId taskId, @Nullable AccessCode accessCode, @Nullable Secret secret) {
+    super(ErxPrescriptionBundle.class, HttpRequestMethod.GET, "Task", taskId.getValue());
 
     if (accessCode != null) {
       this.headerParameters.put("X-AccessCode", accessCode.getValue());

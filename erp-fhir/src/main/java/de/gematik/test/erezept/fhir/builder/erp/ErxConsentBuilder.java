@@ -22,6 +22,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
 import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.ActCode;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
 import de.gematik.test.erezept.fhir.valuesets.ConsentType;
@@ -33,16 +34,21 @@ import org.hl7.fhir.r4.model.*;
 public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder> {
 
   private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
-  private String kvid;
+  private KVNR kvnr;
   private ActCode policyRule = ActCode.OPTIN;
   private Consent.ConsentState status = Consent.ConsentState.ACTIVE;
   private ConsentScope scope = ConsentScope.PATIENT_PRIVACY;
-  private ConsentType consentType = ConsentType.CHARGCONS;
+  private static final ConsentType CONSENT_TYPE = ConsentType.CHARGCONS;
 
-  public static ErxConsentBuilder forKvid(String kvid) {
+  public static ErxConsentBuilder forKvnr(KVNR kvnr) {
     val builder = new ErxConsentBuilder();
-    builder.kvid = kvid;
+    builder.kvnr = kvnr;
     return builder;
+  }
+
+  public ErxConsentBuilder version(ErpWorkflowVersion version) {
+    this.erpWorkflowVersion = version;
+    return self();
   }
 
   public ErxConsentBuilder policyRule(ActCode policyRule) {
@@ -64,17 +70,17 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
     val consent = new ErxConsent();
 
     CanonicalType profile;
-    INamingSystem kvidNamingSystem;
+    INamingSystem kvnrNamingSystem;
     ICodeSystem consentTypeCodeSystem;
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       profile = ErpWorkflowStructDef.CONSENT.asCanonicalType();
-      kvidNamingSystem = DeBasisNamingSystem.KVID;
+      kvnrNamingSystem = DeBasisNamingSystem.KVID;
       consentTypeCodeSystem = ErpWorkflowCodeSystem.CONSENT_TYPE;
     } else {
       profile =
           PatientenrechnungStructDef.GEM_ERPCHRG_PR_CONSENT.asCanonicalType(
               PatientenrechnungVersion.V1_0_0, true);
-      kvidNamingSystem = DeBasisNamingSystem.KVID_PKV;
+      kvnrNamingSystem = DeBasisNamingSystem.KVID_PKV;
       consentTypeCodeSystem = PatientenrechnungCodeSystem.CONSENT_TYPE;
     }
     val meta = new Meta().setProfile(List.of(profile));
@@ -85,11 +91,11 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
     consent.setPatient(
         new Reference()
             .setIdentifier(
-                new Identifier().setSystem(kvidNamingSystem.getCanonicalUrl()).setValue(kvid)));
+                new Identifier().setSystem(kvnrNamingSystem.getCanonicalUrl()).setValue(kvnr.getValue())));
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);
     consent.setScope(scope.asCodeableConcept());
-    consent.setCategory(List.of(consentType.asCodeableConcept(consentTypeCodeSystem)));
+    consent.setCategory(List.of(CONSENT_TYPE.asCodeableConcept(consentTypeCodeSystem)));
     consent.setDateTime(new Date());
 
     return consent;

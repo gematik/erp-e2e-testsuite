@@ -16,56 +16,50 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.dav.*;
-import de.gematik.test.erezept.fhir.builder.erp.*;
-import de.gematik.test.erezept.fhir.parser.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.resources.dav.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import java.util.function.*;
-import javax.annotation.*;
-import lombok.*;
-import net.serenitybdd.screenplay.*;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.strategy.pharmacy.AcceptedPrescriptionStrategy;
+import de.gematik.test.erezept.screenplay.strategy.pharmacy.DispensedPrescriptionStrategy;
+import de.gematik.test.erezept.screenplay.strategy.pharmacy.PharmacyPrescriptionStrategy;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.function.Function;
+import javax.annotation.Nullable;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem> {
 
-  private final DequeStrategy deque;
+  private final PharmacyPrescriptionStrategy strategy;
   @Nullable private final Actor apothecary;
 
-  public static Builder fromStack(String order) {
-    return fromStack(DequeStrategy.fromString(order));
-  }
-
-  public static Builder fromStack(DequeStrategy deque) {
-    return new Builder(deque);
-  }
-
-  @Override
-  public Class<ErxChargeItem> expectedResponseBody() {
-    return ErxChargeItem.class;
+  private ResponseOfPostChargeItem(
+      PharmacyPrescriptionStrategy strategy, @Nullable Actor apothecary) {
+    super("POST /ChargeItem");
+    this.strategy = strategy;
+    this.apothecary = apothecary;
   }
 
   @Override
-  public String getOperationName() {
-    return "POST /ChargeItem";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxChargeItem> answeredBy(Actor actor) {
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
-    val prescriptionStack = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
-    val dispensed = deque.chooseFrom(prescriptionStack.getDispensedPrescriptions());
+    strategy.init(actor);
 
     // use a random faked DavBundle for now
-    val davBundle = DavAbgabedatenBuilder.faker(dispensed.getPrescriptionId()).build();
+    val davBundle = DavAbgabedatenBuilder.faker(strategy.getPrescriptionId()).build();
     Function<DavAbgabedatenBundle, byte[]> signer;
     if (apothecary != null) {
       // sign as apothecary with HBA
@@ -86,31 +80,45 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
     }
 
     val chargeItem =
-        ErxChargeItemBuilder.forPrescription(dispensed.getPrescriptionId())
+        ErxChargeItemBuilder.forPrescription(strategy.getPrescriptionId())
             .version(PatientenrechnungVersion.V1_0_0) // we will always use the new version for now!
-            .accessCode(dispensed.getAccessCode())
             .status("billable")
             .enterer(smcb.getTelematikID())
-            .subject(dispensed.getReceiverKvid(), GemFaker.insuranceName())
-            .markingFlag(false, false, true)
-            .verordnung(dispensed.getTaskId())
+            .subject(strategy.getReceiverKvnr(), GemFaker.insuranceName())
+            .verordnung(strategy.getTaskId().getValue())
             .abgabedatensatz(davBundle, signer)
             .build();
 
-    val cmd = new ChargeItemPostCommand(chargeItem, dispensed.getSecret());
+    val cmd = new ChargeItemPostCommand(chargeItem, strategy.getSecret());
     return erpClient.request(cmd);
+  }
+
+  public static DispensedPrescriptionStrategy.Builder<Builder> fromDispensed(String order) {
+    return fromDispensed(DequeStrategy.fromString(order));
+  }
+
+  public static DispensedPrescriptionStrategy.Builder<Builder> fromDispensed(DequeStrategy deque) {
+    return new DispensedPrescriptionStrategy.ConcreteBuilder<>(deque, Builder::new);
+  }
+
+  public static AcceptedPrescriptionStrategy.Builder<Builder> fromAccepted(String order) {
+    return fromAccepted(DequeStrategy.fromString(order));
+  }
+
+  public static AcceptedPrescriptionStrategy.Builder<Builder> fromAccepted(DequeStrategy deque) {
+    return new AcceptedPrescriptionStrategy.ConcreteBuilder<>(deque, Builder::new);
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
-    private final DequeStrategy deque;
+    private final PharmacyPrescriptionStrategy strategy;
 
     public ResponseOfPostChargeItem signedByPharmacy() {
-      return new ResponseOfPostChargeItem(deque, null);
+      return new ResponseOfPostChargeItem(strategy, null);
     }
 
     public ResponseOfPostChargeItem signedByApothecary(Actor apothecary) {
-      return new ResponseOfPostChargeItem(deque, apothecary);
+      return new ResponseOfPostChargeItem(strategy, apothecary);
     }
   }
 }

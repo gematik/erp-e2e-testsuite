@@ -25,13 +25,13 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Map;
 import lombok.val;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -47,9 +47,13 @@ class VerifyTest {
 
   @Test
   void shouldVerifyOperationOutcomeInteraction() {
-    val cmd = new TaskCreateCommand();
-    val response = new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
-    val interaction = new ErpInteraction<>(cmd, response);
+    val response =
+        ErpResponse.forPayload(
+                FhirTestResourceUtil.createOperationOutcome(), OperationOutcome.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
 
     actor.attemptsTo(
         Verify.that(interaction)
@@ -60,13 +64,16 @@ class VerifyTest {
 
   @Test
   void shouldVerifyWithExpectedType() {
-    val cmd = new TaskCreateCommand();
     val task = new ErxTask();
     val coding = PrescriptionFlowType.FLOW_TYPE_160.asCoding(true);
     task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
 
-    val response = new ErpResponse(201, Map.of(), task);
-    val interaction = new ErpInteraction<>(cmd, response);
+    val response =
+        ErpResponse.forPayload(task, ErxTask.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
 
     actor.attemptsTo(
         Verify.that(interaction)

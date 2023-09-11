@@ -19,6 +19,7 @@ package de.gematik.test.erezept.primsys.model;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.model.actor.BaseActor;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
 import jakarta.ws.rs.WebApplicationException;
@@ -34,11 +35,11 @@ public class AbortUseCase {
 
   public static Response abortPrescription(
       BaseActor actor, String taskId, String accessCode, String secret) {
-    return abortUseCase(actor, taskId, new AccessCode(accessCode), new Secret(secret));
+    return abortUseCase(actor, TaskId.from(taskId), new AccessCode(accessCode), new Secret(secret));
   }
 
   private static Response abortUseCase(
-      BaseActor actor, String taskId, AccessCode accessCode, Secret secret) {
+      BaseActor actor, TaskId taskId, AccessCode accessCode, Secret secret) {
     val abortCommand = new TaskAbortCommand(taskId, accessCode, secret);
     val abortResponse = actor.erpRequest(abortCommand);
     if (abortResponse.isOperationOutcome() || abortResponse.getStatusCode() > 299) {

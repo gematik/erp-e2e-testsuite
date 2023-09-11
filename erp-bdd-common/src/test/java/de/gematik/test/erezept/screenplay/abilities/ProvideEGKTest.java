@@ -33,7 +33,7 @@ class ProvideEGKTest {
     val mockEgk = mock(Egk.class);
     when(mockEgk.getKvnr()).thenReturn(kvnr);
     val ability = ProvideEGK.sheOwns(mockEgk);
-    assertEquals(kvnr, ability.getKvnr());
+    assertEquals(kvnr, ability.getKvnr().getValue());
   }
 
   @Test

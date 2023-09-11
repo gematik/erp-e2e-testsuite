@@ -16,36 +16,48 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static java.text.MessageFormat.*;
-
-import de.gematik.test.core.*;
-import de.gematik.test.core.annotations.*;
-import de.gematik.test.core.expectations.requirements.*;
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.actions.*;
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.fuzzing.core.*;
-import de.gematik.test.fuzzing.kbv.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
-import lombok.extern.slf4j.*;
-import lombok.*;
-import net.serenitybdd.junit.runners.*;
-import net.serenitybdd.junit5.*;
-import net.thucydides.core.annotations.*;
+import de.gematik.test.core.ArgumentComposer;
+import de.gematik.test.core.annotations.Actor;
+import de.gematik.test.core.annotations.TestcaseId;
+import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.FhirRequirements;
+import de.gematik.test.erezept.ErpTest;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
+import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.toggle.E2ECucumberTag;
+import de.gematik.test.erezept.toggle.FhirCloseSlicingToggle;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
+import de.gematik.test.fuzzing.kbv.KbvBundleManipulatorFactory;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import net.thucydides.core.annotations.WithTag;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junit.runner.*;
+import org.hl7.fhir.r4.model.StringType;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runner.RunWith;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static java.text.MessageFormat.format;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
@@ -55,6 +67,8 @@ import org.junit.runner.*;
 @WithTag("Fuzzing")
 class ActivateInvalidKbvBundles extends ErpTest {
 
+  private static final Boolean expectClosedSlicing = featureConf.getToggle(new FhirCloseSlicingToggle());
+
   @Actor(name = "Bernd Claudius")
   private DoctorActor bernd;
 
@@ -62,12 +76,17 @@ class ActivateInvalidKbvBundles extends ErpTest {
   private PatientActor sina;
 
   private static ArgumentComposer baseComposer() {
-    return ArgumentComposer.composeWith()
+    val composer = ArgumentComposer.composeWith()
         .arguments(
             VersicherungsArtDeBasis.GKV, // given insurance kind
             PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY);
+        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
+    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
+        composer.arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+              .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+    }
+    return composer;
   }
 
   private static List<Extension> optionalExtensions() {
@@ -273,21 +292,21 @@ class ActivateInvalidKbvBundles extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
 
     val activationBuilder = IssuePrescription.forPatient(sina).ofAssignmentKind(assignmentKind);
     extensionProvider.getParameter().accept(activationBuilder);
     val activation = bernd.performs(activationBuilder.withRandomKbvBundle());
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      // Note1: for now we expect 202, with a valid ErxTask
+    if (!expectClosedSlicing) {
+      // if closed slicing is expected to be deactivated
       bernd.attemptsTo(
           Verify.that(activation)
               .withExpectedType()
               .hasResponseWith(returnCode(202, ErpAfos.A_22927))
               .isCorrect());
     } else {
-      // Note2: This will be the Verification 6 weeks after FD 1.7 release
+      // closed slicing should be activated by default: in such cases RC 400 is expected
       bernd.attemptsTo(
           Verify.that(activation)
               .withOperationOutcome(ErpAfos.A_22927)

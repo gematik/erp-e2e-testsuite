@@ -1,17 +1,16 @@
 {
-  "name": "de.gematik.erezept-patientenrechnung.r4",
-  "version": "1.0.0-rc3",
-  "description": "Abrechnungsinformationen des E-Rezeptes für den Patienten",
-  "author": "gematik",
   "fhirVersions": [
     "4.0.1"
   ],
+  "name": "de.gematik.erezept-patientenrechnung.r4",
+  "version": "1.0.0",
+  "description": "Abrechnungsinformationen des E-Rezeptes für den Patienten",
+  "author": "gematik",
   "dependencies": {
-    "de.gematik.erezept-workflow.r4": "1.2.0-rc4",
-    "de.abda.eRezeptAbgabedatenPKV": "1.1.0-rc10",
-    "kbv.ita.erp": "1.1.0-PreRelease",
-    "kbv.ita.for": "1.1.0-PreRelease",
+    "hl7.fhir.r4.core": "4.0.1",
     "de.basisprofil.r4": "1.3.2",
-    "hl7.fhir.r4.core": "4.0.1"
+    "de.gematik.erezept-workflow.r4": "1.2.0",
+    "kbv.ita.for": "1.1.0",
+    "kbv.basis": "1.3.0"
   }
 }

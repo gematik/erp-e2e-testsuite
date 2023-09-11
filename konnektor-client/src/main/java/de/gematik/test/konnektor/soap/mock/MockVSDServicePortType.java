@@ -16,17 +16,26 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import de.gematik.test.konnektor.commands.options.ExamEvidence;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmUpdateReason;
+import de.gematik.test.smartcard.Egk;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.vsds.vsdservice.v5.FaultMessage;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDServicePortType;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDStatusType;
 import javax.xml.ws.Holder;
+import lombok.val;
 
 public class MockVSDServicePortType extends AbstractMockService implements VSDServicePortType {
+  private static final String EMPTY = "empty";
 
-  public MockVSDServicePortType(MockKonnektor mockKonnektor) {
+  private final VsdmService vsdmService;
+
+  public MockVSDServicePortType(MockKonnektor mockKonnektor, VsdmService vsdmService) {
     super(mockKonnektor);
+    this.vsdmService = vsdmService;
   }
 
   @Override
@@ -43,16 +52,22 @@ public class MockVSDServicePortType extends AbstractMockService implements VSDSe
       Holder<byte[]> pruefungsnachweis)
       throws FaultMessage {
 
-    // The following parameters are not relevant for our use case because we are simulating
-    // the primary system. Therefore, these can be simulated or simply left empty.
-    persoenlicheVersichertendaten.value = new byte[0];
-    persoenlicheVersichertendaten.value = new byte[0];
-    geschuetzteVersichertendaten.value = new byte[0];
+    val egk =
+        (Egk) mockKonnektor.getSmartcardWrapperByCardHandle(ehcHandle).orElseThrow().getSmartcard();
+
+    val checksum = vsdmService.requestFor(egk, VsdmUpdateReason.UFS_UPDATE);
+    persoenlicheVersichertendaten.value = EMPTY.getBytes();
+    allgemeineVersicherungsdaten.value = EMPTY.getBytes();
+    geschuetzteVersichertendaten.value = EMPTY.getBytes();
+
+    pruefungsnachweis.value =
+        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
+            .checksum(checksum)
+            .build()
+            .encode();
 
     vsdStatus.value = new VSDStatusType();
     vsdStatus.value.setStatus("0");
     vsdStatus.value.setVersion("5.2.0");
-
-    pruefungsnachweis.value = ExamEvidence.NO_UPDATES.encode();
   }
 }

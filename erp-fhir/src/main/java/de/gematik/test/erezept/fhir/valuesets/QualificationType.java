@@ -22,7 +22,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
 
-/** https://simplifier.net/for/kbvcsforqualificationtype */
+/** <a href="https://simplifier.net/for/kbvcsforqualificationtype">...</a> */
 @Getter
 public enum QualificationType implements IValueSet {
   DOCTOR("00", "Arzt"),

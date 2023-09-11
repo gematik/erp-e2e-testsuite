@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ class TaskActivateCommandTest {
 
   @Test
   void getRequestLocator() {
-    val taskId = "123456789";
+    val taskId = TaskId.from("123456789");
     val ac = new AccessCode("xxxxx");
     val cmd = new TaskActivateCommand(taskId, ac, new byte[0]);
 
@@ -39,7 +40,7 @@ class TaskActivateCommandTest {
 
   @Test
   void requestBodyIsPresent() {
-    val taskId = PrescriptionId.random().getValue();
+    val taskId = TaskId.from(PrescriptionId.random());
     AccessCode accsesscode =
         new AccessCode("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
 

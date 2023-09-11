@@ -80,7 +80,12 @@ public class FhirDumpStepListener implements StepListener {
 
   @Override
   public void testFinished(TestOutcome testOutcome, boolean b, ZonedDateTime zonedDateTime) {
-    // not required for FhirDumpStepListener
+    this.testFinished(testOutcome);
+  }
+
+  @Override
+  public void testFailed(TestOutcome testOutcome, Throwable throwable) {
+    this.testFinished(testOutcome);
   }
 
   @Override
@@ -111,6 +116,11 @@ public class FhirDumpStepListener implements StepListener {
   }
 
   @Override
+  public void stepFailed(StepFailure stepFailure, List<ScreenshotAndHtmlSource> list) {
+    // not required for FhirDumpStepListener
+  }
+
+  @Override
   public void lastStepFailed(StepFailure stepFailure) {
     // not required for FhirDumpStepListener
   }
@@ -137,11 +147,6 @@ public class FhirDumpStepListener implements StepListener {
 
   @Override
   public void stepFinished(List<ScreenshotAndHtmlSource> list) {
-    // not required for FhirDumpStepListener
-  }
-
-  @Override
-  public void testFailed(TestOutcome testOutcome, Throwable throwable) {
     // not required for FhirDumpStepListener
   }
 
@@ -202,6 +207,11 @@ public class FhirDumpStepListener implements StepListener {
 
   @Override
   public void takeScreenshots(List<ScreenshotAndHtmlSource> list) {
+    // not required for FhirDumpStepListener
+  }
+
+  @Override
+  public void takeScreenshots(TestResult testResult, List<ScreenshotAndHtmlSource> list) {
     // not required for FhirDumpStepListener
   }
 }

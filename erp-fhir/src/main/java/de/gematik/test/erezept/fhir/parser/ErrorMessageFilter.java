@@ -57,7 +57,10 @@ public class ErrorMessageFilter implements IValidatorModule {
     val message = validationMessage.getMessage();
     val ignore = ignoreMessages.stream().anyMatch(message::matches);
     if (ignore) {
-      log.trace(format("Ignoring parser error message: {0}", validationMessage));
+      log.trace(
+          format(
+              "Ignored validation message: ''{0}'' at {1}",
+              message, validationMessage.getLocationString()));
     }
 
     return ignore;
@@ -66,6 +69,9 @@ public class ErrorMessageFilter implements IValidatorModule {
   @Override
   public void validateResource(final IValidationContext<IBaseResource> iValidationContext) {
     val messages = iValidationContext.getMessages();
-    messages.removeIf(this::ignoreMessage);
+    messages.stream()
+            .filter(this::ignoreMessage)
+            .filter(message -> message.getSeverity().ordinal() >= ResultSeverityEnum.ERROR.ordinal())
+            .forEach(message -> message.setSeverity(ResultSeverityEnum.WARNING));
   }
 }

@@ -16,19 +16,18 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.exceptions.SmartcardMissmatchException;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.test.smartcard.Smartcard;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.konnektor.exceptions.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.test.smartcard.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Slf4j
-public class GetCardHandleCommand extends AbstractKonnektorCommand<CardHandle> {
+public class GetCardHandleCommand extends AbstractKonnektorCommand<CardInfo> {
 
   private final String iccsn;
 
@@ -37,14 +36,14 @@ public class GetCardHandleCommand extends AbstractKonnektorCommand<CardHandle> {
   }
 
   @Override
-  public CardHandle execute(ContextType ctx, ServicePortProvider serviceProvider) {
+  public CardInfo execute(ContextType ctx, ServicePortProvider serviceProvider) {
     log.trace(format("Get CardHandle for ICCSN {0}", iccsn));
     val cmd = new GetCardsCommand();
     val cardsResponse = cmd.execute(ctx, serviceProvider);
 
     return cardsResponse.getCards().getCard().stream()
         .filter(cit -> cit.getIccsn().equals(this.iccsn))
-        .map(CardHandle::fromCardInfoType)
+        .map(CardInfo::fromCardInfoType)
         .findFirst()
         .orElseThrow(
             () -> new SmartcardMissmatchException(this.getClass(), iccsn, serviceProvider));

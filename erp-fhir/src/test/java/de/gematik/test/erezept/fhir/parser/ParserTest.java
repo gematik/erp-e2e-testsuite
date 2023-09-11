@@ -17,10 +17,7 @@
 package de.gematik.test.erezept.fhir.parser;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
@@ -37,6 +34,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -193,8 +191,16 @@ class ParserTest extends ParsingTest {
 
   @Test
   void shouldNotAcceptNullOnValidate() {
-    assertThrows(NullPointerException.class, () -> parser.validate(null)); // null on pupose!
-    assertThrows(NullPointerException.class, () -> parser.isValid(null)); // null on pupose!
+    String content = null;
+    assertThrows(NullPointerException.class, () -> parser.validate(content)); // null on pupose!
+    assertThrows(NullPointerException.class, () -> parser.isValid(content)); // null on pupose!
+  }
+
+  @Test
+  void shouldNotAcceptNullBundleOnValidate() {
+    Bundle bundle = null;
+    assertThrows(NullPointerException.class, () -> parser.validate(bundle)); // null on pupose!
+    assertThrows(NullPointerException.class, () -> parser.isValid(bundle)); // null on pupose!
   }
 
   @Test

@@ -29,7 +29,7 @@ import org.bouncycastle.asn1.*;
 @Getter
 public enum Crypto {
   RSA_2048("RSA", SPEC_RSA, sha256WithRSAEncryption, 2048),
-  RSA_PSS_2048("RSASSA_PSS", SPEC_RSA, id_RSASSA_PSS, 2048),
+  RSA_PSS_2048("RSASSA-PSS", SPEC_RSA, id_RSASSA_PSS, 2048),
   ECC_256("ECC", SPEC_ECC, ecdsa_with_SHA256, 256);
 
   private final String algorithm;
@@ -45,7 +45,7 @@ public enum Crypto {
   }
 
   public static Crypto fromString(String value) {
-    return switch (value.toUpperCase()) {
+    return switch (value.toUpperCase().replace("-", "_")) {
       case "RSA_2048", "R2048", "RSA" -> RSA_2048;
       case "RSASSA_PSS" -> RSA_PSS_2048;
       case "E256", "ECC_256", "ECC" -> ECC_256;

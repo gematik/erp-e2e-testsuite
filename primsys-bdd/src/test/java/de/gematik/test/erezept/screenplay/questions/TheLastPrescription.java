@@ -73,7 +73,7 @@ public class TheLastPrescription implements Question<Boolean> {
     val answer = new AtomicBoolean(false);
 
     response
-        .getResourceOptional(cmd.expectedResponseBody())
+        .getResourceOptional()
         .ifPresent(prescription -> answer.set(checkPrescription(actor, prescription, lastDmc)));
 
     return answer.get();
@@ -87,7 +87,7 @@ public class TheLastPrescription implements Question<Boolean> {
     // 2. check the access code
     answer.compareAndSet(true, checkAccessCode(prescriptionBundle, dmc));
 
-    // 3. check if the KVID is okay only if this is not a representative DMC
+    // 3. check if the KVNR is okay only if this is not a representative DMC
     if (!dmc.isRepresentative())
       answer.compareAndSet(true, checkPatientId(actor, prescriptionBundle));
 
@@ -97,12 +97,12 @@ public class TheLastPrescription implements Question<Boolean> {
   /**
    * Check if the received prescription does have the expected TaskId
    *
-   * @param prescriptionBundle tis he received Prescription-Bundle from FD
+   * @param prescriptionBundle is the received Prescription-Bundle from FD
    * @param dmc is the received DMC from the Doctor
    * @return true if prescription and DMC have the same Prescription-ID false otherwise
    */
   private boolean checkTaskId(ErxPrescriptionBundle prescriptionBundle, DmcPrescription dmc) {
-    return prescriptionBundle.getTask().getUnqualifiedId().equals(dmc.getTaskId());
+    return prescriptionBundle.getTask().getTaskId().equals(dmc.getTaskId());
   }
 
   /**
@@ -117,7 +117,7 @@ public class TheLastPrescription implements Question<Boolean> {
    */
   private boolean checkAccessCode(ErxPrescriptionBundle prescriptionBundle, DmcPrescription dmc) {
     val flowType = prescriptionBundle.getTask().getFlowType();
-    boolean ret = true;
+    boolean ret;
     if (flowType.isDirectAssignment()) {
       // if direct assignment, make sure the prescription does NOT contain the access code for the
       // patient!
@@ -140,7 +140,7 @@ public class TheLastPrescription implements Question<Boolean> {
    */
   private boolean checkPatientId(Actor actor, ErxPrescriptionBundle prescriptionBundle) {
     val baseData = SafeAbility.getAbility(actor, ProvidePatientBaseData.class);
-    val expectedKviId = baseData.getKvid();
+    val expectedKviId = baseData.getKvnr();
 
     // Assume true by default because prescriptionBundle does not necessarily have a KVID e.g. for
     // PKV
@@ -148,7 +148,7 @@ public class TheLastPrescription implements Question<Boolean> {
     prescriptionBundle
         .getKbvBundle()
         .getPatient()
-        .getKvid()
+        .getGkvId()
         .ifPresent(kvid -> kvidCheck.set(expectedKviId.equals(kvid)));
     return kvidCheck.get();
   }

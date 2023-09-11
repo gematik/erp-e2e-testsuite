@@ -16,15 +16,21 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.testutil.PrivateConstructorsUtil;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import lombok.val;
+import org.hl7.fhir.r4.model.DateType;
+import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +40,11 @@ class TaskVerifierTest {
   void setupReporter() {
     // need to start a testcase manually as we are not using the ErpTestExtension here
     CoverageReporter.getInstance().startTestcase("not needed");
+  }
+
+  @Test
+  void shouldNotInstantiateTaskVerifier() {
+    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(TaskVerifier.class));
   }
 
   @Test
@@ -61,6 +72,205 @@ class TaskVerifierTest {
     val task = new ErxTask();
 
     val step = hasValidPrescriptionId();
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldPassOnCorrectReadyTaskStatus() {
+    val task = new ErxTask();
+    task.setStatus(TaskStatus.READY);
+
+    val step = isInReadyStatus();
+    step.apply(task);
+  }
+
+  @Test
+  void shouldPassOnCorrectDraftTaskStatus() {
+    val task = new ErxTask();
+    task.setStatus(TaskStatus.DRAFT);
+
+    val step = isInDraftStatus();
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidStatus() {
+    val task = new ErxTask();
+    task.setStatus(TaskStatus.COMPLETED);
+
+    val step = isInDraftStatus();
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldCheckCorrectMvoExpiryDateWithoutEnd() {
+    val dc = new DateCalculator();
+    val validExpiryDate = dc.getDateAfterCalendarDays(new Date(), 365);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(validExpiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoExpiryDate(null);
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidMvoExpiryDateWithoutEnd() {
+    val dc = new DateCalculator();
+    val invalidExpiryDate = dc.getDateAfterCalendarDays(new Date(), 364);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(invalidExpiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoExpiryDate(null);
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldCheckCorrectMvoExpiryDateWithEnd() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterCalendarDays(new Date(), 10);
+    val mvoEndDate = dc.getDateAfterCalendarDays(new Date(), 10);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoExpiryDate(mvoEndDate);
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidMvoExpiryDateWithEnd() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterCalendarDays(new Date(), 9);
+    val mvoEndDate = dc.getDateAfterCalendarDays(new Date(), 10);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoExpiryDate(mvoEndDate);
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldCheckCorrectMvoAcceptDateWithoutEnd() {
+    val dc = new DateCalculator();
+    val validExpiryDate = dc.getDateAfterCalendarDays(new Date(), 365);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(validExpiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoAcceptDate(null);
+    step.apply(task);
+  }
+
+  @Test
+  void shouldCheckCorrectMvoAcceptDateWithEnd() {
+    val dc = new DateCalculator();
+    val validExpiryDate = dc.getDateAfterCalendarDays(new Date(), 365);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(validExpiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoAcceptDate(validExpiryDate);
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidMvoAcceptDateWithoutEnd() {
+    val dc = new DateCalculator();
+    val invalidExpiryDate = dc.getDateAfterCalendarDays(new Date(), 10);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(invalidExpiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectMvoAcceptDate(null);
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldCheckCorrectExpiryDate() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterMonths(new Date(), 3);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectExpiryDate();
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidExpiryDate() {
+    val dc = new DateCalculator();
+    val expiryDateTmp = dc.getDateAfterMonths(new Date(), 3);
+    val expiryDate = dc.getDateAfterCalendarDays(expiryDateTmp, 1);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectExpiryDate();
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldCheckCorrectAcceptDateGkv() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterCalendarDays(new Date(), 28);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectAcceptDate(PrescriptionFlowType.FLOW_TYPE_160);
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidAcceptDateGkv() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterMonths(new Date(), 3);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectAcceptDate(PrescriptionFlowType.FLOW_TYPE_160);
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldCheckCorrectAcceptDatePkv() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterMonths(new Date(), 3);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectAcceptDate(PrescriptionFlowType.FLOW_TYPE_200);
+    step.apply(task);
+  }
+
+  @Test
+  void shouldFailOnInvalidAcceptDatePkv() {
+    val dc = new DateCalculator();
+    val expiryDate = dc.getDateAfterCalendarDays(new Date(), 28);
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    val step = hasCorrectAcceptDate(PrescriptionFlowType.FLOW_TYPE_200);
     assertThrows(AssertionError.class, () -> step.apply(task));
   }
 }

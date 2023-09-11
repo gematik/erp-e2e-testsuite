@@ -32,14 +32,17 @@ public enum Debug implements PageElement {
   LEAVE_BUTTON(
       "Leave Debug Menu",
       () -> AppiumBy.accessibilityId("TopNavigation.BackButton"),
-      () -> By.xpath("(//XCUIElementTypeButton[@name=\"Einstellungen\"])[1]")),
+      () -> By.xpath("(//XCUIElementTypeButton[@name='Einstellungen'])[1]")),
   SET_VIRTUAL_EGK_FIELD(
-      "Set virtual eGK Field", () -> By.tagName("DebugMenu.SetVirtualHealthCardButton"), null),
+      "Set virtual eGK Field",
+      () -> By.tagName("DebugMenu.SetVirtualHealthCardButton"),
+      () -> AppiumBy.accessibilityId("debug_enable_virtual_egk")),
   ENABLE_VIRTUAL_EGK_USAGE_BUTTON(
       "Activate virtual eGK Button",
       null,
-      () -> AppiumBy.accessibilityId("debug_enable_virtual_egk")),
-  // TODO Alexander: I need clarification which Field that should be;
+      () ->
+          AppiumBy.xpath(
+              "//XCUIElementTypeSwitch[@name='debug_enable_virtual_egk']/XCUIElementTypeSwitch")),
   EGK_PRIVATE_KEY(
       "Input Private Key of eGK",
       () ->
@@ -58,7 +61,7 @@ public enum Debug implements PageElement {
           By.xpath("/ComposeNode/ComposeNode/VerticalScrollAxisRange/ComposeNode[3]/EditableText"),
       () ->
           By.xpath(
-              "//XCUIElementTypeCell[@name=\"Current access token\"]/XCUIElementTypeOther[2]/XCUIElementTypeOther")),
+              "//XCUIElementTypeCell[@name='Current access token']/XCUIElementTypeOther[2]/XCUIElementTypeOther")),
   LOGIN("Login with virtual eGK", null, () -> By.xpath("//XCUIElementTypeButton[@name=\"Login\"]")),
   HIDE_INTRO(
       "Hide Intro",

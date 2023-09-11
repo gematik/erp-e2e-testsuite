@@ -22,7 +22,8 @@ import lombok.*;
 public enum SmartcardType {
   EGK("eGK"),
   HBA("HBA"),
-  SMC_B("SMC-B");
+  SMC_B("SMC-B"),
+  SMC_KT("SMC-KT");
 
   private final String name;
 
@@ -35,11 +36,16 @@ public enum SmartcardType {
     return this.name;
   }
 
+  public String toConfig() {
+    return this.name.toLowerCase().replace("-", "_");
+  }
+
   public static SmartcardType fromString(@NonNull String type) {
     return switch (type.toLowerCase().strip().replaceAll("[-_]", "")) {
       case "egk" -> EGK;
       case "hba" -> HBA;
       case "smcb" -> SMC_B;
+      case "smckt" -> SMC_KT;
       default -> throw new InvalidSmartcardTypeException(type);
     };
   }

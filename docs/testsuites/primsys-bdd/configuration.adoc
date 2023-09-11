@@ -1,0 +1,377 @@
+
+=== PrimSys Konfiguration [[primsys_configuration]]
+
+Die Konfiguration für {name-primsys} ist in mehrere Abschnitte unterteilt, wobei jeder Abschnitt immer eine bestimmte Teilkomponente der Testsuite konfiguriert.
+
+[source,yaml,linenums]
+----
+activeEnvironment: TU   # definiert die aktive Testumgebung
+
+actors:                 # definiert die Akteure
+  ...
+
+environments:           # definiert die Testumgebungen
+  ...
+
+konnektors:             # definiert die Konnektoren
+  ...
+----
+
+==== Akteure
+
+Die Konfiguration der einzelnen Akteure wird im Abschnitt `actors` definiert. Dieser Abschnitt selbst ist nochmals unterteilt nach den einzelnen Arten der Akteure. Hier wird konkret zwischen Ärzten, Apotheken, Apotheker und Versicherten/Patienten unterschieden.
+
+[source,yaml,linenums]
+----
+actors:
+  doctors:            # definiert die Ärzte
+    ...
+  pharmacies:         # definiert die Apotheken
+    ...
+  apothecaries:       # definiert die Apotheker
+    ...
+  patients:           # definiert die Versicherten/Patieten
+    ...
+----
+
+Sämtliche Konfigurationen der Akteure sind sogenannte `NamedConfigurations`, d.h diese müssen immer zwingend ein Feld `name` haben über welchen diese in der Testsuite eindeutig referenziert wird.
+
+NOTE: Grundsätzlich sind die meisten konkreten Werte der einzelnen Felder in der Konfiguration Strings bzw. vereinzelt Booleans und werden als solchen auch ausgelesen. Allerdings sind nicht aller String-Felder als Freitexte definierbar. Hinter einigen der Felder sind Enumerationen hinterlegt, die nur eine fest definierte Menge an möglichen Werten entgegennehmen.
+
+Sämtliche Akteure, die aktiv mit dem Fachdienst und IDP kommunizieren teilen sich eine Untermenge an identischen Konfigurationsfeldern:
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| name
+| Der Name des Akteurs, über den dieser in der Testsuite referenziert wird
+| Freitext
+| true
+
+| clientId
+| Ist die Client-ID die der Arzt für die Kommunikation mit dem IDP nutzen soll
+| Freitext
+| false
+
+| redirectUrl
+| Ist die URL für den Redirect, den der Arzt für die Kommunikation mit dem IDP nutzen soll
+| Freitext
+| false
+
+| userAgent
+| Ist der User-Agent, den der Arzt für die REST-Kommunikation innerhalb von VAU nutzen soll
+| Freitext
+| false
+
+| algorithm
+| Ist der Crypto-Algorithmus, der für die Smartcards verwendet werden soll. Zur Auswahl stehen hier R2048 und E256 zur Auswahl. Der Default-Wert ist R2048
+| Enum
+| false
+
+| acceptMime
+| Ist der mime-Type der FHIR-Responses die vom Fachdienst akzeptiert/erwartet wird. Für Ärzte und Apotheken ist der Default-Wert `application/fhir+xml`, für Versicherte/Patienten hingegen `application/fhir+json`
+| Freitext
+| false
+
+| sendMime
+| Ist der mime-Type der FHIR-Requests die an den Fachdienst gesendet werden. Für Ärzte und Apotheken ist der Default-Wert `application/fhir+xml`, für Versicherte/Patienten hingegen `application/fhir+json`
+| Freitext
+| false
+
+| acceptCharset
+| Ist das Charset, das vom Client des Arztes erwartet wird. Der Default-Wert ist `utf-8`
+| Freitext
+| false
+
+| validateRequest
+| Gibt an, ob ausgehende FHIR-Requests gegen die Profilierung validiert werden sollen
+| Boolean
+| false
+
+| validateResponse
+| Gibt an, ob eingehende FHIR-Responses gegen die Profilierung validiert werden sollen
+| Boolean
+| false
+|===
+
+In den nachfolgenden Abschnitten werden die spezifischen Felder der jeweiligen Akteure erklärt.
+
+===== Ärzte
+
+Nachfolgend die vollständige Konfiguration für den Arzt `Bernd Claudius`.
+
+[source,yaml,linenums]
+----
+doctors:
+- name: Bernd Claudius
+  smcbIccsn: 80276001011699910102
+  hbaIccsn: 80276001011699910100
+  qualificationType: Arzt
+  konnektor: KOCO@kon7
+  clientId: gematikClient                           # optional
+  redirectUrl: http://test-ps.gematik.de/erezept    # optional
+  userAgent: gematik/User/Agent                     # optional
+  algorithm: R2048                                  # optional
+  acceptMime: application/fhir+xml"                 # optional
+  sendMime: application/fhir+xml"                   # optional
+  acceptCharset: utf-8                              # optional
+  validateRequest: false                            # optional
+  validateResponse: false                           # optional
+
+- name: ... # nächster Arzt
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| smcbIccsn
+| Die ICCSN der SMC-B die von dem Arzt verwendet werden soll
+| Freitext
+| true
+
+| hbaIccsn
+| Die ICCSN des HBA der von dem Arzt verwendet werden soll
+| Freitext
+| true
+
+| qualificationType
+| Die Qualification des Arztes gemäß der link:https://simplifier.net/for/kbvcsforqualificationtype[Profilierung der KBV]. Hier wird der `Display`-Wert aus der Profilierung erwartet
+| Enum
+| true
+
+| konnektor
+| Ist eine Referenz auf den Namen eines konkreten Konnektors aus dem Abschnitt `konnektors`
+| Referenz
+| true
+|===
+
+===== Apotheken
+
+Nachfolgend die vollständige Konfiguration für die Apotheke `Am Flughafe`.
+
+[source,yaml,linenums]
+----
+pharmacies:
+- name: Am Flughafen
+  smcbIccsn: 80276883110000116873
+  konnektor: Soft-Konn
+  clientId: gematikClient                           # optional
+  redirectUrl: http://test-ps.gematik.de/erezept    # optional
+  userAgent: gematik/User/Agent                     # optional
+  algorithm: R2048                                  # optional
+  acceptMime: application/fhir+xml"                 # optional
+  sendMime: application/fhir+xml"                   # optional
+  acceptCharset: utf-8                              # optional
+  validateRequest: false                            # optional
+  validateResponse: false                           # optional
+
+- name: ... # nächste Apotheke
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| smcbIccsn
+| Die ICCSN der SMC-B die von der Apotheke verwendet werden soll
+| Freitext
+| true
+
+| konnektor
+| Ist eine Referenz auf den Namen eines konkreten Konnektors aus dem Abschnitt `konnektors`
+| Referenz
+| true
+|===
+
+===== Apotheker
+
+Nachfolgend die vollständige Konfiguration für die Apothekerin `Amanda Albrecht`.
+
+NOTE: Apotheker selbst kommunizieren nie direkt mit dem Fachdienst bzw. dem IDP und haben deshalb keine Konfigurationsfelder für diese Komponenten.
+
+[source,yaml,linenums]
+----
+apothecaries:
+- name: Amanda Albrecht
+  hbaIccsn: 80276001081699900579
+  konnektor: Soft-Konn
+  algorithm: R2048                     # optional
+
+- name: ... # nächste Apotheke
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| hbaIccsn
+| Die ICCSN des HBA der von dem Apotheker verwendet werden soll
+| Freitext
+| true
+
+| konnektor
+| Ist eine Referenz auf den Namen eines konkreten Konnektors aus dem Abschnitt `konnektors`
+| Referenz
+| true
+|===
+
+===== Versicherte
+
+Nachfolgend die vollständige Konfiguration für den Versicherten `Fridolin Straßer`.
+
+[source,yaml,linenums]
+----
+patients:
+- name: Am Flughafen
+  egkIccsn: 80276883110000113311
+  clientId: gematikClient                           # optional
+  redirectUrl: http://test-ps.gematik.de/erezept    # optional
+  userAgent: gematik/User/Agent                     # optional
+  algorithm: R2048                                  # optional
+  acceptMime: application/fhir+xml"                 # optional
+  sendMime: application/fhir+xml"                   # optional
+  acceptCharset: utf-8                              # optional
+  validateRequest: false                            # optional
+  validateResponse: false                           # optional
+
+- name: ... # nächste Apotheke
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| egkIccsn
+| Die ICCSN der eGK die von dem Versicherten verwendet werden soll
+| Freitext
+| true
+|===
+
+==== Testumgebung
+
+Die Konfiguration der einzelnen Testumgebungen wird im Abschnitt `environments` definiert. Die Testumgebung die verwendet werden soll, wird über die Konfiguration `activateEnvironment` über den Namen einer bestimmten Umgebung gesetzt. Nachfolgend die Konfiguration der `TU` Testumgebung:
+
+[source,yaml,linenums]
+----
+environments:
+  - name: TU
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: https://idp-test.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-test.zentral.erp.splitdns.ti-dienste.de
+      subscriptionServiceUrl: wss://subscription-test.zentral.erp.splitdns.ti-dienste.de/subscription
+    internet:
+      discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-test.app.ti-dienste.de
+      xapiKey: 0000000000000000
+----
+
+Darüber hinaus bietet jede Umgebung zwei unterschiedliche Routen. Die eine ist öffentlich aus dem Internet (`inernet`) erreichbar und wird ausschließlich von den Versicherten genutzt. Die zweite Route ist nur über die Telematik-Infrastruktur (`ti`) erreichbar und wird von den Primärsystemen verwendet.
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| name
+| Der Name der Testumgebung, der über `activeEnvironment` referenziert wird
+| Freitext
+| true
+
+| tslBaseUrl
+| Ist die URL für den TSL-Dienst
+| Freitext
+| true
+
+| discoveryDocumentUrl
+| Ist die URL für das DiscoveryDocument welches für die Kommunikation mit dem IDP benötigt wird
+| Freitext
+| true
+
+| fdBaseUrl
+| Ist die URL des E-Rezept-Fachdienstes
+| Freitext
+| true
+
+| subscriptionServiceUrl
+| Ist die URL für den Subscription-Service des E-Rezept-Fachdienstes. Dieser wird ausschließlich von den Apotheke für die Benachrichtigung über neue Nachrichten verwendet.
+| Freitext
+| true
+
+| xapiKey
+| Ist der X-API-Key den der Versicherte für die Kommunikation mit dem Fachdienst verwenden soll
+| Freitext
+| true
+|===
+
+==== Konnektoren
+
+Die Konfiguration der einzelnen Konnektoren wird im Abschnitt `konnektors` definiert. Der Konnektor der von einm Akteur (Apothek, Apotheker und Arzt) verwendet werden soll, referenzieren die jeweiligen Akteure im Feld `konnektor` über den Namen des jeweiligen Konnektors. Zur Auswahl stehen zwei unterschiedliche Arten von Konnektoren: nämlich ein echter Konnektor (mit SOAP-Kommunikation) und ein __"Soft-Konn"__ der ohne einen echten Konnektor und folglich ohne jegliche SOAP-Kommunikation auskommt. Die Konfigurationen dieser beiden Arten unterscheiden sich. Deshalb werden nachfolgend jeweils ein Konnektor von jeder Art konfiguriert.
+
+[source,yaml,linenums]
+----
+konnektors:
+  - name: KonSim@localhost
+    type: remote
+    profile: KONSIM
+    address: 127.0.0.1:9106
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: WP1
+      userId: user1
+    tls:
+      keyStore: konsim_mandant1_keystore.p12
+      keyStorePassword: "00"
+      trustStore: konsim_truststore.jks
+      trustStorePassword: "gematik"
+
+  - name: Soft-Konn
+    type: local
+----
+
+Die nachfolgenden Felder sind für beide Arten von Konnektor identisch.
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| name
+| Der Name des Konnektors, über den die Akteure den jeweiligen Konnektor referenzieren
+| Freitext
+| true
+
+| type
+| Ist die Art des Konnektors. Hier gibt es die Unterscheidung zwischen `remote` und `local`
+| Enum
+| true
+|===
+
+Falls ein Konnektor vom Typ `remote` konfiguriert wird, werden zusätzlich die folgenden Felder benötigt:
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| type
+| Ist die Art des Konnektors. Hier gibt es die Unterscheidung zwischen `remote` und `local`
+| Enum
+| true
+
+| profile
+| Ist das _"Profil"_ des Konnektors (tatsächlich eigentlich der Hersteller!). Hier stehen die folgenden Werte zur Auswahl: `KONSIM`, `SECUNET`, `RISE` und `CGM`
+| Enum
+| true
+
+| address
+| Ist die Adresse, unter derer der Konnektor erreichbar ist.
+| Freitext
+| true
+
+| protocol
+| Ist das Protokoll, welches für die SOAP-Kommunikation verwendet wird. Hier stehen `http` bzw. `https` zur Auswahl. Wobei die Auswahl `https` zur Folge hat, dass das nachfolgend auch `tls` konfiguriert werden muss.
+| Enum
+| true
+|===

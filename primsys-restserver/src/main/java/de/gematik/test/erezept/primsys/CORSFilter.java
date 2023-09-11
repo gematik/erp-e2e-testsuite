@@ -19,17 +19,19 @@ package de.gematik.test.erezept.primsys;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.core.MultivaluedMap;
+import lombok.val;
 
 public class CORSFilter implements ContainerResponseFilter {
 
   public void filter(
       ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
-    MultivaluedMap<String, Object> headers = responseContext.getHeaders();
-
+    val headers = responseContext.getHeaders();
     headers.add("Access-Control-Allow-Origin", "*");
-    headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
-    headers.add("Access-Control-Allow-Headers", "Content-Type");
+    headers.add("Access-Control-Allow-Headers",
+            "CSRF-Token, X-Requested-By, Authorization, Content-Type");
+    headers.add("Access-Control-Allow-Credentials", "true");
+    headers.add("Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS, HEAD");
   }
 }

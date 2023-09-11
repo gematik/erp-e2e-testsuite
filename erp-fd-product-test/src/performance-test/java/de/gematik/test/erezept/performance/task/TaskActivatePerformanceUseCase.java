@@ -14,49 +14,62 @@
  * limitations under the License.
  */
 
-
 package de.gematik.test.erezept.performance.task;
 
-
-import static java.text.MessageFormat.*;
-
-import de.gematik.test.core.*;
+import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
-import de.gematik.test.core.annotations.*;
-import de.gematik.test.core.expectations.requirements.*;
-import de.gematik.test.core.expectations.verifier.*;
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.actions.*;
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.konnektor.*;
-import java.time.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.junit.runners.*;
-import net.serenitybdd.junit5.*;
-import net.serenitybdd.screenplay.*;
-import net.thucydides.core.annotations.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junit.runner.*;
+import de.gematik.test.core.annotations.TestcaseId;
+import de.gematik.test.core.expectations.requirements.DurationOperationRequirement;
+import de.gematik.test.core.expectations.verifier.VerificationStep;
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.ErpTest;
+import de.gematik.test.erezept.actions.ErpAction;
+import de.gematik.test.erezept.actions.TaskAbort;
+import de.gematik.test.erezept.actions.TaskCreate;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.toggle.E2ECucumberTag;
+import de.gematik.test.konnektor.KonnektorResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import net.serenitybdd.screenplay.Performable;
+import net.serenitybdd.screenplay.Question;
+import net.thucydides.core.annotations.Step;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runner.RunWith;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static java.text.MessageFormat.format;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Messung E-Rezept Aktivierung")
+
 class TaskActivatePerformanceUseCase extends ErpTest {
 
   @Actor(name = "Bernd Claudius")
@@ -67,20 +80,30 @@ class TaskActivatePerformanceUseCase extends ErpTest {
 
   static Stream<Arguments> prescriptionTypesProvider() {
 
-    return ArgumentComposer.composeWith()
-        .arguments(
-            VersicherungsArtDeBasis.GKV, // given insurance kind
-            PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
-            DurationOperationRequirement.ACTIVATE_FLOWTYPE_160) // expected flow type
-        .arguments(
-            VersicherungsArtDeBasis.GKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            DurationOperationRequirement.ACTIVATE_FLOWTYPE_169)
-        .arguments(
-            VersicherungsArtDeBasis.PKV,
-            PrescriptionAssignmentKind.PHARMACY_ONLY,
-            DurationOperationRequirement.ACTIVATE_FLOWTYPE_200)
-        .create();
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                VersicherungsArtDeBasis.GKV, // given insurance kind
+                PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
+                DurationOperationRequirement.ACTIVATE_FLOWTYPE_160) // expected flow type
+            .arguments(
+                VersicherungsArtDeBasis.GKV,
+                PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+                DurationOperationRequirement.ACTIVATE_FLOWTYPE_169);
+
+    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
+      composer
+          .arguments(
+              VersicherungsArtDeBasis.PKV,
+              PrescriptionAssignmentKind.PHARMACY_ONLY,
+              DurationOperationRequirement.ACTIVATE_FLOWTYPE_200)
+          .arguments(
+              VersicherungsArtDeBasis.PKV,
+              PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+              DurationOperationRequirement.ACTIVATE_FLOWTYPE_209);
+    }
+
+    return composer.create();
   }
 
   @TestcaseId("ERP_PERFORMANCE_TASK_ACTIVATE_01")
@@ -93,13 +116,12 @@ class TaskActivatePerformanceUseCase extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       DurationOperationRequirement expectedActivateDuration) {
 
-    sina.changeInsuranceType(insuranceType);
+    sina.changePatientInsuranceType(insuranceType);
 
-    val creation = bernd.performs(
-        TaskCreate.forPatient(sina).ofAssignmentKind(assignmentKind));
+    val creation = bernd.performs(TaskCreate.forPatient(sina).ofAssignmentKind(assignmentKind));
     bernd.attemptsTo(
         Verify.that(creation.getResponse().getDuration())
-          .doesNotExceed(quantileFor(DurationOperationRequirement.CREATE)));
+            .doesNotExceed(quantileFor(DurationOperationRequirement.CREATE)));
 
     val draftTask = creation.getExpectedResponse();
     val prescriptionId = draftTask.getPrescriptionId();
@@ -125,8 +147,7 @@ class TaskActivatePerformanceUseCase extends ErpTest {
         Verify.that(activation.getResponse().getDuration())
             .doesNotExceed(quantileFor(expectedActivateDuration)));
 
-    sina.performs(
-        TaskAbort.asPatient(activation.getExpectedResponse()));
+    sina.performs(TaskAbort.asPatient(activation.getExpectedResponse()));
   }
 
   private VerificationStep<Duration> quantileFor(DurationOperationRequirement expected) {
@@ -172,9 +193,11 @@ class TaskActivatePerformanceUseCase extends ErpTest {
   @RequiredArgsConstructor
   static class SignKbvBundleAction implements Question<KonnektorResponse<byte[]>> {
     private final KbvErpBundle kbvErpBundle;
+
     public static SignKbvBundleAction forGiven(KbvErpBundle kbvErpBundle) {
       return new SignKbvBundleAction(kbvErpBundle);
     }
+
     @Override
     @Step("{0} erstellt QES Signatur von #kbvBundle")
     public KonnektorResponse<byte[]> answeredBy(net.serenitybdd.screenplay.Actor actor) {
@@ -189,12 +212,12 @@ class TaskActivatePerformanceUseCase extends ErpTest {
   @RequiredArgsConstructor
   static class ActivateAction extends ErpAction<ErxTask> {
 
-    private final String taskId;
+    private final TaskId taskId;
     private final AccessCode accessCode;
     private final byte[] signedKbv;
 
     public static ActivateAction forGiven(ErxTask task, byte[] signedKbv) {
-      return new ActivateAction(task.getUnqualifiedId(), task.getAccessCode(), signedKbv);
+      return new ActivateAction(task.getTaskId(), task.getAccessCode(), signedKbv);
     }
 
     @Override

@@ -18,11 +18,9 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.cli.cmd.param.InputDirectoryParameter;
-import de.gematik.test.erezept.cli.cmd.param.OutputDirectoryParameter;
+import de.gematik.test.erezept.cli.param.InputOutputDirectoryParameter;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
@@ -46,18 +44,17 @@ public class EncodingTranscoder implements Callable<Integer> {
       description = "Pretty Print the Output")
   private boolean prettyPrint = true;
 
-  @Mixin private InputDirectoryParameter inputDirectory;
-  @Mixin private OutputDirectoryParameter outputDirectory;
+  @Mixin protected InputOutputDirectoryParameter inputOutputDirectory;
 
   @Override
   public Integer call() throws Exception {
     val fhir = new FhirParser();
 
-    while (inputDirectory.hasNext()) {
-      val f = inputDirectory.next();
+    while (inputOutputDirectory.hasNext()) {
+      val f = inputOutputDirectory.next();
       val originalFileName = f.getName();
       val originalEncoding = EncodingType.fromString(originalFileName);
-      val flippedEncoding = EncodingUtil.flipEncoding(originalEncoding);
+      val flippedEncoding = originalEncoding.flipEncoding();
       log.info(
           format(
               "read {0} as {1} and transform to {2}",
@@ -73,7 +70,7 @@ public class EncodingTranscoder implements Callable<Integer> {
           originalFileName.replace(
               originalEncoding.toFileExtension(), flippedEncoding.toFileExtension());
       val flippedContent = fhir.encode(originalResource, flippedEncoding, prettyPrint);
-      outputDirectory.writeFile(flippedFileName, flippedContent);
+      inputOutputDirectory.writeFile(flippedFileName, flippedContent);
     }
 
     return 0;

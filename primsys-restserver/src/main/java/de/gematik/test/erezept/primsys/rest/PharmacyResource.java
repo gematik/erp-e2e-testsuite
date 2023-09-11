@@ -16,15 +16,16 @@
 
 package de.gematik.test.erezept.primsys.rest;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.primsys.model.AbortUseCase;
 import de.gematik.test.erezept.primsys.model.AcceptUseCase;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.erezept.primsys.model.CloseUseCase;
+import de.gematik.test.erezept.primsys.model.CreateChargeItemUseCase;
 import de.gematik.test.erezept.primsys.model.RejectUseCase;
 import de.gematik.test.erezept.primsys.model.ReplyUseCase;
 import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
+import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
+import de.gematik.test.erezept.primsys.rest.request.DispenseRequestData;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -39,6 +40,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+import javax.annotation.Nullable;
+
+import static java.text.MessageFormat.format;
 
 @Slf4j
 @Path("pharm")
@@ -119,17 +124,38 @@ public class PharmacyResource {
     return AbortUseCase.abortPrescription(pharma, taskId, accessCode, secret);
   }
 
-  @DELETE
+  @POST
   @Path("{id}/close")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response closePrescriptionAsPharma(
+  public Response closePrescriptionAsPharmaPKV(
       @PathParam("id") String id,
       @QueryParam("taskId") String taskId,
-      @QueryParam("secret") String secret) {
+      @QueryParam("secret") String secret,
+      DispenseRequestData body) {
     log.info(
-        format("DELETE/pharm/id/close for Pharmacy with ID {0} the Task with Id {1} ", id, taskId));
+        format(
+            "POST/pharm/id/close for Pharmacy with ID {0} the Task with Id {1} and Data to dispense {2}",
+            id, taskId, body));
     val pharma = getPharmacy(id);
-    return CloseUseCase.closePrescription(pharma, taskId, secret);
+    if (body != null) {
+      return CloseUseCase.closePrescription(pharma, taskId, secret, body);
+    } else {
+      return CloseUseCase.closePrescription(pharma, taskId, secret);
+    }
+  }
+
+  @POST
+  @Path("{id}/chargeitem")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response createChargeItem(
+          @PathParam("id") String id, @QueryParam("taskId") String taskId, @Nullable InvoiceData body) {
+    log.info(
+            format(
+                    "POST .../pharm/{0}/chargeitem/?taskId={1} + body: {2}",
+                    id, taskId, body));
+    val pharma = getPharmacy(id);
+    return new CreateChargeItemUseCase().postChargeItem(pharma, taskId, body);
   }
 }

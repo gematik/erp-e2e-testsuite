@@ -6,64 +6,56 @@ actors:
   doctors:
     - name: Bernd Claudius
       smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
-      hbaIccsn: 8027600101169991010  #Arzt Bernd Claudius
+      hbaIccsn: 80276001011699910100  #Arzt Bernd Claudius
       qualificationType: Arzt
       konnektor: Soft-Konn
+      validateResponse: false
 
     - name: Dr. Schraßer
       smcbIccsn: 80276883110000117369 #Praxis Bloch-Bauer
       hbaIccsn: 80276883110000095767 #Arzt Sam Schraßer
       qualificationType: Arzt
       konnektor: Soft-Konn
+      validateResponse: false
 
     - name: Gündüla Gunther
       smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
       hbaIccsn: 80276001081699900578 #Arzt Gunther
       qualificationType: Zahnarzt
       konnektor: Soft-Konn
-
-    - name: Kein Arzt
-      smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
-      hbaIccsn: 80276883110000121166  #Apotheke
-      algorithm: E256
-      qualificationType: Arzt
-      konnektor: Soft-Konn
-
-    - name: Keine Arztpraxis
-      smcbIccsn: 80276883110000116873 #Apotheke Am Flughafen
-      hbaIccsn: 80276883110000121166  #Apotheker
-      algorithm: E256
-      qualificationType: Arzt
-      konnektor: Soft-Konn
+      validateResponse: false
 
   pharmacies:
     - name: Am Flughafen
       smcbIccsn: 80276883110000116873
       konnektor: Soft-Konn
+      validateResponse: false
 
-    - name: NordApotheke
-      smcbIccsn: 80276883110000092475
-      konnektor: Soft-Konn
 
     - name: Stadtapotheke
       smcbIccsn: 80276883110000116872
       konnektor: Soft-Konn
+      validateResponse: false
 
     - name: Am Waldesrand
       smcbIccsn: 80276001011699900861
       konnektor: Soft-Konn
+      validateResponse: false
 
     - name: Adelheid Ulmendorfer
       smcbIccsn: 80276001011699902301
       konnektor: Soft-Konn
+      validateResponse: false
 
     - name: Bernd Ulmendorfer
       smcbIccsn: 80276001011699902302
       konnektor: Soft-Konn
+      validateResponse: false
 
     - name: Christine Ulmendorfer
       smcbIccsn: 80276001011699902303
       konnektor: Soft-Konn
+      validateResponse: false
 
   apothecaries:
     - name: Amanda Albrecht
@@ -123,7 +115,7 @@ environments:
       fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-ref.zentral.erp.splitdns.ti-dienste.de/subscription
     internet:
-      discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
 
 

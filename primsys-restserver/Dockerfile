@@ -1,5 +1,18 @@
 FROM openjdk:17
 
+ARG COMMIT_HASH
+ARG VERSION
+ARG BUILD_DATE
+
+ENV TI_ENV=""
+ENV VERSION=$VERSION
+ENV COMMIT_HASH=$COMMIT_HASH
+ENV BUILD_DATE=$BUILD_DATE
+ENV HTTP_PROXY=""
+ENV HTTPS_PROXY=""
+ENV NO_PROXY="*"
+ENV ERP_FHIR_PROFILE=""
+
 LABEL de.gematik.vendor="gematik GmbH"
 LABEL maintainer="alexander.kaiser@gematik.de"
 LABEL de.gematik.app="E-Rezept PrimSys REST"
@@ -20,12 +33,5 @@ HEALTHCHECK CMD curl --fail http://localhost:9095/info || exit 1
 
 EXPOSE 9095
 
-# choose TITUS as default; can be changed from outside with -eTI_ENV
-ENV TI_ENV="TITUS"
-
-ENV HTTP_PROXY=""
-ENV HTTPS_PROXY=""
-ENV NO_PROXY="*"
-
 # for -Djdk.tsl.namedGroups system property see https://github.com/bcgit/bc-java/issues/589
-CMD java -Djdk.tls.namedGroups="secp256r1, secp384r1, ffdhe2048, ffdhe3072" -Djava.net.useSystemProxies=false -jar -Derp.config.activeEnvironment=${TI_ENV} app.jar /home/primsys/config.yaml
+CMD java -Djdk.tls.namedGroups="secp256r1, secp384r1, ffdhe2048, ffdhe3072" -Djava.net.useSystemProxies=false -jar -Derp.primsys.activeEnvironment=${TI_ENV} app.jar /home/primsys/config.yaml

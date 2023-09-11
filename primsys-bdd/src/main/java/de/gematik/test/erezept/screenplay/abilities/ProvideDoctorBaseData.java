@@ -18,6 +18,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.PractitionerBuilder;
@@ -26,7 +27,7 @@ import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.lei.cfg.DoctorConfiguration;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
@@ -34,6 +35,8 @@ import net.serenitybdd.screenplay.Ability;
 /** The Ability to provide Base-Data (Stammdaten) */
 public class ProvideDoctorBaseData implements Ability {
 
+  private final String practitionerId;
+  private final String medicationOrganizationId;
   private final String firstName;
   private final String lastName;
   private final BaseANR doctorNumber;
@@ -46,6 +49,9 @@ public class ProvideDoctorBaseData implements Ability {
   private final String street;
 
   private ProvideDoctorBaseData(DoctorConfiguration cfg) {
+    this.practitionerId = UUID.randomUUID().toString();
+    this.medicationOrganizationId = UUID.randomUUID().toString();
+
     val fullName = cfg.getName();
 
     String[] tokens;
@@ -58,7 +64,7 @@ public class ProvideDoctorBaseData implements Ability {
     this.firstName = (tokens.length > 0) ? tokens[0] : GemFaker.fakerFirstName();
     this.lastName = (tokens.length > 1) ? tokens[1] : GemFaker.fakerLastName();
 
-    this.qualificationType = cfg.getQualificationType();
+    this.qualificationType = QualificationType.fromDisplay(cfg.getQualificationType());
     this.doctorNumber = BaseANR.randomFromQualification(this.qualificationType);
 
     this.bsnr = GemFaker.fakerBsnr();
@@ -71,6 +77,7 @@ public class ProvideDoctorBaseData implements Ability {
 
   public KbvPractitioner getPractitioner() {
     return PractitionerBuilder.builder()
+        .setResourceId(practitionerId)
         .anr(doctorNumber)
         .name(firstName, lastName, "Dr.")
         .addQualification(qualificationType)
@@ -80,6 +87,7 @@ public class ProvideDoctorBaseData implements Ability {
 
   public MedicalOrganization getMedicalOrganization() {
     return MedicalOrganizationBuilder.builder()
+        .setResourceId(medicationOrganizationId)
         .bsnr(bsnr)
         .phone(phone)
         .email(email)

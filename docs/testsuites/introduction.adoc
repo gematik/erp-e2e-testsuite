@@ -1,0 +1,14 @@
+
+== Einleitung [[introduction]]
+
+Willkommen zur {name-complete-testsuite}, die nach den Prinzipien des {link-bdd} (BDD) entwickelt wurde. Diese Testsuite bietet eine effektive Methode, um das Verhalten des E-Rezept-Fachdienstes im Zusammenspiel der TI zu testen, indem die Funktionen und Anforderungen aus der Sicht des Benutzers betrachtet werden. Durch die Kombination von BDD und End-to-End-Tests erhalten Sie eine leistungsstarke Testsuite, die sowohl technische Aspekte als auch die Anwendungsfälle des Benutzers abdeckt.
+
+Die BDD-Testsuite konzentriert sich auf das Verhalten des Systems, indem sie Szenarien in einer natürlichen Sprache beschreibt. Dies ermöglicht es, Testfälle in einer klaren und verständlichen Weise zu formulieren, die von allen Stakeholdern, einschließlich Nicht-Technikern, gelesen und verstanden werden können. Dadurch wird die Zusammenarbeit zwischen Entwicklern, Testern und Produktmanagern verbessert, da alle auf einer gemeinsamen Sprachebene kommunizieren können.
+
+Unsere End-to-End Testsuite deckt den gesamten Lebenszyklus der Softwareentwicklung ab, von der Erfassung der Anforderungen über das Design und die Implementierung bis hin zur Überprüfung des Endprodukts. Sie ermöglicht es, potenzielle Fehler oder Unstimmigkeiten frühzeitig zu erkennen und sicherzustellen, dass die Software den Anforderungen der Benutzer entspricht. Dabei fokussieren wir uns hauptsächlich auf den "_oberen Abschnitt der Test-Pyramide_". Damit bekennen wir uns zum propagierten Ansatz des {link-ct}
+
+image:testsuite_scopes.png[Test-Pyramide, align="center"]
+
+Diese Testsuite bietet eine automatisierte und wiederholbare Testumgebung, die es Ihnen ermöglicht, die Testsuite auf unterschiedlichen Plattformen und Betriebssystemen auszuführen. Sie können verschiedene Testfälle ausführen, Ergebnisse überprüfen und automatisch generierte Berichte erhalten, um den Fortschritt und die Qualität des E-Rezept-Fachdienstes in voller Integration zu überprüfen.
+
+Durch die <<testsuites_architecture,modulare Bauweise>> bieten wir zusätzlich die Möglichkeit des explorativen Testens. Wir wollen End-Anwender, Entwickler von Primärsystemen und alle anderen Stakeholdern dazu befähigen, das E-Rezept bereits in frühen Entwicklungsphasen auf dedizierten Staging-Umgebungen erlebbar zu machen.

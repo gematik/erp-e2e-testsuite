@@ -17,14 +17,15 @@
 package de.gematik.test.erezept.fhir.parser;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @Slf4j
 class ProfileExtractorTest {
@@ -54,5 +55,39 @@ class ProfileExtractorTest {
     val expectedProfile = "https://gematik.de/fhir/StructureDefinition/ErxTask|1.1.1";
     assertTrue(profile.isPresent());
     assertEquals(expectedProfile, profile.orElseThrow());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"<xml>", "alternative_json", ""})
+  void shouldNotCrashOnCheckingSearchBundles(String content) {
+    assertFalse(ProfileExtractor.isSearchSetOrCollection(content));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "erp/1.1.1/Parameters-accept-out.json",
+        "erp/1.2.0/chargeitembundle/ea33a992-a214-11ed-a8fc-0242ac120002.xml"
+      })
+  void shouldDetectSearchSetsAndCollections(String resourcePath) {
+    val base = "fhir/valid";
+    val resource = format("{0}/{1}", base, resourcePath);
+    val content = ResourceUtils.readFileFromResource(resource);
+    assertTrue(ProfileExtractor.isSearchSetOrCollection(content));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "dav/ad80703d-8c62-44a3-b12b-2ea66eda0aa2.xml",
+        "erp/1.2.0/receiptbundle/dffbfd6a-5712-4798-bdc8-07201eb77ab8.json",
+        "kbv/1.1.0/bundle/1f339db0-9e55-4946-9dfa-f1b30953be9b.xml",
+        "erp/1.2.0/autidevent/9361863d-fec0-4ba9-8776-7905cf1b0cfa.xml",
+      })
+  void shouldPassOtherResources(String resourcePath) {
+    val base = "fhir/valid";
+    val resource = format("{0}/{1}", base, resourcePath);
+    val content = ResourceUtils.readFileFromResource(resource);
+    assertFalse(ProfileExtractor.isSearchSetOrCollection(content));
   }
 }

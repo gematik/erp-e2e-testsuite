@@ -16,107 +16,70 @@
 
 package de.gematik.test.erezept.app.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.gematik.test.erezept.app.exceptions.ActorConfigurationNotFoundException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.config.dto.BaseConfigurationWrapper;
+import de.gematik.test.erezept.config.dto.app.*;
+import de.gematik.test.erezept.config.exceptions.ActorConfigurationNotFoundException;
 import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.*;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
-@Data
 @Slf4j
-public class ErpAppConfiguration {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class ErpAppConfiguration implements BaseConfigurationWrapper {
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
-
-  private static final String PRODUCT_NAME = "erp-app";
-  private static final String CONFIG_YAML = "config.yaml";
-  private static final Path BASE_PATH = Path.of("config", PRODUCT_NAME, CONFIG_YAML);
-
-  private static ErpAppConfiguration instance;
-
-  private boolean shouldLogCapabilityStatement = false;
-  private List<AppConfiguration> apps;
-  private List<ErpActorConfiguration> users;
-  private List<DeviceConfiguration> devices;
-  private List<AppiumConfiguration> appium;
+  @Delegate private final ErpAppConfigurationBase dto;
 
   public ErpActorConfiguration getAppUserByName(String name) {
-    return users.stream()
+    return this.getUsers().stream()
         .filter(actor -> actor.getName().equalsIgnoreCase(name))
         .findFirst()
         .orElseThrow(
             () ->
                 new ActorConfigurationNotFoundException(
-                    name,
-                    users.stream()
-                        .map(ErpActorConfiguration::getName)
-                        .collect(Collectors.toList())));
+                    name, this.getUsers().stream().map(ErpActorConfiguration::getName).toList()));
   }
 
   public DeviceConfiguration getDeviceByName(String deviceName) {
-    return devices.stream()
+    return this.getDevices().stream()
         .filter(device -> device.getName().equalsIgnoreCase(deviceName))
         .findFirst()
         .orElseThrow(
             () ->
-                new ActorConfigurationNotFoundException(
+                new ConfigurationMappingException(
                     deviceName,
-                    devices.stream()
-                        .map(DeviceConfiguration::getName)
-                        .collect(Collectors.toList())));
+                    this.getDevices().stream().map(DeviceConfiguration::getName).toList()));
   }
 
   public AppConfiguration getAppConfiguration(PlatformType platformType) {
-    return this.apps.stream()
-        .filter(app -> app.getPlatformType() == platformType)
+    return this.getApps().stream()
+        .filter(app -> platformType.is(app.getPlatform()))
         .findFirst()
         .orElseThrow(
             () ->
                 new ConfigurationMappingException(
                     platformType.name(),
-                    apps.stream().map(AppConfiguration::getPlatform).collect(Collectors.toList())));
+                    this.getApps().stream().map(AppConfiguration::getPlatform).toList()));
   }
 
   public AppConfiguration getAppConfigurationForUser(@NonNull String username) {
     val userDeviceName = this.getAppUserByName(username).getDevice();
     val device = this.getDeviceByName(userDeviceName);
-    return getAppConfiguration(device.getPlatformType());
+    return getAppConfiguration(PlatformType.fromString(device.getPlatform()));
   }
 
   public AppiumConfiguration getAppiumConfiguration(@NonNull String name) {
-    return appium.stream()
+    return this.getAppium().stream()
         .filter(a -> a.getId().equalsIgnoreCase(name))
         .findFirst()
         .orElseThrow(
             () ->
                 new ConfigurationMappingException(
-                    name,
-                    appium.stream().map(AppiumConfiguration::getId).collect(Collectors.toList())));
+                    name, this.getAppium().stream().map(AppiumConfiguration::getId).toList()));
   }
 
-  public static ErpAppConfiguration getInstance() {
-    if (instance == null) {
-      val ymlFile =
-          BASE_PATH.toFile().exists()
-              ? BASE_PATH.toFile()
-              : Path.of("..").resolve(BASE_PATH).toFile();
-
-      instance = getInstance(ymlFile);
-    }
-
-    return instance;
-  }
-
-  @SneakyThrows
-  public static ErpAppConfiguration getInstance(File ymlFile) {
-    return OBJECT_MAPPER.readValue(ymlFile, ErpAppConfiguration.class);
+  public static ErpAppConfiguration fromDto(ErpAppConfigurationBase dto) {
+    return new ErpAppConfiguration(dto);
   }
 }

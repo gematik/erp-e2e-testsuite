@@ -19,41 +19,45 @@ package de.gematik.test.erezept.app.abilities;
 import static java.text.MessageFormat.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.gematik.test.erezept.app.cfg.AppConfiguration;
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.exceptions.AppErrorException;
+import de.gematik.test.erezept.app.mobile.ListPageElement;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
+import de.gematik.test.erezept.app.mobile.elements.ErrorAlert;
 import de.gematik.test.erezept.app.mobile.elements.PageElement;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.AppiumFluentWait;
+import de.gematik.test.erezept.app.mobile.elements.Utility;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
+import io.appium.java_client.*;
+import io.appium.java_client.serverevents.CustomEvent;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
 import net.serenitybdd.screenplay.HasTeardown;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
+import org.jetbrains.annotations.NotNull;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.*;
 
 @Slf4j
 public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasTeardown {
 
   protected T driver;
   @Getter private final PlatformType platformType;
-  private final AppConfiguration appConfiguration;
-
-  protected UseTheApp(T driver, PlatformType platformType, AppConfiguration appConfiguration) {
+  private final AppiumConfiguration appiumConfiguration;
+  
+  protected UseTheApp(T driver, PlatformType platformType, AppiumConfiguration appiumConfiguration) {
     this.driver = driver;
     this.platformType = platformType;
-    this.appConfiguration = appConfiguration;
+    this.appiumConfiguration = appiumConfiguration;
+    log.info(format("{0} Driver started with session ID {1}", platformType, driver.getSessionId()));
   }
 
   public String getDriverName() {
@@ -62,19 +66,76 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   protected int getMaxWaitTimeout() {
-    return appConfiguration.getMaxWaitTimeout();
+    return appiumConfiguration.getMaxWaitTimeout();
   }
 
   protected int getPollingInterval() {
-    return appConfiguration.getPollingInterval();
+    return appiumConfiguration.getPollingInterval();
   }
 
-  public boolean useVirtualeGK() {
-    return appConfiguration.isUseVirtualeGK();
+  private void removeUtilities() {
+    val pageSource = driver.getPageSource();
+    this.checkForErrorAlerts(pageSource);
+    val changed = new AtomicBoolean(false);
+    for (val utility : Utility.values()) {
+      if (pageSource.contains(utility.extractSourceLabel(this.platformType))) {
+        log.info(format("Found Utility Element {0}", utility.getElementName()));
+        this.getOptionalWebElement(utility, pageSource)
+            .ifPresent(
+                webElement -> {
+                  webElement.click();
+                  changed.set(true);
+                });
+      }
+    }
+    if (changed.get()) removeUtilities(); // recursively remove until nothing changes anymore
+  }
+
+  @SneakyThrows
+  private void checkForErrorAlerts(String pageSource) {
+    Arrays.stream(ErrorAlert.values())
+        .forEach(
+            alert -> {
+              if (pageSource.contains(alert.extractSourceLabel(this.platformType))) {
+                val alertElement = this.getWebElement(alert);
+                val errorLines =
+                    alertElement.findElements(By.className("XCUIElementTypeStaticText")).stream()
+                        .map(WebElement::getText)
+                        .toList();
+                val errorMessage = alert.extractErrorMessage(errorLines);
+                throw new AppErrorException(errorMessage);
+              }
+            });
+  }
+
+  public void tapIfDisplayed(PageElement pageElement) {
+    if (this.isDisplayed(pageElement)) this.tap(pageElement);
   }
 
   public void tap(PageElement pageElement) {
-    this.tap(pageElement.forPlatform(platformType));
+    removeUtilities();
+    log.info(format("Tap ''{0}'' ({1})", pageElement.getFullName(), this.getLocator(pageElement)));
+    val element = this.getWebElement(pageElement);
+    this.tap(element);
+  }
+
+  public void tap(PageElement pageElement, int index) {
+    this.tap(ListPageElement.forElement(pageElement, index));
+  }
+
+  public void tap(ListPageElement listPageElement) {
+    val pageElement = listPageElement.getPageElement();
+    val index = listPageElement.getIndex();
+    val elements = this.getWebElements(pageElement);
+
+    if (index >= elements.size() || index < 0) {
+      throw new NoSuchElementException(
+          format(
+              "Wanted to tap on the {0}th element of {1} but only {2} elements received from App-Driver",
+              index, pageElement, elements.size()));
+    }
+
+    this.tap(elements.get(index));
   }
 
   public void tap(int times, PageElement pageElement) {
@@ -85,13 +146,14 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public void tap(Point point) {
-    PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+    val finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
     val tap = new Sequence(finger, 0);
     tap.addAction(
         finger.createPointerMove(
             Duration.ofMillis(0), PointerInput.Origin.viewport(), point.x, point.y));
     tap.addAction(finger.createPointerDown(PointerInput.MouseButton.MIDDLE.asArg()));
     tap.addAction(finger.createPointerUp(PointerInput.MouseButton.MIDDLE.asArg()));
+    log.info(format("Tap on Point at {0}/{1}", point.x, point.y));
     this.performGesture(tap);
   }
 
@@ -102,23 +164,33 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     }
   }
 
-  protected void tap(WebElement element) {
-    log.info(format("Tap on element {0}", element));
-    element.click();
+  private void tap(WebElement element) {
+    if (element.isEnabled()) {
+      element.click();
+    } else {
+      throw new ElementNotInteractableException(
+          format("Element {0} was displayed but not enabled", element));
+    }
   }
 
-  protected void tap(By locator) {
-    val element = this.getWebElement(locator);
-    this.tap(element);
+  public void tapByLabel(PageElement pageelement, @NotNull String label) {
+    val elements = this.getWebElements(pageelement);
+    elements.stream()
+        .filter(webElement -> webElement.getText().equals(label))
+        .findFirst()
+        .ifPresent(this::tap);
   }
 
   public void input(final String text, PageElement pageElement) {
+    log.info(
+        format(
+            "Type {0} into {1} ({2})",
+            text, pageElement.getFullName(), this.getLocator(pageElement)));
     val element = this.getWebElement(pageElement);
-    log.info(format("Type {0} into {1} ({2})", text, pageElement.getFullName(), element));
     element.clear(); // clear the default text in the input
     element.sendKeys(text);
 
-    // refetch the element and check if appium sent the text correctly
+    // re-fetch the element and check if appium sent the text correctly
     val input = this.getWebElement(pageElement).getText();
     assertThat(input).isEqualTo(text);
   }
@@ -131,21 +203,50 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
    * @param pageElement is the input field where the password is typed in
    */
   public void inputPassword(final String password, PageElement pageElement) {
-    val element = this.getWebElement(pageElement);
     log.info(
-        format("Type Password {0} into {1} ({2})", password, pageElement.getFullName(), element));
+        format(
+            "Type Password {0} into {1} ({2})",
+            password, pageElement.getFullName(), this.getLocator(pageElement)));
+    val element = this.getWebElement(pageElement);
     element.clear();
     for (val c : password.toCharArray()) {
       element.sendKeys(format("{0}", c));
     }
   }
 
+  public void scroll(ScrollDirection direction) {
+    this.scroll(direction, 0.7f); // 0.7f should be almost a full page
+  }
+
+  public void scroll(ScrollDirection direction, float distance) {
+    log.info(format("Scroll {0} with distance {1}", direction, distance));
+    driver.executeScript(
+        "mobile:scroll",
+        Map.of("direction", direction.name().toLowerCase(), "distance", String.valueOf(distance)));
+  }
+
+  public void scrollIntoView(ScrollDirection direction, PageElement pageElement) {
+    log.info(format("Scroll {0} until element {1} is found", direction, pageElement.getFullName()));
+    var scrollCounter = 5;
+    var element = this.getOptionalWebElement(pageElement);
+    while (element.isEmpty() && scrollCounter >= 0) {
+      scrollCounter--;
+      driver.executeScript(
+          "mobile:scroll", Map.of("direction", direction.name().toLowerCase(), "distance", "0.25"));
+      element = this.getOptionalWebElement(pageElement);
+    }
+  }
+
+  public void acceptAlert() {
+    driver.switchTo().alert().accept();
+  }
+
   public void swipe(SwipeDirection direction) {
-    swipe(direction, 1.0f);
+    swipe(direction, 0.5f);
   }
 
   public void swipe(SwipeDirection direction, float factor) {
-    swipe(direction, factor, 100);
+    swipe(direction, factor, 500);
   }
 
   public void swipe(SwipeDirection direction, float factor, int millis) {
@@ -168,55 +269,99 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     this.performGesture(swipe);
   }
 
-  public final void waitUntil(ExpectedCondition<Boolean> expected) {
+  protected final void waitUntil(ExpectedCondition<?> expected) {
     val wait = this.getFluentWaitDriver();
     wait.until(expected);
   }
 
-  public final boolean isDisplayed(PageElement pageElement) {
-    return isDisplayed(pageElement.forPlatform(this.platformType));
+  public final void waitUntilElementIsVisible(PageElement pageElement) {
+    log.info(format("Wait until element {0} is visible", pageElement.getFullName()));
+    waitUntil(ExpectedConditions.visibilityOf(getWebElement(pageElement)));
   }
 
-  protected final boolean isDisplayed(By locator) {
-    val elements = this.driver.findElements(locator);
-    return elements.stream().map(WebElement::isDisplayed).findFirst().orElse(false);
+  public final void waitUntilElementIsPresent(PageElement pageElement) {
+    log.info(format("Wait until element {0} is present", pageElement.getFullName()));
+    waitUntil(ExpectedConditions.presenceOfAllElementsLocatedBy(this.getLocator(pageElement)));
+  }
+
+  public final void waitUntilElementIsClickable(PageElement pageElement) {
+    log.info(format("Wait until element {0} is enabled", pageElement.getFullName()));
+    waitUntil(ExpectedConditions.elementToBeClickable(getWebElement(pageElement)));
+  }
+
+  public final boolean isDisplayed(PageElement pageElement) {
+    val element = this.getOptionalWebElement(pageElement);
+    return element.map(WebElement::isDisplayed).orElse(false);
+  }
+
+  public final boolean isEnabled(PageElement pageElement) {
+    val element = this.getOptionalWebElement(pageElement);
+    return element.map(we -> we.isEnabled() && we.isDisplayed()).orElse(false);
+  }
+
+  public boolean isPresent(PageElement pageElement) {
+    return this.getOptionalWebElement(pageElement).isPresent();
   }
 
   public void performGesture(Sequence sequence) {
     driver.perform(Collections.singletonList(sequence));
   }
 
-  public WebElement getWebElement(PageElement element) {
-    return getWebElement(element.forPlatform(this.platformType));
+  public String getText(PageElement element) {
+    return this.getWebElement(element).getText();
+  }
+
+  public final WebElement getWebElement(PageElement element) {
+    return this.getWebElement(this.getLocator(element));
   }
 
   protected abstract WebElement getWebElement(By locator);
 
-  public abstract List<WebElement> getWebElementList(PageElement pageElement);
+  protected abstract Optional<WebElement> getOptionalWebElement(PageElement pageelement);
+
+  protected abstract Optional<WebElement> getOptionalWebElement(
+      PageElement pageelement, String pageSource);
+
+  public abstract List<WebElement> getWebElements(PageElement pageElement);
 
   public int getWebElementListLen(PageElement pageElement) {
-    return this.getWebElementList(pageElement).size();
+    return this.getWebElements(pageElement).size();
   }
 
   protected final By getLocator(PageElement pageElement) {
     return pageElement.forPlatform(this.platformType);
   }
 
-  protected FluentWait<T> getFluentWaitDriver() {
-    return new AppiumFluentWait<>(driver)
-        .withTimeout(Duration.ofMillis(this.getMaxWaitTimeout()))
-        .ignoring(NoSuchElementException.class)
-        .pollingEvery(Duration.ofMillis(this.getPollingInterval()));
+  protected FluentWait<T> getShortPollingFluentWaitDriver() {
+    return getFluentWaitDriver(this.getMaxWaitTimeout() / 4, this.getPollingInterval());
   }
 
-  @Override
-  public String toString() {
-    return format("use the {0}", getDriverName());
+  protected FluentWait<T> getFluentWaitDriver() {
+    return getFluentWaitDriver(this.getMaxWaitTimeout(), this.getPollingInterval());
+  }
+
+  protected FluentWait<T> getFluentWaitDriver(int timeout, int pollingInterval) {
+    return new AppiumFluentWait<>(driver)
+        .withTimeout(Duration.ofMillis(timeout))
+        .ignoring(NoSuchElementException.class)
+        .pollingEvery(Duration.ofMillis(pollingInterval));
   }
 
   @Override
   public void tearDown() {
     driver.quit();
-    driver.close();
+  }
+
+  public void logEvent(String message) {
+    log.info(message);
+    val event = new CustomEvent();
+    event.setVendor("gematik");
+    event.setEventName(message);
+    driver.logEvent(event);
+  }
+
+  @Override
+  public String toString() {
+    return format("use the {0}", getDriverName());
   }
 }

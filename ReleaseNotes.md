@@ -1,5 +1,14 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.4.0
+
+Implemented Features:
+- Implement test cases for the feature "eGK in the pharmacy" 
+- Improve PKV test cases
+- Further development of test data generation, especially for the prescription data set, based on fuzzing concepts
+- Improved Fhir Validation of Collection and Searchset Bundles which contain resources from different profile versions
+- Implement alternative payor in case of VersicherungsArt BG (Berufsgenossenschaft) 
+
 ## Release 0.3.0
 
 Implemented features:

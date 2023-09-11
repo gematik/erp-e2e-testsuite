@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.exceptions.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.values.*;
@@ -51,8 +52,14 @@ class KbvBuilderTest extends ParsingTest {
     val organizationResourceId = "d55c6c01-057b-483d-a1eb-2bd1e182551f";
     val insuranceResourceId = "914e46d1-95a2-44c7-b900-5ca4ee80b8d5";
 
+    ErpWorkflowNamingSystem prescriptionIdSystem;
+    if (kbvErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID;
+    } else {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
+    }
     // bundle values
-    val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
+    val prescriptionId = new PrescriptionId(prescriptionIdSystem, "160.100.000.000.011.09");
 
     val practitioner =
         PractitionerBuilder.builder()
@@ -79,7 +86,7 @@ class KbvBuilderTest extends ParsingTest {
         PatientBuilder.builder()
             .version(kbvForVersion)
             .setResourceId(patientResourceId)
-            .kvIdentifierDe("X123456789", IdentifierTypeDe.GKV)
+            .kvnr(KVNR.random(), VersicherungsArtDeBasis.GKV)
             .name("Erwin", "Fleischer")
             .birthDate("09.07.1973")
             .address(Country.D, "Berlin", "10117", "Friedrichstraße 136")
@@ -132,6 +139,7 @@ class KbvBuilderTest extends ParsingTest {
             .custodian(organization)
             .patient(patient)
             .insurance(insurance)
+            .statusKennzeichen("00") // 00/NONE is default
             .medicationRequest(medicationRequest) // what is the medication
             .medication(medication)
             .build();
@@ -196,7 +204,7 @@ class KbvBuilderTest extends ParsingTest {
         PatientBuilder.builder()
             .version(kbvForVersion)
             .setResourceId(patientResourceId)
-            .kvIdentifierDe("X123456789", IdentifierTypeDe.PKV)
+            .kvnr(KVNR.random(), VersicherungsArtDeBasis.PKV)
             .assigner(assignerOrganization)
             .name("Erwin", "Fleischer")
             .birthDate("09.07.1973")
@@ -258,7 +266,16 @@ class KbvBuilderTest extends ParsingTest {
 
     // check if all values has been set correctly
     assertNotNull(kbvBundle.getId());
-    assertEquals(new PrescriptionId(prescriptionId), kbvBundle.getPrescriptionId());
+
+    ErpWorkflowNamingSystem prescriptionIdSystem;
+    if (kbvErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID;
+    } else {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
+    }
+
+    assertEquals(
+        new PrescriptionId(prescriptionIdSystem, prescriptionId), kbvBundle.getPrescriptionId());
 
     val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
     assertTrue(result.isSuccessful());
@@ -271,6 +288,336 @@ class KbvBuilderTest extends ParsingTest {
     } else {
       // well, that's how it's currently implemented: assigner is not set anymore!
       assertFalse(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    }
+  }
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build KBV Bundle for BG with Accident at Work and with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void buildKbvBundleWithFixedValuesForBGWithAccidentAtWork(
+      KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
+    val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
+    val medicationRequestResourceId = "75ec9d5d-07ec-44cf-b841-d8a4ef20e521";
+    val patientResourceId = "c9e9eeb8-e397-4d62-a977-656a18027f90";
+    val practitionerResourceId = "d8ac97db-249d-4f14-8c9b-861f8b93ca76";
+    val organizationResourceId = "d55c6c01-057b-483d-a1eb-2bd1e182551f";
+    val insuranceResourceId = "914e46d1-95a2-44c7-b900-5ca4ee80b8d5";
+
+    // bundle values
+    val prescriptionId = "160.100.000.000.011.09";
+
+    val practitioner =
+        PractitionerBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(practitionerResourceId)
+            .zanr("159753527")
+            .name("Mia", "Meyer", "Dr.")
+            .addQualification(QualificationType.DENTIST)
+            .addQualification("Super-Facharzt für alles Mögliche")
+            .build();
+
+    val medicalOrganization =
+        MedicalOrganizationBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(organizationResourceId)
+            .name("Arztpraxis Meyer")
+            .bsnr("757299999")
+            .phone("+490309876543")
+            .email("info@praxis.de")
+            .address(Country.D, "Berlin", "10623", "Wegelystraße 3")
+            .build();
+
+    val assignerOrganization =
+        AssignerOrganizationBuilder.builder()
+            .version(kbvForVersion)
+            .name("Bayerische Beamtenkrankenkasse")
+            .iknr("168141347")
+            .phone("0301111111")
+            .build();
+
+    val patient =
+        PatientBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(patientResourceId)
+            .kvnr(KVNR.random(), VersicherungsArtDeBasis.PKV)
+            .assigner(assignerOrganization)
+            .name("Erwin", "Fleischer")
+            .birthDate("09.07.1973")
+            .address(Country.D, "Berlin", "10117", "Friedrichstraße 136")
+            .build();
+
+    val insurance =
+        KbvCoverageBuilder.insurance("101377508", "Bayerische Beamtenkrankenkasse")
+            .version(kbvForVersion)
+            .beneficiary(patient)
+            .versicherungsArt(VersicherungsArtDeBasis.BG)
+            .setResourceId(insuranceResourceId)
+            .personGroup(PersonGroup.NOT_SET) // default NOT_SET
+            .dmpKennzeichen(DmpKennzeichen.ASTHMA) // default NOT_SET
+            .wop(Wop.BERLIN) // default DUMMY
+            .versichertenStatus(VersichertenStatus.PENSIONER) // default MEMBERS
+            .build();
+
+    val medication =
+        KbvErpMedicationBuilder.builder()
+            .version(kbvErpVersion)
+            .setResourceId(medicationResourceId)
+            .category(MedicationCategory.C_00) // default C_00
+            .isVaccine(false) // default false
+            .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
+            .darreichungsform(Darreichungsform.TKA) // default TAB
+            .amount(5, "Stk") // default 10 {tbl}
+            .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
+            .build();
+
+    val medicationRequest =
+        MedicationRequestBuilder.forPatient(patient)
+            .version(kbvErpVersion)
+            .setResourceId(medicationRequestResourceId)
+            .insurance(insurance)
+            .requester(practitioner)
+            .medication(medication)
+            .accident(AccidentExtension.accidentAtWork().atWorkplace())
+            .dosage("1-0-0-0")
+            .quantityPackages(20)
+            .status("active") // default ACTIVE
+            .intent("order") // default ORDER
+            .isBVG(false) // Bundesversorgungsgesetz default true
+            .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).validForDays(360))
+            .hasEmergencyServiceFee(true) // default false
+            .substitution(false) // default true
+            .coPaymentStatus(StatusCoPayment.STATUS_1) // default StatusCoPayment.STATUS_0
+            .build();
+
+    val kbvBundle =
+        KbvErpBundleBuilder.forPrescription(prescriptionId)
+            .version(kbvErpVersion)
+            .practitioner(practitioner)
+            .custodian(medicalOrganization)
+            .patient(patient)
+            .insurance(insurance)
+            .medicationRequest(medicationRequest) // what is the medication
+            .medication(medication)
+            .assigner(assignerOrganization)
+            .build();
+
+    // check if all values has been set correctly
+    assertNotNull(kbvBundle.getId());
+
+    ErpWorkflowNamingSystem prescriptionIdSystem;
+    if (kbvErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID;
+    } else {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
+    }
+
+    assertEquals(
+        new PrescriptionId(prescriptionIdSystem, prescriptionId), kbvBundle.getPrescriptionId());
+
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(result.isSuccessful());
+
+    // patient is PKV insured
+    assertEquals(VersicherungsArtDeBasis.PKV, kbvBundle.getPatient().getInsuranceKind());
+    // but the payor is a BG
+    assertEquals(VersicherungsArtDeBasis.BG, kbvBundle.getCoverage().getInsuranceKind());
+    assertTrue(kbvBundle.getPatient().getPkvAssigner().isPresent());
+
+    if (kbvForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      assertTrue(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    } else {
+      // well, that's how it's currently implemented: assigner is not set anymore!
+      assertFalse(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    }
+  }
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build KBV Bundle for PKV with Accident and with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void buildKbvBundleWithFixedValuesForPKVWithAccident(
+      KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
+    val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
+    val medicationRequestResourceId = "75ec9d5d-07ec-44cf-b841-d8a4ef20e521";
+    val patientResourceId = "c9e9eeb8-e397-4d62-a977-656a18027f90";
+    val practitionerResourceId = "d8ac97db-249d-4f14-8c9b-861f8b93ca76";
+    val organizationResourceId = "d55c6c01-057b-483d-a1eb-2bd1e182551f";
+    val insuranceResourceId = "914e46d1-95a2-44c7-b900-5ca4ee80b8d5";
+
+    // bundle values
+    val prescriptionId = "160.100.000.000.011.09";
+
+    val practitioner =
+        PractitionerBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(practitionerResourceId)
+            .zanr("159753527")
+            .name("Mia", "Meyer", "Dr.")
+            .addQualification(QualificationType.DENTIST)
+            .addQualification("Super-Facharzt für alles Mögliche")
+            .build();
+
+    val medicalOrganization =
+        MedicalOrganizationBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(organizationResourceId)
+            .name("Arztpraxis Meyer")
+            .bsnr("757299999")
+            .phone("+490309876543")
+            .email("info@praxis.de")
+            .address(Country.D, "Berlin", "10623", "Wegelystraße 3")
+            .build();
+
+    val assignerOrganization =
+        AssignerOrganizationBuilder.builder()
+            .version(kbvForVersion)
+            .name("Bayerische Beamtenkrankenkasse")
+            .iknr("168141347")
+            .phone("0301111111")
+            .build();
+
+    val patient =
+        PatientBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(patientResourceId)
+            .kvnr(KVNR.random(), VersicherungsArtDeBasis.PKV)
+            .assigner(assignerOrganization)
+            .name("Erwin", "Fleischer")
+            .birthDate("09.07.1973")
+            .address(Country.D, "Berlin", "10117", "Friedrichstraße 136")
+            .build();
+
+    val insurance =
+        KbvCoverageBuilder.insurance("101377508", "Bayerische Beamtenkrankenkasse")
+            .version(kbvForVersion)
+            .beneficiary(patient)
+            .versicherungsArt(VersicherungsArtDeBasis.PKV)
+            .setResourceId(insuranceResourceId)
+            .personGroup(PersonGroup.NOT_SET) // default NOT_SET
+            .dmpKennzeichen(DmpKennzeichen.ASTHMA) // default NOT_SET
+            .wop(Wop.BERLIN) // default DUMMY
+            .versichertenStatus(VersichertenStatus.PENSIONER) // default MEMBERS
+            .build();
+
+    val medication =
+        KbvErpMedicationBuilder.builder()
+            .version(kbvErpVersion)
+            .setResourceId(medicationResourceId)
+            .category(MedicationCategory.C_00) // default C_00
+            .isVaccine(false) // default false
+            .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
+            .darreichungsform(Darreichungsform.TKA) // default TAB
+            .amount(5, "Stk") // default 10 {tbl}
+            .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
+            .build();
+
+    val medicationRequest =
+        MedicationRequestBuilder.forPatient(patient)
+            .version(kbvErpVersion)
+            .setResourceId(medicationRequestResourceId)
+            .insurance(insurance)
+            .requester(practitioner)
+            .medication(medication)
+            .accident(AccidentExtension.accident())
+            .dosage("1-0-0-0")
+            .quantityPackages(20)
+            .status("active") // default ACTIVE
+            .intent("order") // default ORDER
+            .isBVG(false) // Bundesversorgungsgesetz default true
+            .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).validForDays(360))
+            .hasEmergencyServiceFee(true) // default false
+            .substitution(false) // default true
+            .coPaymentStatus(StatusCoPayment.STATUS_1) // default StatusCoPayment.STATUS_0
+            .build();
+
+    val kbvBundle =
+        KbvErpBundleBuilder.forPrescription(prescriptionId)
+            .version(kbvErpVersion)
+            .practitioner(practitioner)
+            .custodian(medicalOrganization)
+            .patient(patient)
+            .insurance(insurance)
+            .medicationRequest(medicationRequest) // what is the medication
+            .medication(medication)
+            .assigner(assignerOrganization)
+            .build();
+
+    // check if all values has been set correctly
+    assertNotNull(kbvBundle.getId());
+
+    ErpWorkflowNamingSystem prescriptionIdSystem;
+    if (kbvErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID;
+    } else {
+      prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
+    }
+
+    assertEquals(
+        new PrescriptionId(prescriptionIdSystem, prescriptionId), kbvBundle.getPrescriptionId());
+
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(result.isSuccessful());
+
+    // patient is PKV insured
+    assertEquals(VersicherungsArtDeBasis.PKV, kbvBundle.getPatient().getInsuranceKind());
+    // but the payor is also PKV
+    assertEquals(VersicherungsArtDeBasis.PKV, kbvBundle.getCoverage().getInsuranceKind());
+    assertTrue(kbvBundle.getPatient().getPkvAssigner().isPresent());
+
+    if (kbvForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      assertTrue(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    } else {
+      // well, that's how it's currently implemented: assigner is not set anymore!
+      assertFalse(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    }
+  }
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build KBV Bundle for PKV with Accident at Work and invalid Coverage Type with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void buildKbvBundleForPKVWithAccidentAndInvalidCoverage(
+      KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
+    
+    // bundle values
+    val prescriptionId = "160.100.000.000.011.09";
+    val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
+    val medicalOrganization = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
+    val assignerOrganization = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
+    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.PKV).version(kbvForVersion).assigner(assignerOrganization).build();
+    val insurance =
+        KbvCoverageBuilder.faker(VersicherungsArtDeBasis.PKV).version(kbvForVersion).beneficiary(patient).build();
+    val medication = KbvErpMedicationBuilder.faker().version(kbvErpVersion).build();
+    val medicationRequest =
+            MedicationRequestBuilder.faker(patient)
+                    .version(kbvErpVersion)
+                    .insurance(insurance)
+                    .requester(practitioner)
+                    .medication(medication)
+                    .accident(AccidentExtension.accidentAtWork().atWorkplace())
+                    .build();
+
+    val kbvBundle =
+        KbvErpBundleBuilder.forPrescription(prescriptionId)
+            .version(kbvErpVersion)
+            .practitioner(practitioner)
+            .custodian(medicalOrganization)
+            .patient(patient)
+            .insurance(insurance)
+            .medicationRequest(medicationRequest) // what is the medication
+            .medication(medication)
+            .assigner(assignerOrganization)
+            .build();
+
+    if (kbvForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
+      // accident at work and PKV insurance is allowed for old profiles
+      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+      assertTrue(result.isSuccessful());
+    } else {
+      // but accident at work and PKV insurance is not allowed for new profiles
+      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+      assertFalse(result.isSuccessful());
     }
   }
 
@@ -330,7 +677,7 @@ class KbvBuilderTest extends ParsingTest {
     System.setProperty(kbvForVersion.getCustomProfile().getName(), kbvForVersion.getVersion());
 
     for (int i = 0; i < 5; i++) {
-      val kbvBundle = KbvErpBundleBuilder.faker("X123456789", "04773414").build();
+      val kbvBundle = KbvErpBundleBuilder.faker(KVNR.random(), "04773414").build();
       log.info(
           format(
               "Validating Faker KBV-Bundle {0} with ID {1}",
@@ -356,7 +703,7 @@ class KbvBuilderTest extends ParsingTest {
     System.setProperty(kbvForVersion.getCustomProfile().getName(), kbvForVersion.getVersion());
 
     for (int i = 0; i < 5; i++) {
-      val kbvBundle = KbvErpBundleBuilder.faker("X123456789").build();
+      val kbvBundle = KbvErpBundleBuilder.faker(KVNR.random()).build();
       log.info(
           format(
               "Validating Faker KBV-Bundle {0} with ID {1}",
@@ -382,7 +729,7 @@ class KbvBuilderTest extends ParsingTest {
 
     for (int i = 0; i < 5; i++) {
       val kbvBundle =
-          KbvErpBundleBuilder.faker("X123456789", new PrescriptionId("160.002.362.150.600.45"))
+          KbvErpBundleBuilder.faker(KVNR.random(), new PrescriptionId("160.002.362.150.600.45"))
               .build();
 
       log.info(
@@ -412,7 +759,7 @@ class KbvBuilderTest extends ParsingTest {
     val authoredOn = Date.from(Instant.now().minus(2, ChronoUnit.DAYS));
     val kbvBundle =
         KbvErpBundleBuilder.faker(
-                "X123456789", authoredOn, new PrescriptionId("160.002.362.150.600.45"))
+                KVNR.random(), authoredOn, new PrescriptionId("160.002.362.150.600.45"))
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
     assertTrue(result.isSuccessful());
@@ -447,7 +794,7 @@ class KbvBuilderTest extends ParsingTest {
 
     val coverage =
         KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).version(kbvForVersion).build();
-    val patient = PatientBuilder.faker(IdentifierTypeDe.GKV).version(kbvForVersion).build();
+    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.GKV).version(kbvForVersion).build();
     val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
     val custodian = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
 
@@ -493,7 +840,7 @@ class KbvBuilderTest extends ParsingTest {
                   .anr(BaseANR.randomFromQualification(qt))
                   .build();
           val kbvBundle =
-              KbvErpBundleBuilder.faker("X123456789")
+              KbvErpBundleBuilder.faker(KVNR.random())
                   .version(kbvErpVersion)
                   .practitioner(practitioner)
                   .build();

@@ -19,9 +19,9 @@ package de.gematik.test.erezept.cli.cmd;
 import static java.text.MessageFormat.*;
 
 import ca.uhn.fhir.validation.*;
-import de.gematik.test.erezept.cli.cmd.param.*;
 import de.gematik.test.erezept.cli.description.*;
 import de.gematik.test.erezept.cli.indexmap.*;
+import de.gematik.test.erezept.cli.param.InputOutputDirectoryParameter;
 import de.gematik.test.erezept.fhir.parser.*;
 import java.io.*;
 import java.nio.charset.*;
@@ -48,8 +48,6 @@ public class Validator implements Callable<Integer> {
           "Choose minimum severity to show from INFORMATION, WARNING, ERROR, FATAL (default=${DEFAULT-VALUE})")
   private ResultSeverityEnum severity;
 
-  //  @Mixin private InputDirectoryParameter inputDirectory;
-  //  @Mixin private OutputDirectoryParameter outputDirectory;
   @Mixin private InputOutputDirectoryParameter directories;
 
   private FhirParser fhir;
@@ -85,11 +83,10 @@ public class Validator implements Callable<Integer> {
                   svm ->
                       sb.append(
                           format(
-                              "\n -> {0} in {1} ({2}:{3}): {4}",
+                              "\n -> {0} in {1} {2}: {3}",
                               formatSeverity(svm.getSeverity()),
                               formatValidationErrorLocation(svm.getLocationString()),
-                              svm.getLocationLine(),
-                              svm.getLocationCol(),
+                              formatLineAndColumn(svm.getLocationLine(), svm.getLocationCol()),
                               svm.getMessage())));
           sb.append(format("\n{0}", formatValidationFooter(f.getName())));
           log.error(sb.toString());
@@ -128,9 +125,18 @@ public class Validator implements Callable<Integer> {
     return format("{0}{1}{2}", style.on(), location, style.off());
   }
 
+  private String formatLineAndColumn(Integer line, Integer col) {
+    if (line == null && col == null) {
+      return ""; // no line and column given
+    } else {
+      val style = Style.fg_magenta;
+      return format("{0}({1}:{2}){3}", style.on(), line, col, style.off());
+    }
+  }
+
   private ExampleEntry createEntry(File sourceFile, Resource resource, String description) {
     val fileName = relativize(sourceFile);
-    val encoding = EncodingType.fromString(fileName);
+    val encoding = EncodingType.fromString(sourceFile.getName());
     val content = fhir.encode(resource, encoding, true);
     val result = fhir.validate(content);
 
@@ -145,6 +151,10 @@ public class Validator implements Callable<Integer> {
   private String relativize(File sourceFile) {
     val base = directories.getIn().toUri();
     val source = sourceFile.toURI();
-    return base.relativize(source).getPath();
+    if (base.equals(source)) {
+      return sourceFile.getName();
+    } else {
+      return base.relativize(source).getPath();
+    }
   }
 }

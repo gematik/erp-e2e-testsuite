@@ -17,20 +17,18 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import java.util.List;
-import java.util.Map;
-import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.openqa.selenium.InvalidArgumentException;
+import de.gematik.test.core.expectations.requirements.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
 
 class ErpResponseVerifierTest {
 
@@ -41,57 +39,94 @@ class ErpResponseVerifierTest {
   }
 
   @Test
+  void shouldNotInstantiate() {
+    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(ErpResponseVerifier.class));
+  }
+
+  @Test
   void returnCodeIsCorrectTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCode(200, ErpAfos.A_19514_02);
     step.apply(response);
   }
 
   @Test
   void returnCodeIsWrongTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeIs(201);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
 
   @Test
   void returnCodeIsNotCorrectTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeIsNot(404);
     step.apply(response);
   }
 
   @Test
   void returnCodeIsNotWrongTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeIsNot(200);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
 
   @Test
   void returnCodeIsInCorrectTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeIsIn(100, 200, 300);
     step.apply(response);
   }
 
   @Test
   void returnCodeIsInWrongTest() {
-    val response = new ErpResponse(201, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeIsIn(List.of(100, 200, 300));
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
 
   @Test
   void returnCodeIsBetweenCorrectTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeIsBetween(200, 210);
     step.apply(response);
   }
 
   @Test
   void returnCodeIsBetweenWrongTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = returnCodeBetween(201, 202);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
@@ -104,28 +139,44 @@ class ErpResponseVerifierTest {
 
   @Test
   void payloadIsOfTypeCorrectTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = payloadIsOfType(KbvErpBundle.class, ErpAfos.A_19022);
     step.apply(response);
   }
 
   @Test
   void payloadIsOfTypeWrongTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = payloadIsOfType(OperationOutcome.class, ErpAfos.A_19022);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
 
   @Test
   void payloadIsNotOfTypeCorrectTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = payloadIsNotOfType(OperationOutcome.class, ErpAfos.A_19022);
     step.apply(response);
   }
 
   @Test
   void payloadIsNotOfTypeWrongTest() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = payloadIsNotOfType(KbvErpBundle.class, ErpAfos.A_19022);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }

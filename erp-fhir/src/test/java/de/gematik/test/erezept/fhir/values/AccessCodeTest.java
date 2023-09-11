@@ -16,10 +16,15 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import lombok.val;
+import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class AccessCodeTest {
 
@@ -28,7 +33,7 @@ class AccessCodeTest {
 
   @Test
   void shouldFailOnInvalidAccessCode() {
-    val accessCode = new AccessCode("ffae");
+    val accessCode = AccessCode.fromString("ffae");
     assertFalse(accessCode.isValid());
   }
 
@@ -42,5 +47,15 @@ class AccessCodeTest {
   void shouldGenerateValidRandomAccessCodes() {
     val accessCode = AccessCode.random();
     assertTrue(accessCode.isValid());
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = ErpWorkflowNamingSystem.class,
+      names = {"ACCESS_CODE_121", "ACCESS_CODE"})
+  void shouldDetectAccessCodes(ErpWorkflowNamingSystem ns) {
+    val identifier = new Identifier();
+    identifier.setSystem(ns.getCanonicalUrl()).setValue(STRONG_ACCESS_CODE_VALUE);
+    assertTrue(AccessCode.isAccessCode(identifier));
   }
 }

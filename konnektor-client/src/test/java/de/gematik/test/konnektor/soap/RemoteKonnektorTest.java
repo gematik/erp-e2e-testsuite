@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import de.gematik.test.konnektor.*;
+import de.gematik.test.cardterminal.*;
 import de.gematik.test.konnektor.cfg.*;
 import de.gematik.test.konnektor.commands.*;
 import de.gematik.test.konnektor.exceptions.*;
@@ -135,8 +135,9 @@ class RemoteKonnektorTest {
     val cit = new CardInfoType();
     cit.setIccsn("80276001011699910102");
     cit.setCardHandle("my_test_handle");
+    cit.setCtId("Ct01");
     cit.setCardType(CardTypeType.HBA);
-    val cardHandle = CardHandle.fromCardInfoType(cit);
+    val cardHandle = CardInfo.fromCardInfoType(cit);
     when(mockCmd.execute(any(), any())).thenReturn(cardHandle);
 
     cfg.getKonnektors()
@@ -154,8 +155,9 @@ class RemoteKonnektorTest {
     val cit = new CardInfoType();
     cit.setIccsn("80276001011699910102");
     cit.setCardHandle("my_test_handle");
+    cit.setCtId("Ct01");
     cit.setCardType(CardTypeType.HBA);
-    val cardHandle = CardHandle.fromCardInfoType(cit);
+    val cardHandle = CardInfo.fromCardInfoType(cit);
     when(mockCmd.execute(any(), any())).thenReturn(cardHandle);
 
     cfg.getKonnektors()

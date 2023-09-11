@@ -26,6 +26,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -80,7 +81,7 @@ class HelloWorldFeature extends ErpTest {
   @Disabled("For Demonstration purpose only!")
   void testScreenplay() {
     // no erp-client for now; simply mock some responses
-    val taskGetInteraction = sina.asksFor(TheTask.withId("123123"));
+    val taskGetInteraction = sina.asksFor(TheTask.withId(TaskId.from("123123")));
 
     sina.attemptsTo(
         Verify.that(taskGetInteraction)

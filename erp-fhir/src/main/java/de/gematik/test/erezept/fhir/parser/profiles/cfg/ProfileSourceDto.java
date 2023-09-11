@@ -18,8 +18,10 @@ package de.gematik.test.erezept.fhir.parser.profiles.cfg;
 
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ProfileSourceDto extends ProfileDto {
 
   private List<String> files;

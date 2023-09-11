@@ -16,27 +16,43 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.val;
 
 @Data
 public class MvoData {
-  private int numerator;
-  private int denominator;
+  private Integer numerator;
+  private Integer denominator;
 
+  private LocalDate startDate;
+
+  private LocalDate endDate;
+
+  @JsonIgnore
   public boolean isValid() {
-    return !(numerator < 1
+    return !(numerator == null
+        || denominator == null
+        || startDate == null
+        || numerator < 1
         || numerator > denominator
         || denominator < 2
         || numerator > 4
         || denominator > 4);
   }
 
-  public MvoData fakeMvoNumeAndDenomi() {
+  public MvoData fakeMvoNumeDenomAndDates() {
     val mvo = GemFaker.mvo(true);
     denominator = mvo.getDenominator();
     numerator = mvo.getNumerator();
+    startDate = LocalDate.now();
+    endDate = startDate.plusDays(100);
     return this;
+  }
+
+  public boolean hasEndDate() {
+    return (endDate != null);
   }
 }

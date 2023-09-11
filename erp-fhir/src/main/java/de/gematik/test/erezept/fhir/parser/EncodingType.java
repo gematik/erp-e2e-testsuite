@@ -42,6 +42,16 @@ public enum EncodingType {
     return ret;
   }
 
+  public EncodingType flipEncoding() {
+    EncodingType ret;
+    if (this == EncodingType.XML) {
+      ret = EncodingType.JSON;
+    } else {
+      ret = EncodingType.XML;
+    }
+    return ret;
+  }
+
   public String toFileExtension() {
     return this.name().toLowerCase();
   }

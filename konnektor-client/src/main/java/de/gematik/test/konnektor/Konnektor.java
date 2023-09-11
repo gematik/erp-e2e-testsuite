@@ -16,6 +16,7 @@
 
 package de.gematik.test.konnektor;
 
+import de.gematik.test.cardterminal.*;
 import de.gematik.test.konnektor.cfg.*;
 import de.gematik.test.konnektor.commands.*;
 import de.gematik.test.konnektor.profile.*;
@@ -32,4 +33,6 @@ public interface Konnektor {
   <R> KonnektorResponse<R> execute(KonnektorCommand<R> cmd);
 
   <R> Optional<KonnektorResponse<R>> safeExecute(KonnektorCommand<R> cmd);
+
+  CardTerminalManager getCardTerminalManager();
 }

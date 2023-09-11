@@ -16,37 +16,15 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.and;
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
-import de.gematik.test.erezept.screenplay.questions.HasDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
-import de.gematik.test.erezept.screenplay.questions.HasReceivedCommunication;
-import de.gematik.test.erezept.screenplay.questions.HisInsuranceType;
-import de.gematik.test.erezept.screenplay.questions.HistSentCommunications;
-import de.gematik.test.erezept.screenplay.questions.MedicationDispenseContains;
-import de.gematik.test.erezept.screenplay.questions.PatientDoesHaveMessagesForTask;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetCommunicationFrom;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
-import de.gematik.test.erezept.screenplay.questions.TheLastPrescription;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.task.AbortPrescription;
-import de.gematik.test.erezept.screenplay.task.AlternativelyAssign;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
-import de.gematik.test.erezept.screenplay.task.DeleteAllSentCommunications;
-import de.gematik.test.erezept.screenplay.task.DeleteSentCommunication;
-import de.gematik.test.erezept.screenplay.task.HandoverDataMatrixCode;
-import de.gematik.test.erezept.screenplay.task.RedeemPrescription;
-import de.gematik.test.erezept.screenplay.task.RetrievePrescriptionFromServer;
-import de.gematik.test.erezept.screenplay.task.SendCommunication;
+import de.gematik.test.erezept.screenplay.questions.*;
+import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.core.PendingStepException;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.ensure.Ensure;
 
@@ -90,7 +68,7 @@ public class PatientSteps {
    */
   @Wenn(
       "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte) E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  public void whenAssignDataMatrxiCodeFromStack(
+  public void whenAssignDataMatrixCodeFromStack(
       String patientName, String order, String dmcStack, String pharmacyName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacy = OnStage.theActorCalled(pharmacyName);
@@ -101,7 +79,7 @@ public class PatientSteps {
 
   @Wenn(
       "^(?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte) E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  public void whenAssignDataMatrxiCodeFromStack(
+  public void whenAssignDataMatrixCodeFromStack(
       String order, String dmcStack, String pharmacyName) {
     val thePatient = OnStage.theActorInTheSpotlight();
     val thePharmacy = OnStage.theActorCalled(pharmacyName);
@@ -135,24 +113,6 @@ public class PatientSteps {
   public void whenDownloadPrescription(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient).attemptsTo(RetrievePrescriptionFromServer.andChooseWith(order));
-  }
-
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) das (letztes|erstes) heruntergeladene E-Rezept der Apotheke (.+) zuweist$")
-  public void whenAssignPrescription(String patientName, String order, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacist = OnStage.theActorCalled(pharmName);
-    when(thePatient)
-        .attemptsTo(RedeemPrescription.assign(thePharmacist, DequeStrategy.fromString(order)));
-  }
-
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) für das (letztes|erstes) heruntergeladene E-Rezept eine Anfrage an die Apotheke (.+) schickt$")
-  public void whenReserveRequest(String patientName, String order, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacist = OnStage.theActorCalled(pharmName);
-    when(thePatient)
-        .attemptsTo(RedeemPrescription.reserve(thePharmacist, DequeStrategy.fromString(order)));
   }
 
   /**
@@ -202,321 +162,6 @@ public class PatientSteps {
         .attemptsTo(Ensure.that(TheLastPrescription.from(stack).existsInBackend()).isFalse());
   }
 
-  /**
-   * TMD-1624
-   *
-   * @param patientName ist der Name des Versicherten
-   */
-  @Wenn("^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept löscht$")
-  public void whenDeletePrescription(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    when(thePatient).attemptsTo(AbortPrescription.asPatient().fromStack(order));
-  }
-
-  @Wenn("^(?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept löscht$")
-  public void whenDeletePrescription(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    when(thePatient).attemptsTo(AbortPrescription.asPatient().fromStack(order));
-  }
-
-  @Dann("^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen$")
-  public void thenCannotDeletePrescription(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(400));
-  }
-
-  @Dann("^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen$")
-  public void thenCannotDeletePrescription(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(400));
-  }
-
-  @Und("^(?:der|die) Versicherte (.+) kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen$")
-  public void andCannotDeletePrescription(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    and(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(400));
-  }
-
-  @Und("^(?:der|die) Versicherte kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen$")
-  public void andCannotDeletePrescription(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    and(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(400));
-  }
-
-  @Und(
-      "^(?:der|die) Versicherte (.+) kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
-  public void andCannotDeletePrescription403(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    and(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(403));
-  }
-
-  @Und(
-      "^(?:der|die) Versicherte kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
-  public void andCannotDeletePrescription403(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    and(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(403));
-  }
-
-  /**
-   * Negierung von TMD-1624
-   *
-   * @param patientName ist der Name des Versicherten
-   */
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
-  public void thenCannotDeletePrescription409(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(409));
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
-  public void thenCannotDeletePrescription409(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(409));
-  }
-
-  @Und(
-      "^(?:der|die) Versicherte (.+) kann (?:seine|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
-  public void andCannotDeletePrescription409(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(409));
-  }
-
-  @Und(
-      "^(?:der|die) Versicherte kann (?:seine|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
-  public void andCannotDeletePrescription409(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(409));
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
-  public void thenCannotDeletePrescription403(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(403));
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
-  public void thenCannotDeletePrescription403(String order) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfAbortOperation.asPatient().fromStack(order))
-                .isEqualTo(403));
-  }
-
-  /**
-   * TMD-1640
-   *
-   * @param patientName
-   * @param order
-   * @param pharmName
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept der Apotheke (.+) per Nachricht zuweist$")
-  public void whenRequestDispenseViaCommunication(
-      String patientName, String order, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    when(thePatient)
-        .attemptsTo(
-            SendCommunication.with(
-                ResponseOfPostCommunication.dispenseRequest()
-                    .forPrescriptionFromBackend(order)
-                    .sentTo(thePharmacy)
-                    .withRandomMessage()));
-  }
-
-  /**
-   * TMD-1644
-   *
-   * @param patientName
-   * @param order
-   * @param pharmName
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) zu (?:seinem|ihrem) (letzten|ersten) E-Rezept der Apotheke (.+) eine Anfrage schickt$")
-  public void whenRequestInformationViaCommunication(
-      String patientName, String order, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    when(thePatient)
-        .attemptsTo(
-            SendCommunication.with(
-                ResponseOfPostCommunication.infoRequest()
-                    .forPrescriptionFromBackend(order) // letzte | erste
-                    .sentTo(thePharmacy)
-                    .withRandomMessage()));
-  }
-
-  @Wenn(
-      "^(?:der|die) Versicherte zu (?:seinem|ihrem) (letzten|ersten) E-Rezept der Apotheke (.+) eine Anfrage schickt$")
-  public void whenRequestInformationViaCommunication(String order, String pharmName) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    when(thePatient)
-        .attemptsTo(
-            SendCommunication.with(
-                ResponseOfPostCommunication.infoRequest()
-                    .forPrescriptionFromBackend(order) // letzte | erste
-                    .sentTo(thePharmacy)
-                    .withRandomMessage()));
-  }
-
-  /**
-   * TMD-1646
-   *
-   * @param patientName
-   * @param pharmName
-   */
-  @Dann("^hat (?:der|die) Versicherte (.+) eine Antwort von der Apotheke (.+) erhalten$")
-  public void thenHasReceivedResponseFrom(String patientName, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    then(thePatient)
-        .attemptsTo(Ensure.that(HasReceivedCommunication.reply().from(thePharmacy)).isTrue());
-  }
-
-  @Dann(
-      "^hat (?:der|die) Versicherte (.+) keine Antwort von der Apotheke (.+) für das (letzte|erste) E-Rezept erhalten$")
-  public void thenHasNotReceivedResponseFrom(String patientName, String pharmName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfGetCommunicationFrom.sender(thePharmacy).onStack(order))
-                .isEqualTo(404));
-  }
-
-  @Dann("^hat (?:der|die) Versicherte eine Antwort von der Apotheke (.+) erhalten$")
-  public void thenHasReceivedResponseFrom(String pharmName) {
-    val thePatient = OnStage.theActorInTheSpotlight();
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    then(thePatient)
-        .attemptsTo(Ensure.that(HasReceivedCommunication.reply().from(thePharmacy)).isTrue());
-  }
-
-  /**
-   * TMD-1648
-   *
-   * @param patientName
-   * @param representativeName
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept per Nachricht an (?:den Vertreter|die Vertreterin) (.+) schickt$")
-  public void whenSendCommunicationRepresentative(
-      String patientName, String order, String representativeName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    when(thePatient)
-        .attemptsTo(
-            SendCommunication.with(
-                ResponseOfPostCommunication.representative()
-                    .forPrescriptionFromBackend(order) // letzte | erste
-                    .sentTo(theRepresentative)
-                    .withRandomMessage()));
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht per Nachricht an (?:den Vertreter|die Vertreterin) (.+) schicken$")
-  public void thenCanotSendCommunicationRepresentative400(
-      String patientName, String order, String representativeName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val theRepresentative = OnStage.theActorCalled(representativeName);
-    then(thePatient)
-        .attemptsTo(
-            CheckTheReturnCode.of(
-                    ResponseOfPostCommunication.representative()
-                        .forPrescriptionFromBackend(order) // letzte | erste
-                        .sentTo(theRepresentative)
-                        .withRandomMessage())
-                .isEqualTo(400));
-  }
-
-  /**
-   * Der Step prüft, dass für den Versicherten eine Nachricht vom Typ ChargChangeReplay von der
-   * Apotheke vorliegt
-   *
-   * @param patientName ist der Name des Versicherten Patienten
-   * @param pharmName ist der Name der Apotheke, von der die Antwort erwartet wird
-   */
-  @Dann(
-      "^hat (?:der|die) Versicherte (.+) eine Antwort auf (?:seinen|ihren) Änderungswunsch von der Apotheke (.+) erhalten$")
-  public void thenHasReceivedResponseToChangeRequestFrom(String patientName, String pharmName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-
-    then(thePatient)
-        .attemptsTo(Ensure.that(HasReceivedCommunication.changeReply().from(thePharmacy)).isTrue());
-  }
-
-  /**
-   * Der Step erzeugt und zeigt den DMC zum erzeugten E-Rezept, damit er mit dem E-Rezept
-   * eingescannt werden kann
-   *
-   * @param patientName
-   */
-  @Wenn("^(?:der Versicherte|die Versicherte) (.+) ein DMC zum Rezept erhält$")
-  public void whenDmcIsGivenToPatient(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  /**
-   * Manueller Teststep zum Auslösen der alternativen Zuweisung im FdV
-   *
-   * @param patientName
-   * @param order
-   * @param pharmName
-   * @param option
-   */
-  @Wenn(
-      "^(?:der Versicherte|die Versicherte) (.+) für das (letzte|erste) E-Rezept die alternative Zuweisung an die Apotheke (.+) mit der Option (.+) auslöst$")
-  public void whenPatientInitiatsAlternativeAssignment(
-      String patientName, String order, String pharmName, String option) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-
-    when(thePatient)
-        .attemptsTo(
-            AlternativelyAssign.thePrescriptionReceived(order).to(thePharmacy).with(option));
-  }
-
   @Dann(
       "^kann (?:der|die) Versicherte (.+) (\\d+) Dispensierinformation(?:en)? für (?:sein|ihr) (erstes|letztes) E-Rezept abrufen$")
   public void thenPatientGetsMedicationDispense(String patientName, long amount, String order) {
@@ -528,60 +173,5 @@ public class PatientSteps {
                         .andPrescription(order)
                         .numberOfMedicationDispenses(amount))
                 .isTrue());
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) nicht mehr die Nachrichten zu (?:seinem|ihrem) (ersten|letzten) E-Rezept abrufen$")
-  public void thenPatientCannotGetCommunicationsBasedOnTask(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isFalse());
-  }
-
-  @Wenn("^(?:der|die) Versicherte (.+) alle (?:seinem|ihre) versendeten Nachrichten löscht$")
-  public void whenPatientDeletesAllCommunications(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    when(thePatient).attemptsTo(DeleteAllSentCommunications.fromBackend());
-  }
-
-  @Wenn("^(?:der|die) Versicherte (.+) (?:ihre|seine) (letzte|erste) versendete Nachricht löscht$")
-  public void whenPharmacyDeletesCommunication(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    when(thePatient).attemptsTo(DeleteSentCommunication.fromStack(order));
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) keine (?:ihrer|seiner) versendeten Nachrichten mehr abrufen$")
-  public void thenPatientCannotGetAnyCommunications(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(Ensure.that(HistSentCommunications.onBackend().noneExistAnymore()).isTrue());
-  }
-
-  @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:ihre|seine) (letzte|erste) Nachricht nicht mehr abrufen$")
-  public void thenPatientCannotGetASentCommunication(String patientName, String order) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    then(thePatient)
-        .attemptsTo(
-            Ensure.that(HistSentCommunications.onBackend().fromQueueStillExists(order)).isFalse());
-  }
-
-  @Dann(
-      "^hat (?:der|die) Versicherte (.+) für das (letzte|erste) dispensiert E-Rezept im Zugriffsprotokoll einen Protokolleintrag$")
-  public void thenPatientHasNewEntryInAccessProtocolForPrescription(
-      String patientName, String order) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  @Wenn("^(?:der Versicherte|die Versicherte) (.+) alle löschbaren E-Rezepte löscht$")
-  public void whenPatientDeletesAllPresciptions(String patientName) {
-    throw new PendingStepException("Not yet implemented");
-  }
-
-  @Dann(
-      "^werden (?:der Versicherten|dem Versicherten) (.+) keine löschbaren Rezepte mehr im FDV angezeigt$")
-  public void FdvShowsNoPresciptions(String patientName) {
-    throw new PendingStepException("Not yet implemented");
   }
 }

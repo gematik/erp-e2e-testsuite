@@ -16,16 +16,18 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
+import de.gematik.test.erezept.primsys.rest.request.DispenseRequestData;
 import java.util.Date;
-import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 
 @Data
 @XmlRootElement
-public class DispensedData {
+public class DispensedData extends DispenseRequestData {
 
+  private String taskId;
+  private String secret;
   private AcceptData acceptData;
   private Date dispensedDate;
-  private List<MedicationData> medications;
+  private String receipt;
 }

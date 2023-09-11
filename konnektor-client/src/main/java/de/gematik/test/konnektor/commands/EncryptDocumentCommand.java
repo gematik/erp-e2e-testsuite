@@ -16,7 +16,7 @@
 
 package de.gematik.test.konnektor.commands;
 
-import de.gematik.test.konnektor.*;
+import de.gematik.test.cardterminal.*;
 import de.gematik.test.konnektor.soap.*;
 import de.gematik.test.smartcard.*;
 import de.gematik.ws.conn.connectorcommon.v5.*;
@@ -30,18 +30,18 @@ import oasis.names.tc.dss._1_0.core.schema.*;
 
 public class EncryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 
-  private final CardHandle cardHandle;
+  private final CardInfo cardInfo;
   private final byte[] payload;
   private final Crypto algorithm;
 
-  public EncryptDocumentCommand(CardHandle cardHandle, byte[] payload, Crypto algorithm) {
-    this.cardHandle = cardHandle;
+  public EncryptDocumentCommand(CardInfo cardInfo, byte[] payload, Crypto algorithm) {
+    this.cardInfo = cardInfo;
     this.payload = payload;
     this.algorithm = algorithm;
   }
 
-  public EncryptDocumentCommand(CardHandle cardHandle, byte[] payload) {
-    this(cardHandle, payload, Crypto.RSA_2048);
+  public EncryptDocumentCommand(CardInfo cardInfo, byte[] payload) {
+    this(cardInfo, payload, Crypto.RSA_2048);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class EncryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 
     val recipientKeys = new RecipientKeys();
     val keyOnCardType = new KeyOnCardType();
-    keyOnCardType.setCardHandle(cardHandle.getHandle());
+    keyOnCardType.setCardHandle(cardInfo.getHandle());
     keyOnCardType.setCrypt(algorithm.getAlgorithm());
     recipientKeys.setCertificateOnCard(keyOnCardType);
 

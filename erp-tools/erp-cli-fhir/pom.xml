@@ -7,7 +7,7 @@
   <parent>
     <artifactId>erp-tools</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -27,13 +27,22 @@
   <dependencies>
     <dependency>
       <groupId>de.gematik.test.erezept</groupId>
+      <artifactId>erp-cli-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.gematik.test.erezept</groupId>
       <artifactId>erp-fhir</artifactId>
-      <version>0.3.0</version>
     </dependency>
     <dependency>
       <groupId>de.gematik.test.erezept</groupId>
       <artifactId>erp-fhir-fuzzing</artifactId>
-      <version>0.3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.gematik.test.erezept</groupId>
+      <artifactId>erp-fhir</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -42,7 +51,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <inherited>true</inherited>
         <configuration>
           <source>${maven.compiler.source}</source>
@@ -53,7 +62,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -68,7 +77,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <id>make-jar</id>
@@ -144,7 +153,7 @@
           <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli-codegen</artifactId>
-            <version>4.7.0</version>
+            <version>4.7.3</version>
             <type>jar</type>
           </dependency>
         </dependencies>
@@ -152,27 +161,25 @@
       <plugin>
         <groupId>org.asciidoctor</groupId>
         <artifactId>asciidoctor-maven-plugin</artifactId>
-        <version>2.1.0</version>
+        <version>2.2.3</version>
         <executions>
           <execution>
             <id>output-html</id>
-            <phase>process-classes</phase>
+            <phase>install</phase>
             <goals>
               <goal>process-asciidoc</goal>
             </goals>
             <configuration>
-              <sourceHighlighter>coderay</sourceHighlighter>
               <backend>html5</backend>
             </configuration>
           </execution>
           <execution>
             <id>output-manpage</id>
-            <phase>process-classes</phase>
+            <phase>install</phase>
             <goals>
               <goal>process-asciidoc</goal>
             </goals>
             <configuration>
-              <sourceHighlighter>coderay</sourceHighlighter>
               <backend>manpage</backend>
             </configuration>
           </execution>
@@ -180,6 +187,34 @@
         <configuration>
           <sourceDirectory>${project.build.directory}/generated-picocli-docs</sourceDirectory>
         </configuration>
+      </plugin>
+
+      <!-- copy resources from erp-fhir for testing purposes -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-fhir-test-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>../../erp-fhir/src/test/resources</directory>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -19,6 +19,7 @@ package de.gematik.test.erezept.actions;
 import de.gematik.test.erezept.*;
 import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.*;
 import net.serenitybdd.core.steps.*;
 import net.serenitybdd.screenplay.*;
@@ -28,7 +29,7 @@ import org.hl7.fhir.r4.model.*;
 @RequiredArgsConstructor
 public class TaskAbort extends ErpAction<Resource> {
 
-  private final String taskId;
+  private final TaskId taskId;
 
   @Override
   @Step("{0} weist den aktivierten Task #taskId zurück")
@@ -38,7 +39,6 @@ public class TaskAbort extends ErpAction<Resource> {
   }
 
   public static TaskAbort asPatient(ErxTask task) {
-    return new Instrumented.InstrumentedBuilder<>(TaskAbort.class)
-        .withProperties(task.getUnqualifiedId());
+    return new Instrumented.InstrumentedBuilder<>(TaskAbort.class).withProperties(task.getTaskId());
   }
 }

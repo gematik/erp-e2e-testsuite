@@ -602,7 +602,7 @@
         "id": "f548dde3-a319-486b-8624-6176ff41ad90",
         "meta": {
           "profile": [
-            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.1"
+            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.2"
           ],
           "tag": [
             {
@@ -623,7 +623,7 @@
               "id": "4dc5f425-b9b6-4e39-9166-42668ead6c86",
               "meta": {
                 "profile": [
-                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.1"
+                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.2"
                 ]
               },
               "status": "final",
@@ -670,7 +670,7 @@
               "id": "1fa57d53-812b-4cab-a42e-94a12481108a",
               "meta": {
                 "profile": [
-                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.1"
+                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.2"
                 ]
               },
               "identifier": [
@@ -714,7 +714,7 @@
               "id": "37a647b8-cb89-491a-af0f-f9bffc2b386c",
               "meta": {
                 "profile": [
-                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.1"
+                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.2"
                 ]
               },
               "status": "completed",
@@ -810,7 +810,7 @@
               "id": "8a99bfa5-f7aa-4741-99d8-f1abbd301ae1",
               "meta": {
                 "profile": [
-                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.1"
+                  "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.2"
                 ]
               },
               "status": "issued",
@@ -870,7 +870,8 @@
                         "code": "11514676",
                         "system": "http://fhir.de/CodeSystem/ifa/pzn"
                       }
-                    ]
+                    ],
+                    "text": "AMOXICILLIN / CLAVULANSÄURE HEUMANN 875MG/125MG FTA"
                   }
                 },
                 {
@@ -951,7 +952,8 @@
                         "code": "02567018",
                         "system": "http://fhir.de/CodeSystem/ifa/pzn"
                       }
-                    ]
+                    ],
+                    "text": "Noctu-Zusatzgebühr"
                   }
                 }
               ],

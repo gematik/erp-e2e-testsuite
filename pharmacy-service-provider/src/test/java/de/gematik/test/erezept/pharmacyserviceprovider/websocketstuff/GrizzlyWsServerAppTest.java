@@ -17,33 +17,63 @@
 package de.gematik.test.erezept.pharmacyserviceprovider.websocketstuff;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import de.gematik.test.erezept.pspwsclient.dataobjects.DeliveryOption;
 import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;
 import jakarta.ws.rs.WebApplicationException;
+import org.glassfish.grizzly.http.HttpRequestPacket;
+import org.glassfish.grizzly.websockets.ProtocolHandler;
+import org.glassfish.grizzly.websockets.WebSocketListener;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class GrizzlyWsServerAppTest {
-
   @Test
-  void shouldThrowExceptionWithoutASocekt() {
+  void shouldNotSend() {
     GrizzlyWsServerApp grizzlyWsServerApp = new GrizzlyWsServerApp();
-    assertThrows(
-        WebApplicationException.class,
-        () -> {
-          grizzlyWsServerApp.send("123", "123");
-        });
+    var mockWsClient = mock(WebSocketListener.class);
+    var mockHandler = mock(ProtocolHandler.class);
+    var httpRequestPacke = HttpRequestPacket.builder().uri("/ClientTestId").build();
+    grizzlyWsServerApp.createSocket(mockHandler, httpRequestPacke, mockWsClient);
+    grizzlyWsServerApp.send("123TestId", "TestMessage");
+    verify(mockHandler, times(0)).send(anyString());
   }
 
   @Test
-  void shouldThrowExceptionWithoutTelematikId() {
+  void shouldSend() {
     GrizzlyWsServerApp grizzlyWsServerApp = new GrizzlyWsServerApp();
-    var byteBody = "123".getBytes();
-    PspMessage pspMessage = PspMessage.create(DeliveryOption.ON_PREMISE, "123", "123", byteBody);
+    var mockWsClient = mock(WebSocketListener.class);
+    var mockHandler = mock(ProtocolHandler.class);
+    var httpRequestPacke = HttpRequestPacket.builder().uri("/ClientTestId").build();
+    var socket = grizzlyWsServerApp.createSocket(mockHandler, httpRequestPacke, mockWsClient);
+    socket.onConnect();
+    grizzlyWsServerApp.send("ClientTestId", "TestMessage");
+    verify(mockHandler, times(1)).send(anyString());
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    " , '123456897TestBody', '123TransAction' ",
+    "'123TestId', '', '123TransAction'  ",
+    "'123TestId', 123456897TestBody, '123TransAction'  ",
+    " , '123456897TestBody', '123TransAction'   ",
+    "'123TestId', '', '123TransAction' ",
+    "'123TestId', 123456897TestBody,  ",
+  })
+  void shouldThrowException(String telemId, String bodyContent, String transactionID) {
+    GrizzlyWsServerApp grizzlyWsServerApp = new GrizzlyWsServerApp();
+    var byteBody = bodyContent.getBytes();
+    PspMessage pspMessage =
+        PspMessage.create(DeliveryOption.ON_PREMISE, "123", transactionID, byteBody);
     assertThrows(
         WebApplicationException.class,
         () -> {
-          grizzlyWsServerApp.send(null, pspMessage);
+          grizzlyWsServerApp.send(telemId, pspMessage);
         });
   }
 }

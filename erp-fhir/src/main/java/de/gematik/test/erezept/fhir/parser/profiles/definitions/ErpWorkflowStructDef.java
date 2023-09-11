@@ -42,6 +42,7 @@ public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVers
   BINARY("https://gematik.de/fhir/StructureDefinition/ErxBinary"),
   BINARY_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary"),
   TASK("https://gematik.de/fhir/StructureDefinition/ErxTask"),
+  TASK_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task"),
   MEDICATION_DISPENSE("https://gematik.de/fhir/StructureDefinition/ErxMedicationDispense"),
   MEDICATION_DISPENSE_12(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense"),
@@ -62,9 +63,11 @@ public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVers
   COM_REPRESENTATIVE("https://gematik.de/fhir/StructureDefinition/ErxCommunicationRepresentative"),
   COM_REPRESENTATIVE_12(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Representative"),
-
   AUDIT_EVENT("https://gematik.de/fhir/StructureDefinition/ErxAuditEvent"),
-  ;
+  EXPIRY_DATE("https://gematik.de/fhir/StructureDefinition/ExpiryDate"),
+  EXPIRY_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate"),
+  ACCEPT_DATE("https://gematik.de/fhir/StructureDefinition/AcceptDate"),
+  ACCEPT_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate");
 
   private final String canonicalUrl;
 }

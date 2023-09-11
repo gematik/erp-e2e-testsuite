@@ -28,6 +28,7 @@ import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +57,14 @@ class ValidatorTest extends ParsingTest {
 
   @Test
   void shouldFailOnNullContent() {
-    assertThrows(NullPointerException.class, () -> parser.validate(null)); // intentionally null
+    String content = null;
+    assertThrows(NullPointerException.class, () -> parser.validate(content)); // intentionally null
+  }
+
+  @Test
+  void shouldFailOnNullBundle() {
+    Bundle bundle = null;
+    assertThrows(NullPointerException.class, () -> parser.validate(bundle)); // intentionally null
   }
 
   @Test
@@ -72,7 +80,7 @@ class ValidatorTest extends ParsingTest {
   }
 
   @Test
-  void shouldPassOfficialAbdaBundleResources() {
+  void shouldPassOfficialDavBundleResources() {
     val davBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/dav");
     ValidatorUtil.validateFiles(parser, davBundleResources, Assertions::assertTrue, true);
   }
@@ -87,5 +95,12 @@ class ValidatorTest extends ParsingTest {
   void shouldFailInvalidKbvResources() {
     val invalidResources = ResourceUtils.getResourceFilesInDirectory("fhir/invalid/kbv");
     ValidatorUtil.validateFiles(parser, invalidResources, Assertions::assertFalse, false);
+  }
+
+  @Test
+  void shouldValidateMixedVersionBundles() {
+    val mixedBundleResources =
+        ResourceUtils.getResourceFilesInDirectory("fhir/valid/mixed_bundles", true);
+    ValidatorUtil.validateFiles(parser, mixedBundleResources, Assertions::assertTrue, true);
   }
 }

@@ -23,7 +23,7 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 
 @Slf4j
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class PharmacyActor extends ErpActor {
 
   public PharmacyActor(String name) {

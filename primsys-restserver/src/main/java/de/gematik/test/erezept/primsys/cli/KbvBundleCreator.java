@@ -24,7 +24,7 @@ import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.lei.cfg.*;
+import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.smartcard.*;
 import java.text.*;
 import java.util.concurrent.*;
@@ -38,7 +38,7 @@ public class KbvBundleCreator implements Callable<Integer> {
       paramLabel = "KVNR",
       type = String.class,
       description = "The KVID of the receiving user")
-  private String kvnrParam = GemFaker.fakerKvid();
+  private String kvnrParam = KVNR.random().getValue();
 
   @CommandLine.Option(
       names = "--name",
@@ -155,7 +155,7 @@ public class KbvBundleCreator implements Callable<Integer> {
     val names = nameParam.split(" ");
     val patient =
         PatientBuilder.builder()
-            .kvIdentifierDe(kvnrParam, IdentifierTypeDe.GKV)
+            .kvnr(KVNR.from(kvnrParam), VersicherungsArtDeBasis.GKV)
             .name(names[0], names[1])
             .birthDate(birthDateParam)
             .address(Country.D, cityParam, postalParam, streetParam)

@@ -1,4 +1,7 @@
 
+# Überblick
+Welche Features PrimSys-REST bietet und für welche Anwendungsfälle dieser verwendet werden kann ist in der [primsys-overview](./primsys-overview.adoc) beschrieben.
+
 # Build
 
 REST-Server mit allen Abhängigkeiten bauen

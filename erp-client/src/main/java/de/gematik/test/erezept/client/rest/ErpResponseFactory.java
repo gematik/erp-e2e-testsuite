@@ -19,6 +19,7 @@ package de.gematik.test.erezept.client.rest;
 import static java.text.MessageFormat.*;
 
 import ca.uhn.fhir.parser.*;
+import ca.uhn.fhir.validation.*;
 import de.gematik.test.erezept.fhir.parser.*;
 import java.time.Duration;
 import java.util.*;
@@ -30,27 +31,38 @@ import org.hl7.fhir.r4.model.*;
 public class ErpResponseFactory {
 
   private final FhirParser parser;
+  private final boolean validateResponse;
 
-  public ErpResponseFactory(FhirParser parser) {
+  public ErpResponseFactory(FhirParser parser, boolean validateResponse) {
     this.parser = parser;
+    this.validateResponse = validateResponse;
   }
 
-  public <R extends Resource> ErpResponse createFrom(
-      int status, Duration duration, Map<String, String> headers, String content, Class<R> expect) {
-    ErpResponse response;
+  public <R extends Resource> ErpResponse<R> createFrom(
+      int status, Map<String, String> headers, String usedJwt, String content, Class<R> expect) {
+    return createFrom(status, Duration.ZERO, headers, usedJwt, content, expect);
+  }
 
-    if (content.length() > 0) {
-      val resource = decode(content, expect);
-      response = new ErpResponse(status, duration, headers, resource);
-    } else {
-      response = new ErpResponse(status, duration, headers, null);
+  public <R extends Resource> ErpResponse<R> createFrom(
+      int status,
+      Duration duration,
+      Map<String, String> headers,
+      String usedJwt,
+      String content,
+      Class<R> expect) {
+
+    if (status >= 500) {
+      // log unhandled errors from backend for better analysis
+      log.error(format("Server Error {0}: {1}", status, content));
     }
-    return response;
-  }
 
-  public ErpResponse createFrom(
-      int status, Duration duration, Map<String, String> headers, Resource resource) {
-    return new ErpResponse(status, duration, headers, resource);
+    Resource resource = (content.length() > 0) ? decode(content, expect) : null;
+    return ErpResponse.forPayload(resource, expect)
+        .withStatusCode(status)
+        .withDuration(duration)
+        .usedJwt(usedJwt)
+        .withHeaders(headers)
+        .andValidationResult(validateContent(content));
   }
 
   private Resource decode(String content, Class<? extends Resource> expect) {
@@ -58,18 +70,32 @@ public class ErpResponseFactory {
     try {
       ret = parser.decode(expect, content);
     } catch (DataFormatException | IllegalArgumentException e) {
-      // well, try to parse as an OperationOutcome as this case may occur:
-      // 1. DataFormatException happens, if the Backend responds with an OperationOutcome while a
-      // proper resource was
-      // expected
+      // try to decode without an expected class (and let HAPI decide) as this case may occur:
+      // 1. DataFormatException happens, if the Backend responds with an OperationOutcome (or any
+      // other unexpected resource) while another resource was expected
       // 2. IllegalArgumentException is thrown if an empty response is expected, but we still get a
       // resource (probably an OperationOutcome)
-      log.warn(
+      log.info(
           format(
-              "Given content of length {0} could not be parsed as {1}, try OperationOutcome",
+              "Given content of length {0} could not be decoded as {1}, try without expectation",
               content.length(), expect.getSimpleName()));
-      ret = parser.decode(OperationOutcome.class, content);
+      ret = parser.decode(content);
     }
     return ret;
+  }
+
+  private ValidationResult validateContent(String content) {
+    ValidationResult vr;
+    if (!validateResponse || content.isEmpty() || content.isBlank()) {
+      // simply create an empty validation results which will always be successful
+      vr = new ValidationResult(this.parser.getCtx(), List.of());
+    } else {
+      vr = this.parser.validate(content);
+      if (!vr.isSuccessful()) {
+        log.error(format("FHIR Content is invalid\n{0}", content));
+      }
+    }
+
+    return vr;
   }
 }

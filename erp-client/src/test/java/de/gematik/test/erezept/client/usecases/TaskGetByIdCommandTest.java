@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ class TaskGetByIdCommandTest {
 
   @Test
   void getRequestLocator() {
-    val taskId = "123456789";
+    val taskId = TaskId.from("123456789");
     val cmd = new TaskGetByIdCommand(taskId);
 
     val expected = "/Task/" + taskId;
@@ -40,14 +41,14 @@ class TaskGetByIdCommandTest {
 
   @Test
   void requestBodyShouldBeNotNull() {
-    val taskId = PrescriptionId.random().getValue();
+    val taskId = TaskId.from(PrescriptionId.random());
     val taskGetByIdCommand = new TaskGetByIdCommand(taskId);
     assertNotNull(taskGetByIdCommand.getRequestBody());
   }
 
   @Test
   void shouldContainAccessCodeOnlyInHeader() {
-    val taskId = PrescriptionId.random().getValue();
+    val taskId = TaskId.from(PrescriptionId.random());
     val accessCode = AccessCode.random();
     val cmd = new TaskGetByIdCommand(taskId, accessCode);
 
@@ -62,7 +63,7 @@ class TaskGetByIdCommandTest {
 
   @Test
   void shouldContainSecret() {
-    val taskId = PrescriptionId.random().getValue();
+    val taskId = TaskId.from(PrescriptionId.random());
     val secret = new Secret("abc");
     val cmd = new TaskGetByIdCommand(taskId, secret);
 

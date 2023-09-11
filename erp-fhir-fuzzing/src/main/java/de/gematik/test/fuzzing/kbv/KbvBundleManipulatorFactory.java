@@ -16,6 +16,8 @@
 
 package de.gematik.test.fuzzing.kbv;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
@@ -40,16 +42,18 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import lombok.val;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.DomainResource;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.*;
 
 public class KbvBundleManipulatorFactory {
 
   private KbvBundleManipulatorFactory() {
     throw new AssertionError("Do not instantiate");
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getAllKbvBundleManipulators() {
+    return getAllKbvBundleManipulators(false);
   }
 
   /**
@@ -58,7 +62,8 @@ public class KbvBundleManipulatorFactory {
    *
    * @return list of NamedParameters containing manipulators
    */
-  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getAllKbvBundleManipulators() {
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getAllKbvBundleManipulators(
+      boolean includeMvo) {
     val manipulators = new LinkedList<>(getCoverageManipulators());
     manipulators.addAll(getMedicationManipulators());
     manipulators.addAll(getMedicationRequestManipulators());
@@ -66,6 +71,10 @@ public class KbvBundleManipulatorFactory {
     manipulators.addAll(getPatientManipulators());
     manipulators.addAll(getPractitionerManipulators());
     manipulators.addAll(getCompositionManipulators());
+
+    if (includeMvo) {
+      manipulators.addAll(MvoExtensionManipulatorFactory.getMvoExtensionKennzeichenFalsifier());
+    }
 
     return manipulators;
   }
@@ -270,6 +279,26 @@ public class KbvBundleManipulatorFactory {
                       .getDosageInstructionFirstRep()
                       .setText(
                           "jeweils zu den Mahlzeiten und die Tablette 32 mal ordentlich zerkauen")));
+    } else {
+      manipulators.add(
+          NamedEnvelope.of(
+              "MedicationRequest mit falscher Requester-Referenz",
+              b ->
+                  b.getMedicationRequest()
+                      .getRequester()
+                      .setReference(format("Practitioner/{0}", UUID.randomUUID().toString()))));
+      manipulators.add(
+          NamedEnvelope.of(
+              "MedicationRequest mit fehlender Ressource in der Requester-Referenz",
+              b -> {
+                val originalRef =
+                    b.getMedicationRequest().getRequester().getReference().split("/")[1];
+                b.getMedicationRequest().getRequester().setReference(originalRef);
+              }));
+      manipulators.add(
+          NamedEnvelope.of(
+              "MedicationRequest ohne Requester-Referenz",
+              b -> b.getMedicationRequest().setRequester(null)));
     }
 
     return manipulators;
@@ -489,6 +518,21 @@ public class KbvBundleManipulatorFactory {
                       .getCodingFirstRep();
               coding.setCode(coding.getCode().replace("A", "Ü"));
             }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Practitioner mit fehlendem Qualification Code",
+            b ->
+                b.getPractitioner()
+                    .getQualificationFirstRep()
+                    .getCode()
+                    .setCoding(List.of())
+                    .setText("Chefarzt")));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Practitioner mit fehlender Qualification",
+            b -> b.getPractitioner().setQualification(List.of())));
 
     return manipulators;
   }

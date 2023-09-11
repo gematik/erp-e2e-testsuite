@@ -1,0 +1,27 @@
+:author: Gematik
+:doctype: book
+
+// Captures
+:caution-caption: Achtung
+:important-caption: Wichtig
+:note-caption: Hinweis
+:tip-caption: Tip
+:warning-caption: Warnung
+
+// Settings:
+:experimental:
+:reproducible:
+:icons: font
+:imagesdir: ../images
+:hide-uri-scheme:
+:linkattrs:
+:source-highlighter: coderay
+
+:toc: macro
+:toclevels: 2
+:toc-title: Inhaltsverzeichnis
+:sectnums:
+:chapter-signifier:
+
+include::attributes-commons.adoc[]
+include::attributes-urls.adoc[]

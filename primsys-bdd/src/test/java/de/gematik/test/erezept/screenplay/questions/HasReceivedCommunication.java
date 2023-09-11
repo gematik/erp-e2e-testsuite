@@ -22,15 +22,18 @@ import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -62,6 +65,10 @@ public class HasReceivedCommunication implements Question<Boolean> {
                         format(
                             "Received Message ({0}) by {1} from {2} of type {3} does not contain an AccessCode",
                             com.getId(), actor.getName(), com.getSenderId(), com.getType())));
+    Ensure.that(
+            "BasedOn-Reference contains a valid BasedOn-Reference",
+            CheckCommunicationBasedOnReference.forCommunication(com))
+        .isTrue();
     val dmcStack = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
     dmcStack.appendDmc(DmcPrescription.representativeDmc(taskId, accessCode));
   }
@@ -93,12 +100,35 @@ public class HasReceivedCommunication implements Question<Boolean> {
   public static class Builder {
     private final GetReceivedCommunication.Builder wrapee;
 
-    private Builder(ICommunicationType type) {
+    private Builder(ICommunicationType<?> type) {
       this.wrapee = new GetReceivedCommunication.Builder(type).last();
     }
 
     public HasReceivedCommunication from(Actor sender) {
       return new HasReceivedCommunication(wrapee.from(sender));
+    }
+  }
+
+  @RequiredArgsConstructor
+  private static class CheckCommunicationBasedOnReference implements Question<Boolean> {
+    private final ErxCommunication communication;
+
+    @Override
+    public Boolean answeredBy(Actor actor) {
+      val prescriptionId = PrescriptionId.from(communication.getBasedOnReferenceId());
+      val accessCode = communication.getBasedOnAccessCode();
+      return prescriptionId.check() && accessCode.isPresent() && accessCode.orElseThrow().isValid();
+    }
+
+    @Override
+    public String getSubject() {
+      return format(
+          "dass, die BasedOn-Referenz {0} valide ist",
+          communication.getBasedOnFirstRep().getReference());
+    }
+
+    private static CheckCommunicationBasedOnReference forCommunication(ErxCommunication com) {
+      return new CheckCommunicationBasedOnReference(com);
     }
   }
 }

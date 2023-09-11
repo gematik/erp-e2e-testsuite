@@ -66,6 +66,23 @@ public enum PrescriptionFlowType implements IValueSet {
     return this.equals(FLOW_TYPE_169) || this.equals(FLOW_TYPE_209);
   }
 
+  public boolean isPkvType() {
+    return this.equals(FLOW_TYPE_200) || this.equals(FLOW_TYPE_209);
+  }
+
+  public boolean isGkvType() {
+    return !this.isPkvType();
+  }
+
+  public ErpWorkflowCodeSystem getCodeSystem() {
+    return CODE_SYSTEM;
+  }
+
+  @Override
+  public String toString() {
+    return format("{0}", display);
+  }
+
   public static PrescriptionFlowType fromCode(@NonNull String value) {
     return Arrays.stream(PrescriptionFlowType.values())
         .filter(pft -> pft.code.equals(value))
@@ -78,12 +95,16 @@ public enum PrescriptionFlowType implements IValueSet {
     return PrescriptionFlowType.fromCode(rawFlowType);
   }
 
-  public ErpWorkflowCodeSystem getCodeSystem() {
-    return CODE_SYSTEM;
+  public static PrescriptionFlowType fromInsuranceKind(VersicherungsArtDeBasis insuranceKind) {
+    return fromInsuranceKind(insuranceKind, false);
   }
 
-  @Override
-  public String toString() {
-    return format("{0}", display);
+  public static PrescriptionFlowType fromInsuranceKind(
+      VersicherungsArtDeBasis insuranceKind, boolean asDirectAssignment) {
+    var baseTypeCode = insuranceKind.equals(VersicherungsArtDeBasis.PKV) ? 200 : 160;
+    if (asDirectAssignment) {
+      baseTypeCode += 9;
+    }
+    return PrescriptionFlowType.fromCode(String.valueOf(baseTypeCode));
   }
 }

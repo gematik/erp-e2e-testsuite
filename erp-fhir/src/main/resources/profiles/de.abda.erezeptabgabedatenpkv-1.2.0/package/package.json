@@ -1,0 +1,14 @@
+{
+  "name": "de.abda.erezeptabgabedatenpkv",
+  "version": "1.2.0",
+  "description": "Der PKV-Abgabedatensatz enthält die notwendigen Informationen für die Abrechnung einer elektronischen Arzneimittelverordnung (E-Rezept) für Privatversicherte durch eine Apotheke.",
+  "author": "ABDA FHIR Team",
+  "dependencies": {
+    "de.basisprofil.r4": "1.3.2",
+    "hl7.fhir.r4.core": "4.0.1",
+    "de.abda.erezeptabgabedatenbasis": "1.3.1"
+  },
+  "fhirVersions": [
+    "4.0.1"
+  ]
+}

@@ -21,9 +21,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -35,8 +33,8 @@ import net.serenitybdd.screenplay.Actor;
 @Slf4j
 public class PrescriptionToDispenseStrategy {
 
-  private String taskId;
-  private String kvid;
+  private TaskId taskId;
+  private KVNR kvnr;
   private Actor patient;
   private Secret secret;
 
@@ -66,7 +64,7 @@ public class PrescriptionToDispenseStrategy {
     return taskToDispense.hasConsent();
   }
 
-  public String getTaskId() {
+  public TaskId getTaskId() {
     if (this.taskId == null) {
       this.taskId = taskToDispense.getTaskId();
     }
@@ -80,16 +78,16 @@ public class PrescriptionToDispenseStrategy {
     return this.prescriptionId;
   }
 
-  public String getKvid() {
-    if (this.kvid == null) {
-      this.kvid =
+  public KVNR getKvnr() {
+    if (this.kvnr == null) {
+      this.kvnr =
           taskToDispense
               .getTask()
-              .getForKvid()
+              .getForKvnr()
               .orElseThrow(
                   () -> new MissingFieldException(ErxTask.class, DeBasisNamingSystem.KVID));
     }
-    return this.kvid;
+    return this.kvnr;
   }
 
   public Secret getSecret() {
@@ -140,18 +138,22 @@ public class PrescriptionToDispenseStrategy {
     }
 
     public Builder taskId(String taskId) {
+      return taskId(TaskId.from(taskId));
+    }
+
+    public Builder taskId(TaskId taskId) {
       this.strategy.taskId = taskId;
       return this;
     }
 
-    public Builder kvid(String kvid) {
-      this.strategy.kvid = kvid;
+    public Builder kvnr(KVNR kvnr) {
+      this.strategy.kvnr = kvnr;
       return this;
     }
 
     public Builder patient(Actor patient) {
       val patientData = SafeAbility.getAbility(patient, ProvidePatientBaseData.class);
-      this.strategy.kvid = patientData.getKvid();
+      this.strategy.kvnr = patientData.getKvnr();
       this.strategy.patient = patient;
       return this;
     }

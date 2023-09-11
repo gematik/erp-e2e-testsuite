@@ -19,6 +19,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
@@ -42,7 +43,7 @@ import net.serenitybdd.screenplay.Question;
 public class GetReceivedCommunication implements Question<Optional<ErxCommunication>> {
 
   private final Actor sender;
-  private final ICommunicationType type;
+  private final ICommunicationType<?> type;
   private final DequeStrategy dequeStrategy;
 
   @Override
@@ -55,7 +56,7 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
         newMessages.getCommunications().stream()
             .filter(com -> com.getType().equals(expected.getType()))
             .filter(com -> com.getSenderId().equals(senderId))
-            .collect(Collectors.toList());
+            .toList();
 
     if (mapped.isEmpty()) {
       return Optional.empty();
@@ -86,10 +87,11 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
 
   private String getSenderId() {
     String id;
-    if (this.type.equals(CommunicationType.REPLY)) {
+    if (this.type.equals(CommunicationType.REPLY)
+        || this.type.equals(ChargeItemCommunicationType.CHANGE_REPLY)) {
       id = SafeAbility.getAbility(sender, UseSMCB.class).getTelematikID();
     } else {
-      id = SafeAbility.getAbility(sender, ProvidePatientBaseData.class).getKvid();
+      id = SafeAbility.getAbility(sender, ProvidePatientBaseData.class).getKvnr().getValue();
     }
     return id;
   }
@@ -111,10 +113,10 @@ public class GetReceivedCommunication implements Question<Optional<ErxCommunicat
   }
 
   public static class Builder {
-    private final ICommunicationType type;
+    private final ICommunicationType<?> type;
     private DequeStrategy dequeStrategy;
 
-    Builder(ICommunicationType type) {
+    Builder(ICommunicationType<?> type) {
       this.type = type;
     }
 

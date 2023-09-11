@@ -16,44 +16,38 @@
 
 package de.gematik.test.erezept.actions;
 
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import lombok.*;
-import net.serenitybdd.screenplay.*;
+import static java.text.MessageFormat.format;
+
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
+import de.gematik.test.erezept.client.usecases.TaskGetCommand;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class DownloadOpenTask extends ErpAction<ErxTaskBundle> {
 
   private final TaskGetCommand cmd;
 
-  public static Builder builder() {
-    return new Builder();
+  public static DownloadOpenTask withExamEvidence(String examEvidence) {
+    log.info(format("Request Get /Task as pharmacy with exam evidence {0} ", examEvidence));
+    val cmd = new TaskGetByExamEvidenceCommand(examEvidence);
+    return new DownloadOpenTask(cmd);
+  }
+
+  public static DownloadOpenTask withoutExamEvidence() {
+    log.info(format("Request Get /Task as pharmacy without exam evidence"));
+    val cmd = new TaskGetByExamEvidenceCommand(null);
+    return new DownloadOpenTask(cmd);
   }
 
   @Override
   public ErpInteraction<ErxTaskBundle> answeredBy(Actor actor) {
     return this.performCommandAs(cmd, actor);
-  }
-
-  public static class Builder {
-
-    private String examEvidence;
-    private String kvnr;
-
-    public Builder examEvidence(String examEvidence) {
-      this.examEvidence = examEvidence;
-      return this;
-    }
-
-    public Builder kvnr(String kvnr) {
-      this.kvnr = kvnr;
-      return this;
-    }
-
-    public DownloadOpenTask build() {
-      val cmd = new TaskGetByExamEvidenceCommand(kvnr, examEvidence);
-      return new DownloadOpenTask(cmd);
-    }
   }
 }

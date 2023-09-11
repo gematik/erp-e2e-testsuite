@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import lombok.val;
 import org.hl7.fhir.r4.model.Invoice;
 import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
 class DavAbgabedatenBundleTest extends ParsingTest {
@@ -61,7 +62,7 @@ class DavAbgabedatenBundleTest extends ParsingTest {
     assertEquals(
         "urn:uuid:5dc67a4f-c936-4c26-a7c0-967673a70740", dispensed.getPerformerReference());
     assertEquals(MedicationDispense.MedicationDispenseStatus.COMPLETED, dispensed.getStatus());
-    assertEquals(Date.valueOf(LocalDate.of(2022, 3, 24)), dispensed.getWhenHandedOver());
+    assertEquals(Date.valueOf(LocalDate.of(2023, 7, 24)), dispensed.getWhenHandedOver());
 
     val invoice = bundle.getInvoice();
     assertNotNull(invoice);
@@ -71,6 +72,17 @@ class DavAbgabedatenBundleTest extends ParsingTest {
     assertEquals(0.0, invoice.getTotalCoPayment(), 0.001);
     assertEquals("EUR", invoice.getCurrency());
     assertEquals(19.0, invoice.getVAT(), 0.001);
+  }
+
+  @Test
+  void shouldDecodeWithoutExpectedType() {
+    val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val bundle = parser.decode(content);
+    assertEquals(ResourceType.Bundle, bundle.getResourceType());
+    assertEquals(DavAbgabedatenBundle.class, bundle.getClass());
   }
 
   @Test

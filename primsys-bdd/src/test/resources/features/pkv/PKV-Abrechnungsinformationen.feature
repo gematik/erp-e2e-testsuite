@@ -15,20 +15,21 @@
 #
 # language: de
 
-@Workflow=200
-@Versicherung=PKV
-@Anwendungsfall=A_18822
-@Anwendungsfall=A_18827
-@Impl=open
+@PRODUKT:eRp_FD
+@Funktionalität:Abrechnungsinformationen
+@Workflow:200
+@Versicherung:PKV
+@AFO-ID:A_18822
+@AFO-ID:A_18827
 Funktionalität: Abrechnungsinformationen für PKV-Rezepte
   Umfasst Testfälle zu den Anwendungsfällen:
-  - Abrechnungssinformationen durch den Abgebenden bereitstellen
-  - Abrechnungsinformationen  durch den Abgebenden abrufen
+  - PKV-Abrechnungsinformationen durch den Abgebenden bereitstellen
+  - PKV-Abrechnungsinformationen durch den Abgebenden abrufen
   - PKV-Abgabedatensatz ändern
   - Einwilligung durch den Versicherten erteilen
   - Einwilligung durch den Versicherten widerrufen
   - Einwilligung durch den Versicherten einsehen
-  - Abrufen der Abrechnungsinformationen durch den Versicherten
+  - Abrufen der PKV-Abrechnungsinformationen durch den Versicherten
   - Markieren der Abrechnungsinformation durch den Versicherten
   - Löschen der Abrechnungsinformation durch den Versicherten
   - Berechtigen der Apotheke zum Ändern des PKV-Abgabedatensatzes
@@ -38,7 +39,7 @@ Funktionalität: Abrechnungsinformationen für PKV-Rezepte
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     Und der PKV Versicherte Günther Angermänn hat Zugriff auf seine digitale Identität
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
-    #Und der Versicherte Günther Angermänn hat seine Einwilligung zum Speichern der Abrechnungsinformationen erteilt
+    Und der Versicherte Günther Angermänn hat seine Einwilligung zum Speichern der PKV-Abrechnungsinformationen erteilt
     Und die Ärztin Dr. Schraßer dem Versicherten Günther Angermänn folgendes apothekenpflichtiges Medikament verschreibt:
       | Name          | Workflow |
       | Schmerzmittel | 200      |
@@ -46,138 +47,137 @@ Funktionalität: Abrechnungsinformationen für PKV-Rezepte
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Günther Angermänn dispensiert
 
-  @TCID=ERP_EE_WF200_01
-  @Path=happy
-  @Afo=A_22118
-  @Anwendungsfall=AF_10082
-  @Anwendungsfall=AF_10087
-  @MainActor=Apotheke
-  Szenario: Bereitstellen der Abrechnungsinformationen durch die Apotheke
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_01
+  @TESTFALL:positiv
+  @AFO-ID:A_22118
+  @AF-ID:AF_10082
+  @AF-ID:AF_10087
+  @Hauptdarsteller:Apotheke
+  Szenario: Bereitstellen der PKV-Abrechnungsinformationen durch die Apotheke
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Dann hat der Versicherte Günther Angermänn eine Abrechnungsinformation für das letzte dispensierte Medikament beim Fachdienst vorliegen
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Dann hat der Versicherte Günther Angermänn die PKV-Abrechnungsinformationen für das letzte dispensierte Medikament beim Fachdienst vorliegen
 
-  @TCID=ERP_EE_WF200_02
-  @Path=bad
-  @Afo=A_22133
-  @MainActor=Apotheke
-  Szenario: Keine Abrechnungsinformationen bereitstellen, wenn keine Einwilligung erteilt
-  Falls für den Versicherten keine Einwilligung beim Fachdienst zur Speicherung der Abrechnungsinformationen vorliegt, muss der Fachdienst das Hochladen des ChargeItems mit Fehlercode 403 ablehnen
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_02
+  @TESTFALL:negativ
+  @AFO-ID:A_22133
+  @Hauptdarsteller:Apotheke
+  Szenario: Keine PKV-Abrechnungsinformationen bereitstellen, wenn keine Einwilligung erteilt
+  Falls für den Versicherten keine Einwilligung beim Fachdienst zur Speicherung der PKV-Abrechnungsinformationen vorliegt,
+  muss der Fachdienst das Hochladen des ChargeItems mit Fehlercode 403 ablehnen
 
-    Wenn der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der Abrechnungsinformationen widerruft
-    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil keine Einwilligung vorliegt
+    Wenn der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen widerruft
+    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keine PKV-Abrechnungsinformationen bereitstellen, weil keine Einwilligung vorliegt
 
 
-  @TCID=ERP_EE_WF200_03
-  @Path=happy
-  @Afo=A_22161
-  @Anwendungsfall=AF_10084
-  @Anwendungsfall=AF_10086
-  @MainActor=Versicherter
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_03
+  @TESTFALL:positiv
+  @AFO-ID:A_22161
+  @AF-ID:AF_10084
+  @AF-ID:AF_10086
+  @Hauptdarsteller:Versicherter
   Szenario: Einwilligung durch Versicherten erteilen
-  Der Versicherte kann im FdV die Einwilligung zum Speichern der Abrechnungsinformationen beim Fachdienst erteilen. Diese wird ihm im FdV angezeigt
+  Der Versicherte kann im FdV die Einwilligung zum Speichern der PKV-Abrechnungsinformationen beim Fachdienst erteilen. Diese wird ihm im FdV angezeigt
 
-    Wenn der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der Abrechnungsinformationen erteilt
+    Wenn der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen erteilt
     Dann kann der Versicherte Günther Angermänn seine Einwilligung abrufen
 
-  @TCID=ERP_EE_WF200_04
-  @Path=happy
-  @Afo=A_22157
-  @Anwendungsfall=AF_10085
-  @MainActor=Versicherter
-  Szenario: Abrechnungsinformationen löschen, wenn die Einwilligung vom Versicherten widerrufen wird
-  Falls der Versicherte nach dem Speichern von Abrechnungsinformationen seine Einwilligung widerruft,
-  werden die vorhandenen Abrechnungsinformationen beim Fachdiesnst gelöscht.
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_04
+  @TESTFALL:positiv
+  @AFO-ID:A_22157
+  @AF-ID:AF_10085
+  @Hauptdarsteller:Versicherter
+  Szenario: PKV-Abrechnungsinformationen löschen, wenn die Einwilligung vom Versicherten widerrufen wird
+  Falls der Versicherte nach dem Speichern von PKV-Abrechnungsinformationen seine Einwilligung widerruft,
+  werden die vorhandenen PKV-Abrechnungsinformationen beim Fachdienst gelöscht.
   Der E-Rezept-Fachdienst MUSS beim Aufruf der HTTP-Operation DELETE auf den Endpunkt /Consent mit
   ?category=CHARGCONS alle dem Versicherten zugeordneten ChargeItem-Ressourcen (ChargeItem.subject.identifier)
   anhand der KVNR des Versicherten im ACCESS_TOKEN im "Authorization"-Header des HTTP-Requests identifizieren und löschen.
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn für das letzte E-Rezept die Abrechnungsinformationen abruft
-    Wenn der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der Abrechnungsinformationen widerruft
-    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept keine Abrechnungsinformationen abrufen
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen widerruft
+    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept keine PKV-Abrechnungsinformationen abrufen
 
-  @TCID=ERP_EE_WF200_05
-  @Path=happy
-  @Afo=A_22113
-  @Afo=A_22114
-  @Anwendungsfall=AF_10090
-  @MainActor=Versicherter
-  Szenario: Löschen der Abrechnungsinformationen durch den Versicherten
-  Der Versicherte kann über das FdV die Abrechnungsinformationen zu einem Rezept löschen.
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_05
+  @TESTFALL:positiv
+  @AFO-ID:A_22113
+  @AFO-ID:A_22114
+  @AF-ID:AF_10090
+  @Hauptdarsteller:Versicherter
+  Szenario: Löschen der PKV-Abrechnungsinformationen durch den Versicherten
+  Der Versicherte kann über das FdV die PKV-Abrechnungsinformationen zu einem Rezept löschen.
   Anschließend können sie nicht mehr angezeigt werden (FC 404)
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn für das letzte E-Rezept die Abrechnungsinformationen löscht
-    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept keine Abrechnungsinformationen abrufen, weil sie nicht gefunden werden
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen löscht
+    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept keine PKV-Abrechnungsinformationen abrufen, weil sie nicht gefunden werden
 
-  @TCID=ERP_EE_WF200_06
-  @Path=happy
-  @Anwendungsfall=AF_10083
-  @Anwendungsfall=AF_10081
-  @MainActor=Apotheke
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_06
+  @TESTFALL:positiv
+  @AF-ID:AF_10083
+  @AF-ID:AF_10081
+  @Hauptdarsteller:Apotheke
   Szenario: Ändern des PKV-Abgabedatensatzes auf Wunsch des Versicherten, Übertragung des AccessCodes per DMC
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn für das letzte E-Rezept die Abrechnungsinformationen abruft
-    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern der Abrechnungsinformationen berechtigt
-    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die Abrechnungsinformationen vom Fachdienst abrufen
-    Dann kann die Apotheke Am Flughafen die Abrechnungsinformationen für das letzte dispensierte E-Rezept ändern
-    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept die geänderte Abrechnungsinformationen abrufen
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern des letzten PKV-Abgabedatensatzes berechtigt
+    Und die Apotheke Am Flughafen den letzten autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept ändert
+    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept die geänderte PKV-Abrechnungsinformationen abrufen
 
 
-  @TCID=ERP_EE_WF200_07
-  @Path=happy
-  @Anwendungsfall=AF_10083
-  @MainActor=Apotheke
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_07
+  @TESTFALL:positiv
+  @AF-ID:AF_10083
+  @Hauptdarsteller:Apotheke
   Szenario: Ändern des PKV-Abgabedatensatzes auf Wunsch des Versicherten, Übertragung des AccessCodes per Nachricht
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Und der Versicherte Günther Angermänn für das letzte E-Rezept die Abrechnungsinformationen abruft
-    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen per Nachricht zum Ändern der Abrechnungsinformationen berechtigt
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen per Nachricht zum Ändern der PKV-Abrechnungsinformationen berechtigt
     Und die Apotheke Am Flughafen die letzte Nachricht des Versicherten Günther Angermänn mit dem Änderungswunsch empfängt und beantwortet
-    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die Abrechnungsinformationen vom Fachdienst abrufen
-    Dann kann die Apotheke Am Flughafen die Abrechnungsinformationen für das letzte dispensierte E-Rezept ändern
+    Und die Apotheke Am Flughafen den letzten autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept ändert
     Dann hat der Versicherte Günther Angermänn eine Antwort auf seinen Änderungswunsch von der Apotheke Am Flughafen erhalten
-    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept die geänderte Abrechnungsinformationen abrufen
+    Und der Versicherte Günther Angermänn kann für das letzte E-Rezept die geänderte PKV-Abrechnungsinformationen abrufen
 
 
-  @TCID=ERP_EE_WF200_08
-  @Path=bad
-  @Afo=A_22616
-  @MainActor=Apotheke
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_08
+  @TESTFALL:negativ
+  @AFO-ID:A_22616
+  @Hauptdarsteller:Apotheke
   Szenario: Ändern des PKV-Abgabedatensatzes nur einmal möglich mit gleichem AccessCode
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn für das letzte E-Rezept die Abrechnungsinformationen abruft
-    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern der Abrechnungsinformationen berechtigt
-    Dann kann die Apotheke Am Flughafen die Abrechnungsinformationen für das letzte dispensierte E-Rezept ändern
-    Dann kann die Apotheke Am Flughafen die Abrechnungsinformationen für das letzte dispensierte E-Rezept nicht ändern, weil sie kein Recht dazu hat
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern des letzten PKV-Abgabedatensatzes berechtigt
+    Dann kann die Apotheke Am Flughafen den letzten autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept erstmalig ändern
+    Und die Apotheke Am Flughafen kann den letzten autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept nicht erneut ändern, weil der Datensatz bereits geändert wurde
 
-  @TCID=ERP_EE_WF200_09
-  @Path=bad
-  @Afo=A_22215
-  @MainActor=Apotheke
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_09
+  @TESTFALL:negativ
+  @AFO-ID:A_22215
+  @Hauptdarsteller:Apotheke
   Szenario: Ändern des PKV-Abgabedatensatzes nicht möglich, weil Einwilligung widerrufen
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn für das letzte E-Rezept die Abrechnungsinformationen abruft
-    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern der Abrechnungsinformationen berechtigt
-    Und der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der Abrechnungsinformationen widerruft
-    Dann kann die Apotheke Am Flughafen die Abrechnungsinformationen für das letzte dispensierte E-Rezept nicht ändern, weil sie kein Recht dazu hat
-    Dann kann der Versicherte Günther Angermänn für das letzte E-Rezept keine Abrechnungsinformationen abrufen
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern des letzten PKV-Abgabedatensatzes berechtigt
+    Und der Versicherte Günther Angermänn seine Einwilligung zur Speicherung der PKV-Abrechnungsinformationen widerruft
+    Dann kann die Apotheke Am Flughafen den letzten autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept nicht ändern, weil sie kein Recht dazu hat
+    Und der Versicherte Günther Angermänn kann für das letzte E-Rezept keine PKV-Abrechnungsinformationen mehr abrufen
 
-  @TCID=ERP_EE_WF200_10
-    @Path=happy
-    @Anwendungsfall=AF_10089
-    @MainActor=Versicherter
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_10
+  @TESTFALL:positiv
+  @AF-ID:AF_10089
+  @Hauptdarsteller:Versicherter
   Szenariogrundriss: Markieren des PKV-Abgabedatensatzes durch Versicherten
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn die Markierungen für Abrechnungsinformationen des letzten E-Rezept setzt:
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn die Markierungen für die PKV-Abrechnungsinformationen des letzten E-Rezept setzt:
       | Versicherung   | Beihilfe   | Finanzamt   |
       | <Versicherung> | <Beihilfe> | <Finanzamt> |
-    Dann hat der Versicherte Günther Angermänn die Abrechnungsinformationen des letzten E-Rezepts mit folgenden Markierungen:
+    Dann hat der Versicherte Günther Angermänn die PKV-Abrechnungsinformationen des letzten E-Rezepts mit folgenden Markierungen:
       | Versicherung   | Beihilfe   | Finanzamt   |
       | <Versicherung> | <Beihilfe> | <Finanzamt> |
 
@@ -192,17 +192,17 @@ Funktionalität: Abrechnungsinformationen für PKV-Rezepte
       | false        | false    | false     |
 
 
-  @TCID=ERP_EE_WF200_11
-    @Path=happy
-    @Anwendungsfall=AF_10089
-    @MainActor=Versicherter
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_11
+  @TESTFALL:positiv
+  @AF-ID:AF_10089
+  @Hauptdarsteller:Versicherter
   Szenariogrundriss: Löschen von Markierungen des PKV-Abgabedatensatzes durch Versicherten
 
-    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Wenn der Versicherte Günther Angermänn die Markierungen für Abrechnungsinformationen des letzten E-Rezept setzt:
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn die Markierungen für die PKV-Abrechnungsinformationen des letzten E-Rezept setzt:
       | Versicherung   | Beihilfe   | Finanzamt   |
       | <Versicherung> | <Beihilfe> | <Finanzamt> |
-    Dann hat der Versicherte Günther Angermänn die Abrechnungsinformationen des letzten E-Rezepts mit folgenden Markierungen:
+    Dann hat der Versicherte Günther Angermänn die PKV-Abrechnungsinformationen des letzten E-Rezepts mit folgenden Markierungen:
       | Versicherung   | Beihilfe   | Finanzamt   |
       | <Versicherung> | <Beihilfe> | <Finanzamt> |
 
@@ -218,49 +218,53 @@ Funktionalität: Abrechnungsinformationen für PKV-Rezepte
       | false        | false    | false     |
 
 
-  @TCID=ERP_EE_WF200_12
-  @Path=happy
-  @MainActor=Apotheke
-  Szenario: Bereitstellen der Abrechnungsinformationen durch die Apotheke nach Änderung der Medikation
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_12
+  @TESTFALL:positiv
+  @Hauptdarsteller:Apotheke
+  Szenario: Bereitstellen der PKV-Abrechnungsinformationen durch die Apotheke nach Änderung der Medikation
   Der PKV-Abgabedatensatz muss mit dem HBA signiert werden, wenn die Medikation gegenüber dem ursprünglichem Rezept verändert wurde
 
     Angenommen der Apotheker Finn-Louis Nullmayr hat Zugriff auf seinen HBA
-    Wenn der Apotheker Finn-Louis Nullmayr als Angestellter der Apotheke Am Flughafen für das letzte dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt
-    Dann hat der Versicherte Günther Angermänn eine Abrechnungsinformation für das letzte dispensierte Medikament beim Fachdienst vorliegen
+    Wenn der Apotheker Finn-Louis Nullmayr als Angestellter der Apotheke Am Flughafen für das letzte dispensierte E-Rezept PKV-Abrechnungsinformationen bereitstellt
+    Dann hat der Versicherte Günther Angermänn die PKV-Abrechnungsinformationen für das letzte dispensierte Medikament beim Fachdienst vorliegen
 
-  @TCID=ERP_EE_WF200_13
-  @Path=bad
-  @Afo=A_22131
-  @MainActor=Apotheke
-  Szenario: Bereitstellen der Abrechnungsinformationen nicht möglich, weil E-Rezept gelöscht
-    Wenn die Versicherte Sina Hüllmann ihr letztes E-Rezept löscht
-    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil der Task nicht mehr existiert
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_13
+  @TESTFALL:negativ
+  @AFO-ID:A_22131
+  @Hauptdarsteller:Apotheke
+  Szenario: Bereitstellen der PKV-Abrechnungsinformationen nicht möglich, weil E-Rezept gelöscht wurde
 
-  @TCID=ERP_EE_WF200_14
-    @Path=bad
-    @Afo=A_22731
-    @MainActor=Apotheke
-  Szenariogrundriss: Keine Abrechnungsinformationen für GKV Workflows
-  Keine Abrechnungsinformationen bereitstellen bei Workflow 169 und 160
+    Wenn der Versicherte Günther Angermänn sein letztes E-Rezept löscht
+    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keine PKV-Abrechnungsinformationen bereitstellen, weil der Task nicht mehr existiert
 
-    Wenn die Ärztin Dr. Schraßer dem Versicherten Günther Angermänn folgendes apothekenpflichtiges Medikament verschreibt:
-      | Name          | PZN       | Workflow |
-      | Schmerzmittel | 123456789 | <WF>     |
-    Und der Versicherte Günther Angermänn sein letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
-    Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
-    Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Günther Angermänn dispensiert
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_14
+  @AFO-ID:A_22132
+  @TESTFALL:negativ
+  @Hauptdarsteller:Apotheke
+  Szenario: Keine PKV-Abrechnungsinformationen bereitstellen bei ungültigem Secret
 
-    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz beim Fachdienst hinterlegen, weil es kein PKV-Rezept ist
+    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keine PKV-Abrechnungsinformationen mit dem falschen Secret fgdkjfgd bereitstellen
 
-    Beispiele:
-      | WF  |
-      | 160 |
-      | 169 |
 
-  @TCID=ERP_EE_WF200_13
-  @Afo=A_22132
-  @Path=bad
-  @MainActor=Apotheke
-  Szenario: Keine Abrechnungsinformationen bereitstellen bei ungültigem Secret
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_15
+  @TESTFALL:positiv
+  @AFO-ID:A_22611-01
+  @AFO-ID:A_22128
+  @Hauptdarsteller:Apotheke
+  Szenario: Abrufen der Abrechnungsinformationen durch eine Apotheke mit AccessCode
 
-    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keinen PKV-Abrechnungsdatensatz mit dem falschen Secret fgdkjfgd hinterlegen
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern des letzten PKV-Abgabedatensatzes berechtigt
+    Dann kann die Apotheke Am Flughafen die letzten berechtigten PKV-Abrechnungsinformationen vom Fachdienst abrufen
+
+  @TCID:ERP_EE_WF200_ABRECHNUNGSINFO_16
+  @TESTFALL:negativ
+  @AFO-ID:A_22611-01
+  @Hauptdarsteller:Apotheke
+  Szenario: Abrufen der Abrechnungsinformationen durch einen Apotheker mit falschem AccessCode
+
+    Wenn die Apotheke Am Flughafen für das letzte dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt
+    Und der Versicherte Günther Angermänn für das letzte E-Rezept die PKV-Abrechnungsinformationen abruft
+    Und der Versicherte Günther Angermänn die Apotheke Am Flughafen via Data Matrix Code zum Ändern des letzten PKV-Abgabedatensatzes berechtigt
+    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept den PKV-Abrechnungsinformationen nicht mit dem falschen AccessCode abc vom Fachdienst abrufen

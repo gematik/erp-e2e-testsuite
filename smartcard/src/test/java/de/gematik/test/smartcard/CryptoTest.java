@@ -39,6 +39,12 @@ class CryptoTest {
   }
 
   @Test
+  void shouldGetRsaPssFromString() {
+    val rsa = List.of("RSASSA_PSS", "RSASSA-PSS");
+    rsa.forEach(input -> assertEquals(Crypto.RSA_PSS_2048, Crypto.fromString(input)));
+  }
+
+  @Test
   void shouldThrowOnInvalidString() {
     val rsa = List.of("Ecc256", "ECC_512", "r256", "rsa_256");
     rsa.forEach(input -> assertThrows(AssertionError.class, () -> Crypto.fromString(input)));

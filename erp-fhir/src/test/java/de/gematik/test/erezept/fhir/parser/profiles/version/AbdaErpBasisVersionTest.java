@@ -30,8 +30,8 @@ class AbdaErpBasisVersionTest {
   void getDefaultVersionViaCurrentDate() {
     val defaultVersion = AbdaErpBasisVersion.getDefaultVersion();
 
-    // Note: this assertion will break in the future!
-    assertEquals(AbdaErpBasisVersion.V1_2_1, defaultVersion);
+    // Note: this assertion might break in the future!
+    assertEquals(AbdaErpBasisVersion.V1_3_1, defaultVersion);
   }
 
   @Test
@@ -49,10 +49,10 @@ class AbdaErpBasisVersionTest {
 
   @Test
   void shouldCompareVersions() {
-    assertEquals(1, AbdaErpBasisVersion.V1_3_0.compareTo(AbdaErpBasisVersion.V1_2_1));
+    assertEquals(1, AbdaErpBasisVersion.V1_3_1.compareTo(AbdaErpBasisVersion.V1_2_1));
     assertEquals(0, AbdaErpBasisVersion.V1_2_1.compareTo(AbdaErpBasisVersion.V1_2_1));
-    assertEquals(0, AbdaErpBasisVersion.V1_3_0.compareTo(AbdaErpBasisVersion.V1_3_0));
-    assertEquals(-1, AbdaErpBasisVersion.V1_2_1.compareTo(AbdaErpBasisVersion.V1_3_0));
+    assertEquals(0, AbdaErpBasisVersion.V1_3_1.compareTo(AbdaErpBasisVersion.V1_3_1));
+    assertEquals(-1, AbdaErpBasisVersion.V1_2_1.compareTo(AbdaErpBasisVersion.V1_3_1));
   }
 
   @AfterEach

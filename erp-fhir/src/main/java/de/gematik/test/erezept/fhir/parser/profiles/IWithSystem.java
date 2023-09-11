@@ -16,14 +16,35 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles;
 
-import lombok.NonNull;
-import lombok.val;
+import java.util.*;
+import javax.annotation.Nullable;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
 
 public interface IWithSystem {
 
   String getCanonicalUrl();
 
-  default boolean match(@NonNull String url) {
+  default boolean matchAny(List<CanonicalType> canonicalTypes) {
+    return canonicalTypes.stream().anyMatch(this::match);
+  }
+
+  default boolean match(Meta meta) {
+    return matchAny(meta.getProfile());
+  }
+
+  default boolean match(Identifier identifier) {
+    return match(identifier.getSystem());
+  }
+  
+  default boolean match(CanonicalType canonicalType) {
+    return match(canonicalType.asStringValue());
+  }
+
+  default boolean match(@Nullable String url) {
+    if (url == null) {
+      return false;
+    }
     val unversioned = url.split("\\|")[0];
     return this.getCanonicalUrl().equals(unversioned);
   }

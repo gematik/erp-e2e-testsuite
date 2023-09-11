@@ -16,19 +16,24 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.konnektor.*;
-import de.gematik.test.konnektor.cfg.*;
-import de.gematik.test.konnektor.soap.*;
-import de.gematik.test.smartcard.*;
-import de.gematik.ws.conn.connectorcontext.v2.*;
-import java.io.*;
-import java.nio.charset.*;
-import java.util.*;
-import java.util.stream.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.konnektor.PinType;
+import de.gematik.test.konnektor.cfg.KonnektorModuleConfiguration;
+import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
+import de.gematik.test.smartcard.Egk;
+import de.gematik.test.smartcard.Hba;
+import de.gematik.test.smartcard.SmartcardFactory;
+import de.gematik.ws.conn.connectorcontext.v2.ContextType;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 class ReadVsdCommandTest {
 
@@ -41,7 +46,7 @@ class ReadVsdCommandTest {
   static void setUp() {
     val smartCardArchive = SmartcardFactory.getArchive();
     hba = smartCardArchive.getHbaByICCSN("80276883110000095767");
-    egk = smartCardArchive.getEgkByICCSN("80276881025548431301");
+    egk = smartCardArchive.getEgkByICCSN("80276881040001935352");
 
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
 

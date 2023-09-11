@@ -16,16 +16,19 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import de.gematik.test.core.expectations.requirements.*;
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.konnektor.commands.options.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.erezept.ErpConfiguration;
+import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
+import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmChecksum;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @Slf4j
 class AuditEventVerifierTest {
@@ -46,17 +49,21 @@ class AuditEventVerifierTest {
   }
 
   @Test
+    // todo zugehöriges Ticket: TSERP-171
   void shouldDetectAllRepresentations() {
-    val checksum = ExamEvidence.NO_UPDATES.getChecksum().orElseThrow();
+    val checksum =
+            VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
+                    .checksum(VsdmChecksum.builder("X12345678").build())
+                    .build()
+                    .getChecksum()
+                    .orElseThrow();
     val verifier = AuditEventVerifier.builder().pharmacy(pharmacy).checksum(checksum).build();
     val testData =
-        FhirTestResourceUtil.createErxAuditEventBundle(
+            FhirTestResourceUtil.createErxAuditEventBundle(
             pharmacy.getTelematikId(), pharmacy.getCommonName(), checksum);
     for (Representation rep : Representation.values()) {
       verifier.contains(rep).apply(testData);
     }
-    verifier
-        .firstCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL_WITH_CHECKSUM)
-        .apply(testData);
+    verifier.firstCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL).apply(testData);
   }
 }

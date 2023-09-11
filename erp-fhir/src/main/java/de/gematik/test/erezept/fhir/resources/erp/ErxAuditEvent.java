@@ -16,13 +16,16 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import ca.uhn.fhir.model.api.annotation.*;
-import java.util.stream.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.PrimitiveType;
 
 /**
  * AuditEvent for logging of ePrescription Access
@@ -37,16 +40,11 @@ public class ErxAuditEvent extends AuditEvent {
   @AllArgsConstructor
   @Getter
   public enum Representation {
-    PHARMACY_GET_TASK_SUCCESSFUL_WITH_CHECKSUM(
-        "{agentName} hat mit Ihrer Gesundheitskarte alle Ihre einlösbaren E-Rezepte abgerufen "
-            + "(Prüfziffer: {checksum}).",
-        AuditEventAction.R),
-    PHARMACY_GET_TASK_SUCCESSFUL_WITHOUT_CHECKSUM(
-        "{agentName} hat mit Ihrer Gesundheitskarte alle Ihre einlösbaren E-Rezepte abgerufen."
-            + "(Keine Prüfziffer vorhanden)",
+    PHARMACY_GET_TASK_SUCCESSFUL(
+        "{agentName} hat mit Ihrer eGK die Liste der offenen E-Rezepte abgerufen.",
         AuditEventAction.R),
     PHARMACY_GET_TASK_UNSUCCESSFUL(
-        "{agentName} konnte aufgrund eines Fehlers Ihre E-Rezepte nicht mit Ihrer Gesundheitskarte abrufen.",
+        "{agentName} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.",
         AuditEventAction.R);
 
     private final String text;

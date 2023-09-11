@@ -34,6 +34,6 @@ public class HandleAppAuthenticationTest {
   public void shouldGenerateStrongPassword() {
     val ability = HandleAppAuthentication.withStrongPassword();
     assertNotNull(ability.getPassword());
-    assertTrue(ability.getPassword().length() > 10); // well, won't check the entropy for now!
+    assertTrue(ability.getPassword().length() > 7); // well, won't check the entropy for now!
   }
 }

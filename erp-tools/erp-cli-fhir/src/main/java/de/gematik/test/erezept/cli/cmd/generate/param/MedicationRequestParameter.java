@@ -18,11 +18,14 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import lombok.*;
 import picocli.*;
 import picocli.CommandLine.*;
+
+import javax.annotation.Nullable;
 
 public class MedicationRequestParameter implements BaseResourceParameter {
 
@@ -44,6 +47,13 @@ public class MedicationRequestParameter implements BaseResourceParameter {
       description = "If set an emergency service fee flag will be set (default=${DEFAULT-VALUE})")
   @Getter
   private boolean emergencyServiceFee = false;
+
+  @Option(
+      names = {"--accident"},
+      type = AccidentCauseType.class,
+      description = "If set the MedicationRequest will be marked as an accident (default=null)")
+  @Getter
+  private AccidentCauseType accidentCauseType;
 
   @CommandLine.Option(
       names = {"--dosage"},
@@ -97,6 +107,14 @@ public class MedicationRequestParameter implements BaseResourceParameter {
     return this.getOrDefault(packages, GemFaker::fakerAmount);
   }
 
+  private @Nullable AccidentExtension getAccidentExtension() {
+    if (accidentCauseType != null) {
+      return AccidentExtension.faker(accidentCauseType);
+    } else {
+      return null;
+    }
+  }
+
   public KbvErpMedicationRequest createMedicationRequest() {
     val mvo = mvoOnly ? GemFaker.mvo(true) : GemFaker.mvo();
     return MedicationRequestBuilder.forPatient(this.getPatient())
@@ -109,6 +127,7 @@ public class MedicationRequestParameter implements BaseResourceParameter {
         .intent("order")
         .isBVG(GemFaker.fakerBool())
         .mvo(mvo)
+        .accident(getAccidentExtension())
         .hasEmergencyServiceFee(isEmergencyServiceFee())
         .substitution(isSubstitution())
         .coPaymentStatus(getStatusCoPayment())

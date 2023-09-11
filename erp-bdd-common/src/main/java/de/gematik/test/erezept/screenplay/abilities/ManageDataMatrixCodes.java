@@ -16,35 +16,28 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.exceptions.MissingStackException;
-import de.gematik.test.erezept.screenplay.util.DmcPrescription;
-import de.gematik.test.erezept.screenplay.util.DmcStack;
-import de.gematik.test.erezept.screenplay.util.ManagedList;
-import java.util.List;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.screenplay.Ability;
-import net.serenitybdd.screenplay.HasTeardown;
+import de.gematik.test.erezept.exceptions.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import net.serenitybdd.screenplay.*;
 
 /**
  * This ability is intended to be used by the Patient-Actor for managing his
  * (Low-Detail)-Prescriptions which he receives from the doctor
  */
 @Slf4j
-public class ManageDataMatrixCodes implements Ability, HasTeardown {
+public class ManageDataMatrixCodes implements Ability {
 
   @Getter private final ManagedList<DmcPrescription> dmcs;
   @Getter private final ManagedList<DmcPrescription> deletedDmcs;
 
   private ManageDataMatrixCodes() {
-    this.dmcs =
-        new ManagedList<>(
-            new MissingPreconditionError("No Prescriptions via DataMatrixCode received so far"));
-    this.deletedDmcs =
-        new ManagedList<>(new MissingPreconditionError("No DataMatrixCode were deleted so far"));
+    this.dmcs = new ManagedList<>(() -> "No Prescriptions via DataMatrixCode received so far");
+    this.deletedDmcs = new ManagedList<>(() -> "No DataMatrixCode were deleted so far");
   }
 
   public ManagedList<DmcPrescription> chooseStack(DmcStack stack) {
@@ -92,15 +85,7 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown {
   public String toString() {
     return "DataMatrixCode Manager für die Verwaltung von verschriebenen E-Rezepten auf Papier";
   }
-
-  @Override
-  public void tearDown() {
-    /* TODO:  // NOSONAR still needs to be refactored
-    implement TearDown where this Patient iterates over all of his DMCs (unassigned
-    Prescriptions) and deletes/aborts these */
-    log.info("Teardown not implemented yet: Abort all unassigned (pending) Prescriptions");
-  }
-
+  
   public static ManageDataMatrixCodes heGetsPrescribed() {
     return new ManageDataMatrixCodes();
   }

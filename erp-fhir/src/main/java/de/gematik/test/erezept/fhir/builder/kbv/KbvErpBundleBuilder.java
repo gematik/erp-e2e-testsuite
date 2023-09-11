@@ -28,9 +28,8 @@ import de.gematik.test.erezept.fhir.references.kbv.MedicationRequestReference;
 import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
 import de.gematik.test.erezept.fhir.references.kbv.RequesterReference;
 import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.Date;
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
@@ -45,6 +45,7 @@ import org.hl7.fhir.r4.model.*;
  * This builder provides a convenient way to build <a
  * href="https://simplifier.net/erezept/kbvprerpbundle">KBV ERP Bundles</a>
  */
+@Slf4j
 public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBuilder> {
 
   /**
@@ -55,116 +56,21 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
   private static final String DEVICE_AUTHOR_ID = "GEMATIK/410/2109/36/123";
 
   private static final String BASE_URL = "https://pvs.gematik.de/fhir/";
-
-  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
-
-  private PrescriptionId prescriptionId;
-
-  private Bundle.BundleEntryComponent compositionEntry;
   private final KbvCompositionBuilder compositionBuilder = KbvCompositionBuilder.builder();
-
+  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
+  private PrescriptionId prescriptionId;
+  private Bundle.BundleEntryComponent compositionEntry;
   private StatusKennzeichen statusKennzeichen = StatusKennzeichen.NONE;
 
   private KbvPatient patient;
-  private Coverage coverage;
+  private KbvCoverage coverage;
   private MedicalOrganization medicalOrganization; // the organization issuing the prescription
   private InstitutionalOrganization assignerOrganization;
   private Practitioner practitioner;
-  private MedicationRequest medicationRequest;
+  private KbvErpMedicationRequest medicationRequest;
   private Medication medication;
 
   private KbvErpBundleBuilder() {}
-
-  public static KbvErpBundleBuilder builder() {
-    return new KbvErpBundleBuilder();
-  }
-
-  public static KbvErpBundleBuilder forPrescription(@NonNull String prescriptionId) {
-    return forPrescription(new PrescriptionId(prescriptionId));
-  }
-
-  public static KbvErpBundleBuilder forPrescription(@NonNull PrescriptionId prescriptionId) {
-    return new KbvErpBundleBuilder().prescriptionId(prescriptionId);
-  }
-
-  public static KbvErpBundleBuilder faker() {
-    return faker(fakerKvid(), fakerPrescriptionId());
-  }
-
-  public static KbvErpBundleBuilder faker(String kvid) {
-    return faker(kvid, new Date());
-  }
-
-  public static KbvErpBundleBuilder faker(String kvid, Date authoredOn) {
-    return faker(kvid, authoredOn, fakerPzn());
-  }
-
-  public static KbvErpBundleBuilder faker(String kvid, String pzn) {
-    return faker(kvid, new Date(), pzn);
-  }
-
-  public static KbvErpBundleBuilder faker(String kvid, Date authoredOn, String pzn) {
-    return faker(kvid, pzn, authoredOn, fakerPrescriptionId());
-  }
-
-  public static KbvErpBundleBuilder faker(String kvid, PrescriptionId prescriptionId) {
-    return faker(kvid, new Date(), prescriptionId);
-  }
-
-  public static KbvErpBundleBuilder faker(
-      String kvid, Date authoredOn, PrescriptionId prescriptionId) {
-    return faker(kvid, fakerPzn(), authoredOn, prescriptionId);
-  }
-
-  public static KbvErpBundleBuilder faker(String kvid, String pzn, PrescriptionId prescriptionId) {
-    return faker(kvid, pzn, new Date(), prescriptionId);
-  }
-
-  public static KbvErpBundleBuilder faker(
-      String kvid, String pzn, Date authoredOn, PrescriptionId prescriptionId) {
-    return faker(kvid, pzn, fakerDrugName(), authoredOn, fakerBool(), prescriptionId);
-  }
-
-  public static KbvErpBundleBuilder faker(
-      String kvid,
-      String pzn,
-      String medicationName,
-      boolean substitution,
-      PrescriptionId prescriptionId) {
-    return faker(kvid, pzn, medicationName, new Date(), substitution, prescriptionId);
-  }
-
-  public static KbvErpBundleBuilder faker(
-      String kvid,
-      String pzn,
-      String medicationName,
-      Date authoredOn,
-      boolean substitution,
-      PrescriptionId prescriptionId) {
-    val practitioner = PractitionerBuilder.faker().build();
-    val medicalOrganization = MedicalOrganizationBuilder.faker().build();
-    val assignerOrganization = AssignerOrganizationBuilder.faker().build();
-    val patient =
-        PatientBuilder.faker(kvid, IdentifierTypeDe.GKV).assigner(assignerOrganization).build();
-    val insurance =
-        KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
-    val medication =
-        KbvErpMedicationBuilder.faker(pzn, medicationName, MedicationCategory.C_00).build();
-    val medicationRequest =
-        MedicationRequestBuilder.faker(patient, authoredOn, substitution)
-            .insurance(insurance)
-            .requester(practitioner)
-            .medication(medication)
-            .build();
-    return KbvErpBundleBuilder.forPrescription(prescriptionId.getValue())
-        .practitioner(practitioner)
-        .custodian(medicalOrganization)
-        .assigner(assignerOrganization)
-        .patient(patient)
-        .insurance(insurance)
-        .medicationRequest(medicationRequest)
-        .medication(medication);
-  }
 
   /**
    * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
@@ -190,7 +96,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     return self();
   }
 
-  public KbvErpBundleBuilder insurance(@NonNull Coverage coverage) {
+  public KbvErpBundleBuilder insurance(@NonNull KbvCoverage coverage) {
     this.coverage = coverage;
     return self();
   }
@@ -210,7 +116,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     return self();
   }
 
-  public KbvErpBundleBuilder medicationRequest(@NonNull MedicationRequest medicationRequest) {
+  public KbvErpBundleBuilder medicationRequest(@NonNull KbvErpMedicationRequest medicationRequest) {
     this.medicationRequest = medicationRequest;
     return self();
   }
@@ -229,12 +135,10 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     return self();
   }
 
-  private KbvErpBundleBuilder addComposition(@NonNull Composition composition) {
+  private void addComposition(@NonNull Composition composition) {
     val fullUrl = BASE_URL + "Composition/" + composition.getId();
     this.compositionEntry =
         new Bundle.BundleEntryComponent().setResource(composition).setFullUrl(fullUrl);
-
-    return self();
   }
 
   public KbvErpBundle build() {
@@ -250,30 +154,30 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     kbv.setId(this.getResourceId()).setMeta(meta);
 
     val coverageReference = new CoverageReference(coverage.getId());
-    extendCoverage();
     val coverageEntry =
-        createBundleEntry(coverage, () -> coverageReference, compositionBuilder::coverageReference);
+        createBundleEntry(
+            coverage, coverageReference::asReference, compositionBuilder::coverageReference);
 
     val patientEntry =
         createBundleEntry(
-            patient, () -> patient.getReference(), compositionBuilder::subjectReference);
+            patient, () -> patient.getReference().asReference(), compositionBuilder::subjectReference);
 
     val practitionerEntry =
         createBundleEntry(
             practitioner,
-            () -> new RequesterReference(practitioner.getId()),
+            () -> new RequesterReference(practitioner.getId()).asReference(),
             compositionBuilder::requesterReference);
 
     val organizationEntry =
         createBundleEntry(
             medicalOrganization,
-            () -> new OrganizationReference(medicalOrganization.getId()),
+            () -> new OrganizationReference(medicalOrganization.getId()).asReference(),
             compositionBuilder::custodianReference);
 
     val medicationRequestEntry =
         createBundleEntry(
             medicationRequest,
-            () -> new MedicationRequestReference(medicationRequest.getId()),
+            () -> new MedicationRequestReference(medicationRequest.getId()).asReference(),
             compositionBuilder::medicationRequestReference);
 
     // Note: Medication does not require an entry within the composition
@@ -297,15 +201,15 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
                 coverageEntry));
     kbv.getEntry().add(practitionerEntry);
 
-    if (patient.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
-      if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
-        val assignerFullUrl = BASE_URL + "Organization/" + assignerOrganization.getId();
-        val assignerEntry =
-            new Bundle.BundleEntryComponent()
-                .setResource(assignerOrganization)
-                .setFullUrl(assignerFullUrl);
-        kbv.getEntry().add(assignerEntry);
-      }
+    val isOldProfile = kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0;
+    val isPkvCoverage = coverage.getInsuranceKind() == VersicherungsArtDeBasis.PKV;
+    if (isPkvCoverage && isOldProfile) {
+      val assignerFullUrl = BASE_URL + "Organization/" + assignerOrganization.getId();
+      val assignerEntry =
+          new Bundle.BundleEntryComponent()
+              .setResource(assignerOrganization)
+              .setFullUrl(assignerFullUrl);
+      kbv.getEntry().add(assignerEntry);
 
       // PKV has also an extension for PKV Tariff
       kbv.getComposition().addExtension(PkvTariff.BASIS.asExtension());
@@ -313,14 +217,13 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
 
     compositionBuilder.addExtension(statusKennzeichen.asExtension());
 
+    Identifier identifier;
     if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
-      val identifier = this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
-      kbv.setIdentifier(identifier);
+      identifier = this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
     } else {
-      val identifier =
-          this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
-      kbv.setIdentifier(identifier);
+      identifier = this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
     }
+    kbv.setIdentifier(identifier);
 
     return kbv;
   }
@@ -346,21 +249,6 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     return BASE_URL + id;
   }
 
-  /** if GKV, BG, SKT or UK set legal-basis extension (Rechtsgrundlage) */
-  private void extendCoverage() {
-    // Note: check this rule from KBV_PR_ERP_Bundle: Rule says GKV/BG/SKT/UK but I have only GKV/BG
-    //    coverage.getType().getCoding().stream()
-    //        .filter(
-    //            c ->
-    // c.getSystem().equals(ErpCodeSystem.VERSICHERUNGSART_DE_BASIS.getCanonicalUrl()))
-    //        .map(c -> VersicherungsArtDeBasis.fromCode(c.getCode()))
-    //        .filter(va -> va == VersicherungsArtDeBasis.GKV || va == VersicherungsArtDeBasis.BG)
-    //        .findFirst()
-    //        .ifPresent(va ->
-    // compositionBuilder.addExtension(StatusKennzeichen.NONE.asExtension()));
-    // TODO: remove when not required anymore!!
-  }
-
   private void checkRequired() {
     this.checkRequired(patient, "KBV Bundle requires a patient");
     this.checkRequired(coverage, "KBV Bundle requires a coverage");
@@ -369,14 +257,128 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     this.checkRequired(practitioner, "KBV Bundle requires a practitioner");
     this.checkRequired(medicalOrganization, "KBV Bundle requires a custodian organization");
 
-    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0
-        && patient.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
-      // assigner organization not required from kbv.ita.erp-1.1.0??
-      this.checkRequired(
-          assignerOrganization,
-          format(
-              "KBV Bundle with PKV patient requires an assigner organization for {0}",
-              kbvItaErpVersion));
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+      // old profile
+      if (coverage.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
+        // assigner organization not required from kbv.ita.erp-1.1.0??
+        this.checkRequired(
+            assignerOrganization,
+            format(
+                "KBV Bundle with PKV patient requires an assigner organization for {0}",
+                kbvItaErpVersion));
+      }
+    } else {
+      // new profile
+      medicationRequest
+          .getAccident()
+          .filter(accident -> !accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT))
+          .ifPresent(
+              accident -> {
+                // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
+                // "Berufsgenossenschaft"
+                // and the patient is in this case always GKV (gesetzlich krankenversichert)
+                if (!coverage.getInsuranceKind().equals(VersicherungsArtDeBasis.BG)) {
+                  log.warn(
+                      format(
+                          "Accident set to {0} and insurance is of type {1} but must be {2}",
+                          accident.accidentCauseType().getDisplay(),
+                          coverage.getInsuranceKind(),
+                          VersicherungsArtDeBasis.BG));
+                }
+              });
     }
+  }
+
+  public static KbvErpBundleBuilder builder() {
+    return new KbvErpBundleBuilder();
+  }
+
+  public static KbvErpBundleBuilder forPrescription(@NonNull String prescriptionId) {
+    return forPrescription(new PrescriptionId(prescriptionId));
+  }
+
+  public static KbvErpBundleBuilder forPrescription(@NonNull PrescriptionId prescriptionId) {
+    return new KbvErpBundleBuilder().prescriptionId(prescriptionId);
+  }
+
+  public static KbvErpBundleBuilder faker() {
+    return faker(KVNR.random(), fakerPrescriptionId());
+  }
+
+  public static KbvErpBundleBuilder faker(KVNR kvnr) {
+    return faker(kvnr, new Date());
+  }
+
+  public static KbvErpBundleBuilder faker(KVNR kvnr, Date authoredOn) {
+    return faker(kvnr, authoredOn, fakerPzn());
+  }
+
+  public static KbvErpBundleBuilder faker(KVNR kvnr, String pzn) {
+    return faker(kvnr, new Date(), pzn);
+  }
+
+  public static KbvErpBundleBuilder faker(KVNR kvnr, Date authoredOn, String pzn) {
+    return faker(kvnr, pzn, authoredOn, fakerPrescriptionId());
+  }
+
+  public static KbvErpBundleBuilder faker(KVNR kvnr, PrescriptionId prescriptionId) {
+    return faker(kvnr, new Date(), prescriptionId);
+  }
+
+  public static KbvErpBundleBuilder faker(
+      KVNR kvnr, Date authoredOn, PrescriptionId prescriptionId) {
+    return faker(kvnr, fakerPzn(), authoredOn, prescriptionId);
+  }
+
+  public static KbvErpBundleBuilder faker(KVNR kvnr, String pzn, PrescriptionId prescriptionId) {
+    return faker(kvnr, pzn, new Date(), prescriptionId);
+  }
+
+  public static KbvErpBundleBuilder faker(
+      KVNR kvnr, String pzn, Date authoredOn, PrescriptionId prescriptionId) {
+    return faker(kvnr, pzn, fakerDrugName(), authoredOn, fakerBool(), prescriptionId);
+  }
+
+  public static KbvErpBundleBuilder faker(
+      KVNR kvnr,
+      String pzn,
+      String medicationName,
+      boolean substitution,
+      PrescriptionId prescriptionId) {
+    return faker(kvnr, pzn, medicationName, new Date(), substitution, prescriptionId);
+  }
+
+  public static KbvErpBundleBuilder faker(
+      KVNR kvnr,
+      String pzn,
+      String medicationName,
+      Date authoredOn,
+      boolean substitution,
+      PrescriptionId prescriptionId) {
+    val practitioner = PractitionerBuilder.faker().build();
+    val medicalOrganization = MedicalOrganizationBuilder.faker().build();
+    val assignerOrganization = AssignerOrganizationBuilder.faker().build();
+    val patient =
+        PatientBuilder.faker(kvnr, VersicherungsArtDeBasis.GKV)
+            .assigner(assignerOrganization)
+            .build();
+    val insurance =
+        KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
+    val medication =
+        KbvErpMedicationBuilder.faker(pzn, medicationName, MedicationCategory.C_00).build();
+    val medicationRequest =
+        MedicationRequestBuilder.faker(patient, authoredOn, substitution)
+            .insurance(insurance)
+            .requester(practitioner)
+            .medication(medication)
+            .build();
+    return KbvErpBundleBuilder.forPrescription(prescriptionId.getValue())
+        .practitioner(practitioner)
+        .custodian(medicalOrganization)
+        .assigner(assignerOrganization)
+        .patient(patient)
+        .insurance(insurance)
+        .medicationRequest(medicationRequest)
+        .medication(medication);
   }
 }

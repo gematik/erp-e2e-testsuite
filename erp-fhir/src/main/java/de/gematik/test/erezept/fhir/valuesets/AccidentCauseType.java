@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
+import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import java.util.Arrays;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Getter
@@ -41,5 +44,12 @@ public enum AccidentCauseType implements IValueSet {
   @Override
   public ICodeSystem getCodeSystem() {
     return CODE_SYSTEM;
+  }
+
+  public static AccidentCauseType fromCode(@NonNull String code) {
+    return Arrays.stream(AccidentCauseType.values())
+        .filter(pt -> pt.code.equals(code))
+        .findFirst()
+        .orElseThrow(() -> new InvalidValueSetException(AccidentCauseType.class, code));
   }
 }

@@ -1,0 +1,10 @@
+
+=== E2E-Testsuite
+Die {name-primsys-testsuite} fokussiert sich auf die Qualitätssicherung des E-Rezept-Fachdienstes aus der Perspektive der Anwendungsfälle. Wie <<introduction,eingangs skizziert>> liegt der Fokus hier ganz klar auf dem _End-to-End-Gedanken_ und deckt die Teststufe der _Akzeptanztests_ für den Fachdienst ab.
+
+==== Technologiestack
+Im Wesentlichen setzt die {name-primsys-testsuite} auf den folgenden Technologiestack auf:
+
+- link:https://openjdk.org/projects/jdk/17/[Java 17] mit link:https://maven.apache.org/download.cgi[Maven]
+- {link-serenity-bdd} mit {link-serenity-screenplay}
+- {link-gherkin} mit {link-cucumber}

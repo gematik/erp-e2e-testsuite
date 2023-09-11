@@ -1,7 +1,7 @@
 <Bundle xmlns="http://hl7.org/fhir">
   <id value="ad80703d-8c62-44a3-b12b-2ea66eda0aa2" />
   <meta>
-    <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.1" />
+    <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.2" />
     <tag>
       <display value="Beispiel RezeptAbgabedatenPKV Bundle (FAM)" />
     </tag>
@@ -14,14 +14,14 @@
     <value value="200.100.000.000.081.90" />
   </identifier>
   <type value="document" />
-  <timestamp value="2022-03-24T11:30:00Z" />
+  <timestamp value="2023-07-24T11:30:00Z" />
   <entry>
     <fullUrl value="urn:uuid:72183b44-61cf-4fe7-8f74-1e37d58fcea8" />
     <resource>
       <Composition>
         <id value="72183b44-61cf-4fe7-8f74-1e37d58fcea8" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.2" />
         </meta>
         <status value="final" />
         <type>
@@ -30,7 +30,7 @@
             <code value="ERezeptAbgabedaten" />
           </coding>
         </type>
-        <date value="2022-03-24T11:30:00Z" />
+        <date value="2023-07-24T11:30:00Z" />
         <author>
           <reference value="urn:uuid:5dc67a4f-c936-4c26-a7c0-967673a70740" />
         </author>
@@ -56,11 +56,11 @@
       <Organization>
         <id value="5dc67a4f-c936-4c26-a7c0-967673a70740" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.2" />
         </meta>
         <identifier>
           <system value="http://fhir.de/sid/arge-ik/iknr" />
-          <value value="123456789" />
+          <value value="308412345" />
         </identifier>
         <name value="Adler-Apotheke" />
         <address>
@@ -86,7 +86,7 @@
       <MedicationDispense>
         <id value="335784b4-3f89-47cc-b32f-bc386a212e11" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.2" />
         </meta>
         <extension url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-Abrechnungszeilen">
           <valueReference>
@@ -125,7 +125,7 @@
             <code value="Abgabeinformationen" />
           </coding>
         </type>
-        <whenHandedOver value="2022-03-24" />
+        <whenHandedOver value="2023-07-24" />
       </MedicationDispense>
     </resource>
   </entry>
@@ -135,7 +135,7 @@
       <Invoice>
         <id value="cfd49ec7-fd9c-4ab3-865f-f0aaf010ca19" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.2" />
         </meta>
         <status value="issued" />
         <type>
@@ -151,6 +151,7 @@
               <system value="http://fhir.de/CodeSystem/ifa/pzn" />
               <code value="06313728" />
             </coding>
+            <text value="Sumatriptan 1A Pharma 100 mg Tabletten, 12 St" />
           </chargeItemCodeableConcept>
           <priceComponent>
             <extension url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">

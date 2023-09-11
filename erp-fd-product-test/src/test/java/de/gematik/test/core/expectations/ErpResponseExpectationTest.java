@@ -17,24 +17,21 @@
 package de.gematik.test.core.expectations;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.core.annotations.TestcaseId;
-import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.core.expectations.requirements.Requirement;
-import de.gematik.test.core.extensions.ErpTestExtension;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import java.util.Map;
-import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import de.gematik.test.core.annotations.*;
+import de.gematik.test.core.expectations.requirements.*;
+import de.gematik.test.core.extensions.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
 
 @ExtendWith(ErpTestExtension.class)
 class ErpResponseExpectationTest {
@@ -43,7 +40,11 @@ class ErpResponseExpectationTest {
   @TestcaseId("ut_expecation_01")
   @DisplayName("Positive Unit Test for an Expectation")
   void shouldPassExpectation() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -58,7 +59,11 @@ class ErpResponseExpectationTest {
   @TestcaseId("ut_expecation_02")
   @DisplayName("Negative Unit Test for an Expectation")
   void shouldFailExpectation() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -75,7 +80,11 @@ class ErpResponseExpectationTest {
   @TestcaseId("ut_expecation_03")
   @DisplayName("Expectation contains Requirements in toString")
   void shouldHaveRequirements() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -91,7 +100,11 @@ class ErpResponseExpectationTest {
   @TestcaseId("ut_expecation_04")
   @DisplayName("Expectation contains no Requirements in toString if no given")
   void shouldNotHaveRequirements() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val expectation = ErpResponseExpectation.expectFor(response, KbvErpBundle.class);
 
@@ -103,7 +116,11 @@ class ErpResponseExpectationTest {
   @TestcaseId("ut_expecation_05")
   @DisplayName("Expectation contains no Requirements in toString if only custom requirements given")
   void shouldNotHaveCustomRequirements() {
-    val response = new ErpResponse(200, Map.of(), KbvErpBundleBuilder.faker("X12345673").build());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -119,7 +136,11 @@ class ErpResponseExpectationTest {
   @DisplayName(
       "AssertionError wird bei unerwartetem Payload immer geworfen, auch wenn nicht explizit geprüft")
   void shouldThrowOnUnexpectedPayloadWithoutExplicitVerification() {
-    val response = new ErpResponse(200, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+    val response =
+        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, ErxTask.class).responseWith(returnCodeIs(200));

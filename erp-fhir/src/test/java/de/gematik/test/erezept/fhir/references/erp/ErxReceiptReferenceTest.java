@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.fhir.references.erp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
@@ -31,8 +32,8 @@ class ErxReceiptReferenceTest {
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
     val reference = new ErxReceiptReference(erxReceipt);
 
-    Assertions.assertEquals("Bundle/12345", reference.getReference());
-    Assertions.assertEquals(
-        ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE.getCanonicalUrl(), reference.getDisplay());
+    assertEquals("Bundle/12345", reference.getReference());
+    assertEquals(
+        ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE.getCanonicalUrl(), reference.asReference().getDisplay());
   }
 }

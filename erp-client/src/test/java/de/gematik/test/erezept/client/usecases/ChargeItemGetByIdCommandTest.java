@@ -16,11 +16,12 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.*;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -75,5 +76,13 @@ class ChargeItemGetByIdCommandTest {
     ChargeItemGetByIdCommand chargeItemGetByIdCommand =
         new ChargeItemGetByIdCommand(prescriptionID);
     assertTrue(chargeItemGetByIdCommand.getRequestBody().isEmpty());
+  }
+
+  @Test
+  void shouldProvideAccessCodeForRequest() {
+    val ac = AccessCode.random();
+    val prescriptionID = PrescriptionId.random();
+    val cmd = new ChargeItemGetByIdCommand(prescriptionID, ac);
+    assertTrue(cmd.getRequestLocator().contains(format("ac={0}", ac.getValue())));
   }
 }

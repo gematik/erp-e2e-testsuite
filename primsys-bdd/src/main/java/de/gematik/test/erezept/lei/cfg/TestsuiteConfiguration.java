@@ -22,15 +22,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.gematik.test.erezept.client.cfg.INamedConfiguration;
+import de.gematik.test.erezept.config.PartialConfigSubstituter;
+import de.gematik.test.erezept.config.TestsuiteconfigurationScope;
+import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import de.gematik.test.erezept.config.dto.actor.*;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
+import de.gematik.test.erezept.config.exceptions.MissingKonnektorKonfigurationException;
 import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
-import de.gematik.test.erezept.lei.cfg.util.PartialConfigSubstituter;
-import de.gematik.test.erezept.pspwsclient.config.PSPClientConfig;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorConfiguration;
 import de.gematik.test.konnektor.cfg.LocalKonnektorConfiguration;
-import de.gematik.test.konnektor.cfg.RemoteKonnetorConfiguration;
-import de.gematik.test.konnektor.exceptions.MissingKonnektorKonfigurationException;
+import de.gematik.test.konnektor.cfg.RemoteKonnektorConfiguration;
+import de.gematik.test.konnektor.cfg.VsdmServiceConfiguration;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
@@ -44,52 +48,19 @@ import lombok.val;
 public class TestsuiteConfiguration {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
-
-  static {
-    OBJECT_MAPPER.registerSubtypes(new NamedType(RemoteKonnetorConfiguration.class, "remote"));
-    OBJECT_MAPPER.registerSubtypes(new NamedType(LocalKonnektorConfiguration.class, "local"));
-  }
-
   private static final String PRODUCT_NAME = "primsys";
   private static final String CONFIG_YAML = "config.yaml";
-
   private static TestsuiteConfiguration instance;
-
   private String activeEnvironment;
-
   private boolean preferManualSteps = false;
-
   private PSPClientConfig pspClientConfig;
-
-  private ActorsConfiguration actors;
+  private ActorsListConfiguration actors;
   private List<EnvironmentConfiguration> environments;
   private List<KonnektorConfiguration> konnektors;
 
-  public static TestsuiteConfiguration getInstance() {
-    val basePath = Path.of("config", PRODUCT_NAME, CONFIG_YAML);
-    val ymlFilePath =
-        (basePath.toFile().exists() ? basePath : Path.of("..").resolve(basePath))
-            .toAbsolutePath()
-            .normalize();
-
-    return getInstance(ymlFilePath.toFile());
-  }
-
-  @SneakyThrows
-  public static TestsuiteConfiguration getInstance(File ymlFile) {
-    if (instance == null) {
-      val configTemplate = readFile(ymlFile);
-      val finalConfig = PartialConfigSubstituter.applyUpdates(ymlFile, configTemplate);
-
-      instance = OBJECT_MAPPER.readValue(finalConfig.toString(), TestsuiteConfiguration.class);
-
-      log.info(
-          format(
-              "Read configuration from {0} with configured environment {1} ",
-              ymlFile.getAbsolutePath(), instance.activeEnvironment));
-    }
-
-    return instance;
+  static {
+    OBJECT_MAPPER.registerSubtypes(new NamedType(RemoteKonnektorConfiguration.class, "remote"));
+    OBJECT_MAPPER.registerSubtypes(new NamedType(LocalKonnektorConfiguration.class, "local"));
   }
 
   public EnvironmentConfiguration getActiveEnvironment() {
@@ -101,6 +72,11 @@ public class TestsuiteConfiguration {
         .filter(konnektor -> konnektor.getName().equalsIgnoreCase(name))
         .findFirst()
         .orElseThrow(() -> new MissingKonnektorKonfigurationException(name));
+  }
+
+  public VsdmServiceConfiguration getVsdmServiceConfiguration() {
+    val konCfg = (LocalKonnektorConfiguration) this.getKonnektorConfig("Soft-Konn");
+    return konCfg.getVsdmServiceConfiguration();
   }
 
   private Konnektor instantiateKonnektorClient(String name) {
@@ -135,14 +111,43 @@ public class TestsuiteConfiguration {
     return getConfig(name, this.actors.getPatients());
   }
 
-  private <T extends INamedConfiguration> T getConfig(String name, List<T> configs) {
+  private <T extends INamedConfigurationElement> T getConfig(String name, List<T> configs) {
     return configs.stream()
         .filter(actor -> actor.getName().equalsIgnoreCase(name))
         .findFirst()
         .orElseThrow(
             () ->
                 new ConfigurationMappingException(
-                    name, configs.stream().map(INamedConfiguration::getName).toList()));
+                    name, configs.stream().map(INamedConfigurationElement::getName).toList()));
+  }
+
+  public static TestsuiteConfiguration getInstance() {
+    val basePath = Path.of("config", PRODUCT_NAME, CONFIG_YAML);
+    val ymlFilePath =
+        (basePath.toFile().exists() ? basePath : Path.of("..").resolve(basePath))
+            .toAbsolutePath()
+            .normalize();
+
+    return getInstance(ymlFilePath.toFile());
+  }
+
+  @SneakyThrows
+  public static TestsuiteConfiguration getInstance(File ymlFile) {
+    if (instance == null) {
+      val configTemplate = readFile(ymlFile);
+      val finalConfig =
+          PartialConfigSubstituter.forScope(TestsuiteconfigurationScope.ERP_PRIMSYS)
+              .applyUpdates(ymlFile, configTemplate);
+
+      instance = OBJECT_MAPPER.readValue(finalConfig.toString(), TestsuiteConfiguration.class);
+
+      log.info(
+          format(
+              "Read configuration from {0} with configured environment {1} ",
+              ymlFile.getAbsolutePath(), instance.activeEnvironment));
+    }
+
+    return instance;
   }
 
   @SneakyThrows

@@ -24,10 +24,11 @@ import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.AcceptStrategy;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.strategy.pharmacy.AcceptStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
@@ -41,44 +42,34 @@ public class ResponseOfAcceptOperation extends FhirResponseQuestion<ErxAcceptBun
   private AcceptStrategy strategy;
   private ErxCommunication communication;
 
-  private TaskAcceptCommand executedCommand;
-
   private ResponseOfAcceptOperation(DmcPrescription prescription) {
+    super("Task/$accept via DMC");
     this.prescription = prescription;
   }
 
   private ResponseOfAcceptOperation(AcceptStrategy strategy) {
+    super("Task/$accept");
     this.strategy = strategy;
   }
 
   private ResponseOfAcceptOperation(ErxCommunication communication) {
+    super("Task/$accept via Communication");
     this.communication = communication;
   }
 
   @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
-
-    this.executedCommand = createCommand(actor);
+    val executedCommand = createCommand(actor);
     log.info(
         format(
             "Actor {0} is asking for the response of {1}",
-            actor.getName(), this.executedCommand.getRequestLocator()));
-    return erpClientAbility.request(this.executedCommand);
-  }
-
-  @Override
-  public Class<ErxAcceptBundle> expectedResponseBody() {
-    return executedCommand.expectedResponseBody();
-  }
-
-  @Override
-  public String getOperationName() {
-    return "Task/$accept";
+            actor.getName(), executedCommand.getRequestLocator()));
+    return erpClientAbility.request(executedCommand);
   }
 
   private TaskAcceptCommand createCommand(Actor actor) {
-    String taskId;
+    TaskId taskId;
     AccessCode accessCode;
 
     if (strategy != null) {

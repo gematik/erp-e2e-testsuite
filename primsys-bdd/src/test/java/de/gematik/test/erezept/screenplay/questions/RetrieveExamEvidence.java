@@ -16,36 +16,67 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.*;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmChecksum;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import de.gematik.test.smartcard.Egk;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.core.Serenity;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Question;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.smartcard.*;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import java.util.Base64;
+
+import static java.text.MessageFormat.format;
 
 @Slf4j
-@AllArgsConstructor
-public class RetrieveExamEvidence implements Question<Optional<String>> {
+@RequiredArgsConstructor
+public class RetrieveExamEvidence implements Question<String> {
+
   private final Egk egk;
 
   public static RetrieveExamEvidence with(Egk egk) {
     return new RetrieveExamEvidence(egk);
   }
 
+  private StringBuilder examEvidenceInfo;
+
   @Override
-  public Optional<String> answeredBy(Actor pharmacy) {
+  public String answeredBy(Actor pharmacy) {
     val konnektor = SafeAbility.getAbility(pharmacy, UseTheKonnektor.class);
 
-    val examEvidence = konnektor.requestEvidenceForEgk(egk);
+    val response = konnektor.requestEvidenceForEgk(egk).getPayload();
 
-    if (examEvidence.isEmpty()) {
-      log.warn(format("Exam Evidence could not be determined for {0}", egk.getKvnr()));
-    }
+    val examEvidenceAsBase64 = Base64.getEncoder().encodeToString(response.getPruefungsnachweis());
+    examEvidenceInfo =
+        new StringBuilder(format("Prüfungsnachweis: {0} \n", examEvidenceAsBase64));
+    val examEvidence = VsdmExamEvidence.parse(examEvidenceAsBase64);
+    examEvidenceInfo.append(format("Prüfungsnachweis dekodiert: {0}\n\n", examEvidence));
 
-    return examEvidence.map(
-        e -> Base64.getEncoder().encodeToString(e.getPayload().getPruefungsnachweis()));
+    examEvidence.getChecksum().ifPresentOrElse(
+            it-> verifyChecksum(pharmacy, it)
+     ,() -> examEvidenceInfo.append("Prüfziffer nicht vorhanden")
+    );
+
+    Serenity.recordReportData()
+        .withTitle("Prüfungsnachweis")
+        .andContents(examEvidenceInfo.toString());
+
+    return examEvidenceAsBase64;
+  }
+
+  @SneakyThrows
+  private void verifyChecksum(Actor pharmacy, String checksumAsBase64) {
+    val checksum = VsdmChecksum.parse(checksumAsBase64);
+
+    examEvidenceInfo.append(format("Prüfziffer: {0}\n", checksum));
+
+    pharmacy.attemptsTo(Ensure.that(checksum.getKvnr()).isEqualTo(egk.getKvnr()));
+    pharmacy.attemptsTo(Ensure.that(checksum.getVersion()).isEqualTo('1'));
   }
 }

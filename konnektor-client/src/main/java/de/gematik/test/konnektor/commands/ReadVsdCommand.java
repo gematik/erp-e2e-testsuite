@@ -16,28 +16,27 @@
 
 package de.gematik.test.konnektor.commands;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.vsds.vsdservice.v5.ReadVSDResponse;
-import de.gematik.ws.conn.vsds.vsdservice.v5.VSDStatusType;
-import javax.xml.ws.Holder;
-import lombok.val;
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import de.gematik.ws.conn.vsds.vsdservice.v5.*;
+import javax.xml.ws.*;
+import lombok.*;
 
 public class ReadVsdCommand extends AbstractKonnektorCommand<ReadVSDResponse> {
 
-  private final CardHandle hpcCardHandle;
-  private final CardHandle egkCardHandle;
+  private final CardInfo hpcCardInfo;
+  private final CardInfo egkCardInfo;
   private final boolean withPerformOnlineCheck;
   private final boolean withOnlineReceipt;
 
   public ReadVsdCommand(
-      CardHandle egkCardHandle,
-      CardHandle hpcCardHandle,
+      CardInfo egkCardInfo,
+      CardInfo hpcCardInfo,
       boolean withPerformOnlineCheck,
       boolean withOnlineReceipt) {
-    this.egkCardHandle = egkCardHandle;
-    this.hpcCardHandle = hpcCardHandle;
+    this.egkCardInfo = egkCardInfo;
+    this.hpcCardInfo = hpcCardInfo;
     this.withPerformOnlineCheck = withPerformOnlineCheck;
     this.withOnlineReceipt = withOnlineReceipt;
   }
@@ -56,8 +55,8 @@ public class ReadVsdCommand extends AbstractKonnektorCommand<ReadVSDResponse> {
     this.executeAction(
         () ->
             servicePort.readVSD(
-                egkCardHandle.getHandle(),
-                hpcCardHandle.getHandle(),
+                egkCardInfo.getHandle(),
+                hpcCardInfo.getHandle(),
                 withPerformOnlineCheck,
                 withOnlineReceipt,
                 ctx,

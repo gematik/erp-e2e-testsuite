@@ -16,17 +16,19 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles;
 
-import static java.text.MessageFormat.format;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+import java.util.Optional;
+
+import static java.text.MessageFormat.format;
 
 @Slf4j
 public class ProfileExtractor {
@@ -39,6 +41,40 @@ public class ProfileExtractor {
     val encoding = EncodingType.guessFromContent(content);
     val mapper = encoding.choose(XmlMapper::new, JsonMapper::new);
     return extract(mapper, content);
+  }
+
+  /**
+   * For type hinting it is required to know if the given resource is a searchset or a collection
+   * bundle. In such cases we cannot simply hint the type by the first hit, thus type hinting must
+   * be skipped for such resources
+   *
+   * @param content to be encoded
+   * @return true if the content is a searchset or collection bundle and false otherwise
+   */
+  public static boolean isSearchSetOrCollection(String content) {
+    val encoding = EncodingType.guessFromContent(content);
+    val mapper = encoding.choose(XmlMapper::new, JsonMapper::new);
+
+    try {
+      val root = mapper.readTree(content);
+      val typeNode = root.get("type");
+
+      var type = "";
+      if (typeNode != null && typeNode.getNodeType() == JsonNodeType.OBJECT) {
+        val value = typeNode.get("value");
+        type = value != null ? value.asText("") : "";
+      } else if (typeNode != null) {
+        type = typeNode.asText("");
+      }
+
+      return (type.equalsIgnoreCase("searchset")) || type.equalsIgnoreCase("collection");
+    } catch (JsonProcessingException jpe) {
+      log.warn(
+          format(
+              "Given content cannot be parsed and thus cannot be a searchset or collection bundle: {0}",
+              shortenContentForLogging(content)));
+      return false;
+    }
   }
 
   private static Optional<String> extract(ObjectMapper mapper, String content) {
@@ -75,13 +111,13 @@ public class ProfileExtractor {
     val meta = firstProfileMeta.get();
     val profile = meta.get("profile");
 
+    JsonNode profileValue;
     if (profile.isArray()) {
-      val url = profile.get(0).asText();
-      return Optional.of(url);
+        profileValue = profile.get(0);
     } else {
-      val url = profile.get("value").asText();
-      return Optional.of(url);
+        profileValue = profile.get("value");
     }
+      return (profileValue != null) ? Optional.ofNullable(profileValue.asText()) : Optional.empty();
   }
 
   /**

@@ -18,7 +18,7 @@ package de.gematik.test.konnektor.soap;
 
 import static org.junit.Assert.assertNotNull;
 
-import de.gematik.test.konnektor.cfg.TLSConfiguration;
+import de.gematik.test.erezept.config.dto.konnektor.TLSConfiguration;
 import lombok.val;
 import org.junit.Test;
 

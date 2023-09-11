@@ -16,48 +16,44 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
-import de.gematik.test.konnektor.CardHandle;
-import de.gematik.test.konnektor.exceptions.SOAPRequestException;
-import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.ws.conn.certificateservice.v6.CryptType;
+import de.gematik.test.cardterminal.*;
+import de.gematik.test.konnektor.exceptions.*;
+import de.gematik.test.konnektor.soap.*;
+import de.gematik.ws.conn.certificateservice.v6.*;
 import de.gematik.ws.conn.certificateservice.v6.ObjectFactory;
-import de.gematik.ws.conn.certificateservicecommon.v2.CertRefEnum;
-import de.gematik.ws.conn.certificateservicecommon.v2.X509DataInfoListType;
-import de.gematik.ws.conn.connectorcommon.v5.Status;
-import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import java.io.ByteArrayInputStream;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import javax.xml.ws.Holder;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import de.gematik.ws.conn.certificateservicecommon.v2.*;
+import de.gematik.ws.conn.connectorcommon.v5.*;
+import de.gematik.ws.conn.connectorcontext.v2.*;
+import java.io.*;
+import java.security.cert.*;
+import javax.xml.ws.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Slf4j
 public class ReadCardCertificateCommand extends AbstractKonnektorCommand<X509Certificate> {
 
-  private final CardHandle cardHandle;
+  private final CardInfo cardInfo;
   private final CertRefEnum certRef;
   private final CryptType cryptType;
 
   /**
    * Reads the C_AUT certificate from given card
    *
-   * @param cardHandle identifies the card on the Konnektor
+   * @param cardInfo identifies the card on the Konnektor
    */
-  public ReadCardCertificateCommand(CardHandle cardHandle) {
-    this(cardHandle, CertRefEnum.C_AUT);
+  public ReadCardCertificateCommand(CardInfo cardInfo) {
+    this(cardInfo, CertRefEnum.C_AUT);
   }
 
-  public ReadCardCertificateCommand(CardHandle cardHandle, CertRefEnum certRef) {
-    this(cardHandle, certRef, CryptType.RSA);
+  public ReadCardCertificateCommand(CardInfo cardInfo, CertRefEnum certRef) {
+    this(cardInfo, certRef, CryptType.RSA);
   }
 
-  public ReadCardCertificateCommand(
-      CardHandle cardHandle, CertRefEnum certRef, CryptType cryptType) {
-    this.cardHandle = cardHandle;
+  public ReadCardCertificateCommand(CardInfo cardInfo, CertRefEnum certRef, CryptType cryptType) {
+    this.cardInfo = cardInfo;
     this.certRef = certRef;
     this.cryptType = cryptType;
   }
@@ -65,7 +61,7 @@ public class ReadCardCertificateCommand extends AbstractKonnektorCommand<X509Cer
   @Override
   @SneakyThrows
   public X509Certificate execute(ContextType ctx, ServicePortProvider serviceProvider) {
-    log.trace(format("Read {0} Certificate from Card {1}", certRef, cardHandle));
+    log.trace(format("Read {0} Certificate from Card {1}", certRef, cardInfo));
     val servicePort = serviceProvider.getCertificateService();
     val factory = new ObjectFactory();
 
@@ -78,12 +74,7 @@ public class ReadCardCertificateCommand extends AbstractKonnektorCommand<X509Cer
     this.executeAction(
         () ->
             servicePort.readCardCertificate(
-                cardHandle.getHandle(),
-                ctx,
-                certRefList,
-                cryptType,
-                outStatus,
-                outX509DataInfoList));
+                cardInfo.getHandle(), ctx, certRefList, cryptType, outStatus, outX509DataInfoList));
 
     val x509Bytes =
         outX509DataInfoList.value.getX509DataInfo().stream()
@@ -96,7 +87,7 @@ public class ReadCardCertificateCommand extends AbstractKonnektorCommand<X509Cer
                         this.getClass(),
                         format(
                             "Response does not contain any {0} certificate for {1}",
-                            certRef, cardHandle)));
+                            certRef, cardInfo)));
 
     CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
     return (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(x509Bytes));

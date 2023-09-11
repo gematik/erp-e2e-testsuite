@@ -23,4 +23,8 @@ public class Secret extends Value<String> {
   public Secret(final String secret) {
     super(ErpWorkflowNamingSystem.SECRET, secret);
   }
+
+  public static Secret fromString(String secret) {
+    return new Secret(secret);
+  }
 }

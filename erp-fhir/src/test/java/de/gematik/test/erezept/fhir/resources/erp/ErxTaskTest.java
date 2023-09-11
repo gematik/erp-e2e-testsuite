@@ -18,17 +18,21 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.util.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.hl7.fhir.r4.model.Task.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.util.ResourceUtils;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.valuesets.PerformerType;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.List;
+import lombok.val;
+import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskStatus;
+import org.junit.jupiter.api.Test;
 
 class ErxTaskTest extends ParsingTest {
   private final String BASE_PATH = "fhir/valid/erp/";
@@ -44,7 +48,7 @@ class ErxTaskTest extends ParsingTest {
     assertNotNull(task, "Valid ErxTask must be parseable");
 
     val expectedId = "16aaabf2-1de1-11b2-8057-a3c264e57515";
-    assertEquals(expectedId, task.getUnqualifiedId());
+    assertEquals(expectedId, task.getTaskId().getValue());
 
     val expectedPrescriptionID = new PrescriptionId("160.002.266.580.400.82");
     assertEquals(expectedPrescriptionID, task.getPrescriptionId());
@@ -62,7 +66,7 @@ class ErxTaskTest extends ParsingTest {
     val expectedStatus = Task.TaskStatus.DRAFT;
     assertEquals(expectedStatus, task.getStatus());
     assertTrue(
-        task.getForKvid().isEmpty()); // DRAFT-Task does not have a KVID for a specific Patient
+        task.getForKvnr().isEmpty()); // DRAFT-Task does not have a KVNR for a specific Patient
 
     val expectedPerformer = PerformerType.PUBLIC_PHARMACY;
     assertEquals(expectedPerformer, task.getPerformerFirstRep());
@@ -75,6 +79,22 @@ class ErxTaskTest extends ParsingTest {
   }
 
   @Test
+  void shouldEncodeExpiryAndAcceptDates() {
+    val fileName = "Task_03.xml";
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val task = parser.decode(ErxTask.class, content);
+    assertNotNull(task, "Valid ErxTask must be parseable");
+
+    val dc = DateConverter.getInstance();
+    val expectedExpiry = dc.dateFromIso8601("2020-05-02");
+    val expectedAccept = dc.dateFromIso8601("2020-03-02");
+
+    assertEquals(expectedExpiry, task.getExpiryDate());
+    assertEquals(expectedAccept, task.getAcceptDate());
+  }
+
+  @Test
   void shouldEncodeSingleTask120() {
     val fileName = "160_000_031_325_714_07.json";
 
@@ -83,9 +103,10 @@ class ErxTaskTest extends ParsingTest {
     assertNotNull(task, "Valid ErxTask must be parseable");
 
     val expectedId = "160.000.031.325.714.07";
-    assertEquals(expectedId, task.getUnqualifiedId());
+    assertEquals(expectedId, task.getTaskId().getValue());
 
-    val expectedPrescriptionID = new PrescriptionId("160.000.031.325.714.07");
+    val expectedPrescriptionID =
+        new PrescriptionId(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, "160.000.031.325.714.07");
     assertEquals(expectedPrescriptionID, task.getPrescriptionId());
 
     val expectedFlowType = PrescriptionFlowType.FLOW_TYPE_160;
@@ -100,8 +121,8 @@ class ErxTaskTest extends ParsingTest {
 
     val expectedStatus = TaskStatus.READY;
     assertEquals(expectedStatus, task.getStatus());
-    assertTrue(task.getForKvid().isPresent());
-    assertEquals("X110498565", task.getForKvid().orElseThrow());
+    assertTrue(task.getForKvnr().isPresent());
+    assertEquals("X110498565", task.getForKvnr().orElseThrow().getValue());
 
     val expectedPerformer = PerformerType.PUBLIC_PHARMACY;
     assertEquals(expectedPerformer, task.getPerformerFirstRep());
@@ -109,8 +130,22 @@ class ErxTaskTest extends ParsingTest {
     val expectedIntent = Task.TaskIntent.ORDER;
     assertEquals(expectedIntent, task.getIntent());
 
+    val dc = DateConverter.getInstance();
+    val expectedExpiry = dc.dateFromIso8601("2023-04-25");
+    val expectedAccept = dc.dateFromIso8601("2023-02-22");
+
+    assertEquals(expectedExpiry, task.getExpiryDate());
+    assertEquals(expectedAccept, task.getAcceptDate());
+
     // just for coverage, should never fail
     assertNotNull(task.toString());
+  }
+
+  @Test
+  void shouldThrowMissingFieldExceptionWhenNoDatesGiven() {
+    val task = new ErxTask();
+    assertThrows(MissingFieldException.class, task::getExpiryDate);
+    assertThrows(MissingFieldException.class, task::getAcceptDate);
   }
 
   @Test
@@ -122,9 +157,10 @@ class ErxTaskTest extends ParsingTest {
     assertNotNull(task, "Valid ErxTask must be parseable");
 
     val expectedId = "209.000.000.000.035.71";
-    assertEquals(expectedId, task.getUnqualifiedId());
+    assertEquals(expectedId, task.getTaskId().getValue());
 
-    val expectedPrescriptionID = new PrescriptionId("209.000.000.000.035.71");
+    val expectedPrescriptionID =
+        new PrescriptionId(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, "209.000.000.000.035.71");
     assertEquals(expectedPrescriptionID, task.getPrescriptionId());
 
     val expectedFlowType = PrescriptionFlowType.FLOW_TYPE_209;
@@ -139,7 +175,7 @@ class ErxTaskTest extends ParsingTest {
 
     val expectedStatus = TaskStatus.DRAFT;
     assertEquals(expectedStatus, task.getStatus());
-    assertTrue(task.getForKvid().isEmpty());
+    assertTrue(task.getForKvnr().isEmpty());
 
     val expectedPerformer = PerformerType.PUBLIC_PHARMACY;
     assertEquals(expectedPerformer, task.getPerformerFirstRep());
@@ -189,5 +225,13 @@ class ErxTaskTest extends ParsingTest {
                             .getCanonicalUrl()
                             .equals(identifier.getSystem()));
     assertThrows(MissingFieldException.class, task::getPrescriptionId);
+  }
+
+  @Test
+  void shouldGenerateErxTaskFromResource() {
+    val resource = new Task();
+    val erxTask = ErxTask.fromTask(resource);
+    assertNotNull(erxTask);
+    assertEquals(ErxTask.class, erxTask.getClass());
   }
 }

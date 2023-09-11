@@ -1,0 +1,83 @@
+activeEnvironment: TU
+
+preferManualSteps: false
+
+pspClientConfig:
+  url: "wss://erp-pharmacy-serviceprovider.dev.gematik.solutions/"
+  auth: "123123"
+
+actors:
+  doctors:
+    - name: Bernd Claudius
+      smcbIccsn: 80276001011699910102 #Praxis Damian Claudius
+      hbaIccsn: 80276001011699910100  #Arzt Bernd Claudius
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Dr. Schraßer
+      smcbIccsn: 80276883110000117369 #Praxis Bloch-Bauer
+      hbaIccsn: 80276883110000095767 #Arzt Sam Schraßer
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+  pharmacies:
+    - name: Am Flughafen
+      apoVzdName: Apotheke am FlughafenTEST-ONLY
+      smcbIccsn: 80276883110000116873
+      konnektor: Soft-Konn
+
+    - name: NordApotheke  # Apotheke mit abgelaufener SMCB
+      smcbIccsn: 80276883110000092475
+      konnektor: Soft-Konn
+
+  apothecaries:
+    - name: Amanda Albrecht
+      hbaIccsn: 80276001081699900579
+      konnektor: Soft-Konn
+
+    - name: Finn-Louis Nullmayr
+      hbaIccsn: 80276883110000121166
+      algorithm: E256
+      konnektor: Soft-Konn
+
+  patients:
+    - name: Fridolin Straßer
+      egkIccsn: 80276883110000113311
+
+    - name: Hanna Bäcker
+      egkIccsn: 80276883110000108142
+
+environments:
+  - name: LOCAL
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
+      fdBaseUrl: http://127.0.0.1:3000
+      subscriptionServiceUrl: wss://127.0.0.1:3000/subscription
+      userAgent: eRp-Testsuite
+    internet:
+      discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
+      fdBaseUrl: http://127.0.0.1:3000
+      xapiKey: refimpldoesnotcheckanyways==
+      userAgent: eRp-Testsuite
+
+# TODO: not yet implemented: uncomment once Konnektor configurations are integrated
+#konnektors:
+#  - name: KonSim@localhost
+#    type: remote
+#    profile: KONSIM
+#    address: 127.0.0.1:9106
+#    protocol: http
+#    context:
+#      mandantId: Mandant1
+#      clientSystemId: CS1
+#      workplaceId: WP1
+#      userId: user1
+#    tls:
+#      keyStore: konsim_mandant1_keystore.p12
+#      keyStorePassword: "00"
+#      trustStore: konsim_truststore.jks
+#      trustStorePassword: "gematik"
+#
+#  - name: Soft-Konn
+#    type: local

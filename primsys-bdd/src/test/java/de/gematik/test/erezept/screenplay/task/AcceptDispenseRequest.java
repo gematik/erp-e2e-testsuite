@@ -18,10 +18,13 @@ package de.gematik.test.erezept.screenplay.task;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
+import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
+import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.questions.GetReceivedCommunication;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -58,10 +61,24 @@ public class AcceptDispenseRequest implements Task {
     val responseOfAcceptOperation =
         ResponseOfAcceptOperation.forDispenseRequest(receivedDispenseRequest);
     val acceptedResponse = actor.asksFor(responseOfAcceptOperation);
-    val acceptedTask =
-        acceptedResponse.getResource(responseOfAcceptOperation.expectedResponseBody());
+    val acceptedTask = acceptedResponse.getExpectedResource();
     konnektor.verifyDocument(acceptedTask.getSignedKbvBundle());
     prescriptionManager.appendAcceptedPrescription(acceptedTask);
+
+    // Required for App
+    val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+    val eGK = SafeAbility.getAbility(sender, ProvideEGK.class);
+    val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
+    val response =
+        ErxCommunicationBuilder.builder()
+            .basedOnTaskId(acceptedTask.getTaskId())
+            .recipient(eGK.getKvnr().getValue())
+            .sender(smcb.getTelematikID())
+            .availabilityStatus(AvailabilityStatus.AS_30)
+            .supplyOptions(SupplyOptionsType.shipment())
+            .buildReply("Hallo, das ist meine Response Nachricht!");
+    val comResponse = new CommunicationPostCommand(response);
+    erpClient.request(comResponse);
   }
 
   public static Builder of(String order) {

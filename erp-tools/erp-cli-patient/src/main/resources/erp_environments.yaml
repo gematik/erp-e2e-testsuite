@@ -1,0 +1,17 @@
+- name: TU
+  tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+  internet:
+    discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
+    fdBaseUrl: https://erp-test.app.ti-dienste.de
+
+- name: RU
+  tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+  internet:
+    discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+    fdBaseUrl: https://erp-ref.app.ti-dienste.de
+
+- name: RU-DEV
+  tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+  internet:
+    discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+    fdBaseUrl: https://erp-dev.app.ti-dienste.de

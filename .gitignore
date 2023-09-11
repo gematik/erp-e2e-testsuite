@@ -10,7 +10,9 @@
 *.idsig
 *.ipa
 *.xcarchive
+*.pcs
 
+/erp-fhir-fuzzing/src/main/java/de/gematik/test/fuzzing/fhirfuzz/documents/
 
 COPYRIGHT_HEADER
 Jenkinsfile

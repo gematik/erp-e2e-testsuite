@@ -20,9 +20,10 @@ import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.abilities.UseAndroidApp;
-import de.gematik.test.erezept.app.cfg.PlatformType;
+import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import java.util.List;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -32,19 +33,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SkipOnboardingOnAndroidTest {
-
-  private UseAndroidApp appAbility;
-
+  
+  private String userName;
+  
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
-    appAbility = mock(UseAndroidApp.class);
-    when(appAbility.getPlatformType()).thenReturn(PlatformType.ANDROID);
+    val app = mock(UseAndroidApp.class);
+    when(app.getPlatformType()).thenReturn(PlatformType.ANDROID);
 
     // assemble the screenplay
-    val userName = "Alice";
+    userName = GemFaker.fakerName();
     val theAppUser = OnStage.theActorCalled(userName);
-    givenThat(theAppUser).can(appAbility);
+    givenThat(theAppUser).can(app);
   }
 
   @AfterEach
@@ -54,13 +55,15 @@ class SkipOnboardingOnAndroidTest {
 
   @Test
   void shouldSwipeAndTapToSkipOnboarding() {
-    val theAppUser = OnStage.theActorInTheSpotlight();
+    val actor = OnStage.theActorCalled(userName);
+    val app = actor.abilityTo(UseAndroidApp.class);
     val swipeDirections =
         List.of(SwipeDirection.DOWN, SwipeDirection.UP, SwipeDirection.LEFT, SwipeDirection.RIGHT);
     val skipOnboardong = new SkipOnboardingOnAndroid(swipeDirections);
 
-    theAppUser.attemptsTo(skipOnboardong);
-    verify(appAbility, times(swipeDirections.size())).swipe(any());
-    verify(appAbility, times(1)).tap(Onboarding.SKIP_BUTTON);
+    actor.attemptsTo(skipOnboardong);
+    
+    verify(app, times(swipeDirections.size())).swipe(any());
+    verify(app, times(1)).tap(Onboarding.SKIP_BUTTON);
   }
 }

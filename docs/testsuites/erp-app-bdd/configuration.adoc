@@ -1,0 +1,205 @@
+
+=== App-Testsuite Konfiguration
+
+Die Konfiguration für {name-app-testsuite} ist in mehrere Abschnitte unterteilt, wobei jeder Abschnitt immer eine bestimmte Teilkomponente der Testsuite konfiguriert.
+
+[source,yaml,linenums]
+----
+shouldLogCapabilityStatement: true   # logge die CapabilityStatements
+
+users:              # definiert die Akteure
+  ...
+
+apps:               # definiert die Apps
+  ...
+
+appium:             # definiert die Anbindung an Appium
+  ...
+
+devices:            # definiert die konkreten Smartphones
+  ...
+----
+
+==== Users
+
+Die Konfiguration der einzelnen Akteure wird im Abschnitt `users` definiert.
+
+[source,yaml,linenums]
+----
+users:
+  - name: Alice
+    virtualEgkIccsn: A80276883110000115197
+    useVirtualEgk: false
+    device: T-Systems iPhone 14
+----
+
+Die Akteure sind sogenannte `NamedConfigurations`, d.h diese müssen immer zwingend ein Feld `name` haben über welchen diese in der Testsuite eindeutig referenziert wird.
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| name
+| Der Name des Akteurs, über den dieser in der Testsuite referenziert wird
+| Freitext
+| true
+
+| virtualEgkIccsn
+| Ist die ICCSN der virtuellen eGK die der Akteur nutzen soll, falls die Verwendung von virtuellen eGKs aktiviert wird
+| Freitext
+| false
+
+| useVirtualEgk
+| Gibt an, ob der Actor die virtuelle eGK (mit der ICCSN aus `virtualEgkIccsn`) verwenden oder die eGK über NFC auslesen soll
+| Boolean
+| false
+
+| device
+| Ist der Name des konkreten Smartphones, welches der Akteur benutzen soll
+| Freitext
+| true
+|===
+
+==== Apps
+
+In diesem Abschnitt werden die Apps für die jeweiligen Plattformen konfiguriert:
+
+[source,yaml,linenums]
+----
+apps:
+  - platform: Android
+    appFile: cloud:uniqueName=debug-tsystems0001
+    espressoServerUniqueName: initialOchestratorTestAPK
+    packageName: de.gematik.ti.erp.app.test
+  - platform: iOS
+    appFile: cloud:uniqueName=202305071300_1.11.0
+    packageName: de.gematik.erp4ios.eRezept
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| platform
+| Ist die Plattform - Android oder iOS - auf der die Mobile-App ausgeführt wird
+| Enum
+| true
+
+| appFile
+| Ist der Name der Installations-Datei der App die Appium nutzen soll um die App auf dem Device zu installieren
+| Freitext
+| true
+
+| packageName
+| Ist der Package-Name innerhalb der App
+| Freitext
+| true
+|===
+
+==== Appium
+
+In diesem Abschnitt wird die Anbindung an den Appium-Server konfiguriert.
+
+[source,yaml,linenums]
+----
+appium:
+  - id: local
+    url: http://0.0.0.0:4723
+  - id: t-systems
+    url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
+    version: 2.0.0.beta.23
+    maxWaitTimeout: 12000
+    pollingInterval: 50
+    accessKey: ey####J9.ey####n0.6yX####ab-ru####7k
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| id
+| Ist die ID bzw. der Name der Konfiguration
+| Freitext
+| true
+
+| url
+| Ist die URL zum Appium-Server
+| Freitext
+| true
+
+| version
+| Ist die Version des Appium-Servers. Dieser Wert landet später im `CapabilityStatement` und wird nur von der MDC benötigt
+| Freitext
+| false
+
+| maxWaitTimeout
+| Maximale Dauer in `ms`, bis eine `NoSuchElementException` geworfen wird. Wird benötigt, weil Elemente auf dem Screen nicht immer sofort verfügbar sind. Per Default sind hier `5000 ms` eingestellt.
+| Integer
+| false
+
+| pollingInterval
+| Ist das Intervall in `ms` in denen ein Element angefragt wird, sofern es nicht beim ersten Versuch vorhanden ist. Bei `maxWaitTimeout=12000` und `pollingInterval=50` ergibt das 240 Versuche innerhalb von 12 Sekunden das Element zu holen bis dann endgültig eine `NoSuchElementException` geworfen wird. Per Default sind hier `50 ms` eingestellt.
+| Integer
+| false
+
+| accessKey
+| Ist der Zugangsschlüssel zu der MDC
+| Freitext
+| false
+|===
+
+==== Devices
+
+Im `devices`-Abschnitt werden die Endgeräte konfiguriert, welche für die Testszenarien von den Akteuren verwendet werden sollen.
+
+[source,yaml,linenums]
+----
+devices:
+  - name: Android 12 Emulator
+    platform: Android
+    udid: emulator-5554
+    platformVersion: 12
+    appium: local
+
+  - name: iPhone 14 Pro Max Simulator
+    platform: iOS
+    udid: 06121B5C-FCD9-45CE-9506-90263ECA3CE4
+    platformVersion: 16.4
+    appium: local
+
+  - name: T-Systems iPhone 7
+    platform: iOS
+    udid: b84####8e1
+    platformVersion: 15.7.1
+    appium: t-systems
+----
+
+[cols="3,7,2,1"]
+|===
+| Feld | Beschreibung | Datentyp | Verpflichtend
+
+| name
+| Ist der Name des Endgerätes, über welchen der Akteur dieses dann auswählt
+| Freitext
+| true
+
+| platform
+| Ist die Plattform - Android bzw. iOS. Hierüber wird anschließend die passende App für das Endgerät ausgewählt
+| Enum
+| true
+
+| udid
+| Ist die eindeutige ID des Endgerätes. Diese verwendet Appium und das ausgewählte Gerät anzusprechen.
+| Freitext
+| true
+
+| platformVersion
+| Ist die Version der Plattform auf dem Gerät.
+| Freitext
+| true
+
+| appium
+| Ist die ID des Appium-Servers aus dem `appium`-Abschnitt
+| Freitext
+| true
+|===

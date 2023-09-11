@@ -23,6 +23,7 @@ import de.gematik.test.erezept.fhir.exceptions.*;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
 import de.gematik.test.erezept.fhir.references.kbv.*;
 import de.gematik.test.erezept.fhir.resources.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
@@ -38,16 +39,6 @@ import org.hl7.fhir.r4.model.*;
 @SuppressWarnings({"java:S110"})
 public class KbvPatient extends Patient implements ErpFhirResource {
 
-  public static KbvPatient fromPatient(Patient adaptee) {
-    val kbvBasePatient = new KbvPatient();
-    adaptee.copyValues(kbvBasePatient);
-    return kbvBasePatient;
-  }
-
-  public static KbvPatient fromPatient(Resource adaptee) {
-    return fromPatient((Patient) adaptee);
-  }
-
   public String getLogicalId() {
     return this.id.getIdPart();
   }
@@ -61,8 +52,8 @@ public class KbvPatient extends Patient implements ErpFhirResource {
    *
    * @return true if the Patient has a GKV ID
    */
-  public boolean hasGkvId() {
-    return getKvid().isPresent();
+  public boolean hasGkvKvnr() {
+    return this.getGkvIdentifier().isPresent();
   }
 
   /**
@@ -70,8 +61,8 @@ public class KbvPatient extends Patient implements ErpFhirResource {
    *
    * @return true if the Patient has a PKV ID
    */
-  public boolean hasPkvId() {
-    return getPkvId().isPresent();
+  public boolean hasPkvKvnr() {
+    return getPkvIdentifier().isPresent();
   }
 
   public VersicherungsArtDeBasis getInsuranceKind() {
@@ -94,32 +85,50 @@ public class KbvPatient extends Patient implements ErpFhirResource {
                     this.getClass(), DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS));
   }
 
-  public Optional<String> getKvid() {
-    return getInsuranceId(this::getKvidIdentifier);
+  /**
+   * Get the KVNR of the patient without bothering about the concrete insurance type
+   *
+   * @return the KVNR of the ptient
+   */
+  public KVNR getKvnr() {
+    return getGkvId()
+        .or(this::getPkvId)
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), "KVNR"));
   }
 
-  public Optional<String> getPkvId() {
+  /**
+   * Get the GKV-KVNR of the patient
+   *
+   * @return Optional GKV-KVNR
+   */
+  public Optional<KVNR> getGkvId() {
+    return getInsuranceId(this::getGkvIdentifier);
+  }
+
+  /**
+   * Get the PKV-KVNR of the patient
+   *
+   * @return Optional PKV-KVNR
+   */
+  public Optional<KVNR> getPkvId() {
     return getInsuranceId(this::getPkvIdentifier);
   }
 
-  private Optional<String> getInsuranceId(Supplier<Optional<Identifier>> func) {
+  private Optional<KVNR> getInsuranceId(Supplier<Optional<Identifier>> func) {
     val opt = func.get();
-    Optional<String> ret = Optional.empty();
+    Optional<KVNR> ret = Optional.empty();
     if (opt.isPresent()) {
-      ret = Optional.of(opt.get().getValue());
+      ret = Optional.of(KVNR.from(opt.get().getValue()));
     }
     return ret;
   }
 
-  private Optional<Identifier> getKvidIdentifier() {
+  private Optional<Identifier> getGkvIdentifier() {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
-                identifier.getSystem().equals(DeBasisNamingSystem.KVID.getCanonicalUrl())
-                    || identifier.getSystem().equals(DeBasisNamingSystem.KVID_GKV.getCanonicalUrl())
-                    || identifier
-                        .getSystem()
-                        .equals(DeBasisNamingSystem.KVID_PKV.getCanonicalUrl()))
+                DeBasisNamingSystem.KVID.match(identifier)
+                    || DeBasisNamingSystem.KVID_GKV.match(identifier))
         .findFirst();
   }
 
@@ -130,25 +139,17 @@ public class KbvPatient extends Patient implements ErpFhirResource {
                 identifier.getType().getCoding().stream()
                     .anyMatch(
                         coding ->
-                            coding.getCode().equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
+                            coding.getCode().equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())
+                    ))
         .findFirst();
   }
 
   public Optional<Reference> getPkvAssigner() {
-    val pkvIdentifer = this.getPkvIdentifier();
-
-    AtomicReference<Optional<Reference>> ret = new AtomicReference<>(Optional.empty());
-    pkvIdentifer.ifPresent(identifier -> ret.set(Optional.ofNullable(identifier.getAssigner())));
-    return ret.get();
+    return this.getPkvIdentifier().map(Identifier::getAssigner);
   }
 
   public Optional<String> getPkvAssignerName() {
-    val pkvIdentifer = this.getPkvIdentifier();
-
-    AtomicReference<Optional<String>> ret = new AtomicReference<>(Optional.empty());
-    pkvIdentifer.ifPresent(
-        identifier -> ret.set(Optional.ofNullable(identifier.getAssigner().getDisplay())));
-    return ret.get();
+    return this.getPkvIdentifier().map(identifier -> identifier.getAssigner().getDisplay());
   }
 
   public String getFullname() {
@@ -158,10 +159,22 @@ public class KbvPatient extends Patient implements ErpFhirResource {
 
   @Override
   public String getDescription() {
-    val kvid = new AtomicReference<String>();
-    this.getKvidIdentifier().ifPresentOrElse(id -> kvid.set(id.getValue()), () -> kvid.set("NULL"));
     return format(
         "{0} Versicherte/r {1} (KVNR: {2})",
-        this.getInsuranceKind(), this.getFullname(), kvid.get());
+        this.getInsuranceKind(), this.getFullname(), this.getKvnr().getValue());
+  }
+
+  public static KbvPatient fromPatient(Patient adaptee) {
+    if (adaptee instanceof KbvPatient kbvPatient) {
+      return kbvPatient;
+    } else {
+      val kbvPatient = new KbvPatient();
+      adaptee.copyValues(kbvPatient);
+      return kbvPatient;
+    }
+  }
+
+  public static KbvPatient fromPatient(Resource adaptee) {
+    return fromPatient((Patient) adaptee);
   }
 }

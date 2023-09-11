@@ -49,7 +49,7 @@ public class RegisterNewSubscription implements Task {
             "Communication?received=null&recipient=" + useSMCB.getTelematikID());
     try {
       val subscriptionResponse = erpClientAbility.request(subscriptionCmd);
-      val subscription = subscriptionResponse.getResource(subscriptionCmd.expectedResponseBody());
+      val subscription = subscriptionResponse.getExpectedResource();
 
       val subscriptionId = subscription.getIdElement().getIdPart();
       useSubscriptionService.setSubscriptionId(subscriptionId);

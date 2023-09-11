@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +41,9 @@ class ErxAcceptBundleTest extends ParsingTest {
     val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
     assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 
-    val expectedTaskId = "a4c72c7d-1ee3-11b2-825b-c505a820f066";
+    val expectedTaskId = TaskId.from("a4c72c7d-1ee3-11b2-825b-c505a820f066");
     val erxTask = acceptBundle.getTask();
-    assertEquals(expectedTaskId, erxTask.getUnqualifiedId());
+    assertEquals(expectedTaskId, erxTask.getTaskId());
     assertEquals(expectedTaskId, acceptBundle.getTaskId());
 
     val expectedKbvBundleId = "a54bfb25-1ee3-11b2-825c-c505a820f066";
@@ -66,7 +67,7 @@ class ErxAcceptBundleTest extends ParsingTest {
 
     val expectedTaskId = "160.000.031.325.758.69";
     val erxTask = acceptBundle.getTask();
-    assertEquals(expectedTaskId, erxTask.getUnqualifiedId());
+    assertEquals(expectedTaskId, erxTask.getTaskId().getValue());
 
     val expectedKbvBundleId = "urn:uuid:a03efedd-0100-0000-0001-000000000000";
     assertEquals(expectedKbvBundleId, acceptBundle.getKbvBundleId());

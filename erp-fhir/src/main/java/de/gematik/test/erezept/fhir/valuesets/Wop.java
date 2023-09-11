@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.hl7.fhir.r4.model.Extension;
 
-/** https://applications.kbv.de/S_ITA_WOP_V1.00.xhtml */
+/** <a href="https://applications.kbv.de/S_ITA_WOP_V1.00.xhtml">ITA WOP</a> */
 @Getter
 public enum Wop implements IValueSet {
   DUMMY("00", "Dummy bei eGK"),

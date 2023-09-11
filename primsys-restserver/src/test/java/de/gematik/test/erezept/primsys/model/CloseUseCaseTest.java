@@ -31,10 +31,13 @@ import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
 import de.gematik.test.erezept.primsys.rest.data.AcceptData;
+import de.gematik.test.erezept.primsys.rest.data.MedicationData;
+import de.gematik.test.erezept.primsys.rest.request.DispenseRequestData;
 import de.gematik.test.smartcard.SmcB;
 import jakarta.ws.rs.WebApplicationException;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +45,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Map;
 import lombok.val;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -89,8 +93,11 @@ class CloseUseCaseTest {
           .thenReturn(KbvErpBundleBuilder.faker().build());
       val acceptDataList = new ArrayList<AcceptData>();
       acceptDataList.add(this.createAcceptData());
-      val erpResponseMock = mock(ErpResponse.class);
+      ErpResponse<Resource> erpResponseMock = mock(ErpResponse.class);
+      val receiptMock = mock(ErxReceipt.class);
+      when(receiptMock.getId()).thenReturn("123456789");
       when(mockPharmacyActor.erpRequest(any())).thenReturn(erpResponseMock);
+      when(erpResponseMock.getExpectedResource()).thenReturn(receiptMock);
       when(erpResponseMock.getStatusCode()).thenReturn(204);
       when(mockActorContext.getAcceptedPrescriptions()).thenReturn(acceptDataList);
       try (val response = CloseUseCase.closePrescription(mockPharmacyActor, taskId, secret)) {
@@ -104,16 +111,62 @@ class CloseUseCaseTest {
     try (MockedStatic<ActorContext> mockedStaticActor = mockStatic(ActorContext.class)) {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
-      val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(500, Map.of(), operationOutcome));
+      val mockResponse =
+          ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+              .withStatusCode(500)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any())).thenReturn(mockResponse);
       try (val response =
           CloseUseCase.closePrescription(mockPharmacyActor, "taskId", "accessCode")) {
         fail("RejectUseCase did not throw the expected Exception");
       } catch (WebApplicationException wae) {
         assertEquals(WebApplicationException.class, wae.getClass());
         assertEquals(404, wae.getResponse().getStatus());
+      }
+    }
+  }
+
+  @Test
+  void closePrescriptionWithDispenseDataShouldWork() {
+    try (MockedStatic<ActorContext> mockedStaticActor = mockStatic(ActorContext.class)) {
+      val mockActorContext = mock(ActorContext.class);
+      mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
+      val mockPharmacyActor = mock(Pharmacy.class);
+      val mockClient = mock(ErpClient.class);
+      when(mockPharmacyActor.getClient()).thenReturn(mockClient);
+      val mockSmcb = mock(SmcB.class);
+      when(mockPharmacyActor.getSmcb()).thenReturn(mockSmcb);
+      when(mockSmcb.getTelematikId()).thenReturn("1233456_TelematikId");
+      val mockFhir = mock(FhirParser.class);
+      when(mockClient.getFhir()).thenReturn(mockFhir);
+      when(mockFhir.decode(
+              eq(KbvErpBundle.class),
+              anyString())) // (Class<T> expectedClass, @NonNull final String content
+          .thenReturn(KbvErpBundleBuilder.faker().build());
+      val acceptDataList = new ArrayList<AcceptData>();
+      acceptDataList.add(this.createAcceptData());
+      ErpResponse<Resource> erpResponseMock = mock(ErpResponse.class);
+      val receiptMock = mock(ErxReceipt.class);
+      when(receiptMock.getId()).thenReturn("123456789");
+      when(mockPharmacyActor.erpRequest(any())).thenReturn(erpResponseMock);
+      when(erpResponseMock.getExpectedResource()).thenReturn(receiptMock);
+      when(erpResponseMock.getStatusCode()).thenReturn(204);
+      when(mockActorContext.getAcceptedPrescriptions()).thenReturn(acceptDataList);
+
+      DispenseRequestData dispenseRequestData = new DispenseRequestData();
+      MedicationData medicationData = new MedicationData();
+      medicationData.setCategory("1");
+      medicationData.setSupplyForm("LOE");
+      medicationData.fakeMissing();
+      MedicationData medicationData1 = MedicationData.create();
+      medicationData1.fakeMissing();
+      dispenseRequestData.getMedications().add(medicationData);
+
+      try (val response =
+          CloseUseCase.closePrescription(mockPharmacyActor, taskId, secret, dispenseRequestData)) {
+        assertEquals(200, response.getStatus());
       }
     }
   }

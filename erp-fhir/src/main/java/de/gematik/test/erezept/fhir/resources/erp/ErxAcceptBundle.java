@@ -43,8 +43,8 @@ public class ErxAcceptBundle extends Bundle {
             () -> new MissingFieldException(ErxAcceptBundle.class, ErpWorkflowStructDef.TASK));
   }
 
-  public String getTaskId() {
-    return this.getTask().getUnqualifiedId();
+  public TaskId getTaskId() {
+    return this.getTask().getTaskId();
   }
 
   public Secret getSecret() {

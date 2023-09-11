@@ -16,13 +16,13 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPostChargeItem;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
-import io.cucumber.java.de.Wenn;
-import lombok.val;
-import net.serenitybdd.screenplay.actors.OnStage;
+import de.gematik.test.erezept.screenplay.questions.*;
+import de.gematik.test.erezept.screenplay.task.*;
+import io.cucumber.java.de.*;
+import lombok.*;
+import net.serenitybdd.screenplay.actors.*;
 
 public class ApothecarySteps {
 
@@ -38,7 +38,7 @@ public class ApothecarySteps {
    *     Abrechnungsdatensatz erstellt werden soll
    */
   @Wenn(
-      "^(?:der Apotheker|die Apothekerin) (.+) als Angestellte(?:r)? der Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept einen PKV-Abrechnungsdatensatz erstellt$")
+      "^(?:der Apotheker|die Apothekerin) (.+) als Angestellte(?:r)? der Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept PKV-Abrechnungsinformationen bereitstellt$")
   public void whenPharmacySignsWithHbaAndPostsChargeItem(
       String apothecaryName, String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -46,7 +46,9 @@ public class ApothecarySteps {
     when(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfPostChargeItem.fromStack(order).signedByApothecary(theApothecary))
+                    ResponseOfPostChargeItem.fromDispensed(order)
+                        .and()
+                        .signedByApothecary(theApothecary))
                 .isEqualTo(201));
   }
 }

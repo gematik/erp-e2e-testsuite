@@ -16,38 +16,77 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.UseTheApp;
+import de.gematik.test.erezept.app.mobile.Environment;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
+import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.smartcard.SmartcardArchive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
+import net.thucydides.core.annotations.Step;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class SetUpDevice implements Task {
 
+  private final Environment environment; // required for @Step-Annotation!!
+  private final EnvironmentConfiguration environmentConfiguration;
   private final VersicherungsArtDeBasis insuranceKind;
+  private final SmartcardArchive sca;
 
   @Override
+  @Step("{0} installiert als #insuranceKind Patient/in die E-Rezept App für #environment")
   public <T extends Actor> void performAs(final T actor) {
-    val driverAbility = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
+    val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
+
+    app.logEvent(
+        format(
+            "Setup {0} Device for {1} Patient {2}",
+            app.getPlatformType(), insuranceKind, actor.getName()));
+
     val platformTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
-            driverAbility.getPlatformType(),
-            () -> new SetUpAndroidDevice(insuranceKind),
-            () -> new SetUpIosDevice(insuranceKind));
+            app.getPlatformType(),
+            () -> new SetUpAndroidDevice(insuranceKind, sca),
+            () -> new SetUpIosDevice(environmentConfiguration, insuranceKind, sca));
     platformTask.performAs(actor);
+
+    app.tap(BottomNav.PRESCRIPTION_BUTTON);
+    app.tapIfDisplayed(Utility.DECLINE_LOGIN);
   }
 
-  public static SetUpDevice withInsuranceType(String insuranceKind) {
-    return withInsuranceType(VersicherungsArtDeBasis.fromCode(insuranceKind));
+  public static Builder forEnvironment(EnvironmentConfiguration environment) {
+    return new Builder(environment);
   }
 
-  public static SetUpDevice withInsuranceType(VersicherungsArtDeBasis insuranceKind) {
-    return new SetUpDevice(insuranceKind);
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class Builder {
+    private final EnvironmentConfiguration environmentConfiguration;
+    private VersicherungsArtDeBasis insuranceKind;
+
+    public Builder withInsuranceType(String insuranceKind) {
+      return withInsuranceType(VersicherungsArtDeBasis.fromCode(insuranceKind));
+    }
+
+    public Builder withInsuranceType(VersicherungsArtDeBasis insuranceKind) {
+      this.insuranceKind = insuranceKind;
+      return this;
+    }
+
+    public SetUpDevice byMappingVirtualEgkFrom(SmartcardArchive sca) {
+      val environment = Environment.fromString(environmentConfiguration.getName());
+      return Instrumented.instanceOf(SetUpDevice.class)
+          .withProperties(environment, environmentConfiguration, insuranceKind, sca);
+    }
   }
 }

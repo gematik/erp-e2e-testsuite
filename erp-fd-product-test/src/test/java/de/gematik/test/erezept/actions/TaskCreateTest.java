@@ -16,22 +16,21 @@
 
 package de.gematik.test.erezept.actions;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.actors.DoctorActor;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import java.util.Map;
-import lombok.val;
-import org.junit.jupiter.api.Test;
+import de.gematik.test.erezept.actors.*;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.*;
+import java.util.*;
+import lombok.*;
+import org.junit.jupiter.api.*;
 
 class TaskCreateTest {
 
@@ -42,10 +41,13 @@ class TaskCreateTest {
     doctor.can(useErpClient);
 
     val patient = mock(PatientActor.class);
-    patient.can(ProvidePatientBaseData.forGkvPatient("X123456789", patient.getName()));
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     val mockResponse =
-        new ErpResponse(404, Map.of(), FhirTestResourceUtil.createOperationOutcome());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(

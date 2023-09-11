@@ -16,10 +16,12 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
+import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -31,24 +33,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxCommunication> {
 
   private final DequeStrategy deque;
   private final Actor sender;
 
-  @Override
-  public Class<ErxCommunication> expectedResponseBody() {
-    return ErxCommunication.class;
+  private ResponseOfGetCommunicationFrom(DequeStrategy deque, Actor sender) {
+    super("GET /Communication");
+    this.deque = deque;
+    this.sender = sender;
   }
 
   @Override
-  public String getOperationName() {
-    return "Communication";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<ErxCommunication> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val communicationsOracle = SafeAbility.getAbility(actor, ManageCommunications.class);
     val expectedCommunications =
@@ -61,7 +58,15 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
 
     // now try to fetch
     val com = deque.chooseFrom(expectedCommunications);
-    val cmd = new CommunicationGetByIdCommand(com.getCommunicationId());
+    val id =
+        com.getCommunicationId()
+            .orElseThrow(
+                () ->
+                    new MissingPreconditionError(
+                        format(
+                            "Expected communication from {0} with Type {1} does not have an ID",
+                            com.getSenderName(), com.getType())));
+    val cmd = new CommunicationGetByIdCommand(id);
     return erpClient.request(cmd);
   }
 

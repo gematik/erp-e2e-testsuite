@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.lei.cfg.TestsuiteConfiguration;
 import de.gematik.test.erezept.primsys.model.actor.BaseActor;
 import de.gematik.test.erezept.primsys.model.actor.Doctor;
@@ -31,12 +33,16 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 @Slf4j
 public class ActorContext {
 
   private static ActorContext instance;
+  
+  @Getter
+  private final TestsuiteConfiguration configuration;
+  @Getter
+  private final EnvironmentConfiguration environment;
 
   private final SmartcardArchive sca;
 
@@ -47,32 +53,24 @@ public class ActorContext {
   private final ContextData contextData;
 
   private ActorContext() {
-    val cfg = TestsuiteConfiguration.getInstance();
+    this.configuration = TestsuiteConfiguration.getInstance();
+    this.environment = configuration.getActiveEnvironment();
     this.sca = SmartcardFactory.getArchive();
 
     this.doctors = new ArrayList<>();
-    cfg.getActors()
+    configuration.getActors()
         .getDoctors()
-        .forEach(
-            d ->
-                this.doctors.add(
-                    new Doctor(
-                        d, cfg.getActiveEnvironment(), cfg.instantiateDoctorKonnektor(d), sca)));
+        .forEach(d -> this.doctors.add(new Doctor(d, environment, configuration.instantiateDoctorKonnektor(d), sca)));
 
     this.pharmacies = new ArrayList<>();
-    cfg.getActors()
+    configuration.getActors()
         .getPharmacies()
-        .forEach(p -> this.pharmacies.add(new Pharmacy(p, cfg.getActiveEnvironment(), sca)));
+        .forEach(
+            p ->
+                this.pharmacies.add(
+                    new Pharmacy(p, environment, configuration.instantiatePharmacyKonnektor(p), sca)));
 
     contextData = new ContextData();
-  }
-
-  public static ActorContext getInstance() {
-    if (instance == null) {
-      instance = new ActorContext();
-    }
-
-    return instance;
   }
 
   public Optional<Doctor> getDoctor(String id) {
@@ -100,11 +98,11 @@ public class ActorContext {
   }
 
   public boolean removeAcceptedPrescription(AcceptData prescription) {
-    return removeAcceptedPrescription(prescription.getTaskId());
+    return removeAcceptedPrescription(TaskId.from(prescription.getTaskId()));
   }
 
-  public boolean removeAcceptedPrescription(String taskId) {
-    return contextData.removeAcceptedPrescription(taskId);
+  public boolean removeAcceptedPrescription(TaskId taskId) {
+    return contextData.removeAcceptedPrescription(taskId.getValue());
   }
 
   public List<PrescriptionData> getPrescriptions() {
@@ -121,5 +119,13 @@ public class ActorContext {
 
   public void shutdown() {
     // nothing to be done yet
+  }
+
+  public static ActorContext getInstance() {
+    if (instance == null) {
+      instance = new ActorContext();
+    }
+
+    return instance;
   }
 }

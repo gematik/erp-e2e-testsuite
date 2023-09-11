@@ -18,11 +18,17 @@ package de.gematik.test.smartcard;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.smartcard.exceptions.*;
-import java.lang.reflect.*;
+import de.gematik.test.smartcard.exceptions.CardNotFoundException;
+import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.security.*;
 import java.util.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import java.util.List;
+import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class SmartcardFactoryTest {
 
@@ -34,24 +40,23 @@ class SmartcardFactoryTest {
   }
 
   @Test
-  void createDefaultArchive() {
-    assertEquals(
-        5, sca.getHbaCards().size(), "Expected and actual number of all HBAs does not match");
-    assertEquals(
-        6, sca.getEgkCards().size(), "Expected and actual number of all Egks does not match");
-    assertEquals(
-        11, sca.getSmcbCards().size(), "Expected and actual number of all SMC-B does not match");
+  void getHbasByIccsn() {
+    val hbaIccsn = "80276001081699900578";
+    val hba = sca.getHbaByICCSN(hbaIccsn);
+    assertEquals(hbaIccsn, hba.getIccsn(), "ICCSN of HBA does not match");
   }
 
   @Test
-  void getHbasByIccsn() {
-    val hbaIccsn = "80276001081699900578";
+  void getEgkByKvnr() {
+    val kvnr = "X110465770";
+    val egk = sca.getEgkByKvnr(kvnr);
+    assertEquals(kvnr, egk.getKvnr());
+    assertEquals("80276883110000113323", egk.getIccsn());
+  }
 
-    val hbaRsa = sca.getHbaByICCSN(hbaIccsn);
-    assertEquals(hbaIccsn, hbaRsa.getIccsn(), "ICCSN of HBA does not match");
-
-    val hbaEcc = sca.getHbaByICCSN(hbaIccsn);
-    assertEquals(hbaIccsn, hbaEcc.getIccsn(), "ICCSN of HBA does not match");
+  @Test
+  void shouldThrowOnUnknownKvnr() {
+    assertThrows(CardNotFoundException.class, () -> sca.getEgkByKvnr("X123123123"));
   }
 
   @Test

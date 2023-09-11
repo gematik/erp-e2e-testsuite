@@ -46,7 +46,7 @@ public class DownloadAllTasks implements Question<ErxTaskBundle> {
     } else {
       cmd = new TaskGetCommand();
     }
-    return erpClient.request(cmd).getResource(cmd.expectedResponseBody());
+    return erpClient.request(cmd).getExpectedResource();
   }
 
   public static DownloadAllTasks descending() {

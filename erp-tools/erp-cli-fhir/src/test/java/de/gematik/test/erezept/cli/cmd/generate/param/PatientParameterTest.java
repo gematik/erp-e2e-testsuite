@@ -33,9 +33,9 @@ class PatientParameterTest {
     assertNotNull(pp.getFullName());
     assertNotNull(pp.getAssignerOrganization());
     assertNotNull(pp.getBirthDate());
-    assertNotNull(pp.getKvid());
+    assertNotNull(pp.getKvnrParameter().getKvnr());
     assertNotNull(pp.createPatient());
-    assertEquals(VersicherungsArtDeBasis.GKV, pp.getVersicherungsArt());
+    assertEquals(VersicherungsArtDeBasis.GKV, pp.getKvnrParameter().getInsuranceType());
   }
 
   @Test
@@ -43,7 +43,7 @@ class PatientParameterTest {
     val pp = new PatientParameter();
     val cmdline = new CommandLine(pp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--insurance-type", "PKV"));
-    assertEquals(VersicherungsArtDeBasis.PKV, pp.getVersicherungsArt());
+    assertEquals(VersicherungsArtDeBasis.PKV, pp.getKvnrParameter().getInsuranceType());
     assertNotNull(pp.createPatient());
   }
 }

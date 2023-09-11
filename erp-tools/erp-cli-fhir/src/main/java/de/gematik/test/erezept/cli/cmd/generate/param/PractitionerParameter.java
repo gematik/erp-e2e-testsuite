@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import de.gematik.test.erezept.cli.cmd.converter.*;
+import de.gematik.test.erezept.cli.converter.NameConverter;
 import de.gematik.test.erezept.cli.util.*;
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
@@ -60,13 +60,16 @@ public class PractitionerParameter implements BaseResourceParameter {
   }
 
   public QualificationType getQualificationType() {
-    return this.getOrDefault(
-        qualificationType,
-        () -> GemFaker.randomElement(QualificationType.DOCTOR, QualificationType.DENTIST));
+    this.qualificationType =
+        this.getOrDefault(
+            qualificationType,
+            () -> GemFaker.randomElement(QualificationType.DOCTOR, QualificationType.DENTIST));
+    return qualificationType;
   }
 
   public NameWrapper getFullName() {
-    return this.getOrDefault(fullName, NameWrapper::randomName);
+    this.fullName = this.getOrDefault(fullName, NameWrapper::randomName);
+    return fullName;
   }
 
   public KbvPractitioner createPractitioner() {

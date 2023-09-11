@@ -28,6 +28,7 @@ import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhir.builder.erp.*;
 import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.konnektor.*;
 import java.security.cert.*;
@@ -42,6 +43,9 @@ import org.mockito.*;
 @Slf4j
 class UseTheErpClientTest {
 
+  private static final String TEST_TOKEN =
+      "eyJhbGciOiJCUDI1NlIxIiwidHlwIjoiYXQrSldUIiwia2lkIjoicHVrX2lkcF9zaWcifQ.eyJzdWIiOiJJWERkLTNyUVpLS0ZYVWR4R0dqNFBERG9WNk0wUThaai1xdzF2cjF1XzU4IiwicHJvZmVzc2lvbk9JRCI6IjEuMi4yNzYuMC43Ni40LjQ5Iiwib3JnYW5pemF0aW9uTmFtZSI6ImdlbWF0aWsgTXVzdGVya2Fzc2UxR0tWTk9ULVZBTElEIiwiaWROdW1tZXIiOiJYMTEwNTAyNDE0IiwiYW1yIjpbIm1mYSIsInNjIiwicGluIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTUwMTEvYXV0aC9yZWFsbXMvaWRwLy53ZWxsLWtub3duL29wZW5pZC1jb25maWd1cmF0aW9uIiwiZ2l2ZW5fbmFtZSI6IlJvYmluIEdyYWYiLCJjbGllbnRfaWQiOiJlcnAtdGVzdHN1aXRlLWZkIiwiYWNyIjoiZ2VtYXRpay1laGVhbHRoLWxvYS1oaWdoIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDozMDAwLyIsImF6cCI6ImVycC10ZXN0c3VpdGUtZmQiLCJzY29wZSI6Im9wZW5pZCBlLXJlemVwdCIsImF1dGhfdGltZSI6MTY0MzgwNDczMywiZXhwIjoxNjQzODA1MDMzLCJmYW1pbHlfbmFtZSI6IlbDs3Jtd2lua2VsIiwiaWF0IjoxNjQzODA0NjEzLCJqdGkiOiI2Yjg3NmU0MWNmMGViNGJkIn0.MV5cDnL3JBZ4b6xr9SqiYDmZ7qtZFEWBd1vCrHzVniZeDhkyuSYc7xhf577h2S21CzNgrMp0M6JALNW9Qjnw_g";
+
   private ErpClient mockErpClient;
   private FhirParser mockFhir;
   private UseTheErpClient ability;
@@ -54,11 +58,8 @@ class UseTheErpClientTest {
       when(mockErpClient.getFhir()).thenReturn(mockFhir);
       when(mockErpClient.getAcceptMime()).thenReturn(MediaType.ACCEPT_FHIR_JSON);
       when(mockErpClient.getSendMime()).thenReturn(MediaType.FHIR_JSON);
-      f.when(() -> ErpClientFactory.createErpClient(any())).thenReturn(mockErpClient);
-      val config = new ErpClientConfiguration();
-      config.setClientType(ClientType.PS);
-      config.setFdBaseUrl("http://localhost");
-      ability = UseTheErpClient.with(config);
+      when(mockErpClient.getClientType()).thenReturn(ClientType.PS);
+      ability = UseTheErpClient.with(mockErpClient);
       log.trace(format("Prepared Ability {0}", ability));
     }
   }
@@ -67,8 +68,14 @@ class UseTheErpClientTest {
   void shouldReportRequestResponse() {
     val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
     val cmd = new ChargeItemPostCommand(chargeItem, new Secret("123"));
-    val exptedResponse = new ErpResponse(201, Map.of(), chargeItem);
-    when(mockErpClient.request(cmd)).thenReturn(exptedResponse);
+    val expectedResponse =
+        ErpResponse.forPayload(chargeItem, ErxChargeItem.class)
+            .withStatusCode(201)
+            .usedJwt(TEST_TOKEN)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+
+    when(mockErpClient.request(cmd)).thenReturn(expectedResponse);
     when(mockFhir.encode(any(), any(), eq(true))).thenReturn("mock fhir resource");
 
     try (MockedStatic<Serenity> serenityMockedStatic = mockStatic(Serenity.class)) {
@@ -80,7 +87,7 @@ class UseTheErpClientTest {
       val response = ability.request(cmd);
       val requestTitle = format("{0} {1}", cmd.getMethod(), cmd.getRequestLocator());
       verify(mockWithTitle, times(1)).withTitle(requestTitle);
-      verify(mockWithTitle, times(2)).withTitle(anyString());
+      verify(mockWithTitle, times(3)).withTitle(anyString());
       verify(mockAndContent, times(2)).andContents("mock fhir resource");
     }
   }

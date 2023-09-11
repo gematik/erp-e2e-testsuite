@@ -19,7 +19,10 @@ package de.gematik.test.erezept.lei.cfg;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.cardterminal.cfg.CardTerminalClientConfiguration;
+import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
 import de.gematik.test.erezept.exceptions.ConfigurationMappingException;
+import de.gematik.test.konnektor.cfg.RemoteKonnektorConfiguration;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
@@ -34,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
 @Slf4j
 class TestsuiteConfigurationTest {
@@ -42,9 +46,6 @@ class TestsuiteConfigurationTest {
   void setUp() {
     log.info("Reset the Singleton before testcase");
     resetSingleton(TestsuiteConfiguration.class, "instance");
-
-    // also reset the SystemProperty
-    System.clearProperty("erp.config.activeEnvironment");
   }
 
   @Test
@@ -59,8 +60,9 @@ class TestsuiteConfigurationTest {
   }
 
   @Test
+  @ClearSystemProperty(key = "erp.primsys.activeEnvironment")
   void shouldHaveTestEnvironments() {
-    System.setProperty("erp.config.activeEnvironment", "TU");
+    System.setProperty("erp.primsys.activeEnvironment", "TU");
     val cfg = TestsuiteConfiguration.getInstance();
     val envs = cfg.getEnvironments();
     assertNotNull(envs);
@@ -78,16 +80,18 @@ class TestsuiteConfigurationTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"RU", "RU-DEV", "TU"})
+  @ClearSystemProperty(key = "erp.primsys.activeEnvironment")
   void shouldDetectCustomEnvironmentViaSystemProperty(String env) {
-    System.setProperty("erp.config.activeEnvironment", env);
+    System.setProperty("erp.primsys.activeEnvironment", env);
     val cfg = TestsuiteConfiguration.getInstance();
     assertEquals(env, cfg.getActiveEnvironment().getName());
   }
 
   @ParameterizedTest
   @ValueSource(strings = {"ru", "RU-dev", "tu"})
+  @ClearSystemProperty(key = "erp.primsys.activeEnvironment")
   void shouldDetectCustomEnvironmentViaSystemPropertyCaseInsensitive(String env) {
-    System.setProperty("erp.config.activeEnvironment", env);
+    System.setProperty("erp.primsys.activeEnvironment", env);
     val cfg = TestsuiteConfiguration.getInstance();
     assertTrue(
         env.equalsIgnoreCase(cfg.getActiveEnvironment().getName()),
@@ -95,18 +99,20 @@ class TestsuiteConfigurationTest {
   }
 
   @Test
+  @ClearSystemProperty(key = "erp.primsys.actors.doctors.#0.konnektor")
   void shouldReplaceSingleIndexedKonnektor() {
     val expected = "TEST-KONN-abc";
-    System.setProperty("erp.config.actors.doctors.#0.konnektor", expected);
+    System.setProperty("erp.primsys.actors.doctors.#0.konnektor", expected);
     val cfg = TestsuiteConfiguration.getInstance();
     val substitutedDoc = cfg.getActors().getDoctors().get(0);
     assertEquals(expected, substitutedDoc.getKonnektor());
   }
 
   @Test
+  @ClearSystemProperty(key = "erp.primsys.actors.doctors.*.konnektor")
   void shouldReplaceAllDoctorKonnektors() {
     val expected = "TEST-KONN-abc";
-    System.setProperty("erp.config.actors.doctors.*.konnektor", expected);
+    System.setProperty("erp.primsys.actors.doctors.*.konnektor", expected);
     val cfg = TestsuiteConfiguration.getInstance();
     cfg.getActors().getDoctors().forEach(dc -> assertEquals(expected, dc.getKonnektor()));
   }
@@ -115,7 +121,7 @@ class TestsuiteConfigurationTest {
   void shouldThrowFetchingUnknownConfiguration() {
     val cfg = TestsuiteConfiguration.getInstance();
     val invalidActorName = "John Doe";
-    List<Function<TestsuiteConfiguration, ActorConfiguration>> getConfigFunctions =
+    List<Function<TestsuiteConfiguration, INamedConfigurationElement>> getConfigFunctions =
         List.of(
             c -> c.getDoctorConfig(invalidActorName),
             c -> c.getPharmacyConfig(invalidActorName),
@@ -127,6 +133,7 @@ class TestsuiteConfigurationTest {
 
   @Test
   @SneakyThrows
+  @ClearSystemProperty(key = "erp.primsys.actors.doctors.#0.konnektor")
   void shouldHandleSystemPropertiesMixedWithPcsFile() {
     val basePath = Path.of("config", "primsys", "config.yaml");
     val ymlFilePath =
@@ -152,7 +159,7 @@ class TestsuiteConfigurationTest {
 
     // write concurrent system property
     val expectedSysProp = "SYS-PROP-KONN";
-    System.setProperty("erp.config.actors.doctors.#0.konnektor", expectedSysProp);
+    System.setProperty("erp.primsys.actors.doctors.#0.konnektor", expectedSysProp);
 
     val cfg = TestsuiteConfiguration.getInstance(tmpConfigCopy.toFile());
     val docZero = cfg.getActors().getDoctors().remove(0);
@@ -177,5 +184,25 @@ class TestsuiteConfigurationTest {
     instance = clazz.getDeclaredField(fieldName);
     instance.setAccessible(true);
     instance.set(null, null);
+  }
+
+  @Test
+  void shouldHaveCatsConfigurations() {
+    val cfg = TestsuiteConfiguration.getInstance();
+    val konCfg = (RemoteKonnektorConfiguration) cfg.getKonnektorConfig("KOCO@Kon7");
+    assertNotNull(konCfg);
+    assertDoesNotThrow(
+        () ->
+            konCfg
+                .getCardTerminalClientConfigurations()
+                .forEach(CardTerminalClientConfiguration::create));
+  }
+
+  @Test
+  void shouldHaveVsdmServiceConfigurations() {
+    val cfg = TestsuiteConfiguration.getInstance();
+    val vsdmServiceConfiguration = cfg.getVsdmServiceConfiguration();
+    assertNotNull(vsdmServiceConfiguration);
+    assertDoesNotThrow(vsdmServiceConfiguration::createDefault);
   }
 }

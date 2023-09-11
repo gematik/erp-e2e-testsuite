@@ -16,21 +16,12 @@
 
 package de.gematik.test.konnektor.cfg;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import lombok.val;
-import org.junit.Test;
+import lombok.*;
+import org.junit.*;
 
 public class LocalKonnektorConfigurationTest {
-
-  @Test
-  public void shouldCreateFromConfig() {
-    val lkc = new LocalKonnektorConfiguration();
-    val konnektor = lkc.create();
-    assertNotNull(konnektor);
-    assertEquals(KonnektorType.LOCAL, konnektor.getType());
-  }
 
   @Test
   public void shouldCreateDefaultMockKonnektor() {

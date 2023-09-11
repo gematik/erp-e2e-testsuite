@@ -16,73 +16,64 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import lombok.*;
-import net.serenitybdd.screenplay.*;
-import net.serenitybdd.screenplay.ensure.*;
-import org.hl7.fhir.r4.model.*;
-import org.hl7.fhir.r4.model.Bundle.*;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Question;
+import net.serenitybdd.screenplay.ensure.Ensure;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.DomainResource;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HasDownloadableOpenTask implements Question<Boolean> {
-  private final String kvnr;
   private final String examEvidence;
 
-  public void checkSignature(ErxTaskBundle erxTaskBundle) {
+  private HasDownloadableOpenTask() {
+    this(null);
+  }
+
+  private HasDownloadableOpenTask(String examEvidence) {
+    this.examEvidence = examEvidence;
+  }
+
+  private void performSignatureChecks(Actor actor, ErxTaskBundle erxTaskBundle) {
     // A_22431: ensure that erxTaskBundle do not included signatures
-    Ensure.that(erxTaskBundle.getSignature() != null).isTrue();
+    actor.attemptsTo(Ensure.that(erxTaskBundle.getSignature() != null).isTrue());
 
     // Ensure that all contained resource are instances of ErxTask
-    Ensure.that(
+    actor.attemptsTo(Ensure.that(
             erxTaskBundle.getEntry().stream()
                 .map(BundleEntryComponent::getResource)
                 .anyMatch(r -> r instanceof ErxTask))
-        .isTrue();
+            .isTrue());
 
     // Ensure that all contained Tasks do not contained resources like a binary resource for a
     // signature
-    Ensure.that(
+    actor.attemptsTo(Ensure.that(
             erxTaskBundle.getEntry().stream()
                 .map(e -> (DomainResource) e.getResource())
                 .anyMatch(r -> r.getContained().isEmpty()))
-        .isTrue();
+        .isTrue());
   }
 
   @Override
   public Boolean answeredBy(Actor actor) {
-    val response = actor.asksFor(ResponseOfGetTask.asPharmacy(kvnr, examEvidence));
+    val response = actor.asksFor(ResponseOfGetTask.asPharmacy(examEvidence));
     if (response.isOperationOutcome()) {
-      Ensure.that(response.getStatusCode()).isGreaterThanOrEqualTo(400);
+      actor.attemptsTo(Ensure.that(response.getStatusCode()).isGreaterThanOrEqualTo(400));
       return false;
     } else {
-      Ensure.that(response.getStatusCode()).isEqualTo(200);
-      val erxTaskBundle = response.getResource(ErxTaskBundle.class);
-      checkSignature(erxTaskBundle);
-      return erxTaskBundle.getTasks().size() > 0;
+      actor.attemptsTo(Ensure.that(response.getStatusCode()).isEqualTo(200));
+      performSignatureChecks(actor, response.getExpectedResource());
+      return true;
     }
   }
 
-  public static Builder builder() {
-    return new Builder();
+  public static HasDownloadableOpenTask withExamEvidence(String examEvidence) {
+    return new HasDownloadableOpenTask(examEvidence);
   }
 
-  public static class Builder {
-
-    private String examEvidence;
-    private String kvnr;
-
-    public Builder examEvidence(String examEvidence) {
-      this.examEvidence = examEvidence;
-      return this;
-    }
-
-    public Builder kvnr(String kvnr) {
-      this.kvnr = kvnr;
-      return this;
-    }
-
-    public HasDownloadableOpenTask build() {
-      return new HasDownloadableOpenTask(kvnr, examEvidence);
-    }
+  public static HasDownloadableOpenTask withoutExamEvidence() {
+    return new HasDownloadableOpenTask();
   }
 }

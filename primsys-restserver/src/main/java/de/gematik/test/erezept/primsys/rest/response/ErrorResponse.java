@@ -19,10 +19,11 @@ package de.gematik.test.erezept.primsys.rest.response;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.val;
-import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.Resource;
 
 @Getter
 @XmlRootElement
@@ -34,12 +35,10 @@ public class ErrorResponse {
     this.message = message;
   }
 
-  public ErrorResponse(ErpResponse erpResponse) {
+  public ErrorResponse(ErpResponse<? extends Resource> erpResponse) {
     if (erpResponse.isOperationOutcome()) {
-      val oo = erpResponse.getResource(OperationOutcome.class);
-      val details = oo.getIssueFirstRep().getDetails().getText();
-      val diagnostics = oo.getIssueFirstRep().getDiagnostics();
-      this.message = format("{0}: {1}", details, diagnostics);
+      val oo = erpResponse.getAsOperationOutcome();
+      this.message = OperationOutcomeWrapper.extractFrom(oo);
     } else if (erpResponse.isEmptyBody()) {
       this.message = "Unknown Error: ErpResponse contains empty Body";
     } else {

@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.fhirdump;
 
-import com.fasterxml.jackson.annotation.*;
-import java.util.*;
-import lombok.*;
+import java.util.LinkedList;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@EqualsAndHashCode(callSuper = true)
 public class ScenarioDump extends ScenarioSummary {
 
   private LinkedList<StepDump> steps = new LinkedList<>();

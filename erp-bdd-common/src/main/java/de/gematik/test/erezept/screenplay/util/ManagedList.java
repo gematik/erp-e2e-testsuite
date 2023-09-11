@@ -16,19 +16,19 @@
 
 package de.gematik.test.erezept.screenplay.util;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.val;
+import de.gematik.test.erezept.exceptions.*;
+import java.util.*;
+import java.util.function.*;
+import lombok.*;
 
 public class ManagedList<T> {
 
   private final List<T> managed;
-  private final MissingPreconditionError onError;
+  private final Supplier<String> onErrorMessageSupplier;
 
-  public ManagedList(MissingPreconditionError onError) {
+  public ManagedList(Supplier<String> onError) {
     this.managed = new ArrayList<>();
-    this.onError = onError;
+    this.onErrorMessageSupplier = onError;
   }
 
   public boolean isEmpty() {
@@ -73,7 +73,7 @@ public class ManagedList<T> {
    */
   private T get(int index, boolean consume) {
     if (this.managed.isEmpty()) {
-      throw onError;
+      throw new MissingPreconditionError(onErrorMessageSupplier.get());
     }
 
     // get the correct index: where e.g. -1 leads to last element

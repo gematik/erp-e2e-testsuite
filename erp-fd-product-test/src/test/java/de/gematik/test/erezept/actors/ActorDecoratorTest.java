@@ -21,15 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
+import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.ErpConfiguration;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class ActorDecoratorTest {
 
+  @BeforeAll
+  static void init() {
+    StopwatchProvider.init();
+  }
+  
   @Test
   void decorateDoctorActor() {
     val doctorName = "Bernd Claudius";
@@ -40,7 +47,7 @@ class ActorDecoratorTest {
     try (MockedStatic<UseTheErpClient> useTheErpClientMockedStatic =
         Mockito.mockStatic(UseTheErpClient.class)) {
       val ability = mock(UseTheErpClient.class);
-      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any())).thenReturn(ability);
+      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any(), any())).thenReturn(ability);
 
       assertDoesNotThrow(() -> ActorDecorator.decorateDoctorActor(doctor, config));
       assertNotNull(doctor.abilityTo(UseTheErpClient.class));
@@ -61,7 +68,7 @@ class ActorDecoratorTest {
     try (MockedStatic<UseTheErpClient> useTheErpClientMockedStatic =
         Mockito.mockStatic(UseTheErpClient.class)) {
       val ability = mock(UseTheErpClient.class);
-      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any())).thenReturn(ability);
+      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any(), any())).thenReturn(ability);
 
       assertDoesNotThrow(() -> ActorDecorator.decoratePharmacyActor(doctor, config));
       assertNotNull(doctor.abilityTo(UseTheErpClient.class));
@@ -80,7 +87,7 @@ class ActorDecoratorTest {
     try (MockedStatic<UseTheErpClient> useTheErpClientMockedStatic =
         Mockito.mockStatic(UseTheErpClient.class)) {
       val ability = mock(UseTheErpClient.class);
-      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any())).thenReturn(ability);
+      useTheErpClientMockedStatic.when(() -> UseTheErpClient.with(any(), any())).thenReturn(ability);
 
       assertDoesNotThrow(() -> ActorDecorator.decoratePatientActor(doctor, config));
       assertNotNull(doctor.abilityTo(UseTheErpClient.class));

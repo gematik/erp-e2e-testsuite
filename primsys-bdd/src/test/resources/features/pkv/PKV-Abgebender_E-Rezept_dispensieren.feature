@@ -15,10 +15,10 @@
 #
 # language: de
 
-@Workflow=200
-@Versicherung=PKV
-@Anwendungsfall=A_18514
-@Impl=done
+@PRODUKT:eRp_FD
+@Workflow:200
+@Versicherung:PKV
+@AFO-ID:A_18514
 Funktionalität: PKV-Rezepte dispensieren
   Ein Apotheker dispensiert ein E-Rezept für einen PKV-Versicherten
 
@@ -27,9 +27,9 @@ Funktionalität: PKV-Rezepte dispensieren
     Und der PKV Versicherte Günther Angermänn hat Zugriff auf seine eGK
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
 
-  @TCID=ERP_EE_WF200_03
-  @Path=happy
-  @MainActor=Apotheke
+  @TCID:ERP_EE_WF200_01
+  @TESTFALL:positiv
+  @Hauptdarsteller:Apotheke
   Szenario: PKV E-Rezept dispensieren
   Die Ärztin Dr. Straßer verschreibt dem PKV-Versicherten Günther Angermänn ein E-Rezept, welches dieser bei der
   Apotheke "Am Flughafen" über einen QR-Code einlöst. Die Apotheke hat daraufhin eine Quittung für das dispensierte Medikament.

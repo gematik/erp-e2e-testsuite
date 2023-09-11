@@ -25,9 +25,13 @@ import org.hl7.fhir.r4.model.Resource;
 public class AssignerOrganization extends InstitutionalOrganization {
 
   public static AssignerOrganization fromOrganization(Organization adaptee) {
-    val kbvOrganization = new AssignerOrganization();
-    adaptee.copyValues(kbvOrganization);
-    return kbvOrganization;
+    if (adaptee instanceof AssignerOrganization assignerOrganization) {
+      return assignerOrganization;
+    } else {
+      val kbvOrganization = new AssignerOrganization();
+      adaptee.copyValues(kbvOrganization);
+      return kbvOrganization;
+    }
   }
 
   public static AssignerOrganization fromOrganization(Resource adaptee) {

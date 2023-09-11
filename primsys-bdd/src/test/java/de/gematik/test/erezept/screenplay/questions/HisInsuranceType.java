@@ -34,7 +34,7 @@ public class HisInsuranceType implements Question<Boolean> {
   @Override
   public Boolean answeredBy(final Actor actor) {
     val baseDate = SafeAbility.getAbility(actor, ProvidePatientBaseData.class);
-    return baseDate.getVersicherungsArt().equals(expectedInsuranceType);
+    return baseDate.getPatientInsuranceType().equals(expectedInsuranceType);
   }
 
   public static HisInsuranceType equalsExpected(String insuranceType) {

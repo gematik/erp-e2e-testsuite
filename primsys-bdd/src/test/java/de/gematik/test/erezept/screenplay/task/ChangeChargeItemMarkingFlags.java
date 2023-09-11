@@ -44,7 +44,7 @@ public class ChangeChargeItemMarkingFlags implements Task {
     val prescriptionId = deque.chooseFrom(dispensedDrugs.getDispensedDrugsList());
     val cmd = new ChargeItemPatchCommand(prescriptionId, markingFlag);
     val response = erpClient.request(cmd);
-    val chargeItem = response.getResource(cmd.expectedResponseBody());
+    val chargeItem = response.getExpectedResource();
     chargeItemsAbility.update(chargeItem);
   }
 
@@ -62,7 +62,7 @@ public class ChangeChargeItemMarkingFlags implements Task {
     private final DequeStrategy deque;
 
     public ChangeChargeItemMarkingFlags withDataTable(DataTable dataTable) {
-      val map = dataTable.asMap();
+      val map = dataTable.asMaps().get(0);
       val insurance = Boolean.parseBoolean(map.get("Versicherung"));
       val taxOffice = Boolean.parseBoolean(map.get("Finanzamt"));
       val subsidy = Boolean.parseBoolean(map.get("Beihilfe"));

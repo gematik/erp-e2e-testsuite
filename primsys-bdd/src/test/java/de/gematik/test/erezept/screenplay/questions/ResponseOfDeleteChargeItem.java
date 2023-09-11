@@ -22,29 +22,21 @@ import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.hl7.fhir.r4.model.Resource;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseOfDeleteChargeItem extends FhirResponseQuestion<Resource> {
 
   private final DequeStrategy deque;
 
-  @Override
-  public Class<Resource> expectedResponseBody() {
-    return Resource.class;
+  private ResponseOfDeleteChargeItem(DequeStrategy deque) {
+    super("DELETE /ChargeItem");
+    this.deque = deque;
   }
 
   @Override
-  public String getOperationName() {
-    return "DELETE /ChargeItem";
-  }
-
-  @Override
-  public ErpResponse answeredBy(Actor actor) {
+  public ErpResponse<Resource> answeredBy(Actor actor) {
     val dispensedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 

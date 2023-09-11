@@ -1,7 +1,7 @@
 <Bundle xmlns="http://hl7.org/fhir">
   <id value="f548dde3-a319-486b-8624-6176ff41ad90" />
   <meta>
-    <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.1" />
+    <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.2" />
     <tag>
       <display value="Beispiel RezeptAbgabedatenPKV Bundle (FAM + Noctu + Rezeptänderung)" />
     </tag>
@@ -14,14 +14,14 @@
     <value value="200.100.000.000.082.87" />
   </identifier>
   <type value="document" />
-  <timestamp value="2022-03-25T23:40:00Z" />
+  <timestamp value="2023-07-25T23:40:00Z" />
   <entry>
     <fullUrl value="urn:uuid:4dc5f425-b9b6-4e39-9166-42668ead6c86" />
     <resource>
       <Composition>
         <id value="4dc5f425-b9b6-4e39-9166-42668ead6c86" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.2" />
         </meta>
         <status value="final" />
         <type>
@@ -30,7 +30,7 @@
             <code value="ERezeptAbgabedaten" />
           </coding>
         </type>
-        <date value="2022-03-25T23:40:00Z" />
+        <date value="2023-07-25T23:40:00Z" />
         <author>
           <reference value="urn:uuid:1fa57d53-812b-4cab-a42e-94a12481108a" />
         </author>
@@ -56,11 +56,11 @@
       <Organization>
         <id value="1fa57d53-812b-4cab-a42e-94a12481108a" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.2" />
         </meta>
         <identifier>
           <system value="http://fhir.de/sid/arge-ik/iknr" />
-          <value value="123456789" />
+          <value value="308412345" />
         </identifier>
         <name value="Adler-Apotheke" />
         <address>
@@ -86,7 +86,7 @@
       <MedicationDispense>
         <id value="37a647b8-cb89-491a-af0f-f9bffc2b386c" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.2" />
         </meta>
         <extension url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-Abrechnungszeilen">
           <valueReference>
@@ -125,7 +125,7 @@
             <code value="Abgabeinformationen" />
           </coding>
         </type>
-        <whenHandedOver value="2022-03-25" />
+        <whenHandedOver value="2023-07-25" />
         <substitution>
           <extension url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-Rezeptaenderung">
             <extension url="ArtRezeptaenderung">
@@ -156,7 +156,7 @@
       <Invoice>
         <id value="8a99bfa5-f7aa-4741-99d8-f1abbd301ae1" />
         <meta>
-          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.1" />
+          <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.2" />
         </meta>
         <status value="issued" />
         <type>
@@ -172,6 +172,7 @@
               <system value="http://fhir.de/CodeSystem/ifa/pzn" />
               <code value="11514676" />
             </coding>
+            <text value="Amoxicillin/Clavulansäure Heumann 875 mg/125 mg 10 St" />
           </chargeItemCodeableConcept>
           <priceComponent>
             <extension url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">
@@ -213,7 +214,7 @@
                 </valueCodeableConcept>
               </extension>
               <extension url="DatumUhrzeit">
-                <valueDateTime value="2022-03-25T23:30:00.0Z" />
+                <valueDateTime value="2023-07-25T23:30:00.0Z" />
               </extension>
               <extension url="Schluessel">
                 <valueBoolean value="true" />
@@ -223,9 +224,10 @@
           <sequence value="2" />
           <chargeItemCodeableConcept>
             <coding>
-              <system value="http://fhir.de/CodeSystem/ifa/pzn" />
+              <system value="http://TA1.abda.de" />
               <code value="02567018" />
             </coding>
+            <text value="Noctu-Gebühr" />
           </chargeItemCodeableConcept>
           <priceComponent>
             <extension url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">

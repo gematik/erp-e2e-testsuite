@@ -11,11 +11,10 @@ def IMAGE_NAME = "erezept/pharmacy-service-provider"
 
 pipeline {
     options {
-        skipDefaultCheckout()
         disableConcurrentBuilds()
         buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
     }
-    agent { label 'Docker-Maven' }
+    agent { label 'LTU-DEV-Docker-Maven' }
 
       tools {
         maven 'Default'
@@ -34,15 +33,6 @@ pipeline {
                 useJdk('OPENJDK17')
                 //nur für die Testumgebung notwendig!
                 useTestBuildServer()
-            }
-        }
-
-        stage('Checkout') {
-            steps {
-                git branch: BRANCH,
-                        //nur für die Testumgebung notwendig!
-                        credentialsId: CREDENTIAL_ID_GEMATIK_GIT,
-                        url: REPO_URL
             }
         }
 

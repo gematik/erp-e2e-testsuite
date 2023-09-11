@@ -37,7 +37,7 @@ import net.thucydides.core.annotations.*;
 @RequiredArgsConstructor
 public class ActivatePrescription extends ErpAction<ErxTask> {
 
-  private final String taskId;
+  private final TaskId taskId;
   private final AccessCode accessCode;
   private final KbvErpBundle kbvBundle;
 
@@ -49,10 +49,10 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
   }
 
   public static Builder forGiven(ErxTask task) {
-    return withId(task.getUnqualifiedId()).andAccessCode(task.getAccessCode());
+    return withId(task.getTaskId()).andAccessCode(task.getAccessCode());
   }
 
-  public static Builder withId(String taskId) {
+  public static Builder withId(TaskId taskId) {
     return new Builder(taskId);
   }
 
@@ -75,7 +75,7 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
 
     if (interaction.isOfExpectedType()) {
       val task = interaction.getExpectedResponse();
-      val dmc = DmcPrescription.ownerDmc(task.getUnqualifiedId(), task.getAccessCode());
+      val dmc = DmcPrescription.ownerDmc(task.getTaskId(), task.getAccessCode());
       writeDmcToReport(dmc);
     }
 
@@ -87,7 +87,8 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
     // write the DMC to file and append to the Serenity Report
     val dmcPath =
         Path.of("target", "site", "serenity", "dmcs", format("dmc_{0}.png", dmc.getTaskId()));
-    DataMatrixCodeGenerator.writeToFile(dmc.getTaskId(), dmc.getAccessCode(), dmcPath.toFile());
+    DataMatrixCodeGenerator.writeToFile(
+        dmc.getTaskId().getValue(), dmc.getAccessCode(), dmcPath.toFile());
 
     Serenity.recordReportData()
         .withTitle("Data Matrix Code for " + dmc.getTaskId())
@@ -97,7 +98,7 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
 
   @RequiredArgsConstructor
   public static class Builder {
-    private final String taskId;
+    private final TaskId taskId;
     private final List<StringMutator> stringMutators = new LinkedList<>();
     private final List<ByteArrayMutator> signedBundleMutators = new LinkedList<>();
     private AccessCode accessCode;

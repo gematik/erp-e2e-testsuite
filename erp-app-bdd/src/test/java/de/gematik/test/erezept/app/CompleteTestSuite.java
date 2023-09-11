@@ -24,5 +24,5 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
     features = "src/test/resources/features",
     plugin = {"pretty", "html:target/site/CucumberReport.html"},
-    glue = {"de.gematik.test.erezept.app.steps"})
+    glue = {"de.gematik.test.erezept.app.steps", "de.gematik.test.erezept.lei.steps"})
 public class CompleteTestSuite {}

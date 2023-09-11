@@ -31,7 +31,7 @@ class ErpWorkflowVersionTest {
     val defaultVersion = ErpWorkflowVersion.getDefaultVersion();
 
     // Note: this assertion will break in the future!
-    assertEquals(ErpWorkflowVersion.V1_1_1, defaultVersion);
+    assertEquals(ErpWorkflowVersion.V1_2_0, defaultVersion);
   }
 
   @Test

@@ -18,10 +18,10 @@ package de.gematik.test.erezept.cli.cmd.generate;
 
 import static java.text.MessageFormat.*;
 
-import de.gematik.test.erezept.cli.cmd.param.*;
 import de.gematik.test.erezept.cli.description.*;
 import de.gematik.test.erezept.cli.exceptions.*;
 import de.gematik.test.erezept.cli.indexmap.*;
+import de.gematik.test.erezept.cli.param.OutputDirectoryParameter;
 import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.fuzzing.core.*;
 import java.util.*;

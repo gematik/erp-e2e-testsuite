@@ -31,7 +31,9 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
@@ -119,7 +121,7 @@ public class MedicationDispenser implements Callable<Integer> {
     try {
       prescriptionData.forEach(
           pd -> {
-            val taskId = pd.getTaskId();
+            val taskId = TaskId.from(pd.getTaskId());
             val accessCode = pd.getAccessCode();
             val acceptData = acceptPrescription(pharmacy, taskId, accessCode);
             if (!dispenseParameters.substitute) {
@@ -179,7 +181,7 @@ public class MedicationDispenser implements Callable<Integer> {
             .build();
 
     val medicationDispense =
-        ErxMedicationDispenseBuilder.forKvid(patientData.getKvnr())
+        ErxMedicationDispenseBuilder.forKvnr(KVNR.from(patientData.getKvnr()))
             .medication(medication)
             .prescriptionId(prescriptionData.getPrescriptionId())
             .performerId(pharmacy.getSmcb().getTelematikId())
@@ -204,7 +206,7 @@ public class MedicationDispenser implements Callable<Integer> {
             idx -> {
               val medication = KbvErpMedicationBuilder.faker().build();
               val medicationDispense =
-                  ErxMedicationDispenseBuilder.forKvid(patientData.getKvnr())
+                  ErxMedicationDispenseBuilder.forKvnr(KVNR.from(patientData.getKvnr()))
                       .medication(medication)
                       .prescriptionId(prescriptionData.getPrescriptionId())
                       .performerId(pharmacy.getSmcb().getTelematikId())
@@ -220,7 +222,7 @@ public class MedicationDispenser implements Callable<Integer> {
     dispense(pharmacy, acceptData, medicationDispenses);
   }
 
-  private AcceptData acceptPrescription(Pharmacy actor, String taskId, String accessCode) {
+  private AcceptData acceptPrescription(Pharmacy actor, TaskId taskId, String accessCode) {
     val acceptCommand = new TaskAcceptCommand(taskId, new AccessCode(accessCode));
     val acceptResponse = actor.erpRequest(acceptCommand);
     val acceptedTaskOpt = acceptResponse.getResourceOptional(acceptCommand.expectedResponseBody());
@@ -232,7 +234,7 @@ public class MedicationDispenser implements Callable<Integer> {
 
     val task = atomicAcceptedTask.get();
     val acceptData = new AcceptData();
-    acceptData.setTaskId(task.getUnqualifiedId());
+    acceptData.setTaskId(task.getTaskId().getValue());
     acceptData.setAccessCode(task.getAccessCode().getValue());
     acceptData.setSecret(task.getSecret().orElseThrow().getValue());
     ActorContext.getInstance().addAcceptedPrescription(acceptData);
@@ -249,11 +251,11 @@ public class MedicationDispenser implements Callable<Integer> {
    * @param accessCode to the Prescription
    * @return ErxTask if possible and throw Exception otherwise
    */
-  private ErxTask readTaskAfterFailedAccept(Pharmacy actor, String taskId, String accessCode) {
+  private ErxTask readTaskAfterFailedAccept(Pharmacy actor, TaskId taskId, String accessCode) {
     log.info(format("Could not accept Task {0}, try to read", taskId));
     val cmd = new TaskGetByIdCommand(taskId, new AccessCode(accessCode));
     val response = actor.erpRequest(cmd);
-    val bundle = response.getResource(cmd.expectedResponseBody());
+    val bundle = response.getExpectedResource();
     // make sure the Task has a Secret, which would indicate this is an already accepted task
     log.info(format("Check if the Task has a secret: {0}", bundle.getTask().hasSecret()));
     assert bundle.getTask().hasSecret();
@@ -267,11 +269,16 @@ public class MedicationDispenser implements Callable<Integer> {
             "Dispense Prescription with TaskID {0} and Secret {1}",
             acceptData.getTaskId(), acceptData.getSecret()));
     val secret = new Secret(acceptData.getSecret());
-    val cmd = new DispenseMedicationCommand(acceptData.getTaskId(), secret, medicationDispenses);
+    val cmd =
+        new DispenseMedicationCommand(
+            TaskId.from(acceptData.getTaskId()), secret, medicationDispenses);
     val response = pharmacy.erpRequest(cmd);
-    val receipt = response.getResource(cmd.expectedResponseBody());
+    val receipt = response.getExpectedResource();
 
     val dd = new DispensedData();
+    dd.setTaskId(acceptData.getTaskId());
+    dd.setSecret(acceptData.getSecret());
+    dd.setReceipt(receipt.getId());
     dd.setAcceptData(acceptData);
     dd.setDispensedDate(new Date());
     dd.setMedications(
@@ -286,7 +293,7 @@ public class MedicationDispenser implements Callable<Integer> {
 
   @SneakyThrows
   private void writeAcceptedSummary(String fileNamePrefix, List<?> data) {
-    if (data.size() > 0) { // avoid writing empty lists
+    if (!data.isEmpty()) { // avoid writing empty lists
       val mapper = new ObjectMapper();
       val timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(LocalDateTime.now());
       val fileName = format("{0}_{1}.json", fileNamePrefix, timestamp);

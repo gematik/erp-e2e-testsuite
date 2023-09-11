@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.lang.reflect.Constructor;
@@ -28,9 +27,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junitpioneer.jupiter.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class MvoExtensionManipulatorFactoryTest {
 
@@ -54,14 +53,14 @@ class MvoExtensionManipulatorFactoryTest {
 
     manipulators.forEach(
         m -> {
-          val patient = PatientBuilder.faker(IdentifierTypeDe.GKV).build();
+          val patient = PatientBuilder.faker(VersicherungsArtDeBasis.GKV).build();
           val coverage = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
           val practitioner = PractitionerBuilder.faker().build();
           val medication =
               KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
 
           val kbvBundle =
-              KbvErpBundleBuilder.faker(patient.getKvid().orElseThrow())
+              KbvErpBundleBuilder.faker(patient.getGkvId().orElseThrow())
                   .medication(medication)
                   .medicationRequest(
                       MedicationRequestBuilder.faker(patient)

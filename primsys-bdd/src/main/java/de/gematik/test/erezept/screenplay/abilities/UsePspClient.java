@@ -18,8 +18,8 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import de.gematik.test.erezept.pspwsclient.PSPClient;
-import de.gematik.test.erezept.pspwsclient.config.PSPClientConfig;
 import de.gematik.test.erezept.pspwsclient.dataobjects.DeliveryOption;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

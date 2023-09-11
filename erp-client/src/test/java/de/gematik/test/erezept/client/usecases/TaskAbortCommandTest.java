@@ -19,6 +19,7 @@ package de.gematik.test.erezept.client.usecases;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class TaskAbortCommandTest {
 
   @Test
   void shouldGenerateCorrectRequestLocator() {
-    val taskId = "123456789";
+    val taskId = TaskId.from("123456789");
     val cmd = new TaskAbortCommand(taskId);
 
     val expected = "/Task/" + taskId + "/$abort";
@@ -36,7 +37,7 @@ class TaskAbortCommandTest {
 
   @Test
   void shouldGenerateEmptyRequestBody() {
-    val taskId = "123456789";
+    val taskId = TaskId.from("123456789");
     val cmd = new TaskAbortCommand(taskId);
     assertTrue(cmd.getRequestBody().isEmpty());
   }

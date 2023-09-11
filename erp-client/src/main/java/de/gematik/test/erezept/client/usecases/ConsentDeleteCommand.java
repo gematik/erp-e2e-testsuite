@@ -17,25 +17,15 @@
 package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 public class ConsentDeleteCommand extends BaseCommand<Resource> {
 
-  public ConsentDeleteCommand(String resourceId) {
-    // TODO: what does resourceId represent?  // NOSONAR still needs to be checked
-    super(Resource.class, HttpRequestMethod.DELETE, "Consent", resourceId);
-  }
-
-  /**
-   * This method returns the last (tailing) part of the URL of the inner-HTTP Request e.g.
-   * /Task/[id] or /Communication?[queryParameter]
-   *
-   * @return the tailing part of the URL which combines to full URL like [baseUrl][tailing Part]
-   */
-  @Override
-  public String getRequestLocator() {
-    return this.getResourcePath();
+  public ConsentDeleteCommand() {
+    super(Resource.class, HttpRequestMethod.DELETE, "Consent");
+    this.queryParameters.add(new QueryParameter("category", "CHARGCONS"));
   }
 
   /**

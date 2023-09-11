@@ -45,12 +45,12 @@ public class PatientDoesHaveMessagesForTask implements Question<Boolean> {
 
     val cmd = CommunicationSearch.getLatestCommunications();
     val response = erpClient.request(cmd);
-    val searchBundle = response.getResource(cmd.expectedResponseBody());
+    val searchBundle = response.getExpectedResource();
     return searchBundle.getCommunications().stream()
         .map(ErxCommunication::getAboutReference)
         .filter(Optional::isPresent)
         .map(Optional::orElseThrow)
-        .anyMatch(ref -> ref.contains(taskId));
+        .anyMatch(ref -> ref.contains(taskId.getValue()));
   }
 
   public static PatientDoesHaveMessagesForTask fromStack(String order) {

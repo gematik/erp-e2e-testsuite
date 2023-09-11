@@ -17,7 +17,10 @@
 package de.gematik.test.erezept.fhir.testutil;
 
 import static java.text.MessageFormat.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import ca.uhn.fhir.validation.*;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.values.*;
@@ -37,6 +40,8 @@ public class FhirTestResourceUtil {
     val issue = new OperationOutcome.OperationOutcomeIssueComponent();
     issue.setCode(OperationOutcome.IssueType.VALUE);
     issue.setSeverity(OperationOutcome.IssueSeverity.ERROR);
+    issue.getDetails().setText("error details");
+    issue.setDiagnostics("additional diagnostics about the error");
     val oo = new OperationOutcome();
     val issueList = new LinkedList<OperationOutcome.OperationOutcomeIssueComponent>();
     issueList.add(issue);
@@ -87,5 +92,22 @@ public class FhirTestResourceUtil {
     agent.setWho(agentReference);
     agent.setName(agentName);
     return erxAuditEvent;
+  }
+
+  public static ValidationResult createEmptyValidationResult() {
+    val vr = mock(ValidationResult.class);
+    when(vr.isSuccessful()).thenReturn(true);
+    when(vr.getMessages()).thenReturn(List.of());
+    return vr;
+  }
+
+  public static ValidationResult createFailingValidationResult() {
+    val vr = mock(ValidationResult.class);
+    when(vr.isSuccessful()).thenReturn(false);
+    val errorMessage = new SingleValidationMessage();
+    errorMessage.setMessage("mock error message");
+    errorMessage.setSeverity(ResultSeverityEnum.ERROR);
+    when(vr.getMessages()).thenReturn(List.of(errorMessage));
+    return vr;
   }
 }

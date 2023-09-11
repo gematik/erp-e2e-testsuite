@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+JAVA_ARGS=""
+APP_ARGS=""
+
+for arg in "$@"
+do
+  if [[ "$arg" == -D* ]]; then
+    JAVA_ARGS="$JAVA_ARGS $arg"
+  else
+    APP_ARGS="$APP_ARGS $arg"
+  fi
+done
+
+# trim args
+JAVA_ARGS=`echo $JAVA_ARGS | sed -e 's/^[[:space:]]*//'`
+APP_ARGS=`echo $APP_ARGS | sed -e 's/^[[:space:]]*//'`
+JAR_APP=/usr/local/bin/erp-cli-fhir.jar
+
+sh -c "java -Djdk.tls.namedGroups="secp256r1,secp384r1,ffdhe2048,ffdhe3072" $JAVA_ARGS -jar $JAR_APP ${APP_ARGS}"

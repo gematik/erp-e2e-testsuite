@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
@@ -46,7 +47,7 @@ public class SafeAbilityTest {
     val actor = OnStage.theActor("Marty");
     val provideBaseData =
         ProvidePatientBaseData.forPatient(
-            GemFaker.fakerKvid(),
+            KVNR.random(),
             GemFaker.fakerName(),
             GemFaker.fakerValueSet(VersicherungsArtDeBasis.class));
     actor.can(provideBaseData);

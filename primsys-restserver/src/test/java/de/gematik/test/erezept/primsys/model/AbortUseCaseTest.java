@@ -16,28 +16,23 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.values.TelematikID;
-import de.gematik.test.erezept.primsys.model.actor.Pharmacy;
-import de.gematik.test.erezept.primsys.rest.response.ErrorResponse;
-import jakarta.ws.rs.WebApplicationException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import lombok.val;
-import org.hl7.fhir.r4.model.AuditEvent;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import de.gematik.test.erezept.client.rest.*;
+import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.primsys.model.actor.*;
+import de.gematik.test.erezept.primsys.rest.response.*;
+import jakarta.ws.rs.*;
+import java.lang.reflect.*;
+import java.util.*;
+import lombok.*;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.*;
+import org.mockito.*;
 
 class AbortUseCaseTest {
 
@@ -58,8 +53,12 @@ class AbortUseCaseTest {
       val resource =
           FhirTestResourceUtil.createErxAuditEvent(
               "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(204, Map.of(), resource));
+      val mockResponse =
+          ErpResponse.forPayload(resource, Resource.class)
+              .withStatusCode(204)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any())).thenReturn(mockResponse);
       try (var response =
           AbortUseCase.abortPrescription(mockPharmacyActor, "taskId", "accessCode", "verySecret")) {
         assertEquals(200, response.getStatus());
@@ -72,10 +71,13 @@ class AbortUseCaseTest {
     try (MockedStatic<ActorContext> mockedStaticActor = mockStatic(ActorContext.class)) {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
-      val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(500, Map.of(), operationOutcome));
+      val mockResponse =
+          ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+              .withStatusCode(500)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any())).thenReturn(mockResponse);
 
       try (val response =
           AbortUseCase.abortPrescription(mockPharmacyActor, "taskId", "accessCode", "verySecret")) {
@@ -94,7 +96,12 @@ class AbortUseCaseTest {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any())).thenReturn(new ErpResponse(500, Map.of(), null));
+      val mockResponse =
+          ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+              .withStatusCode(500)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any())).thenReturn(mockResponse);
 
       try (val response =
           AbortUseCase.abortPrescription(mockPharmacyActor, "taskId", "accessCode", "verySecret")) {
@@ -112,10 +119,13 @@ class AbortUseCaseTest {
     try (MockedStatic<ActorContext> mockedStaticActor = mockStatic(ActorContext.class)) {
       val mockActorContext = mock(ActorContext.class);
       mockedStaticActor.when(ActorContext::getInstance).thenReturn(mockActorContext);
-      val operationOutcome = FhirTestResourceUtil.createOperationOutcome();
       val mockPharmacyActor = mock(Pharmacy.class);
-      when(mockPharmacyActor.erpRequest(any()))
-          .thenReturn(new ErpResponse(400, Map.of(), operationOutcome));
+      val mockResponse =
+          ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+              .withStatusCode(400)
+              .withHeaders(Map.of())
+              .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+      when(mockPharmacyActor.erpRequest(any())).thenReturn(mockResponse);
 
       try (val response =
           AbortUseCase.abortPrescription(mockPharmacyActor, "taskId", "accessCode", "verySecret")) {

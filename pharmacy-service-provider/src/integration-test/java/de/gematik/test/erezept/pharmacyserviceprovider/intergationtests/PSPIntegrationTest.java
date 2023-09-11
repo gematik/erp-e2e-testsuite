@@ -150,6 +150,7 @@ class PSPIntegrationTest {
             "'/pspmock/versand/{ti_id}?req={transactionID}', 'arrived @ SHIPMENT' ",
             "'/local_delivery/{ti_id}?req={transactionID}', 'arrived @ DELIVERY' ",
             "'/delivery_only/{ti_id}?req={transactionID}', 'arrived @ SHIPMENT' ",
+            "'/pick_up/{ti_id}?req={transactionID}', 'arrived @ ON_PREMISE' ",
     })
     void shouldAnswer(String send, String expect) {
         sendUnirestPostWithTwoIdsAndBody(SERVER_URL + send);
@@ -158,6 +159,7 @@ class PSPIntegrationTest {
                 expect,
                 clientEndPoint.consumeOldest(1000).orElseThrow(() -> new AssertionError()).getNote());
     }
+
 
     // QueueTests
     @SneakyThrows

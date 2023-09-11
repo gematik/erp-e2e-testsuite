@@ -36,11 +36,7 @@ public enum KbvItaErpStructDef implements IStructureDefinition<KbvItaErpVersion>
   BVG("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_BVG"),
   MULTIPLE_PRESCRIPTION("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription"),
   PACKAGING_SIZE("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_PackagingSize"),
-  @Deprecated(
-      since = "kbv.ita.erp-1.1.0") // from version 1.1.0 on ACCIDENT moved to KbvItaForStructDef
   ACCIDENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Accident"),
-  @Deprecated(since = "kbv.ita.erp-1.1.0") // from version 1.1.0 on STATUS_CO_PAYMENT moved to
-  // KbvItaForStructDef
   STATUS_CO_PAYMENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_StatusCoPayment"),
   ;
 

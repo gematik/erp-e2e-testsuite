@@ -16,23 +16,25 @@
 
 package de.gematik.test.erezept.fhir.references.kbv;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
+import de.gematik.test.erezept.fhir.references.CustomReferenceProvider;
 import org.hl7.fhir.r4.model.Coverage;
 import org.hl7.fhir.r4.model.Reference;
 
-/** Basically coverage represents a Health Insurance */
-@DatatypeDef(name = "Reference")
-@SuppressWarnings({"java:S110"})
-public class CoverageReference extends Reference {
+public class CoverageReference extends CustomReferenceProvider {
 
-  private static final String INSURANCE_PREFIX = "Coverage/";
-
-  public CoverageReference(String referenceId) {
-    super(referenceId.startsWith(INSURANCE_PREFIX) ? referenceId : INSURANCE_PREFIX + referenceId);
+  private String display;
+  
+  public CoverageReference(String referenceValue) {
+    super("Coverage", referenceValue);
   }
 
   public CoverageReference(Coverage coverage) {
     this(coverage.getId());
-    this.setDisplay(coverage.getPayorFirstRep().getDisplay());
+    this.display = coverage.getPayorFirstRep().getDisplay();
+  }
+
+  @Override
+  public Reference asReference() {
+    return new Reference(referenceValue).setDisplay(this.display);
   }
 }

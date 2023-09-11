@@ -51,7 +51,7 @@ public class RetrieveReceiptAgain implements Task {
 
     val cmd = new TaskGetByIdCommand(taskId, secret);
     val response = erpClient.request(cmd);
-    val prescriptionBundle = response.getResource(cmd.expectedResponseBody());
+    val prescriptionBundle = response.getExpectedResource();
 
     val erxReceipt =
         prescriptionBundle
@@ -78,9 +78,9 @@ public class RetrieveReceiptAgain implements Task {
             DocumentType.RECEIPT, erxReceipt.getDocumentType()));
 
     // after checking the bundle, put the receipt on the stack
-    val subjectKvid = receiptToRetrieve.getReceiverKvid();
+    val subjectKvnr = receiptToRetrieve.getReceiverKvnr();
     pharmacyStack.appendDispensedPrescriptions(
-        new DispenseReceipt(subjectKvid, taskId, prescriptionId, accessCode, secret, erxReceipt));
+        new DispenseReceipt(subjectKvnr, taskId, prescriptionId, accessCode, secret, erxReceipt));
   }
 
   public static RetrieveReceiptAgain fromStack(String order) {

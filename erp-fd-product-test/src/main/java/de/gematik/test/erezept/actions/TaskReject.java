@@ -21,6 +21,7 @@ import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.core.steps.Instrumented;
@@ -31,7 +32,7 @@ import org.hl7.fhir.r4.model.Resource;
 @RequiredArgsConstructor
 public class TaskReject extends ErpAction<Resource> {
 
-  private final String taskId;
+  private final TaskId taskId;
   private final AccessCode accessCode;
   private final Secret secret;
 

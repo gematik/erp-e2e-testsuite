@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class TaskRejectCommandTest {
   @BeforeEach
   void precondition() {
     Secret secret = new Secret("thisIsAnUnidentifiedSecret2TestTheReject");
-    val taskId = PrescriptionId.random().getValue();
+    val taskId = TaskId.from(PrescriptionId.random());
     AccessCode accsesscode =
         new AccessCode("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
     this.actualRejectCommand = new TaskRejectCommand(taskId, accsesscode, secret);

@@ -17,9 +17,9 @@
 package de.gematik.test.erezept.cli.cmd;
 
 import de.gematik.test.erezept.cli.cmd.generate.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import picocli.CommandLine.*;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import picocli.CommandLine.Command;
 
 @Slf4j
 @Command(
@@ -34,7 +34,9 @@ import picocli.CommandLine.*;
       KbvPatientGenerator.class,
       KbvCoverageGenerator.class,
       KbvMedicationGenerator.class,
-      KbvMedicationRequestGenerator.class
+      KbvMedicationRequestGenerator.class,
+      ChargeItemGenerator.class,
+      ChargeItemBundleGenerator.class
     })
 @Getter
 public class Generator {}

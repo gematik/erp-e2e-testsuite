@@ -16,16 +16,17 @@
 
 package de.gematik.test.erezept.fhir.references.kbv;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
+import de.gematik.test.erezept.fhir.references.CustomReferenceProvider;
 import org.hl7.fhir.r4.model.Reference;
 
-@DatatypeDef(name = "Reference")
-@SuppressWarnings({"java:S110"})
-public class SubjectReference extends Reference {
+public class SubjectReference extends CustomReferenceProvider {
 
-  private static final String SUBJECT_PREFIX = "Patient/";
+  public SubjectReference(String referenceValue) {
+    super("Patient", referenceValue);
+  }
 
-  public SubjectReference(String referenceId) {
-    super(referenceId.startsWith(SUBJECT_PREFIX) ? referenceId : SUBJECT_PREFIX + referenceId);
+  @Override
+  public Reference asReference() {
+    return new Reference(this.referenceValue);
   }
 }

@@ -19,6 +19,8 @@ package de.gematik.test.core.expectations.verifier;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.KbvProfileRules;
+import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import java.util.function.Predicate;
 import lombok.val;
@@ -37,6 +39,25 @@ public class PrescriptionBundleVerifier {
             ErpAfos.A_19021.getRequirement(),
             format(
                 "Der AccessCode muss eine 256 Bit Zufallszahl mit einer Mindestentropie von 120 Bit sein"));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxPrescriptionBundle> bundleContainsAccident(
+      AccidentExtension accident) {
+    Predicate<ErxPrescriptionBundle> predicate =
+        bundle ->
+            bundle
+                .getKbvBundle()
+                .getMedicationRequest()
+                .getAccident()
+                .map(accidentExtension -> accidentExtension.equals(accident))
+                .isPresent();
+    val step =
+        new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
+            KbvProfileRules.ACCIDENT_EXTENSION,
+            format(
+                "Das E-Rezept muss ein Unfallkennzeichen mit {0} enthalten",
+                accident.accidentCauseType().getDisplay()));
     return step.predicate(predicate).accept();
   }
 }

@@ -15,15 +15,15 @@
 #
 # language: de
 
-@Funktionalität=Direktzuweisung
-@Workflow=169
-@Anwendungsfall=A_18827
-@Anwendungsfall=AF_10111
-@Anwendungsfall=AF_10112
-@Anwendungsfall=A_18502
-@Anwendungsfall=A_18503
-@Versicherung=GKV
-@Impl=done
+@PRODUKT:eRp_FD
+@Funktionalität:Direktzuweisung
+@Workflow:169
+@Versicherung:GKV
+@AFO-ID:A_18827
+@AF-ID:AF_10111
+@AF-ID:AF_10112
+@AFO-ID:A_18502
+@AFO-ID:A_18503
 Funktionalität: Direktzuweisung für GKV-Rezepte
   Die Erezept-Anwendungsfälle für Direktzuweisung für GKV-Versicherte (Workflow 169)
 
@@ -33,12 +33,12 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
 
 
-  @TCID=ERP_EE_WF169_01
-  @Path=happy
-  @Anwendungsfall=AF_10114
-  @Anwendungsfall=A_18822
-  @Afo=A_21360
-  @MainActor=Versicherter
+  @TCID:ERP_EE_WF169_01
+  @TESTFALL:positiv
+  @AF-ID:AF_10114
+  @AFO-ID:A_18822
+  @AFO-ID:A_21360
+  @Hauptdarsteller:Versicherter
   Szenario: Anzeigen von direkt zugewiesenen E-Rezepten
   Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung. Diese Rezept soll im FdV angezeigt werden.
 
@@ -48,9 +48,9 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Dann wird der Versicherten Sina Hüllmann das neue E-Rezept ohne AccessCode angezeigt
 
 
-  @TCID=ERP_EE_WF169_02
-  @Path=happy
-  @MainActor=Arztpraxis
+  @TCID:ERP_EE_WF169_02
+  @TESTFALL:positiv
+  @Hauptdarsteller:Arztpraxis
   Szenario: Direktzuweisung an eine Apotheke durch den Arzt
   Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung und übermittelt es der Apotheke.
   Die Apotheke kann es erfolgreich dispensieren.
@@ -63,10 +63,10 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Dann hat die Apotheke genau eine Quittung vorliegen
 
 
-  @TCID=ERP_EE_WF169_03
-  @Path=bad
-  @Afo=A_22102
-  @MainActor=Versicherter
+  @TCID:ERP_EE_WF169_03
+  @TESTFALL:negativ
+  @AFO-ID:A_22102
+  @Hauptdarsteller:Versicherter
   Szenario: Löschen nicht möglich bis nach der Dispensierung
   Der Versicherte kann E-Rezepte mit Direktzuweisung nicht löschen bis diese durch
   eine Apotheke dispensiert wurden
@@ -78,10 +78,10 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Und die Versicherte kann ihr letztes E-Rezept nicht löschen, weil sie nicht das Recht dazu hat
 
 
-  @TCID=ERP_EE_WF169_04
-  @Path=bad
-  @Afo=A_22102
-  @MainActor=Versicherter
+  @TCID:ERP_EE_WF169_04
+  @TESTFALL:negativ
+  @AFO-ID:A_22102
+  @Hauptdarsteller:Versicherter
   Szenario: Löschen nicht möglich während der Dispensierung
   Der Versicherte kann das E-Rezept nicht löschen während die Apotheke das Rezept dispensiert
 
@@ -93,10 +93,10 @@ Funktionalität: Direktzuweisung für GKV-Rezepte
     Und die Versicherte kann ihr letztes E-Rezept nicht löschen, weil sie nicht das Recht dazu hat
 
 
-  @TCID=ERP_EE_WF169_05
-  @Path=happy
-  @Afo=A_22102
-  @MainActor=Versicherter
+  @TCID:ERP_EE_WF169_05
+  @TESTFALL:positiv
+  @AFO-ID:A_22102
+  @Hauptdarsteller:Versicherter
   Szenario: Löschen möglich erst nach der Dispensierung
   Der Versicherte kann das E-Rezept erst löschen nachdem die Apotheke das Rezept dispensiert hat
 

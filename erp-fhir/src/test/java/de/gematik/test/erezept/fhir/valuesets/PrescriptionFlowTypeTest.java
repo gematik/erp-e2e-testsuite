@@ -16,12 +16,17 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class PrescriptionFlowTypeTest {
 
@@ -38,6 +43,64 @@ class PrescriptionFlowTypeTest {
           val pid = PrescriptionId.random(ft);
           val actual = PrescriptionFlowType.fromPrescriptionId(pid);
           assertEquals(ft, actual);
+          assertNotNull(ft.toString());
         });
+  }
+
+  @Test
+  void shouldDetectDirectAssignments() {
+    List.of(PrescriptionFlowType.FLOW_TYPE_169, PrescriptionFlowType.FLOW_TYPE_209)
+        .forEach(ft -> assertTrue(ft.isDirectAssignment()));
+  }
+
+  @Test
+  void shouldDetectGkvTypes() {
+    List.of(PrescriptionFlowType.FLOW_TYPE_160, PrescriptionFlowType.FLOW_TYPE_169)
+        .forEach(
+            ft -> {
+              assertTrue(ft.isGkvType());
+              assertFalse(ft.isPkvType());
+            });
+  }
+
+  @Test
+  void shouldDetectPkvTypes() {
+    List.of(PrescriptionFlowType.FLOW_TYPE_200, PrescriptionFlowType.FLOW_TYPE_209)
+        .forEach(
+            ft -> {
+              assertTrue(ft.isPkvType());
+              assertFalse(ft.isGkvType());
+            });
+  }
+
+  @ParameterizedTest(name = "#{index} - WorkflowType from InsuranceKind {0} expected to be {1}")
+  @MethodSource("defaultPrescriptionFlowTypes")
+  void shouldGenerateFromInsuranceKind(
+      VersicherungsArtDeBasis insuranceKind, PrescriptionFlowType expectation) {
+    assertEquals(expectation, PrescriptionFlowType.fromInsuranceKind(insuranceKind));
+    assertEquals(expectation, PrescriptionFlowType.fromInsuranceKind(insuranceKind, false));
+    assertFalse(PrescriptionFlowType.fromInsuranceKind(insuranceKind).isDirectAssignment());
+  }
+
+  @ParameterizedTest(name = "#{index} - WorkflowType from InsuranceKind {0} expected to be {1}")
+  @MethodSource("directAssignmentPrescriptionFlowTypes")
+  void shouldGenerateFromInsuranceKindWithDirectAssignment(
+      VersicherungsArtDeBasis insuranceKind, PrescriptionFlowType expectation) {
+    assertEquals(expectation, PrescriptionFlowType.fromInsuranceKind(insuranceKind, true));
+    assertTrue(PrescriptionFlowType.fromInsuranceKind(insuranceKind, true).isDirectAssignment());
+  }
+
+  static Stream<Arguments> defaultPrescriptionFlowTypes() {
+    return Stream.of(
+        arguments(VersicherungsArtDeBasis.GKV, PrescriptionFlowType.FLOW_TYPE_160),
+        arguments(VersicherungsArtDeBasis.PKV, PrescriptionFlowType.FLOW_TYPE_200),
+        arguments(VersicherungsArtDeBasis.BG, PrescriptionFlowType.FLOW_TYPE_160));
+  }
+
+  static Stream<Arguments> directAssignmentPrescriptionFlowTypes() {
+    return Stream.of(
+        arguments(VersicherungsArtDeBasis.GKV, PrescriptionFlowType.FLOW_TYPE_169),
+        arguments(VersicherungsArtDeBasis.PKV, PrescriptionFlowType.FLOW_TYPE_209),
+        arguments(VersicherungsArtDeBasis.BG, PrescriptionFlowType.FLOW_TYPE_169));
   }
 }

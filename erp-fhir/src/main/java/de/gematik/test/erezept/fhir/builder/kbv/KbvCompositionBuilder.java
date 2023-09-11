@@ -73,12 +73,12 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
     return self();
   }
 
-  protected KbvCompositionBuilder subjectReference(@NonNull SubjectReference subjectReference) {
+  protected KbvCompositionBuilder subjectReference(@NonNull Reference subjectReference) {
     this.subjectReference = subjectReference;
     return self();
   }
 
-  protected KbvCompositionBuilder coverageReference(@NonNull CoverageReference coverageReference) {
+  protected KbvCompositionBuilder coverageReference(@NonNull Reference coverageReference) {
     val s = new Composition.SectionComponent();
     s.setCode(BuilderUtil.kbvSectionType("Coverage"));
     s.addEntry(coverageReference);
@@ -87,8 +87,7 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
     return self();
   }
 
-  protected KbvCompositionBuilder custodianReference(
-      @NonNull OrganizationReference custodianReference) {
+  protected KbvCompositionBuilder custodianReference(Reference custodianReference) {
     this.custodianReference = custodianReference;
     return self();
   }
@@ -112,16 +111,14 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
     return this.addAuthor(devRef);
   }
 
-  protected KbvCompositionBuilder requesterReference(
-      @NonNull RequesterReference requesterReference) {
-    // need to copy to set the type of the reference on the copy but not on the original object
-    val authorPractitioner = requesterReference.copy();
+  protected KbvCompositionBuilder requesterReference(Reference requesterReference) {
+    val authorPractitioner = requesterReference;
     authorPractitioner.setType(RequesterReference.REQUESTER_PREFIX);
     return this.addAuthor(authorPractitioner);
   }
 
   protected KbvCompositionBuilder medicationRequestReference(
-      @NonNull MedicationRequestReference medicationReference) {
+      Reference medicationReference) {
     val s = new Composition.SectionComponent();
     s.setCode(BuilderUtil.kbvSectionType("Prescription"));
     s.addEntry(medicationReference);
@@ -130,7 +127,7 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
     return self();
   }
 
-  protected KbvCompositionBuilder title(@NonNull String title) {
+  protected KbvCompositionBuilder title(String title) {
     this.title = title;
     return self();
   }

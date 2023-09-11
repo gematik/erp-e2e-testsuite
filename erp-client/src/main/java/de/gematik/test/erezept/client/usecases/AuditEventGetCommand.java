@@ -16,17 +16,23 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.rest.param.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import java.util.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import java.util.List;
+import java.util.Optional;
+import org.hl7.fhir.r4.model.Resource;
 
 public class AuditEventGetCommand extends BaseCommand<ErxAuditEventBundle> {
 
-  public AuditEventGetCommand(QueryParameter... param) {
+  public AuditEventGetCommand(IQueryParameter... param) {
+    this(List.of(param));
+  }
+  
+  public AuditEventGetCommand(List<IQueryParameter> param) {
     super(ErxAuditEventBundle.class, HttpRequestMethod.GET, "AuditEvent");
-    queryParameters.addAll(List.of(param));
+    queryParameters.addAll(param);
+    headerParameters.put("Accept-Language", "de");
   }
 
   @Override

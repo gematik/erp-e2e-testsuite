@@ -20,11 +20,17 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import net.serenitybdd.screenplay.Question;
 import org.hl7.fhir.r4.model.Resource;
 
-public abstract class FhirResponseQuestion<R extends Resource> implements Question<ErpResponse> {
+public abstract class FhirResponseQuestion<R extends Resource> implements Question<ErpResponse<R>> {
 
-  public abstract Class<R> expectedResponseBody();
+  private final String operationName;
 
-  public abstract String getOperationName();
+  protected FhirResponseQuestion(String operationName) {
+    this.operationName = operationName;
+  }
+
+  public final String getOperationName() {
+    return this.operationName;
+  }
 
   @Override
   public String toString() {

@@ -61,7 +61,7 @@ class DequeStrategyTest {
 
   @Test
   void shouldRemoveFromManagedList() {
-    val managed = new ManagedList<>(new MissingPreconditionError("empty"));
+    val managed = new ManagedList<>(() -> "empty");
     managed.append("first");
     managed.append("second");
 
@@ -74,7 +74,7 @@ class DequeStrategyTest {
 
   @Test
   void failOnRemoveFromEmptyList() {
-    val managed = new ManagedList<>(new MissingPreconditionError("empty"));
+    val managed = new ManagedList<>(() -> "empty");
     val strategies = List.of(FIFO, LIFO);
     strategies.forEach(
         d -> assertThrows(MissingPreconditionError.class, () -> d.removeFrom(managed)));
@@ -82,7 +82,7 @@ class DequeStrategyTest {
 
   @Test
   void shouldChooseLIFOFromManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("missing"));
+    val ml = new ManagedList<String>(() -> "empty");
     ml.append("first");
     ml.append("second");
     val chosen = LIFO.chooseFrom(ml);
@@ -91,7 +91,7 @@ class DequeStrategyTest {
 
   @Test
   void shouldChooseFIFOFromManagedList() {
-    val ml = new ManagedList<String>(new MissingPreconditionError("missing"));
+    val ml = new ManagedList<String>(() -> "empty");
     ml.append("first");
     ml.append("second");
     val chosen = FIFO.chooseFrom(ml);

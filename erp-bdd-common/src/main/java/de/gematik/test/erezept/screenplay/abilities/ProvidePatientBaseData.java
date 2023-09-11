@@ -30,7 +30,7 @@ import net.serenitybdd.screenplay.*;
 
 public class ProvidePatientBaseData implements Ability {
 
-  @Getter @Setter private String kvid;
+  @Getter @Setter private KVNR kvnr;
   private final String firstName;
   private final String lastName;
   private final Date birthDate;
@@ -38,19 +38,20 @@ public class ProvidePatientBaseData implements Ability {
   private final String postal;
   private final String street;
 
-  @Getter private final String iknr;
-  private final String insuranceName;
+  @Getter private String iknr;
+  private String insuranceName;
 
   private AssignerOrganization pkvAssignerOrganization;
 
   private final Wop wop;
 
-  @Getter @Setter private VersicherungsArtDeBasis versicherungsArt;
+  private VersicherungsArtDeBasis patientInsuranceType;
+  private VersicherungsArtDeBasis coverageInsuranceType;
 
   @Setter private ErxConsent erxConsent;
 
-  private ProvidePatientBaseData(String kvid, String firstName, String lastName) {
-    this.kvid = kvid;
+  private ProvidePatientBaseData(KVNR kvnr, String firstName, String lastName) {
+    this.kvnr = kvnr;
     this.firstName = firstName;
     this.lastName = lastName;
     this.birthDate = GemFaker.fakerBirthday();
@@ -58,8 +59,7 @@ public class ProvidePatientBaseData implements Ability {
     this.postal = GemFaker.fakerZipCode();
     this.street = GemFaker.fakerStreetName();
 
-    this.iknr = GemFaker.fakerIknr();
-    this.insuranceName = GemFaker.insuranceName();
+    this.updateInsuranceInfo(this.getCoverageInsuranceType());
     this.wop = GemFaker.fakerValueSet(Wop.class);
   }
 
@@ -67,19 +67,46 @@ public class ProvidePatientBaseData implements Ability {
     return format("{0} {1}", firstName, lastName);
   }
 
+  public VersicherungsArtDeBasis getCoverageInsuranceType() {
+    if (this.coverageInsuranceType == null) {
+      // type of patient and coverage are mostly the same
+      return this.getPatientInsuranceType();
+    } else {
+      // return only if coverage type is divergent from the one of the patient
+      return this.coverageInsuranceType; 
+    }
+  }
+  
+  public void setPatientInsuranceType(VersicherungsArtDeBasis insuranceType) {
+    this.patientInsuranceType = insuranceType;
+    this.updateInsuranceInfo(this.getCoverageInsuranceType());
+  }
+  
+  public void setCoverageInsuranceType(VersicherungsArtDeBasis insuranceType) {
+    this.coverageInsuranceType = insuranceType;
+    this.updateInsuranceInfo(this.getCoverageInsuranceType());
+  }
+  
+  
+  public VersicherungsArtDeBasis getPatientInsuranceType() {
+    return this.patientInsuranceType != null ? this.patientInsuranceType : VersicherungsArtDeBasis.GKV;
+  }
+  
+  private void updateInsuranceInfo(VersicherungsArtDeBasis insuranceType) {
+    val ici = InsuranceCoverageInfo.randomFor(insuranceType);
+    this.iknr = ici.getIknr();
+    this.insuranceName = ici.getName();
+  }
+
   public KbvPatient getPatient() {
-    IdentifierTypeDe identifierTypeDe =
-        (versicherungsArt == VersicherungsArtDeBasis.PKV)
-            ? IdentifierTypeDe.PKV
-            : IdentifierTypeDe.GKV;
     val pb =
         PatientBuilder.builder()
-            .kvIdentifierDe(kvid, identifierTypeDe)
+            .kvnr(kvnr, patientInsuranceType)
             .name(firstName, lastName)
             .birthDate(birthDate)
             .address(Country.D, city, postal, street);
 
-    if (versicherungsArt == VersicherungsArtDeBasis.PKV) {
+    if (patientInsuranceType == VersicherungsArtDeBasis.PKV) {
       if (pkvAssignerOrganization == null) {
         // create Assigner on first call and reuse on later calls to prevent non-deterministic
         // behaviour!
@@ -92,11 +119,12 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public KbvCoverage getInsuranceCoverage() {
+    val coverageType = this.getCoverageInsuranceType();
     return KbvCoverageBuilder.insurance(iknr, insuranceName)
         .beneficiary(this.getPatient())
         .wop(wop)
         .versichertenStatus(VersichertenStatus.MEMBERS)
-        .versicherungsArt(versicherungsArt)
+        .versicherungsArt(coverageType)
         .build();
   }
 
@@ -105,11 +133,11 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public boolean isPKV() {
-    return versicherungsArt == VersicherungsArtDeBasis.PKV;
+    return patientInsuranceType == VersicherungsArtDeBasis.PKV;
   }
 
   public boolean isGKV() {
-    return versicherungsArt == VersicherungsArtDeBasis.GKV;
+    return patientInsuranceType == VersicherungsArtDeBasis.GKV;
   }
 
   public boolean hasRememberedConsent() {
@@ -120,31 +148,31 @@ public class ProvidePatientBaseData implements Ability {
     return Optional.ofNullable(erxConsent);
   }
 
-  public static ProvidePatientBaseData forGkvPatient(String kvid, String name) {
-    return forPatient(kvid, name, VersicherungsArtDeBasis.GKV);
+  public static ProvidePatientBaseData forGkvPatient(KVNR kvnr, String name) {
+    return forPatient(kvnr, name, VersicherungsArtDeBasis.GKV);
   }
 
   public static ProvidePatientBaseData forGkvPatient(
-      String kvid, String givenName, String familyName) {
-    return forPatient(kvid, givenName, familyName, VersicherungsArtDeBasis.GKV);
+          KVNR kvnr, String givenName, String familyName) {
+    return forPatient(kvnr, givenName, familyName, VersicherungsArtDeBasis.GKV);
   }
 
-  public static ProvidePatientBaseData forPkvPatient(String kvid, String fullName) {
-    return forPatient(kvid, fullName, VersicherungsArtDeBasis.PKV);
+  public static ProvidePatientBaseData forPkvPatient(KVNR kvnr, String fullName) {
+    return forPatient(kvnr, fullName, VersicherungsArtDeBasis.PKV);
   }
 
   public static ProvidePatientBaseData forPkvPatient(
-      String kvid, String givenName, String familyName) {
-    return forPatient(kvid, givenName, familyName, VersicherungsArtDeBasis.PKV);
+          KVNR kvnr, String givenName, String familyName) {
+    return forPatient(kvnr, givenName, familyName, VersicherungsArtDeBasis.PKV);
   }
 
   public static ProvidePatientBaseData forPatient(
-      String kvid, String fullName, String versicherungsArt) {
-    return forPatient(kvid, fullName, VersicherungsArtDeBasis.fromCode(versicherungsArt));
+          KVNR kvnr, String fullName, String versicherungsArt) {
+    return forPatient(kvnr, fullName, VersicherungsArtDeBasis.fromCode(versicherungsArt));
   }
 
   public static ProvidePatientBaseData forPatient(
-      String kvid, String fullName, VersicherungsArtDeBasis versicherungsArt) {
+          KVNR kvnr, String fullName, VersicherungsArtDeBasis versicherungsArt) {
     String[] tokens;
     if (fullName != null && fullName.length() > 0) {
       tokens = fullName.split(" "); // split by first and last names
@@ -162,13 +190,13 @@ public class ProvidePatientBaseData implements Ability {
       familyName = GemFaker.fakerLastName();
     }
 
-    return forPatient(kvid, givenName, familyName, versicherungsArt);
+    return forPatient(kvnr, givenName, familyName, versicherungsArt);
   }
 
   public static ProvidePatientBaseData forPatient(
-      String kvid, String firstName, String givenName, VersicherungsArtDeBasis versicherungsArt) {
-    val ret = new ProvidePatientBaseData(kvid, firstName, givenName);
-    ret.setVersicherungsArt(versicherungsArt);
+          KVNR kvnr, String firstName, String givenName, VersicherungsArtDeBasis versicherungsArt) {
+    val ret = new ProvidePatientBaseData(kvnr, firstName, givenName);
+    ret.setPatientInsuranceType(versicherungsArt);
     return ret;
   }
 }

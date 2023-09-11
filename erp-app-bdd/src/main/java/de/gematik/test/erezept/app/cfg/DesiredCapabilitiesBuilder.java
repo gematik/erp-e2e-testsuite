@@ -19,13 +19,20 @@ package de.gematik.test.erezept.app.cfg;
 import static java.text.MessageFormat.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.test.erezept.app.exceptions.MissingRequiredConfigurationException;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.config.dto.app.AppConfiguration;
+import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
+import de.gematik.test.erezept.config.dto.app.DeviceConfiguration;
+import de.gematik.test.erezept.config.exceptions.MissingRequiredConfigurationException;
 import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.MobileCapabilityType;
+import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.thucydides.core.webdriver.MobilePlatform;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 @Slf4j
@@ -33,12 +40,14 @@ public class DesiredCapabilitiesBuilder {
 
   private final DesiredCapabilities caps;
 
-  private DesiredCapabilitiesBuilder() {
+  private DesiredCapabilitiesBuilder(@Nullable String scenarioName) {
     this.caps = new DesiredCapabilities();
     caps.setCapability("gematik:session-override", true);
     caps.setCapability("appium:noReset", false);
     caps.setCapability("appium:fullReset", true);
     caps.setCapability("gematik:instrumentApp", true);
+    if (scenarioName != null)
+      caps.setCapability("testName", scenarioName);
   }
 
   public DesiredCapabilitiesBuilder app(AppConfiguration config) {
@@ -46,11 +55,11 @@ public class DesiredCapabilitiesBuilder {
     caps.setCapability("app", config.getAppFile());
     caps.setCapability("newCommandTimeout", 60 * 5);
 
-    if (config.getPlatformType() == PlatformType.IOS) {
+    if (PlatformType.IOS.is(config.getPlatform())) {
       // not required for Android
       caps.setCapability("appium:appPackage", config.getPackageName());
     }
-    if (config.getPlatformType() == PlatformType.ANDROID) {
+    if (PlatformType.ANDROID.is(config.getPlatform())) {
       // not required for iOS
       if (config.getEspressoServerUniqueName() == null) {
         throw new MissingRequiredConfigurationException(
@@ -64,26 +73,26 @@ public class DesiredCapabilitiesBuilder {
   public DesiredCapabilitiesBuilder device(DeviceConfiguration config) {
     caps.setCapability(MobileCapabilityType.DEVICE_NAME, config.getName());
     caps.setCapability(MobileCapabilityType.UDID, config.getUdid());
-    caps.setCapability("platformVersion", config.getPlatformVersion());
+    caps.setCapability(MobileCapabilityType.PLATFORM_VERSION, config.getPlatformVersion());
     caps.setCapability("appium:enforceAppInstall", config.isEnforceInstall());
 
-    if (config.getPlatformType() == PlatformType.ANDROID) {
-      caps.setCapability("platformName", "Android");
-      caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "espresso");
+    if (PlatformType.ANDROID.is(config.getPlatform())) {
+      caps.setCapability(CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+      caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ESPRESSO);
       caps.setCapability("showGradleLog", true); // will show the log of gradle in Appium
       caps.setCapability("appium:forceEspressoRebuild", false);
       caps.setCapability("appium:espressoBuildConfig", createEspressoBuildConfig());
-    } else if (config.getPlatformType() == PlatformType.IOS) {
-      caps.setCapability("platformName", "iOS");
+    } else if (PlatformType.IOS.is(config.getPlatform())) {
+      caps.setCapability(CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
       caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
     } else {
       log.error(format("Given Platform {0} not yet supported", config.getPlatform()));
-      throw new UnsupportedPlatformException(config.getPlatformType());
+      throw new UnsupportedPlatformException(config.getPlatform());
     }
 
     return this;
   }
-
+  
   public DesiredCapabilitiesBuilder appium(AppiumConfiguration appiumConfiguration) {
     if (appiumConfiguration.getAccessKey() != null
         && !appiumConfiguration.getAccessKey().isEmpty()) {
@@ -119,9 +128,9 @@ public class DesiredCapabilitiesBuilder {
   private static String createEspressoBuildConfig() {
     val mapper = new ObjectMapper();
     val espressoBuildConfig = mapper.createObjectNode();
-    espressoBuildConfig.put("gradle", "7.0.2");
-    espressoBuildConfig.put("kotlin", "1.6.10");
-    espressoBuildConfig.put("compose", "1.1.0-rc01");
+    espressoBuildConfig.put("gradle", "8.1.1");
+    espressoBuildConfig.put("kotlin", "1.8.10");
+    espressoBuildConfig.put("compose", "1.5.0-beta02");
 
     val additionals = mapper.createArrayNode();
     additionals
@@ -164,7 +173,11 @@ public class DesiredCapabilitiesBuilder {
 
      */
 
+  public static DesiredCapabilitiesBuilder initForScenario(String scenarioName) {
+    return new DesiredCapabilitiesBuilder(scenarioName);
+  }
+
   public static DesiredCapabilitiesBuilder init() {
-    return new DesiredCapabilitiesBuilder();
+    return new DesiredCapabilitiesBuilder(null);
   }
 }

@@ -24,6 +24,7 @@ import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
 
 class KbvBasePatientTest extends ParsingTest {
@@ -45,15 +46,30 @@ class KbvBasePatientTest extends ParsingTest {
     val expectedGender = Enumerations.AdministrativeGender.MALE;
     assertEquals(expectedGender, erwin.getGender());
 
-    assertTrue(erwin.hasGkvId());
-    val expectedKvid = "M234567890";
-    assertEquals(expectedKvid, erwin.getKvid().orElseThrow());
+    assertTrue(erwin.hasGkvKvnr());
+    val expectedGkvKvnr = "M234567890";
+    assertEquals(expectedGkvKvnr, erwin.getGkvId().orElseThrow().getValue());
 
-    assertTrue(erwin.hasPkvId());
-    val expectedPkvId = "2345678900";
-    assertEquals(expectedPkvId, erwin.getPkvId().orElseThrow());
+    assertTrue(erwin.hasPkvKvnr());
+    val expectedPkvKvnr = "2345678900";
+    assertEquals(expectedPkvKvnr, erwin.getPkvId().orElseThrow().getValue());
 
     assertEquals("Fleischer, Erwin", erwin.getFullname());
     assertNotNull(erwin.getDescription());
+  }
+
+  @Test
+  void shouldGetKbvPatientFromResource() {
+    val fileExtension = ".xml";
+    val fileName = "erwin_fleischer" + fileExtension;
+
+    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val erwin = parser.decode(content);
+    assertNotNull(erwin);
+    assertEquals(Patient.class, erwin.getClass());
+
+    val kbvPatient = KbvPatient.fromPatient(erwin);
+    assertNotNull(kbvPatient);
+    assertEquals(KbvPatient.class, kbvPatient.getClass());
   }
 }

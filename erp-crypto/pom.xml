@@ -5,11 +5,12 @@
   <parent>
     <artifactId>erezept-testsuite</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>erp-crypto</artifactId>
+  <name>E-Rezept Cryptography</name>
 
   <properties>
     <java.version>${version.java}</java.version>
@@ -22,19 +23,14 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
-      <version>${version.bouncycastle}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcutil-${artefact.bouncycastle}</artifactId>
-      <version>${version.bouncycastle}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-${artefact.bouncycastle}</artifactId>
-      <version>${version.bouncycastle}</version>
     </dependency>
   </dependencies>
-
-
 </project>
