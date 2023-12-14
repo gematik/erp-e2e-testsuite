@@ -1,0 +1,5 @@
+<jaxws:bindings
+  wsdlLocation="../main/resources/gematik_schemes/conn/AuthSignatureService_v7_4_1.wsdl"
+  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+  <jaxws:package name="de.gematik.ws.conn.authsignatureservice.wsdl.v7_4"/>
+</jaxws:bindings>

@@ -1,0 +1,51 @@
+
+== FHIR Profilversionen
+Das E-Rezept hat eine link:https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc[Versionierung der FHIR Profile]. Das bedeutet, dass mit der Zeit unterschiedliche _"Profil Konfigurationen"_ aktiv sind. Um diesem Umstand gerecht zu werden, können E-Rezept FHIR Ressourcen mit unterschiedlichen Profilversionen generiert und validiert werden.
+
+Das Modul `erp-fhir` hat die folgende Konfiguration für die verfügbaren Profile:
+
+[source,yaml]
+----
+include::../../erp-fhir/src/main/resources/parsers.yaml[]
+----
+
+=== FHIR Validierung
+Für die Validierung von E-Rezept FHIR Ressourcen bedarf es keiner gesonderten Konfiguration. Die Version des Profiles ist in der Regel in der Ressource selbst enthalten. Sollte die Ressource keine Versionsangabe enthalten, wird für die Validierung standardmäßig die *älteste* verfügbare (sinngemäß `profileSettings[0]`) Profil-Konfiguration angenommen.
+
+==== Validierungsmodus
+Der FHIR-Validator unterstützt die drei folgenden Validierungs-Modi:
+
+- Der `NORMAL`-Modus entspricht dem Standardmodus von HAPI
+- Der `STRICT`-Modus inkrementiert den Schweregrad für _INFORMATION_- und _WARNING_-Meldungen. Das bedeutet in den konkreten Fällen:
+** eine _INFORMATION_-Meldung wird zu einer _WARNING_-Meldung angehoben
+** eine _WARNING_-Meldung wird zu einer _ERROR_-Meldung angehoben
+** _ERROR_- und _FATAL_-Meldungen bleiben unverändert
+- Der `PEDANTIC`-Modus hebt den Schweregrad _INFORMATION_- und _WARNING_-Meldungen auf eine _ERROR_-Meldung an. _ERROR_- und _FATAL_-Meldungen bleiben weiterhin unverändert
+
+Der Validierungs-Modus kann über die folgenden Möglichkeiten eingestellt werden:
+
+1. **parsers.yaml**: hier kann jedem einzelnen Validator ein eigener Modus mittels `mode: "normal"` eingestellt werden.
+
+2. **System Property**: vor der Ausführung kann mittels `-Derp.fhir.validator.mode=pedantic` eingestellt werden
+
+3. **Umgebungsvariable**: über das Setzen der Umgebungsvariable mittels `export ERP_FHIR_VALIDATOR_MODE=strict` kann der Modus auf dem Host-System permanent eingestellt werden
+
+4. **Default**: wenn nichts explizit definiert wird, laufen alle Validatoren im Modus `NORMAL, indem das HAPI-Ergebnis nicht verändert wird.
+
+
+Die Einstellungen werden dabei von 1 nach 4 abgearbeitet. Das impliziert die folgenden Regeln:
+
+- für die alten Profile ist in der `parsers.yaml` der Modus auf `NORMAL` eingestellt und kann damit weder über die System Property noch über die Umgebungsvariable verändert werden.
+- Wird auf dem Host-System über die Umgebungsvariable ein Modus eingestellt, so kann dieser vor jedem Start weiterhin über die System Property übersteuert werden.
+
+=== FHIR Generierung
+Grundsätzlich wird keine explizite Konfiguration für die Profile benötigt. Als Voreinstellung werden die Profilversionen automatisch aus der Systemzeit und der link:https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc[Versionierung der FHIR Profile] abgeleitet.
+Diese Voreinstellung lässt sich darüber hinaus auf mehreren Wegen umkonfigurieren:
+
+- hartkodiert beim Aufruf der FHIR Ressourcen Builder (optional)
+- Definition einer bestimmten Profilversion über die *System Properties* beim Aufruf z.B. `-Dkbv.ita.erp=1.0.2`
+- Definition einer bestimmten Profilkonfiguration über die *System Properties* beim Aufruf z.B. `-Derp.fhir.profile=1.1.1`
+- Definition einer bestimmten Profilkonfiguration über die *Environment Variablen* vor dem Aufruf z.B. `export ERP_FHIR_PROFILE=1.2.0`
+- Voreinstellung gemäß der Systemzeit
+
+Die Priorität der Konfigurationen nimmt dabei von oben nach unten ab. Das heißt eine hartkodierte Version, sofern angegeben, wird alle anderen Konfigurationen immer überschreiben. Wohingegen die Konfiguration über eine Umgebungsvariable über die System Properties weiter überschrieben werden kann.

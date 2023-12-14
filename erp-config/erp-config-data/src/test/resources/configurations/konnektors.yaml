@@ -1,0 +1,19 @@
+konnektors:
+  - name: KonSim@localhost
+    type: remote
+    profile: KONSIM
+    address: 127.0.0.1:9106
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: WP1
+      userId: user1
+    tls:
+      keyStore: konsim_mandant1_keystore.p12
+      keyStorePassword: "00"
+      trustStore: konsim_truststore.jks
+      trustStorePassword: "gematik"
+
+  - name: Soft-Konn
+    type: local

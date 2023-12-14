@@ -1,0 +1,12 @@
+{
+  "category": "00",
+  "standardSize": "KA",
+  "supplyForm": "BAL",
+  "amount": 1,
+  "pzn": "17260627",
+  "name": "Vitamin C axicur 200 mg - 100 St.",
+  "batch": {
+    "lotNumber": "123123",
+    "expiryDate": "26/02/2024"
+  }
+}

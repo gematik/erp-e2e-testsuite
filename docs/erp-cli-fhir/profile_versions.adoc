@@ -1,0 +1,35 @@
+include::../erp-fhir/profile_versions.adoc[]
+
+=== Profilversionen anzeigen [[list_profiles_cmd]]
+Um die Profilversionen anzuzeigen, kann das Kommando *List Profiles* `lsp` genutzt werden.
+
+Alle verfügbaren Profilkonfigurationen können über `erpf lsp -a` und in einer ausführlichen Version mit den dazugehörenden FHIR Spezifikations-Dateien `erpf lsp -la`
+
+=== Profilversionen konfigurieren
+Um eine bestimmte Profilkonfiguration über die Umgebungsvariable zu definieren wird der folgende Aufruf benötigt:
+
+[source,shell]
+----
+env ERP_FHIR_PROFILE=1.2.0 erpf lsp
+----
+
+Möchte man nun z.B. das _neue Profilset_ nutzen und aus irgendeinem Grund das `de.basisprofil.r4` in der _alten Version_ verwenden, dann kann das über den folgenden Aufruf erreicht werden:
+
+[source,shell]
+----
+env ERP_FHIR_PROFILE=1.2.0 erpf lsp -Dde.basisprofil.r4=0.9.13
+----
+
+[TIP]
+Die Umgebungsvariable für die Profilkonfiguration kann auch einmalig und persistent über `export ERP_FHIR_PROFILE=1.2.0` gesetzt werden
+
+Angenommen, man hat die Profilkonfiguration `1.2.0` über die Umgebungsvariable als Standard gesetzt und möchte nun einen Durchlauf mit der Profilkonfiguration `1.1.1` starten, dann braucht man nicht zwangsläufig die Umgebungsvariable umzudefinieren, sondern kann diesen Wert über die System Property einmalig überschreiben:
+
+[source,shell]
+----
+export ERP_FHIR_PROFILE=1.2.0
+erpf lsp -Derp.fhir.profile=1.1.1
+----
+
+[NOTE]
+Hier wird nur exemplarisch das Kommando `lsp` genutzt, weil hier die Änderungen für den Anwender direkt sichtbar sind. Diese Möglichkeiten der Konfiguration funktionieren analog auch für das `generate` Kommando

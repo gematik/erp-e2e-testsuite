@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: eu.gcr.io/gematik-all-infra-prod/erezept/primsys-nginx
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "6095:80"
+
+  primsys-ru:
+    image: eu.gcr.io/gematik-all-infra-prod/erezept/primsys-rest
+    restart: unless-stopped
+    hostname: primsys-ru
+    environment:
+      - TI_ENV=RU
+      - ERP_FHIR_PROFILE=1.2.0
+    env_file:
+      - .env
+
+
+  primsys-tu:
+    image: eu.gcr.io/gematik-all-infra-prod/erezept/primsys-rest
+    restart: unless-stopped
+    hostname: primsys-tu
+    environment:
+      - TI_ENV=TU
+      - ERP_FHIR_PROFILE=1.2.0
+    env_file:
+      - .env
+
+  primsys-rudev:
+    image: eu.gcr.io/gematik-all-infra-prod/erezept/primsys-rest
+    restart: unless-stopped
+    environment:
+      - TI_ENV=RU-DEV
+      - ERP_FHIR_PROFILE=1.1.1
+    env_file:
+      - .env

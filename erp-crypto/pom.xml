@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>erezept-testsuite</artifactId>
+    <groupId>de.gematik.test.erezept</groupId>
+    <version>0.5.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>erp-crypto</artifactId>
+  <name>E-Rezept Cryptography</name>
+
+  <properties>
+    <java.version>${version.java}</java.version>
+    <maven.compiler.target>${version.java}</maven.compiler.target>
+    <maven.compiler.source>${version.java}</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcutil-${artefact.bouncycastle}</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-${artefact.bouncycastle}</artifactId>
+    </dependency>
+  </dependencies>
+</project>

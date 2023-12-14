@@ -1,0 +1,79 @@
+/*
+ * Copyright 2023 gematik GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.gematik.test.erezept.client.usecases;
+
+import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.QueryParameter;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuilder;
+import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
+import java.util.List;
+import java.util.Optional;
+import org.hl7.fhir.r4.model.Resource;
+
+public class DispenseMedicationCommand extends BaseCommand<ErxReceipt> {
+
+  private final List<ErxMedicationDispense> medicationDispenses;
+
+  public DispenseMedicationCommand(
+      TaskId taskId, Secret secret, ErxMedicationDispense medicationDispense) {
+    this(taskId, secret, List.of(medicationDispense));
+  }
+
+  public DispenseMedicationCommand(
+      TaskId taskId, Secret secret, List<ErxMedicationDispense> medicationDispenses) {
+    super(ErxReceipt.class, HttpRequestMethod.POST, "Task", taskId.getValue());
+    this.medicationDispenses = medicationDispenses;
+
+    // TODO: check if we can/should provide the secret via HTTP-Header  // NOSONAR still needs to be
+    // checked
+    queryParameters.add(new QueryParameter("secret", secret.getValue()));
+  }
+
+  /**
+   * This method returns the last (tailing) part of the URL of the inner-HTTP Request e.g.
+   * /Task/[id] or /Communication?[queryParameter]
+   *
+   * @return the tailing part of the URL which combines to full URL like [baseUrl][tailing Part]
+   */
+  @Override
+  public String getRequestLocator() {
+    return this.getResourcePath() + "/$close" + this.encodeQueryParameters();
+  }
+
+  /**
+   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
+   *
+   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
+   *     is empty
+   */
+  @Override
+  public Optional<Resource> getRequestBody() {
+    Optional<Resource> ret;
+
+    if (medicationDispenses.size() == 1) {
+      ret = Optional.of(medicationDispenses.get(0));
+    } else if (medicationDispenses.size() > 1) {
+      ret = Optional.of(ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build());
+    } else {
+      ret = Optional.empty();
+    }
+    return ret;
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPCHRG-PR-Communication-ChargChangeReply",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
+      "valueString": "Clinical.Request &amp; Response"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
+      "valueCode": "patient"
+    }
+  ],
+  "url": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_Communication_ChargChangeReply",
+  "version": "1.0",
+  "name": "GEM_ERPCHRG_PR_Communication_ChargChangeReply",
+  "title": "Reply on change Request on ChargeItem from pharmacy to Patient",
+  "status": "draft",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "description": "Ressource used for the communication to reply to a change request on a ChargeItem",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "workflow",
+      "uri": "http://hl7.org/fhir/workflow",
+      "name": "Workflow Pattern"
+    },
+    {
+      "identity": "w5",
+      "uri": "http://hl7.org/fhir/fivews",
+      "name": "FiveWs Pattern Mapping"
+    },
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    }
+  ],
+  "kind": "resource",
+  "abstract": true,
+  "type": "Communication",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Communication",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Communication.meta",
+        "path": "Communication.meta",
+        "min": 1
+      },
+      {
+        "id": "Communication.meta.versionId",
+        "path": "Communication.meta.versionId",
+        "max": "0"
+      },
+      {
+        "id": "Communication.meta.source",
+        "path": "Communication.meta.source",
+        "max": "0"
+      },
+      {
+        "id": "Communication.meta.profile",
+        "path": "Communication.meta.profile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_Communication_ChargChangeReply|1.0"
+      },
+      {
+        "id": "Communication.meta.security",
+        "path": "Communication.meta.security",
+        "max": "0"
+      },
+      {
+        "id": "Communication.basedOn",
+        "path": "Communication.basedOn",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_ChargeItem"
+            ],
+            "aggregation": [
+              "referenced"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.basedOn.reference",
+        "path": "Communication.basedOn.reference",
+        "min": 1
+      },
+      {
+        "id": "Communication.status",
+        "path": "Communication.status",
+        "fixedCode": "unknown"
+      },
+      {
+        "id": "Communication.sent",
+        "path": "Communication.sent",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.received",
+        "path": "Communication.received",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.recipient",
+        "path": "Communication.recipient",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Communication.recipient.identifier",
+        "path": "Communication.recipient.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Identifier_PkvID_10",
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.sender",
+        "path": "Communication.sender",
+        "min": 1
+      },
+      {
+        "id": "Communication.sender.identifier",
+        "path": "Communication.sender.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-telematik-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.payload",
+        "path": "Communication.payload",
+        "max": "1"
+      },
+      {
+        "id": "Communication.payload.content[x]",
+        "path": "Communication.payload.content[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      }
+    ]
+  }
+}

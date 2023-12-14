@@ -1,0 +1,13 @@
+
+
+erpClients:
+  - name: "Doc Brown"
+
+    clientId: gematikTestPs
+    clientType: Primärsystem
+    redirectUrl: http://test-ps.gematik.de/erezept
+    discoveryDocumentUrl: http://localhost:8580/auth/realms/idp/.well-known/openid-configuration
+    fdBaseUrl: http://localhost:3000
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    acceptMime: application/fhir+xml
+    sendMime: application/fhir+xml

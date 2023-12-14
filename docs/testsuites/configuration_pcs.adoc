@@ -1,0 +1,60 @@
+=== Individuelle Konfigurationsanpassung
+
+Neben der eigentlich Konfiguration der Testsuite existiert zusätzlich die Möglichkeit diese gezielt zu verändern ohne die Basiskonfiguration ändern zu müssen. Dafür unterstützt die Testsuite das __Partial Configuration Substitution__ über zwei Wege.
+
+==== PCS Files
+
+Die `.pcs`-Files sind spezielle Dateien die im Kontext der E-Rezept Testsuite zum Einsatz kommen. Die Struktur dieser Dateien ist an gewöhnliche `.properties`-Files angelehnt, hat allerdings noch einige zusätzliche Eigenschaften.
+Diese sollen es dem Benutzer erlauben notwendige Änderungen, die in der Konfiguration auf einem bestimmten Rechner immer vorgenommen werden müssen, in eine separate Datei auszulagern. Damit das `.pcs`-File korrekt eingelesen und ausgewertet werden kann, müssen die folgenden Regeln beachtet werden:
+
+1. Die Datei benötigt zwingend die Dateiendung `.pcs`
+2. Die Datei muss im gleichen Pfad mit der `config.yaml` liegen
+3. Die Datei muss den Benutzernamen des aktuellen Benutzers, der die Testsuite ausführt, haben z.B. `user.pcs`
+
+[TIP]
+Unter Linux kommt man in der Regel mit dem Kommando `whoami` an den aktuellen Benutzernamen.
+
+[TIP]
+Hierüber lassen sich z.B. sensible Daten wie Passwörter in das `.pcs`-File auslagern und mittels Git von der Versionierung ausschließen.
+
+Wie bereits erwähnt ist die Syntax der `.pcs`-Files an `.properties`-Files angelehnt.
+Das nachfolgende Beispiel veranschaulicht die drei wesentlichen Features:
+
+[source,properties]
+----
+# change the active Environment always to local on my mashine
+activeEnvironment = local
+
+# let all doctors and pharmacies use the Soft-Konn
+actors.doctors.*.konnektor = Soft-Konn
+actors.pharmacies.*.konnektor = Soft-Konn
+
+# except the doctor with Index 0 should use another Konnektor
+actors.doctors.#0.konnektor = KonSim@localhost
+----
+
+==== System Properties
+
+Zusätzlich zu den `.pcs`-Files gibt es noch die Möglichkeit die Basiskonfiguration über die System Properties zu verändern. Die Substitution über die System Properties kann mit dem `.pcs`-File kombiniert werden. Dabei wird Konfiguration folgendermaßen eingelesen:
+
+1. Basiskonfiguration aus `config.yaml` einlesen
+2. Rechnerspezifische Substitutionen aus `<username>.pcs` auf die Basiskonfiguration anwenden
+3. Substitutionen aus den System Properties auf die Basiskonfiguration anwenden
+
+Die Syntax der Substitutionen über die System Properties ist nahezu identisch zu der des `.pcs`-Files mit einem kleinen Unterschied: die Properties benötigen einen Prefix damit die jeweilige Testsuite die Properties finden und der richtigen Konfiguration zuordnen kann.
+
+Für die {name-primsys-testsuite} und {name-fd-prod-testsuite} lautet der Prefix `erp.primsys` und für die {name-app-testsuite} lautet der Prefix `erp.app`
+
+==== Beispielszenario
+
+Schauen wir uns das folgende Szenario an um das Konzept zu verdeutlichen:
+
+|===
+|*Angenommen* wir haben die Basiskonfiguration in der `config.yaml`
+|*Und* wir haben im selben Pfad `user.pcs` mit Substitutionen aus dem vorherigen Beispiel
+|*Wenn* wir die Testsuite mit dem folgenden Kommando als Benutzer `user` ausführen:
+`user@myhost:~$ java -jar testsuite.jar -Derp.primsys.activeEnvironment=RU -Derp.primsys.actors.doctors.#1.konnektor`
+|*Dann* wird die Testsuite gegen die Testumgebung `RU` ausgeführt
+|*Und* die konfigurierten Ärzte mit den Indizes `0` und `1` benutzen den Konnektor `KonSim@localhost`
+|*Und* alle anderen Ärzte und Apotheken benutzen den Konnektor `Soft-Konn`
+|===

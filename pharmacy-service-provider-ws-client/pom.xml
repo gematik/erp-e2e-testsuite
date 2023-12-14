@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>erezept-testsuite</artifactId>
+        <groupId>de.gematik.test.erezept</groupId>
+        <version>0.5.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>pharmacy-service-provider-ws-client</artifactId>
+    <name>Pharmacy Service Provider Client</name>
+    <description>
+        The PSP-client enables pharmacies to connect to the PSP and subscribe for their alternative assignment messages
+    </description>
+
+    <properties>
+        <java.version>${version.java}</java.version>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
+        <main.class>de.gematik.test.erezept.pspwsclient.Main</main.class>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-config-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.konghq</groupId>
+            <artifactId>unirest-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+    </dependencies>
+    
+</project>

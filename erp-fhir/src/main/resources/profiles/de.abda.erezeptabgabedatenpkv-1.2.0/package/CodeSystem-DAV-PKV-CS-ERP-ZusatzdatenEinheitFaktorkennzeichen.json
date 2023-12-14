@@ -1,0 +1,21 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "DAV_PKV_CS_ERP_ZusatzdatenEinheitFaktorkennzeichen",
+  "id": "DAV-PKV-CS-ERP-ZusatzdatenEinheitFaktorkennzeichen",
+  "version": "1.2",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-ZusatzdatenEinheitFaktorkennzeichen",
+  "concept": [
+    {
+      "code": "11",
+      "display": "Anteil in Promille",
+      "definition": "Kennzeichen für verarbeitete Packungen oder Teilmengen von Packungen, Stoffen, Gefäßen oder für Zuschläge"
+    },
+    {
+      "code": "99",
+      "display": "Anteil einer Packung in Promille (Verwurf)"
+    }
+  ],
+  "count": 2
+}

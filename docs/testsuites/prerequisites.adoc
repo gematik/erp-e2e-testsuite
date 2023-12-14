@@ -1,0 +1,22 @@
+
+== Voraussetzungen [[prerequisites]]
+Um die {name-all-testsuites} auszuführen und einzusetzen müssen zunächst einige Voraussetzungen erfüllt werden.
+
+=== Basisanforderungen [[prerequisites_basics]]
+Bei der Entwicklung der {name-all-testsuites} setzen wir auf {link-serenity-bdd} in Kombination mit Java und Maven:
+
+- link:https://openjdk.org/projects/jdk/17/[Java Development Kit 17]
+- link:https://maven.apache.org/download.cgi[Maven] (idealerweise 3.8.5 und neuer)
+
+=== Integrierte Entwicklungsumgebung [[prerequisites_ide]]
+Sofern man aktiv Code-Änderungen vornehmen möchte oder z.B. <<testsuite_ide_exec,Test-Szenarien über die IntelliJ>> ausführen möchte, werden neben der IDE noch zusätzlich die folgenden Plugins benötigt:
+
+- link:https://plugins.jetbrains.com/plugin/7212-cucumber-for-java[Cucumber for Java]
+- link:https://plugins.jetbrains.com/plugin/9164-gherkin[Gherkin]
+
+=== Infrastruktur [[prerequisites_infrastructure]]
+Wie in der <<introduction,Einleitung>> erwähnt, fokussieren sich die {name-all-testsuites} auf den "oberen Abschnitt der Testpyramide". Das bedeutet, dass eine laufende Instanz des E-Rezept-Fachdienstes - idealerweise in einer Staging-Umgebung der TI - vorausgesetzt wird.
+
+Diese Voraussetzung impliziert, dass die notwendigen Komponenten des E-Rezeptes (z.b. IDP, E-Rezept Fachdienst) von der Testsuite sowohl über die TI als auch über das Internet erreicht werden kann.
+Das muss durch den Anwender sichergestellt werden.
+

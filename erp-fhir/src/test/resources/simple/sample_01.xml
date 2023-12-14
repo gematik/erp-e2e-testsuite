@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<test>
+    <title value="Test-XML-Page"/>
+    <greeting>
+        Hello, World !
+    </greeting>
+</test>

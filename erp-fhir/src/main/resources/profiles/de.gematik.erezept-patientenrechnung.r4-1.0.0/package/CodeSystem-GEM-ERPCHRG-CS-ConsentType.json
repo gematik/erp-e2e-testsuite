@@ -1,0 +1,31 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "draft",
+  "content": "complete",
+  "name": "GEM_ERPCHRG_CS_ConsentType",
+  "id": "GEM-ERPCHRG-CS-ConsentType",
+  "title": "CodeSystem of types for a consent",
+  "description": "Type of patient consent.",
+  "version": "1.0",
+  "url": "https://gematik.de/fhir/erpchrg/CodeSystem/GEM_ERPCHRG_CS_ConsentType",
+  "concept": [
+    {
+      "code": "CHARGCONS",
+      "display": "Consent for saving electronic charge item"
+    }
+  ],
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 1
+}

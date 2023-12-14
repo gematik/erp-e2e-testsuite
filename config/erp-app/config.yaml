@@ -1,0 +1,60 @@
+shouldLogCapabilityStatement: true
+
+users:
+  - name: Alice
+    egkIccsn: 80276883110000115197
+    useVirtualEgk: false
+    device: T-Systems iPhone 14
+  - name: Bob
+    egkIccsn: 80276883110000115202
+    useVirtualEgk: true # won't have any effects because Bob as co-user will always use virtual eGK
+
+apps:
+  - platform: iOS
+#    appFile: cloud:uniqueName=202309181405
+    packageName: de.gematik.erp4ios.eRezept
+  - platform: Android
+    appFile: cloud:uniqueName=debug-tsystems0001
+    espressoServerUniqueName: initialOchestratorTestAPK
+    packageName: de.gematik.ti.erp.app.test
+
+appium:
+  - name: local
+    url: http://0.0.0.0:4723
+  - name: t-systems
+    url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
+    version: 2.0.0
+    maxWaitTimeout: 12000 # how many milliseconds to wait at maximum for an element
+    pollingInterval: 100   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
+    accessKey: DUMMY VALUE
+
+devices:
+  - name: iPhone 14 Pro Max Simulator
+    platform: iOS
+    udid: CF5BE8A7-CBAE-4855-8E29-AFF4CFD45C6D
+    platformVersion: 16.4
+    appium: local
+
+  - name: iPhone 7 Plus Simulator
+    platform: iOS
+    udid: F5209097-BA96-41CC-8D58-D225C9E9CFB9
+    platformVersion: 16.4
+    appium: local
+
+  - name: T-Systems iPhone 7 Plus
+    platform: iOS
+    udid: b849ffff983020c610f1ec495dadd39cb9c828e1
+    platformVersion: 15.7.1
+    appium: t-systems
+
+  - name: T-Systems iPhone 12 Pro
+    platform: iOS
+    udid: 00008101-001469393A91001E
+    platformVersion: 16.1
+    appium: t-systems
+
+  - name: T-Systems iPhone 14
+    platform: iOS
+    udid: 00008110-000249802299401E
+    platformVersion: 16.1
+    appium: t-systems

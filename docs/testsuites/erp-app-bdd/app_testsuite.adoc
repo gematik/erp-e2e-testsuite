@@ -1,0 +1,13 @@
+
+=== App-Testsuite
+Die {name-app-testsuite} fokussiert sich auf die Qualitätssicherung der E-Rezept-Apps.
+
+==== Technologiestack
+Im Wesentlichen setzt die {name-primsys-testsuite} auf den folgenden Technologiestack auf:
+
+- link:https://openjdk.org/projects/jdk/17/[Java 17] mit link:https://maven.apache.org/download.cgi[Maven]
+- {link-serenity-bdd} mit {link-serenity-screenplay}
+- {link-gherkin} mit {link-cucumber}
+- link:https://appium.io/docs/en/2.0/[Appium 2.0]
+
+include::ios_simulator_build.adoc[]

@@ -1,0 +1,83 @@
+
+== Anwendungsfälle
+Nachfolgend werden die gängigsten Anwendungsfälle beschrieben, die mit {APP} umgesetzt werden können.
+
+=== Identitäten anzeigen
+Das {APP} kann nur mit Identitäten arbeiten, für die auch _"virtuelle-eGKs"_ hinterlegt sind.
+Um alle verfügbaren Identitäten auszulesen, bietet sich das `lsp` (list patients) als Sub-Kommando an:
+
+[source,shell]
+----
+erpp lsp
+----
+
+Wird nur die Information zu einer bzw. mehreren bestimmten Identitäten benötigt, bietet `lsp` zusätzliche die folgenden Schalter:
+
+[source,shell]
+----
+erpp lsp --iccsn 80276883110000113311,80276883110000108142 --cert
+----
+
+Weil man in der Regel eher mit KVNRs anstatt mit den ICCSNs der eGKs arbeitet, gibt es zur Filterung es die beiden sich _exklusiv ausschließenden_ Schalter `--iccssn` und `--kvnr`. Der nachfolgende Aufruf führt also entsprechend zu demselben Ergebnis:
+
+[source,shell]
+----
+erpp lsp --kvnr X110406067,X110499478 --cert
+----
+
+=== Umgebungen anzeigen
+Um Informationen über die erreichbaren Umgebungen und deren Konfigurationen abzufragen, dient das Sub-Kommando `lsenv` (list environments)
+
+[source,shell]
+----
+erpp lsenv
+----
+
+Der Umgebungsname (z.B. `TU`) wird in den nachfolgenden Kommandos benötigt, um mittels `--env` die jeweilige Umgebung auszuwählen.
+
+=== E-Rezepte abrufen
+Das {APP} ist in der Lage für eine bestimmte Identität E-Rezepte über das CLI abzurufen und zusammengefasst darzustellen.
+
+Um sämtliche E-Rezepte für eine bestimmte KVNR abzurufen, genügt der folgende Aufruf:
+
+[source,shell]
+----
+erpp prescriptions show --kvnr X110406067
+----
+
+Darüber hinaus können auch die E-Rezepte aus einer bestimmten Umgebung auch gleichzeitig für mehrere KVNRs abgerufen werden:
+
+[source,shell]
+----
+erpp prescriptions show --env TU --kvnr X110406067,X110406067,X110499478
+----
+
+=== E-Rezepte löschen
+Da {APP} die _"virtuellen-eGKs"_ hat, können damit E-Rezepte auch gelöscht werden. Mit dem nachfolgenden Aufruf werden alle _löschbaren_ E-Rezepte für eine bestimmte KVNR in der TU gelöscht:
+
+[source,shell]
+----
+erpp prescriptions delete --env TU --kvnr X110406067
+----
+
+[NOTE]
+Mit _löschbar_ ist gemeint, dass {APP} hier analog zu einem echten FdV über die REST-Schnittstelle mti dem Fachdienst kommuniziert. Der Fachdienst verhindert z.B. dass E-Rezepte, die sich aktuell in der Ausgabe befinden, (Status `in-progress`) gelöscht werden können.
+
+[IMPORTANT]
+Der Fachdienst setzt einen _Paging-Mechanismus_ um. Das hat zur Folge, dass wenn das _Paging_ greift, das {APP} auch nur die Menge löschen wird. Um alle _löschbaren_ E-Rezepte zu löschen, kann es daher nötig sein, die `delete`-Operation mehrfach aufzurufen.
+
+=== Auditevents anzeigen
+Über das folgende Sub-Kommando können die AuditEvents für eine bestimmte KVNR in der TU abgerufen werden:
+
+[source,shell]
+----
+erpp auditevent --env TU --kvnr X110406067
+----
+
+=== ChargeItems anzeigen
+Über das folgende Sub-Kommando können die ChargeItems für eine bestimmte KVNR in der RU abgerufen werden:
+
+[source,shell]
+----
+erpp chargeitems --env RU --kvnr X110488614
+----

@@ -1,0 +1,91 @@
+== cURLs
+Mit diesen cURL aufrufen kann der gesamte Workflow für ein E-Rezept durchlaufen werden. Diese Beispiele dienen lediglich zu Dokumentationszwecken.
+
+[IMPORTANT]
+In sämtlichen nachfolgenden cURL-Aufrufen wird ein Header für den API-Key benötigt. Um die Aufrufe möglichst kurzzuhalten, empfiehlt es sich, den API-Key als Umgebungsvariable unter `$ERPIONE_API_KEY` abzulegen. Diese Umgebungsvariable wird dann auch so direkt von der {name-erpione} nachgenutzt.
+
+=== Akteure abrufen
+In den meisten der nachfolgenden Aufrufe, wird stets ein bestimmter Akteur benötigt, der die Operationen ausführen soll. Jeder Akteur hat eine eigene ID, über die er adressiert werden kann. Um die IDs der Akteure auszulesen, bietet {name-primsys} den Endpunkt `/actors` an:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" https://erpps-test.dev.gematik.solutions/actors | jq
+----
+
+=== E-Rezept ausstellen
+Um ein E-Rezept mit einem bestimmten Arzt auszustellen, bietet {name-primsys} den Endpunkt `/prescribe` an. Dieser Endpunkt erwartet im Request-Body ein JSON-Objekt, woraus der Verordnungsdatensatz dann erstellt wird.
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/doc/6a7f66bc2bb0f4cd76deaa260abbb484/prescribe -d '{"patient": {"kvnr": "K220635158"}, "medication": {"pzn": "00571748"}}' | jq
+----
+
+Alternativ bietet {name-primsys} auch einen XML-Endpunkt `/xml/prescribe` an, der ein KBV-Bundle (als XML) entgegennehmen kann. Dieses KBV-Bundle wird dann nahezu unverändert, signiert und am Fachdienst ausgestellt.
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/xml" https://erpps-test.dev.gematik.solutions/doc/6a7f66bc2bb0f4cd76deaa260abbb484/xml/prescribe -d "@/home/user/kbv_bundle.xml" | jq
+----
+
+[NOTE]
+Der Content-Type-Header ist hier wichtig und muss zwingend zu `application/xml` anstatt `applicathon/json` wie in den meisten anderen Endpunkten abgeändert werden.
+
+=== E-Rezept akzeptieren
+Um ein E-Rezept als Apotheke zu akzeptieren, bietet {name-primsys} den Endpunkt `/accept` an.
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/accept?taskId=<TASK-ID>&ac=<ACCESS-CODE> | jq
+----
+
+=== Akzeptiertes E-Rezept zurückgeben
+Um ein bereits akzeptiertes E-Rezept als Apotheke wieder zurückzugeben, bietet {name-primsys} den Endpunkt `/reject`
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/reject?taskId=<TASK-ID>&ac=<ACCESS-CODE>&secret=<SECRET> | jq
+----
+
+=== Akzeptiertes E-Rezept dispensieren
+Um ein bereits akzeptiertes E-Rezept als Apotheke zu dispensieren, bietet {name-primsys} den Endpunkt `/close` an. Dieser Endpunkt nimmt *optional* einen Body entgegen.
+
+Wird *kein* Body mitgegeben, dann wird das ursprünglich verschriebene Medikament dispensiert:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/close?taskId=<TASK-ID>&ac=<ACCESS-CODE>&secret=<SECRET> | jq
+----
+
+Wird *ein* Body mitgegeben, dann wird ein alternatives Medikament (oder auch mehrere) dispensiert:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/close?taskId=<TASK-ID>&ac=<ACCESS-CODE>&secret=<SECRET> -d '[{"pzn": "17260627", "batch": {"lotNumber": 123123 }}]' | jq
+----
+
+[IMPORTANT]
+Der JSON-Body ist eine Liste von Medikamenten die dispensiert werden sollen. Hier muss also genau darauf geachtet werden, dass der Body innerhalb von `[]` steht, auch wenn nur ein Medikament dispensiert wird.
+
+=== Lokalen Rezept-Speicher abrufen
+Mit {name-primsys} können auch alle E-Rezepte abgerufen werden, die dem Service bekannt sind.
+
+Um *offene* E-Rezepte abzurufen, die über {name-primsys} erstellt wurden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/prescription/prescribed | jq
+----
+
+Um *akzeptierte* E-Rezepte abzurufen, die über {name-primsys} akzeptiert wurden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/prescription/accepted | jq
+----
+
+Um *dispensierte* E-Rezepte abzurufen, die über {name-primsys} dispensiert wurden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/prescription/dispensed | jq
+----

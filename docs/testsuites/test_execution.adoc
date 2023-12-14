@@ -1,0 +1,97 @@
+
+== Testausführung
+Je nach Bedarf und den vorherrschenden Rahmenbedingungen kann die {name-primsys-testsuite} sowohl von einem Entwicklungsrechner mit <<testsuite_maven_exec,Maven>> oder mit der <<testsuite_ide_exec,IDE>> als auch über den <<testsuite_pipeline_exec,Jenkins>> ausgeführt werden.
+
+=== Maven Testausführung [[testsuite_maven_exec]]
+Wenn die <<prerequisites,Voraussetzung>> (insbesondere jene an die <<prerequisites_infrastructure,Infrastruktur-Anbindung>>) gewährleistet sind, dann ist auch eine lokale Testausführung problemlos möglich. Für die Ausführung der {name-all-testsuites} wird das {link-maven-failsafe} verwendet.
+
+Um z.B. die {name-primsys-testsuite} auszuführen, wird der folgende Befehl benötigt:
+
+[source,shell,subs="attributes"]
+----
+mvn verify -f {module-primsys-testsuite}/pom.xml
+----
+
+=== IntelliJ Testausführung [[testsuite_ide_exec]]
+Ähnlich der <<testsuite_maven_exec,Ausführung über Maven>>, können Testszenarien auch direkt über IntelliJ ausgeführt werden. Hierfür müssen zusätzlich noch die <<prerequisites_ide,benötigten Plugins>> installiert sein.
+
+Ein Test-Szenario kann direkt über den _Run Test_-Button (1) aus dem Feature-File ausgeführt werden:
+
+image:ide_run_scenario.png[Run Scenario, align="center"]
+
+Hier hat allerdings {link-serenity-bdd} eine kleine Besonderheit, denn als _Main class_ wird der _Serenity Runner_ `net.serenitybdd.cucumber.cli.Main` benötigt:
+
+image:ide_run_configuration.png[Run Configuration, align="center"]
+
+[TIP]
+Besonders unter Windows kommt es vor, dass Länge der CLI-Anweisung zu lang sein kann. Hier empfiehlt es sich daher immer link:https://blog.jetbrains.com/idea/2017/10/intellij-idea-2017-3-eap-configurable-command-line-shortener-and-more/[command line shortener] zu nutzen, indem man Option _Shorten command line_ auf `@argfile` setzt.
+
+=== Pipeline Testausführung [[testsuite_pipeline_exec]]
+Die einfachste Form der Testausführung ist zweifellos die Ausführung über Jenkins mit der {link-jenkins-bdd-pipeline}. Hierfür werden keine besonderen Anforderungen an den Anwender gestellt, weil die gesamte Testsuite innerhalb der gematik-Infrastruktur auf dem Jenkins ausgeführt wird.
+
+Die Verwendung von {link-jsltuz} und {link-serenity-bdd} zur Ausführung der {name-all-testsuites} ermöglicht nicht nur die effiziente Durchführung von BDD-Tests, sondern legt auch besonderen Fokus auf das erstklassige <<test_reporting,Reporting der Testergebnisse>>.
+
+Die einzige Anforderung an den Benutzer sind gültige gematik-Zugangsdaten, um die {link-jenkins-bdd-pipeline} über den Browser erreichen zu können.
+
+Unter {link-jenkins-bdd-pipeline} erwartet dich zunächst eine link:https://www.jenkins.io/doc/book/pipeline/multibranch/[Multibranch Pipeline]. Das bedeutet, dass du dich hier zunächst für einen link:https://git-scm.com/docs/git-branch[Entwicklungs- bzw. Feature-Branch] entscheiden musst. Der aktuellste stabile Entwicklungsstand der {name-all-testsuites} befindet sich dabei in der Regel auf dem `Development_1.x`-Branch:
+
+image:jenkins_e2e_pipeline_01.png[E-Rezept E2E TestSuites, align="center"]
+
+Auf einem konkret Branch angekommen, musst du nun _Bauen mit Parametern_ ausgewählt werden:
+
+image:jenkins_e2e_pipeline_02.png[E-Rezept E2E TestSuites, align="center"]
+
+[IMPORTANT]
+Wenn du im vorherigen Schritt einen _"frischen Branch"_ ausgewählt hast, dann zeigt Jenkins anstatt _Bauen mit Parametern_ an der Stelle lediglich _Jetzt bauen_ an. Das liegt daran, dass Jenkins die Parameter **noch nicht** kennt. In diesem Fall musst du auf _Jetzt bauen_ klicken und abwarten, bis Jenkins den Branch einmal vollständig ausgecheckt und das Pipeline-Script eingelesen hat. Anschließend sollte _Bauen mit Parametern_ auftauchen.
+
+Nun kommen wir zur eigentlichen Parametrisierung der Pipeline. Im ersten Block können wir die Testsuiten aussuchen, die ausgeführt werden sollen:
+
+image:jenkins_e2e_pipeline_03.png[E-Rezept E2E TestSuites Choice, align="center"]
+
+Im zweiten Block können nun Angaben über das _System Under Test_ (SUT) konfiguriert werden:
+
+image:jenkins_e2e_pipeline_04.png[E-Rezept E2E TestSuites Environment, align="center"]
+
+- `TEST_ENV`: ist selbstsprechend und definiert in welcher Staging-Umgebung der E-Rezept-Fachdienst angesprochen werden soll.
+- `PROFILE_SET` definiert mit welchem Profil-Set die FHIR-Ressourcen für die Requests generiert werden sollen.
+- `DEFAULT_MEDICATION_DISPENSE` sollte in der Regel nicht mehr gesetzt werden, weil die MedicationDispense bereits in allen Staging-Umgebungen in der Version `1.2.0` verwendet werden soll.
+- `SKIP_RESPONSE_VALIDATION`, wenn aktiviert, dann wird FHIR-Validierung der Responses vom Fachdienst deaktiviert. Per Default ist diese immer aktiviert, siehe <<primsys_configuration,PrimSys Konfiguration>>
+- `DUMP_E2E_SCENARIOS` dieser Schalter funktioniert nur mit der {name-primsys-testsuite} und bewirkt, dass die Szenarien strukturiert abgespeichert werden, siehe link:https://github.com/gematik/eRezept-Examples/tree/main/End-to-End-Examples[eRezept-Examples]
+
+Im nächsten Abschnitt werden die auszuführenden Szenarien konfiguriert:
+
+image:jenkins_e2e_pipeline_05.png[E-Rezept E2E TestSuites Scenarios, align="center"]
+
+- `INCLUDE_TAGS` gibt über die link:https://cucumber.io/docs/cucumber/api/?lang=java#tags[Cucumber Tags] an, welche Szenarien ausgeführt werden sollen. Dieser Parameter wird hauptsächlich von der {name-primsys-testsuite} und {name-app-testsuite} ausgewertet. In Confluence haben wir eine grobe Übersicht der verwendeten link:https://wiki.gematik.de/display/TST/@Medical+-+Overview[BDD-Tags]
+- `FUZZING_ITERATIONS` ist nur gültig für die {name-fd-prod-testsuite} und gibt an, wie viele Iterationen bei den link:https://de.wikipedia.org/wiki/Fuzzing[Fuzzing-Testfällen] ausgeführt werden sollen.
+- `CLOSED_SLICING_ACTIVE` ist ebenfalls nur gültig für die {name-fd-prod-testsuite} und gibt an, ob die Testsuite erwartet, dass _Closed Slicing_ auf dem Fachdienst aktiviert ist.
+
+Der Konnektor-Abschnitt hat lediglich einen einzigen Parameter als Drop-Down-Menu:
+
+image:jenkins_e2e_pipeline_06.png[E-Rezept E2E TestSuites Konnektor, align="center"]
+
+Hierüber kann definiert werden, welchen Konnektor die Primärsystem-Akteure verwenden sollen. Diese Option wird von allen Testsuiten ausgewertet.
+
+[IMPORTANT]
+Wenn die Konnektor-Interaktion keine Rolle spielt, sollte stets der `Soft-Konn` verwendet werden. Wird ein anderer Konnektor ausgewählt, so muss vorher sichergestellt werden, dass dieser erreichbar und korrekt konfiguriert ist.
+
+Der vorletzte Abschnitt beschäftigt sich ausschließlich mit der Benachrichtigung und dem Verteilen der generierten Reports per E-Mail:
+
+image:jenkins_e2e_pipeline_07.png[E-Rezept E2E TestSuites Notification, align="center"]
+
+- `NOTIFY` konfiguriert, wer standardmäßig per E-Mail benachrichtigt wird. Über das Drop-Down-Menu werden festgelegte E-Mail-Adressen aus der link:https://gitlab.prod.ccs.gematik.solutions/git/Verwaltung/Entwicklungsumgebung/jenkins-shared-e-mail-library/-/blob/master/vars/getErpE2ETestsuiteEMailList.groovy[E-Mail-Liste] ausgewählt.
+- `ADDITIONAL_RECIPIENTS` kann verwendet werden, um zusätzliche E-Mail-Empfänger in einer komma-separierten Liste einzufügen (z.B. solche die nicht auf der link:https://gitlab.prod.ccs.gematik.solutions/git/Verwaltung/Entwicklungsumgebung/jenkins-shared-e-mail-library/-/blob/master/vars/getErpE2ETestsuiteEMailList.groovy[E-Mail-Liste] stehen)
+- `MAIL_SUBJECT_PREFIX` konfiguriert die E-Mail-Kopfzeile der Benachrichtigung
+- `MAIL_INFO` kann dazu verwendet werden, zusätzliche Informationen über den Testlauf mitzugeben. Dieser Freitext taucht später in der E-Mail-Benachrichtigung auf.
+- `MAIL_ATTACHMENT` aktiviert das Attachment in der E-Mail-Benachrichtigung. Dabei wird der gesamte Serenity-Report als zip-Datei der E-Mail beigefügt.
+
+Und abschließend haben wir im letzten Block noch einige weitere Optionen:
+
+image:jenkins_e2e_pipeline_08.png[E-Rezept E2E TestSuites Others, align="center"]
+
+- `UPLOAD_POLARION` veranlasst die Pipeline die Ergebnisse nach dem Testlauf mit Polarion zu synchronisieren
+- `STORE_REPORT` veranlasst die Pipeline den Serenity-Report nach dem Testlauf persistent im Nexus abzulegen
+- `DEVELOPMENT_BUILD` führt vor der Testausführung ein `mvn clean install` auf das gesamte Projekt aus. Dieser Schalter wird benötigt, wenn Änderungen an Kern-Modulen vorgenommen wurden, die noch nicht im Nexus veröffentlicht sind.
+
+[NOTE]
+Der gesamte letzte Abschnitt sollte für den Anwender normalerweise nicht nötig sein und kann ignoriert werden.

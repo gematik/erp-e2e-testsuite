@@ -1,0 +1,55 @@
+
+profileSettings:
+- id: "1.1.1"
+  note: "old profiles configuration"
+  mode: "normal"
+  profiles:
+    - name: "kbv.ita.erp"
+      version: "1.0.2"
+    - name: "kbv.basis"
+      version: "1.1.3"
+    - name: "dav.kbv.sfhir.cs.vs"
+      version: "1.0.2"
+    - name: "kbv.ita.for"
+      version: "1.0.3"
+    - name: "de.basisprofil.r4"
+      version: "0.9.13"
+    - name: "de.abda.erezeptabgabedatenbasis"
+      version: "1.2.1"
+    - name: "de.gematik.erezept-workflow"
+      version: "1.1.1"
+  errorFilter:
+    - "^Found a reference to a CodeSystem \\(https://gematik.de/fhir/CodeSystem/Documenttype\\) where a ValueSet belongs"
+    - "^Relative URLs must be of the format \\[ResourceName\\]/\\[id\\].*" # known bug on FD see B_FD-139 / ANFERP-1732
+
+    # TODO: still to be reported!
+    #- "^Bundle.id: minimum required = 1.*"
+    - "^Profile reference 'http://hl7.org/fhir/StructureDefinition/Binary\\|4.0.1' has not been checked because it is unknown"
+
+- id: "1.2.0"
+  note: "new profiles configuration"
+  profiles:
+    - name: "kbv.ita.erp"
+      version: "1.1.0"
+    - name: "kbv.basis"
+      version: "1.3.0"
+    - name: "kbv.ita.for"
+      version: "1.1.0"
+    - name: "dav.kbv.sfhir.cs.vs"
+      version: "1.0.3"
+    - name: "de.basisprofil.r4"
+      version: "1.3.2"
+    - name: "de.abda.erezeptabgabedatenbasis"
+      version: "1.3.1"
+    - name: "de.abda.erezeptabgabedatenpkv"
+      version: "1.2.0"
+    - name: "de.gematik.erezept-workflow"
+      version: "1.2.0"
+    - name: "de.gematik.erezept-patientenrechnung"
+      version: "1.0.0"
+  errorFilter:
+    # TODO: still to be reported!
+    - "^Profile reference 'http://hl7.org/fhir/StructureDefinition/Binary\\|4.0.1' has not been checked because it is unknown"
+    - "^Relative URLs must be of the format \\[ResourceName\\]/\\[id\\].*"
+    # this error must be filtered because a ErxMedicationDispense may contain a Medication from old profiles
+    - "^Profile reference 'https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN\\|1.0.2' has not been checked because it is unknown"

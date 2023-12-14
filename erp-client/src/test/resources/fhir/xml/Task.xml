@@ -1,0 +1,36 @@
+<Task xmlns="http://hl7.org/fhir">
+    <id value="vRMYSIwWk8lKLY75NUCS4ULkzdx1npjcWGU5iHaoWCGys0bzHvcinNiRe1DVXw9n"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/StructureDefinition/ErxTask"/>
+    </meta>
+    <extension url="https://gematik.de/fhir/StructureDefinition/PrescriptionType">
+        <valueCoding>
+            <system value="https://gematik.de/fhir/CodeSystem/Flowtype"/>
+            <code value="160"/>
+        </valueCoding>
+    </extension>
+    <identifier>
+        <system value="https://gematik.de/fhir/NamingSystem/PrescriptionID"/>
+        <value value="160.000.000.000.123.76"/>
+    </identifier>
+    <identifier>
+        <system value="https://gematik.de/fhir/NamingSystem/AccessCode"/>
+        <value value="9D77C1AF2EB29937A0B77BE3F5D59C696CE1B5395A4DA04D2574ACAB865545"/>
+    </identifier>
+    <status value="draft"/>
+    <intent value="order"/>
+    <for>
+        <identifier>
+            <system value="http://fhir.de/NamingSystem/gkv/kvid-10"/>
+            <value value="KVNR0123456789"/>
+        </identifier>
+    </for>
+    <authoredOn value="2020-08-26T10:12:58.795828472+00:00"/>
+    <lastModified value="2020-08-26T10:12:58.795853772+00:00"/>
+    <performerType>
+        <coding>
+            <system value="urn:ietf:rfc:3986"/>
+            <code value="urn:oid:1.2.276.0.76.4.54"/>
+        </coding>
+    </performerType>
+</Task>

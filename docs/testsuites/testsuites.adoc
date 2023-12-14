@@ -1,0 +1,10 @@
+
+== Testsuiten [[testsuites_architecture]]
+Die {name-all-testsuites} sind modular aufgebaut und teilen sich einen gemeinsamen und technischen Unterbau.
+
+image:overview.png[Grob-Architektur, align="center"]
+
+include::configuration.adoc[leveloffset=+1]
+include::primsys-bdd/e2e_testsuite.adoc[]
+include::primsys-bdd/prod_testsuite.adoc[]
+include::erp-app-bdd/app_testsuite.adoc[]

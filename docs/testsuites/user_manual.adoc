@@ -1,0 +1,10 @@
+include::../attributes-settings.adoc[]
+
+= E-Rezept-E2E Testsuite : User Manual
+:toc:
+
+include::introduction.adoc[]
+include::prerequisites.adoc[]
+include::testsuites.adoc[]
+include::test_execution.adoc[]
+include::test_reporting.adoc[]

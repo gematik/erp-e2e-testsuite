@@ -1,0 +1,62 @@
+# this config is intended to be used for unit-testing only!!
+
+konnektors:
+  - name: KonSim@localhost
+    type: remote
+    profile: KONSIM
+    address: 127.0.0.1:9106
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: WP1
+      userId: user1
+    tls:
+      keyStore: konsim_mandant1_keystore.p12
+      keyStorePassword: "abc"
+      trustStore: konsim_truststore.jks
+      trustStorePassword: "123"
+
+  - name: Secunet@gwtop279
+    type: remote
+    profile: SECUNET
+    address: 10.11.221.141:80
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+
+  - name: RISE@gwtop381
+    type: remote
+    profile: RISE
+    address: 10.11.221.140:80
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+
+  - name: KOCO@kon7
+    type: remote
+    profile: CGM
+    address: eau.dev.top.local/kon7
+    protocol: https
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    tls:
+      keyStore: kon7_CS1.p12
+      keyStorePassword: "123123"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "123123"
+    basicAuth:
+      username: "user"
+      password: "123123"
+
+  - name: Soft-Konn
+    type: local

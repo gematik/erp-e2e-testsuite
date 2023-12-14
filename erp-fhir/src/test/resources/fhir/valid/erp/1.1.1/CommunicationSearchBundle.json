@@ -1,0 +1,71 @@
+{
+  "id": "f95e85df-5a3d-4f26-8aea-89dc5571cdb2",
+  "type": "searchset",
+  "timestamp": "2023-04-02T23:50:22.500+00:00",
+  "resourceType": "Bundle",
+  "total": 1,
+  "entry": [
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01eba240-f41a-fc60-d658-3e7861273e62",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01eba240-f41a-fc60-d658-3e7861273e62",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/StructureDefinition/ErxCommunicationRepresentative"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.306.676.73/$accept?ac=89e0747c0360a1a25c267bd69b37a51ab930cefa95d80277b58ed28cb0d822de"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/NamingSystem/gkv/kvid-10",
+              "value": "X110465770"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/StructureDefinition/SubstitutionAllowedType",
+                "valueBoolean": true
+              },
+              {
+                "url": "https://gematik.de/fhir/StructureDefinition/PrescriptionType",
+                "valueCoding": {
+                  "system": "https://gematik.de/fhir/CodeSystem/Flowtype",
+                  "code": "160",
+                  "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+                }
+              }
+            ],
+            "contentString": "Einmal wurde Chuck Norris auf Latein beleidigt. Seitdem gilt es als tote Sprache."
+          }
+        ],
+        "sent": "2023-04-02T23:50:21.948+00:00",
+        "sender": {
+          "identifier": {
+            "value": "X110498565",
+            "system": "http://fhir.de/NamingSystem/gkv/kvid-10"
+          }
+        },
+        "received": "2023-04-02T23:50:22.492+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ],
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?received=eqNULL&_sort=-sent"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "de.gematik.erezept-workflow.r4",
+  "version": "1.2.0",
+  "description": "ePrescription workflow specification.\r\nRessources for ePrescription workflow major update 01.07.2023",
+  "author": "gematik",
+  "dependencies": {
+    "kbv.ita.erp": "1.1.0",
+    "kbv.ita.for": "1.1.0",
+    "de.basisprofil.r4": "1.3.2",
+    "hl7.fhir.r4.core": "4.0.1"
+  },
+  "fhirVersions": [
+    "4.0.1"
+  ]
+}

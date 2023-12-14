@@ -1,0 +1,368 @@
+activeEnvironment: TU
+
+preferManualSteps: false
+
+pspClientConfig:
+  url: DUMMY VALUE
+  auth: DUMMY VALUE
+
+actors:
+  doctors:
+    - name: Adelheid Ulmenwald
+      smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
+      hbaIccsn: 80276001011699901501
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Dr. Schraßer
+      smcbIccsn: 80276883110000117369 #Praxis Bloch-Bauer
+      hbaIccsn: 80276883110000095767
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Gündüla Gunther
+      smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
+      hbaIccsn: 80276001081699900578
+      qualificationType: Zahnarzt
+      konnektor: Soft-Konn
+
+    - name: Kein Arzt
+      description: "Akteur mit Apotheker-HBA und Arztpraxis SMC-B der sich als Arzt ausgibt"
+      smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
+      hbaIccsn: 80276883110000121166  # Apotheker Nullmayr
+      algorithm: E256
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Keine Arztpraxis
+      description: "Akteur mit Apotheker-HBA und Apotheken SMC-B der sich als Arzt ausgibt"
+      smcbIccsn: 80276883110000116873 # Apotheke Am Flughafen
+      hbaIccsn: 80276883110000121166  # Apotheker Nullmayr
+      algorithm: E256
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+  pharmacies:
+    - name: Am Flughafen
+      apoVzdName: Apotheke am FlughafenTEST-ONLY
+      smcbIccsn: 80276883110000116873
+      konnektor: Soft-Konn
+
+    - name: NordApotheke  # Apotheke mit abgelaufener SMCB
+      smcbIccsn: 80276883110000092475
+      konnektor: Soft-Konn
+
+    - name: Stadtapotheke
+      smcbIccsn: 80276883110000116872
+      konnektor: Soft-Konn
+
+    - name: Keine Apotheke
+      description: "Apotheke mit der SMC-B einer Arztpraxis"
+      smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
+      konnektor: Soft-Konn
+
+    - name: Am Waldesrand
+      smcbIccsn: 80276001011699900861
+      konnektor: Soft-Konn
+
+    - name: Adelheid Ulmendorfer
+      smcbIccsn: 80276001011699902301
+      konnektor: Soft-Konn
+
+    - name: Bernd Ulmendorfer
+      smcbIccsn: 80276001011699902302
+      konnektor: Soft-Konn
+
+    - name: Christine Ulmendorfer
+      smcbIccsn: 80276001011699902303
+      konnektor: Soft-Konn
+
+  apothecaries:
+    - name: Amanda Albrecht
+      hbaIccsn: 80276001081699900579
+      konnektor: Soft-Konn
+
+    - name: Finn-Louis Nullmayr
+      hbaIccsn: 80276883110000121166
+      algorithm: E256
+      konnektor: Soft-Konn
+
+  patients:
+    - name: Fridolin Straßer
+      egkIccsn: 80276883110000113311
+
+    - name: Hanna Bäcker
+      egkIccsn: 80276883110000108142
+
+    - name: Sina Hüllmann
+      egkIccsn: 80276883110000113298
+
+    - name: Leonie Hütter
+      egkIccsn: 80276883110000113312
+
+    - name: Günther Angermänn
+      egkIccsn: 80276883110000113323
+
+    - name: Aenna Gondern
+      egkIccsn: 80276881040001935352
+
+    - name: Gerda 'kkh' Galle
+      egkIccsn: 80276881025548404901
+
+    - name: Fabian 'GKVI' Krause
+      egkIccsn: 80276882999999992121
+
+    - name: Juliane 'TK' Sommer
+      egkIccsn: 80276881040001935352
+
+    - name: Thomas 'Bitmarck' Gottschalk
+      egkIccsn: 80276883501400000011
+
+    - name: Martha 'ITS Care' Koch
+      egkIccsn: 80276883169999962222
+
+    - name: Maria 'Mobil ISC' Neumann
+      egkIccsn: 80276883309999982341
+
+    - name: Sofia 'Kubus' Herrmann
+      egkIccsn: 80276881299985314267
+
+    - name: Julian 'Arge AOK' Nagelsmann
+      egkIccsn: 80276881129999213224
+
+    - name: Lucius 'ITSC' Fox
+      egkIccsn: 80276882250000100221
+
+environments:
+  - name: TU
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: https://idp-test.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-test.zentral.erp.splitdns.ti-dienste.de
+      subscriptionServiceUrl: wss://subscription-test.zentral.erp.splitdns.ti-dienste.de/subscription
+      userAgent: DUMMY VALUE
+    internet:
+      discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-test.app.ti-dienste.de
+      xapiKey: DUMMY VALUE
+      userAgent: DUMMY VALUE
+
+  - name: RU
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-ref.zentral.erp.splitdns.ti-dienste.de
+      subscriptionServiceUrl: wss://subscription-ref.zentral.erp.splitdns.ti-dienste.de/subscription
+      userAgent: DUMMY VALUE
+    internet:
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-ref.app.ti-dienste.de
+      xapiKey: DUMMY VALUE
+      userAgent: DUMMY VALUE
+
+  - name: RU-DEV
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
+      subscriptionServiceUrl: wss://subscription-dev.zentral.erp.splitdns.ti-dienste.de/subscription
+      userAgent: DUMMY VALUE
+    internet:
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-dev.app.ti-dienste.de
+      xapiKey: DUMMY VALUE
+      userAgent: DUMMY VALUE
+
+  - name: TITUS
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://fd.erezept-instanz1.titus.gematik.solutions
+      subscriptionServiceUrl: wss://subscription.erezept-instanz1.titus.gematik.solutions/subscription  # TODO: needs to be fixed!
+      userAgent: DUMMY VALUE
+    internet:
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-ref.app.ti-dienste.de
+      xapiKey: DUMMY VALUE
+      userAgent: DUMMY VALUE
+
+  - name: LOCAL
+    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+    ti:
+      discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
+      fdBaseUrl: http://127.0.0.1:3000
+      subscriptionServiceUrl: wss://127.0.0.1:3000/subscription
+      userAgent: eRp-Testsuite
+    internet:
+      discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
+      fdBaseUrl: http://127.0.0.1:3000
+      xapiKey: refimpldoesnotcheckanyways==
+      userAgent: eRp-Testsuite
+
+konnektors:
+  - name: KonSim@localhost
+    type: remote
+    profile: KONSIM
+    address: 127.0.0.1:9106
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: WP1
+      userId: user1
+    tls:
+      keyStore: konsim_mandant1_keystore.p12
+      keyStorePassword: "00"
+      trustStore: konsim_truststore.jks
+      trustStorePassword: "gematik"
+
+  - name: Soft-Konn
+    type: local
+    vsdmService:
+      hMacKey: DUMMY VALUE
+      operator: S
+      version: 1
+
+  - name: Secunet@gwtop279
+    type: remote
+    profile: SECUNET
+    address: 10.11.221.141:80
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+
+  - name: RISE@gwtop381
+    type: remote
+    profile: RISE
+    address: 10.11.221.140:80
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    cats:
+
+  - name: KoCo@gwtop381
+    type: remote
+    profile: CGM
+    address: 10.11.221.142:80
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+
+  - name: RISE@gwtop281
+    type: remote
+    profile: RISE
+    address: 10.11.221.143:80
+    protocol: http
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    tls:
+      keyStore: rise_ru_cs1.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "DUMMY VALUE"
+
+  - name: KOCO@kon7
+    type: remote
+    profile: CGM
+    address: gltu1184.mgm1.telematik-test/kon7
+    protocol: https
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    tls:
+      keyStore: kon7_CS1.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "DUMMY VALUE"
+    basicAuth:
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: CT_ID_0000
+        url: https://ksp.ltuzd.telematik-test/kon7/cats
+      - ctId: CT_ID_0001
+        url: https://ksp.ltuzd.telematik-test/kon7/cats2
+
+  - name: RISE@kon8
+    type: remote
+    profile: RISE
+    address: gltu1184.mgm1.telematik-test/kon8
+    protocol: https
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    tls:
+      keyStore: kon8_CS1.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "DUMMY VALUE"
+    basicAuth:
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: 02:42:0A:64:00:03
+        url: https://ksp.ltuzd.telematik-test/kon8/cats
+      - ctId: 02:42:0A:64:00:04
+        url: https://ksp.ltuzd.telematik-test/kon8/cats2
+
+  - name: SECUNET@kon9
+    type: remote
+    profile: SECUNET
+    address: gltu1184.mgm1.telematik-test/kon9
+    protocol: https
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    tls:
+      keyStore: kon9_CS1.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "DUMMY VALUE"
+    basicAuth:
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: daca044c-16df-4f5e-82c6-592d2590040a
+        url: https://ksp.ltuzd.telematik-test/kon9/cats
+      - ctId: 59e0cc5a-89f8-4b68-86df-487b036bb849
+        url: https://ksp.ltuzd.telematik-test/kon9/cats2
+
+  - name: KocoRu@kon19
+    type: remote
+    profile: CGM
+    address: gltu1184.mgm1.telematik-test/kon19
+    protocol: https
+    context:
+      mandantId: m1
+      clientSystemId: cs1
+      workplaceId: ap1
+      userId: user1
+    tls:
+      keyStore: kon19_CS1.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "DUMMY VALUE"
+    basicAuth:
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: CT_ID_0001
+        url: https://ksp.ltuzd.telematik-test/kon19/cats

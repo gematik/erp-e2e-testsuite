@@ -1,0 +1,22 @@
+
+== Installation
+Das Tool `erp-cli-patient` ist aktuell nicht im Docker-Repository verfügbar und muss daher vorerst direkt über das JAR ausgeführt werden.
+
+=== Hilfe
+Dieses User Manual dient als ein Einstiegspunkt und Anleitung um dem Benutzer eine Übersicht über die gängigsten Anwendungsfälle, Kommandos, Argumente und Schalter von {APP} zu vermitteln. Es nicht das Ziel und auch nicht möglich den vollen Umfang mit allen Variationen zu dokumentieren. {APP} nutzt einen Linux-Unterbau und folgt in der Regel auch den Linux-Konventionen für CLI wie z.B. link:https://clig.dev/#guidelines[CLI Guidlines].
+
+Deshalb bietet {APP} zu sämtlichen Kommandos eine Hilfe über das `--help` Flag bzw. Man-Pages über link:https://wiki.ubuntuusers.de/man/[`man`] an. So kann der Benutzer über das folgende Kommando die Man-Page oder die Hilfe für das Haupt-Kommando `erpp` anzeigen lassen:
+
+[source,shell]
+----
+man erpp
+erpp --help
+----
+
+Sämtliche Sub-Kommandos haben ihre eigene Hilfe und auch eigene Man-Pages die folgendermaßen aufgerufen werden können:
+
+[source,shell]
+----
+man erpp lsp
+erpp lsenv --help
+----

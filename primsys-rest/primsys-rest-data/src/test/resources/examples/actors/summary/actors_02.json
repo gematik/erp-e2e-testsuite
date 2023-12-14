@@ -1,0 +1,19 @@
+{
+  "actors": [
+    {
+      "type": "Arzt",
+      "name": "Bernd Claudius",
+      "id": "9a15b6f9f4b8f2e9df1db745a4091bbd"
+    },
+    {
+      "type": "Arzt",
+      "name": "Dr. Schraßer",
+      "id": "5dd78b5f4376fa876b512452b19380a9"
+    },
+    {
+      "type": "Arzt",
+      "name": "Gündüla Gunther",
+      "id": "7980d97ebfd808708c421902157f400a"
+    }
+  ]
+}

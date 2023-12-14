@@ -1,0 +1,29 @@
+{
+  "doctors": 3,
+  "pharmacies": 6,
+  "build": {
+    "hash": "c8fb3a05069641e073b5f8d03d4b2067b3b8a877",
+    "version": "0.5.5",
+    "build-date": "29-09-2023T11:27"
+  },
+  "fhir": {
+    "configured": "1.2.0",
+    "configuration": {
+      "kbv.basis": "1.3.0",
+      "kbv.ita.for": "1.1.0",
+      "de.basisprofil.r4": "1.3.2",
+      "de.gematik.erezept-patientenrechnung": "1.0.0",
+      "de.abda.erezeptabgabedatenpkv": "1.2.0",
+      "de.gematik.erezept-workflow": "1.2.0",
+      "dav.kbv.sfhir.cs.vs": "1.0.3",
+      "kbv.ita.erp": "1.1.0",
+      "de.abda.erezeptabgabedatenbasis": "1.3.1"
+    }
+  },
+  "ti": {
+    "environment": "TU",
+    "fachdienst": "https://erp-test.zentral.erp.splitdns.ti-dienste.de",
+    "discoveryDocument": "https://idp-test.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration",
+    "tsl": "https://download-ref.tsl.ti-dienste.de/ECC/"
+  }
+}

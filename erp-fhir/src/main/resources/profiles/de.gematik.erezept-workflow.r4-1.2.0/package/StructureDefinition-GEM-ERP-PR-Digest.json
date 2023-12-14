@@ -1,0 +1,59 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-Digest",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
+      "valueString": "Foundation.Other"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
+      "valueCode": "not-classified"
+    }
+  ],
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest",
+  "version": "1.2",
+  "name": "GEM_ERP_PR_Digest",
+  "title": "QES-Digest in Binary",
+  "status": "active",
+  "description": "QES-Digest in Binary",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    }
+  ],
+  "kind": "resource",
+  "abstract": false,
+  "type": "Binary",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Binary",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Binary.meta",
+        "path": "Binary.meta",
+        "min": 1
+      },
+      {
+        "id": "Binary.meta.profile",
+        "path": "Binary.meta.profile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"
+      },
+      {
+        "id": "Binary.contentType",
+        "path": "Binary.contentType",
+        "fixedCode": "application/octet-stream"
+      },
+      {
+        "id": "Binary.data",
+        "path": "Binary.data",
+        "min": 1
+      }
+    ]
+  }
+}

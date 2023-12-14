@@ -1,0 +1,25 @@
+{
+  "prescriptionId": "160.000.210.267.466.08",
+  "prescriptionReference": "13052639-2dee-465c-8b5a-0e82d5fd4aca",
+  "forKvnr": "S040464113",
+  "accessCode": "123123123",
+  "secret": "123123123",
+  "insurance": {
+    "insuranceType": "GKV",
+    "iknr": "123",
+    "name": "AOK",
+    "wop": "BERLIN",
+    "insurantState": "MEMBERS",
+    "personGroup": "00"
+  },
+  "medication": {
+    "category": "C_00",
+    "vaccine": false,
+    "standardSize": "N1",
+    "supplyForm": "GPA",
+    "amount": 3,
+    "amountUnit": "Stk",
+    "pzn": "07765007",
+    "name": "NEUPRO 8MG/24H PFT 7 ST"
+  }
+}

@@ -1,0 +1,38 @@
+
+== Test Reporting [[test_reporting]]
+Die {link-serenity-guide-reports} sind ein besonders mächtiges Feature von {link-serenity-bdd}. Sie dienen nicht nur dazu, Testergebnisse zu reporten, sondern auch zu dokumentieren, wie Funktionalitäten getestet werden und wie das SUT funktioniert.
+
+Mit den {link-serenity-guide-reports} sind wir in der Lage unterschiedliche Ziel- und Interessensgruppen zu adressieren. Insbesondere wenn die {name-all-testsuites} über die <<testsuite_pipeline_exec,Jenkins Pipeline>> ausgeführt werden, verteilt die {jsltuz} mehrere Reports über unterschiedliche Kanäle.
+
+Nachfolgend werden die jeweiligen Reports und deren Ziele näher erläutert.
+
+=== Microsoft Teams Benachrichtigung
+Nach jeder Testausführung wird das Testergebnis in einen bestimmten Microsoft Teams Kanal geschrieben.
+
+[NOTE]
+Für die {name-all-testsuites} werden die Reports in aller Regel in den Kanal `eRezept Test` im Team `DEV-Medical` geschrieben.
+
+image:teams_summary.png[MS Teams Summary, align="center"]
+
+Die Idee hinter der _Teams-Notification_ ist eine möglichst große Zielgruppe ohne besondere Einschränkungen. Jeder Interessierte kann sich flexibel den Kanal abonnieren. Der Informationsgehalt ist dabei bewusst klein gehalten um einen schnellen und einfachen Überblick über einen Testlauf (z.B. auf einem mobilen Endgerät) zu bekommen.
+
+=== E-Mail Benachrichtigung
+Zusätzlich wird auch eine _Executive Summary_ der Testergebnisse per E-Mail versendet.
+
+Hier ist der Informationsgehalt schon wesentlich größer und die Zielgruppe auch etwas eingeschränkter.
+
+image:email_summary.png[E-Mail Summary, align="center"]
+
+Die Idee hinter der _E-Mail-Benachrichtigung_ ist eine möglichst fokussierte Zielgruppe von genau definierten Interessenten.
+
+=== Serenity Report
+Die {link-serenity-guide-reports} sind die eigentlich Reports mit sämtlichen Informationen die während der Testausführung gesammelt werden. Wenn bei der <<testsuite_pipeline_exec,Testausführung>> die Option `MAIL_ATTACHMENT` ausgewählt wird, dann wird dieser Report bei der E-Mail-Benachrichtigung angehängt.
+
+Diese Reports sind primär an alle Interessenten aus dem _Team E-Rezept_ gerichtet und bieten detaillierte Informationen über die getesteten Anwendungsfälle.
+
+=== Logging
+Neben den Reports generieren die {name-all-testsuites} auch eine ausführliches Logging, welches nach der Testausführung im Jenkins heruntergeladen werden kann:
+
+image:jenkins_e2e_pipeline_logs.png[Testsuite Logs, align="center"]
+
+Diese technischen Logs sind hauptsächlich für die nachträgliche Fehleranalyse gedacht. Die Analyse der Logs erfordert ein gewisses Grundverständnis der {name-all-testsuites} und adressiert primär Tester und Entwickler die einen tieferen Einblick in die Testausführung benötigen.

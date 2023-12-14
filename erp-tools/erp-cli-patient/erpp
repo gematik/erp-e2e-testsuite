@@ -1,0 +1,36 @@
+#!/usr/bin/env zsh
+
+#
+# Copyright 2023 gematik GmbH
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+JAVA_ARGS=""
+APP_ARGS=""
+
+for arg in "$@"
+do
+  if [[ "$arg" == -D* ]]; then
+    JAVA_ARGS="$JAVA_ARGS $arg"
+  else
+    APP_ARGS="$APP_ARGS $arg"
+  fi
+done
+
+# trim args
+JAVA_ARGS=`echo $JAVA_ARGS | sed -e 's/^[[:space:]]*//'`
+APP_ARGS=`echo $APP_ARGS | sed -e 's/^[[:space:]]*//'`
+JAR_APP=/usr/local/bin/erp-cli-fhir.jar
+
+sh -c "java -Djdk.tls.namedGroups="secp256r1,secp384r1,ffdhe2048,ffdhe3072" $JAVA_ARGS -jar $JAR_APP ${APP_ARGS}"

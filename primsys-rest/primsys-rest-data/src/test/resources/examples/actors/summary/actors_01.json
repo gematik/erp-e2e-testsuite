@@ -1,0 +1,34 @@
+{
+  "actors": [
+    {
+      "type": "Apotheke",
+      "name": "Am Flughafen",
+      "id": "886c6eda7dd5a1c6b1d112907f544d3"
+    },
+    {
+      "type": "Apotheke",
+      "name": "Stadtapotheke",
+      "id": "84b5f179e0451d03ea8c8948f52687b8"
+    },
+    {
+      "type": "Apotheke",
+      "name": "Am Waldesrand",
+      "id": "fd4e63e24aac935e5120ef48cf7440e"
+    },
+    {
+      "type": "Apotheke",
+      "name": "Adelheid Ulmendorfer",
+      "id": "46623098c75eda6ce91bea416e0c6977"
+    },
+    {
+      "type": "Apotheke",
+      "name": "Bernd Ulmendorfer",
+      "id": "aef98e7ae7b222fedeed1bc5166561bd"
+    },
+    {
+      "type": "Apotheke",
+      "name": "Christine Ulmendorfer",
+      "id": "9d393b62c35805b9e516d8ca1ef23285"
+    }
+  ]
+}

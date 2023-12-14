@@ -1,0 +1,94 @@
+package de.gematik.test.erezept.integration.task;
+
+import de.gematik.test.core.ArgumentComposer;
+import de.gematik.test.core.annotations.Actor;
+import de.gematik.test.core.annotations.TestcaseId;
+import de.gematik.test.erezept.ErpTest;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runner.RunWith;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
+
+@Slf4j
+@RunWith(SerenityParameterizedRunner.class)
+@ExtendWith(SerenityJUnit5Extension.class)
+@DisplayName("E-Rezept Verordnung mit verantwortlichem Arzt")
+@Tag("Feature:ResponsibleDoctor")
+@WithTag("Feature:ResponsibleDoctor")
+class ActivateWithResponsablePractitioner extends ErpTest {
+
+  @Actor(name = "Adelheid Ulmenwald")
+  private DoctorActor responsibleDoctor;
+
+  @Actor(name = "Gündüla Gunther")
+  private DoctorActor prescribingDoctor;
+
+  @Actor(name = "Sina Hüllmann")
+  private PatientActor sina;
+
+  @TestcaseId("ERP_TASK_ACTIVATE_RESPONSIBLE_DOC_01")
+  @ParameterizedTest(
+      name =
+          "[{index}] verordnender Arzt in Weiterbildung stellt für einen {0} Patienten ein E-Rezept mit PayorType {1} und einem verantwortlichen Arzt der Profession {2} aus.")
+  @DisplayName(
+      "E-Rezept als verordnender Arzt in Weiterbildung mit verantwortlichen Arzt ausstellen")
+  @MethodSource("responsibleDoctor")
+  void activateWithDoctorInTraining(
+      VersicherungsArtDeBasis insuranceType,
+      PayorType payorType,
+      QualificationType responsibleDoctorType) {
+    sina.changePatientInsuranceType(insuranceType);
+    sina.setPayorType(payorType);
+    prescribingDoctor.changeQualificationType(QualificationType.DOCTOR_IN_TRAINING);
+    responsibleDoctor.changeQualificationType(responsibleDoctorType);
+
+    val issuePrescription =
+        IssuePrescription.forPatient(sina)
+            .withResponsibleDoctor(responsibleDoctor)
+            .ofAssignmentKind(PHARMACY_ONLY)
+            .withRandomKbvBundle();
+    val activation = prescribingDoctor.performs(issuePrescription);
+
+    responsibleDoctor.attemptsTo(
+        Verify.that(activation).withExpectedType().hasResponseWith(returnCode(200)).isCorrect());
+  }
+
+  private static Stream<Arguments> responsibleDoctor() {
+    // Note 05.12.23: Skip PayorType.SKT because currently not possible to build a valid prescription with SKT
+    val payorTypes = new LinkedList<>(List.of(PayorType.UK));
+    payorTypes.add(null); // required to have no payor type!
+    return ArgumentComposer.composeWith()
+        .arguments(QualificationType.DOCTOR)
+        .arguments(QualificationType.DENTIST)
+        .arguments(QualificationType.DOCTOR_AS_REPLACEMENT)
+        .multiply(
+            List.of(
+                VersicherungsArtDeBasis.BG,
+                VersicherungsArtDeBasis.GKV,
+                VersicherungsArtDeBasis.PKV))
+        .multiply(1, payorTypes)
+        .create();
+  }
+}
