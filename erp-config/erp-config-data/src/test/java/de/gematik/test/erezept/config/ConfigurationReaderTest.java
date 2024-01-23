@@ -86,8 +86,9 @@ class ConfigurationReaderTest {
                 .getResource("configurations/app_config.yaml")
                 .getPath());
 
-    val config =assertDoesNotThrow(
-        () -> ConfigurationReader.forAppConfiguration().configFile(templatePath).create());
+    val config =
+        assertDoesNotThrow(
+            () -> ConfigurationReader.forAppConfiguration().configFile(templatePath).create());
     val app = config.getApps().get(0);
     assertEquals(app.getPlatform(), app.getName());
   }

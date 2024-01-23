@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.gematik.test.erezept.app.task.ios;
+
+import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.ScrollDirection;
@@ -22,6 +25,7 @@ import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.smartcard.Algorithm;
 import de.gematik.test.smartcard.Egk;
 import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
+import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +34,6 @@ import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import java.util.Base64;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @RequiredArgsConstructor

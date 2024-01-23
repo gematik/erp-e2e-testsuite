@@ -126,7 +126,7 @@ class RejectUseCaseTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(1);
     val mockClient = pharmacy.getClient();
-    
+
     val mockResponse =
         ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
             .withStatusCode(400)

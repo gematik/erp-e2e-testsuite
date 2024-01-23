@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.*;
-
-import de.gematik.test.erezept.cli.converter.GermanDateConverter;
 import lombok.*;
 import org.junit.jupiter.api.*;
 

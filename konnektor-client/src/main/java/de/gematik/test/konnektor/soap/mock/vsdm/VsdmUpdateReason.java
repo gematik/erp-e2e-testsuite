@@ -16,10 +16,10 @@
 
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.konnektor.exceptions.ParsingUpdateResonException;
 import lombok.Getter;
-
-import static java.text.MessageFormat.format;
 
 public enum VsdmUpdateReason {
   UFS_UPDATE('U', "Update Flag Service (UFS) Anfrage"),

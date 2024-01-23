@@ -16,10 +16,10 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class WopDtoTest {
 
@@ -32,8 +32,9 @@ class WopDtoTest {
     assertEquals(value1, value2);
     assertEquals(WopDto.NORD_WUERTTEMBERG, value3);
   }
+
   @Test
-  void shouldThrowOnNullCode(){
-    assertThrows(NullPointerException.class, ()-> WopDto.fromCode(null));
+  void shouldThrowOnNullCode() {
+    assertThrows(NullPointerException.class, () -> WopDto.fromCode(null));
   }
 }

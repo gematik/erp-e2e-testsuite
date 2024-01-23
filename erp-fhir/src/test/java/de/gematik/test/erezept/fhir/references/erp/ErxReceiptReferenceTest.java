@@ -34,6 +34,7 @@ class ErxReceiptReferenceTest {
 
     assertEquals("Bundle/12345", reference.getReference());
     assertEquals(
-        ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE.getCanonicalUrl(), reference.asReference().getDisplay());
+        ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE.getCanonicalUrl(),
+        reference.asReference().getDisplay());
   }
 }

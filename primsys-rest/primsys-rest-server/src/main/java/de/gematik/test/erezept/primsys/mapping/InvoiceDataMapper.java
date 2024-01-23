@@ -26,32 +26,27 @@ import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.data.PriceComponentData;
+import java.util.List;
 import lombok.val;
 
-import java.util.List;
+public class InvoiceDataMapper extends BaseMapper<InvoiceData> {
 
-import static de.gematik.test.erezept.primsys.mapping.DefaulterChecker.getOrDefault;
+  public InvoiceDataMapper(InvoiceData dto) {
+    super(dto);
+  }
 
-public class InvoiceDataConverter {
-
-  private final InvoiceData invoiceData;
-
-  public InvoiceDataConverter(InvoiceData invoiceData) {
-    this.invoiceData = invoiceData;
+  @Override
+  protected void complete() {
     fakeMissing();
   }
 
-  public InvoiceDataConverter() {
-    this(new InvoiceData());
-  }
-
   public DavInvoice convert() {
-    val priceComponents = invoiceData.getPriceComponents();
+    val priceComponents = dto.getPriceComponents();
     val davInvoiceBuilder =
         DavInvoiceBuilder.builder()
-            .currency(Currency.valueOf(invoiceData.getCurrency()))
+            .currency(Currency.valueOf(dto.getCurrency()))
             .status("issued") // defaultValue
-            .vatRate(invoiceData.getVatRate());
+            .vatRate(dto.getVatRate());
 
     addPriceComponents(davInvoiceBuilder, priceComponents);
     return davInvoiceBuilder.build();
@@ -63,7 +58,7 @@ public class InvoiceDataConverter {
       val inLiItPc =
           PriceComponentBuilder.builder(KostenVersicherterKategorie.fromName(pc.getCategory()))
               .version(AbdaErpPkvVersion.getDefaultVersion())
-              .currency(Currency.valueOf(invoiceData.getCurrency()))
+              .currency(Currency.valueOf(dto.getCurrency()))
               .type(pc.getType().toLowerCase())
               .insurantCost(pc.getInsurantCost())
               .totalCost(pc.getTotalCost())
@@ -74,10 +69,10 @@ public class InvoiceDataConverter {
   }
 
   private void fakeMissing() {
-    this.invoiceData.setCurrency(
-        getOrDefault(this.invoiceData.getCurrency(), String.valueOf(Currency.EUR)));
-    this.invoiceData.setVatRate(getOrDefault(this.invoiceData.getVatRate(), GemFaker::vatRate));
-    var pcs = this.invoiceData.getPriceComponents();
+
+    this.dto.setCurrency(getOrDefault(this.dto.getCurrency(), String.valueOf(Currency.EUR)));
+    this.dto.setVatRate(getOrDefault(this.dto.getVatRate(), GemFaker::vatRate));
+    var pcs = this.dto.getPriceComponents();
     if (pcs.isEmpty()) {
       pcs.add(new PriceComponentData());
     }

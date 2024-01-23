@@ -33,7 +33,7 @@ class KbvPatientTest extends ParsingTest {
 
   private final String BASE_PATH_1_0_2 = "fhir/valid/kbv/1.0.2/bundle/";
   private final String BASE_PATH_1_1_0 = "fhir/valid/kbv/1.1.0/bundle/";
-  
+
   @Test
   void shouldDecodeWithoutExpectedType() {
     val expectedID = "sdf6s75f-d959-43f0-8ac4-sd6f7sd6";
@@ -63,7 +63,7 @@ class KbvPatientTest extends ParsingTest {
     val patient = bundle.getPatient();
     assertEquals("K220635158", patient.getKvnr().getValue());
   }
-  
+
   @Test
   void shouldThrowOnMissingIdentifiers() {
     val expectedID = "sdf6s75f-d959-43f0-8ac4-sd6f7sd6";
@@ -72,9 +72,9 @@ class KbvPatientTest extends ParsingTest {
     val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
     val bundle = parser.decode(KbvErpBundle.class, content);
     val patient = bundle.getPatient();
-    
+
     patient.setIdentifier(List.of()); // remove all identifier
-    
+
     assertThrows(MissingFieldException.class, patient::getKvnr);
     assertThrows(MissingFieldException.class, patient::getInsuranceKind);
   }

@@ -120,13 +120,18 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
             erxChargeItem -> {
               assertTrue(
                   erxChargeItem.getContained().isEmpty(),
-                  "Laut Anpassung der Spec A_23704 - E-Rezept-Fachdienst – Abrechnungsinformation bereitstellen – darf kein AccessCode und Quittung ausgeliefert werden. Diese Informationen könnten im 'Contained' enthalten sein.");
+                  "Laut Anpassung der Spec A_23704 - E-Rezept-Fachdienst – Abrechnungsinformation"
+                      + " bereitstellen – darf kein AccessCode und Quittung ausgeliefert werden."
+                      + " Diese Informationen könnten im 'Contained' enthalten sein.");
               assertTrue(
                   erxChargeItem.getExtension().isEmpty(),
-                  "Laut Anpassung der Spec A_23704 - E-Rezept-Fachdienst – Abrechnungsinformation bereitstellen – darf kein AccessCode und Quittung ausgeliefert werden. Diese Informationen könnten in einer Extension enthalten sein.");
+                  "Laut Anpassung der Spec A_23704 - E-Rezept-Fachdienst – Abrechnungsinformation"
+                      + " bereitstellen – darf kein AccessCode und Quittung ausgeliefert werden."
+                      + " Diese Informationen könnten in einer Extension enthalten sein.");
               assertTrue(
                   erxChargeItem.getAccessCode().isEmpty(),
-                  "Laut Anpassung der Spec A_23704 - E-Rezept-Fachdienst – Abrechnungsinformation bereitstellen – darf kein AccessCode im Identifier ausgeliefert werden");
+                  "Laut Anpassung der Spec A_23704 - E-Rezept-Fachdienst – Abrechnungsinformation"
+                      + " bereitstellen – darf kein AccessCode im Identifier ausgeliefert werden");
             });
   }
 

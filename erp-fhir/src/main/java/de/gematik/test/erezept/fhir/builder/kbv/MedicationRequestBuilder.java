@@ -107,12 +107,11 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
         .hasEmergencyServiceFee(fakerBool())
         .insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build())
         .requester(PractitionerBuilder.faker().build())
-        .medication(KbvErpMedicationBuilder.faker().build())
+        .medication(KbvErpMedicationPZNBuilder.faker().build())
         .substitution(substitution)
         .authoredOn(authoredOn)
         .coPaymentStatus(fakerValueSet(StatusCoPayment.class));
   }
-
 
   /**
    * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
@@ -168,7 +167,8 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     if (status == null) {
       log.warn(
           format(
-              "Given code {0} cannot be converted to a MedicationRequestStatus: using UNKNOWN as default",
+              "Given code {0} cannot be converted to a MedicationRequestStatus: using UNKNOWN as"
+                  + " default",
               code));
       status = MedicationRequest.MedicationRequestStatus.UNKNOWN;
     }
@@ -186,7 +186,8 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     if (intent == null) {
       log.warn(
           format(
-              "Given code {0} cannot be converted to a MedicationRequestIntent: using NULL as default",
+              "Given code {0} cannot be converted to a MedicationRequestIntent: using NULL as"
+                  + " default",
               code));
       intent = MedicationRequest.MedicationRequestIntent.NULL;
     }
@@ -273,7 +274,8 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     if (dispenseRequestQuantity == null) this.quantityPackages(1); // by default 1 package
 
     extensions.add(KbvItaErpStructDef.BVG.asBooleanExtension(bvg));
-    extensions.add(KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.asBooleanExtension(emergencyServiceFee));
+    extensions.add(
+        KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.asBooleanExtension(emergencyServiceFee));
     extensions.add(mvo.asExtension(kbvItaErpVersion));
 
     if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
@@ -296,7 +298,11 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     if (note != null) {
       medReq.addNote().setText(note);
     }
-    setDosageInstruction(medReq);
+    if (this.medicationType == null) {
+      medReq.setSubstitution(substitution);
+    } else {
+      medicationTypeConfig(medReq);
+    }
     medReq
         .setMedication(medicationReference)
         .setSubject(subjectReference)
@@ -306,33 +312,41 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
         .setIntent(requestIntent)
         .setAuthoredOnElement(new DateTimeType(authoredOn, temporalPrecision))
         .setDispenseRequest(dispenseRequestQuantity)
-        .setSubstitution(substitution)
         .setExtension(extensions);
 
     return medReq;
   }
 
   @SuppressWarnings("java:S6205")
-  private void setDosageInstruction(KbvErpMedicationRequest medReq) {
+  private void medicationTypeConfig(KbvErpMedicationRequest medReq) {
     Optional.ofNullable(this.medicationType)
         .ifPresentOrElse(
             mt -> {
               switch (mt) {
                 case INGREDIENT -> {
-                  medReq.setDosageInstruction(List.of(createFlagedDosage())); // tobe adapted
+                  setForIngredient(medReq);
                 }
-                case FREETEXT -> { // NOSONAR tobe adapted for freetext
-                  medReq.setDosageInstruction( // NOSONAR tobe adapted for freetext
-                      List.of(createFlagedDosage())); // NOSONAR tobe adapted for freetext
-                } // NOSONAR tobe adapted for freetext
+                case FREETEXT -> {
+                  medReq
+                      .setDosageInstruction(List.of(createFlagedDosage()))
+                      .setSubstitution(substitution);
+                }
                 case COMPOUNDING -> {
                   val adaptedDosage = new Dosage();
                   adaptedDosage.setPatientInstruction(dosageInstruction);
-                  medReq.setDosageInstruction(List.of(adaptedDosage));
+                  medReq.setDosageInstruction(List.of(adaptedDosage)).setSubstitution(substitution);
                 }
               }
             },
             () -> medReq.setDosageInstruction(List.of(createFlagedDosage())));
+  }
+
+  private void setForIngredient(KbvErpMedicationRequest medReq) {
+    medReq.setDosageInstruction(List.of(createFlagedDosage())); // tobe adapted
+
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+      medReq.setSubstitution(substitution);
+    } // in version 1.1.0 is no substitution allowed if MedicationIngredient is
   }
 
   private Dosage createFlagedDosage() {

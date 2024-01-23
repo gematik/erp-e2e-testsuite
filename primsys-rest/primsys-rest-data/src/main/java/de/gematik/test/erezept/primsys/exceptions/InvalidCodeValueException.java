@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 
 public class InvalidCodeValueException extends RuntimeException {
 
-    public InvalidCodeValueException(Class<?> codeType, String code) {
-        super(format("Given Code {0} cannot be interpreted as {1}", code, codeType.getSimpleName()));
-    }
+  public InvalidCodeValueException(Class<?> codeType, String code) {
+    super(format("Given Code {0} cannot be interpreted as {1}", code, codeType.getSimpleName()));
+  }
 }

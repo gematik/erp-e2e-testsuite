@@ -113,7 +113,8 @@ public class PartialConfigSubstituter {
                     () ->
                         new PcsExpressionException(
                             format(
-                                "Could not find element {0} in configuration: probably the index {1} is out of range",
+                                "Could not find element {0} in configuration: probably the index"
+                                    + " {1} is out of range",
                                 element, idx)));
         nextNodes.add(chosenNode);
       } else if (element.equals("*")) {
@@ -227,7 +228,8 @@ public class PartialConfigSubstituter {
       hostName = InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException e) {
       log.warn(
-          "Could not find name of the machine: possibly desired configuration diff files cannot be used!");
+          "Could not find name of the machine: possibly desired configuration diff files cannot be"
+              + " used!");
       hostName = UUID.randomUUID().toString(); // just return something random!
     }
 

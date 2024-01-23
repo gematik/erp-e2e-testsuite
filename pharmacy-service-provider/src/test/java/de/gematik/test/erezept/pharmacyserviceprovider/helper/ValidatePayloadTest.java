@@ -39,7 +39,11 @@ class ValidatePayloadTest {
       strings = {
         "test body from App",
         "t",
-        "senseless long String without an idea what to write inside because it does not make sense to write something senseless, but a good idea is to try to push all keys at the same time like that: asudzigkughjevfuilgqwe678tdguzb079rhoifweksdcvn 89wquoejedjgfbhasweupq OCERIO/=()q2zwe OPFfgWERZOZOIQUZE IROUZFTw eIWUEHFRUZq3wuzepi IUEWZSGTuzwe iWEGRUZFqw3teoI Eiuzwer  "
+        "senseless long String without an idea what to write inside because it does not make sense"
+            + " to write something senseless, but a good idea is to try to push all keys at the"
+            + " same time like that: asudzigkughjevfuilgqwe678tdguzb079rhoifweksdcvn"
+            + " 89wquoejedjgfbhasweupq OCERIO/=()q2zwe OPFfgWERZOZOIQUZE IROUZFTw"
+            + " eIWUEHFRUZq3wuzepi IUEWZSGTuzwe iWEGRUZFqw3teoI Eiuzwer  "
       })
   void bodyHasContent(String args) {
     byte[] testByteArray = args.getBytes();

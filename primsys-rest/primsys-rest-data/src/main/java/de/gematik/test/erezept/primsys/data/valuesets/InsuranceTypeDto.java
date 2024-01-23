@@ -19,10 +19,9 @@ package de.gematik.test.erezept.primsys.data.valuesets;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Arrays;
 
 /**
  * corresponding to FHIR-ValueSet {@link

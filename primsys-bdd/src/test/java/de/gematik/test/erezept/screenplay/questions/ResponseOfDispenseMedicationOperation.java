@@ -16,11 +16,13 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispenseMedicationCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
@@ -38,16 +40,13 @@ import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.strategy.PrescriptionToDispenseStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.datatable.DataTable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<ErxReceipt> {
@@ -149,7 +148,7 @@ public class ResponseOfDispenseMedicationOperation extends FhirResponseQuestion<
                   "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());
 
           val medication =
-              KbvErpMedicationBuilder.builder()
+              KbvErpMedicationPZNBuilder.builder()
                   .pzn(pzn, name)
                   .amount(amount, unit)
                   .category(MedicationCategory.fromCode(categoryCode))

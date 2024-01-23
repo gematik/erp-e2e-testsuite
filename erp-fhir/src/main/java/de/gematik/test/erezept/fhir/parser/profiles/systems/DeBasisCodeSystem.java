@@ -30,6 +30,7 @@ public enum DeBasisCodeSystem implements ICodeSystem {
   IDENTIFIER_TYPE_DE_BASIS("http://fhir.de/CodeSystem/identifier-type-de-basis"),
   NORMGROESSE("http://fhir.de/CodeSystem/normgroesse"),
   PZN("http://fhir.de/CodeSystem/ifa/pzn"),
+  ASK_CODE("http://fhir.de/CodeSystem/ask"),
   ;
 
   private final String canonicalUrl;

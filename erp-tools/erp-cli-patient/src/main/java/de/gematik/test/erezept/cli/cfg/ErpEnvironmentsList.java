@@ -17,12 +17,11 @@
 package de.gematik.test.erezept.cli.cfg;
 
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class ErpEnvironmentsList {
 
-    private List<EnvironmentConfiguration> environments;
+  private List<EnvironmentConfiguration> environments;
 }

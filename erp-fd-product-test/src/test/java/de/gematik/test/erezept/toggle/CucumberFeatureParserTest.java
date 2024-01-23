@@ -33,7 +33,8 @@ class CucumberFeatureParserTest {
   @Test
   void shouldDeactivatePkvWithCucumberTags() {
     val input =
-        "not @STATUS:InBearbeitung and not @Demo and not @Funktionalität:Abrechnungsinformationen and not @Versicherung:PKV";
+        "not @STATUS:InBearbeitung and not @Demo and not @Funktionalität:Abrechnungsinformationen"
+            + " and not @Versicherung:PKV";
     val cfp = CucumberFeatureParser.fromString(input);
     assertFalse(cfp.isFeatureActive(E2ECucumberTag.INSURANCE_PKV));
   }
@@ -41,7 +42,8 @@ class CucumberFeatureParserTest {
   @Test
   void shouldActivatePkvWithCucumberTags() {
     val input =
-        "not @STATUS:InBearbeitung and not @Demo and not @Funktionalität:Abrechnungsinformationen and @Versicherung:PKV";
+        "not @STATUS:InBearbeitung and not @Demo and not @Funktionalität:Abrechnungsinformationen"
+            + " and @Versicherung:PKV";
     val cfp = CucumberFeatureParser.fromString(input);
     assertTrue(cfp.isFeatureActive(E2ECucumberTag.INSURANCE_PKV));
   }

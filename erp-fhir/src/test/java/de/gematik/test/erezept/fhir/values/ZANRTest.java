@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ZANRTest {
 
@@ -46,7 +46,8 @@ class ZANRTest {
   }
 
   @ParameterizedTest(name = "[{index}]: ZANR {0} is valid")
-  @ValueSource(strings = {"444444401","444444499", "999999900", "555555560", "000000000", "999999991"})
+  @ValueSource(
+      strings = {"444444401", "444444499", "999999900", "555555560", "000000000", "999999991"})
   void additionalNumbersShouldBeValid(String value) {
     val zanr = new ZANR(value);
     assertTrue(zanr.isValid());

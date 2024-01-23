@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.primsys.data.CoverageDto;
 import de.gematik.test.erezept.primsys.data.valuesets.PayorTypeDto;
 import lombok.val;
-import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CoverageDataMapperTest {
 
@@ -40,8 +39,9 @@ class CoverageDataMapperTest {
     assertNotNull(dto.getInsurantState());
     assertNotNull(dto.getPersonGroup());
   }
+
   @Test
-  void shouldCompleteCoverageWithPayorTypeNotNull(){
+  void shouldCompleteCoverageWithPayorTypeNotNull() {
     val dto = CoverageDto.ofType(PayorTypeDto.SKT).build();
     val beneficiary = mock(KbvPatient.class);
     when(beneficiary.getInsuranceKind()).thenReturn(VersicherungsArtDeBasis.GKV);

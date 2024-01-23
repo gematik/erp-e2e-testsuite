@@ -40,7 +40,9 @@ public class ErrorMessageFilter implements IValidatorModule {
       /* Note: comments in json are detected as errors but should be technically valid
       for now we haven't seen @fhir_comments in the wild but only in some rare examples like
       ParserTest.roundtripAllKbvBundles() */
-      List.of("^Unrecognised property '@fhir_comments'.*", "^This module has no support for code system.*'");
+      List.of(
+          "^Unrecognised property '@fhir_comments'.*",
+          "^This module has no support for code system.*'");
 
   private final List<String> ignoreMessages;
 

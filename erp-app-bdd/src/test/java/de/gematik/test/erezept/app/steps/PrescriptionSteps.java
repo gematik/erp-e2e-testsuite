@@ -48,25 +48,29 @@ public class PrescriptionSteps {
   }
 
   @Dann(
-      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte) E-Rezept in der App nicht mehr angezeigt$")
+      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
+          + " E-Rezept in der App nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String patientName, String order, String stack) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
             Ensure.that(
-                "the deleted prescription is gone",
-                    PrescriptionHasGone.fromStack(stack).withDeque(order)).isTrue());
+                    "the deleted prescription is gone",
+                    PrescriptionHasGone.fromStack(stack).withDeque(order))
+                .isTrue());
   }
 
   @Dann(
-      "^wird das (letzte|erste) (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten in der App nicht mehr angezeigt$")
+      "^wird das (letzte|erste) (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten in der"
+          + " App nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String order, String stack) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
         .attemptsTo(
             Ensure.that(
-                "the deleted prescription is gone",
-                    PrescriptionHasGone.fromStack(stack).withDeque(order)).isTrue());
+                    "the deleted prescription is gone",
+                    PrescriptionHasGone.fromStack(stack).withDeque(order))
+                .isTrue());
   }
 
   @Wenn("^(?:der|dem) Versicherten (.+) das (letzte|erste) E-Rezept in der App angezeigt wird$")
@@ -96,7 +100,8 @@ public class PrescriptionSteps {
   }
 
   @Dann(
-      "^wird (?:der|dem) Versicherten (.+) das (letzte|erste) E-Rezept noch für (\\d+) Tage einlösbar angezeigt$")
+      "^wird (?:der|dem) Versicherten (.+) das (letzte|erste) E-Rezept noch für (\\d+) Tage"
+          + " einlösbar angezeigt$")
   public void thenCheckPrescriptionValidity(String patientName, String order, int remainingDays) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -106,9 +111,11 @@ public class PrescriptionSteps {
   }
 
   @Dann(
-      "^wird (?:der|dem) Versicherten das (letzte|erste) E-Rezept noch für (\\d+) Tage einlösbar angezeigt$")
+      "^wird (?:der|dem) Versicherten das (letzte|erste) E-Rezept noch für (\\d+) Tage einlösbar"
+          + " angezeigt$")
   @Und(
-      "^(?:der|dem) Versicherten wird das (letzte|erste) E-Rezept noch für (\\d+) Tage einlösbar angezeigt$")
+      "^(?:der|dem) Versicherten wird das (letzte|erste) E-Rezept noch für (\\d+) Tage einlösbar"
+          + " angezeigt$")
   public void thenCheckPrescriptionValidity(String order, int remainingDays) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)

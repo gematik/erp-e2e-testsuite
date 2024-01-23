@@ -44,7 +44,7 @@ class AcceptBundleVerifierTest {
   void shouldNotInstantiate() {
     assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AcceptBundleVerifier.class));
   }
-  
+
   @Test
   void shouldPassForTaskInProgress() {
     val mockBundle = mock(ErxAcceptBundle.class);
@@ -66,13 +66,13 @@ class AcceptBundleVerifierTest {
     val step = AcceptBundleVerifier.isInProgressStatus();
     assertThrows(AssertionError.class, () -> step.apply(mockBundle));
   }
-  
+
   @ParameterizedTest(name = "AcceptBundle is expected to have consent = {0}")
   @ValueSource(booleans = {true, false})
   void shouldPassWhenHasConsent(boolean shouldHave) {
     val mockBundle = mock(ErxAcceptBundle.class);
     when(mockBundle.hasConsent()).thenReturn(shouldHave);
-    
+
     val step = AcceptBundleVerifier.consentIsPresent(shouldHave);
     step.apply(mockBundle);
   }

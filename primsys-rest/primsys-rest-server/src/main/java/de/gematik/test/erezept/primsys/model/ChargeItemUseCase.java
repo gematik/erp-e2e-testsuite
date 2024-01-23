@@ -40,7 +40,7 @@ import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.ChargeItemDto;
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
-import de.gematik.test.erezept.primsys.mapping.InvoiceDataConverter;
+import de.gematik.test.erezept.primsys.mapping.InvoiceDataMapper;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.core.Response;
@@ -111,9 +111,9 @@ public class ChargeItemUseCase {
   private DavInvoice createDavInvoice(@Nullable InvoiceData invoiceData) {
     DavInvoice davInvoice;
     if (invoiceData == null) {
-      davInvoice = new InvoiceDataConverter().convert();
+      davInvoice = new InvoiceDataMapper(new InvoiceData()).convert();
     } else {
-      davInvoice = new InvoiceDataConverter(invoiceData).convert();
+      davInvoice = new InvoiceDataMapper(invoiceData).convert();
     }
     return davInvoice;
   }

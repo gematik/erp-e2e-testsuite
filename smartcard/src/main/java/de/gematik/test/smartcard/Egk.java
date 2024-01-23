@@ -17,6 +17,8 @@
 package de.gematik.test.smartcard;
 
 import de.gematik.test.erezept.crypto.certificate.Oid;
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -25,9 +27,6 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.encoders.Base64;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -51,7 +50,8 @@ public class Egk extends Smartcard {
       val asn1Sequence = ASN1Sequence.getInstance(asn1Object);
       val encapsulated = ASN1OctetString.getInstance(asn1Sequence.getObjectAt(2));
       val encapsulatedAsn1Sequence = ASN1Sequence.getInstance(encapsulated.getOctets());
-      val encapsulatedPrivateKey = ASN1OctetString.getInstance(encapsulatedAsn1Sequence.getObjectAt(1));
+      val encapsulatedPrivateKey =
+          ASN1OctetString.getInstance(encapsulatedAsn1Sequence.getObjectAt(1));
       pkBase64 = Base64.toBase64String(encapsulatedPrivateKey.getOctets());
     }
 

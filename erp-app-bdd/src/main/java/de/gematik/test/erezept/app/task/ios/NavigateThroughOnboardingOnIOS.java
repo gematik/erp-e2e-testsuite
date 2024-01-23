@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.gematik.test.erezept.app.task.ios;
 
 import static de.gematik.test.erezept.app.mobile.OnboardingScreen.*;
@@ -40,7 +41,7 @@ public class NavigateThroughOnboardingOnIOS implements Task {
     return Instrumented.instanceOf(NavigateThroughOnboardingOnIOS.class)
         .withProperties(onboardingScreen);
   }
-  
+
   public static NavigateThroughOnboardingOnIOS entirely() {
     return toScreen(FINISH_ALL);
   }
@@ -70,15 +71,14 @@ public class NavigateThroughOnboardingOnIOS implements Task {
     if (onboardingScreen.getiOSOrdinal() >= ANALYTICS_SCREEN.getiOSOrdinal()) {
       app.tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
       app.tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
-      
-      // no need to ask both elements separately because they always appear together 
+
+      // no need to ask both elements separately because they always appear together
       if (app.isDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON)) {
         app.tap(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON);
         app.tap(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON);
       }
     }
 
-    if (onboardingScreen.getiOSOrdinal() >= FINISH_ALL.getiOSOrdinal())
-      app.removeTooltips();
+    if (onboardingScreen.getiOSOrdinal() >= FINISH_ALL.getiOSOrdinal()) app.removeTooltips();
   }
 }

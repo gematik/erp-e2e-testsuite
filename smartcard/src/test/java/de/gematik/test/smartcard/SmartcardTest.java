@@ -21,10 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
 import java.util.List;
 import java.util.Optional;
-
-import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

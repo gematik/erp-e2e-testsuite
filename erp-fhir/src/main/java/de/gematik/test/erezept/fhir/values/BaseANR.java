@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
 import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
@@ -27,17 +29,14 @@ import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import static java.text.MessageFormat.format;
 
 public abstract class BaseANR implements WithChecksum {
 
@@ -167,8 +166,7 @@ public abstract class BaseANR implements WithChecksum {
       case DOCTOR, DOCTOR_AS_REPLACEMENT, DOCTOR_IN_TRAINING -> LANR.random();
       case DENTIST -> ZANR.random();
       case MIDWIFE -> throw new IllegalArgumentException(
-              format("Profession midwife do not have an ANR"));
-
+          format("Profession midwife do not have an ANR"));
     };
   }
 

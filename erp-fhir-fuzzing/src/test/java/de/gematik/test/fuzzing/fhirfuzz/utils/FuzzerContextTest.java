@@ -16,66 +16,62 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.utils;
 
-import lombok.val;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.RepeatedTest;
-
 import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
+
 class FuzzerContextTest {
-    static FuzzerContext fuzzerContext;
+  static FuzzerContext fuzzerContext;
 
+  @BeforeAll
+  static void setup() {
+    FuzzConfig fuzzConfig = new FuzzConfig();
+    fuzzConfig.setPercentOfEach(100.00F);
+    fuzzConfig.setPercentOfEach(100.00f);
+    fuzzerContext = new FuzzerContext(fuzzConfig);
+  }
 
-    @BeforeAll
-    static void setup() {
-        FuzzConfig fuzzConfig = new FuzzConfig();
-        fuzzConfig.setPercentOfEach(100.00F);
-        fuzzConfig.setPercentOfEach(100.00f);
-        fuzzerContext = new FuzzerContext(fuzzConfig);
+  @RepeatedTest(REPETITIONS)
+  void generateFakeLong() {
+    assertNotNull(fuzzerContext.generateFakeLong());
+    assertTrue(fuzzerContext.generateFakeLong() >= 0L);
+
+    // dateTimeType.get
+  }
+
+  @RepeatedTest(REPETITIONS)
+  void conditionalChance() {
+    var res = fuzzerContext.conditionalChance(100.0f);
+    assertTrue(res);
+    var res2 = fuzzerContext.conditionalChance(0.0f);
+    assertFalse(res2);
+  }
+
+  @RepeatedTest(REPETITIONS)
+  void shouldGetRandomConf() {
+    FuzzConfig fuzzConfig = FuzzConfig.getRandom();
+    assertNotNull(fuzzerContext);
+    assertNotNull(fuzzConfig.toString());
+  }
+
+  @RepeatedTest(REPETITIONS)
+  void testRandom() {
+    int counter = 0;
+    for (int i = 0; i < 10000; i++) {
+      val res = (int) fuzzerContext.getRandom().nextFloat(2f);
+      if (res > 0) counter++;
     }
+    assertTrue(counter > 3000);
+    assertTrue(counter < 7000);
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void generateFakeLong() {
-        assertNotNull(fuzzerContext.generateFakeLong());
-        assertTrue(fuzzerContext.generateFakeLong() >= 0L);
-
-        //dateTimeType.get
-    }
-
-
-    @RepeatedTest(REPETITIONS)
-    void conditionalChance() {
-        var res = fuzzerContext.conditionalChance(100.0f);
-        assertTrue(res);
-        var res2 = fuzzerContext.conditionalChance(0.0f);
-        assertFalse(res2);
-
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void shouldGetRandomConf() {
-        FuzzConfig fuzzConfig = FuzzConfig.getRandom();
-        assertNotNull(fuzzerContext);
-        assertNotNull(fuzzConfig.toString());
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void testRandom() {
-        int counter = 0;
-        for (int i = 0; i < 10000; i++) {
-            val res = (int) fuzzerContext.getRandom().nextFloat(2f);
-            if (res > 0) counter++;
-        }
-        assertTrue(counter > 3000);
-        assertTrue(counter < 7000);
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void shouldGetRandomTime() {
-        assertNotNull(fuzzerContext.getRandomDate());
-
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldGetRandomTime() {
+    assertNotNull(fuzzerContext.getRandomDate());
+  }
 }

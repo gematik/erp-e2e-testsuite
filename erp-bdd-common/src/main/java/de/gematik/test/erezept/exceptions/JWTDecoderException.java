@@ -19,11 +19,11 @@ package de.gematik.test.erezept.exceptions;
 import static java.text.MessageFormat.format;
 
 public class JWTDecoderException extends RuntimeException {
-    public JWTDecoderException(String token) {
-        super(format("Given input {0} is not a valid JWT", token));
-    }
+  public JWTDecoderException(String token) {
+    super(format("Given input {0} is not a valid JWT", token));
+  }
 
-    public JWTDecoderException(String token, Exception parent) {
-        super(format("Given input {0} is not a valid JWT: produced {1}", token, parent.getMessage()));
-    }
+  public JWTDecoderException(String token, Exception parent) {
+    super(format("Given input {0} is not a valid JWT: produced {1}", token, parent.getMessage()));
+  }
 }

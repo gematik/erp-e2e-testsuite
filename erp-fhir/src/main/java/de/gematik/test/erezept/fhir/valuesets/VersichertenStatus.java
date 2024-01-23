@@ -34,7 +34,9 @@ public enum VersichertenStatus implements IValueSet {
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.VERSICHERTEN_STATUS;
   public static final String VERSION = "1.02";
   public static final String DESCRIPTION =
-      "Versichertenstatus gibt an, ob ein Versicherter ein Familienversicherter, Mitglied oder Rentner ist. Auf der KVK ist diese Angabe Teil des Feldes VERSICHERTENSTATUS - die 1. Stelle.";
+      "Versichertenstatus gibt an, ob ein Versicherter ein Familienversicherter, Mitglied oder"
+          + " Rentner ist. Auf der KVK ist diese Angabe Teil des Feldes VERSICHERTENSTATUS - die 1."
+          + " Stelle.";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
 
   private final String code;

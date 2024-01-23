@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.primsys.rest.response;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
-
-import java.util.Optional;
-
-import static java.text.MessageFormat.format;
 
 public class ErrorResponseBuilder {
 

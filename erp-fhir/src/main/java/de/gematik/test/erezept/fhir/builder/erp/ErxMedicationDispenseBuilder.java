@@ -16,8 +16,12 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
@@ -29,18 +33,13 @@ import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.toggle.FeatureConfiguration;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class ErxMedicationDispenseBuilder
@@ -67,20 +66,20 @@ public class ErxMedicationDispenseBuilder
       this.erpWorkflowVersion = ErpWorkflowVersion.V1_2_0;
     }
   }
-  
+
   public static ErxMedicationDispenseBuilder faker(
-          KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
+      KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
     return faker(kvnr, performerId, PZN.random().getValue(), prescriptionId);
   }
 
   public static ErxMedicationDispenseBuilder faker(
-          KVNR kvnr, String performerId, String pzn, PrescriptionId prescriptionId) {
+      KVNR kvnr, String performerId, String pzn, PrescriptionId prescriptionId) {
     // Note: the KbvItaErpVersion must be set here because we are using ErpWorkflowVersion.V1_2_0 by
     // default
     return faker(
-            kvnr,
+        kvnr,
         performerId,
-        KbvErpMedicationBuilder.faker(pzn).version(KbvItaErpVersion.getDefaultVersion()).build(),
+        KbvErpMedicationPZNBuilder.faker(pzn).version(KbvItaErpVersion.getDefaultVersion()).build(),
         prescriptionId);
   }
 
@@ -188,7 +187,9 @@ public class ErxMedicationDispenseBuilder
       prescriptionIdentifier =
           this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
       subjectIdentifier =
-          new Identifier().setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl()).setValue(kvnr.getValue());
+          new Identifier()
+              .setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl())
+              .setValue(kvnr.getValue());
       performerRef
           .getIdentifier()
           .setSystem(ErpWorkflowNamingSystem.TELEMATIK_ID.getCanonicalUrl())

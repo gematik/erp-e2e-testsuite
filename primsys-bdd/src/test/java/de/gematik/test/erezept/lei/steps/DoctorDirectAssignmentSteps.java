@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.task.IssuePrescription;
 import de.gematik.test.erezept.screenplay.task.Negate;
@@ -25,9 +28,6 @@ import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 public class DoctorDirectAssignmentSteps {
 
@@ -39,7 +39,8 @@ public class DoctorDirectAssignmentSteps {
    * @param medications ist die Liste der Medikamente, die der Arzt dem Patienten ausstellt
    */
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende(?:s)? Medikament(?:e)? verschreibt und der Apotheke (.+) direkt zuweist:$")
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende(?:s)? Medikament(?:e)?"
+          + " verschreibt und der Apotheke (.+) direkt zuweist:$")
   public void whenIssueDirectAssignmentPrescriptionToActor(
       String docName, String patientName, String pharmacyName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -55,7 +56,8 @@ public class DoctorDirectAssignmentSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) folgende(?:s)? Medikament(?:e)? verschreibt und der Apotheke (.+) direkt zuweist:$")
+      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) folgende(?:s)? Medikament(?:e)?"
+          + " verschreibt und der Apotheke (.+) direkt zuweist:$")
   public void whenIssueDirectAssignmentPrescriptionToActor(
       String patientName, String pharmacyName, DataTable medications) {
     val theDoctor = OnStage.theActorInTheSpotlight();
@@ -71,7 +73,8 @@ public class DoctorDirectAssignmentSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) ein Medikament verschreibt und der Apotheke (.+) direkt zuweist$")
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) ein Medikament verschreibt und"
+          + " der Apotheke (.+) direkt zuweist$")
   public void whenIssueSingleRandomDirectAssignmentPrescriptionToActor(
       String docName, String patientName, String pharmacyName) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -87,7 +90,8 @@ public class DoctorDirectAssignmentSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) ein Medikament verschreibt und der Apotheke (.+) direkt zuweist$")
+      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) ein Medikament verschreibt und der"
+          + " Apotheke (.+) direkt zuweist$")
   public void whenIssueSingleRandomDirectAssignmentPrescriptionToActor(
       String patientName, String pharmacyName) {
     val theDoctor = OnStage.theActorInTheSpotlight();
@@ -103,7 +107,8 @@ public class DoctorDirectAssignmentSteps {
   }
 
   @Dann(
-      "^darf (?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) das folgende E-Rezept nicht verschreiben und der Apotheke (.+) direkt zuweisen:$")
+      "^darf (?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) das folgende E-Rezept nicht"
+          + " verschreiben und der Apotheke (.+) direkt zuweisen:$")
   public void thenIssueDirectAssignmentPrescriptionToActorNotAllowed(
       String docName, String patientName, String pharmacyName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);

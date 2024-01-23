@@ -48,6 +48,7 @@ import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -58,7 +59,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 
 class PrescriptionTests {
-  
+
   private UseTheErpClient erpClient;
   private String userName;
 
@@ -67,7 +68,7 @@ class PrescriptionTests {
     OnStage.setTheStage(new Cast() {});
     val app = mock(UseIOSApp.class);
     when(app.getPlatformType()).thenReturn(PlatformType.IOS);
-    
+
     erpClient = mock(UseTheErpClient.class);
 
     userName = GemFaker.fakerName();
@@ -101,7 +102,7 @@ class PrescriptionTests {
     when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
     when(kbvBundle.getMedicationName()).thenReturn("Schmerzmittel");
     when(kbvBundle.isMultiple()).thenReturn(false);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(prescriptionBundle.getTask()).thenReturn(task);
     when(kbvBundle.getMedication()).thenReturn(medication);
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
@@ -109,15 +110,15 @@ class PrescriptionTests {
     when(medicationRequest.isMultiple()).thenReturn(false);
     when(kbvBundle.isMultiple()).thenReturn(false);
     val taskGetResponse =
-            ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-                    .withHeaders(Map.of())
-                    .withStatusCode(200)
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
+            .withHeaders(Map.of())
+            .withStatusCode(200)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(taskGetResponse);
 
     val firstPrescription = WebElementMockFactory.createRedeemablePrescription();
     val secondPrescription = WebElementMockFactory.createRedeemablePrescription();
-    
+
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getWebElements(Mainscreen.PRESCRIPTION_LIST_ELEMENT_STATUS))
         .thenReturn(List.of(firstPrescription, secondPrescription));

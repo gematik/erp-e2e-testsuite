@@ -18,15 +18,14 @@ package de.gematik.test.konnektor.soap.mock.vsdm;
 
 import de.gematik.test.konnektor.exceptions.InvalidKeyLengthException;
 import de.gematik.test.konnektor.exceptions.ParsingUpdateResonException;
-import lombok.*;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.KeyParameter;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
+import lombok.*;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -62,33 +61,38 @@ public class VsdmChecksum {
   public static VsdmChecksum parse(String checksumAsBase64) throws ParsingUpdateResonException {
     val checksum = Base64.getDecoder().decode(checksumAsBase64.getBytes(StandardCharsets.UTF_8));
     val kvnr = new String(copyByteArrayFrom(checksum, 0, 10), StandardCharsets.UTF_8);
-    val timestamp = Instant.ofEpochSecond(Long.parseLong(new String(copyByteArrayFrom(checksum, 10, 20), StandardCharsets.UTF_8)));
+    val timestamp =
+        Instant.ofEpochSecond(
+            Long.parseLong(
+                new String(copyByteArrayFrom(checksum, 10, 20), StandardCharsets.UTF_8)));
     val reason = VsdmUpdateReason.fromChecksum(copyCharFrom(checksum, 20));
     val identifier = copyCharFrom(checksum, 21);
     val version = copyCharFrom(checksum, 22);
     return VsdmChecksum.builder(kvnr)
-            .timestamp(timestamp)
-            .updateReason(reason)
-            .identifier(identifier)
-            .version(version)
-            .build();
+        .timestamp(timestamp)
+        .updateReason(reason)
+        .identifier(identifier)
+        .version(version)
+        .build();
   }
 
-  private static byte[] copyByteArrayFrom(byte[] data, int from, int to) throws ParsingUpdateResonException {
+  private static byte[] copyByteArrayFrom(byte[] data, int from, int to)
+      throws ParsingUpdateResonException {
     try {
       return Arrays.copyOfRange(data, from, to);
-    } catch(ArrayIndexOutOfBoundsException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
       throw new ParsingUpdateResonException(data, from, to);
     }
   }
 
   private static char copyCharFrom(byte[] data, int pos) throws ParsingUpdateResonException {
     try {
-     return (char) data[pos];
-    } catch(ArrayIndexOutOfBoundsException e) {
+      return (char) data[pos];
+    } catch (ArrayIndexOutOfBoundsException e) {
       throw new ParsingUpdateResonException(data, pos);
     }
   }
+
   /**
    * The method generate a checksum encode as base64. The checksum contains the first 24 bytes of
    * the signature, which contains a HMac hash (SHA256) over the fields 1 to 5

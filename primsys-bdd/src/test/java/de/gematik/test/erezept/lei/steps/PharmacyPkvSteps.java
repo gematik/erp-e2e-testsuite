@@ -43,7 +43,8 @@ public class PharmacyPkvSteps {
    *     Abrechnungsdatensatz erstellt werden soll
    */
   @Wenn(
-      "^die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept die PKV-Abrechnungsinformationen bereitstellt$")
+      "^die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept die"
+          + " PKV-Abrechnungsinformationen bereitstellt$")
   public void whenPharmacySignsWithSmcbAndPostsChargeItem(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy)
@@ -54,7 +55,8 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine PKV-Abrechnungsinformationen bereitstellen, weil keine Einwilligung vorliegt$")
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine"
+          + " PKV-Abrechnungsinformationen bereitstellen, weil keine Einwilligung vorliegt$")
   public void thenCannotPostChargeItem403(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy)
@@ -65,7 +67,8 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine PKV-Abrechnungsinformationen bereitstellen, weil es kein PKV-Rezept ist$")
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine"
+          + " PKV-Abrechnungsinformationen bereitstellen, weil es kein PKV-Rezept ist$")
   public void thenCannotPostChargeItem400(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy)
@@ -76,7 +79,8 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine PKV-Abrechnungsinformationen bereitstellen, weil der Task nicht mehr existiert$")
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine"
+          + " PKV-Abrechnungsinformationen bereitstellen, weil der Task nicht mehr existiert$")
   public void thenCannotPostChargeItemFromDispensed409(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
 
@@ -88,7 +92,8 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) akzeptierte E-Rezept (?:noch) keine PKV-Abrechnungsinformationen bereitstellen, weil der Task noch nicht quittiert ist$")
+      "^kann die Apotheke (.+) für das (letzte|erste) akzeptierte E-Rezept (?:noch) keine"
+          + " PKV-Abrechnungsinformationen bereitstellen, weil der Task noch nicht quittiert ist$")
   public void thenCannotPostChargeItemForAccepted409(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
 
@@ -100,9 +105,11 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept (?:erstmalig ändern|ändern)$")
+      "^kann die Apotheke (.+) den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das"
+          + " dispensierte E-Rezept (?:erstmalig ändern|ändern)$")
   @Und(
-      "^die Apotheke (.+) den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept (?:erstmalig ändert|ändert)$")
+      "^die Apotheke (.+) den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das"
+          + " dispensierte E-Rezept (?:erstmalig ändert|ändert)$")
   public void thenChargeItemCanBeChanged(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -113,9 +120,13 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept nicht (?:erneut ändern|ändern), (?:weil sie kein Recht dazu hat|weil der Datensatz bereits geändert wurde)$")
+      "^kann die Apotheke (.+) den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das"
+          + " dispensierte E-Rezept nicht (?:erneut ändern|ändern), (?:weil sie kein Recht dazu"
+          + " hat|weil der Datensatz bereits geändert wurde)$")
   @Und(
-      "^die Apotheke (.+) kann den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das dispensierte E-Rezept nicht (?:erneut ändern|ändern), (?:weil sie kein Recht dazu hat|weil der Datensatz bereits geändert wurde)$")
+      "^die Apotheke (.+) kann den (letzten|ersten) autorisierten PKV-Abgabedatensatz für das"
+          + " dispensierte E-Rezept nicht (?:erneut ändern|ändern), (?:weil sie kein Recht dazu"
+          + " hat|weil der Datensatz bereits geändert wurde)$")
   public void andThenCannotChangeChargeItem403(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -126,9 +137,11 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die (letzten|ersten) berechtigten PKV-Abrechnungsinformationen vom Fachdienst abrufen$")
+      "^kann die Apotheke (.+) die (letzten|ersten) berechtigten PKV-Abrechnungsinformationen vom"
+          + " Fachdienst abrufen$")
   @Wenn(
-      "^die Apotheke (.+) die (letzten|ersten) berechtigten PKV-Abrechnungsinformationen vom Fachdienst abruft$")
+      "^die Apotheke (.+) die (letzten|ersten) berechtigten PKV-Abrechnungsinformationen vom"
+          + " Fachdienst abruft$")
   public void andWhenThenPharmacyGetsChargeItemBundle(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -136,7 +149,9 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept den PKV-Abrechnungsinformationen nicht mit einem falschen AccessCode vom Fachdienst abrufen$")
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept den"
+          + " PKV-Abrechnungsinformationen nicht mit einem falschen AccessCode vom Fachdienst"
+          + " abrufen$")
   public void thenPharmacyCannotGetChargeItemWithWrongAccessCode(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -149,7 +164,9 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept den PKV-Abrechnungsinformationen nicht mit dem falschen AccessCode (.+) vom Fachdienst abrufen$")
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept den"
+          + " PKV-Abrechnungsinformationen nicht mit dem falschen AccessCode (.+) vom Fachdienst"
+          + " abrufen$")
   public void thenPharmacyCannotGetChargeItemWithWrongAccessCode(
       String pharmName, String order, String accessCode) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -163,7 +180,8 @@ public class PharmacyPkvSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine PKV-Abrechnungsinformationen mit dem falschen Secret (.+) bereitstellen$")
+      "^kann die Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept keine"
+          + " PKV-Abrechnungsinformationen mit dem falschen Secret (.+) bereitstellen$")
   public void thenCannotPostChargeItemWithWrongSecret(
       String pharmName, String order, String wrongSecret) {
     val thePharmacy = OnStage.theActorCalled(pharmName);

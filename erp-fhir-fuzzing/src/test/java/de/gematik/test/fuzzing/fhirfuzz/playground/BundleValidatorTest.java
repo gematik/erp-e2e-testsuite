@@ -68,10 +68,12 @@ public class BundleValidatorTest extends ParsingTest {
   @SneakyThrows
   @SuppressWarnings("java:S6300")
   public static void writeStringUsingBufferedWriter(String bundle, Path dir, String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Path.of(dir.toAbsolutePath().toString(), fileName).toFile()))) {
-            writer.write(bundle);
-        }
+    try (BufferedWriter writer =
+        new BufferedWriter(
+            new FileWriter(Path.of(dir.toAbsolutePath().toString(), fileName).toFile()))) {
+      writer.write(bundle);
     }
+  }
 
   @BeforeEach
   void prepareTestList() {
@@ -121,7 +123,7 @@ public class BundleValidatorTest extends ParsingTest {
     }
 
     val bundle = parser.decode(stringBundle2, EncodingType.XML);
-    val result = ValidatorUtil.encodeAndValidate(parser, bundle, true);
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
 
     val emptyTargetDir = Path.of(System.getProperty("user.dir"), "target", "tmp", "out");
     emptyTargetDir.toFile().mkdirs();
@@ -133,22 +135,20 @@ public class BundleValidatorTest extends ParsingTest {
         writeStringUsingBufferedWriter(
             b, emptyTargetDir, format("Run_{0}_xmlFuzzedBundle{1}.xml", counter2Save, false));
       }
-        }
-
     }
+  }
 
-    private void getBundleFromXML(String stringXMLBundle) throws IllegalArgumentException {
-        Bundle bundle;
-        if (stringXMLBundle == null
-                || stringXMLBundle.length() < 5) {
-            throw new IllegalArgumentException("given XML String is no valid Bundle");
-        } else if (!fhirParser.isValid(stringXMLBundle)) {
-            val validResult = fhirParser.validate(stringXMLBundle);
-            if (!validResult.isSuccessful()) {
-                log.info(validResult.toString());
-                invalidBundleList.add(stringXMLBundle);
-                counter++;
-            }
-        }
+  private void getBundleFromXML(String stringXMLBundle) throws IllegalArgumentException {
+    Bundle bundle;
+    if (stringXMLBundle == null || stringXMLBundle.length() < 5) {
+      throw new IllegalArgumentException("given XML String is no valid Bundle");
+    } else if (!fhirParser.isValid(stringXMLBundle)) {
+      val validResult = fhirParser.validate(stringXMLBundle);
+      if (!validResult.isSuccessful()) {
+        log.info(validResult.toString());
+        invalidBundleList.add(stringXMLBundle);
+        counter++;
+      }
     }
+  }
 }

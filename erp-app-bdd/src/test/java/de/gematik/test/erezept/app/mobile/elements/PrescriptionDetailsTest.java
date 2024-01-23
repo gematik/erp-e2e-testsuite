@@ -33,7 +33,8 @@ class PrescriptionDetailsTest {
     assertEquals(
         element.getIosLocator().get(),
         By.xpath(
-            "(//XCUIElementTypeAlert[@name='Das Rezept ist gerade in Bearbeitung durch eine Apotheke und kann nicht gelöscht werden.'])"));
+            "(//XCUIElementTypeAlert[@name='Das Rezept ist gerade in Bearbeitung durch eine"
+                + " Apotheke und kann nicht gelöscht werden.'])"));
     assertNull(element.getAndroidLocator().get());
   }
 

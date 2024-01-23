@@ -43,8 +43,7 @@ public class ErxPrescriptionBundle extends Bundle {
                 new MissingFieldException(ErxPrescriptionBundle.class, ErpWorkflowStructDef.TASK));
   }
 
-  // TODO: KbvErpBundle is not always included!! make return Optional
-  public KbvErpBundle getKbvBundle() {
+  public Optional<KbvErpBundle> getKbvBundle() {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Bundle))
@@ -54,10 +53,7 @@ public class ErxPrescriptionBundle extends Bundle {
                     .map(PrimitiveType::getValue)
                     .anyMatch(KbvItaErpStructDef.BUNDLE::match))
         .map(KbvErpBundle.class::cast)
-        .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(ErxPrescriptionBundle.class, KbvItaErpStructDef.BUNDLE));
+        .findFirst();
   }
 
   /**

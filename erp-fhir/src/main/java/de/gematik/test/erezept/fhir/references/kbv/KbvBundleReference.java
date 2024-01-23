@@ -28,13 +28,15 @@ public class KbvBundleReference extends CustomReferenceProvider {
   private static final String DISPLAY_VALUE = "E-Rezept";
   private static final IWithSystem STRUCTURE_DEFINITION = KbvItaErpStructDef.BUNDLE;
 
-  
   public KbvBundleReference(String referenceValue) {
-      super(referenceValue);
+    super(referenceValue);
   }
 
   @Override
   public Reference asReference() {
-    return new Reference().setDisplay(DISPLAY_VALUE).setReference(this.referenceValue).setType(STRUCTURE_DEFINITION.getCanonicalUrl());
+    return new Reference()
+        .setDisplay(DISPLAY_VALUE)
+        .setReference(this.referenceValue)
+        .setType(STRUCTURE_DEFINITION.getCanonicalUrl());
   }
 }

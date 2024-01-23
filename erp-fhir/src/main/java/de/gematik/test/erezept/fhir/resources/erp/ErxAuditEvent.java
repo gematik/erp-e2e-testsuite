@@ -46,7 +46,8 @@ public class ErxAuditEvent extends AuditEvent {
         "{agentName} hat mit Ihrer eGK die Liste der offenen E-Rezepte abgerufen.",
         AuditEventAction.R),
     PHARMACY_GET_TASK_UNSUCCESSFUL(
-        "{agentName} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.",
+        "{agentName} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit"
+            + " Ihrer eGK abrufen.",
         AuditEventAction.R);
 
     private final String text;

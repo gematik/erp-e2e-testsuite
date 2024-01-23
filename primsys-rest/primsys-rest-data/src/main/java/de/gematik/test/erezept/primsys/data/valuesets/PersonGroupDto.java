@@ -36,13 +36,16 @@ public enum PersonGroupDto {
   ASY("09", "ASY");
 
   private final String code;
-  @JsonValue
-  private final String display;
+  @JsonValue private final String display;
 
   @JsonCreator
   public static PersonGroupDto fromCode(@NonNull String code) {
     return Arrays.stream(PersonGroupDto.values())
-        .filter(it -> it.getCode().equals(code) || it.name().equalsIgnoreCase(code) || it.getDisplay().equalsIgnoreCase(code))
+        .filter(
+            it ->
+                it.getCode().equals(code)
+                    || it.name().equalsIgnoreCase(code)
+                    || it.getDisplay().equalsIgnoreCase(code))
         .findFirst()
         .orElseThrow(() -> new InvalidCodeValueException(PersonGroupDto.class, code));
   }

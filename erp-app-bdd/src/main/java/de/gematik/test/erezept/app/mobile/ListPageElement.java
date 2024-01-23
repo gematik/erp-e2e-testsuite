@@ -23,11 +23,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class ListPageElement {
-    
-    private final PageElement pageElement;
-    private final int index;
 
-    public static ListPageElement forElement(PageElement pageElement, int index) {
-        return new ListPageElement(pageElement, index);
-    }
+  private final PageElement pageElement;
+  private final int index;
+
+  public static ListPageElement forElement(PageElement pageElement, int index) {
+    return new ListPageElement(pageElement, index);
+  }
 }

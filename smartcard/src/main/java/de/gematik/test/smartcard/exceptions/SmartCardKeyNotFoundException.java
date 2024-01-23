@@ -16,13 +16,12 @@
 
 package de.gematik.test.smartcard.exceptions;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.crypto.certificate.Oid;
 import de.gematik.test.smartcard.Algorithm;
 import de.gematik.test.smartcard.Smartcard;
-
 import java.util.List;
-
-import static java.text.MessageFormat.format;
 
 public class SmartCardKeyNotFoundException extends RuntimeException {
 
@@ -33,7 +32,7 @@ public class SmartCardKeyNotFoundException extends RuntimeException {
   public SmartCardKeyNotFoundException(Smartcard smartcard) {
     this(smartcard, smartcard.getAutOids());
   }
-  
+
   public SmartCardKeyNotFoundException(Smartcard smartcard, List<Oid> oids) {
     super(format("Key with {0} not found for {1}", oids, smartcard));
   }
@@ -41,5 +40,4 @@ public class SmartCardKeyNotFoundException extends RuntimeException {
   public SmartCardKeyNotFoundException(Smartcard smartcard, Oid oid, Algorithm crypto) {
     this(smartcard, List.of(oid), crypto);
   }
-
 }

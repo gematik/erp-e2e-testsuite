@@ -34,7 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SerenityJUnit5Extension.class)
 class UsedSessionKVNRTest {
-  
+
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
@@ -44,7 +44,7 @@ class UsedSessionKVNRTest {
   void tearDown() {
     OnStage.drawTheCurtain();
   }
-  
+
   @Test
   void shouldDetectAvailableKVNR() {
     val app = mock(UseIOSApp.class);

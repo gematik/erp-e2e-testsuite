@@ -32,7 +32,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
@@ -86,7 +86,7 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
@@ -130,7 +130,7 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
@@ -168,7 +168,7 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
@@ -209,7 +209,7 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()

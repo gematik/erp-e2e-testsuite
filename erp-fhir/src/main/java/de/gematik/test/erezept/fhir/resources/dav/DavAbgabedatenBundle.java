@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.fhir.resources.dav;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
@@ -26,6 +28,7 @@ import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -33,10 +36,6 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-
-import java.util.List;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @Getter
@@ -77,13 +76,16 @@ public class DavAbgabedatenBundle extends Bundle implements ErpFhirResource {
                 org.getIdentifier().stream()
                     .anyMatch(
                         identifier ->
-                            identifier.getSystem().equals(DeBasisNamingSystem.IKNR.getCanonicalUrl())
+                            identifier
+                                    .getSystem()
+                                    .equals(DeBasisNamingSystem.IKNR.getCanonicalUrl())
                                 || identifier
                                     .getSystem()
                                     .equals(DeBasisNamingSystem.IKNR_SID.getCanonicalUrl())))
         .map(PharmacyOrganization::fromOrganization)
         .findAny()
-        .orElseThrow(() -> new MissingFieldException(PharmacyOrganization.class,DeBasisNamingSystem.IKNR));
+        .orElseThrow(
+            () -> new MissingFieldException(PharmacyOrganization.class, DeBasisNamingSystem.IKNR));
   }
 
   public DavDispensedMedication getDispensedMedication() {
@@ -150,7 +152,8 @@ public class DavAbgabedatenBundle extends Bundle implements ErpFhirResource {
     val pharmacyName = this.getPharmacy().getName();
     val vat = this.getInvoice().getVAT();
     return format(
-        "{0} für das E-Rezept {1} mit der PZN {2} im Gesamtwert von {3} {6} (Selbstbeteiligung: {4} {6}) inkl. MwSt {7}% durch die {5}",
+        "{0} für das E-Rezept {1} mit der PZN {2} im Gesamtwert von {3} {6} (Selbstbeteiligung: {4}"
+            + " {6}) inkl. MwSt {7}% durch die {5}",
         type, prescriptionId, pzn, totalPrice, insurantPrice, pharmacyName, currency, vat);
   }
 }

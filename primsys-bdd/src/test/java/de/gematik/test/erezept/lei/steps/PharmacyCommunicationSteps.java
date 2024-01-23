@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.questions.HasNewSubscriptionPing;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfGetCommunicationFrom;
@@ -27,9 +30,6 @@ import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 public class PharmacyCommunicationSteps {
 
@@ -86,7 +86,8 @@ public class PharmacyCommunicationSteps {
   }
 
   @Dann(
-      "^kann (.+) die (letzte|erste) Nachricht von (.+) nicht beantworten, weil sie keine Apotheke ist$")
+      "^kann (.+) die (letzte|erste) Nachricht von (.+) nicht beantworten, weil sie keine Apotheke"
+          + " ist$")
   public void whenPharmacyCannotAnswersToMessage(
       String pharmName, String order, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -103,7 +104,8 @@ public class PharmacyCommunicationSteps {
   }
 
   @Wenn(
-      "^die Apotheke (.+) die (letzte|erste) Nachricht (?:der|des) Versicherten (.+) mit dem Änderungswunsch empfängt und beantwortet$")
+      "^die Apotheke (.+) die (letzte|erste) Nachricht (?:der|des) Versicherten (.+) mit dem"
+          + " Änderungswunsch empfängt und beantwortet$")
   public void whenReceiveAndAnswerChargeChangeReq(
       String pharmName, String order, String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -119,7 +121,8 @@ public class PharmacyCommunicationSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die (letzte|erste) Nachricht von (.+) nicht abrufen, weil die Nachricht bereits gelöscht wurde$")
+      "^kann die Apotheke (.+) die (letzte|erste) Nachricht von (.+) nicht abrufen, weil die"
+          + " Nachricht bereits gelöscht wurde$")
   public void thenCannotGetCommunicationFrom(String pharmName, String order, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);

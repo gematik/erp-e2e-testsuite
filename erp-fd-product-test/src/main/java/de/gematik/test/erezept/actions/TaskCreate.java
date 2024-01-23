@@ -58,13 +58,16 @@ public class TaskCreate extends ErpAction<ErxTask> {
 
     public TaskCreate ofAssignmentKind(PrescriptionAssignmentKind kind) {
       /*
-        When PayorType is given, WorkflowTypes 200/209 MUST NOT be used even for PKV.
-        Therefor, even for PKV patients with PayorType WorkflowTypes 160/169 MUST be used
-       */
+       When PayorType is given, WorkflowTypes 200/209 MUST NOT be used even for PKV.
+       Therefor, even for PKV patients with PayorType WorkflowTypes 160/169 MUST be used
+      */
       val insurance =
           patient
               .getPayorType()
-              .map(pt -> VersicherungsArtDeBasis.GKV) // when payor type given use GKV to distinguish the flowtype
+              .map(
+                  pt ->
+                      VersicherungsArtDeBasis
+                          .GKV) // when payor type given use GKV to distinguish the flowtype
               .orElse(patient.getCoverageInsuranceType());
 
       val flowType = FlowTypeUtil.getFlowType(null, insurance, kind);

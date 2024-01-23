@@ -18,10 +18,9 @@ package de.gematik.test.smartcard;
 
 import de.gematik.test.erezept.crypto.certificate.Oid;
 import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
-import lombok.val;
-
 import java.util.List;
 import java.util.function.Supplier;
+import lombok.val;
 
 public abstract class InstituteSmartcard extends Smartcard {
 

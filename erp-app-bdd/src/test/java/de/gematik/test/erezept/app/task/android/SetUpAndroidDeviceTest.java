@@ -48,7 +48,7 @@ class SetUpAndroidDeviceTest {
   private final SmartcardArchive smartcards = SmartcardFactory.getArchive();
   private Egk egk;
   private EnvironmentConfiguration environment;
-  
+
   @BeforeEach
   void init() {
     OnStage.setTheStage(new Cast() {});
@@ -114,9 +114,10 @@ class SetUpAndroidDeviceTest {
       uiProvider
           .when(() -> UIProvider.getQuestionResult("What is the Name on the eGK?"))
           .thenReturn("Alice");
-      val task = SetUpDevice.forEnvironment(environment)
-          .withInsuranceType(VersicherungsArtDeBasis.GKV)
-          .byMappingVirtualEgkFrom(smartcards);
+      val task =
+          SetUpDevice.forEnvironment(environment)
+              .withInsuranceType(VersicherungsArtDeBasis.GKV)
+              .byMappingVirtualEgkFrom(smartcards);
       theAppUser.attemptsTo(task);
     }
 

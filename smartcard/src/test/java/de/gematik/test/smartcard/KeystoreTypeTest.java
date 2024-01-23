@@ -31,8 +31,9 @@ class KeystoreTypeTest {
     val types = List.of(KeystoreType.JKS, KeystoreType.P12);
     types.forEach(t -> assertEquals(t, KeystoreType.fromFileExtension(t.getFileExtension())));
   }
+
   @Test
-  void shouldThrowOnKeystoreTypeNull(){
+  void shouldThrowOnKeystoreTypeNull() {
     assertThrows(NullPointerException.class, () -> KeystoreType.fromFileExtension(null));
   }
 

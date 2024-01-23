@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.questions.HasDownloadableOpenTask;
 import de.gematik.test.erezept.screenplay.questions.HasRetrieved;
@@ -28,9 +31,6 @@ import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 public class EgkInPharmacySteps {
 
@@ -46,14 +46,16 @@ public class EgkInPharmacySteps {
   }
 
   @Wenn(
-      "^die Apotheke (.+) für die eGK von (.+) (?:einen alten|keinen) Prüfungsnachweis (?:verwendet|abruft)$")
+      "^die Apotheke (.+) für die eGK von (.+) (?:einen alten|keinen) Prüfungsnachweis"
+          + " (?:verwendet|abruft)$")
   @Wenn("^die Krankenhaus-Apotheke (.+) die E-Rezepte mit der eGK von (.+) abruft$")
   public void whenPharmacyUseExpiredEvidence(String pharmName, String patientName) {
     // dummy step to increase comprehensibility in the test scenario
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis zeitlich ungültig ist$")
+      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis"
+          + " zeitlich ungültig ist$")
   public void thenPharmacyCanNotRequestPrescriptionsWithExpiredEvidence(
       String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -68,7 +70,8 @@ public class EgkInPharmacySteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis nicht abgerufen wurde$")
+      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis"
+          + " nicht abgerufen wurde$")
   public void thenPharmacyCanNotRequestPrescriptionsWithoutEvidence(
       String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -77,7 +80,8 @@ public class EgkInPharmacySteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das letzte E-Rezept nicht abrufen, weil die Apotheke (.+) dieses bereits akzeptiert hat$")
+      "^kann die Apotheke (.+) das letzte E-Rezept nicht abrufen, weil die Apotheke (.+) dieses"
+          + " bereits akzeptiert hat$")
   public void thenPharmacyCanNotRequestPrescriptionsAlreadyAccepted(
       String pharmName, String otherPharmName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -88,7 +92,8 @@ public class EgkInPharmacySteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil Krankenhaus-Apotheken nicht berechtigt sind$")
+      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil Krankenhaus-Apotheken"
+          + " nicht berechtigt sind$")
   public void thenHospitalPharmacyCanNotRequestPrescriptions(String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);

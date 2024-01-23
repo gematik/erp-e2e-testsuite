@@ -45,7 +45,8 @@ public class Validator implements Callable<Integer> {
       type = ResultSeverityEnum.class,
       defaultValue = "WARNING",
       description =
-          "Choose minimum severity to show from INFORMATION, WARNING, ERROR, FATAL (default=${DEFAULT-VALUE})")
+          "Choose minimum severity to show from INFORMATION, WARNING, ERROR, FATAL"
+              + " (default=${DEFAULT-VALUE})")
   private ResultSeverityEnum severity;
 
   @Mixin private InputOutputDirectoryParameter directories;

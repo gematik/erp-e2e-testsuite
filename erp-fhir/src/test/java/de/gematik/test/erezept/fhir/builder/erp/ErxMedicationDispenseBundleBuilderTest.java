@@ -19,7 +19,7 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
@@ -85,7 +85,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                     ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
 
     val bundle = builder.build();
-    val result = ValidatorUtil.encodeAndValidate(parser, bundle, false);
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
     assertEquals(3, bundle.getEntry().size());
   }
@@ -106,7 +106,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                     ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId)
                         .version(erpWorkflowVersion)
                         .medication(
-                            KbvErpMedicationBuilder.faker().version(kbvItaErpVersion).build())
+                            KbvErpMedicationPZNBuilder.faker().version(kbvItaErpVersion).build())
                         .build()));
 
     val bundle = builder.build();
@@ -131,7 +131,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                     ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId)
                         .version(erpWorkflowVersion)
                         .medication(
-                            KbvErpMedicationBuilder.faker().version(kbvItaErpVersion).build())
+                            KbvErpMedicationPZNBuilder.faker().version(kbvItaErpVersion).build())
                         .build()));
 
     val bundle = builder.build();

@@ -18,11 +18,10 @@ package de.gematik.test.smartcard;
 
 import de.gematik.test.erezept.crypto.certificate.Oid;
 import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
 import java.util.List;
 import java.util.function.Supplier;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 @EqualsAndHashCode(callSuper = true)
 @Getter

@@ -26,8 +26,7 @@ import net.serenitybdd.core.steps.Instrumented;
 
 public class ActorStage {
 
-  @Getter
-  private final ErpFdTestsuiteFactory config;
+  @Getter private final ErpFdTestsuiteFactory config;
   private final Map<String, DoctorActor> doctors;
   private final Map<String, PatientActor> patients;
   private final Map<String, PharmacyActor> pharmacies;

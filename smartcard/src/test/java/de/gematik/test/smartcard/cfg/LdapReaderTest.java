@@ -35,12 +35,16 @@ class LdapReaderTest {
   private static Stream<Arguments> getReferenceOwnerData() {
     return Stream.of(
         Arguments.of(
-            "GIVENNAME=Bernd + SURNAME=Claudius + SERIALNUMBER=16.80276001011699910102 + CN=Arzt Bernd Claudius TEST-ONLY, C=DE",
+            "GIVENNAME=Bernd + SURNAME=Claudius + SERIALNUMBER=16.80276001011699910102 + CN=Arzt"
+                + " Bernd Claudius TEST-ONLY, C=DE",
             "Bernd",
             "Claudius",
             "Arzt Bernd Claudius TEST-ONLY"),
         Arguments.of(
-            "SURNAME=Gunther + GIVENNAME=Gündüla + SERIALNUMBER=11.80276001081699900578 + CN=Dr. med. Gündüla Gunther ARZT TEST-ONLY, C=DE + T = Dr. med. + STREET = Friedrichstrasse 136 + POSTALCODE = 10117 + OU = someOrganizationUnit + L = locality",
+            "SURNAME=Gunther + GIVENNAME=Gündüla + SERIALNUMBER=11.80276001081699900578 + CN=Dr."
+                + " med. Gündüla Gunther ARZT TEST-ONLY, C=DE + T = Dr. med. + STREET ="
+                + " Friedrichstrasse 136 + POSTALCODE = 10117 + OU = someOrganizationUnit + L ="
+                + " locality",
             "Gündüla",
             "Gunther",
             "Dr. med. Gündüla Gunther ARZT TEST-ONLY",
@@ -50,12 +54,14 @@ class LdapReaderTest {
             "someOrganizationUnit",
             "locality"),
         Arguments.of(
-            "GIVENNAME=Amanda + SURNAME=Albrecht + SERIALNUMBER=11.80276001081699900579 + CN=Dr. Amanda Albrecht APO TEST-ONLY, C=DE",
+            "GIVENNAME=Amanda + SURNAME=Albrecht + SERIALNUMBER=11.80276001081699900579 + CN=Dr."
+                + " Amanda Albrecht APO TEST-ONLY, C=DE",
             "Amanda",
             "Albrecht",
             "Dr. Amanda Albrecht APO TEST-ONLY"),
         Arguments.of(
-            "CN=Arztpraxis Bernd Claudius TEST-ONLY, GIVENNAME=Bernd, SURNAME=Claudius, O=202110001 NOT-VALID, C=DE",
+            "CN=Arztpraxis Bernd Claudius TEST-ONLY, GIVENNAME=Bernd, SURNAME=Claudius, O=202110001"
+                + " NOT-VALID, C=DE",
             "Bernd",
             "Claudius",
             "Arztpraxis Bernd Claudius TEST-ONLY"));
@@ -63,7 +69,7 @@ class LdapReaderTest {
 
   @ParameterizedTest
   @MethodSource
-  void getReferenceOwnerData(String subject, String givenName, String surname, String commonName){
+  void getReferenceOwnerData(String subject, String givenName, String surname, String commonName) {
     val bernd = LdapReader.getOwnerData(subject);
     assertEquals(givenName, bernd.getGivenName());
     assertEquals(surname, bernd.getSurname());

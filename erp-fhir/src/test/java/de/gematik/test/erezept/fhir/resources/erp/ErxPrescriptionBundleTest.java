@@ -48,9 +48,14 @@ class ErxPrescriptionBundleTest extends ParsingTest {
 
     val kbvBundle = prescriptionBundle.getKbvBundle();
     assertNotNull(kbvBundle);
-    assertEquals("169.000.000.006.874.07", kbvBundle.getPrescriptionId().getValue());
+    assertTrue(kbvBundle.isPresent());
+    kbvBundle.ifPresent(
+        kbvErpBundle ->
+            assertEquals("169.000.000.006.874.07", kbvErpBundle.getPrescriptionId().getValue()));
 
-    assertEquals(PrescriptionFlowType.FLOW_TYPE_169, kbvBundle.getFlowType());
+    kbvBundle.ifPresent(
+        kbvErpBundle ->
+            assertEquals(PrescriptionFlowType.FLOW_TYPE_169, kbvBundle.get().getFlowType()));
     assertEquals(PrescriptionFlowType.FLOW_TYPE_169, task.getFlowType());
 
     val receipt = prescriptionBundle.getReceipt();
@@ -71,9 +76,13 @@ class ErxPrescriptionBundleTest extends ParsingTest {
 
     val kbvBundle = prescriptionBundle.getKbvBundle();
     assertNotNull(kbvBundle);
-    assertEquals("160.000.031.325.714.07", kbvBundle.getPrescriptionId().getValue());
+    kbvBundle.ifPresent(
+        kbvErpBundle ->
+            assertEquals("160.000.031.325.714.07", kbvErpBundle.getPrescriptionId().getValue()));
 
-    assertEquals(PrescriptionFlowType.FLOW_TYPE_160, kbvBundle.getFlowType());
+    kbvBundle.ifPresent(
+        kbvErpBundle ->
+            assertEquals(PrescriptionFlowType.FLOW_TYPE_160, kbvBundle.get().getFlowType()));
     assertEquals(PrescriptionFlowType.FLOW_TYPE_160, task.getFlowType());
 
     val receipt = prescriptionBundle.getReceipt();
@@ -90,12 +99,24 @@ class ErxPrescriptionBundleTest extends ParsingTest {
 
     // make sure no ClassCastExceptions are thrown: see TSERP-120
     assertDoesNotThrow(prescriptionBundle::getKbvBundle);
-    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getPatient);
-    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getMedication);
-    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getMedicationRequest);
-    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getMedicalOrganization);
-    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getCoverage);
-    assertDoesNotThrow(prescriptionBundle.getKbvBundle()::getPractitioner);
+    prescriptionBundle
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> assertDoesNotThrow(kbvErpBundle::getPatient));
+    prescriptionBundle
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> assertDoesNotThrow(kbvErpBundle::getMedication));
+    prescriptionBundle
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> assertDoesNotThrow(kbvErpBundle::getMedicationRequest));
+    prescriptionBundle
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> assertDoesNotThrow(kbvErpBundle::getMedicalOrganization));
+    prescriptionBundle
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> assertDoesNotThrow(kbvErpBundle::getCoverage));
+    prescriptionBundle
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> assertDoesNotThrow(kbvErpBundle::getPractitioner));
     assertDoesNotThrow(prescriptionBundle::getTask);
     assertDoesNotThrow(prescriptionBundle.getTask()::getAcceptDate);
   }
@@ -158,8 +179,7 @@ class ErxPrescriptionBundleTest extends ParsingTest {
                 resource -> resource.getResource().getResourceType().equals(ResourceType.Bundle))
             .toList();
     prescriptionBundle.getEntry().removeAll(kbvBundleResources);
-
-    assertThrows(MissingFieldException.class, prescriptionBundle::getKbvBundle);
+    assertTrue(prescriptionBundle.getKbvBundle().isEmpty());
   }
 
   @Test
@@ -176,6 +196,6 @@ class ErxPrescriptionBundleTest extends ParsingTest {
         .forEach(
             bundle -> bundle.getMeta().getProfile().get(0).setValueAsString("invalid profile!"));
 
-    assertThrows(MissingFieldException.class, prescriptionBundle::getKbvBundle);
+    assertTrue(prescriptionBundle.getKbvBundle().isEmpty());
   }
 }

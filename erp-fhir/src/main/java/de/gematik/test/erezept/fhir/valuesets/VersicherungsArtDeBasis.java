@@ -22,13 +22,15 @@ import de.gematik.test.erezept.fhir.values.BGInsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.values.PkvInsuranceCoverageInfo;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-/** <a href="https://simplifier.net/packages/de.basisprofil.r4/1.0.0/files/397841">de.basisprofil.r4</a> */
+/**
+ * <a
+ * href="https://simplifier.net/packages/de.basisprofil.r4/1.0.0/files/397841">de.basisprofil.r4</a>
+ */
 @Getter
 public enum VersicherungsArtDeBasis implements IValueSet {
   GKV("GKV", "gesetzliche Krankenversicherung"),
@@ -38,8 +40,7 @@ public enum VersicherungsArtDeBasis implements IValueSet {
   SOZ("SOZ", "Sozialamt"),
   GPV("GPV", "gesetzliche Pflegeversicherung"),
   PPV("PPV", "private Pflegeversicherung"),
-  BEI("BEI", "Beihilfe")
-  ;
+  BEI("BEI", "Beihilfe");
 
   public static final DeBasisCodeSystem CODE_SYSTEM = DeBasisCodeSystem.VERSICHERUNGSART_DE_BASIS;
   public static final String VERSION = "0.9.13";
@@ -50,7 +51,7 @@ public enum VersicherungsArtDeBasis implements IValueSet {
   private final String code;
   private final String display;
   private final String definition = "N/A";
-  
+
   VersicherungsArtDeBasis(String code, String display) {
     this.code = code;
     this.display = display;
@@ -69,7 +70,7 @@ public enum VersicherungsArtDeBasis implements IValueSet {
       default -> Optional.empty();
     };
   }
-  
+
   public static VersicherungsArtDeBasis fromCode(@NonNull String code) {
     return Arrays.stream(VersicherungsArtDeBasis.values())
         .filter(scp -> scp.code.equals(code))

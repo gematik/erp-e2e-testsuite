@@ -70,7 +70,14 @@ public class AcceptedPrescriptionDto {
     }
 
     public AcceptedPrescriptionDto andMedication(PznMedicationDto medication) {
-      return new AcceptedPrescriptionDto(prescriptionId, prescriptionReference, forKvnr, accessCode, secret, insurance, medication);
+      return new AcceptedPrescriptionDto(
+          prescriptionId,
+          prescriptionReference,
+          forKvnr,
+          accessCode,
+          secret,
+          insurance,
+          medication);
     }
   }
 }

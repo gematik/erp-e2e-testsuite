@@ -16,13 +16,12 @@
 
 package de.gematik.test.konnektor.commands.options;
 
-import lombok.val;
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+import lombok.val;
+import org.junit.Test;
 
 public class SignDocumentOptionsTest {
 

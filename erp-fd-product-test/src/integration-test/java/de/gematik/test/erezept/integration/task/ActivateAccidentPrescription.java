@@ -16,6 +16,12 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
+import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleContainsAccident;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -28,7 +34,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
@@ -43,6 +49,9 @@ import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.core.ParameterPair;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.annotations.WithTag;
@@ -56,16 +65,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
-
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleContainsAccident;
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
@@ -99,7 +98,7 @@ class ActivateAccidentPrescription extends ErpTest {
       sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
     }
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
     val medicationRequest =
         MedicationRequestBuilder.faker(sina.getPatientData())
             .insurance(sina.getInsuranceCoverage())
@@ -153,7 +152,7 @@ class ActivateAccidentPrescription extends ErpTest {
       sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
     }
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
     val medicationRequest =
         MedicationRequestBuilder.faker(sina.getPatientData())
             .insurance(sina.getInsuranceCoverage())

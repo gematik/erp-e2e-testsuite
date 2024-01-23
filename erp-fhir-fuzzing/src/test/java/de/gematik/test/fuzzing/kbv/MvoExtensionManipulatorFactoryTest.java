@@ -57,7 +57,7 @@ class MvoExtensionManipulatorFactoryTest {
           val coverage = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
           val practitioner = PractitionerBuilder.faker().build();
           val medication =
-              KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+              KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
 
           val kbvBundle =
               KbvErpBundleBuilder.faker(patient.getGkvId().orElseThrow())

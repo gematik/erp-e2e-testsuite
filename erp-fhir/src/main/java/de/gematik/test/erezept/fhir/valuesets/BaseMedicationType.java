@@ -31,7 +31,8 @@ public enum BaseMedicationType implements IValueSet {
   MEDICAL_PRODUCT("763158003", "Medicinal product (product)"),
   PHARM_BIO_PRODUCT(
       "373873005:860781008=362943005",
-      "Pharmaceutical / biologic product (product) : Has product characteristic (attribute) = Manual method (qualifier value)");
+      "Pharmaceutical / biologic product (product) : Has product characteristic (attribute) ="
+          + " Manual method (qualifier value)");
 
   public static final CommonCodeSystem CODE_SYSTEM = CommonCodeSystem.SNOMED_SCT;
   public static final String VERSION = "http://snomed.info/sct/900000000000207008/version/20220331";

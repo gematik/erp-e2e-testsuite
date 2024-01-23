@@ -46,15 +46,16 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   }
 
   @ParameterizedTest(
-          name =
-                  "[{index}] -> Build KBV MedicationRequest with CoPayment Status in versions KbvItaErpVersion {0}")
+      name =
+          "[{index}] -> Build KBV MedicationRequest with CoPayment Status in versions"
+              + " KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithStatusCoPayment(KbvItaErpVersion version) {
     val medicationRequest =
-            MedicationRequestBuilder.faker()
-                    .version(version)
-                    .coPaymentStatus(StatusCoPayment.STATUS_0)
-                    .build();
+        MedicationRequestBuilder.faker()
+            .version(version)
+            .coPaymentStatus(StatusCoPayment.STATUS_0)
+            .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -64,7 +65,8 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV MedicationRequest with Accident at Work in versions KbvItaErpVersion {0}")
+          "[{index}] -> Build KBV MedicationRequest with Accident at Work in versions"
+              + " KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithAccidentAtWork(KbvItaErpVersion version) {
     val medicationRequest =
@@ -79,7 +81,8 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV MedicationRequest with Accident at Work in versions KbvItaErpVersion {0}")
+          "[{index}] -> Build KBV MedicationRequest with Accident at Work in versions"
+              + " KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithOccupationalDisease(KbvItaErpVersion version) {
     val medicationRequest =
@@ -94,7 +97,8 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV MedicationRequest with random Accident in versions KbvItaErpVersion {0}")
+          "[{index}] -> Build KBV MedicationRequest with random Accident in versions"
+              + " KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithFakerAccident(KbvItaErpVersion version) {
     val medicationRequest =
@@ -108,15 +112,16 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   }
 
   @ParameterizedTest(
-          name =
-                  "[{index}] -> Build KBV MedicationRequest with random Accident in versions KbvItaErpVersion {0}")
+      name =
+          "[{index}] -> Build KBV MedicationRequest with random Accident in versions"
+              + " KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithMvoIdentifier(KbvItaErpVersion version) {
     val medicationRequest =
-            MedicationRequestBuilder.faker()
-                    .version(version)
-                    .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).withRandomId().validForDays(365))
-                    .build();
+        MedicationRequestBuilder.faker()
+            .version(version)
+            .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).withRandomId().validForDays(365))
+            .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -124,7 +129,8 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build random KBV MedicationRequest with faker in versions KbvItaErpVersion {0}")
+          "[{index}] -> Build random KBV MedicationRequest with faker in versions KbvItaErpVersion"
+              + " {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithFaker(KbvItaErpVersion version) {
     val medicationRequest = MedicationRequestBuilder.faker().version(version).build();

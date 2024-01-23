@@ -17,12 +17,20 @@
 package de.gematik.test.erezept.fhir.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
+import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class ProfileFhirParserFactoryTest {
+
+  @Test
+  void shouldNotInstantiate() {
+    assertTrue(
+        PrivateConstructorsUtil.throwsInvocationTargetException(ProfileFhirParserFactory.class));
+  }
 
   @Test
   void shouldCreateProfiledParsers() {

@@ -16,17 +16,12 @@
 
 package de.gematik.test.smartcard;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.crypto.certificate.Oid;
 import de.gematik.test.erezept.crypto.certificate.X509CertificateWrapper;
 import de.gematik.test.smartcard.exceptions.CardNotFoundException;
 import de.gematik.test.smartcard.exceptions.InvalidCertificateException;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.bouncycastle.cert.X509CertificateHolder;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,8 +32,12 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
 import java.util.function.Supplier;
-
-import static java.text.MessageFormat.format;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.bouncycastle.cert.X509CertificateHolder;
 
 @EqualsAndHashCode
 @Slf4j
@@ -126,15 +125,19 @@ public class SmartcardCertificate {
   @SneakyThrows
   private KeyStore.PrivateKeyEntry loadEntryFromKeystore(final InputStream is) {
     val ks = KeyStore.getInstance(KeystoreType.P12.getName());
-    ks.load(is, getP12KeyStorePassword().toCharArray());
+    ks.load(is, getP12KeyStorePassword());
     val alias =
         ks.aliases()
             .nextElement(); // use only the first element as each file has only a single alias
     return (KeyStore.PrivateKeyEntry)
-        ks.getEntry(alias, new KeyStore.PasswordProtection(getP12KeyStorePassword().toCharArray()));
+        ks.getEntry(alias, new KeyStore.PasswordProtection(getP12KeyStorePassword()));
   }
 
-  public String getP12KeyStorePassword() {
-    return "00";
+  public char[] getP12KeyStorePassword() {
+    return "00".toCharArray();
+  }
+
+  public KeyStore.PasswordProtection getP12KeyStoreProtection() {
+    return new KeyStore.PasswordProtection(this.getP12KeyStorePassword());
   }
 }

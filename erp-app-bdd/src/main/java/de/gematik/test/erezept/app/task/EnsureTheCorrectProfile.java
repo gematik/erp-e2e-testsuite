@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.ProfileSelectorElement;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -31,7 +33,9 @@ public class EnsureTheCorrectProfile implements Task {
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseIOSApp.class);
     if (!actor.getName().equals(app.getCurrentUserProfile())) {
+      app.logEvent(format("Der Benutzer {0} wechselt zu seinem Profil", actor.getName()));
       app.tap(ProfileSelectorElement.forActor(actor).fromMainScreen());
+      app.waitUntilElementIsSelected(ProfileSelectorElement.forActor(actor).fromMainScreen());
       app.setCurrentUserProfile(actor.getName());
     }
   }

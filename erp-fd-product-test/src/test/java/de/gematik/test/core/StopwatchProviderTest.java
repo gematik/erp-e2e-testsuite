@@ -40,7 +40,7 @@ class StopwatchProviderTest {
     } catch (NotInitializedException nie) {
       log.info("StopwatchProvider was already closed; proceed with testcase");
     }
-    
+
     assertThrows(NotInitializedException.class, StopwatchProvider::getInstance);
     assertThrows(NotInitializedException.class, StopwatchProvider::close);
   }

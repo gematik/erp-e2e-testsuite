@@ -102,7 +102,10 @@ public class ListProfiles implements Callable<Integer> {
   private void printFallbackSettings(ParserConfigurations configurations) {
     System.out.println(
         format(
-            "No ProfileSetting is configured via Environment or System Property!\ntry one of: \nexport {0}={1}\n-D{0}={2}\n",
+            "No ProfileSetting is configured via Environment or System Property!\n"
+                + "try one of: \n"
+                + "export {0}={1}\n"
+                + "-D{0}={2}\n",
             ParserConfigurations.ENV_TOGGLE,
             configurations.getProfileSettings().get(0).getId(),
             ParserConfigurations.SYS_PROP_TOGGLE));

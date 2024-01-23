@@ -16,26 +16,29 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class DynamicInsuranceCoverageInfoTest {
 
-    @Test
-    void shouldGenerateDynamicCoverageData() {
-        val data = DynamicInsuranceCoverageInfo.named("Farmer").ofType(VersicherungsArtDeBasis.SEL).withIknr("123123123");
-        assertEquals("Farmer", data.getName());
-        assertEquals("123123123", data.getIknr());
-        assertEquals(VersicherungsArtDeBasis.SEL, data.getInsuranceType());
-    }
+  @Test
+  void shouldGenerateDynamicCoverageData() {
+    val data =
+        DynamicInsuranceCoverageInfo.named("Farmer")
+            .ofType(VersicherungsArtDeBasis.SEL)
+            .withIknr("123123123");
+    assertEquals("Farmer", data.getName());
+    assertEquals("123123123", data.getIknr());
+    assertEquals(VersicherungsArtDeBasis.SEL, data.getInsuranceType());
+  }
 
-    @Test
-    void shouldGenerateRandomCoverageData() {
-        val data = DynamicInsuranceCoverageInfo.random();
-        assertNotNull(data.getName());
-        assertNotNull(data.getIknr());
-    }
+  @Test
+  void shouldGenerateRandomCoverageData() {
+    val data = DynamicInsuranceCoverageInfo.random();
+    assertNotNull(data.getName());
+    assertNotNull(data.getIknr());
+  }
 }

@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMED_PRESCRIPTION_STATUS_LABEL;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -23,9 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMED_PRESCRIPTION_STATUS_LABEL;
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class DeleteBatchArchivedPrescription implements Task {

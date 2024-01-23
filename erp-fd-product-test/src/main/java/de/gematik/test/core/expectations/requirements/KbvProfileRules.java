@@ -28,17 +28,21 @@ public enum KbvProfileRules implements RequirementsSet {
 
   SUPPLY_REQUEST_AND_MEDICATION_REQUEST(
       "VERORDNUNGSDATENSATZ_OHNE_MEDICATION_REQUEST",
-      "A_23384, Mit 1.12.0 wird A_23384 \"E-Rezept-Fachdienst - Prüfung Gültigkeit FHIR Ressourcen\" ->Bundles ohne MedicationRequest oder MedicationRequest.authoredOn werden abgewiesen "),
+      "A_23384, Mit 1.12.0 wird A_23384 \"E-Rezept-Fachdienst - Prüfung Gültigkeit FHIR"
+          + " Ressourcen\" ->Bundles ohne MedicationRequest oder MedicationRequest.authoredOn"
+          + " werden abgewiesen "),
 
   IKNR_VALIDATION(
       "IKNR_LENGTH_VALIDATION",
-      "Die IK-Nr. muss genau 9 Stellen lang sein ('/KBV_PR_FOR_Coverage') und darf nur aus Zahlen bestehen (HL7-DE 'identifier-iknr' ('[0-9]{9}')"),
+      "Die IK-Nr. muss genau 9 Stellen lang sein ('/KBV_PR_FOR_Coverage') und darf nur aus Zahlen"
+          + " bestehen (HL7-DE 'identifier-iknr' ('[0-9]{9}')"),
   // "http://fhir.de/StructureDefinition/identifier-iknr" +
   // "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage"
 
   KVNR_VALIDATION(
       "KVNR_VALIDATION",
-      "Die KVNR muss (laut KBV.ita.for.Patient) 10 stellig sein und mit einem Großbuchstaben beginnen matches('^[A-Z][0-9]{9}$')");
+      "Die KVNR muss (laut KBV.ita.for.Patient) 10 stellig sein und mit einem Großbuchstaben"
+          + " beginnen matches('^[A-Z][0-9]{9}$')");
 
   @Getter private final Requirement requirement;
 

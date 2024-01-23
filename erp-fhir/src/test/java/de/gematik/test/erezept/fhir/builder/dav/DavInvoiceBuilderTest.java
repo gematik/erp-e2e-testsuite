@@ -57,7 +57,8 @@ class DavInvoiceBuilderTest extends ParsingTest {
             .currency(Currency.EUR) // EUR by default
             .status("issued")
             .vatRate(19.0f)
-            .addPriceComponent(pc1, "11514676", "Amoxicillin/Clavulansure Heumann 875 mg/125 mg 10 St")
+            .addPriceComponent(
+                pc1, "11514676", "Amoxicillin/Clavulansure Heumann 875 mg/125 mg 10 St")
             .addPriceComponent(pc2, "87654321", "Asprin")
             .build();
 

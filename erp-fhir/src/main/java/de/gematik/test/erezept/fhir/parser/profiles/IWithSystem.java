@@ -36,9 +36,13 @@ public interface IWithSystem {
   default boolean match(Identifier identifier) {
     return match(identifier.getSystem());
   }
-  
+
   default boolean match(CanonicalType canonicalType) {
     return match(canonicalType.asStringValue());
+  }
+
+  default boolean match(Coding coding) {
+    return match(coding.getSystem());
   }
 
   default boolean match(@Nullable String url) {

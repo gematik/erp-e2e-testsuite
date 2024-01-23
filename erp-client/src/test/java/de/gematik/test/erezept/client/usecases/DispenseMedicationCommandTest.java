@@ -49,7 +49,8 @@ class DispenseMedicationCommandTest {
   @Test
   void getRequestLocator() {
     val md =
-        ErxMedicationDispenseBuilder.faker(KVNR.random(), "performerid", PrescriptionId.random()).build();
+        ErxMedicationDispenseBuilder.faker(KVNR.random(), "performerid", PrescriptionId.random())
+            .build();
     val taskId = TaskId.from("123456");
     val secret = "7890123";
     val cmd = new DispenseMedicationCommand(taskId, new Secret(secret), md);

@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PznDispensedMedicationDataMapperTest extends ParsingTest {
 

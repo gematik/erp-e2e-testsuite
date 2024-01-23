@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
 import de.gematik.test.erezept.screenplay.task.AbortPrescription;
 import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
@@ -24,9 +27,6 @@ import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
 
 public class PatientDeletePrescriptionSteps {
 
@@ -84,7 +84,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Und(
-      "^(?:der|die) Versicherte (.+) kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
+      "^(?:der|die) Versicherte (.+) kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen,"
+          + " weil (?:sie|er) nicht das Recht dazu hat$")
   public void andCannotDeletePrescription403(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     and(thePatient)
@@ -94,7 +95,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Und(
-      "^(?:der|die) Versicherte kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
+      "^(?:der|die) Versicherte kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil"
+          + " (?:sie|er) nicht das Recht dazu hat$")
   public void andCannotDeletePrescription403(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     and(thePatient)
@@ -109,7 +111,8 @@ public class PatientDeletePrescriptionSteps {
    * @param patientName ist der Name des Versicherten
    */
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
+      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen,"
+          + " weil es einen Konflikt gibt$")
   public void thenCannotDeletePrescription409(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -119,7 +122,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
+      "^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es"
+          + " einen Konflikt gibt$")
   public void thenCannotDeletePrescription409(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
@@ -129,7 +133,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Und(
-      "^(?:der|die) Versicherte (.+) kann (?:seine|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
+      "^(?:der|die) Versicherte (.+) kann (?:seine|ihr) (letztes|erstes) E-Rezept nicht löschen,"
+          + " weil es einen Konflikt gibt$")
   public void andCannotDeletePrescription409(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -139,7 +144,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Und(
-      "^(?:der|die) Versicherte kann (?:seine|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es einen Konflikt gibt$")
+      "^(?:der|die) Versicherte kann (?:seine|ihr) (letztes|erstes) E-Rezept nicht löschen, weil es"
+          + " einen Konflikt gibt$")
   public void andCannotDeletePrescription409(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
@@ -149,7 +155,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
+      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen,"
+          + " weil (?:sie|er) nicht das Recht dazu hat$")
   public void thenCannotDeletePrescription403(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -159,7 +166,8 @@ public class PatientDeletePrescriptionSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil (?:sie|er) nicht das Recht dazu hat$")
+      "^kann (?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil"
+          + " (?:sie|er) nicht das Recht dazu hat$")
   public void thenCannotDeletePrescription403(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)

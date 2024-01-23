@@ -16,43 +16,44 @@
 
 package de.gematik.test.erezept.apimeasure;
 
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Random;
-
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class DumpingStopwatchTest {
 
-    @Test
-    void shouldWriteMeasurements() {
-        val name = format("test_{0}", new Random().nextInt());
-        val sw = new DumpingStopwatch(name);
-        val clientType = ClientType.PS;
-        val cmd = new TaskGetCommand();
-        val vr = mock(ValidationResult.class);
-        val response =
-                ErpResponse.forPayload(null, ErxTaskBundle.class)
-                        .withDuration(Duration.ofMillis(200))
-                        .withStatusCode(200)
-                        .withHeaders(Map.of())
-                        .andValidationResult(vr);
-        assertDoesNotThrow(() -> sw.measurement(clientType, cmd, response));
-        assertDoesNotThrow(sw::close);
+  @Test
+  void shouldWriteMeasurements() {
+    val name = format("test_{0}", new Random().nextInt());
+    val sw = new DumpingStopwatch(name);
+    val clientType = ClientType.PS;
+    val cmd = new TaskGetCommand();
+    val vr = mock(ValidationResult.class);
+    val response =
+        ErpResponse.forPayload(null, ErxTaskBundle.class)
+            .withDuration(Duration.ofMillis(200))
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(vr);
+    assertDoesNotThrow(() -> sw.measurement(clientType, cmd, response));
+    assertDoesNotThrow(sw::close);
 
-        val expectedOutput = Path.of(System.getProperty("user.dir"), "target", "stopwatch", format("{0}.json", name)).toFile();
-        assertTrue(expectedOutput.isFile());
-        assertTrue(expectedOutput.exists());
-    }
+    val expectedOutput =
+        Path.of(System.getProperty("user.dir"), "target", "stopwatch", format("{0}.json", name))
+            .toFile();
+    assertTrue(expectedOutput.isFile());
+    assertTrue(expectedOutput.exists());
+  }
 }

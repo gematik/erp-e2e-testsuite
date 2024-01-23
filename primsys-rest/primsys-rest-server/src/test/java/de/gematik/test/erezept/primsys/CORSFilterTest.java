@@ -27,15 +27,15 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class CORSFilterTest {
-    
-    @Test
-    void shouldContainCorsHeadersInResponse() {
-        val request = mock(ContainerRequestContext.class);
-        val response = mock(ContainerResponseContext.class);
-        val responseHeaders = new MultivaluedHashMap<String, Object>();
-        when(response.getHeaders()).thenReturn(responseHeaders);
-        val cors = new CORSFilter();
-        cors.filter(request, response);
-        assertEquals("*", responseHeaders.getFirst("Access-Control-Allow-Origin"));
-    }
+
+  @Test
+  void shouldContainCorsHeadersInResponse() {
+    val request = mock(ContainerRequestContext.class);
+    val response = mock(ContainerResponseContext.class);
+    val responseHeaders = new MultivaluedHashMap<String, Object>();
+    when(response.getHeaders()).thenReturn(responseHeaders);
+    val cors = new CORSFilter();
+    cors.filter(request, response);
+    assertEquals("*", responseHeaders.getFirst("Access-Control-Allow-Origin"));
+  }
 }

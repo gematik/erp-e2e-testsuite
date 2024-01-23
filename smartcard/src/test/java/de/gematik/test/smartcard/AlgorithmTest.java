@@ -16,15 +16,14 @@
 
 package de.gematik.test.smartcard;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.smartcard.Algorithm.CryptographySpecification;
 import de.gematik.test.smartcard.exceptions.InvalidCryptographySpecificationException;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class AlgorithmTest {
 

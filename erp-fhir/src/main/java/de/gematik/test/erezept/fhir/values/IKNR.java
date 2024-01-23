@@ -16,22 +16,21 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import lombok.val;
-import org.hl7.fhir.r4.model.Identifier;
-
 import java.util.Objects;
 import java.util.regex.Pattern;
-
-import static java.text.MessageFormat.format;
+import lombok.val;
+import org.hl7.fhir.r4.model.Identifier;
 
 /** <a href="https://de.wikipedia.org/wiki/Institutionskennzeichen">Institutionskennzeichen</a> */
 public class IKNR extends Value<String> implements WithChecksum {
   private static final Pattern IKNR_PATTERN = Pattern.compile("^\\d{9}$");
 
   public IKNR(String iknr) {
-    super( DeBasisNamingSystem.IKNR, iknr);
+    super(DeBasisNamingSystem.IKNR, iknr);
   }
 
   public static IKNR from(String value) {
@@ -42,7 +41,7 @@ public class IKNR extends Value<String> implements WithChecksum {
     val faker = GemFaker.getFaker();
     val numbers = faker.regexify("\\d{8}");
     int checksum = calcChecksum(numbers);
-    val value = format("{0}{1}", numbers,checksum);
+    val value = format("{0}{1}", numbers, checksum);
     return from(value);
   }
 
@@ -57,14 +56,14 @@ public class IKNR extends Value<String> implements WithChecksum {
 
   private int getChecksum() {
     val value = getValue();
-    return Character.getNumericValue(value.charAt(value.length()-1));
+    return Character.getNumericValue(value.charAt(value.length() - 1));
   }
 
   private static int calcChecksum(String number) {
     var sum = 0;
-    for(int i=7;  i>=2 ; i--) {
+    for (int i = 7; i >= 2; i--) {
       var value = Character.getNumericValue(number.charAt(i));
-      if(i % 2 == 0) value *=2;
+      if (i % 2 == 0) value *= 2;
       sum += WithChecksum.crossSum(value);
     }
     return sum % 10;

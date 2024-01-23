@@ -55,6 +55,7 @@ public interface PSPClient {
   void callServerStoredMessages();
 
   String getId();
+
   /**
    * generate the connection to server
    *

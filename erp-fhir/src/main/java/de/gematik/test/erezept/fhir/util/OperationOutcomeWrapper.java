@@ -16,11 +16,10 @@
 
 package de.gematik.test.erezept.fhir.util;
 
-import org.hl7.fhir.r4.model.OperationOutcome;
+import static java.text.MessageFormat.format;
 
 import java.util.stream.Collectors;
-
-import static java.text.MessageFormat.format;
+import org.hl7.fhir.r4.model.OperationOutcome;
 
 public class OperationOutcomeWrapper {
 

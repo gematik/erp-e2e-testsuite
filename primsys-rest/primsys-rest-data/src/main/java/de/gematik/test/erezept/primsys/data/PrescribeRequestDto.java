@@ -26,6 +26,7 @@ public class PrescribeRequestDto {
 
   @JsonProperty(required = true)
   private PatientDto patient;
+
   private CoverageDto coverage;
   private MedicationRequestDto medicationRequest;
   private PznMedicationDto medication;

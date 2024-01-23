@@ -16,10 +16,12 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
@@ -27,6 +29,12 @@ import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -35,22 +43,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 import org.junitpioneer.jupiter.ClearSystemProperty.ClearSystemProperties;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
-
 @Slf4j
 class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV Bundle for GKV with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build KBV Bundle for GKV with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildKbvBundleWithFixedValuesForGKV(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -81,14 +80,14 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val responsiblePractitioner =
-            PractitionerBuilder.builder()
-                    .version(kbvForVersion)
-                    .setResourceId(UUID.randomUUID().toString())
-                    .lanr(BaseANR.randomFromQualification(QualificationType.DOCTOR).getValue())
-                    .name("Emmett ", "Brown", "Dr.")
-                    .addQualification(QualificationType.DOCTOR)
-                    .addQualification("Super-Facharzt für alles Mögliche")
-                    .build();
+        PractitionerBuilder.builder()
+            .version(kbvForVersion)
+            .setResourceId(UUID.randomUUID().toString())
+            .lanr(BaseANR.randomFromQualification(QualificationType.DOCTOR).getValue())
+            .name("Emmett ", "Brown", "Dr.")
+            .addQualification(QualificationType.DOCTOR)
+            .addQualification("Super-Facharzt für alles Mögliche")
+            .build();
 
     val organization =
         MedicalOrganizationBuilder.builder()
@@ -123,7 +122,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -156,7 +155,7 @@ class KbvBuilderTest extends ParsingTest {
         KbvErpBundleBuilder.forPrescription(prescriptionId)
             .version(kbvErpVersion)
             .practitioner(prescribingPractitioner)
-                .attester(responsiblePractitioner)
+            .attester(responsiblePractitioner)
             .custodian(organization)
             .patient(patient)
             .insurance(insurance)
@@ -169,7 +168,7 @@ class KbvBuilderTest extends ParsingTest {
     assertNotNull(kbvBundle.getId());
     assertEquals(prescriptionId, kbvBundle.getPrescriptionId());
 
-    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle, EncodingType.XML, true, true);
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
     assertTrue(result.isSuccessful());
     assertEquals(VersicherungsArtDeBasis.GKV, kbvBundle.getPatient().getInsuranceKind());
     assertFalse(kbvBundle.getPatient().getPkvAssigner().isPresent());
@@ -178,7 +177,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV Bundle for PKV with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build KBV Bundle for PKV with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildKbvBundleWithFixedValuesForPKV(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -245,7 +245,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -314,7 +314,6 @@ class KbvBuilderTest extends ParsingTest {
   }
 
   @Test()
-
   void buildKbvBundleWithFixedValuesAndNoAnrInPractitioner() {
     val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
     val medicationRequestResourceId = "75ec9d5d-07ec-44cf-b841-d8a4ef20e521";
@@ -380,7 +379,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -431,13 +430,14 @@ class KbvBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
     assertEquals(VersicherungsArtDeBasis.PKV, kbvBundle.getPatient().getInsuranceKind());
     assertTrue(kbvBundle.getPatient().getPkvAssigner().isPresent());
-      // well, that's how it's currently implemented: assigner is not set anymore!
-      assertFalse(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    // well, that's how it's currently implemented: assigner is not set anymore!
+    assertFalse(kbvBundle.getPatient().getPkvAssignerName().isPresent());
   }
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV Bundle for BG with Accident at Work and with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build KBV Bundle for BG with Accident at Work and with versions"
+              + " KbvItaForVersion {0} and KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildKbvBundleWithFixedValuesForBGWithAccidentAtWork(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -503,7 +503,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -577,7 +577,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV Bundle for PKV with Accident and with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build KBV Bundle for PKV with Accident and with versions KbvItaForVersion"
+              + " {0} and KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildKbvBundleWithFixedValuesForPKVWithAccident(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -644,7 +645,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -718,7 +719,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build KBV Bundle for PKV with Accident at Work and invalid Coverage Type with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build KBV Bundle for PKV with Accident at Work and invalid Coverage Type"
+              + " with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildKbvBundleForPKVWithAccidentAndInvalidCoverage(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -738,7 +740,7 @@ class KbvBuilderTest extends ParsingTest {
             .version(kbvForVersion)
             .beneficiary(patient)
             .build();
-    val medication = KbvErpMedicationBuilder.faker().version(kbvErpVersion).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().version(kbvErpVersion).build();
     val medicationRequest =
         MedicationRequestBuilder.faker(patient)
             .version(kbvErpVersion)
@@ -773,7 +775,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildKbvBundleWithFaker(KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
 
@@ -785,7 +788,7 @@ class KbvBuilderTest extends ParsingTest {
           PatientBuilder.faker().assigner(assignerOrganization).version(kbvForVersion).build();
       val insurance =
           KbvCoverageBuilder.faker().beneficiary(patient).version(kbvForVersion).build();
-      val medication = KbvErpMedicationBuilder.faker().version(kbvErpVersion).build();
+      val medication = KbvErpMedicationPZNBuilder.faker().version(kbvErpVersion).build();
       val medicationRequest =
           MedicationRequestBuilder.faker(patient)
               .version(kbvErpVersion)
@@ -814,7 +817,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   @ClearSystemProperties(
       value = {
@@ -839,7 +843,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   @ClearSystemProperties(
       value = {
@@ -865,7 +870,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build faked KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   @ClearSystemProperties(
       value = {
@@ -893,7 +899,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Change authoredOn Date in faked KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Change authoredOn Date in faked KBV Bundle with versions KbvItaForVersion"
+              + " {0} and KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   @ClearSystemProperties(
       value = {
@@ -921,7 +928,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build incomplete KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build incomplete KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldThrowOnEmptyKbvBundleBuilder(KbvItaErpVersion kbvErpVersion) {
 
@@ -931,13 +939,14 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build incomplete KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build incomplete KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildFakerWithGivenMedicationCategory(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
 
     val medication =
-        KbvErpMedicationBuilder.faker()
+        KbvErpMedicationPZNBuilder.faker()
             .version(kbvErpVersion)
             .category(MedicationCategory.C_00)
             .build();
@@ -975,7 +984,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Get Practitioner from KBV Bundle with versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Get Practitioner from KBV Bundle with versions KbvItaForVersion {0} and"
+              + " KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void shouldGetPractitionersFromKbvBundle(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -1057,7 +1067,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -1158,7 +1168,7 @@ class KbvBuilderTest extends ParsingTest {
             .build();
 
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(kbvErpVersion)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -1217,7 +1227,8 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build incomplete KBV Bundle with MedicationCompounding and versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build incomplete KBV Bundle with MedicationCompounding and versions"
+              + " KbvItaForVersion {0} and KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void buildFakerWithGivenMedicationCompounding(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
@@ -1329,11 +1340,49 @@ class KbvBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build incomplete KBV Bundle with MedicationCompounding and versions KbvItaForVersion {0} and KbvItaErpVersion {1}")
+          "[{index}] -> Build incomplete KBV Bundle with MedicationCompounding and versions"
+              + " KbvItaForVersion {0} and KbvItaErpVersion {1}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
   void fakerShouldWorkWithMedicationCompounding(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
     val medication = KbvErpMedicationCompoundingBuilder.faker().version(kbvErpVersion).build();
+    val assigner = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
+    val patient = PatientBuilder.faker().version(kbvForVersion).assigner(assigner).build();
+    val insurance =
+        KbvCoverageBuilder.faker(patient.getInsuranceKind()).version(kbvForVersion).build();
+    val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
+    val medicationRequest =
+        MedicationRequestBuilder.faker(patient)
+            .medication(medication)
+            .requester(practitioner)
+            .insurance(insurance)
+            .version(kbvErpVersion)
+            .build();
+    val organisation = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
+    val bundle =
+        KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
+            .patient(patient)
+            .version(kbvErpVersion)
+            .assigner(assigner)
+            .practitioner(practitioner)
+            .custodian(organisation)
+            .medicationRequest(medicationRequest)
+            .insurance(insurance)
+            .medication(medication)
+            .build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
+    assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build incomplete KBV Bundle with MedicationFreeText and versions"
+              + " KbvItaForVersion {0} and KbvItaErpVersion {1}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void fakerShouldWorkWithMedicationFreeText(
+      KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
+    val medication = KbvErpMedicationFreeTextBuilder.faker().version(kbvErpVersion).build();
     val assigner = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
     val patient = PatientBuilder.faker().version(kbvForVersion).assigner(assigner).build();
     val insurance =

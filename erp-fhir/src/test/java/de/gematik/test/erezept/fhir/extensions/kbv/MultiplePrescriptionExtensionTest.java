@@ -147,10 +147,9 @@ class MultiplePrescriptionExtensionTest {
 
   @Test
   void shouldCreateWithId() {
-    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4)
-            .withId("123").withoutEndDate(false);
+    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).withId("123").withoutEndDate(false);
     val ext = mvo.asExtension(KbvItaErpVersion.V1_1_0);
-    
+
     val idExt = ext.getExtensionByUrl("ID");
     val mvoId = idExt.getValue().castToIdentifier(idExt.getValue()).getValue();
     assertTrue(mvoId.contains("123"));
@@ -158,8 +157,7 @@ class MultiplePrescriptionExtensionTest {
 
   @Test
   void shouldIgnoreIdOnOldProfiles() {
-    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4)
-            .withId("123").withoutEndDate(false);
+    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).withId("123").withoutEndDate(false);
     val ext = mvo.asExtension(KbvItaErpVersion.V1_0_2);
 
     val idExt = ext.getExtensionByUrl("ID");

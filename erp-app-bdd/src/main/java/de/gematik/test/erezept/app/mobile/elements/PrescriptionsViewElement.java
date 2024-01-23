@@ -63,7 +63,7 @@ public class PrescriptionsViewElement implements PageElement {
           AppiumBy.iOSNsPredicateString(
               format(
                   "type == \"XCUIElementTypeStaticText\" AND name == \"{0}\"",
-                      PRESCRIPTION_ELEMENT_LOCATOR));
+                  PRESCRIPTION_ELEMENT_LOCATOR));
   }
 
   public static PrescriptionsViewElement named(String prescriptionName) {

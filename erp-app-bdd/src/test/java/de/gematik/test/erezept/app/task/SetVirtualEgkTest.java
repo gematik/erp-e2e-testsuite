@@ -65,7 +65,7 @@ class SetVirtualEgkTest {
   void shouldSetOnIos() {
     val appUser = OnStage.theActorCalled(iosUserName);
     assertDoesNotThrow(() -> appUser.attemptsTo(SetVirtualEgk.withEgk(egk)));
-    
+
     // check that private key and certificate chain are sent to the driver
     verify(iosAbility, times(1)).input(bobsPrivateKey, Debug.EGK_PRIVATE_KEY);
     verify(iosAbility, times(1)).input(any(), eq(Debug.EGK_CERTIFICATE_CHAIN));

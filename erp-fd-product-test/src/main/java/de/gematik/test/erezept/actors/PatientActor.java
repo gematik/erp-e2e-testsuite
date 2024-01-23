@@ -42,9 +42,9 @@ public class PatientActor extends ErpActor {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getKvnr();
   }
-  
+
   public Egk getEgk() {
-    return SafeAbility.getAbility(this, ProvideEGK.class).getEgk(); 
+    return SafeAbility.getAbility(this, ProvideEGK.class).getEgk();
   }
 
   public void changePatientInsuranceType(VersicherungsArtDeBasis insuranceType) {

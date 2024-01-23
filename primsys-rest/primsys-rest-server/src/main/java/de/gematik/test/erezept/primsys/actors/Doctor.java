@@ -34,8 +34,7 @@ public class Doctor extends BaseActor {
 
   private final Konnektor konnektor;
 
-  @Getter
-  private final Hba hba;
+  @Getter private final Hba hba;
   private final CardInfo hbaHandle;
 
   public Doctor(
@@ -51,7 +50,7 @@ public class Doctor extends BaseActor {
   }
 
   public byte[] signDocument(String document) {
-    val signCmd = new SignXMLDocumentCommand(hbaHandle, document,algorithm);
+    val signCmd = new SignXMLDocumentCommand(hbaHandle, document, algorithm);
     return konnektor.execute(signCmd).getPayload();
   }
 

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
@@ -36,6 +38,11 @@ import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.fhirdump.FhirDumper;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -44,14 +51,6 @@ import net.serenitybdd.core.Serenity;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import org.hl7.fhir.r4.model.Practitioner;
-
-import javax.annotation.Nullable;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class IssuePrescription implements Task {
@@ -100,7 +99,7 @@ public class IssuePrescription implements Task {
     val kbvOrganization = baseDataAbility.getMedicalOrganization();
     val kbvPatient = this.getPatientBaseData();
     val kbvPatientCoverage = this.getPatientInsuranceCoverage();
-    
+
     medications.forEach(
         med -> {
           // get the flowtype either from med or reason from patient's insurance kind
@@ -216,7 +215,7 @@ public class IssuePrescription implements Task {
 
     // create the medication
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .category(MedicationCategory.fromCode(category))
             .isVaccine(isVaccine)
             .normgroesse(StandardSize.fromCode(size))

@@ -28,6 +28,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructD
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
@@ -258,6 +259,10 @@ public class KbvBundleManipulatorFactory {
                 b.getMedication().getExtension().stream()
                     .filter(ext -> KbvItaErpStructDef.MEDICATION_VACCINE.match(ext.getUrl()))
                     .forEach(ext -> ext.setValue(new IntegerType(1)))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Medication mit fehlender ID", b -> b.getMedication().setId((String) null)));
     return manipulators;
   }
 
@@ -306,6 +311,11 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
+            "MedicationRequest mit fehlender ID",
+            b -> b.getMedicationRequest().setId((String) null)));
+
+    manipulators.add(
+        NamedEnvelope.of(
             "MedicationRequest Validity Period Start & End",
             b -> {
               b.getMedicationRequest()
@@ -334,7 +344,8 @@ public class KbvBundleManipulatorFactory {
                   b.getMedicationRequest()
                       .getDosageInstructionFirstRep()
                       .setText(
-                          "jeweils zu den Mahlzeiten und die Tablette 32 mal ordentlich zerkauen")));
+                          "jeweils zu den Mahlzeiten und die Tablette 32 mal ordentlich"
+                              + " zerkauen")));
     } else {
       manipulators.add(
           NamedEnvelope.of(
@@ -444,7 +455,6 @@ public class KbvBundleManipulatorFactory {
                   .setValue("7211111010");
             }));
 
-
     manipulators.add(
         NamedEnvelope.of(
             "Leerzeichen nach der Organization-Adresse",
@@ -458,6 +468,10 @@ public class KbvBundleManipulatorFactory {
                   .getExtensionByUrl(Hl7StructDef.HOUSE_NUMBER.getCanonicalUrl())
                   .setValue(new StringType("14"));
             }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Organization mit fehlender ID", b -> b.getMedicalOrganization().setId((String) null)));
 
     return manipulators;
   }
@@ -529,6 +543,9 @@ public class KbvBundleManipulatorFactory {
                     .addExtension(
                         DeBasisStructDef.HUMAN_NAMENSZUSATZ.getCanonicalUrl(),
                         new StringType("Graf Freiherr der Letzte"))));
+
+    manipulators.add(
+        NamedEnvelope.of("Patient mit fehlender ID", b -> b.getPatient().setId((String) null)));
 
     /*
     Note: die Prüfung wird so vom FD aktuell noch nicht gefordert
@@ -630,8 +647,40 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
-            "Practitioner mit fehlender Qualification",
+            "Practitioner ohne QualificationTypes",
             b -> b.getPractitioner().setQualification(List.of())));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Practitioner mit ungültigen QualificationTypes",
+            b -> {
+              val qt1 = new CodeableConcept();
+              qt1.setText("Chefarzt");
+              val qt2 = new CodeableConcept();
+              qt2.setText("Onkologie");
+              val qualificationTypes =
+                  List.of(
+                      new Practitioner.PractitionerQualificationComponent(qt1),
+                      new Practitioner.PractitionerQualificationComponent(qt2));
+              b.getPractitioner().setQualification(qualificationTypes);
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Practitioner mit fehlender Berufsbezeichnung",
+            b -> {
+              val practitioner = b.getPractitioner();
+              val jobTitleOpt =
+                  practitioner.getQualification().stream()
+                      .filter(
+                          qualification ->
+                              qualification.getCode().getCoding().stream()
+                                  .anyMatch(
+                                      code ->
+                                          KbvCodeSystem.BERUFSBEZEICHNUNG.match(code.getSystem())))
+                      .findFirst();
+              jobTitleOpt.ifPresent(jt -> practitioner.getQualification().remove(jt));
+            }));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -641,6 +690,10 @@ public class KbvBundleManipulatorFactory {
                     .add(
                         new Bundle.BundleEntryComponent()
                             .setResource(PractitionerBuilder.faker().build()))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Practitioner mit fehlender ID", b -> b.getPractitioner().setId((String) null)));
 
     return manipulators;
   }
@@ -665,6 +718,10 @@ public class KbvBundleManipulatorFactory {
         NamedEnvelope.of(
             "Composition mit invalider Formular Art",
             b -> b.getComposition().getType().getCodingFirstRep().setCode("e16a")));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Composition mit fehlender ID", b -> b.getComposition().setId((String) null)));
 
     return manipulators;
   }

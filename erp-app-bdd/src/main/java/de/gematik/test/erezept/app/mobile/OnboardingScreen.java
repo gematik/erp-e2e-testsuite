@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.gematik.test.erezept.app.mobile;
 
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
@@ -30,7 +31,6 @@ public enum OnboardingScreen {
   private final int iOSOrdinal;
   private final int androidOrdinal;
   private final String label;
-
 
   public int getiOSOrdinal() {
     if (iOSOrdinal < 0) {

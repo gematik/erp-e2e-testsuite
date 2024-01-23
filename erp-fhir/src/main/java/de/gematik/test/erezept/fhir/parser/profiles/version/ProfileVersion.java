@@ -34,7 +34,8 @@ public interface ProfileVersion<V extends ProfileVersion<V>> {
   static String parseVersion(String input) {
     val matcher = SEMVER_REGEX.matcher(input);
     if (!matcher.find()) {
-      throw new FhirValidatorException(format("Given input does not contain a version: {0}", input));
+      throw new FhirValidatorException(
+          format("Given input does not contain a version: {0}", input));
     }
 
     return matcher.group(1);
@@ -94,7 +95,8 @@ public interface ProfileVersion<V extends ProfileVersion<V>> {
               () ->
                   new RuntimeException(
                       format(
-                          "Unable to determine a valid profile version for {0} which is valid on {1}",
+                          "Unable to determine a valid profile version for {0} which is valid on"
+                              + " {1}",
                           profile, now)));
     }
   }

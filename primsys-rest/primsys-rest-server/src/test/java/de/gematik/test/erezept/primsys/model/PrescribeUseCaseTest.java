@@ -72,16 +72,16 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-            ErpResponse.forPayload(draftErxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val activateResponse =
-            ErpResponse.forPayload(activatedErxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
@@ -120,20 +120,19 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-            ErpResponse.forPayload(draftErxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val activateResponse =
-            ErpResponse.forPayload(activatedErxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
-
 
     val kbvBundle = fhir.encode(KbvErpBundleBuilder.faker().build(), EncodingType.XML);
     try (val response = PrescribeUseCase.issuePrescription(doctor, kbvBundle)) {
@@ -159,14 +158,14 @@ class PrescribeUseCaseTest extends TestWithActorContext {
 
     try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeBody)) {
       fail(
-              "PrescribeUseCase did not throw the expected Exception and answered with "
-                      + response.getStatus());
+          "PrescribeUseCase did not throw the expected Exception and answered with "
+              + response.getStatus());
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(400, wae.getResponse().getStatus());
       assertEquals(ErrorDto.class, wae.getResponse().getEntity().getClass());
       assertTrue(
-              ((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("KVNR is required"));
+          ((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("KVNR is required"));
     }
   }
 
@@ -182,14 +181,14 @@ class PrescribeUseCaseTest extends TestWithActorContext {
 
     try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeBody)) {
       fail(
-              "PrescribeUseCase did not throw the expected Exception and answered with "
-                      + response.getStatus());
+          "PrescribeUseCase did not throw the expected Exception and answered with "
+              + response.getStatus());
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(400, wae.getResponse().getStatus());
       assertEquals(ErrorDto.class, wae.getResponse().getEntity().getClass());
       assertTrue(
-              ((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("KVNR is required"));
+          ((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("KVNR is required"));
     }
   }
 
@@ -205,19 +204,19 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     prescribeRequest.setPatient(patientDto);
 
     val createResponse =
-            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
-                    .withHeaders(Map.of())
-                    .withStatusCode(401)
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
+            .withHeaders(Map.of())
+            .withStatusCode(401)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(createResponse))
-            .when(mockClient)
-            .request(any(TaskCreateCommand.class));
+        .when(mockClient)
+        .request(any(TaskCreateCommand.class));
 
     try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
       fail(
-              "PrescribeUseCase did not throw the expected Exception and answered with "
-                      + response.getStatus());
+          "PrescribeUseCase did not throw the expected Exception and answered with "
+              + response.getStatus());
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(401, wae.getResponse().getStatus());
@@ -248,16 +247,16 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-            ErpResponse.forPayload(draftErxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val activateResponse =
-            ErpResponse.forPayload(activatedErxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
@@ -294,16 +293,16 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     when(erxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-            ErpResponse.forPayload(erxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(erxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     val activateResponse =
-            ErpResponse.forPayload(erxTask, ErxTask.class)
-                    .withStatusCode(204)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(erxTask, ErxTask.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
@@ -320,19 +319,19 @@ class PrescribeUseCaseTest extends TestWithActorContext {
 
     try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
       fail(
-              "PrescribeUseCase did not throw the expected Exception and answered with "
-                      + response.getStatus());
+          "PrescribeUseCase did not throw the expected Exception and answered with "
+              + response.getStatus());
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(400, wae.getResponse().getStatus());
       assertEquals(ErrorDto.class, wae.getResponse().getEntity().getClass());
       assertTrue(
-              ((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("MVO Data is invalid"));
+          ((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("MVO Data is invalid"));
     }
   }
 
   @ParameterizedTest(
-          name = "#{index} - Detect Error while parsing FHIR-Bundle with directAssignment={0}")
+      name = "#{index} - Detect Error while parsing FHIR-Bundle with directAssignment={0}")
   @NullSource // pass a null value
   @ValueSource(booleans = {true, false})
   void shouldReturn400OnInvalidFhirBundle(Boolean directAssignment) {
@@ -343,22 +342,22 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     Supplier<Response> responseSupplier;
     if (directAssignment != null) {
       responseSupplier =
-              () -> PrescribeUseCase.issuePrescription(doctor, invalidFhir, directAssignment);
+          () -> PrescribeUseCase.issuePrescription(doctor, invalidFhir, directAssignment);
     } else {
       responseSupplier = () -> PrescribeUseCase.issuePrescription(doctor, invalidFhir);
     }
     try (val response = responseSupplier.get()) {
       fail(
-              "PrescribeUseCase did not throw the expected Exception and answered with "
-                      + response.getStatus());
+          "PrescribeUseCase did not throw the expected Exception and answered with "
+              + response.getStatus());
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(400, wae.getResponse().getStatus());
       assertEquals(ErrorDto.class, wae.getResponse().getEntity().getClass());
       assertTrue(
-              ((ErrorDto) wae.getResponse().getEntity())
-                      .getMessage()
-                      .contains("Unable to decode the given FHIR-Content"));
+          ((ErrorDto) wae.getResponse().getEntity())
+              .getMessage()
+              .contains("Unable to decode the given FHIR-Content"));
     }
   }
 
@@ -366,5 +365,4 @@ class PrescribeUseCaseTest extends TestWithActorContext {
   void shouldNotInstantiate() {
     assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(PrescribeUseCase.class));
   }
-
 }

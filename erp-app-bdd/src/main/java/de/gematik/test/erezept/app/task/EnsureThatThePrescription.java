@@ -27,6 +27,9 @@ import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
@@ -38,12 +41,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
+@Slf4j
 @RequiredArgsConstructor
 public class EnsureThatThePrescription implements Task {
 
@@ -58,8 +63,12 @@ public class EnsureThatThePrescription implements Task {
     val dmcAbility = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
     val dmc = deque.chooseFrom(dmcAbility.chooseStack(DmcStack.ACTIVE));
 
-    // first refresh the screen
+    app.logEvent(
+        format(
+            "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
+            actor.getName(), deque));
     app.tap(Mainscreen.REFRESH_BUTTON);
+
     val prescriptionBundle =
         actor
             .asksFor(MovingToPrescription.withTaskId(dmc.getTaskId()))
@@ -68,7 +77,13 @@ public class EnsureThatThePrescription implements Task {
                     new MissingPreconditionError(
                         format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
 
-    val kbvBundle = prescriptionBundle.getKbvBundle();
+    val kbvBundle =
+        prescriptionBundle
+            .getKbvBundle()
+            .orElseThrow(
+                () ->
+                    new MissingFieldException(
+                        ErxPrescriptionBundle.class, KbvItaErpStructDef.BUNDLE));
     val medication = kbvBundle.getMedication();
     val medicationRequest = kbvBundle.getMedicationRequest();
 
@@ -76,14 +91,17 @@ public class EnsureThatThePrescription implements Task {
     val actualTitle = app.getText(PrescriptionDetails.PRESCRIPTION_TITLE);
     assertEquals(medication.getMedicationName(), actualTitle);
 
-
     if (!kbvBundle.getFlowType().isDirectAssignment()) {
-      // direct assignments have no validity information because these are theoretically already assigned to a pharmacy
-      val expectedValidityText = this.calculateValidityText(prescriptionBundle.getTask(), kbvBundle);
+      // direct assignments have no validity information because these are theoretically already
+      // assigned to a pharmacy
+      val expectedValidityText =
+          this.calculateValidityText(prescriptionBundle.getTask(), kbvBundle);
       val actualValidityText = app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT);
       assertEquals(expectedValidityText, actualValidityText);
     } else {
-      assertTrue(app.isPresent(PrescriptionDetails.DIRECT_ASSIGNMENT_BADGE), "Missing 'Direktzuweisung'-Label");
+      assertTrue(
+          app.isPresent(PrescriptionDetails.DIRECT_ASSIGNMENT_BADGE),
+          "Missing 'Direktzuweisung'-Label");
     }
 
     val expectedZuzahlung =

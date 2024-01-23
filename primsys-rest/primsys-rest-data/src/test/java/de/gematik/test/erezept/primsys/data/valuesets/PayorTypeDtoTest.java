@@ -16,11 +16,11 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import lombok.val;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PayorTypeDtoTest {
 

@@ -39,6 +39,7 @@ public class UseTheErpClient implements Ability {
 
   @Delegate(excludes = DelegateExclude.class)
   private final ErpClient client;
+
   private final ApiCallStopwatch stopwatch;
   private final JWTDecoder jwtDecoder;
 
@@ -60,7 +61,7 @@ public class UseTheErpClient implements Ability {
     this.authenticateWith(konnektor);
     return this;
   }
-  
+
   public UseTheErpClient authenticatingWith(Smartcard smartcard) {
     this.authenticateWith(smartcard);
     return this;

@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
@@ -27,18 +30,14 @@ import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.*;
-
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-import static java.text.MessageFormat.format;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * This builder provides a convenient way to build <a
@@ -90,6 +89,11 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     return new KbvErpBundleBuilder().prescriptionId(prescriptionId);
   }
 
+  /**
+   * Faker produces a Bundle with Medication_PZN !!!
+   *
+   * @return KbvErpBundleBuilder
+   */
   public static KbvErpBundleBuilder faker() {
     return faker(KVNR.random(), fakerPrescriptionId());
   }
@@ -154,7 +158,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     val insurance =
         KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
     val medication =
-        KbvErpMedicationBuilder.faker(pzn, medicationName, MedicationCategory.C_00).build();
+        KbvErpMedicationPZNBuilder.faker(pzn, medicationName, MedicationCategory.C_00).build();
     val medicationRequest =
         MedicationRequestBuilder.faker(patient, authoredOn, substitution)
             .insurance(insurance)

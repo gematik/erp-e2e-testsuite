@@ -118,15 +118,14 @@ public class KbvCompositionBuilder extends AbstractResourceBuilder<KbvCompositio
   }
 
   protected KbvCompositionBuilder attesterReference(Reference attesterReference) {
-    val attesterComponent =new Composition.CompositionAttesterComponent();
+    val attesterComponent = new Composition.CompositionAttesterComponent();
     attesterComponent.setParty(attesterReference);
     attesterComponent.setMode(Composition.CompositionAttestationMode.LEGAL);
     attesters.add(attesterComponent);
     return self();
   }
 
-  protected KbvCompositionBuilder medicationRequestReference(
-          Reference medicationReference) {
+  protected KbvCompositionBuilder medicationRequestReference(Reference medicationReference) {
     val s = new Composition.SectionComponent();
     s.setCode(KbvCodeSystem.SECTION_TYPE.asCodeableConcept("Prescription"));
     s.addEntry(medicationReference);

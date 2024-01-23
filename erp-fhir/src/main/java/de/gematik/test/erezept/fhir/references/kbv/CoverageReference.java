@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Reference;
 public class CoverageReference extends CustomReferenceProvider {
 
   private String display;
-  
+
   public CoverageReference(String referenceValue) {
     super("Coverage", referenceValue);
   }

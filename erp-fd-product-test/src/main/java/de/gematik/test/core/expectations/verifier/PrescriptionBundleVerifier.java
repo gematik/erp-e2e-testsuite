@@ -21,7 +21,9 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.values.PZN;
 import java.util.function.Predicate;
@@ -40,7 +42,8 @@ public class PrescriptionBundleVerifier {
         new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
             ErpAfos.A_19021.getRequirement(),
             format(
-                "Der AccessCode muss eine 256 Bit Zufallszahl mit einer Mindestentropie von 120 Bit sein"));
+                "Der AccessCode muss eine 256 Bit Zufallszahl mit einer Mindestentropie von 120 Bit"
+                    + " sein"));
     return step.predicate(predicate).accept();
   }
 
@@ -50,10 +53,13 @@ public class PrescriptionBundleVerifier {
         bundle ->
             bundle
                 .getKbvBundle()
+                .orElseThrow(
+                    () -> new MissingFieldException(bundle.getClass(), KbvItaErpStructDef.BUNDLE))
                 .getMedicationRequest()
                 .getAccident()
                 .map(accidentExtension -> accidentExtension.equals(accident))
                 .isPresent();
+
     val step =
         new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
             KbvProfileRules.ACCIDENT_EXTENSION,
@@ -65,14 +71,15 @@ public class PrescriptionBundleVerifier {
 
   public static VerificationStep<ErxPrescriptionBundle> bundleContainsPzn(
       PZN expected, RequirementsSet requirementsSet) {
+
     Predicate<ErxPrescriptionBundle> predicate =
         bundle ->
             bundle
                 .getKbvBundle()
-                .getMedication()
-                .getPznOptional()
+                .flatMap(kbvErpBundle -> kbvErpBundle.getMedication().getPznOptional())
                 .map(pzn -> pzn.equals(expected))
                 .orElse(false);
+
     val step =
         new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
             requirementsSet,
@@ -84,18 +91,22 @@ public class PrescriptionBundleVerifier {
       String expected, RequirementsSet requirementsSet) {
     Predicate<ErxPrescriptionBundle> predicate =
         bundle ->
-            expected.equals(
-                bundle
-                    .getKbvBundle()
-                    .getMedication()
-                    .getIngredientFirstRep()
-                    .getItemCodeableConcept()
-                    .getText());
+            bundle
+                .getKbvBundle()
+                .map(
+                    kbvErpBundle ->
+                        kbvErpBundle
+                            .getMedication()
+                            .getIngredientFirstRep()
+                            .getItemCodeableConcept()
+                            .getText())
+                .map(expected::equals)
+                .orElse(false);
+
     val step =
         new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
             requirementsSet,
-            format(
-                "Das E-Rezept muss die Übergebene mMedikamentenbezeichnung {0} haben", expected));
+            format("Das E-Rezept muss die Übergebene Medikamentenbezeichnung {0} haben", expected));
     return step.predicate(predicate).accept();
   }
 }

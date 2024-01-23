@@ -17,7 +17,6 @@
 package de.gematik.test.erezept.config.dto;
 
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
-
 import java.util.List;
 
 /**

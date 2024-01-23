@@ -243,7 +243,8 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_07")
   @Test
-  @DisplayName("Abrufen von Tasks als Apotheker ohne Secret und mit AccessCode")
+  @DisplayName(
+      "Abrufen von Rezepten als Apotheker ohne vorheriges ACCEPT, daher kein Secret und nur ein AccessCode")
   void withTaskIdAndAccessCode() {
     val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
     val activation = doctor.performs(IssuePrescription.forPatient(patient).withRandomKbvBundle());
@@ -253,8 +254,8 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
             GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
     pharmacy.attemptsTo(
         Verify.that(response)
-            .withOperationOutcome(ErpAfos.A_19113_01)
-            .responseWith(returnCodeIs(403))
+            .withOperationOutcome(ErpAfos.A_24176)
+            .responseWith(returnCodeIs(412))
             .isCorrect());
   }
 

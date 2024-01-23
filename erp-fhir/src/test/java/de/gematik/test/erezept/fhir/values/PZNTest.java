@@ -16,33 +16,33 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class PZNTest {
 
-    @ParameterizedTest(name = "[{index}]: PZN {0} is valid")
-    @ValueSource(strings = {"27580899", "20987327", "91168337"})
-    void shouldValidPZN(String value) {
-        val pzn = PZN.from(value);
-        assertTrue(pzn.isValid());
-    }
+  @ParameterizedTest(name = "[{index}]: PZN {0} is valid")
+  @ValueSource(strings = {"27580899", "20987327", "91168337"})
+  void shouldValidPZN(String value) {
+    val pzn = PZN.from(value);
+    assertTrue(pzn.isValid());
+  }
 
-    @RepeatedTest(5)
-    void shouldGenerateRandomValidPZN() {
-        val pzn = PZN.random();
-        assertTrue(pzn.isValid());
-    }
+  @RepeatedTest(5)
+  void shouldGenerateRandomValidPZN() {
+    val pzn = PZN.random();
+    assertTrue(pzn.isValid());
+  }
 
-    @ParameterizedTest(name = "[{index}]: PZN {0} is invalid")
-    @ValueSource(strings = {"abc", "1234", "123456789"})
-    void shouldCheckInvalidPznCheckDigit(String value) {
-        val pzn = PZN.from(value);
-        assertFalse(pzn.isValid());
-    }
+  @ParameterizedTest(name = "[{index}]: PZN {0} is invalid")
+  @ValueSource(strings = {"abc", "1234", "123456789"})
+  void shouldCheckInvalidPznCheckDigit(String value) {
+    val pzn = PZN.from(value);
+    assertFalse(pzn.isValid());
+  }
 }

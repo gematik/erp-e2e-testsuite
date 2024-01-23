@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import de.gematik.test.erezept.cli.param.InputOutputDirectoryParameter;
 import lombok.*;
 import org.junit.jupiter.api.*;
 import picocli.*;

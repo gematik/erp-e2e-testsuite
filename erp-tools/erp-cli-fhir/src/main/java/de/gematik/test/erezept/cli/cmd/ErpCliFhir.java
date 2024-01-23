@@ -22,7 +22,8 @@ import picocli.CommandLine.Command;
     name = "erpf",
     aliases = {"erp-cli-fhir"},
     description =
-        "E-Rezept CLI FHIR is a Swiss Army knife for creating, validating, and transcoding E- Rezept FHIR Resources",
+        "E-Rezept CLI FHIR is a Swiss Army knife for creating, validating, and transcoding E-"
+            + " Rezept FHIR Resources",
     version = "0.1.0",
     mixinStandardHelpOptions = true,
     subcommands = {

@@ -112,12 +112,12 @@ public class MultiplePrescriptionExtension {
     public Builder withRandomId() {
       return withId(UUID.randomUUID().toString());
     }
-    
+
     public Builder withId(String id) {
       this.id = id;
       return this;
     }
-    
+
     public Builder fromNow() {
       return starting(new Date());
     }

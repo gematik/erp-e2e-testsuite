@@ -37,23 +37,27 @@ import net.serenitybdd.screenplay.actors.OnStage;
 public class PharmacyAcceptSteps {
 
   @Wenn(
-      "^die Apotheke (.+) das (letzte|erste) (?:zugewiesene|abgerufene) E-Rezept beim Fachdienst akzeptiert$")
+      "^die Apotheke (.+) das (letzte|erste) (?:zugewiesene|abgerufene) E-Rezept beim Fachdienst"
+          + " akzeptiert$")
   public void whenAcceptPrescription(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy).attemptsTo(AcceptPrescription.fromStack(order));
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept beim Fachdienst akzeptieren$")
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept beim Fachdienst"
+          + " akzeptieren$")
   public void thenAcceptPrescription(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy).attemptsTo(AcceptPrescription.fromStack(order));
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren$")
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren$")
   @Und(
-      "^die Apotheke (.+) kann das (letzte|erste) zugewiesen E-Rezept nicht beim Fachdienst akzeptieren$")
+      "^die Apotheke (.+) kann das (letzte|erste) zugewiesen E-Rezept nicht beim Fachdienst"
+          + " akzeptieren$")
   public void thenForbiddenToAcceptPrescription(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -63,7 +67,8 @@ public class PharmacyAcceptSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es nicht mehr existiert$")
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren, weil es nicht mehr existiert$")
   public void thenForbiddenToAcceptPrescriptionWith410(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -72,7 +77,8 @@ public class PharmacyAcceptSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es noch nicht gültig ist$")
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren, weil es noch nicht gültig ist$")
   public void thenForbiddenToAcceptPrescriptionWith403(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -84,7 +90,8 @@ public class PharmacyAcceptSteps {
    * @param order
    */
   @Dann(
-      "^kann die Apotheke das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es nicht mehr existiert$")
+      "^kann die Apotheke das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren, weil es nicht mehr existiert$")
   public void thenForbiddenToAcceptPrescriptionWith410(String order) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
@@ -93,7 +100,8 @@ public class PharmacyAcceptSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es einen Konflikt gibt$")
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren, weil es einen Konflikt gibt$")
   public void thenForbiddenToAcceptPrescriptionWith409(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -102,7 +110,8 @@ public class PharmacyAcceptSteps {
   }
 
   @Dann(
-      "^kann die Apotheke das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es einen Konflikt gibt$")
+      "^kann die Apotheke das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren, weil es einen Konflikt gibt$")
   public void thenForbiddenToAcceptPrescriptionWith409(String order) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)

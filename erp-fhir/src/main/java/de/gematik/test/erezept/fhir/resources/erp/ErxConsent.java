@@ -19,6 +19,7 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.PatientenrechnungCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
 import de.gematik.test.erezept.fhir.valuesets.ConsentType;
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +43,8 @@ public class ErxConsent extends Consent {
                 cat.getCoding().stream()
                     .anyMatch(
                         coding ->
-                            coding
-                                .getSystem()
-                                .equals(ErpWorkflowCodeSystem.CONSENT_TYPE.getCanonicalUrl())))
+                            ErpWorkflowCodeSystem.CONSENT_TYPE.match(coding)
+                                || PatientenrechnungCodeSystem.CONSENT_TYPE.match(coding)))
         .map(CodeableConcept::getCodingFirstRep)
         .map(coding -> ConsentType.fromCode(coding.getCode()))
         .findFirst()

@@ -19,9 +19,9 @@ package de.gematik.test.erezept.lei.steps;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.test.erezept.PrimSysBddFactory;
 import de.gematik.test.erezept.apimeasure.DumpingStopwatch;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.PrimSysBddFactory;
 import de.gematik.test.erezept.screenplay.task.ConnectSubscriptionService;
 import de.gematik.test.smartcard.SmartcardArchive;
 import de.gematik.test.smartcard.SmartcardFactory;
@@ -100,7 +100,8 @@ public class ActorsInitializationSteps {
    *     identifizieren
    */
   @Angenommen(
-      "^(?:der Arzt|die Ärztin) (.+) hat Zugriff auf (?:seinen|ihren) HBA und auf die SMC-B der Praxis$")
+      "^(?:der Arzt|die Ärztin) (.+) hat Zugriff auf (?:seinen|ihren) HBA und auf die SMC-B der"
+          + " Praxis$")
   public void initDoctor(String docName) {
     log.trace(format("Initialize Doctor {0}", docName));
     val theActor = OnStage.theActorCalled(docName);
@@ -130,7 +131,8 @@ public class ActorsInitializationSteps {
    *     diesen zu identifizieren
    */
   @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat Zugriff auf (?:seine|ihre) (?:digitale Identität|eGK)$")
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat Zugriff auf"
+          + " (?:seine|ihre) (?:digitale Identität|eGK)$")
   public void initPatient(String insuranceType, String patientName) {
     log.trace(format("Initialize Patient {0} {1}", insuranceType, patientName));
     val theActor = OnStage.theActorCalled(patientName);
@@ -138,7 +140,8 @@ public class ActorsInitializationSteps {
   }
 
   @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat eine (?:digitale Identität|eGK) für die Abholung in der Apotheke$")
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat eine (?:digitale"
+          + " Identität|eGK) für die Abholung in der Apotheke$")
   public void initPatientForVsdm(String insuranceType, String patientName) {
     log.trace(format("Initialize Patient {0} {1} for VSDM", insuranceType, patientName));
     val theActor = OnStage.theActorCalled(patientName);

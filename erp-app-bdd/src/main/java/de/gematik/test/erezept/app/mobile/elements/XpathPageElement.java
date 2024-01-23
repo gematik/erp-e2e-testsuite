@@ -17,11 +17,10 @@
 package de.gematik.test.erezept.app.mobile.elements;
 
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.openqa.selenium.By;
-
-import java.util.function.Supplier;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class XpathPageElement implements PageElement {

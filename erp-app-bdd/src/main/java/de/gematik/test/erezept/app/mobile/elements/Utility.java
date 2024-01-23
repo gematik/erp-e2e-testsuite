@@ -17,18 +17,16 @@
 package de.gematik.test.erezept.app.mobile.elements;
 
 import io.appium.java_client.AppiumBy;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
-
-import java.util.function.Supplier;
 
 @Getter
 @RequiredArgsConstructor
 public enum Utility implements PageElement {
   TOOLTIPS("Tooltip", null, () -> AppiumBy.accessibilityId("ctl_tooltip_container")),
-  SAVE_PASSWORD_LATER(
-          "Save Password later", () -> null, () -> AppiumBy.accessibilityId("Später")),
+  SAVE_PASSWORD_LATER("Save Password later", () -> null, () -> AppiumBy.accessibilityId("Später")),
   DECLINE_LOGIN("Decline Cardwall Login", null, () -> AppiumBy.accessibilityId("wlcd_btn_decline"));
 
   private final String elementName;

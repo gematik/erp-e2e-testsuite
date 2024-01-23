@@ -33,9 +33,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SkipOnboardingOnAndroidTest {
-  
+
   private String userName;
-  
+
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
@@ -62,7 +62,7 @@ class SkipOnboardingOnAndroidTest {
     val skipOnboardong = new SkipOnboardingOnAndroid(swipeDirections);
 
     actor.attemptsTo(skipOnboardong);
-    
+
     verify(app, times(swipeDirections.size())).swipe(any());
     verify(app, times(1)).tap(Onboarding.SKIP_BUTTON);
   }

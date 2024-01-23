@@ -16,59 +16,60 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.impl;
 
+import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodingTypeFuzzerImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
+import java.util.LinkedList;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 
-import java.util.LinkedList;
-
-import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 class ListFuzzerImplTest {
-    private static FuzzConfig fuzzConfig;
-    private static FuzzerContext fuzzerContext;
-    private static ListFuzzerImpl<Coding> listFuzzer;
+  private static FuzzConfig fuzzConfig;
+  private static FuzzerContext fuzzerContext;
+  private static ListFuzzerImpl<Coding> listFuzzer;
 
-    Coding coding;
+  Coding coding;
 
-    @BeforeAll
-    static void setUpConf() {
-        fuzzConfig = new FuzzConfig();
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        fuzzConfig.setUseAllMutators(true);
-        fuzzerContext = new FuzzerContext(fuzzConfig);
-        val codingTypeFuzzer = fuzzerContext.getTypeFuzzerFor(Coding.class, () -> new CodingTypeFuzzerImpl(fuzzerContext));
-        listFuzzer = new ListFuzzerImpl<>(fuzzerContext, codingTypeFuzzer);
-    }
+  @BeforeAll
+  static void setUpConf() {
+    fuzzConfig = new FuzzConfig();
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    fuzzConfig.setUseAllMutators(true);
+    fuzzerContext = new FuzzerContext(fuzzConfig);
+    val codingTypeFuzzer =
+        fuzzerContext.getTypeFuzzerFor(Coding.class, () -> new CodingTypeFuzzerImpl(fuzzerContext));
+    listFuzzer = new ListFuzzerImpl<>(fuzzerContext, codingTypeFuzzer);
+  }
 
-    @BeforeEach
-    void setupComp() {
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        coding = new Coding();
-    }
+  @BeforeEach
+  void setupComp() {
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    coding = new Coding();
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void getContext() {
-        assertNotNull(listFuzzer.getContext());
-    }
+  @RepeatedTest(REPETITIONS)
+  void getContext() {
+    assertNotNull(listFuzzer.getContext());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void fuzz() {
-        val codingTypeFuzzer = fuzzerContext.getTypeFuzzerFor(Coding.class, () -> new CodingTypeFuzzerImpl(fuzzerContext));
-        LinkedList<Coding> cod = new LinkedList<>();
-        cod.add(codingTypeFuzzer.generateRandom());
-        cod.add(codingTypeFuzzer.generateRandom());
-        cod.add(codingTypeFuzzer.generateRandom());
-        cod.add(codingTypeFuzzer.generateRandom());
-        listFuzzer.fuzz(cod);
-        assertNotNull(cod);
-    }
+  @RepeatedTest(REPETITIONS)
+  void fuzz() {
+    val codingTypeFuzzer =
+        fuzzerContext.getTypeFuzzerFor(Coding.class, () -> new CodingTypeFuzzerImpl(fuzzerContext));
+    LinkedList<Coding> cod = new LinkedList<>();
+    cod.add(codingTypeFuzzer.generateRandom());
+    cod.add(codingTypeFuzzer.generateRandom());
+    cod.add(codingTypeFuzzer.generateRandom());
+    cod.add(codingTypeFuzzer.generateRandom());
+    listFuzzer.fuzz(cod);
+    assertNotNull(cod);
+  }
 }

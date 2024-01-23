@@ -33,12 +33,12 @@ import net.serenitybdd.screenplay.Question;
 @Slf4j
 @NoArgsConstructor
 public class UsedSessionKVNR implements Question<String> {
-  
+
   @Override
   @Step("{0} liest die KVNR aus dem Benutzerprofil aus")
   public String answeredBy(Actor actor) {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
-    
+
     app.tap(BottomNav.SETTINGS_BUTTON);
     app.tap(ProfileSelectorElement.forActor(actor).fromSettingsMenu());
     val userKVNR = app.getText(Profile.USER_KVNR);

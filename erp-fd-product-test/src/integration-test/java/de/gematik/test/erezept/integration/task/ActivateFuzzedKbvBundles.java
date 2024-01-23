@@ -206,8 +206,9 @@ class ActivateFuzzedKbvBundles extends ErpTest {
     }
 
   @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_13")
-  @DisplayName("FhirFuzzer hat mit Random gefuzzten Werten versucht Rezepte einzustellen")
-  @ParameterizedTest(name = "[{index}] -> Verordnender Arzt stellt ein smartFuzzed E-Rezept mit ''{0}'' aus")
+  @DisplayName("FhirFuzz hat mit Random gefuzzten Werten versucht Rezepte einzustellen")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein smartFuzzed E-Rezept mit ''{0}'' aus")
   @MethodSource("fuzzingContextProvider")
   void activatePrescriptionWithSmartFuzzer(FuzzConfig fuzzConfig) {
     var assignmentKind = PrescriptionAssignmentKind.PHARMACY_ONLY;
@@ -220,11 +221,11 @@ class ActivateFuzzedKbvBundles extends ErpTest {
     val fuzzerContext = new FuzzerContext(fuzzConfig);
     val fhirFuzzer = new FhirFuzzImpl(fuzzerContext);
     val activation =
-            doctor.performs(
-                    IssuePrescription.forPatient(sina)
-                            .ofAssignmentKind(assignmentKind)
-                            .withSmartFuzzer(fhirFuzzer)
-                            .withRandomKbvBundle());
+        doctor.performs(
+            IssuePrescription.forPatient(sina)
+                .ofAssignmentKind(assignmentKind)
+                .withSmartFuzzer(fhirFuzzer)
+                .withRandomKbvBundle());
     val fuzzLog = fuzzerContext.getOperationLogs().stream().map(Object::toString).collect(Collectors.joining("\n"));
     log.info("FuzzLogWithSmartFuzzer:\n" + fuzzLog);
 

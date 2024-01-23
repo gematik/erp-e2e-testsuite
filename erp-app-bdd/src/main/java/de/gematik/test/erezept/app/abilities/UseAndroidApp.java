@@ -54,14 +54,15 @@ public class UseAndroidApp extends UseTheApp<AndroidDriver> {
     } catch (NoSuchElementException nsee) {
       val duration = Duration.between(start, Instant.now());
       log.error(
-              format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis()));
+          format("Failed to fetch element with <{0}> after {1}ms", locator, duration.toMillis()));
       throw nsee;
     }
   }
 
   @Override
   protected Optional<WebElement> getOptionalWebElement(PageElement pageelement) {
-    return this.getOptionalWebElement(pageelement, ""); // currently pagesoure is not used on android
+    return this.getOptionalWebElement(
+        pageelement, ""); // currently pagesoure is not used on android
   }
 
   @Override

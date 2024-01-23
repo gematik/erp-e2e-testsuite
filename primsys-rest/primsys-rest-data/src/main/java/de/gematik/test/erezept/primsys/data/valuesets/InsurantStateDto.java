@@ -35,8 +35,7 @@ public enum InsurantStateDto {
   PENSIONER("5", "Rentner");
 
   private final String code;
-  @JsonValue
-  private final String display;
+  @JsonValue private final String display;
 
   @JsonCreator
   public static InsurantStateDto fromCode(String code) {

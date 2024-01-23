@@ -16,6 +16,12 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
+
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
@@ -29,12 +35,17 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.E2ECucumberTag;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -46,18 +57,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
@@ -113,7 +112,7 @@ class TaskActivateUsecase extends ErpTest {
     sina.changePatientInsuranceType(insuranceType);
 
     val medication =
-        KbvErpMedicationBuilder.faker()
+        KbvErpMedicationPZNBuilder.faker()
             .category(MedicationCategory.C_00)
             .darreichungsform(df)
             .build();
@@ -185,7 +184,7 @@ class TaskActivateUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
     val medicationRequest =
         MedicationRequestBuilder.faker(sina.getPatientData())
             .insurance(sina.getInsuranceCoverage())

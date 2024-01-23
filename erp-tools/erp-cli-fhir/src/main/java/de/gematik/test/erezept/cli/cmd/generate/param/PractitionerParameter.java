@@ -42,7 +42,8 @@ public class PractitionerParameter implements BaseResourceParameter {
       paramLabel = "<NUM>",
       type = String.class,
       description =
-          "Define a LANR/ZANR (depending on the qualification type) value to the practitioner doctor (default=random)")
+          "Define a LANR/ZANR (depending on the qualification type) value to the practitioner"
+              + " doctor (default=random)")
   private String anrValue;
 
   @CommandLine.Option(
@@ -50,7 +51,8 @@ public class PractitionerParameter implements BaseResourceParameter {
       paramLabel = "<TYPE>",
       type = QualificationType.class,
       description =
-          "The qualification type of the practitioner doctor from ${COMPLETION-CANDIDATES} (default=random)")
+          "The qualification type of the practitioner doctor from ${COMPLETION-CANDIDATES}"
+              + " (default=random)")
   private QualificationType qualificationType;
 
   public BaseANR getANR() {

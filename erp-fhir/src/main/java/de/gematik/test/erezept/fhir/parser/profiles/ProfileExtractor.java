@@ -134,13 +134,14 @@ public class ProfileExtractor {
    *     profiles found
    */
   private static Optional<JsonNode> extractProfileFromCollection(JsonNode root) {
-    return extractProfileFromRoot(root).or(
-        () ->
-            root.findValues(ENTRY_LITERAL).stream()
-                .map(entry -> entry.findValue(META_LITERAL))
-                .filter(ProfileExtractor::filterEmptyProfiles)
-                .map(meta -> meta.findValue(PROFILE_LITERAL))
-                .findFirst());
+    return extractProfileFromRoot(root)
+        .or(
+            () ->
+                root.findValues(ENTRY_LITERAL).stream()
+                    .map(entry -> entry.findValue(META_LITERAL))
+                    .filter(ProfileExtractor::filterEmptyProfiles)
+                    .map(meta -> meta.findValue(PROFILE_LITERAL))
+                    .findFirst());
   }
 
   /**

@@ -16,6 +16,8 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.crypto.signature.EcdsaSigner;
 import de.gematik.test.erezept.crypto.signature.RsaPssSigner;
 import de.gematik.test.smartcard.Algorithm;
@@ -26,14 +28,11 @@ import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7_4.BinaryDocumentType;
 import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.OptionalInputs;
+import java.security.interfaces.RSAPrivateKey;
+import javax.xml.ws.Holder;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.Base64Signature;
 import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
-
-import javax.xml.ws.Holder;
-import java.security.interfaces.RSAPrivateKey;
-
-import static java.text.MessageFormat.format;
 
 public class MockAuthSignatureServicePortType extends AbstractMockService
     implements AuthSignatureServicePortType {

@@ -35,7 +35,8 @@ public class OperationOutcomeVerifier {
 
   public static VerificationStep<OperationOutcome> operationOutcomeHintsDeviatingAuthoredOnDate() {
     val detailsText =
-        "Ausstellungsdatum und Signaturzeitpunkt weichen voneinander ab, müssen aber taggleich sein";
+        "Ausstellungsdatum und Signaturzeitpunkt weichen voneinander ab, müssen aber taggleich"
+            + " sein";
     return operationOutcomeHasDetailsText(detailsText, ErpAfos.A_22487);
   }
 

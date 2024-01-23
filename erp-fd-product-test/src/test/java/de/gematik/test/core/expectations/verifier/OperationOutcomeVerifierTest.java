@@ -99,7 +99,8 @@ class OperationOutcomeVerifierTest {
     oo.addIssue()
         .getDetails()
         .setText(
-            "Ausstellungsdatum und Signaturzeitpunkt weichen voneinander ab, müssen aber taggleich sein");
+            "Ausstellungsdatum und Signaturzeitpunkt weichen voneinander ab, müssen aber taggleich"
+                + " sein");
 
     val step = operationOutcomeHintsDeviatingAuthoredOnDate();
 
@@ -113,7 +114,8 @@ class OperationOutcomeVerifierTest {
     oo.addIssue()
         .getDetails()
         .setText(
-            "Ausstellungsdatum und Signaturzeitpunkt weichen voneinander ab, müssen aber taggleich sein!");
+            "Ausstellungsdatum und Signaturzeitpunkt weichen voneinander ab, müssen aber taggleich"
+                + " sein!");
 
     val step = operationOutcomeHintsDeviatingAuthoredOnDate();
 

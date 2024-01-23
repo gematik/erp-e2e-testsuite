@@ -25,10 +25,9 @@ import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.OptionalInputs;
 import de.gematik.ws.conn.encryptionservice.v6.EncryptDocument.RecipientKeys;
 import de.gematik.ws.conn.encryptionservice.v6.KeyOnCardType;
+import javax.xml.ws.Holder;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.Base64Data;
-
-import javax.xml.ws.Holder;
 
 public class EncryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 

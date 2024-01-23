@@ -37,5 +37,4 @@ public class InfoResource {
     log.info("GET /info");
     return InfoResponseBuilder.getInfo(actors);
   }
-
 }

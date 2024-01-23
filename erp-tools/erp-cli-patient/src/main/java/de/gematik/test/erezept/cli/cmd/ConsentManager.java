@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package de.gematik.test.erezept.fhir.testutil;
+package de.gematik.test.erezept.cli.cmd;
 
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import java.io.File;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import picocli.CommandLine;
 
-@Getter
-@RequiredArgsConstructor
-public class FileTuple {
-  private final String fileName;
-  private final String content;
-
-  public static FileTuple fromFile(File file) {
-    return new FileTuple(file.getAbsolutePath(), ResourceUtils.readFileFromResource(file));
-  }
-}
+@CommandLine.Command(
+    name = "consent",
+    description = "Manage PKV Consent",
+    mixinStandardHelpOptions = true,
+    subcommands = {ConsentReader.class, ConsentDeleter.class, ConsentWriter.class})
+public class ConsentManager {}

@@ -16,11 +16,10 @@
 
 package de.gematik.test.smartcard.exceptions;
 
-import de.gematik.test.smartcard.Algorithm.CryptographySpecification;
-
-import java.util.Arrays;
-
 import static java.text.MessageFormat.format;
+
+import de.gematik.test.smartcard.Algorithm.CryptographySpecification;
+import java.util.Arrays;
 
 public class InvalidCryptographySpecificationException extends RuntimeException {
 

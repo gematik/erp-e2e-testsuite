@@ -17,72 +17,67 @@
 package de.gematik.test.fuzzing.fhirfuzz;
 
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
-import lombok.val;
-
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import lombok.val;
 
 public interface BaseFuzzer<T> {
-    /**
-     * Method to fuzz direct a Value with concrete
-     * implementations of specified Fuzzer
-     *
-     * @param value
-     * @return fuzzedValue
-     */
-    T fuzz(T value);
+  /**
+   * Method to fuzz direct a Value with concrete implementations of specified Fuzzer
+   *
+   * @param value
+   * @return fuzzedValue
+   */
+  T fuzz(T value);
 
-    /**
-     * Method to fuzz with specific Getter and Setter
-     * a conditional chance behaves for getting a Random Object
-     *
-     * @param getter
-     * @param setter
-     */
-    default void fuzz(Supplier<T> getter, Consumer<T> setter) {
-        if (getContext().conditionalChance()) {
-            setter.accept(this.generateRandom());
-        } else {
-            val a = getter.get();
-            val fuzzedOne = this.fuzz(a);
-            setter.accept(fuzzedOne);
-        }
+  /**
+   * Method to fuzz with specific Getter and Setter a conditional chance behaves for getting a
+   * Random Object
+   *
+   * @param getter
+   * @param setter
+   */
+  default void fuzz(Supplier<T> getter, Consumer<T> setter) {
+    if (getContext().conditionalChance()) {
+      setter.accept(this.generateRandom());
+    } else {
+      val a = getter.get();
+      val fuzzedOne = this.fuzz(a);
+      setter.accept(fuzzedOne);
     }
+  }
 
-    /**
-     * Method to fuzz with specific Getter and Setter
-     * or generate a Random and concrete Object if no
-     * one is set
-     *
-     * @param checker
-     * @param getter
-     * @param setter
-     */
-    default void fuzz(BooleanSupplier checker, Supplier<T> getter, Consumer<T> setter) {
-        if (!checker.getAsBoolean()) {
-            setter.accept(this.generateRandom());
-        } else {
-            fuzz(getter, setter);
-        }
+  /**
+   * Method to fuzz with specific Getter and Setter or generate a Random and concrete Object if no
+   * one is set
+   *
+   * @param checker
+   * @param getter
+   * @param setter
+   */
+  default void fuzz(BooleanSupplier checker, Supplier<T> getter, Consumer<T> setter) {
+    if (!checker.getAsBoolean()) {
+      setter.accept(this.generateRandom());
+    } else {
+      fuzz(getter, setter);
     }
+  }
 
-    default String getMapContent(String key) {
-        Map<?, ?> map;
-        if (getContext().getFuzzConfig().getDetailSetup() != null &&
-                getContext().getFuzzConfig().getDetailSetup().get(key) != null) {
-            map = getContext().getFuzzConfig().getDetailSetup();
-        } else {
-            return "false";
-        }
-        val erg = map.get(key);
-        return erg.toString();
+  default String getMapContent(String key) {
+    Map<?, ?> map;
+    if (getContext().getFuzzConfig().getDetailSetup() != null
+        && getContext().getFuzzConfig().getDetailSetup().get(key) != null) {
+      map = getContext().getFuzzConfig().getDetailSetup();
+    } else {
+      return "false";
     }
+    val erg = map.get(key);
+    return erg.toString();
+  }
 
+  T generateRandom();
 
-    T generateRandom();
-
-    FuzzerContext getContext();
-
+  FuzzerContext getContext();
 }

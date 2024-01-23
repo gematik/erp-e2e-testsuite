@@ -52,7 +52,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
     builder.versicherungsArt = coverage.getInsuranceType();
     return builder;
   }
-  
+
   public static KbvCoverageBuilder insurance(String iknr, String insuranceName) {
     return insurance(new IKNR(iknr), insuranceName);
   }
@@ -69,13 +69,14 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   }
 
   public static KbvCoverageBuilder faker(VersicherungsArtDeBasis insuranceType) {
-    val builder = switch (insuranceType) {
-      case GKV -> insurance(randomElement(GkvInsuranceCoverageInfo.values()));
-      case PKV -> insurance(randomElement(PkvInsuranceCoverageInfo.values()));
-      case BG -> insurance(randomElement(BGInsuranceCoverageInfo.values()));
-      default -> insurance(DynamicInsuranceCoverageInfo.random());
-    };
-    
+    val builder =
+        switch (insuranceType) {
+          case GKV -> insurance(randomElement(GkvInsuranceCoverageInfo.values()));
+          case PKV -> insurance(randomElement(PkvInsuranceCoverageInfo.values()));
+          case BG -> insurance(randomElement(BGInsuranceCoverageInfo.values()));
+          default -> insurance(DynamicInsuranceCoverageInfo.random());
+        };
+
     builder
         .personGroup(fakerValueSet(PersonGroup.class))
         .beneficiary(PatientBuilder.faker(insuranceType).build())

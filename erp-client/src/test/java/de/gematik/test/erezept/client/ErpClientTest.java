@@ -16,6 +16,10 @@
 
 package de.gematik.test.erezept.client;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import de.gematik.idp.client.IdpClient;
 import de.gematik.idp.client.IdpClientRuntimeException;
 import de.gematik.idp.client.IdpTokenResult;
@@ -36,16 +40,11 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.smartcard.Smartcard;
 import de.gematik.test.smartcard.SmartcardCertificate;
+import java.security.cert.X509Certificate;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.security.cert.X509Certificate;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 class ErpClientTest {
 
@@ -62,7 +61,6 @@ class ErpClientTest {
   void resetMocks() {
     reset(mockVau, mockIdp);
   }
-
 
   @Test
   void shouldCatchNpeFromIdpClientOnAuthenticateWithSmartcard() {

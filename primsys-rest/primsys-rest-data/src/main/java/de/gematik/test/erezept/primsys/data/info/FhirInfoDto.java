@@ -16,10 +16,9 @@
 
 package de.gematik.test.erezept.primsys.data.info;
 
-import lombok.Data;
-
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 
 @Data
 public class FhirInfoDto {

@@ -16,7 +16,6 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.strategy.AmountAdverb;

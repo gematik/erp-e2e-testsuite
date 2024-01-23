@@ -41,9 +41,11 @@ public class RepresentativePatientSteps {
    * @param patientName Name des versicherten
    */
   @Dann(
-      "^hat (?:der Vertreter|die Vertreterin) (.+) die Nachricht mit dem Rezept (?:der Versicherten|des Versicherten) (.+) empfangen$")
+      "^hat (?:der Vertreter|die Vertreterin) (.+) die Nachricht mit dem Rezept (?:der"
+          + " Versicherten|des Versicherten) (.+) empfangen$")
   @Und(
-      "^(?:der Vertreter|die Vertreterin) (.+) hat die Nachricht mit dem Rezept (?:der Versicherten|des Versicherten) (.+) empfangen$")
+      "^(?:der Vertreter|die Vertreterin) (.+) hat die Nachricht mit dem Rezept (?:der"
+          + " Versicherten|des Versicherten) (.+) empfangen$")
   public void thenRepresentativeReceivedMessageFrom(String representativeName, String patientName) {
     val theRepresentative = OnStage.theActorCalled(representativeName);
     val thePatient = OnStage.theActorCalled(patientName);
@@ -53,7 +55,8 @@ public class RepresentativePatientSteps {
   }
 
   @Wenn(
-      "^(?:der Vertreter|die Vertreterin) (.+) (?:sein|ihr) (letztes|erstes) von (.+) zugewiesenes E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
+      "^(?:der Vertreter|die Vertreterin) (.+) (?:sein|ihr) (letztes|erstes) von (.+) zugewiesenes"
+          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
   public void whenAssignDispenseRequestPhysicallyAsRepresentative(
       String representativeName, String order, String patientName, String pharmacyName) {
     val theRepresentative = OnStage.theActorCalled(representativeName);
@@ -75,7 +78,8 @@ public class RepresentativePatientSteps {
   }
 
   @Dann(
-      "^kann (?:der Vertreter|die Vertreterin) (.+) das (letzte|erste) von (.+) zugewiesene E-Rezept ohne AccessCode nicht löschen$")
+      "^kann (?:der Vertreter|die Vertreterin) (.+) das (letzte|erste) von (.+) zugewiesene"
+          + " E-Rezept ohne AccessCode nicht löschen$")
   public void thenRepresentativeCannotDeletePrescription(
       String representativeName, String order, String patientName) {
     val theRepresentative = OnStage.theActorCalled(representativeName);
@@ -90,7 +94,8 @@ public class RepresentativePatientSteps {
   }
 
   @Aber(
-      "^(?:der Vertreter|die Vertreterin) (.+) kann das (letzte|erste) von (.+) zugewiesene E-Rezept mit AccessCode löschen$")
+      "^(?:der Vertreter|die Vertreterin) (.+) kann das (letzte|erste) von (.+) zugewiesene"
+          + " E-Rezept mit AccessCode löschen$")
   public void thenRepresentativeCanDeletePrescription(
       String representativeName, String order, String patientName) {
     val theRepresentative = OnStage.theActorCalled(representativeName);

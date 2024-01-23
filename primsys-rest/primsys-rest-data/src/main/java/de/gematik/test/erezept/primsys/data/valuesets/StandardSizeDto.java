@@ -24,30 +24,30 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-/**
- * corresponding to FHIR-ValueSet {@link
- * de.gematik.test.erezept.fhir.valuesets.StandardSize}
- */
+/** corresponding to FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.StandardSize} */
 @Getter
 @RequiredArgsConstructor
 public enum StandardSizeDto {
-    KA("KA", "Kein Angabe"),
-    KTP("KTP", "Keine therapiegerechte Packungsgröße"),
-    N1("N1", "Normgröße 1"),
-    N2("N2", "Normgröße 2"),
-    N3("N3", "Normgröße 3"),
-    NB("NB", "Nicht betroffen"),
-    SONSTIGES("Sonstiges", "Sonstiges");
+  KA("KA", "Kein Angabe"),
+  KTP("KTP", "Keine therapiegerechte Packungsgröße"),
+  N1("N1", "Normgröße 1"),
+  N2("N2", "Normgröße 2"),
+  N3("N3", "Normgröße 3"),
+  NB("NB", "Nicht betroffen"),
+  SONSTIGES("Sonstiges", "Sonstiges");
 
-    @JsonValue
-    private final String code;
-    private final String display;
+  @JsonValue private final String code;
+  private final String display;
 
-    @JsonCreator
-    public static StandardSizeDto fromCode(@NonNull String code) {
-        return Arrays.stream(StandardSizeDto.values())
-                .filter(it -> it.getCode().equals(code) || it.name().equalsIgnoreCase(code) || it.getDisplay().equalsIgnoreCase(code))
-                .findFirst()
-                .orElseThrow(() -> new InvalidCodeValueException(StandardSizeDto.class, code));
-    }
+  @JsonCreator
+  public static StandardSizeDto fromCode(@NonNull String code) {
+    return Arrays.stream(StandardSizeDto.values())
+        .filter(
+            it ->
+                it.getCode().equals(code)
+                    || it.name().equalsIgnoreCase(code)
+                    || it.getDisplay().equalsIgnoreCase(code))
+        .findFirst()
+        .orElseThrow(() -> new InvalidCodeValueException(StandardSizeDto.class, code));
+  }
 }

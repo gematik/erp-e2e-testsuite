@@ -16,10 +16,17 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.impl.typefuzzer;
 
+import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodeableConceptFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodingTypeFuzzerImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -27,96 +34,90 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 
-import java.util.List;
-
-import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class CodeableConceptFuzzImplTest {
-    private static FuzzConfig fuzzConfig;
-    private static FuzzerContext fuzzerContext;
+  private static FuzzConfig fuzzConfig;
+  private static FuzzerContext fuzzerContext;
 
-    private static CodeableConceptFuzzImpl codeableConceptFuzzImpl;
+  private static CodeableConceptFuzzImpl codeableConceptFuzzImpl;
 
-    private CodeableConcept cc;
+  private CodeableConcept cc;
 
-    @BeforeAll
-    static void setUpConf() {
-        fuzzConfig = new FuzzConfig();
-        fuzzConfig.setUseAllMutators(true);
-        fuzzerContext = new FuzzerContext(fuzzConfig);
-        codeableConceptFuzzImpl = new CodeableConceptFuzzImpl(fuzzerContext);
-    }
+  @BeforeAll
+  static void setUpConf() {
+    fuzzConfig = new FuzzConfig();
+    fuzzConfig.setUseAllMutators(true);
+    fuzzerContext = new FuzzerContext(fuzzConfig);
+    codeableConceptFuzzImpl = new CodeableConceptFuzzImpl(fuzzerContext);
+  }
 
-    @BeforeEach
-    void setupComp() {
-        fuzzConfig.setUseAllMutators(true);
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        cc = new CodeableConcept();
-    }
+  @BeforeEach
+  void setupComp() {
+    fuzzConfig.setUseAllMutators(true);
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    cc = new CodeableConcept();
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void getContext() {
-        assertNotNull(codeableConceptFuzzImpl.getContext());
-    }
+  @RepeatedTest(REPETITIONS)
+  void getContext() {
+    assertNotNull(codeableConceptFuzzImpl.getContext());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void generateRandom() {
-        assertTrue(codeableConceptFuzzImpl.generateRandom().hasText());
-        assertTrue(codeableConceptFuzzImpl.generateRandom().hasCoding());
+  @RepeatedTest(REPETITIONS)
+  void generateRandom() {
+    assertTrue(codeableConceptFuzzImpl.generateRandom().hasText());
+    assertTrue(codeableConceptFuzzImpl.generateRandom().hasCoding());
+  }
 
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzText() {
+    assertFalse(cc.hasText());
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertTrue(cc.hasText());
+    codeableConceptFuzzImpl.fuzz(cc);
+    val teststring = fuzzerContext.getStringFuzz().generateRandom(150);
+    cc.setText(teststring);
+    fuzzConfig.setPercentOfAll(0.00f);
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertNotEquals(teststring, cc.getText());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzText() {
-        assertFalse(cc.hasText());
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertTrue(cc.hasText());
-        codeableConceptFuzzImpl.fuzz(cc);
-        val teststring = fuzzerContext.getStringFuzz().generateRandom(150);
-        cc.setText(teststring);
-        fuzzConfig.setPercentOfAll(0.00f);
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertNotEquals(teststring, cc.getText());
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzId() {
+    assertFalse(cc.hasId());
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertTrue(cc.hasId());
+    codeableConceptFuzzImpl.fuzz(cc);
+    val teststring = fuzzerContext.getIdFuzzer().generateRandom();
+    cc.setId(teststring);
+    fuzzConfig.setPercentOfAll(0.00f);
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertNotEquals(teststring, cc.getId());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzId() {
-        assertFalse(cc.hasId());
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertTrue(cc.hasId());
-        codeableConceptFuzzImpl.fuzz(cc);
-        val teststring = fuzzerContext.getIdFuzzer().generateRandom();
-        cc.setId(teststring);
-        fuzzConfig.setPercentOfAll(0.00f);
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertNotEquals(teststring, cc.getId());
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCoding() {
+    assertFalse(cc.hasCoding());
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertTrue(cc.hasCoding());
+    val codings =
+        List.of(
+            fuzzerContext
+                .getTypeFuzzerFor(Coding.class, () -> new CodingTypeFuzzerImpl(fuzzerContext))
+                .generateRandom());
+    val teststring = codings.get(0).getId();
+    cc.setCoding(codings);
+    fuzzConfig.setPercentOfAll(0.00f);
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertNotEquals(teststring, cc.getCoding().get(0).getId());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCoding() {
-        assertFalse(cc.hasCoding());
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertTrue(cc.hasCoding());
-        val codings = List.of(fuzzerContext.getTypeFuzzerFor(Coding.class, () -> new CodingTypeFuzzerImpl(fuzzerContext)).generateRandom());
-        val teststring = codings.get(0).getId();
-        cc.setCoding(codings);
-        fuzzConfig.setPercentOfAll(0.00f);
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertNotEquals(teststring, cc.getCoding().get(0).getId());
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzExtension() {
-        assertFalse(cc.hasExtension());
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertTrue(cc.hasExtension());
-        codeableConceptFuzzImpl.fuzz(cc);
-        assertFalse(cc.hasExtension());
-
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzExtension() {
+    assertFalse(cc.hasExtension());
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertTrue(cc.hasExtension());
+    codeableConceptFuzzImpl.fuzz(cc);
+    assertFalse(cc.hasExtension());
+  }
 }

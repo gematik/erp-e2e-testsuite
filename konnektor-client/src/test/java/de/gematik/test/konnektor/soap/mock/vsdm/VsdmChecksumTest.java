@@ -16,20 +16,19 @@
 
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.konnektor.exceptions.InvalidKeyLengthException;
 import de.gematik.test.konnektor.exceptions.ParsingUpdateResonException;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import lombok.SneakyThrows;
+import lombok.val;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class VsdmChecksumTest {
 
@@ -71,8 +70,11 @@ class VsdmChecksumTest {
   @SneakyThrows
   @Test
   void shouldParseValidChecksum() {
-    Assertions.assertDoesNotThrow(() ->VsdmChecksum.parse("WTc4NTcyODA3MTE2ODU0NDA4MzdVQzEpQdKViiyA4SGBIjkJuPVMWhLD6OBwggI="));
-    val checksum = VsdmChecksum.parse("WTc4NTcyODA3MTE2ODU0NDA4MzdVQzEpQdKViiyA4SGBIjkJuPVMWhLD6OBwggI=");
+    Assertions.assertDoesNotThrow(
+        () ->
+            VsdmChecksum.parse("WTc4NTcyODA3MTE2ODU0NDA4MzdVQzEpQdKViiyA4SGBIjkJuPVMWhLD6OBwggI="));
+    val checksum =
+        VsdmChecksum.parse("WTc4NTcyODA3MTE2ODU0NDA4MzdVQzEpQdKViiyA4SGBIjkJuPVMWhLD6OBwggI=");
     Assertions.assertEquals("Y785728071", checksum.getKvnr());
     Assertions.assertEquals('1', checksum.getVersion());
     Assertions.assertEquals('C', checksum.getIdentifier());
@@ -82,8 +84,13 @@ class VsdmChecksumTest {
   @Test
   void shouldNotParseInvalidChecksum() {
     Assertions.assertThrows(ParsingUpdateResonException.class, () -> VsdmChecksum.parse("abc"));
-    Assertions.assertThrows(ParsingUpdateResonException.class, () -> VsdmChecksum.parse("UzYyODUwMzkzMDE2ODM3MjQyODR"));
-    Assertions.assertThrows(ParsingUpdateResonException.class, () -> VsdmChecksum.parse("UzYyODUwMzkzMDE2ODM3MjQyODRV"));
-    Assertions.assertThrows(ParsingUpdateResonException.class, () -> VsdmChecksum.parse("UzYyODUwMzkzMDE2ODM3MjQyODRP"));
+    Assertions.assertThrows(
+        ParsingUpdateResonException.class, () -> VsdmChecksum.parse("UzYyODUwMzkzMDE2ODM3MjQyODR"));
+    Assertions.assertThrows(
+        ParsingUpdateResonException.class,
+        () -> VsdmChecksum.parse("UzYyODUwMzkzMDE2ODM3MjQyODRV"));
+    Assertions.assertThrows(
+        ParsingUpdateResonException.class,
+        () -> VsdmChecksum.parse("UzYyODUwMzkzMDE2ODM3MjQyODRP"));
   }
 }

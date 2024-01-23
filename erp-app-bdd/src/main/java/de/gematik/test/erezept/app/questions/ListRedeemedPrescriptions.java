@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.app.questions;
 
+import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMED_PRESCRIPTION_STATUS_LABEL;
+
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
@@ -25,13 +27,9 @@ import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 
-
-import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMED_PRESCRIPTION_STATUS_LABEL;
-
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ListRedeemedPrescriptions implements Question<Boolean> {
-
 
   public static ListRedeemedPrescriptions isEmpty() {
     return new ListRedeemedPrescriptions();

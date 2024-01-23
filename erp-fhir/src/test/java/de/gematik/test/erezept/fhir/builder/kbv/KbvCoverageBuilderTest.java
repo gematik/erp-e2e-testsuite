@@ -55,21 +55,22 @@ class KbvCoverageBuilderTest extends ParsingTest {
     assertNotNull(coverage.getDescription());
   }
 
-  @ParameterizedTest(name = "[{index}] -> Build KBV Coverage with UK PayorType with KbvItaForVersion {0}")
+  @ParameterizedTest(
+      name = "[{index}] -> Build KBV Coverage with UK PayorType with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithUKPayorType(KbvItaForVersion version) {
     val patient = PatientBuilder.faker().version(version).build();
     val tkCoverageInfo = GkvInsuranceCoverageInfo.TK;
     val coverage =
-            KbvCoverageBuilder.insurance(tkCoverageInfo)
-                    .version(version)
-                    .beneficiary(patient)
-                    .personGroup(PersonGroup.NOT_SET)
-                    .dmpKennzeichen(DmpKennzeichen.ASTHMA)
-                    .wop(Wop.BERLIN)
-                    .versichertenStatus(VersichertenStatus.PENSIONER)
-                    .versicherungsArt(PayorType.UK)
-                    .build();
+        KbvCoverageBuilder.insurance(tkCoverageInfo)
+            .version(version)
+            .beneficiary(patient)
+            .personGroup(PersonGroup.NOT_SET)
+            .dmpKennzeichen(DmpKennzeichen.ASTHMA)
+            .wop(Wop.BERLIN)
+            .versichertenStatus(VersichertenStatus.PENSIONER)
+            .versicherungsArt(PayorType.UK)
+            .build();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
 
@@ -82,21 +83,22 @@ class KbvCoverageBuilderTest extends ParsingTest {
     assertNotNull(coverage.getDescription());
   }
 
-  @ParameterizedTest(name = "[{index}] -> Build KBV Coverage with SKT PayorType with KbvItaForVersion {0}")
+  @ParameterizedTest(
+      name = "[{index}] -> Build KBV Coverage with SKT PayorType with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithSKTPayorType(KbvItaForVersion version) {
     val patient = PatientBuilder.faker().version(version).build();
     val tkCoverageInfo = GkvInsuranceCoverageInfo.TK;
     val coverage =
-            KbvCoverageBuilder.insurance(tkCoverageInfo)
-                    .version(version)
-                    .beneficiary(patient)
-                    .personGroup(PersonGroup.NOT_SET)
-                    .dmpKennzeichen(DmpKennzeichen.ASTHMA)
-                    .wop(Wop.BERLIN)
-                    .versichertenStatus(VersichertenStatus.PENSIONER)
-                    .versicherungsArt(PayorType.SKT)
-                    .build();
+        KbvCoverageBuilder.insurance(tkCoverageInfo)
+            .version(version)
+            .beneficiary(patient)
+            .personGroup(PersonGroup.NOT_SET)
+            .dmpKennzeichen(DmpKennzeichen.ASTHMA)
+            .wop(Wop.BERLIN)
+            .versichertenStatus(VersichertenStatus.PENSIONER)
+            .versicherungsArt(PayorType.SKT)
+            .build();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
 
@@ -122,11 +124,11 @@ class KbvCoverageBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFaker02(KbvItaForVersion version) {
     val insuranceKinds =
-            List.of(
-                    VersicherungsArtDeBasis.GKV,
-                    VersicherungsArtDeBasis.PKV,
-                    VersicherungsArtDeBasis.BG,
-                    VersicherungsArtDeBasis.BEI);
+        List.of(
+            VersicherungsArtDeBasis.GKV,
+            VersicherungsArtDeBasis.PKV,
+            VersicherungsArtDeBasis.BG,
+            VersicherungsArtDeBasis.BEI);
 
     insuranceKinds.forEach(
         ik -> {

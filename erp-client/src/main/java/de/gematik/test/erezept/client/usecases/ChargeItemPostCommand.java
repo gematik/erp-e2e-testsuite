@@ -44,5 +44,4 @@ public class ChargeItemPostCommand extends BaseCommand<ErxChargeItem> {
   public Optional<Resource> getRequestBody() {
     return Optional.of(body);
   }
-
 }

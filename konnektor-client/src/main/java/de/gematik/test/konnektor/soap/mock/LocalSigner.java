@@ -16,6 +16,8 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.smartcard.Algorithm;
 import de.gematik.test.smartcard.Hba;
 import de.gematik.test.smartcard.SmartcardCertificate;
@@ -27,18 +29,14 @@ import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.util.encoders.Base64;
-
-import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.util.Date;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class LocalSigner {
@@ -71,8 +69,7 @@ public class LocalSigner {
 
     try (val signingToken =
         new Pkcs12SignatureToken(
-            signingKey.getInputStreamSupplier().get(),
-            new KeyStore.PasswordProtection(signingKey.getP12KeyStorePassword().toCharArray()))) {
+            signingKey.getInputStreamSupplier().get(), signingKey.getP12KeyStoreProtection())) {
       val privateKey = signingToken.getKeys().get(0);
 
       val signParams = getCAdESSignatureParameters(signingDate, privateKey);

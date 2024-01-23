@@ -19,7 +19,7 @@ package de.gematik.test.erezept.primsys.mapping;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
@@ -56,7 +56,7 @@ public class PznMedicationDataMapper extends DataMapper<PznMedicationDto, KbvErp
 
   @Override
   protected KbvErpMedication convertInternal() {
-    return KbvErpMedicationBuilder.builder()
+    return KbvErpMedicationPZNBuilder.builder()
         .isVaccine(dto.isVaccine())
         .normgroesse(this.getStandardSize())
         .darreichungsform(this.getDarreichungsform())

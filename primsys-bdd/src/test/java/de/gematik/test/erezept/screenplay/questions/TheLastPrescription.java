@@ -147,8 +147,7 @@ public class TheLastPrescription implements Question<Boolean> {
     val kvidCheck = new AtomicBoolean(true);
     prescriptionBundle
         .getKbvBundle()
-        .getPatient()
-        .getGkvId()
+        .flatMap(kbvErpBundle -> kbvErpBundle.getPatient().getGkvId())
         .ifPresent(kvid -> kvidCheck.set(expectedKviId.equals(kvid)));
     return kvidCheck.get();
   }

@@ -23,36 +23,40 @@ import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PznMedicationBatchDto;
+import java.util.Date;
 import lombok.val;
 
-import java.util.Date;
+public class PznDispensedMedicationDataMapper
+    extends DataMapper<PznDispensedMedicationDto, ErxMedicationDispense> {
 
-public class PznDispensedMedicationDataMapper extends DataMapper<PznDispensedMedicationDto, ErxMedicationDispense> {
+  private final KVNR forKvnr;
+  private final PrescriptionId forPrescription;
+  private final String performerTelematikId;
 
-    private final KVNR forKvnr;
-    private final PrescriptionId forPrescription;
-    private final String performerTelematikId;
+  public PznDispensedMedicationDataMapper(
+      PznDispensedMedicationDto dto,
+      KVNR forKvnr,
+      PrescriptionId forPrescription,
+      String performerTelematikId) {
+    super(dto);
+    this.forKvnr = forKvnr;
+    this.forPrescription = forPrescription;
+    this.performerTelematikId = performerTelematikId;
+  }
 
-    public PznDispensedMedicationDataMapper(PznDispensedMedicationDto dto, KVNR forKvnr, PrescriptionId forPrescription, String performerTelematikId)  {
-        super(dto);
-        this.forKvnr = forKvnr;
-        this.forPrescription = forPrescription;
-        this.performerTelematikId = performerTelematikId;
-    }
-    
-    @Override
-    protected void complete() {
-        // simply reuse the PznMedicationDataMapper here!
-        PznMedicationDataMapper.from(dto);
-        ensure(dto::getBatch, dto::setBatch, PznMedicationBatchDto::new);
-        
-        val batch = dto.getBatch();
-        ensure(batch::getLotNumber, batch::setLotNumber, GemFaker::fakerLotNumber);
-        ensure(batch::getExpiryDate, batch::setExpiryDate, GemFaker::fakerFutureExpirationDate);
-    }
+  @Override
+  protected void complete() {
+    // simply reuse the PznMedicationDataMapper here!
+    PznMedicationDataMapper.from(dto);
+    ensure(dto::getBatch, dto::setBatch, PznMedicationBatchDto::new);
 
-    @Override
-    protected ErxMedicationDispense convertInternal() {
+    val batch = dto.getBatch();
+    ensure(batch::getLotNumber, batch::setLotNumber, GemFaker::fakerLotNumber);
+    ensure(batch::getExpiryDate, batch::setExpiryDate, GemFaker::fakerFutureExpirationDate);
+  }
+
+  @Override
+  protected ErxMedicationDispense convertInternal() {
     return ErxMedicationDispenseBuilder.forKvnr(forKvnr)
         .performerId(performerTelematikId)
         .prescriptionId(forPrescription)
@@ -61,18 +65,24 @@ public class PznDispensedMedicationDataMapper extends DataMapper<PznDispensedMed
         .whenPrepared(new Date())
         .batch(dto.getBatch().getLotNumber(), dto.getBatch().getExpiryDate())
         .build();
-    }
+  }
 
-    public static PznDispensedMedicationDataMapper from(PznDispensedMedicationDto dto, KVNR forKvnr, PrescriptionId forPrescription, String performerTelematikId) {
-        return new PznDispensedMedicationDataMapper(dto, forKvnr, forPrescription, performerTelematikId);
-    }
+  public static PznDispensedMedicationDataMapper from(
+      PznDispensedMedicationDto dto,
+      KVNR forKvnr,
+      PrescriptionId forPrescription,
+      String performerTelematikId) {
+    return new PznDispensedMedicationDataMapper(
+        dto, forKvnr, forPrescription, performerTelematikId);
+  }
 
-    public static PznDispensedMedicationDataMapper random() {
-        val dto = randomDto();
-        return new PznDispensedMedicationDataMapper(dto, KVNR.random(), PrescriptionId.random(), GemFaker.fakerTelematikId());
-    }
+  public static PznDispensedMedicationDataMapper random() {
+    val dto = randomDto();
+    return new PznDispensedMedicationDataMapper(
+        dto, KVNR.random(), PrescriptionId.random(), GemFaker.fakerTelematikId());
+  }
 
-    public static PznDispensedMedicationDto randomDto() {
-        return new PznDispensedMedicationDto();
-    }
+  public static PznDispensedMedicationDto randomDto() {
+    return new PznDispensedMedicationDto();
+  }
 }

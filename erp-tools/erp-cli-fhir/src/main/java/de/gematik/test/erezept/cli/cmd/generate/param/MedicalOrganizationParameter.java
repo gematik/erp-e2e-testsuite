@@ -40,7 +40,8 @@ public class MedicalOrganizationParameter implements BaseResourceParameter {
       paramLabel = "<BSNR>",
       type = String.class,
       description =
-          "BSNR (Betriebsstättennummer) is a unique 9-digit number which identifies the medical organization")
+          "BSNR (Betriebsstättennummer) is a unique 9-digit number which identifies the medical"
+              + " organization")
   private String bsnr;
 
   public void changeOrganizationName(String medOrgName) {

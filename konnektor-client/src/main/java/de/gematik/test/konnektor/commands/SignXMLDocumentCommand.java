@@ -16,6 +16,8 @@
 
 package de.gematik.test.konnektor.commands;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.konnektor.commands.options.SignDocumentOptions;
 import de.gematik.test.konnektor.exceptions.SOAPRequestException;
@@ -24,15 +26,12 @@ import de.gematik.test.smartcard.Algorithm;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7.ObjectFactory;
 import de.gematik.ws.conn.signatureservice.v7.SignRequest;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import oasis.names.tc.dss._1_0.core.schema.Base64Data;
-
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
-
-import static java.text.MessageFormat.format;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import oasis.names.tc.dss._1_0.core.schema.Base64Data;
 
 @Slf4j
 public class SignXMLDocumentCommand extends AbstractKonnektorCommand<byte[]> {
@@ -42,7 +41,10 @@ public class SignXMLDocumentCommand extends AbstractKonnektorCommand<byte[]> {
   private final SignDocumentOptions options;
 
   public SignXMLDocumentCommand(CardInfo cardInfo, String content, Algorithm algorithm) {
-    this(cardInfo, content.getBytes(StandardCharsets.UTF_8), SignDocumentOptions.withAlgorithm(algorithm) );
+    this(
+        cardInfo,
+        content.getBytes(StandardCharsets.UTF_8),
+        SignDocumentOptions.withAlgorithm(algorithm));
   }
 
   public SignXMLDocumentCommand(CardInfo cardInfo, byte[] content, SignDocumentOptions options) {

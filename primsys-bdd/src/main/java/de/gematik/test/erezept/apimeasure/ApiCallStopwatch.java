@@ -23,19 +23,20 @@ import org.hl7.fhir.r4.model.Resource;
 
 public interface ApiCallStopwatch {
 
-    <T extends Resource> void measurement(ClientType type, ICommand<T> command, ErpResponse<T> response);
+  <T extends Resource> void measurement(
+      ClientType type, ICommand<T> command, ErpResponse<T> response);
 
-    void close();
+  void close();
 
-    default <T extends Resource> String getResourceType(ICommand<T> command) {
-        return command.getRequestBody().map(b -> b.getClass().getSimpleName()).orElse("none");
+  default <T extends Resource> String getResourceType(ICommand<T> command) {
+    return command.getRequestBody().map(b -> b.getClass().getSimpleName()).orElse("none");
+  }
+
+  default <T extends Resource> String getResourceType(ErpResponse<T> response) {
+    if (response.getResourceType() != null) {
+      return response.getResourceType().getSimpleName();
+    } else {
+      return "none";
     }
-
-    default <T extends Resource> String getResourceType(ErpResponse<T> response) {
-        if (response.getResourceType() != null) {
-            return response.getResourceType().getSimpleName();
-        } else {
-            return "none";
-        }
-    }
+  }
 }

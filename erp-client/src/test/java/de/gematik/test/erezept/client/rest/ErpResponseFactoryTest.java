@@ -38,9 +38,9 @@ class ErpResponseFactoryTest {
       Map.of("content-type", MediaType.FHIR_JSON.asString());
   private static final int STATUS_OK = 200;
   private static final int STATUS_ERROR = 500;
-  
+
   private static final String testToken =
-          "eyJhbGciOiJCUDI1NlIxIiwidHlwIjoiYXQrSldUIiwia2lkIjoicHVrX2lkcF9zaWcifQ.eyJzdWIiOiJJWERkLTNyUVpLS0ZYVWR4R0dqNFBERG9WNk0wUThaai1xdzF2cjF1XzU4IiwicHJvZmVzc2lvbk9JRCI6IjEuMi4yNzYuMC43Ni40LjQ5Iiwib3JnYW5pemF0aW9uTmFtZSI6ImdlbWF0aWsgTXVzdGVya2Fzc2UxR0tWTk9ULVZBTElEIiwiaWROdW1tZXIiOiJYMTEwNTAyNDE0IiwiYW1yIjpbIm1mYSIsInNjIiwicGluIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTUwMTEvYXV0aC9yZWFsbXMvaWRwLy53ZWxsLWtub3duL29wZW5pZC1jb25maWd1cmF0aW9uIiwiZ2l2ZW5fbmFtZSI6IlJvYmluIEdyYWYiLCJjbGllbnRfaWQiOiJlcnAtdGVzdHN1aXRlLWZkIiwiYWNyIjoiZ2VtYXRpay1laGVhbHRoLWxvYS1oaWdoIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDozMDAwLyIsImF6cCI6ImVycC10ZXN0c3VpdGUtZmQiLCJzY29wZSI6Im9wZW5pZCBlLXJlemVwdCIsImF1dGhfdGltZSI6MTY0MzgwNDczMywiZXhwIjoxNjQzODA1MDMzLCJmYW1pbHlfbmFtZSI6IlbDs3Jtd2lua2VsIiwiaWF0IjoxNjQzODA0NjEzLCJqdGkiOiI2Yjg3NmU0MWNmMGViNGJkIn0.MV5cDnL3JBZ4b6xr9SqiYDmZ7qtZFEWBd1vCrHzVniZeDhkyuSYc7xhf577h2S21CzNgrMp0M6JALNW9Qjnw_g";
+      "eyJhbGciOiJCUDI1NlIxIiwidHlwIjoiYXQrSldUIiwia2lkIjoicHVrX2lkcF9zaWcifQ.eyJzdWIiOiJJWERkLTNyUVpLS0ZYVWR4R0dqNFBERG9WNk0wUThaai1xdzF2cjF1XzU4IiwicHJvZmVzc2lvbk9JRCI6IjEuMi4yNzYuMC43Ni40LjQ5Iiwib3JnYW5pemF0aW9uTmFtZSI6ImdlbWF0aWsgTXVzdGVya2Fzc2UxR0tWTk9ULVZBTElEIiwiaWROdW1tZXIiOiJYMTEwNTAyNDE0IiwiYW1yIjpbIm1mYSIsInNjIiwicGluIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTUwMTEvYXV0aC9yZWFsbXMvaWRwLy53ZWxsLWtub3duL29wZW5pZC1jb25maWd1cmF0aW9uIiwiZ2l2ZW5fbmFtZSI6IlJvYmluIEdyYWYiLCJjbGllbnRfaWQiOiJlcnAtdGVzdHN1aXRlLWZkIiwiYWNyIjoiZ2VtYXRpay1laGVhbHRoLWxvYS1oaWdoIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDozMDAwLyIsImF6cCI6ImVycC10ZXN0c3VpdGUtZmQiLCJzY29wZSI6Im9wZW5pZCBlLXJlemVwdCIsImF1dGhfdGltZSI6MTY0MzgwNDczMywiZXhwIjoxNjQzODA1MDMzLCJmYW1pbHlfbmFtZSI6IlbDs3Jtd2lua2VsIiwiaWF0IjoxNjQzODA0NjEzLCJqdGkiOiI2Yjg3NmU0MWNmMGViNGJkIn0.MV5cDnL3JBZ4b6xr9SqiYDmZ7qtZFEWBd1vCrHzVniZeDhkyuSYc7xhf577h2S21CzNgrMp0M6JALNW9Qjnw_g";
 
   private final String RESOURCE_PATH_ERP = "fhir/valid/erp/1.1.1/";
 
@@ -65,7 +65,12 @@ class ErpResponseFactoryTest {
             content -> {
               val response =
                   responseFactory.createFrom(
-                      STATUS_OK, Duration.ZERO, HEADERS_JSON, testToken, content, ErxAuditEvent.class);
+                      STATUS_OK,
+                      Duration.ZERO,
+                      HEADERS_JSON,
+                      testToken,
+                      content,
+                      ErxAuditEvent.class);
               val auditEvent = response.getAsBaseResource();
               assertNotNull(
                   auditEvent,
@@ -126,7 +131,12 @@ class ErpResponseFactoryTest {
     val auditEventContent = ResourceUtils.readFileFromResource(RESOURCE_PATH_ERP + filename);
     val response =
         responseFactory.createFrom(
-            STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, auditEventContent, OperationOutcome.class);
+            STATUS_ERROR,
+            Duration.ZERO,
+            HEADERS_JSON,
+            testToken,
+            auditEventContent,
+            OperationOutcome.class);
     assertFalse(response.isResourceOfType(OperationOutcome.class));
     assertTrue(response.isResourceOfType(ErxAuditEvent.class));
   }
@@ -137,7 +147,12 @@ class ErpResponseFactoryTest {
         encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
-            STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
+            STATUS_ERROR,
+            Duration.ZERO,
+            HEADERS_JSON,
+            testToken,
+            testOperationOutcome,
+            ErxAuditEvent.class);
     assertThrows(UnexpectedResponseResourceError.class, response::getExpectedResource);
   }
 
@@ -147,7 +162,12 @@ class ErpResponseFactoryTest {
         encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
-            STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
+            STATUS_ERROR,
+            Duration.ZERO,
+            HEADERS_JSON,
+            testToken,
+            testOperationOutcome,
+            ErxAuditEvent.class);
     val resource = response.getResourceOptional();
     assertTrue(resource.isEmpty());
   }
@@ -158,7 +178,12 @@ class ErpResponseFactoryTest {
         encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
-            STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
+            STATUS_ERROR,
+            Duration.ZERO,
+            HEADERS_JSON,
+            testToken,
+            testOperationOutcome,
+            ErxAuditEvent.class);
     assertTrue(response.isResourceOfType(OperationOutcome.class));
     assertTrue(response.isOperationOutcome());
   }
@@ -169,7 +194,12 @@ class ErpResponseFactoryTest {
         encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
-            STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
+            STATUS_ERROR,
+            Duration.ZERO,
+            HEADERS_JSON,
+            testToken,
+            testOperationOutcome,
+            ErxAuditEvent.class);
     assertFalse(response.isResourceOfType(ErxAuditEvent.class));
   }
 
@@ -185,7 +215,8 @@ class ErpResponseFactoryTest {
     val rf = new ErpResponseFactory(fhir, true);
     val testOperationOutcome =
         encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
-    val response = rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
+    val response =
+        rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
     assertTrue(response.isValidPayload());
   }
 
@@ -195,7 +226,8 @@ class ErpResponseFactoryTest {
     val testOperationOutcome =
         encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON)
             .replace("issue", "issues");
-    val response = rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
+    val response =
+        rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
     assertFalse(response.isValidPayload());
   }
 }

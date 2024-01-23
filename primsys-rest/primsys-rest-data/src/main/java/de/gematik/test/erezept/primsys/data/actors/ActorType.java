@@ -26,37 +26,36 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Slf4j
 public enum ActorType {
-    DOCTOR("Arzt"),
-    PHARMACY("Apotheke");
+  DOCTOR("Arzt"),
+  PHARMACY("Apotheke");
 
-    @JsonValue
-    private final String readable;
+  @JsonValue private final String readable;
 
-    ActorType(final String readable) {
-        this.readable = readable;
+  ActorType(final String readable) {
+    this.readable = readable;
+  }
+
+  @Override
+  public String toString() {
+    return readable;
+  }
+
+  @JsonCreator
+  public static ActorType fromString(String value) {
+    return switch (value.toLowerCase()) {
+      case "arzt", "doctor" -> DOCTOR;
+      case "apotheke", "pharmacy" -> PHARMACY;
+      default -> throw new InvalidActorRoleException(value);
+    };
+  }
+
+  public static Optional<ActorType> optionalFromString(String value) {
+    Optional<ActorType> ret = Optional.empty();
+    try {
+      ret = Optional.of(fromString(value));
+    } catch (RuntimeException rte) {
+      log.warn(rte.getMessage());
     }
-
-    @Override
-    public String toString() {
-        return readable;
-    }
-
-    @JsonCreator
-    public static ActorType fromString(String value) {
-        return switch (value.toLowerCase()) {
-            case "arzt", "doctor" -> DOCTOR;
-            case "apotheke", "pharmacy" -> PHARMACY;
-            default -> throw new InvalidActorRoleException(value);
-        };
-    }
-
-    public static Optional<ActorType> optionalFromString(String value) {
-        Optional<ActorType> ret = Optional.empty();
-        try {
-            ret = Optional.of(fromString(value));
-        } catch (RuntimeException rte) {
-            log.warn(rte.getMessage());
-        }
-        return ret;
-    }
+    return ret;
+  }
 }

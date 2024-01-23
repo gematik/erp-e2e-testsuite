@@ -16,14 +16,19 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 import de.gematik.test.cardterminal.CardInfo;
+import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.crypto.BC;
 import de.gematik.test.erezept.exceptions.MissingSmartcardException;
 import de.gematik.test.erezept.exceptions.VerifyPinFailed;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.KonnektorResponse;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
-import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.konnektor.commands.ExternalAuthenticateCommand;
 import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import de.gematik.test.konnektor.commands.VerifyPinCommand;
@@ -33,6 +38,7 @@ import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.test.smartcard.SmartcardType;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResponseType;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
+import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.Serenity;
@@ -43,13 +49,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.MockedStatic;
-
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @Slf4j
 class UseTheKonnektorTest {
@@ -132,7 +131,6 @@ class UseTheKonnektorTest {
     val ability = UseTheKonnektor.with(smcb).on(konnektor);
     assertDoesNotThrow(() -> ability.externalAuthenticate(challenge));
   }
-
 
   @ParameterizedTest
   @EnumSource(Algorithm.class)

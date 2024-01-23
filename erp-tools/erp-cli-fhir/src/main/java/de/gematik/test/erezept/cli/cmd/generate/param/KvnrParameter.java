@@ -36,7 +36,8 @@ public class KvnrParameter implements BaseResourceParameter {
       names = {"--insurance-type"},
       paramLabel = "<TYPE>",
       type = VersicherungsArtDeBasis.class,
-      description = "The Type of the Insurance from ${COMPLETION-CANDIDATES} for the Patient-Section")
+      description =
+          "The Type of the Insurance from ${COMPLETION-CANDIDATES} for the Patient-Section")
   private VersicherungsArtDeBasis versicherungsArt;
 
   public KVNR getKvnr() {

@@ -23,15 +23,14 @@ import de.gematik.test.konnektor.cfg.KonnektorModuleFactory;
 import de.gematik.test.smartcard.Algorithm;
 import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.test.smartcard.SmcB;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 class DecryptDocumentCommandTest {
 
@@ -60,20 +59,25 @@ class DecryptDocumentCommandTest {
   void integrationTestWithKonnektorSoftKonn() {
     val cfg = ConfigurationReader.forKonnektorClient().wrappedBy(KonnektorModuleFactory::fromDto);
     val softKon = KonnektorFactory.createSoftKon();
-    val konnektor = cfg.createKonnektorClient("KOCO@kon7");;
+    val konnektor = cfg.createKonnektorClient("KOCO@kon7");
+    ;
 
     var smcbCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
     konnektor.execute(new VerifyPinCommand(smcbCardHandle, PinType.PIN_SMC));
 
     val encryptedData =
         konnektor
-            .execute(new EncryptDocumentCommand(smcbCardHandle, Base64.getDecoder().decode(data), Algorithm.RSA_2048))
+            .execute(
+                new EncryptDocumentCommand(
+                    smcbCardHandle, Base64.getDecoder().decode(data), Algorithm.RSA_2048))
             .getPayload();
 
     smcbCardHandle = softKon.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
     softKon.execute(new VerifyPinCommand(smcbCardHandle, PinType.PIN_SMC));
     val decrypted =
-        softKon.execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData, Algorithm.RSA_2048)).getPayload();
+        softKon
+            .execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData, Algorithm.RSA_2048))
+            .getPayload();
     Assertions.assertEquals(
         new String(Base64.getEncoder().encode(decrypted), StandardCharsets.UTF_8),
         new String(data, StandardCharsets.UTF_8));

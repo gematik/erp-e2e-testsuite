@@ -16,34 +16,33 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class IKNRTest {
 
-    @ParameterizedTest(name = "[{index}]: IKNR {0} is valid")
-    @ValueSource(strings = {"260326822"})
-    void shouldValidIKNR(String value) {
-        val iknr = IKNR.from(value);
-        assertTrue(iknr.isValid());
-    }
+  @ParameterizedTest(name = "[{index}]: IKNR {0} is valid")
+  @ValueSource(strings = {"260326822"})
+  void shouldValidIKNR(String value) {
+    val iknr = IKNR.from(value);
+    assertTrue(iknr.isValid());
+  }
 
-    @RepeatedTest(5)
-    void shouldGenerateRandomValidIKNR() {
-        val iknr = IKNR.random();
-        assertTrue(iknr.isValid());
-    }
+  @RepeatedTest(5)
+  void shouldGenerateRandomValidIKNR() {
+    val iknr = IKNR.random();
+    assertTrue(iknr.isValid());
+  }
 
-    @ParameterizedTest(name = "[{index}]: IKNR {0} is invalid")
-    @ValueSource(strings = {"abc", "12345678", "1234567890"})
-    void shouldCheckInvalidIKNRCheckDigit(String value) {
-        val iknr = IKNR.from(value);
-        assertFalse(iknr.isValid());
-    }
-
+  @ParameterizedTest(name = "[{index}]: IKNR {0} is invalid")
+  @ValueSource(strings = {"abc", "12345678", "1234567890"})
+  void shouldCheckInvalidIKNRCheckDigit(String value) {
+    val iknr = IKNR.from(value);
+    assertFalse(iknr.isValid());
+  }
 }

@@ -30,24 +30,29 @@ public enum ActCode implements IValueSet {
   OPTIN(
       "OPTIN",
       "opt-in",
-      "A grantor's assent to the terms of an agreement offered by a grantee without an opportunity for to dissent to any terms."),
+      "A grantor's assent to the terms of an agreement offered by a grantee without an opportunity"
+          + " for to dissent to any terms."),
   OPTINR(
       "OPTINR",
       "opt-in with restrictions",
-      "A grantor's assent to the grantee's terms of an agreement with an opportunity for to dissent to certain grantor or grantee selected terms."),
+      "A grantor's assent to the grantee's terms of an agreement with an opportunity for to dissent"
+          + " to certain grantor or grantee selected terms."),
   OPTOUT(
       "OPTOUT",
       "opt-out",
-      "A grantor's dissent to the terms of agreement offered by a grantee without an opportunity for to assent to any terms."),
+      "A grantor's dissent to the terms of agreement offered by a grantee without an opportunity"
+          + " for to assent to any terms."),
   OPTOUTE(
       "OPTOUTE",
       "opt-out with exceptions",
-      "A grantor's dissent to the grantee's terms of agreement except for certain grantor or grantee selected terms.");
+      "A grantor's dissent to the grantee's terms of agreement except for certain grantor or"
+          + " grantee selected terms.");
 
   public static final Hl7CodeSystem CODE_SYSTEM = Hl7CodeSystem.ACT_CODE;
   public static final String VERSION = "5.0.0";
   public static final String DESCRIPTION =
-      "A code specifying the particular kind of Act that the Act-instance represents within its class.";
+      "A code specifying the particular kind of Act that the Act-instance represents within its"
+          + " class.";
   public static final String PUBLISHER = "Health Level 7";
 
   private final String code;

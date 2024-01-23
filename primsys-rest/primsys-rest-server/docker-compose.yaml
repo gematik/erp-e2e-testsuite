@@ -35,6 +35,6 @@ services:
     restart: unless-stopped
     environment:
       - TI_ENV=RU-DEV
-      - ERP_FHIR_PROFILE=1.1.1
+      - ERP_FHIR_PROFILE=1.2.0
     env_file:
       - .env

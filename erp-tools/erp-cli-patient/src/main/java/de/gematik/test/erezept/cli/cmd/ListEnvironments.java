@@ -42,15 +42,17 @@ public class ListEnvironments implements Callable<Integer> {
     System.out.println(format("Environment: {0}", env.getName()));
     System.out.println(format("\tFachdienst:         {0}", env.getInternet().getFdBaseUrl()));
     System.out.println(format("\tUser-Agent:         {0}", env.getInternet().getUserAgent()));
-    System.out.println(format("\tAPI-Key:            {0}", maskSecret(env.getInternet().getXapiKey())));
+    System.out.println(
+        format("\tAPI-Key:            {0}", maskSecret(env.getInternet().getXapiKey())));
     System.out.println(format("\tTSL:                {0}", env.getTslBaseUrl()));
-    System.out.println(format("\tDiscovery Document: {0}", env.getInternet().getDiscoveryDocumentUrl()));
+    System.out.println(
+        format("\tDiscovery Document: {0}", env.getInternet().getDiscoveryDocumentUrl()));
     System.out.println(format("\tIDP Client ID:      {0}", env.getInternet().getClientId()));
     System.out.println(format("\tIDP Redirect URL:   {0}", env.getInternet().getRedirectUrl()));
 
     System.out.println("----------------");
   }
-  
+
   private String maskSecret(String secret) {
     if (secret.isEmpty() || secret.isBlank()) {
       return secret;

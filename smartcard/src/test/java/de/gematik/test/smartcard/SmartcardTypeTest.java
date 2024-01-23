@@ -50,8 +50,9 @@ class SmartcardTypeTest {
 
     inputs.forEach((k, v) -> assertEquals(v, SmartcardType.fromString(k)));
   }
+
   @Test
-  void shouldThrowOnSmartcardTypeNull(){
+  void shouldThrowOnSmartcardTypeNull() {
     assertThrows(NullPointerException.class, () -> SmartcardType.fromString(null));
   }
 
@@ -65,10 +66,9 @@ class SmartcardTypeTest {
   }
 
   @Test
-  void shouldPerformCorrectConfiguration(){
+  void shouldPerformCorrectConfiguration() {
     val testCard = SmartcardType.SMC_B;
     val expected = "smc_b";
     assertEquals(expected, testCard.toConfig());
-
   }
 }

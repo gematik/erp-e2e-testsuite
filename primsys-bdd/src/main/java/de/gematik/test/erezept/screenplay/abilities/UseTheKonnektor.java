@@ -20,9 +20,9 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
-import de.gematik.test.erezept.fhirdump.FhirDumper;
 import de.gematik.test.erezept.exceptions.MissingSmartcardException;
 import de.gematik.test.erezept.exceptions.VerifyPinFailed;
+import de.gematik.test.erezept.fhirdump.FhirDumper;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.KonnektorResponse;
 import de.gematik.test.konnektor.PinType;

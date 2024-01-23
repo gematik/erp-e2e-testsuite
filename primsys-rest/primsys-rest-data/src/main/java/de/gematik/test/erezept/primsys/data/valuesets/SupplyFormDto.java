@@ -25,8 +25,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * corresponding to FHIR-ValueSet {@link
- * de.gematik.test.erezept.fhir.valuesets.Darreichungsform}
+ * corresponding to FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.Darreichungsform}
  */
 @Getter
 @RequiredArgsConstructor
@@ -53,7 +52,7 @@ public enum SupplyFormDto {
   BTA("BTA", "Brausetabletten"),
   CRE("CRE", "Creme"),
   DFL("DFL", "Durchstechflaschen"),
-  //DIG("DIG", "Digitale Gesundheitsanwendungen"), // not supported yet by IBM
+  // DIG("DIG", "Digitale Gesundheitsanwendungen"), // not supported yet by IBM
   DIL("DIL", "Dilution"),
   DIS("DIS", "Depot-Injektionssuspension"),
   DKA("DKA", "Dragees in Kalenderpackung"),
@@ -181,21 +180,25 @@ public enum SupplyFormDto {
   PFT("PFT", "Pflaster transdermal"),
   PHI("PHI", "Pulver zur Herstellung einer Injektions-, Infusions- oder Inhalationslösung"),
   PHV(
-          "PHV",
-          "Pulver zur Herstellung einer Injektions- bzw. Infusionslösung oder Pulver und Lösungsmittel zur Herstellung einer Lösung zur intravesikalen Anwendung"),
+      "PHV",
+      "Pulver zur Herstellung einer Injektions- bzw. Infusionslösung oder Pulver und Lösungsmittel"
+          + " zur Herstellung einer Lösung zur intravesikalen Anwendung"),
   PIE(
-          "PIE",
-          "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung einer Lösung zum Einnehmen"),
+      "PIE",
+      "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung"
+          + " einer Lösung zum Einnehmen"),
   PIF(
-          "PIF",
-          "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung einer Lösung zum Einnehmen"),
+      "PIF",
+      "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung"
+          + " einer Lösung zum Einnehmen"),
   PII("PII", "Pulver zur Herstellung einer Injektions- oder Infusionslösung"),
   PIJ("PIJ", "Pulver zur Herstellung einer Injektionslösung"),
   PIK("PIK", "Pulver zur Herstellung eines Infusionslösungskonzentrates"),
   PIS("PIS", "Pulver zur Herstellung einer Infusionssuspension"),
   PIV(
-          "PIV",
-          "Pulver zur Herstellung einer Injektions- bzw. Infusionslösung oder einer Lösung zur intravesikalen Anwendung"),
+      "PIV",
+      "Pulver zur Herstellung einer Injektions- bzw. Infusionslösung oder einer Lösung zur"
+          + " intravesikalen Anwendung"),
   PKI("PKI", "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung"),
   PLD("PLD", "Pulver und Lösungsmittel zur Herstellung einer Depot-Injektionssuspension"),
   PLE("PLE", "Pulver zur Herstellung einer Lösung zum Einnehmen"),
@@ -236,7 +239,7 @@ public enum SupplyFormDto {
   SPF("SPF", "Sprühflasche"),
   SPL("SPL", "Spüllösung"),
   SPR("SPR", "Spray"),
-  SPT("SPT","Transdermales Spray"),
+  SPT("SPT", "Transdermales Spray"),
   SRI("SRI", "Spritzen"),
   SSU("SSU", "Säuglings-Suppositorien"),
   STA("STA", "Stechampullen"),
@@ -312,12 +315,10 @@ public enum SupplyFormDto {
   ZCR("ZCR", "Zahncreme"),
   ZGE("ZGE", "Zahngel"),
   ZKA("ZKA", "Zerbeisskapseln"),
-  ZPA("ZPA", "Zahnpasta")
-  ;
+  ZPA("ZPA", "Zahnpasta");
 
   private final String code;
-  @JsonValue
-  private final String display;
+  @JsonValue private final String display;
 
   @JsonCreator
   public static SupplyFormDto fromCode(@NonNull String code) {

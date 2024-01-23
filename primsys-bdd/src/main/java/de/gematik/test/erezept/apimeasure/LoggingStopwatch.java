@@ -16,18 +16,19 @@
 
 package de.gematik.test.erezept.apimeasure;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ICommand;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Resource;
 
-import static java.text.MessageFormat.format;
-
 @Slf4j
 public class LoggingStopwatch implements ApiCallStopwatch {
   @Override
-  public <T extends Resource>  void measurement(ClientType type, ICommand<T> command, ErpResponse<T> response) {
+  public <T extends Resource> void measurement(
+      ClientType type, ICommand<T> command, ErpResponse<T> response) {
     log.info(
         format(
             "{0} request from {1} to {2} with return code {3} and payload {4} took {5}ms",

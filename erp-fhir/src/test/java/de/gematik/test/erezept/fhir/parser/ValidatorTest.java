@@ -25,36 +25,39 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import java.util.List;
+import java.io.File;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
 @Slf4j
 class ValidatorTest extends ParsingTest {
 
-  @Test
-  void shouldFailOnValidateGarbage() {
-    val invalidContents =
-        List.of(
+  @ParameterizedTest
+  @MethodSource
+  void shouldFailOnValidateGarbage(String content) {
+    val vr = parser.validate(content);
+    val severity = vr.getMessages().get(0).getSeverity();
+    assertFalse(vr.isSuccessful());
+    assertFalse(vr.getMessages().isEmpty());
+    assertThat(severity, anyOf(is(ResultSeverityEnum.ERROR), is(ResultSeverityEnum.FATAL)));
+  }
+
+  static Stream<Arguments> shouldFailOnValidateGarbage() {
+    return Stream.of(
             "Garbage content is definitely no valid FHIR content",
             "<xml>invalid</xml>",
             "{content: \"invalid\"}",
             "{\"content}\": \"invalid\"}",
-            "");
-
-    invalidContents.forEach(
-        content -> {
-          val vr = parser.validate(content);
-          val severity = vr.getMessages().get(0).getSeverity();
-          assertFalse(vr.isSuccessful());
-          assertFalse(vr.getMessages().isEmpty());
-          assertThat(severity, anyOf(is(ResultSeverityEnum.ERROR), is(ResultSeverityEnum.FATAL)));
-        });
+            "")
+        .map(Arguments::of);
   }
 
   @Test
@@ -63,51 +66,38 @@ class ValidatorTest extends ParsingTest {
     assertThrows(NullPointerException.class, () -> parser.validate(content)); // intentionally null
   }
 
-  @Test
-  void shouldPassValidErpResources() {
-    val validResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/erp", true);
-    ValidatorUtil.validateFiles(parser, validResources, Assertions::assertTrue, true);
+  @ParameterizedTest
+  @MethodSource
+  void shouldPassValidResources(File file) {
+    ValidatorUtil.validateFile(parser, file, Assertions::assertTrue, true);
   }
 
-  @Test
-  void shouldPassOfficialKbvBundleResources() {
-    val kbvBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv", true);
-    ValidatorUtil.validateFiles(parser, kbvBundleResources, Assertions::assertTrue, false);
+  static Stream<Arguments> shouldPassValidResources() {
+    return ResourceUtils.getResourceFilesInDirectory("fhir/valid", true).stream()
+        .map(Arguments::of);
   }
 
-  @Test
-  void shouldPassOfficialDavBundleResources() {
-    val davBundleResources = ResourceUtils.getResourceFilesInDirectory("fhir/valid/dav", true);
-    ValidatorUtil.validateFiles(parser, davBundleResources, Assertions::assertTrue, false);
+  @ParameterizedTest
+  @MethodSource
+  void shouldDetectInvalidResources(File invalidResource) {
+    ValidatorUtil.validateFile(parser, invalidResource, Assertions::assertFalse, false);
   }
 
-  @Test
-  void shouldFailInvalidErpResources() {
-    val invalidResources = ResourceUtils.getResourceFilesInDirectory("fhir/invalid/erp", true);
-    ValidatorUtil.validateFiles(parser, invalidResources, Assertions::assertFalse, false);
-  }
-
-  @Test
-  void shouldFailInvalidKbvResources() {
-    val invalidResources = ResourceUtils.getResourceFilesInDirectory("fhir/invalid/kbv", true);
-    ValidatorUtil.validateFiles(parser, invalidResources, Assertions::assertFalse, false);
-  }
-
-  @Test
-  void shouldValidateMixedVersionBundles() {
-    val mixedBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/mixed_bundles", true);
-    ValidatorUtil.validateFiles(parser, mixedBundleResources, Assertions::assertTrue, false);
+  static Stream<Arguments> shouldDetectInvalidResources() {
+    return ResourceUtils.getResourceFilesInDirectory("fhir/invalid", true).stream()
+        .map(Arguments::arguments);
   }
 
   @ParameterizedTest(name = "Validate Mixed Version Bundles with {0}")
-  @EnumSource(value = ValidatorMode.class, names = {"PEDANTIC", "STRICT"})
+  @EnumSource(
+      value = ValidatorMode.class,
+      names = {"PEDANTIC", "STRICT"})
   @ClearSystemProperty(key = ValidatorMode.SYS_PROP_TOGGLE)
   void shouldValidateMixedVersionBundlesWithStrictPedanticValidation(ValidatorMode mode) {
     System.setProperty(ValidatorMode.SYS_PROP_TOGGLE, mode.name());
     val pedanticFhir = new FhirParser();
     val mixedBundleResources =
-            ResourceUtils.getResourceFilesInDirectory("fhir/valid/mixed_bundles", true);
+        ResourceUtils.getResourceFilesInDirectory("fhir/valid/mixed_bundles", true);
     ValidatorUtil.validateFiles(pedanticFhir, mixedBundleResources, Assertions::assertTrue, true);
   }
 }

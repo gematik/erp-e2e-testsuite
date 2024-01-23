@@ -29,7 +29,7 @@ class ConfigurationFactoryTest {
   void shouldNotInstantiate() {
     assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(ConfigurationFactory.class));
   }
-  
+
   @Test
   void shouldCreatePatientConfiguration() {
     val egk = SmartcardFactory.getArchive().getEgkCards().get(0);

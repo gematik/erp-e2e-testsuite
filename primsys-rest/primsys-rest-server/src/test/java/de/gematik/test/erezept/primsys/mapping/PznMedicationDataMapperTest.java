@@ -37,7 +37,7 @@ class PznMedicationDataMapperTest extends ParsingTest {
   }
 
   @Test
-  void shouldGenerateWithMedicationTypeDtoNotPzn(){
+  void shouldGenerateWithMedicationTypeDtoNotPzn() {
     val dto = new PznMedicationDto();
     dto.setType(MedicationTypeDto.FREETEXT);
     val mapper = PznMedicationDataMapper.from(dto);

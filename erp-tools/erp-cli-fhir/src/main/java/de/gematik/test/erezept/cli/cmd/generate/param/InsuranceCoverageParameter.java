@@ -34,7 +34,8 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
       paramLabel = "<IKNR>",
       type = String.class,
       description =
-          "IKNR (Institutionskennzeichen) is a unique 9-digit number which identifies the health insurance organization")
+          "IKNR (Institutionskennzeichen) is a unique 9-digit number which identifies the health"
+              + " insurance organization")
   private String iknr;
 
   @CommandLine.Option(
@@ -57,7 +58,8 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
       paramLabel = "<GROUP>",
       type = PersonGroup.class,
       description =
-          "Defines to which person group the insured person belongs to. Can be one of ${COMPLETION-CANDIDATES}")
+          "Defines to which person group the insured person belongs to. Can be one of"
+              + " ${COMPLETION-CANDIDATES}")
   private PersonGroup personGroup;
 
   @CommandLine.Option(
@@ -65,7 +67,8 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
       paramLabel = "<DMP>",
       type = DmpKennzeichen.class,
       description =
-          "Defines to which DMP the insured person is subscribed to. Can be one of ${COMPLETION-CANDIDATES}")
+          "Defines to which DMP the insured person is subscribed to. Can be one of"
+              + " ${COMPLETION-CANDIDATES}")
   private DmpKennzeichen dmp;
 
   @CommandLine.Option(
@@ -87,7 +90,8 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
   private Optional<InsuranceCoverageInfo> getInsuranceInfoFor() {
     Optional<InsuranceCoverageInfo> ret = Optional.empty();
 
-    val typeOption = Optional.ofNullable(versicherungsArt).flatMap(VersicherungsArtDeBasis::getCoverageOptions);
+    val typeOption =
+        Optional.ofNullable(versicherungsArt).flatMap(VersicherungsArtDeBasis::getCoverageOptions);
 
     if (iknr != null && insuranceName == null && typeOption.isEmpty()) {
       // when only IKNR given, try to guess the name from all known
@@ -107,12 +111,15 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
       var rndCov = GemFaker.randomElement(typeOption.get().getEnumConstants());
       if (insuranceName != null) {
         // overwrite the name if one was given
-        rndCov = DynamicInsuranceCoverageInfo.named(insuranceName).ofType(versicherungsArt).withIknr(rndCov.getIknr());
+        rndCov =
+            DynamicInsuranceCoverageInfo.named(insuranceName)
+                .ofType(versicherungsArt)
+                .withIknr(rndCov.getIknr());
       }
       ret = Optional.of(rndCov);
     }
-      
-      return ret;
+
+    return ret;
   }
 
   public String getInsuranceName() {

@@ -99,7 +99,7 @@ class NavigateThroughOnboardingOnIOSTest {
     val app = actor.abilityTo(UseIOSApp.class);
 
     assertDoesNotThrow(() -> actor.attemptsTo(task));
-    
+
     verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
     verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
     verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
@@ -118,7 +118,7 @@ class NavigateThroughOnboardingOnIOSTest {
     val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
 
     when(app.isDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON)).thenReturn(true);
-    
+
     assertDoesNotThrow(() -> actor.attemptsTo(task));
 
     verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
@@ -141,9 +141,9 @@ class NavigateThroughOnboardingOnIOSTest {
 
     // simply for covering the case where no pin selection is suggested
     when(app.isDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON)).thenReturn(false);
-    
+
     assertDoesNotThrow(() -> actor.attemptsTo(task));
-    
+
     verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
     verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
     verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
@@ -172,7 +172,7 @@ class NavigateThroughOnboardingOnIOSTest {
 
     verify(app, times(1)).tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
     verify(app, times(1)).tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
-    
+
     assertDoesNotThrow(() -> actor.attemptsTo(task));
   }
 }

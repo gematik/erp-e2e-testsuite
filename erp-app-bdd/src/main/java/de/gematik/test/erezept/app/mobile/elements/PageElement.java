@@ -71,8 +71,8 @@ public interface PageElement {
       } else {
         return UUID.randomUUID().toString(); // ensure nothing is found in the page source
       }
-    } 
-    
+    }
+
     val locatorValue = locator.toString().split(": ")[1];
     if (locator instanceof AppiumBy.ByIosNsPredicate) {
       // ByIosNsPredicates have a special syntax: for now we care only about == comparison

@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
@@ -42,7 +42,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val pzn = "06313728";
     val kbvItaVersion =
         ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
-    val medication = KbvErpMedicationBuilder.faker(pzn).version(kbvItaVersion).build();
+    val medication = KbvErpMedicationPZNBuilder.faker(pzn).version(kbvItaVersion).build();
 
     val kvnr = KVNR.from("X234567890");
     val telematikId = "606358757";
@@ -154,14 +154,14 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   }
 
   @Test
-  @SetSystemProperty(key = "erp.fhir.medicationdispense.default", value="True")
+  @SetSystemProperty(key = "erp.fhir.medicationdispense.default", value = "True")
   void shouldTurnOffDefaultMedicationDispense120() {
     val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-            ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
 
     val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
     val profileVersion = profile.split("\\|")[1];
@@ -170,14 +170,14 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   }
 
   @Test
-  @SetSystemProperty(key = "erp.fhir.medicationdispense.default", value="False")
+  @SetSystemProperty(key = "erp.fhir.medicationdispense.default", value = "False")
   void shouldTurnOnDefaultMedicationDispense120() {
     val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-            ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
 
     val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
     val profileVersion = profile.split("\\|")[1];

@@ -22,14 +22,14 @@ import lombok.val;
 
 public class ConfigurationFactory {
 
-    private ConfigurationFactory() {
-        throw new IllegalArgumentException("utility class");
-    }
+  private ConfigurationFactory() {
+    throw new IllegalArgumentException("utility class");
+  }
 
-    public static PatientConfiguration createPatientConfigurationFor(Egk egk) {
-        val pcfg = new PatientConfiguration();
-        pcfg.setName(egk.getOwner().getGivenName());
-        pcfg.setValidateResponse(false);
-        return pcfg;
-    }
+  public static PatientConfiguration createPatientConfigurationFor(Egk egk) {
+    val pcfg = new PatientConfiguration();
+    pcfg.setName(egk.getOwner().getGivenName());
+    pcfg.setValidateResponse(false);
+    return pcfg;
+  }
 }

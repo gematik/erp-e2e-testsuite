@@ -20,8 +20,8 @@ import lombok.Data;
 
 @Data
 public class TelematikInfoDto {
-    private String environment;
-    private String fachdienst;
-    private String discoveryDocument;
-    private String tsl;
+  private String environment;
+  private String fachdienst;
+  private String discoveryDocument;
+  private String tsl;
 }

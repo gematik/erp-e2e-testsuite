@@ -17,11 +17,11 @@
 package de.gematik.test.erezept.fhir.values;
 
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-
 import java.util.Optional;
 
 /**
- * <a href="https://institut-ba.de/service/schluesselverzeichnisse/S_8a_ABRIK_001.PDF">S_8a_ABRIK_001.PDF</a>
+ * <a
+ * href="https://institut-ba.de/service/schluesselverzeichnisse/S_8a_ABRIK_001.PDF">S_8a_ABRIK_001.PDF</a>
  */
 public enum GkvInsuranceCoverageInfo implements InsuranceCoverageInfo {
   ACTIMONDA("actimonda krankenkasse", "104127692"),

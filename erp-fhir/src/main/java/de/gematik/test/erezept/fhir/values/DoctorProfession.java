@@ -24,15 +24,19 @@ public enum DoctorProfession {
   ALLGEMEINMEDIZIN("Hausarzt:in"),
   ANAESTHESIE(
       "Anästhesist:in",
-      "Böse (Chirurgen-)Zungen bezeichnen die Anästhesisten als die Schlafmützen mit der Kaffeetasse"),
+      "Böse (Chirurgen-)Zungen bezeichnen die Anästhesisten als die Schlafmützen mit der"
+          + " Kaffeetasse"),
   ANATOMIE("Anatom:in", "Anatomie ist die Lehre vom Aufbau des menschlichen Körpers."),
   ARBEITSMEDIZIN(
       "Arbeitsmediziner:in",
-      " präventivmedizinische Ärzte und zuständig für die Förderung der Gesundheit der arbeitenden Bevölkerung"),
+      " präventivmedizinische Ärzte und zuständig für die Förderung der Gesundheit der arbeitenden"
+          + " Bevölkerung"),
   AUGENHEILKUNDE("Ophthalmolog:in"),
   BIOCHEMIE(
       "Doktor:in der Biochemie",
-      "Die medizinische Biochemie beschäftigt sich mit der organischen Chemie, z.B. Kohlenhydrate, Fette, Nukleinsäuren, oder Proteine und Aminosäuren und deren Stoffwechsel, sowie Erkrankungen die darauf zurückzuführen sind, z.B. die berühmte „Gicht“."),
+      "Die medizinische Biochemie beschäftigt sich mit der organischen Chemie, z.B. Kohlenhydrate,"
+          + " Fette, Nukleinsäuren, oder Proteine und Aminosäuren und deren Stoffwechsel, sowie"
+          + " Erkrankungen die darauf zurückzuführen sind, z.B. die berühmte „Gicht“."),
   CHIRURGIE("Allgemeine Chirurg:in"),
   GEFAESSCHIRURGIE("Gefäßchirurg:in"),
   HANDCHIRURGIE("Handchirurg:in"),
@@ -40,7 +44,8 @@ public enum DoctorProfession {
   KINDERCHIRURGIE("Kinderchirurg:in"),
   ORTHOPAEDIE(
       "Ortopäd:in",
-      "Orthopädie heißt „gerades Kind“ – behandelt werden sozusagen eher mechanische Erkrankungen des Stütz- und Bewegungsapparates"),
+      "Orthopädie heißt „gerades Kind“ – behandelt werden sozusagen eher mechanische Erkrankungen"
+          + " des Stütz- und Bewegungsapparates"),
   PLASTISCHE_CHIRURGIE(
       "Plastischer Chirurg",
       "Rekonstruktion und Wiederherstellung von ungewollt abweichenden Strukturen"),
@@ -55,12 +60,16 @@ public enum DoctorProfession {
       "Rekonstruktion und Wiederherstellung von ungewollt abweichenden Strukturen"),
   NEUROCHIRURGIE(
       "Neurochirurgie:in",
-      "Operationen des Zentralen Nervensystems inklusive Gefäßen und Hüllen, und mit Operationen des peripheren und vegetativen Nervensystems"),
+      "Operationen des Zentralen Nervensystems inklusive Gefäßen und Hüllen, und mit Operationen"
+          + " des peripheren und vegetativen Nervensystems"),
   MUND_KIEFER_GESICHTSCHIRURGIE("Mund Kiefer Gesichts Chirurg:in"),
   VISZERALCHIRURGIE("Viszeral Chirurg:in", "Chirurgie des Ober- und Unterbauch"),
   FRAUENHEILKUNDE(
       "Gynäkolog:in",
-      "Frauenheilkunde_und_Geburtshilfe. Es geht um den Körper und die geschlechtsspezifischen Krankheiten der Frau. Gynäkologen arbeiten eng mit dem Allgemeinarzt zusammen. Ihr Hauptaugenmerk bezieht sich auf die weiblichen Geschlechtsorgane, den Hormonhaushalt (Endokrinologie), dessen Auswirkungen auf Verhütung und Schwangerschaft"),
+      "Frauenheilkunde_und_Geburtshilfe. Es geht um den Körper und die geschlechtsspezifischen"
+          + " Krankheiten der Frau. Gynäkologen arbeiten eng mit dem Allgemeinarzt zusammen. Ihr"
+          + " Hauptaugenmerk bezieht sich auf die weiblichen Geschlechtsorgane, den Hormonhaushalt"
+          + " (Endokrinologie), dessen Auswirkungen auf Verhütung und Schwangerschaft"),
   HALS_NASEN_OHREN_HEILKUNDE("HNO Arzt:in"),
   HAUT_UND_GESCHLECHTSKRANKHEITEN(
       "Dermatolog:in / Venerolog:in",
@@ -79,7 +88,8 @@ public enum DoctorProfession {
   KINDER_UND_JUGENDMEDIZIN("Pädiater:in"),
   NEUROLOGIE(
       "Neurolog:in",
-      "zentrale und periphere Nervensystem betreffen. In diesem Fach werden jedoch im Gegensatz zur Neurochirurgie keine Operationen durchgeführt."),
+      "zentrale und periphere Nervensystem betreffen. In diesem Fach werden jedoch im Gegensatz zur"
+          + " Neurochirurgie keine Operationen durchgeführt."),
   PHARMAKOLOGIE("Pharmakolog:in"),
   PSYCHOLOGIE("Physiolog:in"),
   PSYCHIATRIE("Psychiater:in"),
@@ -87,7 +97,9 @@ public enum DoctorProfession {
   UROLOGIE("Urolog:in"),
   PATHOLGIE(
       "Patholog:in",
-      "Unter dem Mikroskop untersucht der Pathologie die von den MTAs unterschiedlich gefärbten Gewebsschnitte und diagnostiziert auf diese Weise zum Beispiel Tumoren oder Entzündungen");
+      "Unter dem Mikroskop untersucht der Pathologie die von den MTAs unterschiedlich gefärbten"
+          + " Gewebsschnitte und diagnostiziert auf diese Weise zum Beispiel Tumoren oder"
+          + " Entzündungen");
 
   private final String naming;
   private final String description;

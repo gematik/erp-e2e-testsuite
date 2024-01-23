@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
+import static de.gematik.test.erezept.app.mobile.elements.Receipt.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.appium.java_client.AppiumBy;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import static de.gematik.test.erezept.app.mobile.elements.Receipt.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ReceiptTests {
   @Test

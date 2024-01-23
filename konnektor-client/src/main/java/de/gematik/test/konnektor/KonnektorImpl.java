@@ -61,8 +61,7 @@ public class KonnektorImpl implements Konnektor {
       KonnektorType type,
       ServicePortProvider serviceProvider,
       CardTerminalClient... cardTerminalClients) {
-    this(
-        KonnektorFactory.fromConfig(ctxConfig), name, type, serviceProvider, cardTerminalClients);
+    this(KonnektorFactory.fromConfig(ctxConfig), name, type, serviceProvider, cardTerminalClients);
   }
 
   public KonnektorImpl(

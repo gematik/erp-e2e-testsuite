@@ -16,7 +16,6 @@
 
 package de.gematik.test.erezept.config.dto.konnektor;
 
-
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;

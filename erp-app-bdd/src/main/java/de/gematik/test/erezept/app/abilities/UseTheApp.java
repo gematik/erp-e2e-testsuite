@@ -141,7 +141,8 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     if (index >= elements.size() || index < 0) {
       throw new NoSuchElementException(
           format(
-              "Wanted to tap on the {0}th element of {1} but only {2} elements received from App-Driver",
+              "Wanted to tap on the {0}th element of {1} but only {2} elements received from"
+                  + " App-Driver",
               index, pageElement, elements.size()));
     }
 
@@ -175,12 +176,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   private void tap(WebElement element) {
-    if (element.isEnabled()) {
-      element.click();
-    } else {
-      throw new ElementNotInteractableException(
-          format("Element {0} was displayed but not enabled", element));
-    }
+    element.click();
   }
 
   @Deprecated(forRemoval = true)
@@ -235,14 +231,12 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   public void scrollIntoView(ScrollDirection direction, PageElement pageElement) {
     log.info(format("Scroll {0} until element {1} is found", direction, pageElement.getFullName()));
     var scrollCounter = 5;
-    boolean isDisplayed =
-        this.getOptionalWebElement(pageElement).isPresent();
+    boolean isDisplayed = this.getOptionalWebElement(pageElement).isPresent();
     while (!isDisplayed && scrollCounter >= 0) {
       scrollCounter--;
       driver.executeScript(
           "mobile:scroll", Map.of("direction", direction.name().toLowerCase(), "distance", "0.25"));
-      isDisplayed =
-          this.getOptionalWebElement(pageElement).isPresent();
+      isDisplayed = this.getOptionalWebElement(pageElement).isPresent();
     }
   }
 
@@ -296,6 +290,11 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   public final void waitUntilElementIsPresent(PageElement pageElement) {
     log.info(format("Wait until element {0} is present", pageElement.getFullName()));
     waitUntil(ExpectedConditions.presenceOfAllElementsLocatedBy(this.getLocator(pageElement)));
+  }
+
+  public final void waitUntilElementIsSelected(PageElement pageElement) {
+    log.info(format("Wait until element {0} is selected", pageElement.getFullName()));
+    waitUntil(ExpectedConditions.elementToBeSelected(this.getLocator(pageElement)));
   }
 
   public final void waitUntilElementIsClickable(PageElement pageElement) {

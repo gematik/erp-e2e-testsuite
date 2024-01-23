@@ -23,23 +23,23 @@ import java.util.Arrays;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-/** corresponding to WOP FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.MedicationType} */
+/**
+ * corresponding to WOP FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.MedicationType}
+ */
 @RequiredArgsConstructor
 public enum MedicationTypeDto {
-    PZN("PZN"),
-    INGREDIENT("Wirkstoff"),
-    FREETEXT("Freitext"),
-    COMPOUNDING("Rezeptur");
+  PZN("PZN"),
+  INGREDIENT("Wirkstoff"),
+  FREETEXT("Freitext"),
+  COMPOUNDING("Rezeptur");
 
+  @JsonValue private final String display;
 
-    @JsonValue
-    private final String display;
-
-    @JsonCreator
-    public static MedicationTypeDto fromCode(@NonNull String code) {
-        return Arrays.stream(MedicationTypeDto.values())
-                .filter(it -> it.display.equalsIgnoreCase(code) || it.name().equalsIgnoreCase(code))
-                .findFirst()
-                .orElseThrow(() -> new InvalidCodeValueException(MedicationTypeDto.class, code));
-    }
+  @JsonCreator
+  public static MedicationTypeDto fromCode(@NonNull String code) {
+    return Arrays.stream(MedicationTypeDto.values())
+        .filter(it -> it.display.equalsIgnoreCase(code) || it.name().equalsIgnoreCase(code))
+        .findFirst()
+        .orElseThrow(() -> new InvalidCodeValueException(MedicationTypeDto.class, code));
+  }
 }

@@ -62,14 +62,15 @@ public enum CardWall implements PageElement {
       () -> AppiumBy.accessibilityId("cdw_btn_loginOption_continue")),
 
   START_NFC_READOUT_BUTTON(
-          "Start the NFC readout Button",
-          () -> null,
-          () -> AppiumBy.iOSNsPredicateString("type == \"XCUIElementTypeButton\" AND name == \"cdw_btn_rc_next\" AND label == \"Karte verbinden\"")),
+      "Start the NFC readout Button",
+      () -> null,
+      () ->
+          AppiumBy.iOSNsPredicateString(
+              "type == \"XCUIElementTypeButton\" AND name == \"cdw_btn_rc_next\" AND label =="
+                  + " \"Karte verbinden\"")),
 
   CARD_PARING_GO_BACK_BUTTON(
-      "Go back button in card paring screen",
-      null,
-      () -> AppiumBy.xpath("//*[@label='Zurück']")),
+      "Go back button in card paring screen", null, () -> AppiumBy.xpath("//*[@label='Zurück']")),
   ;
 
   private final String elementName;

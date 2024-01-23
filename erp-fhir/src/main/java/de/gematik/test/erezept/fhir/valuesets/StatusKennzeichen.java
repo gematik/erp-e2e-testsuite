@@ -42,7 +42,9 @@ public enum StatusKennzeichen implements IValueSet {
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.STATUSKENNZEICHEN;
   public static final String VERSION = "1.01";
   public static final String DESCRIPTION =
-      "Das Statuskennzeichen wird im Statusfeld des Personalienfeldes auf den KBV-Mustern angegeben. Weitere Informationen dazu siehe: technische Anlage zur Anlage 4a des BMV-Ä";
+      "Das Statuskennzeichen wird im Statusfeld des Personalienfeldes auf den KBV-Mustern"
+          + " angegeben. Weitere Informationen dazu siehe: technische Anlage zur Anlage 4a des"
+          + " BMV-Ä";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
 
   private final String code;

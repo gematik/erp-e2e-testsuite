@@ -73,8 +73,8 @@ public enum Settings implements PageElement {
       "Open Source button", () -> null, () -> AppiumBy.accessibilityId("Open Source Lizenzen")),
   OPEN_SOURCE_LEGEND(
       "Open Source legend", () -> null, () -> AppiumBy.accessibilityId("FHIRModels 0.4.0")),
-  NEW_USER_PROFILE_BUTTON("Add new user profile button", null, () -> AppiumBy.accessibilityId("stg_btn_new_profile"))
-  ;
+  NEW_USER_PROFILE_BUTTON(
+      "Add new user profile button", null, () -> AppiumBy.accessibilityId("stg_btn_new_profile"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

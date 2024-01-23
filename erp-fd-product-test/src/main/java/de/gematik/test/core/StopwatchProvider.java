@@ -23,30 +23,29 @@ import lombok.Getter;
 
 public class StopwatchProvider {
 
-    private static StopwatchProvider instance;
+  private static StopwatchProvider instance;
 
-    @Getter
-    private final ApiCallStopwatch stopwatch;
+  @Getter private final ApiCallStopwatch stopwatch;
 
-    private StopwatchProvider() {
-        this.stopwatch = new DumpingStopwatch("prod_testsuite");
+  private StopwatchProvider() {
+    this.stopwatch = new DumpingStopwatch("prod_testsuite");
+  }
+
+  public static void init() {
+    if (instance == null) {
+      instance = new StopwatchProvider();
     }
+  }
 
-    public static void init() {
-        if (instance == null) {
-            instance = new StopwatchProvider();
-        }
+  public static StopwatchProvider getInstance() {
+    if (instance == null) {
+      throw new NotInitializedException(ApiCallStopwatch.class);
     }
+    return instance;
+  }
 
-    public static StopwatchProvider getInstance() {
-        if (instance == null) {
-            throw new NotInitializedException(ApiCallStopwatch.class);
-        }
-        return instance;
-    }
-
-    public static void close() {
-        getInstance().getStopwatch().close();
-        instance = null;
-    }
+  public static void close() {
+    getInstance().getStopwatch().close();
+    instance = null;
+  }
 }

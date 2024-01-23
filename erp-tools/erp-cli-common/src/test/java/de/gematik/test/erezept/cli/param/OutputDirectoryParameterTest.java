@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
-
-import de.gematik.test.erezept.cli.param.OutputDirectoryParameter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;

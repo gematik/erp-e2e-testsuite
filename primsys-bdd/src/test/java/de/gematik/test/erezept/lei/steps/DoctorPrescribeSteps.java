@@ -37,7 +37,8 @@ import net.serenitybdd.screenplay.actors.OnStage;
 public class DoctorPrescribeSteps {
 
   @Angenommen(
-      "^(?:der Arzt|die Ärztin) (.+) verschreibt folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+):$")
+      "^(?:der Arzt|die Ärztin) (.+) verschreibt folgende(?:s)? E-Rezept(?:e)? an (?:den|die)"
+          + " Versicherte(?:n)? (.+):$")
   public void givenIssueMultiplePrescriptionsToActor(
       String docName, String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -51,7 +52,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Angenommen(
-      "^(?:der Arzt|die Ärztin) verschreibt folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+):$")
+      "^(?:der Arzt|die Ärztin) verschreibt folgende(?:s)? E-Rezept(?:e)? an (?:den|die)"
+          + " Versicherte(?:n)? (.+):$")
   public void givenIssueMultiplePrescriptionsToActor(String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorInTheSpotlight();
     val thePatient = OnStage.theActorCalled(patientName);
@@ -64,7 +66,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Angenommen(
-      "^(?:der Arzt|die Ärztin) (.+) verschreibt ein E-Rezept an (?:den|die) Versicherte(?:n)? (.+)$")
+      "^(?:der Arzt|die Ärztin) (.+) verschreibt ein E-Rezept an (?:den|die) Versicherte(?:n)?"
+          + " (.+)$")
   public void givenIssueSingleRandomPrescriptionsToActor(String docName, String patientName) {
     val theDoctor = OnStage.theActorCalled(docName);
     val thePatient = OnStage.theActorCalled(patientName);
@@ -90,7 +93,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+) verschreibt:$")
+      "^(?:der Arzt|die Ärztin) (.+) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)?"
+          + " (.+) verschreibt:$")
   public void whenIssueMultiplePrescriptionsToActor(
       String docName, String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -104,7 +108,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+) verschreibt:$")
+      "^(?:der Arzt|die Ärztin) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+)"
+          + " verschreibt:$")
   public void whenIssueMultiplePrescriptionsToActor(String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorInTheSpotlight();
     val thePatient = OnStage.theActorCalled(patientName);
@@ -117,7 +122,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) ein E-Rezept an (?:den|die) Versicherte(?:n)? (.+) verschreibt$")
+      "^(?:der Arzt|die Ärztin) (.+) ein E-Rezept an (?:den|die) Versicherte(?:n)? (.+)"
+          + " verschreibt$")
   public void whenIssueSingleRandomPrescriptionsToActor(String docName, String patientName) {
     val theDoctor = OnStage.theActorCalled(docName);
     val thePatient = OnStage.theActorCalled(patientName);
@@ -149,7 +155,8 @@ public class DoctorPrescribeSteps {
    * @param medications ist die Liste der Medikationen, die der Arzt dem Patienten ausstellt
    */
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende(?:s)? apothekenpflichtige(?:s)? Medikament(?:e)? verschreibt:$")
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende(?:s)?"
+          + " apothekenpflichtige(?:s)? Medikament(?:e)? verschreibt:$")
   public void whenIssuePharmacyOnlyPrescriptionToActor(
       String docName, String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -163,7 +170,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) folgende(?:s)? apothekenpflichtige(?:s)? Medikament(?:e)? verschreibt:$")
+      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) folgende(?:s)?"
+          + " apothekenpflichtige(?:s)? Medikament(?:e)? verschreibt:$")
   public void whenIssuePharmacyOnlyPrescriptionToActor(String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorInTheSpotlight();
     val thePatient = OnStage.theActorCalled(patientName);
@@ -176,7 +184,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges Medikament verschreibt$")
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges"
+          + " Medikament verschreibt$")
   public void whenIssueSingleRandomPharmacyOnlyPrescriptionToActor(
       String docName, String patientName) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -190,7 +199,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges Medikament verschreibt$")
+      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges Medikament"
+          + " verschreibt$")
   public void whenIssuePharmacyOnlyPrescriptionToActor(String patientName) {
     val theDoctor = OnStage.theActorInTheSpotlight();
     val thePatient = OnStage.theActorCalled(patientName);
@@ -210,7 +220,8 @@ public class DoctorPrescribeSteps {
    * @param medications ist die Liste der Informationen zu den einzelnen Verschreibungen
    */
   @Dann(
-      "^darf (?:der Arzt|die Ärztin) (.+) (?:diesem|dieser) Versicherten das folgende E-Rezept nicht ausstellen:$")
+      "^darf (?:der Arzt|die Ärztin) (.+) (?:diesem|dieser) Versicherten das folgende E-Rezept"
+          + " nicht ausstellen:$")
   public void thenIsNotAllowedToPrescribe(String docName, DataTable medications) {
     val thePatient = OnStage.theActorInTheSpotlight();
     val theDoctor = OnStage.theActorCalled(docName);
@@ -248,7 +259,8 @@ public class DoctorPrescribeSteps {
    * @param medications ist die Liste der Informationen zu den einzelnen Verschreibungen
    */
   @Dann(
-      "^darf (?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) das folgende E-Rezept nicht ausstellen:$")
+      "^darf (?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) das folgende E-Rezept nicht"
+          + " ausstellen:$")
   public void thenIsNotAllowedToPrescribe(
       String docName, String patientName, DataTable medications) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -264,7 +276,8 @@ public class DoctorPrescribeSteps {
   }
 
   @Dann(
-      "^kann (?:der Arzt|die Ärztin) (.+) (?:der|dem) Versicherten (.+) kein E-Rezept verschreiben, weil die PZN eine falsche Länge hat$")
+      "^kann (?:der Arzt|die Ärztin) (.+) (?:der|dem) Versicherten (.+) kein E-Rezept verschreiben,"
+          + " weil die PZN eine falsche Länge hat$")
   public void thenPznIsNotAllowed(String docName, String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
     val thePatient = OnStage.theActorCalled(patientName);

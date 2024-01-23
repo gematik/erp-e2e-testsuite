@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
@@ -100,7 +100,7 @@ public class MedicationParameter implements BaseResourceParameter {
   }
 
   public KbvErpMedication createMedication() {
-    return KbvErpMedicationBuilder.builder()
+    return KbvErpMedicationPZNBuilder.builder()
         .category(getCategory())
         .isVaccine(getIsVaccine())
         .normgroesse(getStandardSize())

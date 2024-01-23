@@ -23,16 +23,16 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class DoctorDto extends ActorDto {
 
-    private String officeName;
-    private String hba;
-    private String smcb;
-    private String docNumber;
-    private String docNumberType;
-    private String docQualificationType;
-    private String bsnr;
-    private String phone;
-    private String email;
-    private String city;
-    private String postal;
-    private String street;
+  private String officeName;
+  private String hba;
+  private String smcb;
+  private String docNumber;
+  private String docNumberType;
+  private String docQualificationType;
+  private String bsnr;
+  private String phone;
+  private String email;
+  private String city;
+  private String postal;
+  private String street;
 }

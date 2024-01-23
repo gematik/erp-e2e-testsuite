@@ -74,7 +74,6 @@ class ErpActorConfigurationTest {
         "device": "iPhone"
         }
         """;
-  
 
   @ParameterizedTest
   @MethodSource

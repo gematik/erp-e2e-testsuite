@@ -36,7 +36,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 class UseIOSAppTest {
-  
+
   @Test
   void shouldGetStaticValues() {
     val driver = mock(IOSDriver.class);
@@ -84,10 +84,22 @@ class UseIOSAppTest {
     val tooltips = mock(WebElement.class);
     val webElement = mock(WebElement.class);
     when(driver.getPageSource())
-        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())  // first tooltip calling pagesource 2 times
-        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())  // first tooltip calling pagesource 2 times
-        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())  // second tooltip calling pagesource 2 times
-        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())  // second tooltip calling pagesource 2 times
+        .thenReturn(
+            Utility.TOOLTIPS
+                .forPlatform(PlatformType.IOS)
+                .toString()) // first tooltip calling pagesource 2 times
+        .thenReturn(
+            Utility.TOOLTIPS
+                .forPlatform(PlatformType.IOS)
+                .toString()) // first tooltip calling pagesource 2 times
+        .thenReturn(
+            Utility.TOOLTIPS
+                .forPlatform(PlatformType.IOS)
+                .toString()) // second tooltip calling pagesource 2 times
+        .thenReturn(
+            Utility.TOOLTIPS
+                .forPlatform(PlatformType.IOS)
+                .toString()) // second tooltip calling pagesource 2 times
         .thenReturn("");
     when(driver.findElement(Utility.TOOLTIPS.forPlatform(PlatformType.IOS)))
         .thenReturn(tooltips)
@@ -133,7 +145,7 @@ class UseIOSAppTest {
     val appiumConfig = new AppiumConfiguration();
     appiumConfig.setMaxWaitTimeout(10);
     appiumConfig.setPollingInterval(5);
-    
+
     val driver = mock(IOSDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.getPageSource()).thenReturn("page source");

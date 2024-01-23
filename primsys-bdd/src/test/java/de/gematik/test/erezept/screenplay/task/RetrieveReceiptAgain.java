@@ -60,7 +60,8 @@ public class RetrieveReceiptAgain implements Task {
                 () ->
                     new AssertionError(
                         format(
-                            "Retrieved ErxPrescriptionBundle for Task {0} does not contain an ErxReceipt",
+                            "Retrieved ErxPrescriptionBundle for Task {0} does not contain an"
+                                + " ErxReceipt",
                             taskId)));
 
     assertEquals(

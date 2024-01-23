@@ -33,7 +33,8 @@ class ProvidePatientBaseDataTest extends ParsingTest {
 
   @Test
   void shouldCreateGkvPatientFullName() {
-    val patient = ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin Schraßer");
+    val patient =
+        ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin Schraßer");
 
     assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Schraßer", patient.getPatient().getNameFirstRep().getFamily());
@@ -54,7 +55,8 @@ class ProvidePatientBaseDataTest extends ParsingTest {
 
   @Test
   void shouldCreateGkvPatient() {
-    val patient = ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin", "Straßer");
+    val patient =
+        ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin", "Straßer");
 
     assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
@@ -88,7 +90,8 @@ class ProvidePatientBaseDataTest extends ParsingTest {
 
   @Test
   void shouldCreatePkvPatient02() {
-    val patient = ProvidePatientBaseData.forPkvPatient(KVNR.from("X123456789"), "Fridolin", "Straßer");
+    val patient =
+        ProvidePatientBaseData.forPkvPatient(KVNR.from("X123456789"), "Fridolin", "Straßer");
 
     assertEquals("Fridolin", patient.getPatient().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Straßer", patient.getPatient().getNameFirstRep().getFamily());
@@ -147,10 +150,8 @@ class ProvidePatientBaseDataTest extends ParsingTest {
     assertFalse(patient.isGKV());
     assertTrue(patient.getPatient().hasPkvKvnr());
 
-    if (payorType != null)
-      assertFalse(patient.getPayorType().isEmpty());
-    else
-      assertTrue(patient.getPayorType().isEmpty());
+    if (payorType != null) assertFalse(patient.getPayorType().isEmpty());
+    else assertTrue(patient.getPayorType().isEmpty());
 
     val coverage = patient.getInsuranceCoverage();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);

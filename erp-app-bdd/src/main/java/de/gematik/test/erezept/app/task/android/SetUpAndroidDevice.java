@@ -85,16 +85,15 @@ public class SetUpAndroidDevice implements Task {
   private <T extends Actor> void performWithVirtualeGK(T actor, UseTheApp<?> app, Egk egk) {
     app.tap(BottomNav.SETTINGS_BUTTON);
     app.tap(Debug.MENU_BUTTON);
-    
+
     val provideEgk = ProvideEGK.sheOwns(egk);
     actor.can(provideEgk);
     actor.can(
-            ProvidePatientBaseData.forPatient(
-                    provideEgk.getKvnr(),
-                    egk.getOwner().getGivenName(),
-                    egk.getOwner().getSurname(),
-                    insuranceKind));
-
+        ProvidePatientBaseData.forPatient(
+            provideEgk.getKvnr(),
+            egk.getOwner().getGivenName(),
+            egk.getOwner().getSurname(),
+            insuranceKind));
 
     val autCertificate = egk.getAutCertificate();
     val pkBase64 = Base64.getEncoder().encodeToString(autCertificate.getPrivateKey().getEncoded());
@@ -119,7 +118,9 @@ public class SetUpAndroidDevice implements Task {
     val kvnrValue = token.getPayload().getIdentifier();
     val givenName = token.getPayload().getGivenName();
     val familyName = token.getPayload().getFamilyName();
-    actor.can(ProvidePatientBaseData.forPatient(KVNR.from(kvnrValue), givenName, familyName, insuranceKind));
+    actor.can(
+        ProvidePatientBaseData.forPatient(
+            KVNR.from(kvnrValue), givenName, familyName, insuranceKind));
 
     app.tap(Debug.LEAVE_BUTTON);
     app.tap(Settings.LEAVE_BUTTON);

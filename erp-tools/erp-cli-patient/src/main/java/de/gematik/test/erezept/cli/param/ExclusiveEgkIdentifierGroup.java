@@ -19,11 +19,10 @@ package de.gematik.test.erezept.cli.param;
 import de.gematik.test.erezept.cli.converter.StringListConverter;
 import de.gematik.test.smartcard.Egk;
 import de.gematik.test.smartcard.SmartcardArchive;
-import lombok.val;
-import picocli.CommandLine;
-
 import java.util.LinkedList;
 import java.util.List;
+import lombok.val;
+import picocli.CommandLine;
 
 public class ExclusiveEgkIdentifierGroup {
 

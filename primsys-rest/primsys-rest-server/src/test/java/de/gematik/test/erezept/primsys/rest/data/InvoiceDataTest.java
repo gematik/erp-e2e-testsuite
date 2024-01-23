@@ -16,21 +16,20 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
-import de.gematik.test.erezept.primsys.mapping.InvoiceDataConverter;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
+import de.gematik.test.erezept.primsys.mapping.InvoiceDataMapper;
+import java.util.List;
+import lombok.SneakyThrows;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class InvoiceDataTest {
 
@@ -112,7 +111,7 @@ class InvoiceDataTest {
   void shouldConvertCorrectToDavInvoice() {
     val mapper = new ObjectMapper();
     val result = mapper.readValue(testString, InvoiceData.class);
-    DavInvoice davInvoice = new InvoiceDataConverter(result).convert();
+    DavInvoice davInvoice = new InvoiceDataMapper(result).convert();
     assertTrue(davInvoice.hasId());
     assertTrue(davInvoice.hasStatus());
     assertEquals("INFORMATIONAL", davInvoice.getPriceComponents().get(0).getType().name());
@@ -123,7 +122,7 @@ class InvoiceDataTest {
   void shouldConvertCorrectIncompleteStringToDavInvoice() {
     val mapper = new ObjectMapper();
     val result = mapper.readValue(testStringIncomplete, InvoiceData.class);
-    DavInvoice davInvoice = new InvoiceDataConverter(result).convert();
+    DavInvoice davInvoice = new InvoiceDataMapper(result).convert();
     assertTrue(davInvoice.hasId());
     assertTrue(davInvoice.hasStatus());
     assertEquals("INFORMATIONAL", davInvoice.getPriceComponents().get(0).getType().name());
@@ -132,8 +131,8 @@ class InvoiceDataTest {
 
   @Test
   void shouldFakeMissingAll() {
-    val invoiceDataConverter = new InvoiceDataConverter();
-    val davInvoice = invoiceDataConverter.convert();
+    val invoiceDataMapper = new InvoiceDataMapper(new InvoiceData());
+    val davInvoice = invoiceDataMapper.convert();
     assertEquals("EUR", davInvoice.getCurrency());
   }
 
@@ -142,7 +141,7 @@ class InvoiceDataTest {
     val invoiceData = new InvoiceData();
     invoiceData.setVatRate(12.23f);
     assertNull(invoiceData.getCurrency());
-    val invoiceDataConverter = new InvoiceDataConverter(invoiceData);
+    val invoiceDataConverter = new InvoiceDataMapper(invoiceData);
     val davInvoice = invoiceDataConverter.convert();
     assertEquals("EUR", davInvoice.getCurrency());
     assertFalse(invoiceData.getPriceComponents().isEmpty());

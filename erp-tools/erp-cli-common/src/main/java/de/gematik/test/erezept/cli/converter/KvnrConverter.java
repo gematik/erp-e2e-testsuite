@@ -20,8 +20,8 @@ import de.gematik.test.erezept.fhir.values.KVNR;
 import picocli.CommandLine;
 
 public class KvnrConverter implements CommandLine.ITypeConverter<KVNR> {
-    @Override
-    public KVNR convert(String value) throws Exception {
-        return KVNR.from(value);
-    }
+  @Override
+  public KVNR convert(String value) throws Exception {
+    return KVNR.from(value);
+  }
 }

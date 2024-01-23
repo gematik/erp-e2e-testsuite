@@ -16,19 +16,18 @@
 
 package de.gematik.test.erezept.cli.converter;
 
-import de.gematik.test.erezept.cli.converter.KvnrConverter;
+import static org.junit.jupiter.api.Assertions.*;
+
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class KvnrConverterTest {
 
-    @Test
-    void shouldConvertFromString() throws Exception {
-        val converter = new KvnrConverter();
-        val kvnrValue = "X123123123";
-        val kvnr = converter.convert(kvnrValue);
-        assertEquals(kvnrValue, kvnr.getValue());
-    }
+  @Test
+  void shouldConvertFromString() throws Exception {
+    val converter = new KvnrConverter();
+    val kvnrValue = "X123123123";
+    val kvnr = converter.convert(kvnrValue);
+    assertEquals(kvnrValue, kvnr.getValue());
+  }
 }

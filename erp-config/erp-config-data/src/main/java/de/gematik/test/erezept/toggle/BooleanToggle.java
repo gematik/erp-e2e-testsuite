@@ -16,10 +16,9 @@
 
 package de.gematik.test.erezept.toggle;
 
-import lombok.Getter;
-
 import java.util.List;
 import java.util.function.Function;
+import lombok.Getter;
 
 @Getter
 public class BooleanToggle implements FeatureToggle<Boolean> {

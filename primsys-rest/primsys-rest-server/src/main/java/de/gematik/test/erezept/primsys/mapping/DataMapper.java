@@ -16,13 +16,11 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-
 import javax.annotation.Nullable;
 
 public abstract class DataMapper<D, R> extends BaseMapper<D> {
 
-  @Nullable
-  private R converted;
+  @Nullable private R converted;
 
   protected DataMapper(D dto) {
     super(dto);

@@ -32,11 +32,14 @@ public class RegExUtil {
 
   private static final Pattern PRESCRIPTION_ID =
       Pattern.compile(
-          "<system value=\"https://gematik\\.de/fhir/NamingSystem/PrescriptionID\"\\W/>\\W*<value value=\"([\\w.]+)");
+          "<system value=\"https://gematik\\.de/fhir/NamingSystem/PrescriptionID\"\\W/>\\W*<value"
+              + " value=\"([\\w.]+)");
 
   private static final Pattern PRESCRIPTION_ID_121 =
       Pattern.compile(
-          "<system value=\"https://gematik\\.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId\"\\W/>\\W*<value value=\"([\\w.]+)");
+          "<system"
+              + " value=\"https://gematik\\.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId\"\\W/>\\W*<value"
+              + " value=\"([\\w.]+)");
 
   private static final Pattern AUDIT_EVENT_ACTION = Pattern.compile("\"action\":\\s?\"(\\w)");
   private static final Pattern AUDIT_EVENT_RECORDED =

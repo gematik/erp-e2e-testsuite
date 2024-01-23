@@ -16,13 +16,13 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.screenplay.task.AlternativelyAssign;
 import de.gematik.test.erezept.screenplay.task.DecryptPSPMessage;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 public class AlternativeAssignmentSteps {
 
@@ -30,7 +30,8 @@ public class AlternativeAssignmentSteps {
    * @param pharmName
    */
   @Wenn(
-      "^die Apotheke (.+) eine Nachricht mit einer alternativen Zuweisung vom Dienstleister empfängt und entschlüsselt$")
+      "^die Apotheke (.+) eine Nachricht mit einer alternativen Zuweisung vom Dienstleister"
+          + " empfängt und entschlüsselt$")
   public void whenPharmacyGetsMessageFromServiceProvider(String pharmName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy).attemptsTo(DecryptPSPMessage.receivedFromPharmacyService());
@@ -45,7 +46,8 @@ public class AlternativeAssignmentSteps {
    * @param option
    */
   @Wenn(
-      "^(?:der Versicherte|die Versicherte) (.+) für das (letzte|erste) E-Rezept die alternative Zuweisung an die Apotheke (.+) mit der Option (.+) auslöst$")
+      "^(?:der Versicherte|die Versicherte) (.+) für das (letzte|erste) E-Rezept die alternative"
+          + " Zuweisung an die Apotheke (.+) mit der Option (.+) auslöst$")
   public void whenPatientInitiatesAlternativeAssignment(
       String patientName, String order, String pharmName, String option) {
     val thePatient = OnStage.theActorCalled(patientName);

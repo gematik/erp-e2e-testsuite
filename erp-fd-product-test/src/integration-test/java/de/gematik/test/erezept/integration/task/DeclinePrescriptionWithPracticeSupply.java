@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 gematik GmbH
+ * Copyright (c) 2024 gematik GmbH
  * 
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
+
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
@@ -26,7 +28,7 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.SupplyRequestBuilder;
@@ -35,6 +37,7 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -45,11 +48,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-
-import java.util.UUID;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
-
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
@@ -68,8 +66,8 @@ public class DeclinePrescriptionWithPracticeSupply extends ErpTest {
     @Test
     void activateInvalidPrescriptionWithPracticeSupplyAndMedicationRequest() {
         sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
-        val medication = KbvErpMedicationBuilder.faker().build();
-        val supplyRequest = getSupplyRequest(medication);
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val supplyRequest = getSupplyRequest(medication);
         val coverage = KbvCoverageBuilder.faker().build();
         val kbvBundleBuilder = generateKbvBundle(
                 UUID.randomUUID().toString(),
@@ -98,8 +96,8 @@ public class DeclinePrescriptionWithPracticeSupply extends ErpTest {
     @Test
     void activateValidPrescriptionWithPracticeSupply() {
         sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
-        val medication = KbvErpMedicationBuilder.faker().build();
-        val supplyRequest = getSupplyRequest(medication);
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val supplyRequest = getSupplyRequest(medication);
         val kbvBundleBuilder = generateKbvBundle(
                 UUID.randomUUID().toString(),
                 KbvCoverageBuilder.faker().build(),

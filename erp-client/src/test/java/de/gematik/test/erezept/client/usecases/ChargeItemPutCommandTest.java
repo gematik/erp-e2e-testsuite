@@ -51,7 +51,7 @@ class ChargeItemPutCommandTest {
     val cmd = new ChargeItemPutCommand(accessCode, chargeItem);
     assertTrue(cmd.getRequestLocator().contains(format("ac={0}", accessCode.getValue())));
     assertTrue(
-            cmd.getRequestLocator().contains(format("ChargeItem/{0}", prescriptionId.getValue())));
+        cmd.getRequestLocator().contains(format("ChargeItem/{0}", prescriptionId.getValue())));
     assertTrue(cmd.getRequestBody().isPresent());
     assertEquals(chargeItem, cmd.getRequestBody().orElseThrow());
   }

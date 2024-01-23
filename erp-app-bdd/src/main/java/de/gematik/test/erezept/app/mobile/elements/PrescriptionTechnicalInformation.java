@@ -17,17 +17,19 @@
 package de.gematik.test.erezept.app.mobile.elements;
 
 import io.appium.java_client.AppiumBy;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
-
-import java.util.function.Supplier;
 
 @Getter
 @RequiredArgsConstructor
 public enum PrescriptionTechnicalInformation implements PageElement {
   TASKID("Task Identifier", () -> null, () -> AppiumBy.accessibilityId("prsc_dtl_ti_task_id")),
-  BACK("Back to Detail", () -> null, () -> AppiumBy.xpath("//XCUIElementTypeButton[@name='Detail']"));
+  BACK(
+      "Back to Detail",
+      () -> null,
+      () -> AppiumBy.xpath("//XCUIElementTypeButton[@name='Detail']"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

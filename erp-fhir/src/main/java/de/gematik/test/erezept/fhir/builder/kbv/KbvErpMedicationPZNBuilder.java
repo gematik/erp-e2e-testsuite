@@ -36,7 +36,8 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Ratio;
 import org.hl7.fhir.r4.model.StringType;
 
-public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedicationBuilder> {
+public class KbvErpMedicationPZNBuilder
+    extends AbstractResourceBuilder<KbvErpMedicationPZNBuilder> {
 
   private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
 
@@ -54,23 +55,23 @@ public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedic
   private long amountNumerator;
   private String amountNumeratorUnit;
 
-  public static KbvErpMedicationBuilder builder() {
-    return new KbvErpMedicationBuilder();
+  public static KbvErpMedicationPZNBuilder builder() {
+    return new KbvErpMedicationPZNBuilder();
   }
 
-  public static KbvErpMedicationBuilder faker() {
+  public static KbvErpMedicationPZNBuilder faker() {
     return faker(PZN.random().getValue());
   }
 
-  public static KbvErpMedicationBuilder faker(String pzn) {
+  public static KbvErpMedicationPZNBuilder faker(String pzn) {
     return faker(pzn, fakerDrugName());
   }
 
-  public static KbvErpMedicationBuilder faker(String pzn, String name) {
+  public static KbvErpMedicationPZNBuilder faker(String pzn, String name) {
     return faker(pzn, name, MedicationCategory.C_00);
   }
 
-  public static KbvErpMedicationBuilder faker(
+  public static KbvErpMedicationPZNBuilder faker(
       String pzn, String name, MedicationCategory category) {
     return builder()
         .type(BaseMedicationType.MEDICAL_PRODUCT) // for now only Medical Products
@@ -90,51 +91,51 @@ public class KbvErpMedicationBuilder extends AbstractResourceBuilder<KbvErpMedic
    * @param version to use for generation of this resource
    * @return Builder
    */
-  public KbvErpMedicationBuilder version(KbvItaErpVersion version) {
+  public KbvErpMedicationPZNBuilder version(KbvItaErpVersion version) {
     this.kbvItaErpVersion = version;
     return this;
   }
 
-  public KbvErpMedicationBuilder type(BaseMedicationType type) {
+  public KbvErpMedicationPZNBuilder type(BaseMedicationType type) {
     this.baseMedicationType = type;
     return self();
   }
 
-  public KbvErpMedicationBuilder category(MedicationCategory category) {
+  public KbvErpMedicationPZNBuilder category(MedicationCategory category) {
     this.category = category;
     return self();
   }
 
-  public KbvErpMedicationBuilder isVaccine(boolean isVaccine) {
+  public KbvErpMedicationPZNBuilder isVaccine(boolean isVaccine) {
     this.isVaccine = isVaccine;
     return self();
   }
 
-  public KbvErpMedicationBuilder normgroesse(StandardSize size) {
+  public KbvErpMedicationPZNBuilder normgroesse(StandardSize size) {
     this.normgroesse = size;
     return self();
   }
 
-  public KbvErpMedicationBuilder darreichungsform(Darreichungsform form) {
+  public KbvErpMedicationPZNBuilder darreichungsform(Darreichungsform form) {
     this.darreichungsform = form;
     return self();
   }
 
-  public KbvErpMedicationBuilder pzn(@NonNull String pzn, @NonNull String medicationName) {
+  public KbvErpMedicationPZNBuilder pzn(@NonNull String pzn, @NonNull String medicationName) {
     return pzn(PZN.from(pzn), medicationName);
   }
 
-  public KbvErpMedicationBuilder pzn(@NonNull PZN pzn, @NonNull String medicationName) {
+  public KbvErpMedicationPZNBuilder pzn(@NonNull PZN pzn, @NonNull String medicationName) {
     this.pzn = pzn;
     this.medicationName = medicationName;
     return self();
   }
 
-  public KbvErpMedicationBuilder amount(long numerator) {
+  public KbvErpMedicationPZNBuilder amount(long numerator) {
     return this.amount(numerator, "Stk");
   }
 
-  public KbvErpMedicationBuilder amount(long numerator, String unit) {
+  public KbvErpMedicationPZNBuilder amount(long numerator, String unit) {
     this.amountNumerator = numerator;
     this.amountNumeratorUnit = unit;
     return self();

@@ -16,54 +16,54 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.utils;
 
-import org.junit.jupiter.api.RepeatedTest;
-
 import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.RepeatedTest;
+
 class FuzzOperationResultTest {
 
-    @RepeatedTest(REPETITIONS)
-    void shouldBuildWithString() {
-        String s1 = "S1";
-        String s2 = "S2";
-        String s3 = "S3";
-        FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, s2, s3);
-        FuzzOperationResult fuzzOperationResul2 = new FuzzOperationResult<>(s1, null, null);
-        assertTrue(fuzzOperationResult.toString().contains(s1));
-        assertTrue(fuzzOperationResul2.toString().contains(s1));
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldBuildWithString() {
+    String s1 = "S1";
+    String s2 = "S2";
+    String s3 = "S3";
+    FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, s2, s3);
+    FuzzOperationResult fuzzOperationResul2 = new FuzzOperationResult<>(s1, null, null);
+    assertTrue(fuzzOperationResult.toString().contains(s1));
+    assertTrue(fuzzOperationResul2.toString().contains(s1));
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldBuildWithInt() {
-        String s1 = "S1";
-        int s2 = 123;
-        int s3 = 123;
-        FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, s2, s3);
-        FuzzOperationResult fuzzOperationResul2 = new FuzzOperationResult<>(s1, null, null);
-        assertTrue(fuzzOperationResult.toString().contains(Integer.toString(s2)));
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldBuildWithInt() {
+    String s1 = "S1";
+    int s2 = 123;
+    int s3 = 123;
+    FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, s2, s3);
+    FuzzOperationResult fuzzOperationResul2 = new FuzzOperationResult<>(s1, null, null);
+    assertTrue(fuzzOperationResult.toString().contains(Integer.toString(s2)));
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldBuildWithMixed() {
-        String s1 = "S1";
-        int s2 = 123;
-        Float s3 = 123.0f;
-        FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, s2, s3);
-        FuzzOperationResult fuzzOperationResul2 = new FuzzOperationResult<>(s1, null, null);
-        assertTrue(fuzzOperationResult.toString().contains(Integer.toString(s2)));
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldBuildWithMixed() {
+    String s1 = "S1";
+    int s2 = 123;
+    Float s3 = 123.0f;
+    FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, s2, s3);
+    FuzzOperationResult fuzzOperationResul2 = new FuzzOperationResult<>(s1, null, null);
+    assertTrue(fuzzOperationResult.toString().contains(Integer.toString(s2)));
+  }
 
+  @RepeatedTest(REPETITIONS)
+  void testToStringWithObjects() {
 
-    @RepeatedTest(REPETITIONS)
-    void testToStringWithObjects() {
-
-        FuzzConfig fuzzConfig = new FuzzConfig();
-        fuzzConfig.setName("testname");
-        FuzzConfig fuzzConfig2 = new FuzzConfig();
-        fuzzConfig2.setName("testname2");
-        String s1 = "S1";
-        FuzzOperationResult fuzzOperationResult = new FuzzOperationResult<>(s1, fuzzConfig, fuzzConfig2);
-        assertTrue(fuzzOperationResult.toString().contains("->"));
-    }
+    FuzzConfig fuzzConfig = new FuzzConfig();
+    fuzzConfig.setName("testname");
+    FuzzConfig fuzzConfig2 = new FuzzConfig();
+    fuzzConfig2.setName("testname2");
+    String s1 = "S1";
+    FuzzOperationResult fuzzOperationResult =
+        new FuzzOperationResult<>(s1, fuzzConfig, fuzzConfig2);
+    assertTrue(fuzzOperationResult.toString().contains("->"));
+  }
 }

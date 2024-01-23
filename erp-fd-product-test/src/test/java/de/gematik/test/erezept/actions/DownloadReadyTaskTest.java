@@ -60,8 +60,5 @@ class DownloadReadyTaskTest {
 
     assertDoesNotThrow(() -> pharmacist.performs(DownloadReadyTask.withExamEvidence(examEvidence)));
     assertDoesNotThrow(() -> pharmacist.performs(DownloadReadyTask.withoutExamEvidence()));
-
-
-
   }
 }

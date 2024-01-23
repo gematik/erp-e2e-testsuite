@@ -21,7 +21,5 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface UnmutableFuzzingMutator<T> extends Function<T, T> {
 
-    T apply(T t);
-
+  T apply(T t);
 }
-

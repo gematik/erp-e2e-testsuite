@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.app.exceptions;
 
 public class AppStateMissmatchException extends RuntimeException {
-    public AppStateMissmatchException(String message) {
-        super(message);
-    }
+  public AppStateMissmatchException(String message) {
+    super(message);
+  }
 }

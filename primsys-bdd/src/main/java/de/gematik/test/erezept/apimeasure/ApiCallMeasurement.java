@@ -21,11 +21,11 @@ import lombok.Data;
 @Data
 public class ApiCallMeasurement {
 
-    private String fhirResource;
-    private String restPath;
-    private String httpMethod;
-    private String requestBodyType;
-    private String responseBodyType;
-    private int returnCode;
-    private long duration;
+  private String fhirResource;
+  private String restPath;
+  private String httpMethod;
+  private String requestBodyType;
+  private String responseBodyType;
+  private int returnCode;
+  private long duration;
 }

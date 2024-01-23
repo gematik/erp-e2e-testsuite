@@ -79,10 +79,7 @@ public class FhirProfiledValidator {
     // these CodeSystems need to be ignored and should be configurable in the future!
     validationSupports.add(
         new IgnoreMissingValueSetValidationSupport(
-            ctx,
-            List.of(
-                "http://fhir.de/CodeSystem/ask",
-                "http://fhir.de/CodeSystem/ifa/pzn")));
+            ctx, List.of("http://fhir.de/CodeSystem/ask", "http://fhir.de/CodeSystem/ifa/pzn")));
 
     // configure the HAPI FhirParser
     val fiv = new FhirInstanceValidator(ctx);

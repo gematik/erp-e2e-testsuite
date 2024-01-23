@@ -16,18 +16,17 @@
 
 package de.gematik.test.fuzzing.fhirfuzz;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 public class CentralIterationSetupForTests {
 
-    public static final int REPETITIONS = 1;
+  public static final int REPETITIONS = 1;
 
-    // more
-    @Test
-    void repetitionsShouldBePublic() {
-        assertTrue(REPETITIONS >= 0);
-    }
-
+  // more
+  @Test
+  void repetitionsShouldBePublic() {
+    assertTrue(REPETITIONS >= 0);
+  }
 }

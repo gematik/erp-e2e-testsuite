@@ -16,14 +16,13 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import lombok.val;
-
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
-
-import static java.text.MessageFormat.format;
+import lombok.val;
 
 /**
  * <a href="https://de.wikipedia.org/wiki/Krankenversichertennummer">Krankenversichertennummer</a>
@@ -49,12 +48,12 @@ public class KVNR extends Value<String> implements WithChecksum {
     return new KVNR(value);
   }
 
-
   /**
-   * get the chunked KVNR without the check number and calculate the check number 
+   * get the chunked KVNR without the check number and calculate the check number
+   *
    * @param capLetter is the leading capital letter [A-Z]
-   * @param numbers 8 random digits 
-   * @return the calculated check number 
+   * @param numbers 8 random digits
+   * @return the calculated check number
    */
   private static int getCalculateCheckNumber(char capLetter, String numbers) {
     val letterValue = String.format("%02d", capLetter - 64);
@@ -63,14 +62,14 @@ public class KVNR extends Value<String> implements WithChecksum {
     val idx = new AtomicInteger();
     var sum = new AtomicInteger();
     rawNumber
-            .chars()
-            .map(asciiValue -> asciiValue - 48)
-            .forEach(
-                    value -> {
-                      if (idx.getAndIncrement() % 2 == 1) value *= 2;
-                      if (value > 9) value -= 9;
-                      sum.addAndGet(value);
-                    });
+        .chars()
+        .map(asciiValue -> asciiValue - 48)
+        .forEach(
+            value -> {
+              if (idx.getAndIncrement() % 2 == 1) value *= 2;
+              if (value > 9) value -= 9;
+              sum.addAndGet(value);
+            });
     return sum.get() % 10;
   }
 
@@ -89,6 +88,6 @@ public class KVNR extends Value<String> implements WithChecksum {
 
   protected int getChecksum() {
     val value = getValue();
-    return Character.getNumericValue(value.charAt(value.length()-1));
+    return Character.getNumericValue(value.charAt(value.length() - 1));
   }
 }

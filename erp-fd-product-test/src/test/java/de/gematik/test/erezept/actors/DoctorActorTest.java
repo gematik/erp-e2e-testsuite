@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.actors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
@@ -25,9 +28,6 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DoctorActorTest {
 
@@ -40,7 +40,6 @@ class DoctorActorTest {
     doctor.can(provideBaseData);
     return doctor;
   }
-
 
   @Test
   void shouldProvideCorrectData() {

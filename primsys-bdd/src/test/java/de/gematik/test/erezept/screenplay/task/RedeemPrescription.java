@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
@@ -29,16 +31,13 @@ import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import java.util.List;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -82,11 +81,14 @@ public class RedeemPrescription implements Task {
       // TODO replace this
       val message = "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
 
-      communicationBuilder.medication(prescription.getKbvBundle().getMedication());
+      prescription
+          .getKbvBundle()
+          .ifPresent(kbvErpBundle -> communicationBuilder.medication(kbvErpBundle.getMedication()));
       communicationBuilder.basedOnTaskId(prescription.getTask().getTaskId());
       communication = communicationBuilder.buildInfoReq(message);
     } else {
-      val message = new CommunicationDisReqMessage(
+      val message =
+          new CommunicationDisReqMessage(
               SupplyOptionsType.DELIVERY,
               "Dr. Maximilian von Muster",
               List.of("wohnhaft bei Emilia Fischer", "Bundesallee 312", "123. OG", "12345 Berlin"),

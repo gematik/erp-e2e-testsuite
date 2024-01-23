@@ -22,5 +22,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PharmacyDto extends ActorDto {
-    private String smcb;
+  private String smcb;
 }

@@ -16,26 +16,24 @@
 
 package de.gematik.test.smartcard;
 
-import de.gematik.test.smartcard.exceptions.InvalidCryptographySpecificationException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.val;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-
-import java.util.Arrays;
-
 import static de.gematik.test.smartcard.Algorithm.CryptographySpecification.*;
 import static java.text.MessageFormat.format;
 import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.id_RSASSA_PSS;
 import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.sha256WithRSAEncryption;
 import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.ecdsa_with_SHA256;
 
+import de.gematik.test.smartcard.exceptions.InvalidCryptographySpecificationException;
+import java.util.Arrays;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.val;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+
 @Getter
 public enum Algorithm {
   RSA_2048("RSA", SPEC_RSA, sha256WithRSAEncryption, 2048),
   RSA_PSS_2048("RSASSA-PSS", SPEC_RSA, id_RSASSA_PSS, 2048),
   ECC_256("ECC", SPEC_ECC, ecdsa_with_SHA256, 256);
-
 
   public static final Algorithm DEFAULT_ALGORITHM = ECC_256;
 
@@ -45,7 +43,8 @@ public enum Algorithm {
   private final ASN1ObjectIdentifier oid;
   private final CryptographySpecification specification;
 
-  Algorithm(String algo, CryptographySpecification standard, ASN1ObjectIdentifier oid, int keyLength) {
+  Algorithm(
+      String algo, CryptographySpecification standard, ASN1ObjectIdentifier oid, int keyLength) {
     this.algorithmName = algo;
     this.oid = oid;
     this.keyLength = keyLength;

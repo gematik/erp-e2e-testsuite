@@ -73,8 +73,7 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
     return this;
   }
 
-  public PatientBuilder kvnr(
-          @NonNull KVNR kvnr, @NonNull VersicherungsArtDeBasis insuranceType) {
+  public PatientBuilder kvnr(@NonNull KVNR kvnr, @NonNull VersicherungsArtDeBasis insuranceType) {
     this.kvnr = kvnr;
     this.identifierTypeDe =
         insuranceType.equals(VersicherungsArtDeBasis.GKV)

@@ -48,7 +48,9 @@ public class AssignerOrganizationBuilder
   }
 
   public static AssignerOrganizationBuilder faker() {
-    return faker(new OrganizationReference(UUID.randomUUID().toString()).asReference(), GemFaker.insuranceName());
+    return faker(
+        new OrganizationReference(UUID.randomUUID().toString()).asReference(),
+        GemFaker.insuranceName());
   }
 
   public static AssignerOrganizationBuilder faker(@NonNull KbvPatient pkvPatient) {
@@ -81,10 +83,11 @@ public class AssignerOrganizationBuilder
     return faker(assignerRef, assignerName);
   }
 
-  public static AssignerOrganizationBuilder faker(@NonNull OrganizationReference reference, String name) {
+  public static AssignerOrganizationBuilder faker(
+      @NonNull OrganizationReference reference, String name) {
     return faker(reference.asReference(), name);
   }
-  
+
   public static AssignerOrganizationBuilder faker(@NonNull Reference reference, String name) {
     val builder = builder();
 

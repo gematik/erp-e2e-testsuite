@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.app.questions;
 
+import static org.junit.Assert.assertTrue;
+
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.Receipt;
 import de.gematik.test.erezept.app.mobile.elements.XpathPageElement;
@@ -26,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
-
-import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,7 +46,8 @@ public class RedeemedPrescription implements Question<Boolean> {
     return driverAbility.getText(Receipt.TASKID).equals(taskIdValue);
   }
 
-  public static RedeemedPrescription lastRedeemedPrescriptionWithStatusAndTaskId(String receipt, String status, String taskidValue) {
+  public static RedeemedPrescription lastRedeemedPrescriptionWithStatusAndTaskId(
+      String receipt, String status, String taskidValue) {
     String xPathLabel = "//*[@label='" + receipt + ", Eingelöst: Heute, " + status + "']";
     return new RedeemedPrescription(taskidValue, xPathLabel);
   }

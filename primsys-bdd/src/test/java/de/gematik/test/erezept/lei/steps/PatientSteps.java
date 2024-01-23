@@ -45,7 +45,8 @@ public class PatientSteps {
    * @param insuranceType ist die erwartete Versicherungsart
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) die Versicherungsart (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) aufweist$")
+      "^(?:der|die) Versicherte (.+) die Versicherungsart (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI)"
+          + " aufweist$")
   public void whenInsuranceTypeIs(String patientName, String insuranceType) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient)
@@ -67,7 +68,8 @@ public class PatientSteps {
    * @param pharmacyName ist die Apotheke, welche den DMC zugewiesen bekommt
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte) E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
+          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
   public void whenAssignDataMatrixCodeFromStack(
       String patientName, String order, String dmcStack, String pharmacyName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -78,7 +80,8 @@ public class PatientSteps {
   }
 
   @Wenn(
-      "^(?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte) E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
+      "^(?:der|die) Versicherte (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte) E-Rezept der"
+          + " Apotheke (.+) via Data Matrix Code zuweist$")
   public void whenAssignDataMatrixCodeFromStack(
       String order, String dmcStack, String pharmacyName) {
     val thePatient = OnStage.theActorInTheSpotlight();
@@ -95,21 +98,24 @@ public class PatientSteps {
   }
 
   @Dann(
-      "^hat (?:der|die) Versicherte (.+) (mindestens|maximal|genau) (\\d+) Medikament(?:e)? erhalten$")
+      "^hat (?:der|die) Versicherte (.+) (mindestens|maximal|genau) (\\d+) Medikament(?:e)?"
+          + " erhalten$")
   public void thenReceivedDrugs(String patientName, String adverb, long amount) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient).attemptsTo(Ensure.that(HasDispensedDrugs.of(adverb, amount)).isTrue());
   }
 
   @Und(
-      "^(?:der|die) Versicherte (.+) hat (mindestens|maximal|genau) (\\d+) Medikament(?:e)? erhalten$")
+      "^(?:der|die) Versicherte (.+) hat (mindestens|maximal|genau) (\\d+) Medikament(?:e)?"
+          + " erhalten$")
   public void andReceivedDrugs(String patientName, String adverb, long amount) {
     val thePatient = OnStage.theActorCalled(patientName);
     and(thePatient).attemptsTo(Ensure.that(HasDispensedDrugs.of(adverb, amount)).isTrue());
   }
 
   @Wenn(
-      "^(?:der|die) Versicherte (.+) das (letztes|erstes) (?:ihm|ihr) zugewiesene E-Rezept herunterlädt$")
+      "^(?:der|die) Versicherte (.+) das (letztes|erstes) (?:ihm|ihr) zugewiesene E-Rezept"
+          + " herunterlädt$")
   public void whenDownloadPrescription(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient).attemptsTo(RetrievePrescriptionFromServer.andChooseWith(order));
@@ -147,7 +153,8 @@ public class PatientSteps {
    * @param patientName ist der Name des Versicherten
    */
   @Dann(
-      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) letztes (ausgestellte|gelöschte) E-Rezept nicht mehr angezeigt$")
+      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) letztes (ausgestellte|gelöschte) E-Rezept"
+          + " nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String patientName, String stack) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -155,7 +162,8 @@ public class PatientSteps {
   }
 
   @Dann(
-      "^wird das letzte (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten nicht mehr angezeigt$")
+      "^wird das letzte (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten nicht mehr"
+          + " angezeigt$")
   public void thenPrescriptionNotDisplayed(String stack) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
@@ -163,7 +171,8 @@ public class PatientSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) (\\d+) Dispensierinformation(?:en)? für (?:sein|ihr) (erstes|letztes) E-Rezept abrufen$")
+      "^kann (?:der|die) Versicherte (.+) (\\d+) Dispensierinformation(?:en)? für (?:sein|ihr)"
+          + " (erstes|letztes) E-Rezept abrufen$")
   public void thenPatientGetsMedicationDispense(String patientName, long amount, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)

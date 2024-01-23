@@ -29,6 +29,7 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
@@ -42,6 +43,7 @@ import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import java.util.Map;
+import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -85,7 +87,7 @@ class MovingToPrescriptionTest {
   }
 
   @Test
-  void shouldThrowOnAppStateMissmatch() {
+  void shouldThrowOnAppStateMismatch() {
     val actor = OnStage.theActorCalled(userName);
     val erpClient = actor.abilityTo(UseTheErpClient.class);
     val dmcList = actor.abilityTo(ManageDataMatrixCodes.class);
@@ -101,7 +103,7 @@ class MovingToPrescriptionTest {
     val medicationRequest = mock(KbvErpMedicationRequest.class);
     when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedication()).thenReturn(medication);
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
@@ -119,6 +121,36 @@ class MovingToPrescriptionTest {
     val movingTo = MovingToPrescription.withTaskId(taskId);
 
     assertThrows(AppStateMissmatchException.class, () -> actor.asksFor(movingTo));
+  }
+
+  @Test
+  void shouldThrowOnMissingKbvBundle() {
+    val actor = OnStage.theActorCalled(userName);
+    val erpClient = actor.abilityTo(UseTheErpClient.class);
+    val dmcList = actor.abilityTo(ManageDataMatrixCodes.class);
+
+    val taskId = TaskId.from(PrescriptionId.random());
+    val accessCode = AccessCode.random();
+    dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
+
+    val task = mock(ErxTask.class);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+
+    when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
+    when(prescriptionBundle.getTask()).thenReturn(task);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.empty());
+
+    val getTaskResponse =
+        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
+            .withHeaders(Map.of())
+            .withStatusCode(200)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+
+    when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
+
+    val movingTo = MovingToPrescription.withTaskId(taskId);
+
+    assertThrows(MissingFieldException.class, () -> actor.asksFor(movingTo));
   }
 
   @Test

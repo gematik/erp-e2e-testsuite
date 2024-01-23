@@ -85,11 +85,13 @@ class ErrorResponseBuilderTest {
   @Test
   void shouldThrowFachdienstErrorResponse() {
     val erpResponse =
-            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
-                    .withStatusCode(500)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
-    assertThrows(WebApplicationException.class, () -> ErrorResponseBuilder.throwFachdienstError(erpResponse));
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+            .withStatusCode(500)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    assertThrows(
+        WebApplicationException.class,
+        () -> ErrorResponseBuilder.throwFachdienstError(erpResponse));
   }
 
   @Test
@@ -102,7 +104,7 @@ class ErrorResponseBuilderTest {
     try {
       val response = ErrorResponseBuilder.createFachdienstError(erpResponse);
     } catch (WebApplicationException wae) {
-      val errorDto = (ErrorDto)wae.getResponse().getEntity();
+      val errorDto = (ErrorDto) wae.getResponse().getEntity();
       assertEquals(ErrorType.INTERNAL, errorDto.getType());
     }
   }
@@ -110,14 +112,14 @@ class ErrorResponseBuilderTest {
   @Test
   void shouldThrowInternalErrorOnMissingOperationOutcomeWithEmptyBody() {
     val erpResponse =
-            ErpResponse.forPayload(null, Resource.class)
-                    .withStatusCode(200)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(null, Resource.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     try {
       val response = ErrorResponseBuilder.createFachdienstError(erpResponse);
     } catch (WebApplicationException wae) {
-      val errorDto = (ErrorDto)wae.getResponse().getEntity();
+      val errorDto = (ErrorDto) wae.getResponse().getEntity();
       assertEquals(ErrorType.INTERNAL, errorDto.getType());
     }
   }

@@ -138,8 +138,7 @@ public class ProvidePatientBaseData implements Ability {
             .versichertenStatus(VersichertenStatus.MEMBERS);
 
     Optional.ofNullable(payorType)
-        .ifPresentOrElse(
-                builder::versicherungsArt, () -> builder.versicherungsArt(coverageType));
+        .ifPresentOrElse(builder::versicherungsArt, () -> builder.versicherungsArt(coverageType));
 
     return builder.build();
   }

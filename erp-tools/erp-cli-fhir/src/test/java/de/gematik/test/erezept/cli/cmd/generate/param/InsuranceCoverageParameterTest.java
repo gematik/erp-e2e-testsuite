@@ -33,7 +33,7 @@ class InsuranceCoverageParameterTest {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs());
-    
+
     assertNotNull(icp.getPersonGroup());
     assertNotNull(icp.getDmp());
     assertNotNull(icp.getWop());
@@ -54,13 +54,13 @@ class InsuranceCoverageParameterTest {
     // reference
     assertEquals(patient.getInsuranceKind(), coverage.getInsuranceKind());
   }
-  
+
   @Test
   void shouldCreateWithRealCoverageFromIknr() {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692"));
-    
+
     val coverage = icp.createCoverage();
     assertEquals("104127692", coverage.getIknr().getValue());
     assertEquals("actimonda krankenkasse", coverage.getName());
@@ -71,7 +71,7 @@ class InsuranceCoverageParameterTest {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "950585030", "--coverage-type", "PKV"));
-    
+
     val coverage = icp.createCoverage();
     assertEquals("950585030", coverage.getIknr().getValue());
     assertEquals("PBeaKK Postbeamtenkrankenkasse", coverage.getName());
@@ -83,7 +83,7 @@ class InsuranceCoverageParameterTest {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692", "--insurance-name", "ABC"));
-    
+
     val coverage = icp.createCoverage();
     assertEquals("104127692", coverage.getIknr().getValue());
     assertEquals("ABC", coverage.getName());
@@ -93,7 +93,8 @@ class InsuranceCoverageParameterTest {
   void shouldCreateWithRealCoverageFromTypeWitCustomName() {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
-    assertDoesNotThrow(() -> cmdline.parseArgs("--coverage-type", "PKV", "--insurance-name", "ABC"));
+    assertDoesNotThrow(
+        () -> cmdline.parseArgs("--coverage-type", "PKV", "--insurance-name", "ABC"));
 
     val coverage = icp.createCoverage();
     assertNotNull(coverage.getIknr());
@@ -107,7 +108,7 @@ class InsuranceCoverageParameterTest {
     val icp = new InsuranceCoverageParameter();
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--coverage-type", type));
-    
+
     val coverage = icp.createCoverage();
     assertNotNull(coverage.getIknr().getValue());
     assertNotNull(coverage.getName());
@@ -124,7 +125,8 @@ class InsuranceCoverageParameterTest {
     icp.setPatient(patient);
     val coverage = icp.createCoverage();
     assertEquals("104127692", coverage.getIknr().getValue());
-    // should not equal because patient is PKV though actimondia is a GKV insurance: -> random default name
+    // should not equal because patient is PKV though actimondia is a GKV insurance: -> random
+    // default name
     assertEquals("actimonda krankenkasse", coverage.getName());
   }
 }

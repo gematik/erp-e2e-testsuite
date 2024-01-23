@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.cli.cfg;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ErpEnvironmentsConfigurationTest {
 

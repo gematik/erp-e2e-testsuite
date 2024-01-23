@@ -66,7 +66,11 @@ public enum WopDto {
   @JsonCreator
   public static WopDto fromCode(@NonNull String code) {
     return Arrays.stream(WopDto.values())
-        .filter(it -> it.getCode().equals(code) || it.name().equalsIgnoreCase(code) || it.getDisplay().equalsIgnoreCase(code))
+        .filter(
+            it ->
+                it.getCode().equals(code)
+                    || it.name().equalsIgnoreCase(code)
+                    || it.getDisplay().equalsIgnoreCase(code))
         .findFirst()
         .orElseThrow(() -> new InvalidCodeValueException(WopDto.class, code));
   }

@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortUnaccepted;
 import de.gematik.test.erezept.screenplay.task.AbortPrescription;
@@ -26,15 +29,14 @@ import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
-
 public class PharmacyDeletePrescriptionSteps {
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret (.+) löschen$")
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen"
+          + " Secret (.+) löschen$")
   @Und(
-      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret (.+) löschen$")
+      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen"
+          + " Secret (.+) löschen$")
   public void thenDeleteMedicationWithWrongSecret(
       String pharmName, String order, String wrongSecret) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -49,9 +51,11 @@ public class PharmacyDeletePrescriptionSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht mit einem falschen Secret löschen$")
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht mit einem falschen"
+          + " Secret löschen$")
   @Und(
-      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht mit einem falschen Secret löschen$")
+      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht mit einem falschen"
+          + " Secret löschen$")
   public void thenDeleteMedicationWithWrongSecret(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
 
@@ -90,7 +94,8 @@ public class PharmacyDeletePrescriptionSteps {
    *     wird
    */
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept ohne (?:Secret|zu akzeptieren) nicht löschen$")
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept ohne (?:Secret|zu"
+          + " akzeptieren) nicht löschen$")
   public void thenPharmacyCannotAbortPrescription(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy)

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationBuilder;
@@ -26,14 +28,11 @@ import de.gematik.test.erezept.fhir.values.AsvFachgruppennummer;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
-
-import java.util.UUID;
-
-import static java.text.MessageFormat.format;
 
 /** The Ability to provide Base-Data (Stammdaten) */
 public class ProvideDoctorBaseData implements Ability {

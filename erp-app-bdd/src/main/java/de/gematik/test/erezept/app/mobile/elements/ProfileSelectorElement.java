@@ -16,16 +16,15 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
+import static java.text.MessageFormat.format;
+
 import io.appium.java_client.AppiumBy;
+import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.openqa.selenium.By;
-
-import java.util.function.Supplier;
-
-import static java.text.MessageFormat.format;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProfileSelectorElement implements PageElement {
@@ -54,7 +53,8 @@ public class ProfileSelectorElement implements PageElement {
       return () ->
           AppiumBy.iOSNsPredicateString(
               format(
-                  "type == \"XCUIElementTypeButton\" AND name == \"pro_btn_selection_profile_row\" AND label == \"{0}\"",
+                  "type == \"XCUIElementTypeButton\" AND name == \"pro_btn_selection_profile_row\""
+                      + " AND label == \"{0}\"",
                   userName));
     }
   }

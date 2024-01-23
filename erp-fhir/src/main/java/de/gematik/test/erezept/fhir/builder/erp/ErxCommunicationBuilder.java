@@ -31,10 +31,9 @@ import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
-
-import java.util.List;
 
 public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCommunicationBuilder> {
 

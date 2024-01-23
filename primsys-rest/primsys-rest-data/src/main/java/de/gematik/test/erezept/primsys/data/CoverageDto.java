@@ -28,59 +28,59 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CoverageDto {
-    private InsuranceTypeDto insuranceType;
-    private PayorTypeDto payorType;
+  private InsuranceTypeDto insuranceType;
+  private PayorTypeDto payorType;
+  private String iknr;
+  private String name;
+  private WopDto wop;
+  private InsurantStateDto insurantState;
+  private PersonGroupDto personGroup;
+
+  public static Builder ofType(InsuranceTypeDto type) {
+    return new Builder(type, null);
+  }
+
+  public static Builder ofType(PayorTypeDto type) {
+    return new Builder(null, type);
+  }
+
+  @RequiredArgsConstructor
+  public static class Builder {
+    private final InsuranceTypeDto insuranceType;
+    private final PayorTypeDto payorType;
     private String iknr;
     private String name;
     private WopDto wop;
     private InsurantStateDto insurantState;
     private PersonGroupDto personGroup;
 
-    public static Builder ofType(InsuranceTypeDto type) {
-        return new Builder(type, null);
+    public Builder named(String name) {
+      this.name = name;
+      return this;
     }
 
-    public static Builder ofType(PayorTypeDto type) {
-        return new Builder(null, type);
+    public Builder withIknr(String iknr) {
+      this.iknr = iknr;
+      return this;
     }
 
-    @RequiredArgsConstructor
-    public static class Builder {
-        private final InsuranceTypeDto insuranceType;
-        private final PayorTypeDto payorType;
-        private String iknr;
-        private String name;
-        private WopDto wop;
-        private InsurantStateDto insurantState;
-        private PersonGroupDto personGroup;
-
-        public Builder named(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder withIknr(String iknr) {
-            this.iknr = iknr;
-            return this;
-        }
-
-        public Builder resident(WopDto wop) {
-            this.wop = wop;
-            return this;
-        }
-
-        public Builder insurantState(InsurantStateDto insurantState) {
-            this.insurantState = insurantState;
-            return this;
-        }
-
-        public Builder personGroup(PersonGroupDto personGroup) {
-            this.personGroup = personGroup;
-            return this;
-        }
-
-        public CoverageDto build() {
-            return new CoverageDto(insuranceType, payorType, iknr, name, wop, insurantState, personGroup);
-        }
+    public Builder resident(WopDto wop) {
+      this.wop = wop;
+      return this;
     }
+
+    public Builder insurantState(InsurantStateDto insurantState) {
+      this.insurantState = insurantState;
+      return this;
+    }
+
+    public Builder personGroup(PersonGroupDto personGroup) {
+      this.personGroup = personGroup;
+      return this;
+    }
+
+    public CoverageDto build() {
+      return new CoverageDto(insuranceType, payorType, iknr, name, wop, insurantState, personGroup);
+    }
+  }
 }

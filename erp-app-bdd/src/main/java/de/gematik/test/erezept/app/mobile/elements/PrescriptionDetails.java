@@ -29,7 +29,8 @@ public enum PrescriptionDetails implements PageElement {
       "Alert information",
       () ->
           By.xpath(
-              "(//XCUIElementTypeAlert[@name='Das Rezept ist gerade in Bearbeitung durch eine Apotheke und kann nicht gelöscht werden.'])")),
+              "(//XCUIElementTypeAlert[@name='Das Rezept ist gerade in Bearbeitung durch eine"
+                  + " Apotheke und kann nicht gelöscht werden.'])")),
   DELETE_BUTTON_TOOLBAR(
       "Delete Prescription tool bar item",
       () -> AppiumBy.accessibilityId("prsc_dtl_btn_toolbar_item")),
@@ -39,32 +40,30 @@ public enum PrescriptionDetails implements PageElement {
   REDEEM_BY_DELIVERY(
       "Redeem Prescription remotely via delivery",
       () -> AppiumBy.accessibilityId("rdm_btn_delivery_tile")),
-  PRESCRIPTION_TITLE(
-          "Prescription Title", () -> AppiumBy.accessibilityId("prsc_dtl_txt_title")
-  ),
+  PRESCRIPTION_TITLE("Prescription Title", () -> AppiumBy.accessibilityId("prsc_dtl_txt_title")),
   DIRECT_ASSIGNMENT_BADGE(
-          "Direct Assignment Badge",
-          () -> AppiumBy.accessibilityId("prsc_dtl_btn_direct_assignment_info")
-  ),
+      "Direct Assignment Badge",
+      () -> AppiumBy.accessibilityId("prsc_dtl_btn_direct_assignment_info")),
   PRESCRIPTION_VALIDITY_TEXT(
-          "Prescription Validity Text", () -> AppiumBy.xpath("//XCUIElementTypeStaticText[@name='prsc_dtl_txt_prescription_validity']")
-  ),
+      "Prescription Validity Text",
+      () ->
+          AppiumBy.xpath(
+              "//XCUIElementTypeStaticText[@name='prsc_dtl_txt_prescription_validity']")),
   PRESCRIPTION_ADDITIONAL_PAYMENT(
       "Additional Payment",
       () ->
           AppiumBy.xpath(
               "//XCUIElementTypeButton[@name='prsc_dtl_btn_scanned_prescription_info']/XCUIElementTypeStaticText[@name!='Zuzahlung']")),
   PRESCRIPTION_MEDICATION(
-          "Prescription Medication",
-          () -> AppiumBy.iOSNsPredicateString("label == \"Medikament\"")
-  ),
+      "Prescription Medication", () -> AppiumBy.iOSNsPredicateString("label == \"Medikament\"")),
   DELETE_BUTTON_TOOLBAR_ITEM(
       "Delete Prescription button", () -> AppiumBy.xpath("//*[@label='Löschen']")),
   DELETE_PRESCRIPTION_ITEM_BUTTON(
-      "Delete Prescription button", () -> AppiumBy.xpath("//*[@name='Horizontaler Rollbalken, 1 Seite']")),
+      "Delete Prescription button",
+      () -> AppiumBy.xpath("//*[@name='Horizontaler Rollbalken, 1 Seite']")),
   TECHNICAL_INFORMATION(
-          "Technische Informationen",
-          () -> AppiumBy.accessibilityId("prsc_dtl_btn_technical_informations")),
+      "Technische Informationen",
+      () -> AppiumBy.accessibilityId("prsc_dtl_btn_technical_informations")),
   LEAVE_DETAILS_BUTTON(
       "Leave Prescription Details",
       () -> By.xpath("(//XCUIElementTypeButton[@name='Rezepte'])[1]")),

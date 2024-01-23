@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.primsys.rest.response;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.model.ActorContext;
@@ -25,8 +26,8 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
 
-class InfoResponseBuilderTest extends TestWithActorContext{
-  
+class InfoResponseBuilderTest extends TestWithActorContext {
+
   @Test
   void shouldNotInstantiate() {
     assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(InfoResponseBuilder.class));
@@ -44,7 +45,6 @@ class InfoResponseBuilderTest extends TestWithActorContext{
     assertEquals("default", info.getFhir().getConfigured());
   }
 
-
   @Test
   @SetSystemProperty(key = "erp.fhir.profile", value = "1.2.0")
   void shouldChangeProfileViaSystemProperty() {
@@ -53,30 +53,23 @@ class InfoResponseBuilderTest extends TestWithActorContext{
     assertNotNull(info.getFhir());
     assertEquals("1.2.0", info.getFhir().getConfigured());
     assertNotNull(info.getFhir());
-
   }
 
   @Test
   @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "")
-  void shouldGenerateDefaultInfoResponseWhenEmptyVersion(){
+  void shouldGenerateDefaultInfoResponseWhenEmptyVersion() {
     val ctx = ActorContext.getInstance();
     val info = InfoResponseBuilder.getInfo(ctx);
     assertNotNull(info.getFhir());
     assertEquals("default", info.getFhir().getConfigured());
   }
+
   @Test
   @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = " ")
-  void shouldGenerateDefaultInfoResponseWhenBlankVersion(){
+  void shouldGenerateDefaultInfoResponseWhenBlankVersion() {
     val ctx = ActorContext.getInstance();
     val info = InfoResponseBuilder.getInfo(ctx);
     assertNotNull(info.getFhir());
     assertEquals("default", info.getFhir().getConfigured());
   }
-
-
-
-
-
-
-
 }

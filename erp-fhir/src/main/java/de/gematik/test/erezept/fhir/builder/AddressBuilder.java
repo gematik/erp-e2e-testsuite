@@ -36,6 +36,7 @@ public class AddressBuilder {
 
   private static final Pattern STREET_PATTERN =
       Pattern.compile("^([\\D\\s]+)\\s*([\\d|\\w]+)?.*"); // NOSONAR won't be exposed to a user
+
   // directly
 
   public static Address address(

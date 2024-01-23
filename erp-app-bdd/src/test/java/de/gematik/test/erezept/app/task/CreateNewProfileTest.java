@@ -35,41 +35,41 @@ import org.junit.jupiter.api.Test;
 
 class CreateNewProfileTest {
 
-    private String userName;
+  private String userName;
 
-    @BeforeEach
-    void setUp() {
-        OnStage.setTheStage(new Cast() {});
-        val app = mock(UseIOSApp.class);
-        when(app.getPlatformType()).thenReturn(PlatformType.IOS);
+  @BeforeEach
+  void setUp() {
+    OnStage.setTheStage(new Cast() {});
+    val app = mock(UseIOSApp.class);
+    when(app.getPlatformType()).thenReturn(PlatformType.IOS);
 
-        userName = GemFaker.fakerName();
-        val aliceIos = OnStage.theActorCalled((userName));
-        givenThat(aliceIos).can(app);
-    }
+    userName = GemFaker.fakerName();
+    val aliceIos = OnStage.theActorCalled((userName));
+    givenThat(aliceIos).can(app);
+  }
 
-    @AfterEach
-    void tearDown() {
-        OnStage.drawTheCurtain();
-    }
-    
-    @Test
-    void shouldCreateNewProfileFromSettingsMenu() {
-        val task = CreateNewProfile.fromSettingsMenu();
-        val actor = OnStage.theActorCalled(userName);
-        val app = actor.abilityTo(UseIOSApp.class);
+  @AfterEach
+  void tearDown() {
+    OnStage.drawTheCurtain();
+  }
 
-        assertDoesNotThrow(() -> actor.attemptsTo(task));
+  @Test
+  void shouldCreateNewProfileFromSettingsMenu() {
+    val task = CreateNewProfile.fromSettingsMenu();
+    val actor = OnStage.theActorCalled(userName);
+    val app = actor.abilityTo(UseIOSApp.class);
 
-        verify(app, times(1)).input(actor.getName(), NewProfileScreen.NAME_INPUT);
-        verify(app, times(1)).setCurrentUserProfile(actor.getName());
-    }
+    assertDoesNotThrow(() -> actor.attemptsTo(task));
 
-    @Test
-    void createNewProfileFromMainScreenNotYetImplemented() {
-        val task = CreateNewProfile.fromMainScreen();
-        val actor = OnStage.theActorCalled(userName);
+    verify(app, times(1)).input(actor.getName(), NewProfileScreen.NAME_INPUT);
+    verify(app, times(1)).setCurrentUserProfile(actor.getName());
+  }
 
-        assertThrows(FeatureNotImplementedException.class, () -> actor.attemptsTo(task));
-    }
+  @Test
+  void createNewProfileFromMainScreenNotYetImplemented() {
+    val task = CreateNewProfile.fromMainScreen();
+    val actor = OnStage.theActorCalled(userName);
+
+    assertThrows(FeatureNotImplementedException.class, () -> actor.attemptsTo(task));
+  }
 }

@@ -25,7 +25,7 @@ public enum ErpAfos implements RequirementsSet {
   A_19021("A_19021", "Generierung AccessCode"),
   A_19022("A_19022", "Rollenprüfung Verordnender aktiviert Rezept"),
   A_19112("A_19112", "Parametrierung Task für Workflow-Typ"),
-  A_19113_01("A_19113-01","Rollenprüfung Versicherter oder Apotheker liest Rezept"),
+  A_19113_01("A_19113-01", "Rollenprüfung Versicherter oder Apotheker liest Rezept"),
   A_19114("A_19114", "Task im Status Draft nach Erstellung"),
   A_19128("A_19128", "Task im Status Ready nach Aktivierung"),
   A_19166("A_19166", "Rollenprüfung Abgebender ruft Rezept ab"),
@@ -33,6 +33,7 @@ public enum ErpAfos implements RequirementsSet {
   A_19230("A_19230", "Rollenprüfung Abgebender vollzieht Abgabe des Rezepts"),
   A_19248_02("A_19248-02", "Schemaprüfung und Speicherung MedicationDispense"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
+  A_19514_02("A_19514-02", "HTTP Status-Codes"),
   A_19514_03("A_19514-03", "HTTP Status-Codes"),
   A_22110("A_22110", "Task akzeptieren - Flowtype 200/209 - Einwilligung ermitteln"),
   A_22487("A_22487", "Prüfregel Ausstellungsdatum"),
@@ -55,18 +56,26 @@ public enum ErpAfos implements RequirementsSet {
       "A_23450",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Prüfung Prüfungsnachweis"),
   A_23454("A_23454", "E-Rezept-Fachdienst - Prüfung Prüfziffer"),
+  A_23878("A_23878", "E-RezeptFachdienst, validierung des Payload des DispenseRequest"),
+  A_23879("A_23879", "E-RezeptFachdienst, validierung des Payload des CommunicationReply"),
   A_23888(
       "A_23888",
-      "E-Rezept-Fachdienst - Task aktivieren – Überprüfung der IK Nummer im Profil KBV_PR_FOR_Coverage, -> payor.identifier.value"),
+      "E-Rezept-Fachdienst - Task aktivieren – Überprüfung der IK Nummer im Profil"
+          + " KBV_PR_FOR_Coverage, -> payor.identifier.value"),
   A_23890(
       "A_23890",
-      "Überprüfung der KVNR in KBV_PR_FOR_Patient - gemäß der Anlage 1 der 'Prüfziffernberechnung für die Krankenversichertennummer nach § 290 SGB V' vom 26.02.2019"),
+      "Überprüfung der KVNR in KBV_PR_FOR_Patient - gemäß der Anlage 1 der 'Prüfziffernberechnung"
+          + " für die Krankenversichertennummer nach § 290 SGB V' vom 26.02.2019"),
 
   A_23891("A_23891", "Validierung der ANR / ZANR"),
-  A_23936("A_23936", "E-Rezept-Fachdienst - Task aktivieren - Versicherten-ID als Identifikator von Versicherten"),
+  A_23892("A_23892", "Überprüfung der PZN-Prüfziffer im Medication_PZN"),
+  A_23936(
+      "A_23936",
+      "E-Rezept-Fachdienst - Task aktivieren - Versicherten-ID als Identifikator von Versicherten"),
   A_24030(
       "A_24030",
-      "Validierung der IK Nummer im Profil KBV_PR_FOR_Coverage, bei einem Unfall (BG-ABrechnung) -> payor.identifier.extension:alternativeID.value[x]:valueIdentifier"),
+      "Validierung der IK Nummer im Profil KBV_PR_FOR_Coverage, bei einem Unfall (BG-ABrechnung) ->"
+          + " payor.identifier.extension:alternativeID.value[x]:valueIdentifier"),
   A_24032(
       "A_24032",
       "Auffälligkeit für ANR & ZANR validierung, invalide Prüfziffer bei Konfiguration Fehler"),
@@ -74,8 +83,11 @@ public enum ErpAfos implements RequirementsSet {
       "A_24033",
       "Auffälligkeit für ANR & ZANR validierung, invalide Prüfziffer bei Konfiguration Warnung"),
 
-  A_23892("A_23892", "Überprüfung der PZN-Prüfziffer im Medication_PZN"),
-  A_24034("A_24034", "Überprüfung der PZN-Prüfziffer im Medication_Compounding");
+  A_24034("A_24034", "Überprüfung der PZN-Prüfziffer im Medication_Compounding"),
+  A_24176(
+      "A_24176",
+      "Apotheke - Verordnung abrufen - Prüfung der Telematik-ID in ACCESS_TOKEN und Task.owner"),
+  ;
   @Getter private final Requirement requirement;
 
   ErpAfos(String id, String description) {

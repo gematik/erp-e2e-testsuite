@@ -16,7 +16,6 @@
 
 package de.gematik.test.erezept.cli;
 
-import de.gematik.test.erezept.cli.cmd.ErpCliPatient;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import picocli.CommandLine;

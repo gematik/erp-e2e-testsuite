@@ -16,6 +16,10 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static java.text.MessageFormat.format;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.screenplay.task.IssuePrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import io.cucumber.datatable.DataTable;
@@ -25,15 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 
-import static java.text.MessageFormat.format;
-import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
-
 @Slf4j
 public class DoctorPrescribeKvnrSteps {
 
   @Angenommen(
-      "^(?:der Arzt|die Ärztin) (.+) verschreibt folgende(?:s)? E-Rezept(?:e)? an die KVNR (\\w+):$")
+      "^(?:der Arzt|die Ärztin) (.+) verschreibt folgende(?:s)? E-Rezept(?:e)? an die KVNR"
+          + " (\\w+):$")
   public void givenIssueMultiplePrescriptionsToKvnr(
       String docName, String kvnr, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
@@ -181,7 +182,8 @@ public class DoctorPrescribeKvnrSteps {
    * @param medications ist die DataTable für die Parametrisierung des E-Rezeptes
    */
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.*) folgende(?:s)? E-Rezept(?:e)? an die KVNR (\\w+) verschreibt:$")
+      "^(?:der Arzt|die Ärztin) (.*) folgende(?:s)? E-Rezept(?:e)? an die KVNR (\\w+)"
+          + " verschreibt:$")
   public void whenIssueMultiplePrescriptionsToKvnr(
       String docName, String kvnr, DataTable medications) {
     log.trace(format("Doctor {0} will issue Prescription to Patient with KVNR {1}", docName, kvnr));

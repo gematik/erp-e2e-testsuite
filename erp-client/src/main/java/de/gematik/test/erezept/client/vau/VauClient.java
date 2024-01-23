@@ -129,7 +129,8 @@ public class VauClient {
 
     log.info(
         format(
-            "Received VAU-Response with Status Code {0} for Request ID {1} (X-Request-Id {2}) with VAU Userpseudonym: {3}",
+            "Received VAU-Response with Status Code {0} for Request ID {1} (X-Request-Id {2}) with"
+                + " VAU Userpseudonym: {3}",
             outerResponse.getStatus(),
             Base64.getEncoder().encodeToString(vauProtocol.getRequestId()),
             responseId,

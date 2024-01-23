@@ -56,9 +56,8 @@ class KbvItaForVersionTest {
 
   static Stream<Arguments> getDefaultVersionViaSpecialDates() {
     return Stream.of(
-            arguments(LocalDate.of(2023, 7, 31), KbvItaForVersion.V1_0_3),
-            arguments(LocalDate.of(2023, 8, 1), KbvItaForVersion.V1_1_0)
-    );
+        arguments(LocalDate.of(2023, 7, 31), KbvItaForVersion.V1_0_3),
+        arguments(LocalDate.of(2023, 8, 1), KbvItaForVersion.V1_1_0));
   }
 
   @Test

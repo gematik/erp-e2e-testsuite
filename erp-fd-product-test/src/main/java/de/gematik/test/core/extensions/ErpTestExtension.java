@@ -42,7 +42,10 @@ import org.junit.jupiter.api.extension.ExtensionContext.Store;
 
 @Slf4j
 public class ErpTestExtension
-    implements BeforeTestExecutionCallback, AfterTestExecutionCallback, BeforeAllCallback, AfterAllCallback {
+    implements BeforeTestExecutionCallback,
+        AfterTestExecutionCallback,
+        BeforeAllCallback,
+        AfterAllCallback {
 
   private static final String START_TIME = "start time";
 
@@ -51,7 +54,7 @@ public class ErpTestExtension
     getStore(context).put(START_TIME, System.currentTimeMillis());
     val testMethod = context.getRequiredTestMethod();
     val id = getRequiredAnnotation(testMethod, TestcaseId.class).value();
-    
+
     log.info(format("# Start Testcase {0} / {1} #", id, context.getDisplayName()));
 
     CoverageReporter.getInstance().startTestcase(id);
@@ -73,7 +76,7 @@ public class ErpTestExtension
   public void beforeAll(ExtensionContext extensionContext) throws Exception {
     StopwatchProvider.init();
   }
-  
+
   @Override
   @SneakyThrows
   @SuppressWarnings({"java:S6300"}) // writing to File by intention; not an issue!
@@ -96,7 +99,7 @@ public class ErpTestExtension
     } else {
       throw new IOException(format("Unable to write File {0} ", rawJsonOutput));
     }
-    
+
     StopwatchProvider.close();
   }
 

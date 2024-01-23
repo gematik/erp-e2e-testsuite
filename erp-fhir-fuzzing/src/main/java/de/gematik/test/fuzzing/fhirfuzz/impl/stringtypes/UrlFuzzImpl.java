@@ -24,47 +24,46 @@ import lombok.val;
 @Slf4j
 public class UrlFuzzImpl implements BaseFuzzer<String> {
 
-    private final FuzzerContext fuzzerContext;
-    private static final String HTTPS = "https://";
-    public UrlFuzzImpl(FuzzerContext fuzzerContext) {
-        this.fuzzerContext = fuzzerContext;
+  private final FuzzerContext fuzzerContext;
+  private static final String HTTPS = "https://";
+
+  public UrlFuzzImpl(FuzzerContext fuzzerContext) {
+    this.fuzzerContext = fuzzerContext;
+  }
+
+  @Override
+  public FuzzerContext getContext() {
+    return fuzzerContext;
+  }
+
+  @Override
+  public String fuzz(String s) {
+    if (s == null) {
+      log.info("given String at UriFuzzer was NULL");
+      return this.generateRandom();
     }
+    if (s.length() < 7) return s;
+    val stringFuzz = new StringFuzzImpl(fuzzerContext);
 
-    @Override
-    public FuzzerContext getContext() {
-        return fuzzerContext;
+    if (s.contains(HTTPS)) {
+      return HTTPS + stringFuzz.fuzz(s.substring(8));
     }
-
-    @Override
-    public String fuzz(String s) {
-        if (s == null) {
-            log.info("given String at UriFuzzer was NULL");
-            return this.generateRandom();
-        }
-        if (s.length() < 7)
-            return s;
-        val stringFuzz = new StringFuzzImpl(fuzzerContext);
-
-        if (s.contains(HTTPS)) {
-            return HTTPS + stringFuzz.fuzz(s.substring(8));
-        }
-        val secondHttps = "Https://";
-        if (s.contains(secondHttps)) {
-            return secondHttps + stringFuzz.fuzz(s.substring(8));
-        }
-        val http = "http://";
-        if (s.contains(http)) {
-            return http + stringFuzz.fuzz(s.substring(7));
-        }
-        val secondHttp = "Http://";
-        if (s.contains(secondHttp)) {
-            return secondHttp + stringFuzz.fuzz(s.substring(7));
-        }
-        return stringFuzz.fuzz(s);
+    val secondHttps = "Https://";
+    if (s.contains(secondHttps)) {
+      return secondHttps + stringFuzz.fuzz(s.substring(8));
     }
-
-
-    public String generateRandom() {
-        return HTTPS + fuzzerContext.getFaker().internet().url();
+    val http = "http://";
+    if (s.contains(http)) {
+      return http + stringFuzz.fuzz(s.substring(7));
     }
+    val secondHttp = "Http://";
+    if (s.contains(secondHttp)) {
+      return secondHttp + stringFuzz.fuzz(s.substring(7));
+    }
+    return stringFuzz.fuzz(s);
+  }
+
+  public String generateRandom() {
+    return HTTPS + fuzzerContext.getFaker().internet().url();
+  }
 }

@@ -38,9 +38,10 @@ public class SettingsSteps {
   @Wenn("^(?:der|die) Versicherte das Impressum nach dem Onboarding überprüfen möchte$")
   public void userCanFinishTheOnboardingAfterTOUScreen() {
     val theAppUser = OnStage.theActorInTheSpotlight();
-    when(theAppUser).attemptsTo(NavigateThroughOnboarding.byFinishingTheEntireOnboardingSuccessfully());
+    when(theAppUser)
+        .attemptsTo(NavigateThroughOnboarding.byFinishingTheEntireOnboardingSuccessfully());
   }
-  
+
   @Dann("^sind die Nutzungsbedingungen und den Datenschutz sichtbar$")
   public void dieNutzungsbedingungenUndDenDatenschutzSindSichtbar() {
     val theAppUser = OnStage.theActorInTheSpotlight();

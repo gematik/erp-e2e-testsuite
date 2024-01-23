@@ -125,7 +125,8 @@ public class PharmacyResource {
       List<PznDispensedMedicationDto> body) {
     log.info(
         format(
-            "POST/pharm/id/close for Pharmacy with ID {0} the Task with Id {1} and Data to dispense {2}",
+            "POST/pharm/id/close for Pharmacy with ID {0} the Task with Id {1} and Data to dispense"
+                + " {2}",
             id, taskId, body));
     val pharma = getPharmacy(id);
     if (body != null) {

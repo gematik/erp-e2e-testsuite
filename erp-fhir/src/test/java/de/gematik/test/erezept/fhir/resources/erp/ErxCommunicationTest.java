@@ -126,7 +126,8 @@ class ErxCommunicationTest extends ParsingTest {
               val expectedRecipientKvid = "X234567890";
               val expectedSenderId = "606358757";
               val expectedMessage =
-                  "Hallo, wir haben das Medikament vorrätig. Kommen Sie gern in die Filiale oder wir schicken einen Boten.";
+                  "Hallo, wir haben das Medikament vorrätig. Kommen Sie gern in die Filiale oder"
+                      + " wir schicken einen Boten.";
               val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
               val expectedDate =
                   ZonedDateTime.parse("2020-03-12T18:01:10+00:00")

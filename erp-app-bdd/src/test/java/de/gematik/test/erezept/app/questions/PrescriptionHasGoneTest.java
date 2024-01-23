@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 gematik GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package de.gematik.test.erezept.app.questions;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
@@ -75,10 +91,12 @@ class PrescriptionHasGoneTest {
     val accessCode = AccessCode.random();
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
-    when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(TaskId.from(PrescriptionId.random()).getValue());
+    when(app.getText(PrescriptionTechnicalInformation.TASKID))
+        .thenReturn(TaskId.from(PrescriptionId.random()).getValue());
 
     val getTaskResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
+        ErpResponse.forPayload(
+                FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(404)
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -103,10 +121,11 @@ class PrescriptionHasGoneTest {
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
 
     val getTaskResponse =
-            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
-                    .withHeaders(Map.of())
-                    .withStatusCode(404)
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(
+                FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
+            .withHeaders(Map.of())
+            .withStatusCode(404)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
 

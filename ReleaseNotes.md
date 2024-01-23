@@ -1,5 +1,11 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.6.0
+
+Implemented Features:
+- TSERP-8: Create different medication types (Medication_Ingredient, Medication_Free_Text und Medication_Compounding)
+- TMD-2341: OpenAPI for test drivers of the FdVs
+
 ## Release 0.5.0
 
 Implemented Features:

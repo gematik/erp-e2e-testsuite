@@ -44,7 +44,8 @@ public class EnsureThatThePrescriptionValidity implements Task {
 
   @SuppressWarnings("java:S2201")
   @Override
-  @Step("{0} überprüft, dass das #deque ausgestellte E-Rezept noch #remainingDays Tage einlösbar ist")
+  @Step(
+      "{0} überprüft, dass das #deque ausgestellte E-Rezept noch #remainingDays Tage einlösbar ist")
   public <T extends Actor> void performAs(T actor) {
     actor.attemptsTo(EnsureTheCorrectProfile.isChosen());
 

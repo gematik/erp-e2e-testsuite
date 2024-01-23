@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.exceptions.FhirValidatorException;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.values.PZN;
@@ -35,7 +35,7 @@ class KbvErpMedicationTest {
     List.of(KbvItaErpVersion.V1_0_2, KbvItaErpVersion.V1_1_0)
         .forEach(
             version -> {
-              val medication = KbvErpMedicationBuilder.faker().version(version).build();
+              val medication = KbvErpMedicationPZNBuilder.faker().version(version).build();
               assertEquals(version, medication.getVersion());
             });
   }
@@ -48,7 +48,7 @@ class KbvErpMedicationTest {
 
   @Test
   void shouldProvideDefaultVersionIfMissing() {
-    val medication = KbvErpMedicationBuilder.faker().build();
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
 
     // remove version from profile
     medication
@@ -72,7 +72,7 @@ class KbvErpMedicationTest {
   @Test
   void getPznOptionalShouldWorkForMedicationPZN() {
     String pzn = PZN.random().getValue();
-    val medComp = KbvErpMedicationBuilder.faker(pzn, "Useless Medicine").build();
+    val medComp = KbvErpMedicationPZNBuilder.faker(pzn, "Useless Medicine").build();
     assertEquals(pzn, medComp.getPznOptional().get().getValue());
   }
 }

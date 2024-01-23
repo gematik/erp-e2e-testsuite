@@ -16,20 +16,17 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
+import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 
-import java.util.regex.Pattern;
-
-import static java.text.MessageFormat.format;
-
-/**
- * <a href="https://de.wikipedia.org/wiki/Pharmazentralnummer">Pharmazentralnummer</a>
- */
+/** <a href="https://de.wikipedia.org/wiki/Pharmazentralnummer">Pharmazentralnummer</a> */
 public class PZN extends Value<String> implements WithChecksum {
   private static final Pattern PZN_PATTERN = Pattern.compile("^\\d{8}$");
 
@@ -76,7 +73,7 @@ public class PZN extends Value<String> implements WithChecksum {
       numbers = faker.regexify("[0-9]{7}");
       checkNum = calcChecksum(numbers);
     } while (checkNum == 10);
-    val value = format("{0}{1}", numbers,checkNum);
+    val value = format("{0}{1}", numbers, checkNum);
     return from(value);
   }
 
@@ -88,19 +85,19 @@ public class PZN extends Value<String> implements WithChecksum {
     if (!matcher.matches()) return false;
 
     val calcChecksum = calcChecksum(pzn);
-    if(calcChecksum == 10) return false;
+    if (calcChecksum == 10) return false;
     return getChecksum() == calcChecksum;
   }
 
   private int getChecksum() {
     val value = getValue();
-    return Character.getNumericValue(value.charAt(value.length()-1));
+    return Character.getNumericValue(value.charAt(value.length() - 1));
   }
 
   protected static int calcChecksum(String pzn) {
     int sum = 0;
-    for(int i=0;  i<=6 ; i++) {
-      val value = Character.getNumericValue(pzn.charAt(i)) * (i+1);
+    for (int i = 0; i <= 6; i++) {
+      val value = Character.getNumericValue(pzn.charAt(i)) * (i + 1);
       sum += value;
     }
     return sum % 11;

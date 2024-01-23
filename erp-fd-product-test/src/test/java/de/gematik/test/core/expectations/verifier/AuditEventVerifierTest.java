@@ -52,14 +52,14 @@ class AuditEventVerifierTest {
   @Test
   void shouldDetectAllRepresentations() {
     val checksum =
-            VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
-                    .checksum(VsdmChecksum.builder("X12345678").build())
-                    .build()
-                    .getChecksum()
-                    .orElseThrow();
+        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
+            .checksum(VsdmChecksum.builder("X12345678").build())
+            .build()
+            .getChecksum()
+            .orElseThrow();
     val verifier = AuditEventVerifier.builder().pharmacy(pharmacy).checksum(checksum).build();
     val testData =
-            FhirTestResourceUtil.createErxAuditEventBundle(
+        FhirTestResourceUtil.createErxAuditEventBundle(
             pharmacy.getTelematikId(), pharmacy.getCommonName());
     for (Representation rep : Representation.values()) {
       verifier.contains(rep).apply(testData);

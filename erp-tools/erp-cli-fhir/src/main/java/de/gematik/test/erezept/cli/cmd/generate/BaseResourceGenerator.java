@@ -51,7 +51,8 @@ public abstract class BaseResourceGenerator implements Callable<Integer> {
       type = EncodingType.class,
       defaultValue = "XML",
       description =
-          "Type of the encoding to use. Choose one from ${COMPLETION-CANDIDATES} (default=${DEFAULT-VALUE})")
+          "Type of the encoding to use. Choose one from ${COMPLETION-CANDIDATES}"
+              + " (default=${DEFAULT-VALUE})")
   protected EncodingType encodingType;
 
   @Option(

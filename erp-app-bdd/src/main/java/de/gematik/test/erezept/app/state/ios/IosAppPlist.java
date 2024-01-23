@@ -30,23 +30,23 @@ import lombok.val;
 
 public class IosAppPlist {
 
-  private static final List<String> TOOLTIP_KEYS = List.of("MainViewTooltipId_1000", "MainViewTooltipId_900", "MainViewTooltipId_9900");
+  private static final List<String> TOOLTIP_KEYS =
+      List.of("MainViewTooltipId_1000", "MainViewTooltipId_900", "MainViewTooltipId_9900");
 
   private final NSObject dict;
 
   private IosAppPlist(NSObject dict) {
     this.dict = dict;
   }
-  
+
   public static PlistComposer forE2ETest() {
     return new PlistComposer().withoutTooltips().allowTracking(true).hideWelcomeDrawer();
   }
-  
 
   public String toXml() {
     return this.dict.toXMLPropertyList();
   }
-  
+
   @SneakyThrows
   public byte[] toBinary() {
     val baos = new ByteArrayOutputStream();
@@ -57,7 +57,7 @@ public class IosAppPlist {
   public byte[] toBase64() {
     return Base64.getEncoder().encode(this.toBinary());
   }
-  
+
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class PlistComposer {
     private final NSDictionary dict = new NSDictionary();
@@ -77,12 +77,12 @@ public class IosAppPlist {
     public PlistComposer hideWelcomeDrawer() {
       return hideWelcomeDrawer(true);
     }
-    
+
     public PlistComposer hideWelcomeDrawer(boolean allow) {
       dict.put("kHideWelcomeDrawer", allow);
       return this;
     }
-    
+
     public IosAppPlist asPlist() {
       return new IosAppPlist(this.dict);
     }

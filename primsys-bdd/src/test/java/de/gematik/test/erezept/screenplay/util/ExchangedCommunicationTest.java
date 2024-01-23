@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.screenplay.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ExchangedCommunicationTest {
 

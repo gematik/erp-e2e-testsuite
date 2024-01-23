@@ -16,9 +16,7 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-
 import java.util.Optional;
 
 /**
@@ -26,6 +24,7 @@ import java.util.Optional;
  * href="https://www.cida.de/wp-content/uploads/sites/2/2020/07/IK_Liste_Krankenkassen.pdf">IK_Liste_Krankenkassen.pdf</a>
  * <a href="https://apm-it.de/iatropro/Benutzerhandbuch/BH/BG-Liste.html">BG-Liste</a>
  */
+@SuppressWarnings("java:S1192")
 public enum BGInsuranceCoverageInfo implements InsuranceCoverageInfo {
   BG_BAU_SUED("BG BAU Süd", "81241 München, Am Knie 6", "120991009"),
   BG_BAU("BG Bau", "30519 Hannover, Hildesheimer Str. 3", "120390887"),
@@ -51,23 +50,36 @@ public enum BGInsuranceCoverageInfo implements InsuranceCoverageInfo {
       "BG Handel und Warendistribution Berlin", "10715 Berlin, Bundesallee 57/58", "121191069"),
   BG_HANDEL_GERA("BG Handel und Warendistributio Gera", "07545 Gera, Bahnhofstr. 22", "121690041"),
   HOLZ_METALL_HANNOVER(
-      "Berufsgenossenschaft Holz und Metall Hannover", "30173 Hannover, Seligmann Allee 4", "120392377"),
-  BGHM_DUESSELDORF(
-      "BG Holz und Metall Düsseldorf", "40010 Düsseldorf, Kreuzstr. 54", "120590264"),
-  BGHM_KOELN("Berufsgenossenschaft Holz und Metall Köln", "50829 Köln, Hugo-Eckener-Str. 20", "120590275"),
-  BGHM_MAINZ("Berufsgenossenschaft Holz und Metall Mainz", "55124 Mainz, Isaac-Fulda-Allee 18", "120790391"),
-  BGHM_MUENCHEN("Berufsgenossenschaft Holz und Metall München", "81241 München, Am Knie 8", "120990623"),
-  BGHM_BERLIN("Berufsgenossenschaft Holz und Metall Berlin", "10825 Berlin, Innsbrucker Strasse", "121590028"),
+      "Berufsgenossenschaft Holz und Metall Hannover",
+      "30173 Hannover, Seligmann Allee 4",
+      "120392377"),
+  BGHM_DUESSELDORF("BG Holz und Metall Düsseldorf", "40010 Düsseldorf, Kreuzstr. 54", "120590264"),
+  BGHM_KOELN(
+      "Berufsgenossenschaft Holz und Metall Köln", "50829 Köln, Hugo-Eckener-Str. 20", "120590275"),
+  BGHM_MAINZ(
+      "Berufsgenossenschaft Holz und Metall Mainz",
+      "55124 Mainz, Isaac-Fulda-Allee 18",
+      "120790391"),
+  BGHM_MUENCHEN(
+      "Berufsgenossenschaft Holz und Metall München", "81241 München, Am Knie 8", "120990623"),
+  BGHM_BERLIN(
+      "Berufsgenossenschaft Holz und Metall Berlin",
+      "10825 Berlin, Innsbrucker Strasse",
+      "121590028"),
   BGHM_ERFURT(
-      "Berufsgenossenschaft Holz und Metall Erfurt", "99097 Erfurt, Lucas-Chranach-Platz", "121690085"),
+      "Berufsgenossenschaft Holz und Metall Erfurt",
+      "99097 Erfurt, Lucas-Chranach-Platz",
+      "121690085"),
   BGHM_NORD(
-          "Berufsgenossenschaft Holz und Metall",
-          "20149 Hamburg, Rothenbaumchaussee Chaussee 145",
-          "120491958"),
-  BGHM_SUED("Berufsgenossenschaft Holz und Metall", "70563 Stuttgart, Vollmöllerstr. 11", "120890369"),
+      "Berufsgenossenschaft Holz und Metall",
+      "20149 Hamburg, Rothenbaumchaussee Chaussee 145",
+      "120491958"),
+  BGHM_SUED(
+      "Berufsgenossenschaft Holz und Metall", "70563 Stuttgart, Vollmöllerstr. 11", "120890369"),
   BGHM("Berufsgenossenschaft Holz und Metall", "55124 Mainz, Isaac-Fulda-Allee 18", "120790335"),
   HUETTEN_WALZWERKE("BG Hütten-Walzwerke", "44263 Dortmund, Semerteichstr. 98", "120590208"),
-  LAND_FORSTWIRTSCHAFT("BG Land- und Forstwirtschaft", "64289 Darmstadt, BARTNINGSTR.57", "120692791"),
+  LAND_FORSTWIRTSCHAFT(
+      "BG Land- und Forstwirtschaft", "64289 Darmstadt, BARTNINGSTR.57", "120692791"),
   LANDWIRTSCHAFT_SAARLAND(
       "BG Landwirtschaft Saarland", "66121 Saarbrücken, HEINERSTR. 2-4", "121092811"),
   LANDESUNFALLKASSE_NDR_SACH(
@@ -81,7 +93,8 @@ public enum BGInsuranceCoverageInfo implements InsuranceCoverageInfo {
       "BG Landwirtschaft Baden", "76135 Karlsruhe, Steinhäuserstr. 14", "120892873"),
   LANDWIRTSCHAFT_KASSEL("BG Landwirtschaftliche", "34121 Kassel, Frankfurterstr. 126", "120692702"),
   LEDERINDUTRIE_MAINZ("BG Lederindustrie", "55127 Mainz, Lortzingstr. 2", "120790723"),
-  NAHRUNG_GASTSTAETTEN("BG Nahrungsmittel und Gastgewerbe", "68165 Mannheim, Dynamo-Str. 7-9", "120890780"),
+  NAHRUNG_GASTSTAETTEN(
+      "BG Nahrungsmittel und Gastgewerbe", "68165 Mannheim, Dynamo-Str. 7-9", "120890780"),
   RCI("BG RCI", "90449 Nürnberg, Südwestpark 2 und 4", "120990075"),
   RCI_BERGBAU_BONN("BG RCI Bergbau", "53175 Bonn, Peter Hensen Str. 1", "120590015"),
   RCI_BERGBAU_SAARBRUECKEN("BG RCI Bergbau", "66119 Saarbrücken, Talstraße 15", "121090056"),

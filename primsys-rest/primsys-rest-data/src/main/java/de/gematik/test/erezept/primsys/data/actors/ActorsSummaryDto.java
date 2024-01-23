@@ -22,5 +22,5 @@ import lombok.Data;
 @Data
 public class ActorsSummaryDto {
 
-    private List<ActorDto> actors;
+  private List<ActorDto> actors;
 }

@@ -44,8 +44,9 @@ public enum KbvItaErpStructDef implements IStructureDefinition<KbvItaErpVersion>
   ACCIDENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Accident"),
   STATUS_CO_PAYMENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_StatusCoPayment"),
   SUPPLY_REQUEST("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_PracticeSupply|1.1.0"),
-  MEDICATION_INGREDIENT(
+  MEDICATION_INGREDIENT_AMOUNT(
       "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Ingredient_Amount"),
+  MEDICATION_INGREDIENT("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Ingredient"),
   ;
 
   private final String canonicalUrl;

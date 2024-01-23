@@ -43,16 +43,18 @@ public class AcceptBundleVerifier {
   }
 
   public static VerificationStep<ErxAcceptBundle> consentIsPresent(boolean isPresent) {
-    Predicate<ErxAcceptBundle> predicate =
-            acceptBundle -> acceptBundle.hasConsent() == isPresent;
-    
+    Predicate<ErxAcceptBundle> predicate = acceptBundle -> acceptBundle.hasConsent() == isPresent;
+
     String expectation;
     if (isPresent) {
-      expectation = "Bei vorhandener Einwilligung des Versicherten muss diese im AcceptBundle vorhanden sein";
+      expectation =
+          "Bei vorhandener Einwilligung des Versicherten muss diese im AcceptBundle vorhanden sein";
     } else {
-      expectation = "Bei nicht vorhandener Einwilligung des Versicherten darf diese im AcceptBundle nicht vorhanden sein";
+      expectation =
+          "Bei nicht vorhandener Einwilligung des Versicherten darf diese im AcceptBundle nicht"
+              + " vorhanden sein";
     }
-    
+
     val step = new VerificationStep.StepBuilder<ErxAcceptBundle>(ErpAfos.A_22110, expectation);
     return step.predicate(predicate).accept();
   }

@@ -16,20 +16,19 @@
 
 package de.gematik.test.konnektor.commands;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.konnektor.commands.options.VerifyDocumentOptions;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7.ObjectFactory;
 import de.gematik.ws.conn.signatureservice.v7.VerificationResultType;
+import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
 import oasis.names.tc.dss_x._1_0.profiles.verificationreport.schema_.ReturnVerificationReport;
-
-import javax.xml.ws.Holder;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class VerifyDocumentCommand extends AbstractKonnektorCommand<Boolean> {

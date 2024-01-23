@@ -16,9 +16,14 @@
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
 import org.junit.jupiter.api.AfterEach;
@@ -27,12 +32,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class AccidentExtensionTest {
 

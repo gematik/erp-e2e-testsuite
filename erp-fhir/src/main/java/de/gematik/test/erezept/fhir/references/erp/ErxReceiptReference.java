@@ -26,7 +26,6 @@ public class ErxReceiptReference extends CustomReferenceProvider {
   private static final ErpWorkflowStructDef STRUCTURE_DEFINITION =
       ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE;
 
-
   public ErxReceiptReference(ErxReceipt erxReceipt) {
     this(erxReceipt.getId());
   }
@@ -37,6 +36,8 @@ public class ErxReceiptReference extends CustomReferenceProvider {
 
   @Override
   public Reference asReference() {
-    return new Reference().setDisplay(STRUCTURE_DEFINITION.getCanonicalUrl()).setReference(this.referenceValue);
+    return new Reference()
+        .setDisplay(STRUCTURE_DEFINITION.getCanonicalUrl())
+        .setReference(this.referenceValue);
   }
 }

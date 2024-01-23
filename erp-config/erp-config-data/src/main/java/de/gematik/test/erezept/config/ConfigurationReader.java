@@ -83,12 +83,12 @@ public class ConfigurationReader<DTO extends BaseConfigurationDto> {
    * @return Builder for the E2E-Testsuite Configuration
    */
   public static Builder<PrimsysConfigurationDto> forPrimSysConfiguration() {
-    return forConfiguration(
-        PrimsysConfigurationDto.class, TestsuiteconfigurationScope.ERP_PRIMSYS);
+    return forConfiguration(PrimsysConfigurationDto.class, TestsuiteconfigurationScope.ERP_PRIMSYS);
   }
 
   public static Builder<KonnektorModuleConfigurationDto> forKonnektorClient() {
-    return forConfiguration(KonnektorModuleConfigurationDto.class, ModuleConfigurationScope.KONNEKTOR_CLIENT);
+    return forConfiguration(
+        KonnektorModuleConfigurationDto.class, ModuleConfigurationScope.KONNEKTOR_CLIENT);
   }
 
   private static <BDTO extends BaseConfigurationDto> Builder<BDTO> forConfiguration(
@@ -99,8 +99,8 @@ public class ConfigurationReader<DTO extends BaseConfigurationDto> {
   private static Path calculateDefaultPath(ConfigurationScope scope) {
     val basePath = Path.of("config", scope.getDefaultDirectoryName(), "config.yaml");
     return (basePath.toFile().exists() ? basePath : Path.of("..").resolve(basePath))
-            .toAbsolutePath()
-            .normalize();
+        .toAbsolutePath()
+        .normalize();
   }
 
   public static class Builder<BDTO extends BaseConfigurationDto> {

@@ -65,7 +65,6 @@ public enum Onboarding implements PageElement {
       () -> null,
       () -> AppiumBy.accessibilityId("onb_auth_btn_password")),
 
-
   CONTINUE_ANALYTICS_SCREEN_BUTTON(
       "Continue the analytics screen button",
       () -> null,

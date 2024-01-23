@@ -16,22 +16,21 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
 import de.gematik.test.erezept.fhir.values.BaseANR.ANRType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import java.util.Arrays;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class BaseANRTest {
 
@@ -100,8 +99,10 @@ class BaseANRTest {
             QualificationType.DOCTOR_AS_REPLACEMENT,
             QualificationType.MIDWIFE)
         .forEach(
-            qt -> assertThrows(
-                IllegalArgumentException.class, () -> BaseANR.forQualification(qt, "123456789")));
+            qt ->
+                assertThrows(
+                    IllegalArgumentException.class,
+                    () -> BaseANR.forQualification(qt, "123456789")));
   }
 
   @Test
@@ -254,7 +255,6 @@ class BaseANRTest {
   @Test
   void shouldThrowOnIllegalQualificationTypes() {
     val qt = QualificationType.MIDWIFE;
-    assertThrows(
-            IllegalArgumentException.class, () -> BaseANR.randomFromQualification(qt));
+    assertThrows(IllegalArgumentException.class, () -> BaseANR.randomFromQualification(qt));
   }
 }

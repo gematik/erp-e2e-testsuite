@@ -63,7 +63,8 @@ class InsuranceCoverageInfoTest {
 
   @ParameterizedTest(name = "{0} Name must not exceed max length of 45")
   @MethodSource("coverageDataImplementors")
-  void shouldNotExceedMaxNameLength(VersicherungsArtDeBasis type, List<InsuranceCoverageInfo> data) {
+  void shouldNotExceedMaxNameLength(
+      VersicherungsArtDeBasis type, List<InsuranceCoverageInfo> data) {
     data.forEach(
         cid ->
             assertTrue(
@@ -93,7 +94,7 @@ class InsuranceCoverageInfoTest {
     assertNotNull(data.getIknr());
     assertNotNull(data.getName());
   }
-  
+
   @Test
   void shouldGetGkvByIknr() {
     val element = GkvInsuranceCoverageInfo.getByIknr("108018007");

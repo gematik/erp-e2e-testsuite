@@ -16,6 +16,10 @@
 
 package de.gematik.test.erezept.fhir.testutil;
 
+import static java.text.MessageFormat.format;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
@@ -23,17 +27,12 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStruc
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.values.TelematikID;
-import lombok.val;
-import org.hl7.fhir.r4.model.AuditEvent.AuditEventAction;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.*;
-
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.text.MessageFormat.format;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import lombok.val;
+import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.AuditEvent.AuditEventAction;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 public class FhirTestResourceUtil {
 
@@ -62,11 +61,10 @@ public class FhirTestResourceUtil {
       TelematikID telematikId, String agentName) {
     val textItems =
         List.of(
+            format("{0} hat mit Ihrer eGK die Liste der offenen E-Rezepte abgerufen.", agentName),
             format(
-                "{0} hat mit Ihrer eGK die Liste der offenen E-Rezepte abgerufen.",
-                agentName),
-            format(
-                "{0} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.",
+                "{0} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit"
+                    + " Ihrer eGK abrufen.",
                 agentName));
 
     val erxAuditEventBundle = new ErxAuditEventBundle();

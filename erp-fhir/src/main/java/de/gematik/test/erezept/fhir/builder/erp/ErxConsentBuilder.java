@@ -91,7 +91,9 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
     consent.setPatient(
         new Reference()
             .setIdentifier(
-                new Identifier().setSystem(kvnrNamingSystem.getCanonicalUrl()).setValue(kvnr.getValue())));
+                new Identifier()
+                    .setSystem(kvnrNamingSystem.getCanonicalUrl())
+                    .setValue(kvnr.getValue())));
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);
     consent.setScope(scope.asCodeableConcept());

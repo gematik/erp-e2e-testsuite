@@ -25,6 +25,7 @@ public class PspMessage {
   private String clientId;
   private String transactionId;
   private byte[] blob;
+
   /** info note */
   private String note;
 

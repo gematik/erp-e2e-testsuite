@@ -22,39 +22,39 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LanguageCodeFuzzerImpl implements BaseFuzzer<String> {
-    private final FuzzerContext fuzzerContext;
+  private final FuzzerContext fuzzerContext;
 
-    public LanguageCodeFuzzerImpl(FuzzerContext fuzzerContext) {
-        this.fuzzerContext = fuzzerContext;
-    }
+  public LanguageCodeFuzzerImpl(FuzzerContext fuzzerContext) {
+    this.fuzzerContext = fuzzerContext;
+  }
 
-    @Override
-    public FuzzerContext getContext() {
-        return fuzzerContext;
-    }
+  @Override
+  public FuzzerContext getContext() {
+    return fuzzerContext;
+  }
 
-    @Override
-    public String fuzz(String id) {
-        if (id == null) {
-            log.info("given String to fuzz was null!");
-            return null;
-        }
-        char[] chars = id.toCharArray();
-        for (int iter = 0; iter < chars.length; iter++) {
-            if (fuzzerContext.conditionalChance(fuzzerContext.getFuzzConfig().getPercentOfEach() * 5)) {
-                chars[iter] = (char) (fuzzerContext.getRandom().nextInt(26) + 'a');
-            }
-        }
-        return String.valueOf(chars);
+  @Override
+  public String fuzz(String id) {
+    if (id == null) {
+      log.info("given String to fuzz was null!");
+      return null;
     }
+    char[] chars = id.toCharArray();
+    for (int iter = 0; iter < chars.length; iter++) {
+      if (fuzzerContext.conditionalChance(fuzzerContext.getFuzzConfig().getPercentOfEach() * 5)) {
+        chars[iter] = (char) (fuzzerContext.getRandom().nextInt(26) + 'a');
+      }
+    }
+    return String.valueOf(chars);
+  }
 
-    @Override
-    public String generateRandom() {
-        int languageCodeLength = 2;
-        StringBuilder result = new StringBuilder();
-        for (int iter = 0; iter < languageCodeLength; iter++) {
-            result.append((char) (fuzzerContext.getRandom().nextInt(26) + 'a'));
-        }
-        return result.toString();
+  @Override
+  public String generateRandom() {
+    int languageCodeLength = 2;
+    StringBuilder result = new StringBuilder();
+    for (int iter = 0; iter < languageCodeLength; iter++) {
+      result.append((char) (fuzzerContext.getRandom().nextInt(26) + 'a'));
     }
+    return result.toString();
+  }
 }

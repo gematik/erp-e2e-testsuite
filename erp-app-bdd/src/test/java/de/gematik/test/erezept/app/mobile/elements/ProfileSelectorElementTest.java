@@ -16,35 +16,35 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ProfileSelectorElementTest {
 
-    @Test
-    void shouldNotHaveAndroidLocator() {
-        val pse = ProfileSelectorElement.forUser("alice").fromMainScreen();
-        val locatorSupplier = pse.getAndroidLocator();
-        assertNull(locatorSupplier.get());
-    }
+  @Test
+  void shouldNotHaveAndroidLocator() {
+    val pse = ProfileSelectorElement.forUser("alice").fromMainScreen();
+    val locatorSupplier = pse.getAndroidLocator();
+    assertNull(locatorSupplier.get());
+  }
 
-    @Test
-    void shouldCreateLocatorForMainscreen() {
-        val pse = ProfileSelectorElement.forUser("alice").fromMainScreen();
-        val locator = pse.getIosLocator().get();
-        assertTrue(pse.getElementName().contains("main screen"));
-        assertTrue(locator.toString().contains("alice"));
-        assertTrue(locator.toString().contains("pro_btn_selection_profile_row"));
-    }
+  @Test
+  void shouldCreateLocatorForMainscreen() {
+    val pse = ProfileSelectorElement.forUser("alice").fromMainScreen();
+    val locator = pse.getIosLocator().get();
+    assertTrue(pse.getElementName().contains("main screen"));
+    assertTrue(locator.toString().contains("alice"));
+    assertTrue(locator.toString().contains("pro_btn_selection_profile_row"));
+  }
 
-    @Test
-    void shouldCreateLocatorForSettingsMenu() {
-        val pse = ProfileSelectorElement.forUser("alice").fromSettingsMenu();
-        val locator = pse.getIosLocator().get();
-        assertTrue(pse.getElementName().contains("settings menu"));
-        assertTrue(locator.toString().contains("alice"));
-        assertFalse(locator.toString().contains("pro_btn_selection_profile_row"));
-    }
+  @Test
+  void shouldCreateLocatorForSettingsMenu() {
+    val pse = ProfileSelectorElement.forUser("alice").fromSettingsMenu();
+    val locator = pse.getIosLocator().get();
+    assertTrue(pse.getElementName().contains("settings menu"));
+    assertTrue(locator.toString().contains("alice"));
+    assertFalse(locator.toString().contains("pro_btn_selection_profile_row"));
+  }
 }

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
@@ -27,8 +29,6 @@ import jakarta.ws.rs.WebApplicationException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PrescribeRequestDataMapperTest extends ParsingTest {
 

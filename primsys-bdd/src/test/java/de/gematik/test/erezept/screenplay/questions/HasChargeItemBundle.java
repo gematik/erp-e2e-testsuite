@@ -16,9 +16,11 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.exceptions.InvalidActorRoleException;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -32,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
-
-import static java.text.MessageFormat.format;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
@@ -85,10 +85,10 @@ public class HasChargeItemBundle implements Question<Boolean> {
 
     if (!chargeItem.getPrescriptionId().equals(dispensed.getPrescriptionId())) {
       log.warn(
-              format(
-                      "Prescription Id {0} of charge item do not match to "
-                              + "prescription Id {1} of the task.",
-                      chargeItem.getPrescriptionId(), dispensed.getPrescriptionId()));
+          format(
+              "Prescription Id {0} of charge item do not match to "
+                  + "prescription Id {1} of the task.",
+              chargeItem.getPrescriptionId(), dispensed.getPrescriptionId()));
       return false;
     }
 

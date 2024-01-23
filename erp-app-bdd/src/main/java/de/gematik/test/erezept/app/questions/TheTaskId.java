@@ -47,5 +47,4 @@ public class TheTaskId implements Question<String> {
   public static TheTaskId ofTheLastPrescriptionInTheMainScreen() {
     return new TheTaskId();
   }
-
 }

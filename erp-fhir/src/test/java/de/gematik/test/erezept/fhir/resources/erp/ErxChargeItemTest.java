@@ -147,7 +147,8 @@ class ErxChargeItemTest extends ParsingTest {
 
     val changedResource = "changed binary data";
     val abgabeRefenrece = new AbgabedatensatzReference(UUID.randomUUID().toString());
-    val changedChargeItem = chargeItem.withChangedContainedBinaryData(abgabeRefenrece, changedResource.getBytes());
+    val changedChargeItem =
+        chargeItem.withChangedContainedBinaryData(abgabeRefenrece, changedResource.getBytes());
     assertEquals(changedResource, new String(changedChargeItem.getContainedBinaryData()));
 
     val encodedChargeItem = parser.encode(changedChargeItem, EncodingType.XML);

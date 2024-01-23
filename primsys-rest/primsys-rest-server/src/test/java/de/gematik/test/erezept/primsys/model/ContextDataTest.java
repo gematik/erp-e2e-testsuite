@@ -50,7 +50,8 @@ class ContextDataTest {
             .taskId(oneToZero)
             .build();
 
-    prescriptionData2 = PrescriptionDto.builder()
+    prescriptionData2 =
+        PrescriptionDto.builder()
             .prescriptionId(oneToZero)
             .accessCode(oneToZero)
             .taskId("testID")

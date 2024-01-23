@@ -16,7 +16,9 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import static org.junit.jupiter.api.Assertions.*;
+
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
@@ -35,8 +37,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ErxCommunicationBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
@@ -46,7 +46,7 @@ class ErxCommunicationBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildCommunicationInfoReqFixedValues(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val medication = KbvErpMedicationBuilder.faker().build();
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
     val infoReq =
         ErxCommunicationBuilder.builder()
             .basedOnTaskId(TaskId.from("4711"))
@@ -87,7 +87,7 @@ class ErxCommunicationBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void shouldThrowOnMissingFlowTypeForInfoReq(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val medication = KbvErpMedicationBuilder.faker().build();
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
     val builder =
         ErxCommunicationBuilder.builder()
             .basedOnTaskId(TaskId.from("4711"))
@@ -144,13 +144,13 @@ class ErxCommunicationBuilderTest extends ParsingTest {
 
   @ParameterizedTest(
       name =
-          "[{index}] -> Build CommunicationDispReq with E-Rezept FHIR Profiles {0} and missing Task")
+          "[{index}] -> Build CommunicationDispReq with E-Rezept FHIR Profiles {0} and missing"
+              + " Task")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
   void shouldThrowOnMissingTaskForDispReq(ErpWorkflowVersion version) {
     val builder = ErxCommunicationBuilder.builder().version(version).recipient("606358757");
     val message = new CommunicationDisReqMessage();
-    assertThrows(
-        BuilderException.class, () -> builder.buildDispReq(message));
+    assertThrows(BuilderException.class, () -> builder.buildDispReq(message));
   }
 
   @ParameterizedTest(name = "[{index}] -> Build CommunicationReply with E-Rezept FHIR Profiles {0}")

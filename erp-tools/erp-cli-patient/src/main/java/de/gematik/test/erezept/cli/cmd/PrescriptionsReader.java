@@ -18,21 +18,17 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
-import de.gematik.test.erezept.cli.param.EgkParameter;
-import de.gematik.test.erezept.cli.param.EnvironmentParameter;
 import de.gematik.test.erezept.cli.param.TaskStatusWrapper;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardFactory;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
@@ -43,20 +39,17 @@ import picocli.CommandLine;
     name = "show",
     description = "show prescriptions",
     mixinStandardHelpOptions = true)
-public class PrescriptionsViewer implements Callable<Integer> {
+public class PrescriptionsReader extends BaseRemoteCommand {
 
   private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
-
-  @CommandLine.Mixin private EgkParameter egkParameter;
-
-  @CommandLine.Mixin private EnvironmentParameter environmentParameter;
 
   @CommandLine.Option(
       names = {"--sort"},
       paramLabel = "<SORT>",
       type = SortOrder.class,
       description =
-          "Sort-Order by Date from ${COMPLETION-CANDIDATES} for the Query (default=${DEFAULT-VALUE})")
+          "Sort-Order by Date from ${COMPLETION-CANDIDATES} for the Query"
+              + " (default=${DEFAULT-VALUE})")
   private SortOrder sortOrder = SortOrder.DESCENDING;
 
   @CommandLine.Option(
@@ -68,20 +61,11 @@ public class PrescriptionsViewer implements Callable<Integer> {
   private TaskStatusWrapper taskStatus = TaskStatusWrapper.ANY;
 
   @Override
-  public Integer call() throws Exception {
-    val sca = SmartcardFactory.getArchive();
-    val egks = egkParameter.getEgks(sca);
-    val env = environmentParameter.getEnvironment();
-
-    egks.forEach(egk -> this.performFor(env, egk));
-    return 0;
-  }
-
-  private void performFor(EnvironmentConfiguration env, Egk egk) {
-    val patientConfig = ConfigurationFactory.createPatientConfigurationFor(egk);
-    val erpClient = ErpClientFactory.createErpClient(env, patientConfig);
-    erpClient.authenticateWith(egk);
-    log.info(format("Show prescriptions for {0} from {1}", egk.getKvnr(), env.getName()));
+  public void performFor(Egk egk, ErpClient erpClient) {
+    log.info(
+        format(
+            "Show prescriptions for {0} ({1}) from {2}",
+            egk.getOwner().getOwnerName(), egk.getKvnr(), this.getEnvironmentName()));
 
     val cmd =
         TaskSearch.builder()
@@ -101,7 +85,7 @@ public class PrescriptionsViewer implements Callable<Integer> {
     System.out.println(
         format(
             "Received {0} Prescriptions(s) for {1} ({2}) in {3}\n",
-            size, ownerName, egk.getKvnr(), env.getName()));
+            size, ownerName, egk.getKvnr(), this.getEnvironmentName()));
     tasks.forEach(task -> this.printPrescription(erpClient, task));
   }
 
@@ -110,7 +94,11 @@ public class PrescriptionsViewer implements Callable<Integer> {
     val prescription = erpClient.request(cmd).getExpectedResource();
 
     val prescriptionId = prescription.getTask().getPrescriptionId();
-    val kbvBundle = prescription.getKbvBundle();
+    val kbvBundle =
+        prescription
+            .getKbvBundle()
+            .orElseThrow(
+                () -> new MissingFieldException(KbvErpBundle.class, KbvItaErpStructDef.BUNDLE));
     val medication = kbvBundle.getMedication();
     val medicationRequest = kbvBundle.getMedicationRequest();
     val coverage = kbvBundle.getCoverage();

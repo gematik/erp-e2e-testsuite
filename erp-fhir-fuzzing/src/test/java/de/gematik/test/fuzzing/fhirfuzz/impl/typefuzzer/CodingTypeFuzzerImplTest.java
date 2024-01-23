@@ -16,6 +16,11 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.impl.typefuzzer;
 
+import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodingTypeFuzzerImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
@@ -24,114 +29,106 @@ import org.hl7.fhir.r4.model.Coding;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 
-import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class CodingTypeFuzzerImplTest {
 
-    private static FuzzConfig fuzzConfig;
-    private static FuzzerContext fuzzerContext;
-    private static CodingTypeFuzzerImpl codingTypeFuzzerImpl;
+  private static FuzzConfig fuzzConfig;
+  private static FuzzerContext fuzzerContext;
+  private static CodingTypeFuzzerImpl codingTypeFuzzerImpl;
 
-    @BeforeAll
-    static void setUpConf() {
-        fuzzConfig = new FuzzConfig();
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        fuzzConfig.setUseAllMutators(true);
-        fuzzerContext = new FuzzerContext(fuzzConfig);
-        codingTypeFuzzerImpl = new CodingTypeFuzzerImpl(fuzzerContext);
-    }
+  @BeforeAll
+  static void setUpConf() {
+    fuzzConfig = new FuzzConfig();
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    fuzzConfig.setUseAllMutators(true);
+    fuzzerContext = new FuzzerContext(fuzzConfig);
+    codingTypeFuzzerImpl = new CodingTypeFuzzerImpl(fuzzerContext);
+  }
 
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCodingCode() {
+    fuzzConfig.setUseAllMutators(true);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val coding = new Coding(null, null, null);
+    assertFalse(coding.hasCode());
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasCode());
+    fuzzConfig.setPercentOfAll(100.0f);
+    codingTypeFuzzerImpl.fuzz(coding);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val c = "ABdA";
+    coding.setCode(c);
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasCode());
+    assertNotEquals(c, coding.getCode());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCodingCode() {
-        fuzzConfig.setUseAllMutators(true);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val coding = new Coding(null, null, null);
-        assertFalse(coding.hasCode());
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasCode());
-        fuzzConfig.setPercentOfAll(100.0f);
-        codingTypeFuzzerImpl.fuzz(coding);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val c = "ABdA";
-        coding.setCode(c);
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasCode());
-        assertNotEquals(c, coding.getCode());
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCodingSystem() {
+    fuzzConfig.setUseAllMutators(true);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val coding = new Coding(null, null, null);
+    assertFalse(coding.hasSystem());
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasSystem());
+    fuzzConfig.setPercentOfAll(100.0f);
+    codingTypeFuzzerImpl.fuzz(coding);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val c = "http://soNuNuesch";
+    coding.setSystem(c);
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasSystem());
+    assertNotEquals(c, coding.getSystem());
+  }
 
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCodingVersion() {
+    fuzzConfig.setUseAllMutators(true);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val coding = new Coding(null, null, null);
+    assertFalse(coding.hasVersion());
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasVersion());
+    fuzzConfig.setPercentOfAll(100.0f);
+    codingTypeFuzzerImpl.fuzz(coding);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val c = "1.12.3.1";
+    coding.setVersion(c);
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasVersion());
+    assertNotEquals(c, coding.getVersion());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCodingSystem() {
-        fuzzConfig.setUseAllMutators(true);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val coding = new Coding(null, null, null);
-        assertFalse(coding.hasSystem());
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasSystem());
-        fuzzConfig.setPercentOfAll(100.0f);
-        codingTypeFuzzerImpl.fuzz(coding);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val c = "http://soNuNuesch";
-        coding.setSystem(c);
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasSystem());
-        assertNotEquals(c, coding.getSystem());
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCodingDiplay() {
+    fuzzConfig.setUseAllMutators(true);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val coding = new Coding(null, null, null);
+    assertFalse(coding.hasDisplay());
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasDisplay());
+    fuzzConfig.setPercentOfAll(100.0f);
+    codingTypeFuzzerImpl.fuzz(coding);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val c = "qsdaö#lsdm,2131 mqdlkw09ui23 öljkpoqwje öpoqwkepoi poqwepoiqwpo";
+    coding.setDisplay(c);
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasDisplay());
+    assertNotEquals(c, coding.getDisplay());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCodingVersion() {
-        fuzzConfig.setUseAllMutators(true);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val coding = new Coding(null, null, null);
-        assertFalse(coding.hasVersion());
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasVersion());
-        fuzzConfig.setPercentOfAll(100.0f);
-        codingTypeFuzzerImpl.fuzz(coding);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val c = "1.12.3.1";
-        coding.setVersion(c);
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasVersion());
-        assertNotEquals(c, coding.getVersion());
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCodingDiplay() {
-        fuzzConfig.setUseAllMutators(true);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val coding = new Coding(null, null, null);
-        assertFalse(coding.hasDisplay());
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasDisplay());
-        fuzzConfig.setPercentOfAll(100.0f);
-        codingTypeFuzzerImpl.fuzz(coding);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val c = "qsdaö#lsdm,2131 mqdlkw09ui23 öljkpoqwje öpoqwkepoi poqwepoiqwpo";
-        coding.setDisplay(c);
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasDisplay());
-        assertNotEquals(c, coding.getDisplay());
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCodingUserSelected() {
-        fuzzConfig.setUseAllMutators(true);
-        fuzzConfig.setPercentOfAll(00.0f);
-        val coding = new Coding(null, null, null);
-        assertFalse(coding.hasUserSelected());
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasUserSelected());
-        val c = fuzzerContext.conditionalChance();
-        coding.setUserSelected(c);
-        codingTypeFuzzerImpl.fuzz(coding);
-        assertTrue(coding.hasUserSelected());
-        assertNotEquals(c, coding.getUserSelected());
-    }
-
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCodingUserSelected() {
+    fuzzConfig.setUseAllMutators(true);
+    fuzzConfig.setPercentOfAll(00.0f);
+    val coding = new Coding(null, null, null);
+    assertFalse(coding.hasUserSelected());
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasUserSelected());
+    val c = fuzzerContext.conditionalChance();
+    coding.setUserSelected(c);
+    codingTypeFuzzerImpl.fuzz(coding);
+    assertTrue(coding.hasUserSelected());
+    assertNotEquals(c, coding.getUserSelected());
+  }
 }

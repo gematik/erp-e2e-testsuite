@@ -34,7 +34,7 @@ import org.junit.jupiter.api.*;
 class ValidateLegalDuringOnboardingIOSTest {
 
   private String userName;
-  
+
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
@@ -71,11 +71,11 @@ class ValidateLegalDuringOnboardingIOSTest {
   void validateLegalAfterTheOnboardingTest() {
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
-    
+
     when(app.isPresent(Settings.LEGAL_TEXT)).thenReturn(true);
-    
+
     actor.attemptsTo(ValidateLegal.insideSettingsMenu());
-    
+
     verify(app, times(1)).tap(BottomNav.SETTINGS_BUTTON);
     verify(app, times(1)).tap(Settings.IMPRINT_BUTTON);
     verify(app, times(1)).tap(Settings.TERMS_BUTTON);

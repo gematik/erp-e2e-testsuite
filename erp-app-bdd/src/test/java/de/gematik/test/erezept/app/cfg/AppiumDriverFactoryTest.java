@@ -55,7 +55,8 @@ class AppiumDriverFactoryTest {
     configDto.getApps().add(desktopConfig);
 
     assertThrows(
-        UnsupportedPlatformException.class, () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
+        UnsupportedPlatformException.class,
+        () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
   }
 
   @Test
@@ -73,7 +74,8 @@ class AppiumDriverFactoryTest {
 
     // must fail because no local appium should be running
     assertThrows(
-        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
+        SessionNotCreatedException.class,
+        () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
   }
 
   @Test
@@ -91,6 +93,7 @@ class AppiumDriverFactoryTest {
 
     // must fail because no local appium should be running
     assertThrows(
-        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
+        SessionNotCreatedException.class,
+        () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
   }
 }

@@ -40,32 +40,44 @@ import net.serenitybdd.screenplay.ensure.*;
 public class PrescriptionAssignmentSteps {
 
   @Angenommen(
-    "der Versicherte {string} löst das E-Rezept {string} per Reservierung bei der Apotheke {string} ein")
+      "der Versicherte {string} löst das E-Rezept {string} per Reservierung bei der Apotheke"
+          + " {string} ein")
   public void derUserLöstDasERezeptPerReservierungBeiDerEin(
-    String user, String eRezep, String pharmacy) {
+      String user, String eRezep, String pharmacy) {
     val theAppUser = OnStage.theActorCalled(user);
     val thePharmacyActor = OnStage.theActorCalled(pharmacy);
     givenThat(theAppUser)
-      .attemptsTo(NavigateThroughRedeemablePrescriptions.redeemTo(thePharmacyActor));
+        .attemptsTo(NavigateThroughRedeemablePrescriptions.redeemTo(thePharmacyActor));
   }
 
   @Dann(
-    "kann der Versicherte {string} den Status {string} und das Gültigkeitsdatum {string} des Rezepts {string} überprüfen")
+      "kann der Versicherte {string} den Status {string} und das Gültigkeitsdatum {string} des"
+          + " Rezepts {string} überprüfen")
   public void userCanCheckIfGivenPrescriptionIsValid(
-    String user, String status, String validityDate, String prescription) {
+      String user, String status, String validityDate, String prescription) {
     val theAppUser = OnStage.theActorCalled(user);
     then(theAppUser).asksFor(StatusAndValidity.check(status, validityDate, prescription));
 
-    val expectedTaskId = SafeAbility.getAbility(theAppUser, ManageDataMatrixCodes.class).getLastDmc().getTaskId();
+    val expectedTaskId =
+        SafeAbility.getAbility(theAppUser, ManageDataMatrixCodes.class).getLastDmc().getTaskId();
 
-    then(theAppUser).attemptsTo(Ensure.that(TheLastPrescriptionInTheMainScreen.isPresent(prescription,validityDate,status)).isTrue());
-    then(theAppUser).attemptsTo(Ensure.that(TheTaskId.ofTheLastPrescriptionInTheMainScreen()).matches(expectedTaskId.getValue()));
+    then(theAppUser)
+        .attemptsTo(
+            Ensure.that(
+                    TheLastPrescriptionInTheMainScreen.isPresent(
+                        prescription, validityDate, status))
+                .isTrue());
+    then(theAppUser)
+        .attemptsTo(
+            Ensure.that(TheTaskId.ofTheLastPrescriptionInTheMainScreen())
+                .matches(expectedTaskId.getValue()));
   }
 
   @Und("das E-Rezept {string} kann nicht gelöscht werden")
   public void dasERezeptKannNichtGelöschtWerden(String eRezep) {
     val theAppUser = OnStage.theActorInTheSpotlight();
-    then(theAppUser).attemptsTo(Ensure.that(ThePrescriptionInRedemption.canNotBeDeleted(eRezep)).isTrue());
+    then(theAppUser)
+        .attemptsTo(Ensure.that(ThePrescriptionInRedemption.canNotBeDeleted(eRezep)).isTrue());
   }
 
   @Und("das E-Rezept {string} kann nicht eingelöst werden")
@@ -81,55 +93,55 @@ public class PrescriptionAssignmentSteps {
 
   @Deprecated
   @Dann("ist das E-Rezept {string} nicht mehr in den Aktuellen Rezepten des Versicherte {string}")
-  public void istDasERezeptNichtMehrInDenAktuellenRezeptenDesVersicherte(String receipt, String user) {
+  public void istDasERezeptNichtMehrInDenAktuellenRezeptenDesVersicherte(
+      String receipt, String user) {
     val theAppUser = OnStage.theActorCalled(user);
-    val expectedTaskId = SafeAbility.getAbility(theAppUser, ManageDataMatrixCodes.class).getLastDmc().getTaskId();
+    val expectedTaskId =
+        SafeAbility.getAbility(theAppUser, ManageDataMatrixCodes.class).getLastDmc().getTaskId();
 
     then(theAppUser).asksFor(TheLastPrescriptionInTheMainScreen.waitTillIsGone());
     if (then(theAppUser).asksFor(PrescriptionList.isThereElements()))
-      then(theAppUser).attemptsTo(Ensure.that(TheTaskId.ofTheLastPrescriptionInTheMainScreen()).doesNotContain(expectedTaskId.getValue()));
+      then(theAppUser)
+          .attemptsTo(
+              Ensure.that(TheTaskId.ofTheLastPrescriptionInTheMainScreen())
+                  .doesNotContain(expectedTaskId.getValue()));
   }
-  
+
   @Deprecated
   @Dann("kann die Versicherte {string} das letzte entfernte E-Rezept nicht mehr abrufen")
-  public void istDasERezeptInDenAktuellenRezeptenDesVersicherteNichtMehrAnrufen(String user){
-    istDasERezeptNichtMehrInDenAktuellenRezeptenDesVersicherte(null,user);
+  public void istDasERezeptInDenAktuellenRezeptenDesVersicherteNichtMehrAnrufen(String user) {
+    istDasERezeptNichtMehrInDenAktuellenRezeptenDesVersicherte(null, user);
   }
 
   @Und("das E-Rezept {string} hat den Status {string}")
   public void dasERezeptHatDenStatus(String receipt, String status) {
     val theAppUser = OnStage.theActorInTheSpotlight();
     val managePrescriptions = SafeAbility.getAbility(theAppUser, ManageDataMatrixCodes.class);
-    assertTrue(theAppUser
-      .asksFor(
-        RedeemedPrescription.lastRedeemedPrescriptionWithStatusAndTaskId(
-          receipt, status, managePrescriptions.getLastDmc().getTaskId().getValue())));
+    assertTrue(
+        theAppUser.asksFor(
+            RedeemedPrescription.lastRedeemedPrescriptionWithStatusAndTaskId(
+                receipt, status, managePrescriptions.getLastDmc().getTaskId().getValue())));
   }
 
   @Und("das E-Rezept {string} enthält das Einlösedatum")
   public void dasERezeptEnthältDasEinlösedatum(String receipt) {
     val theAppUser = OnStage.theActorInTheSpotlight();
-    assertTrue(theAppUser
-      .asksFor(
-        IsIssued.today()));
+    assertTrue(theAppUser.asksFor(IsIssued.today()));
   }
 
   @Wenn("der Versicherte kann das eingelöste Rezept erfolgreich entfernen")
   public void derVersicherteKannDasEingelösteRezeptErfolgreichEntfernen() {
     val theAppUser = OnStage.theActorInTheSpotlight();
 
-    when(theAppUser)
-      .attemptsTo(DeleteRedeemedPrescription.insideTheApp());
+    when(theAppUser).attemptsTo(DeleteRedeemedPrescription.insideTheApp());
   }
 
   @Und("keine Rezepte im Zustand Einlösbar oder Eingelöst in {string} App")
   public void keineRezepteImZustandEinlösbarOderEingelöstInAliceApp(String user) {
     val theAppUser = OnStage.theActorCalled(user);
-    then(theAppUser)
-      .attemptsTo(DeleteBatchRedeemablePrescriptions.insideTheApp());
+    then(theAppUser).attemptsTo(DeleteBatchRedeemablePrescriptions.insideTheApp());
 
-    then(theAppUser)
-      .attemptsTo(DeleteBatchArchivedPrescription.insideTheApp());
+    then(theAppUser).attemptsTo(DeleteBatchArchivedPrescription.insideTheApp());
   }
 
   @Dann("das E-Rezept {string} ist nicht mehr Teil des eingelöste Rezepte Mainscreens")
@@ -137,6 +149,4 @@ public class PrescriptionAssignmentSteps {
     val theAppUser = OnStage.theActorInTheSpotlight();
     assertFalse(theAppUser.asksFor(ListRedeemedPrescriptions.isEmpty()));
   }
-
-
 }

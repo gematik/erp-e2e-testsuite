@@ -16,9 +16,9 @@
 
 package de.gematik.test.erezept.app.exceptions;
 
-public class AppErrorException extends RuntimeException{
+public class AppErrorException extends RuntimeException {
 
-    public AppErrorException(String message) {
-        super(message);
-    }
+  public AppErrorException(String message) {
+    super(message);
+  }
 }

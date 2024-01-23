@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.gematik.test.erezept.app.task.ios;
 
 import static java.text.MessageFormat.format;
@@ -38,7 +39,9 @@ public class ValidateLegalInsideSettingsIOS implements Task {
 
     app.tap(BottomNav.SETTINGS_BUTTON);
     app.scrollIntoView(ScrollDirection.DOWN, Settings.LEGAL_TEXT);
-    assertTrue(app.isPresent(Settings.LEGAL_TEXT), format("Unable to find {0}", Settings.LEGAL_TEXT.getElementName()));
+    assertTrue(
+        app.isPresent(Settings.LEGAL_TEXT),
+        format("Unable to find {0}", Settings.LEGAL_TEXT.getElementName()));
 
     app.tap(Settings.IMPRINT_BUTTON);
     app.isPresent(Settings.IMPRINT_LEGEND);

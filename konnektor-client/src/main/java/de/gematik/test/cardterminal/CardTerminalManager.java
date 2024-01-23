@@ -16,19 +16,18 @@
 
 package de.gematik.test.cardterminal;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.cardterminal.exceptions.NoAppropriateSlotException;
-import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorType;
+import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.commands.GetCardsCommand;
 import de.gematik.test.smartcard.Smartcard;
 import de.gematik.test.smartcard.SmartcardType;
+import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-
-import java.util.*;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class CardTerminalManager {
@@ -74,7 +73,9 @@ public class CardTerminalManager {
   }
 
   private Optional<CardTerminalClient> getCardTerminalClient(@NonNull CardTerminal ct) {
-    return cardTerminalClients.stream().filter(it -> ct.getCtId().equalsIgnoreCase(it.getCtId())).findFirst();
+    return cardTerminalClients.stream()
+        .filter(it -> ct.getCtId().equalsIgnoreCase(it.getCtId()))
+        .findFirst();
   }
 
   public boolean insertCard(@NonNull Smartcard card) {
@@ -110,16 +111,18 @@ public class CardTerminalManager {
         () ->
             log.warn(
                 format(
-                    "no card terminal client with id {0} has matched. Card terminal client ids: {1}",
+                    "no card terminal client with id {0} has matched. Card terminal client ids:"
+                        + " {1}",
                     ctSlot.getCt().getCtId(), cardTerminalClients)));
 
     return true;
   }
 
   private Optional<CardTerminalSlot> getOccupiedSlot(Smartcard card) {
-    return this.cardTerminals.stream().flatMap(it -> it.getSlots().stream())
-            .filter(it -> it.getCard().getIccsn().equals(card.getIccsn()))
-            .findFirst();
+    return this.cardTerminals.stream()
+        .flatMap(it -> it.getSlots().stream())
+        .filter(it -> it.getCard().getIccsn().equals(card.getIccsn()))
+        .findFirst();
   }
 
   private Optional<CardTerminalSlot> getFreeSlot() {

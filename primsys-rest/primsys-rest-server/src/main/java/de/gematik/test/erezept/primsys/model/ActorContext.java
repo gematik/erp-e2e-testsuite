@@ -39,8 +39,7 @@ public class ActorContext {
 
   private static ActorContext instance;
 
-  @Getter
-  private final EnvironmentConfiguration environment;
+  @Getter private final EnvironmentConfiguration environment;
 
   @Getter private final List<Doctor> doctors;
 
@@ -48,7 +47,6 @@ public class ActorContext {
 
   private final ContextData contextData;
 
-  
   private ActorContext(PrimSysRestFactory factory) {
     this.environment = factory.getActiveEnvironment();
     this.doctors = factory.createDoctorActors();
@@ -70,7 +68,7 @@ public class ActorContext {
   }
 
   public List<ActorDto> getActorsSummary() {
-      return this.getActors().stream().map(BaseActor::getActorSummary).toList();
+    return this.getActors().stream().map(BaseActor::getActorSummary).toList();
   }
 
   public List<ActorDto> getActorsSummary(ActorType type) {
@@ -107,8 +105,8 @@ public class ActorContext {
 
   public Optional<AcceptedPrescriptionDto> getAcceptedPrescription(String prescriptionId) {
     return this.getAcceptedPrescriptions().stream()
-            .filter(p -> p.getPrescriptionId().equals(prescriptionId))
-            .findFirst();
+        .filter(p -> p.getPrescriptionId().equals(prescriptionId))
+        .findFirst();
   }
 
   public List<DispensedMedicationDto> getDispensedMedications() {
@@ -117,8 +115,8 @@ public class ActorContext {
 
   public Optional<DispensedMedicationDto> getDispensedMedication(String prescriptionId) {
     return this.getDispensedMedications().stream()
-            .filter(dd -> dd.getPrescriptionId().equals(prescriptionId))
-            .findFirst();
+        .filter(dd -> dd.getPrescriptionId().equals(prescriptionId))
+        .findFirst();
   }
 
   public void shutdown() {

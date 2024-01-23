@@ -46,7 +46,7 @@ public class ErxMedicationDispenseBundleBuilder
   }
 
   public static ErxMedicationDispenseBundleBuilder faker(
-          int amount, KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
+      int amount, KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
     val medicationDispenses = new ArrayList<ErxMedicationDispense>();
     IntStream.range(0, amount)
         .forEach(
@@ -81,10 +81,19 @@ public class ErxMedicationDispenseBundleBuilder
     val mdBundle = new Bundle(bundleType);
 
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) != 0) {
-      mdBundle.getMeta().addProfile(ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.getVersionedUrl(erpWorkflowVersion, true));
+      mdBundle
+          .getMeta()
+          .addProfile(
+              ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.getVersionedUrl(
+                  erpWorkflowVersion, true));
 
       // Note: HAPI seems to skip the tags on serialization, why?
-      mdBundle.getMeta().addTag().setDisplay("MedicationDispense Bundle for $close-Operation on dispensation of multiple medications");
+      mdBundle
+          .getMeta()
+          .addTag()
+          .setDisplay(
+              "MedicationDispense Bundle for $close-Operation on dispensation of multiple"
+                  + " medications");
     }
 
     this.medicationDispenses.forEach(

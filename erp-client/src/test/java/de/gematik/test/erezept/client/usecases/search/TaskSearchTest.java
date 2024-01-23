@@ -36,7 +36,7 @@ class TaskSearchTest {
     val cmd = TaskSearch.getSortedByAuthoredOn(SortOrder.ASCENDING);
     assertTrue(cmd.getRequestLocator().contains("_sort=authored-on"));
   }
-  
+
   @Test
   void shouldBuildComplexSearchQuery() {
     val cmd =
@@ -50,10 +50,7 @@ class TaskSearchTest {
 
   @Test
   void shouldNotAddNullStatusOnComplexSearchQuery() {
-    val cmd =
-            TaskSearch.builder()
-                    .withStatus(null)
-                    .createCommand();
+    val cmd = TaskSearch.builder().withStatus(null).createCommand();
     assertFalse(cmd.getRequestLocator().contains("status="));
   }
 }

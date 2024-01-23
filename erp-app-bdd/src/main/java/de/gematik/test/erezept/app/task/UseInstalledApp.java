@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
@@ -34,8 +36,6 @@ import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import static java.text.MessageFormat.format;
 
 @RequiredArgsConstructor
 public class UseInstalledApp implements Task {
@@ -64,9 +64,11 @@ public class UseInstalledApp implements Task {
         NavigateThroughCardwall.forEnvironment(environment)
             .byMappingVirtualEgkFrom(sca, insuranceKind));
 
-    // NOTE: once navigated through cardwall and logged in: waste some time here and tap refresh a few times!!
+    // NOTE: once navigated through cardwall and logged in: waste some time here and tap refresh a
+    // few times!!
     for (var i = 0; i < 5; i++) {
-      // this hack is required to enforce a login, otherwise we won't find any prescriptions later on
+      // this hack is required to enforce a login, otherwise we won't find any prescriptions later
+      // on
       app.tap(BottomNav.PRESCRIPTION_BUTTON);
       app.tap(Mainscreen.REFRESH_BUTTON);
     }

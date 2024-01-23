@@ -31,7 +31,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.*;
@@ -386,14 +386,14 @@ class ActivateInvalidKbvBundles extends ErpTest {
   @Disabled(value = "Wird vom FD aktuell so nicht gefordert")
   @DisplayName("Leere oder nur Whitespace enthaltende Notes in der MedicationRequest sind nicht zulässig")
   void activatePrescriptionWithWhitespaceNote() {
-    val medication = KbvErpMedicationBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
     val medicationRequest =
-            MedicationRequestBuilder.faker(sina.getPatientData())
-                    .insurance(sina.getInsuranceCoverage())
-                    .requester(doctor.getPractitioner())
-                    .medication(medication)
-                    .note("!REPLACE!")    // replace marker for StringFuzzer
-                    .build();
+        MedicationRequestBuilder.faker(sina.getPatientData())
+            .insurance(sina.getInsuranceCoverage())
+            .requester(doctor.getPractitioner())
+            .medication(medication)
+            .note("!REPLACE!") // replace marker for StringFuzzer
+            .build();
 
     val kbvBundleBuilder =
             KbvErpBundleBuilder.faker(sina.getKvnr())

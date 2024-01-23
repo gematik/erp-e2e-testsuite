@@ -16,21 +16,20 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.smartcard.*;
 import de.gematik.ws.conn.cardservice.v8.Cards;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.FaultMessage;
 import de.gematik.ws.tel.error.v2.Error;
-import lombok.SneakyThrows;
-import lombok.val;
-
-import javax.xml.datatype.DatatypeFactory;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static java.text.MessageFormat.format;
+import javax.xml.datatype.DatatypeFactory;
+import lombok.SneakyThrows;
+import lombok.val;
 
 public class MockKonnektor {
 
@@ -67,7 +66,8 @@ public class MockKonnektor {
     smcbs.forEach(smcb -> cardsMap.put(smcb.getCardHandle(), smcb));
   }
 
-  public byte[] signDocumentWith(String cardHandle, Algorithm algorithm, byte[] data) throws FaultMessage {
+  public byte[] signDocumentWith(String cardHandle, Algorithm algorithm, byte[] data)
+      throws FaultMessage {
     val wrapper = cardsMap.get(cardHandle);
     if (wrapper == null) {
       throw new FaultMessage(

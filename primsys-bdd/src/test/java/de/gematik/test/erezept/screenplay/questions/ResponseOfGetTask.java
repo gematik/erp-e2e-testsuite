@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
@@ -26,14 +28,11 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.ActorRole;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.hl7.fhir.r4.model.Task;
-
-import java.util.Comparator;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
@@ -59,14 +58,17 @@ public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
     val erpClient = SafeAbility.getAbility(pharmacy, UseTheErpClient.class);
     val response = erpClient.request(cmd);
     val erxTaskBundle = response.getResourceOptional();
-    erxTaskBundle.ifPresent(bundle -> {
-      val prescriptionManager = SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class);
-      bundle.getTasks().stream()
+    erxTaskBundle.ifPresent(
+        bundle -> {
+          val prescriptionManager =
+              SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class);
+          bundle.getTasks().stream()
               .sorted(Comparator.comparing(Task::getAuthoredOn))
               .map(t -> DmcPrescription.ownerDmc(t.getTaskId(), t.getAccessCode()))
-              .filter(dmc -> !prescriptionManager.getAssignedPrescriptions().getRawList().contains(dmc))
+              .filter(
+                  dmc -> !prescriptionManager.getAssignedPrescriptions().getRawList().contains(dmc))
               .forEachOrdered(prescriptionManager::appendAssignedPrescription);
-    });
+        });
     return response;
   }
 

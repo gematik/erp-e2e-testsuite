@@ -66,7 +66,6 @@ class PrescriptionBundleVerifierTest {
     step.apply(prescriptionBundle);
   }
 
-
   @Test
   void shouldFailOnMissingAccessCode() {
     val erxTask = new ErxTask();
@@ -93,7 +92,7 @@ class PrescriptionBundleVerifierTest {
     val medicationRequest = mock(KbvErpMedicationRequest.class);
     val kbvBundle = mock(KbvErpBundle.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
 
     val date = new Date();
@@ -111,7 +110,7 @@ class PrescriptionBundleVerifierTest {
     val medicationRequest = mock(KbvErpMedicationRequest.class);
     val kbvBundle = mock(KbvErpBundle.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.getAccident()).thenReturn(Optional.empty());
 
@@ -124,7 +123,7 @@ class PrescriptionBundleVerifierTest {
     val medication = mock(KbvErpMedication.class);
     val kbvBundle = mock(KbvErpBundle.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedication()).thenReturn(medication);
     val teststring = "12345678";
     val testPzn = PZN.from(teststring);
@@ -140,7 +139,7 @@ class PrescriptionBundleVerifierTest {
     val medication = mock(KbvErpMedication.class);
     val kbvBundle = mock(KbvErpBundle.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedication()).thenReturn(medication);
     val teststring = "12345678";
     val verifyPzn = PZN.from(teststring);
@@ -156,7 +155,7 @@ class PrescriptionBundleVerifierTest {
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
     val medIngrComp = mock(Medication.MedicationIngredientComponent.class);
     val codeConc = mock(CodeableConcept.class);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedication()).thenReturn(medication);
     when(medication.getIngredientFirstRep()).thenReturn(medIngrComp);
     when(medIngrComp.getItemCodeableConcept()).thenReturn(codeConc);
@@ -177,7 +176,7 @@ class PrescriptionBundleVerifierTest {
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
     val medIngrComp = mock(Medication.MedicationIngredientComponent.class);
     val codeConc = mock(CodeableConcept.class);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(kbvBundle.getMedication()).thenReturn(medication);
     when(medication.getIngredientFirstRep()).thenReturn(medIngrComp);
     when(medIngrComp.getItemCodeableConcept()).thenReturn(codeConc);

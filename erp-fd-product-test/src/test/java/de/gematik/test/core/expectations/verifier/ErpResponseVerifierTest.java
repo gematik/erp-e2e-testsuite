@@ -16,6 +16,10 @@
 
 package de.gematik.test.core.expectations.verifier;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -23,18 +27,13 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
+import java.util.List;
+import java.util.Map;
 import lombok.val;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.InvalidArgumentException;
-
-import java.util.List;
-import java.util.Map;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ErpResponseVerifierTest {
 
@@ -123,9 +122,7 @@ class ErpResponseVerifierTest {
             .withHeaders(Map.of("Warning", "123 und Zahlen und so weiter"))
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     val step = headerContentContains("Warning", "nee nix passendes drin !", ErpAfos.A_23891);
-    assertThrows(
-        AssertionError.class,
-        () -> step.apply(response));
+    assertThrows(AssertionError.class, () -> step.apply(response));
   }
 
   @Test

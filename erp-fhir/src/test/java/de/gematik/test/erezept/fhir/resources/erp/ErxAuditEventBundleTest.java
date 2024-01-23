@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ErxAuditEventBundleTest {
 
@@ -29,8 +29,7 @@ class ErxAuditEventBundleTest {
   void shouldCorrectFilterAuditEvents() {
     val agentName = "Am Flughafen";
     val agentId = TelematikID.from("3-SMC-B-Testkarte-883110000116873");
-    val erxAuditEventBundle =
-        FhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName);
+    val erxAuditEventBundle = FhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName);
 
     assertEquals(2, erxAuditEventBundle.getAuditEvents().size());
     assertEquals(2, erxAuditEventBundle.getAuditEvents(agentId).size());

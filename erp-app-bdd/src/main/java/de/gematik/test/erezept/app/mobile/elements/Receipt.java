@@ -60,49 +60,45 @@ public enum Receipt implements PageElement {
       () -> AppiumBy.xpath("//*[@label='Zur Startseite']")),
 
   FULL_DAYS_VALID_RECEIPT(
-    "28 days validity recipt",
-    () -> null,
-    () -> AppiumBy.xpath("//*[@label='Noch 28 Tage gültig']")),
+      "28 days validity recipt",
+      () -> null,
+      () -> AppiumBy.xpath("//*[@label='Noch 28 Tage gültig']")),
 
   ARCHIVED_PRESCRIPTIONS_BTN(
-    "Eingelöste Rezepte",
-    () -> null,
-    () -> AppiumBy.xpath("//*[@label='Eingelöste Rezepte']")),
+      "Eingelöste Rezepte", () -> null, () -> AppiumBy.xpath("//*[@label='Eingelöste Rezepte']")),
 
   REDEEMABLE_PRESCRIPTION_CARD_BUTTON(
-    "get the top redeemed prescription",
-    () -> null,
-    () -> AppiumBy.xpath("//*[@label='Einlösbar']")),
+      "get the top redeemed prescription",
+      () -> null,
+      () -> AppiumBy.xpath("//*[@label='Einlösbar']")),
 
   TECHNICAL_INFORMATION(
-    "Technische Informationen",
-    () -> null,
-    () -> AppiumBy.accessibilityId("prsc_dtl_btn_technical_informations")),
+      "Technische Informationen",
+      () -> null,
+      () -> AppiumBy.accessibilityId("prsc_dtl_btn_technical_informations")),
 
   PRESCRIPTION_STATUS_LABEL(
-    "prescription status label",
-    () -> null,
-    () -> AppiumBy.accessibilityId("erx_detailed_prescription_name-erx_detailed_prescription_validity-erx_detailed_status")),
+      "prescription status label",
+      () -> null,
+      () ->
+          AppiumBy.accessibilityId(
+              "erx_detailed_prescription_name-erx_detailed_prescription_validity-erx_detailed_status")),
 
   REDEEMED_PRESCRIPTION_STATUS_LABEL(
-    "redeemed prescription status label",
-    () -> null,
-    () -> AppiumBy.accessibilityId("erx_detailed_prescription_name-erx_detailed_prescription_validity-erx_detailed_status-erx_detailed_status")),
-  TASKID(
-    "Task Identifier",
-    () -> null,
-    () -> AppiumBy.accessibilityId("prsc_dtl_ti_task_id")),
+      "redeemed prescription status label",
+      () -> null,
+      () ->
+          AppiumBy.accessibilityId(
+              "erx_detailed_prescription_name-erx_detailed_prescription_validity-erx_detailed_status-erx_detailed_status")),
+  TASKID("Task Identifier", () -> null, () -> AppiumBy.accessibilityId("prsc_dtl_ti_task_id")),
 
   GOBACK_TO_DETAILS(
-    "from technical information go back to detail page",
-    () -> null,
-    () -> AppiumBy.name("Detail")),
+      "from technical information go back to detail page",
+      () -> null,
+      () -> AppiumBy.name("Detail")),
 
   RECEIPT_DATE_OF_ISSUE_LABEL(
-    "Date of issue",
-    () -> null,
-    () -> AppiumBy.accessibilityId("prsc_dtl_txt_authored_on")),
-
+      "Date of issue", () -> null, () -> AppiumBy.accessibilityId("prsc_dtl_txt_authored_on")),
   ;
 
   private final String elementName;

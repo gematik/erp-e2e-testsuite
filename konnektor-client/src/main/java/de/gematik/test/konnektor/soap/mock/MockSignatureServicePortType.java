@@ -23,15 +23,14 @@ import de.gematik.ws.conn.signatureservice.v7.*;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.FaultMessage;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureServicePortType;
 import de.gematik.ws.tel.error.v2.Error;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.datatype.Duration;
+import javax.xml.ws.Holder;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.Base64Signature;
 import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
 import org.apache.commons.lang3.NotImplementedException;
-
-import javax.xml.datatype.Duration;
-import javax.xml.ws.Holder;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MockSignatureServicePortType extends AbstractMockService
     implements SignatureServicePortType {
@@ -80,7 +79,8 @@ public class MockSignatureServicePortType extends AbstractMockService
     val response = new ArrayList<SignResponse>();
     for (val sr : signRequest) {
       val signedData =
-          mockKonnektor.signDocumentWith(cardHandle, Algorithm.fromString(crypt), sr.getDocument().getBase64Data().getValue());
+          mockKonnektor.signDocumentWith(
+              cardHandle, Algorithm.fromString(crypt), sr.getDocument().getBase64Data().getValue());
 
       val signResponse = new SignResponse();
       signResponse.setRequestID(sr.getRequestID());

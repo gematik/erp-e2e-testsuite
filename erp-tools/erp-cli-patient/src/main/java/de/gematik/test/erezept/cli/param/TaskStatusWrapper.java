@@ -23,12 +23,10 @@ import org.hl7.fhir.r4.model.Task;
 @Getter
 @RequiredArgsConstructor
 public enum TaskStatusWrapper {
+  READY(Task.TaskStatus.READY),
+  INPROGRESS(Task.TaskStatus.INPROGRESS),
+  COMPLETED(Task.TaskStatus.COMPLETED),
+  ANY(null);
 
-    READY(Task.TaskStatus.READY),
-    INPROGRESS(Task.TaskStatus.INPROGRESS),
-    COMPLETED(Task.TaskStatus.COMPLETED),
-    ANY(null)
-    ;
-
-    private final Task.TaskStatus status;
+  private final Task.TaskStatus status;
 }

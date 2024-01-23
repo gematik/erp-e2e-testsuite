@@ -16,15 +16,47 @@
 
 package de.gematik.test.fuzzing.fhirfuzz;
 
+import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 
 /**
- * this Interface has generic implementations in BaseFuzzer
- * concrete implementation in implemented ResourceFuzzerImpl
+ * this Interface has generic implementations in BaseFuzzer concrete implementation in implemented
+ * ResourceFuzzerImpl
  *
  * @param <T> restrict the generic Type of BaseFuzzer to Resource
  */
 public interface FhirResourceFuzz<T extends Resource> extends BaseFuzzer<T> {
 
-
+  default T fuzzTilInvalid(T value, FhirParser parser) {
+    val inputPOE = getContext().getFuzzConfig().getPercentOfEach();
+    val inputPOA = getContext().getFuzzConfig().getPercentOfAll();
+    val inputPOM = getContext().getFuzzConfig().getUsedPercentOfMutators();
+    var counter = 5;
+    var finalCounter = 5;
+    boolean isValid;
+    do {
+      do {
+        fuzz(value);
+        counter--;
+        isValid = parser.isValid(parser.encode(value, EncodingType.XML));
+      } while (isValid && counter > 0);
+      counter = 5;
+      finalCounter--;
+      getContext()
+          .getFuzzConfig()
+          .setUsedPercentOfMutators(getContext().getFuzzConfig().getUsedPercentOfMutators() + 1f);
+      getContext()
+          .getFuzzConfig()
+          .setPercentOfEach(getContext().getFuzzConfig().getPercentOfEach() + 1f);
+      getContext()
+          .getFuzzConfig()
+          .setPercentOfAll(getContext().getFuzzConfig().getPercentOfAll() + 1f);
+    } while (isValid && finalCounter > 0);
+    getContext().getFuzzConfig().setUsedPercentOfMutators(inputPOM);
+    getContext().getFuzzConfig().setPercentOfEach(inputPOE);
+    getContext().getFuzzConfig().setPercentOfAll(inputPOA);
+    return value;
+  }
 }

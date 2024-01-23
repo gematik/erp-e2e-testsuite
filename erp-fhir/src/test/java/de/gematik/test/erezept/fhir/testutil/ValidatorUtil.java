@@ -23,6 +23,7 @@ import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
@@ -44,18 +45,19 @@ public class ValidatorUtil {
       List<File> files,
       Consumer<Boolean> validationAssertion,
       boolean printResult) {
-    files.stream()
-        .map(FileTuple::fromFile)
-        .forEach(
-            fileTuple -> {
-              log.info(format("Validate {0}", fileTuple.getFileName()));
-              val content = fileTuple.getContent();
-              val vr = parser.validate(content);
-              if (printResult) {
-                printValidationResult(vr);
-              }
-              validationAssertion.accept(vr.isSuccessful());
-            });
+    files.forEach(file -> validateFile(parser, file, validationAssertion, printResult));
+  }
+
+  public static void validateFile(
+      FhirParser parser, File file, Consumer<Boolean> validationAssertion, boolean printResult) {
+
+    log.info(format("Validate {0}", file.getName()));
+    val content = ResourceUtils.readFileFromResource(file);
+    val vr = parser.validate(content);
+    if (printResult) {
+      printValidationResult(vr);
+    }
+    validationAssertion.accept(vr.isSuccessful());
   }
 
   public static ValidationResult encodeAndValidate(FhirParser parser, Resource resource) {

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.questions.HasReceipts;
 import de.gematik.test.erezept.screenplay.questions.VerifyReceiptSignature;
@@ -26,8 +28,6 @@ import io.cucumber.java.de.Und;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
 
 public class PharmacyReceiptSteps {
 
@@ -71,9 +71,11 @@ public class PharmacyReceiptSteps {
   }
 
   @Dann(
-      "^hat die Apotheke (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? für (.+) vorliegen$")
+      "^hat die Apotheke (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? für (.+)"
+          + " vorliegen$")
   @Und(
-      "^die Apotheke hat (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? für (.+) vorliegen$")
+      "^die Apotheke hat (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? für (.+)"
+          + " vorliegen$")
   public void hasReceiptFor(String pharmName, String adverb, long amount, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
@@ -103,7 +105,8 @@ public class PharmacyReceiptSteps {
    * @param pharmName ist der Name der Apotheke, die ihre Quittung validieren soll
    */
   @Dann(
-      "^kann die Apotheke (.+) die Signatur der (letzten|ersten) Quittung erfolgreich mit dem Konnektor validieren$")
+      "^kann die Apotheke (.+) die Signatur der (letzten|ersten) Quittung erfolgreich mit dem"
+          + " Konnektor validieren$")
   public void thenPharmacySuccessfullyValidatesSignatureofReceipt(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy).attemptsTo(Ensure.that(VerifyReceiptSignature.fromStack(order)).isTrue());

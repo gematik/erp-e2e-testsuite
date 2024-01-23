@@ -16,10 +16,16 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.impl.typefuzzer;
 
+import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodeableConceptFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.TimingFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DateTimeType;
@@ -29,85 +35,81 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 
-import java.util.List;
-
-import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 class TimingFuzzImplTest {
 
+  private static FuzzConfig fuzzConfig;
+  private static FuzzerContext fuzzerContext;
 
-    private static FuzzConfig fuzzConfig;
-    private static FuzzerContext fuzzerContext;
+  private static TimingFuzzImpl timingFuzz;
 
-    private static TimingFuzzImpl timingFuzz;
+  private Timing timing;
 
-    private Timing timing;
+  @BeforeAll
+  static void setUpConf() {
+    fuzzConfig = new FuzzConfig();
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    fuzzConfig.setUseAllMutators(true);
+    fuzzerContext = new FuzzerContext(fuzzConfig);
+    timingFuzz = new TimingFuzzImpl(fuzzerContext);
+  }
 
-    @BeforeAll
-    static void setUpConf() {
-        fuzzConfig = new FuzzConfig();
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        fuzzConfig.setUseAllMutators(true);
-        fuzzerContext = new FuzzerContext(fuzzConfig);
-        timingFuzz = new TimingFuzzImpl(fuzzerContext);
-    }
+  @BeforeEach
+  void setupComp() {
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    timing = new Timing();
+  }
 
-    @BeforeEach
-    void setupComp() {
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        timing = new Timing();
-    }
+  @RepeatedTest(REPETITIONS)
+  void fuzzEvent() {
+    assertFalse(timing.hasEvent());
+    timingFuzz.fuzz(timing);
+    Assertions.assertTrue(timing.hasEvent());
+    val testObject = new DateTimeType(fuzzerContext.getRandomDate());
+    timing.setEvent(List.of(testObject));
+    fuzzConfig.setPercentOfAll(0.00f);
+    timingFuzz.fuzz(timing);
+    assertNotEquals(testObject, timing.getEvent().get(0));
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void fuzzEvent() {
-        assertFalse(timing.hasEvent());
-        timingFuzz.fuzz(timing);
-        Assertions.assertTrue(timing.hasEvent());
-        val testObject = new DateTimeType(fuzzerContext.getRandomDate());
-        timing.setEvent(List.of(testObject));
-        fuzzConfig.setPercentOfAll(0.00f);
-        timingFuzz.fuzz(timing);
-        assertNotEquals(testObject, timing.getEvent().get(0));
-    }
+  @RepeatedTest(REPETITIONS)
+  void fuzzRepeat() {
+    assertFalse(timing.hasRepeat());
+    timingFuzz.fuzz(timing);
+    Assertions.assertTrue(timing.hasRepeat());
+    val testObject = timingFuzz.generateRandom().getRepeat();
+    timing.setRepeat(testObject.copy());
+    timingFuzz.fuzz(timing);
+    assertNotEquals(testObject, timing.getRepeat());
+    assertNotEquals(testObject.getCount(), timing.getRepeat().getCount());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void fuzzRepeat() {
-        assertFalse(timing.hasRepeat());
-        timingFuzz.fuzz(timing);
-        Assertions.assertTrue(timing.hasRepeat());
-        val testObject = timingFuzz.generateRandom().getRepeat();
-        timing.setRepeat(testObject.copy());
-        timingFuzz.fuzz(timing);
-        assertNotEquals(testObject, timing.getRepeat());
-        assertNotEquals(testObject.getCount(), timing.getRepeat().getCount());
-    }
+  @RepeatedTest(REPETITIONS)
+  void fuzzCode() {
+    assertFalse(timing.hasCode());
+    timingFuzz.fuzz(timing);
+    Assertions.assertTrue(timing.hasCode());
+    val testObject =
+        fuzzerContext
+            .getTypeFuzzerFor(
+                CodeableConcept.class, () -> new CodeableConceptFuzzImpl(fuzzerContext))
+            .generateRandom();
+    timing.setCode(testObject.copy());
+    fuzzConfig.setPercentOfAll(0.00f);
+    timingFuzz.fuzz(timing);
+    assertNotEquals(testObject, timing.getCode());
+    assertNotEquals(testObject.getCodingFirstRep(), timing.getCode().getCodingFirstRep());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void fuzzCode() {
-        assertFalse(timing.hasCode());
-        timingFuzz.fuzz(timing);
-        Assertions.assertTrue(timing.hasCode());
-        val testObject = fuzzerContext.getTypeFuzzerFor(CodeableConcept.class, () -> new CodeableConceptFuzzImpl(fuzzerContext)).generateRandom();
-        timing.setCode(testObject.copy());
-        fuzzConfig.setPercentOfAll(0.00f);
-        timingFuzz.fuzz(timing);
-        assertNotEquals(testObject, timing.getCode());
-        assertNotEquals(testObject.getCodingFirstRep(), timing.getCode().getCodingFirstRep());
-    }
+  @RepeatedTest(REPETITIONS)
+  void generateRandom() {
+    assertNotNull(timingFuzz.generateRandom());
+    assertNotNull(timingFuzz.generateRandom().getEvent());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void generateRandom() {
-        assertNotNull(timingFuzz.generateRandom());
-        assertNotNull(timingFuzz.generateRandom().getEvent());
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void getContext() {
-        assertNotNull(timingFuzz.getContext());
-    }
+  @RepeatedTest(REPETITIONS)
+  void getContext() {
+    assertNotNull(timingFuzz.getContext());
+  }
 }

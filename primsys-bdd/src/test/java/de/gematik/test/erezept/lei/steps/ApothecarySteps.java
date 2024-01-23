@@ -38,7 +38,8 @@ public class ApothecarySteps {
    *     Abrechnungsdatensatz erstellt werden soll
    */
   @Wenn(
-      "^(?:der Apotheker|die Apothekerin) (.+) als Angestellte(?:r)? der Apotheke (.+) für das (letzte|erste) dispensierte E-Rezept PKV-Abrechnungsinformationen bereitstellt$")
+      "^(?:der Apotheker|die Apothekerin) (.+) als Angestellte(?:r)? der Apotheke (.+) für das"
+          + " (letzte|erste) dispensierte E-Rezept PKV-Abrechnungsinformationen bereitstellt$")
   public void whenPharmacySignsWithHbaAndPostsChargeItem(
       String apothecaryName, String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);

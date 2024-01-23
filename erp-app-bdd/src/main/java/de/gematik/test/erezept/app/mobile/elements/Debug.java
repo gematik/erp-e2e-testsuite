@@ -61,7 +61,8 @@ public enum Debug implements PageElement {
           By.xpath("/ComposeNode/ComposeNode/VerticalScrollAxisRange/ComposeNode[3]/EditableText"),
       () ->
           By.xpath(
-              "//XCUIElementTypeCell[@name='Current access token']/XCUIElementTypeOther[2]/XCUIElementTypeOther")),
+              "//XCUIElementTypeCell[@name='Current access"
+                  + " token']/XCUIElementTypeOther[2]/XCUIElementTypeOther")),
   LOGIN("Login with virtual eGK", null, () -> By.xpath("//XCUIElementTypeButton[@name=\"Login\"]")),
   HIDE_INTRO(
       "Hide Intro",

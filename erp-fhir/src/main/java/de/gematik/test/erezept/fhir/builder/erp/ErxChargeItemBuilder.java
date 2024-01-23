@@ -275,5 +275,4 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
   public static ErxChargeItemBuilder forPrescription(PrescriptionId prescriptionId) {
     return new ErxChargeItemBuilder(prescriptionId);
   }
-
 }

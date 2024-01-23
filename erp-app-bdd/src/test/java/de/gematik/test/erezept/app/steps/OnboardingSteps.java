@@ -26,12 +26,13 @@ import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 
 public class OnboardingSteps {
-  
+
   @Dann("sieht der User den Mainscreen")
   public void thenUserCanSeeTheMainscreen() {
     val theAppUser = OnStage.theActorInTheSpotlight();
     assertTrue(
-            "Onboarding wurde erfolgreich durchlaufen und wir prüfen, ob wir uns auf dem Mainscreen der App befinden",
-            then(theAppUser).asksFor(IsElementAvailable.withName(Mainscreen.LOGIN_BUTTON)));
+        "Onboarding wurde erfolgreich durchlaufen und wir prüfen, ob wir uns auf dem Mainscreen der"
+            + " App befinden",
+        then(theAppUser).asksFor(IsElementAvailable.withName(Mainscreen.LOGIN_BUTTON)));
   }
 }

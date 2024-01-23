@@ -96,7 +96,7 @@ class ManageDataMatrixCodesTest {
     val actor = OnStage.theActor("Alice");
     val ability = spy(ManageDataMatrixCodes.sheGetsPrescribed());
     actor.can(ability);
-    
+
     val dmc = DmcPrescription.ownerDmc(TaskId.from(PrescriptionId.random()), AccessCode.random());
     ability.getDmcList().add(dmc);
 
@@ -104,17 +104,17 @@ class ManageDataMatrixCodesTest {
     actor.can(erpClient);
 
     val mockResponse =
-            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
-                    .withStatusCode(404)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     OnStage.drawTheCurtain();
 
     verify(ability, times(1)).tearDown();
   }
-  
+
   @Test
   void shouldHaveToString() {
     assertTrue(DmcStack.ACTIVE.toString().contains("ausgestellt"));

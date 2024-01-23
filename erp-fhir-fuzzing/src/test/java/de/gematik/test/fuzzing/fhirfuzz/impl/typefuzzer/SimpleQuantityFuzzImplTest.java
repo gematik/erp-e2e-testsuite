@@ -16,6 +16,12 @@
 
 package de.gematik.test.fuzzing.fhirfuzz.impl.typefuzzer;
 
+import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.SimpleQuantityFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
@@ -25,97 +31,89 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 
-import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class SimpleQuantityFuzzImplTest {
-    private static FuzzConfig fuzzConfig;
-    private static FuzzerContext fuzzerContext;
+  private static FuzzConfig fuzzConfig;
+  private static FuzzerContext fuzzerContext;
 
-    private static SimpleQuantityFuzzImpl quantityFuzzer;
-    private Quantity quantity;
+  private static SimpleQuantityFuzzImpl quantityFuzzer;
+  private Quantity quantity;
 
+  @BeforeAll
+  static void setUpConf() {
+    fuzzConfig = new FuzzConfig();
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    fuzzConfig.setUseAllMutators(true);
+    fuzzerContext = new FuzzerContext(fuzzConfig);
+    quantityFuzzer = new SimpleQuantityFuzzImpl(fuzzerContext);
+  }
 
-    @BeforeAll
-    static void setUpConf() {
-        fuzzConfig = new FuzzConfig();
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        fuzzConfig.setUseAllMutators(true);
-        fuzzerContext = new FuzzerContext(fuzzConfig);
-        quantityFuzzer = new SimpleQuantityFuzzImpl(fuzzerContext);
-    }
+  @BeforeEach
+  void setupComp() {
+    fuzzConfig.setPercentOfEach(100.0f);
+    fuzzConfig.setPercentOfAll(100.0f);
+    quantity = new Quantity();
+  }
 
-    @BeforeEach
-    void setupComp() {
-        fuzzConfig.setPercentOfEach(100.0f);
-        fuzzConfig.setPercentOfAll(100.0f);
-        quantity = new Quantity();
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzUnit() {
+    assertFalse(quantity.hasUnit());
+    quantityFuzzer.fuzz(quantity);
+    assertTrue(quantity.hasUnit());
+    quantityFuzzer.fuzz(quantity);
+    val testObject = fuzzerContext.getStringFuzz().generateRandom(15);
+    quantity.setUnit(testObject);
+    fuzzConfig.setPercentOfAll(0.00f);
+    quantityFuzzer.fuzz(quantity);
+    assertNotEquals(testObject, quantity.getUnit());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzUnit() {
-        assertFalse(quantity.hasUnit());
-        quantityFuzzer.fuzz(quantity);
-        assertTrue(quantity.hasUnit());
-        quantityFuzzer.fuzz(quantity);
-        val testObject = fuzzerContext.getStringFuzz().generateRandom(15);
-        quantity.setUnit(testObject);
-        fuzzConfig.setPercentOfAll(0.00f);
-        quantityFuzzer.fuzz(quantity);
-        assertNotEquals(testObject, quantity.getUnit());
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzSystem() {
+    assertFalse(quantity.hasSystem());
+    quantityFuzzer.fuzz(quantity);
+    assertTrue(quantity.hasSystem());
+    quantityFuzzer.fuzz(quantity);
+    val testObject = fuzzerContext.getStringFuzz().generateRandom(15);
+    quantity.setSystem(testObject);
+    fuzzConfig.setPercentOfAll(0.00f);
+    quantityFuzzer.fuzz(quantity);
+    assertNotEquals(testObject, quantity.getSystem());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzSystem() {
-        assertFalse(quantity.hasSystem());
-        quantityFuzzer.fuzz(quantity);
-        assertTrue(quantity.hasSystem());
-        quantityFuzzer.fuzz(quantity);
-        val testObject = fuzzerContext.getStringFuzz().generateRandom(15);
-        quantity.setSystem(testObject);
-        fuzzConfig.setPercentOfAll(0.00f);
-        quantityFuzzer.fuzz(quantity);
-        assertNotEquals(testObject, quantity.getSystem());
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzValue() {
+    assertFalse(quantity.hasValue());
+    quantityFuzzer.fuzz(quantity);
+    assertTrue(quantity.hasValue());
+    quantityFuzzer.fuzz(quantity);
+    val testObject = fuzzerContext.getIntFuzz().generateRandom();
+    quantity.setValue(testObject);
+    fuzzConfig.setPercentOfAll(0.00f);
+    quantityFuzzer.fuzz(quantity);
+    assertNotEquals(testObject, quantity.getValue());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzValue() {
-        assertFalse(quantity.hasValue());
-        quantityFuzzer.fuzz(quantity);
-        assertTrue(quantity.hasValue());
-        quantityFuzzer.fuzz(quantity);
-        val testObject = fuzzerContext.getIntFuzz().generateRandom();
-        quantity.setValue(testObject);
-        fuzzConfig.setPercentOfAll(0.00f);
-        quantityFuzzer.fuzz(quantity);
-        assertNotEquals(testObject, quantity.getValue());
-    }
+  @RepeatedTest(REPETITIONS)
+  void shouldFuzzCode() {
+    assertFalse(quantity.hasCode());
+    quantityFuzzer.fuzz(quantity);
+    assertTrue(quantity.hasCode());
+    quantityFuzzer.fuzz(quantity);
+    val testObject = fuzzerContext.getStringFuzz().generateRandom(15);
+    quantity.setCode(testObject);
+    fuzzConfig.setPercentOfAll(0.00f);
+    quantityFuzzer.fuzz(quantity);
+    assertNotEquals(testObject, quantity.getCode());
+  }
 
-    @RepeatedTest(REPETITIONS)
-    void shouldFuzzCode() {
-        assertFalse(quantity.hasCode());
-        quantityFuzzer.fuzz(quantity);
-        assertTrue(quantity.hasCode());
-        quantityFuzzer.fuzz(quantity);
-        val testObject = fuzzerContext.getStringFuzz().generateRandom(15);
-        quantity.setCode(testObject);
-        fuzzConfig.setPercentOfAll(0.00f);
-        quantityFuzzer.fuzz(quantity);
-        assertNotEquals(testObject, quantity.getCode());
-    }
+  @RepeatedTest(REPETITIONS)
+  void generateRandom() {
+    assertNotNull(quantityFuzzer.generateRandom().getValue());
+  }
 
-
-    @RepeatedTest(REPETITIONS)
-    void generateRandom() {
-        assertNotNull(quantityFuzzer.generateRandom().getValue());
-    }
-
-    @RepeatedTest(REPETITIONS)
-    void getContext() {
-        assertNotNull(quantityFuzzer.getContext());
-    }
+  @RepeatedTest(REPETITIONS)
+  void getContext() {
+    assertNotNull(quantityFuzzer.getContext());
+  }
 }

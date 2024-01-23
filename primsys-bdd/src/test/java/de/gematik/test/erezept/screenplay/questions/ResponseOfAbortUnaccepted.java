@@ -52,7 +52,8 @@ public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
     val cmd = new TaskAbortCommand(taskId, accessCode);
     log.info(
         format(
-            "Pharmacy {0} is asking for the response of {1} with AccessCode {2} and without a secret",
+            "Pharmacy {0} is asking for the response of {1} with AccessCode {2} and without a"
+                + " secret",
             actor.getName(), cmd.getRequestLocator(), accessCode));
     return erpClientAbility.request(cmd);
   }

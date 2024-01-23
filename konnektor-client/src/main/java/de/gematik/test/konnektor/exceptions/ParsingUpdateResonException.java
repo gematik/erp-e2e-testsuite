@@ -16,20 +16,26 @@
 
 package de.gematik.test.konnektor.exceptions;
 
-import java.util.Base64;
-
 import static java.text.MessageFormat.format;
 
+import java.util.Base64;
+
 public class ParsingUpdateResonException extends RuntimeException {
-    public ParsingUpdateResonException(char value) {
-        super(format("Checksum value ''{0}'' is not a valid literal of VSDM Update Reasons", value));
-    }
+  public ParsingUpdateResonException(char value) {
+    super(format("Checksum value ''{0}'' is not a valid literal of VSDM Update Reasons", value));
+  }
 
-    public ParsingUpdateResonException(byte[] data, int pos) {
-        super(format("Checksum information {0} could not be parsed at position {1}", Base64.getEncoder().encodeToString(data), pos));
-    }
+  public ParsingUpdateResonException(byte[] data, int pos) {
+    super(
+        format(
+            "Checksum information {0} could not be parsed at position {1}",
+            Base64.getEncoder().encodeToString(data), pos));
+  }
 
-    public ParsingUpdateResonException(byte[] data, int from, int to) {
-        super(format("Checksum information {0} could not be parsed from position {1} to {2}", Base64.getEncoder().encodeToString(data), from, to));
-    }
+  public ParsingUpdateResonException(byte[] data, int from, int to) {
+    super(
+        format(
+            "Checksum information {0} could not be parsed from position {1} to {2}",
+            Base64.getEncoder().encodeToString(data), from, to));
+  }
 }

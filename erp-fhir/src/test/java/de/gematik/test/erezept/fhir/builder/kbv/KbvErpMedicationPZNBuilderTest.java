@@ -20,19 +20,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.parser.profiles.version.*;
 import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import lombok.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
-class KbvErpMedicationBuilderTest extends ParsingTest {
+class KbvErpMedicationPZNBuilderTest extends ParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationWithFixedValues(KbvItaErpVersion version) {
     val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
     val medication =
-        KbvErpMedicationBuilder.builder()
+        KbvErpMedicationPZNBuilder.builder()
             .version(version)
             .setResourceId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
@@ -41,6 +42,26 @@ class KbvErpMedicationBuilderTest extends ParsingTest {
             .darreichungsform(Darreichungsform.TKA) // default TAB
             .amount(5, "Stk") // default 10 {tbl}
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
+            .build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationWithFixedValues2(KbvItaErpVersion version) {
+    val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
+    val medication =
+        KbvErpMedicationPZNBuilder.builder()
+            .version(version)
+            .setResourceId(medicationResourceId)
+            .category(MedicationCategory.C_00) // default C_00
+            .isVaccine(false) // default false
+            .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
+            .darreichungsform(Darreichungsform.TKA) // default TAB
+            .pzn(PZN.random(), "5 in 1 Medikament")
+            .amount(4L)
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medication);

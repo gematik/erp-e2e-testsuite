@@ -63,7 +63,8 @@ public class HasReceivedCommunication implements Question<Boolean> {
                 () ->
                     new AssertionError(
                         format(
-                            "Received Message ({0}) by {1} from {2} of type {3} does not contain an AccessCode",
+                            "Received Message ({0}) by {1} from {2} of type {3} does not contain an"
+                                + " AccessCode",
                             com.getId(), actor.getName(), com.getSenderId(), com.getType())));
     Ensure.that(
             "BasedOn-Reference contains a valid BasedOn-Reference",

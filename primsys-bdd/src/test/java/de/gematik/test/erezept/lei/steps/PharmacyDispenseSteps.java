@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
@@ -32,9 +35,6 @@ import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 public class PharmacyDispenseSteps {
 
@@ -66,7 +66,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Wenn(
-      "^die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an (.+) dispensiert:$")
+      "^die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept mit den folgenden Medikamenten"
+          + " korrekt an (.+) dispensiert:$")
   public void whenDispenseAlternativeReplacementMedications(
       String pharmName, String order, String patientName, DataTable medications) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -78,7 +79,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Wenn(
-      "^die Apotheke das (letzte|erste) akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an (.+) dispensiert:$")
+      "^die Apotheke das (letzte|erste) akzeptierte E-Rezept mit den folgenden Medikamenten korrekt"
+          + " an (.+) dispensiert:$")
   public void whenDispenseAlternativeReplacementMedications(
       String order, String patientName, DataTable medications) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
@@ -90,9 +92,11 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret (.+) dispensieren$")
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen"
+          + " Secret (.+) dispensieren$")
   @Und(
-      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret (.+) dispensieren$")
+      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen"
+          + " Secret (.+) dispensieren$")
   public void thenDispenseMedicationWithWrongSecret(
       String pharmName, String order, String wrongSecret) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -104,9 +108,11 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret (.+) dispensieren$")
+      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret"
+          + " (.+) dispensieren$")
   @Und(
-      "^die Apotheke kann das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret (.+) dispensieren$")
+      "^die Apotheke kann das (letzte|erste) akzeptierte E-Rezept nicht mit dem falschen Secret"
+          + " (.+) dispensieren$")
   public void thenDispenseMedicationWithWrongSecret(String order, String wrongSecret) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
@@ -117,9 +123,11 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten mit KVNR (.+) dispensieren$")
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten"
+          + " mit KVNR (.+) dispensieren$")
   @Und(
-      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten mit KVNR (.+) dispensieren$")
+      "^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten"
+          + " mit KVNR (.+) dispensieren$")
   public void thenDispenseMedicationToWrongPerson(
       String pharmName, String order, String wrongKvnr) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -130,9 +138,11 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten mit KVNR (.+) dispensieren$")
+      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten mit"
+          + " KVNR (.+) dispensieren$")
   @Und(
-      "^die Apotheke kann das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten mit KVNR (.+) dispensieren$")
+      "^die Apotheke kann das (letzte|erste) akzeptierte E-Rezept nicht an den Versicherten mit"
+          + " KVNR (.+) dispensieren$")
   public void thenDispenseMedicationToWrongPerson(String order, String wrongKvnr) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
@@ -169,7 +179,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil es nicht mehr existiert$")
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil es"
+          + " nicht mehr existiert$")
   public void thenCannotDispenseMedicationWith410(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -181,7 +192,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil es nicht mehr existiert$")
+      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil es nicht"
+          + " mehr existiert$")
   public void thenCannotDispenseMedicationWith410(String order) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
@@ -193,7 +205,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil sie nicht das Recht dazu hat$")
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil sie"
+          + " nicht das Recht dazu hat$")
   public void thenCannotDispenseMedicationWith403(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
@@ -205,7 +218,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil sie nicht das Recht dazu hat$")
+      "^kann die Apotheke das (letzte|erste) akzeptierte E-Rezept nicht dispensieren, weil sie"
+          + " nicht das Recht dazu hat$")
   public void thenCannotDispenseMedicationWith403(String order) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
@@ -233,7 +247,8 @@ public class PharmacyDispenseSteps {
   }
 
   @Dann(
-      "^darf die Apotheke (.+) die Dispensierinformationen für das (erste|letzte) dispensierte E-Rezept nicht abrufen$")
+      "^darf die Apotheke (.+) die Dispensierinformationen für das (erste|letzte) dispensierte"
+          + " E-Rezept nicht abrufen$")
   public void thenPharmacyCannotGetMedicationDispense(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)

@@ -16,14 +16,13 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ErrorAlertTest {
 

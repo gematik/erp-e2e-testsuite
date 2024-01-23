@@ -61,7 +61,8 @@ public class PrescribeUseCase {
     val bodyMapper = PrescribeRequestDataMapper.from(body);
 
     if (!bodyMapper.getPatientMapper().hasKvnr()) {
-      throw ErrorResponseBuilder.createInternalErrorException(400, "KVNR is required field for the body");
+      throw ErrorResponseBuilder.createInternalErrorException(
+          400, "KVNR is required field for the body");
     }
 
     val kbvBundle = bodyMapper.createKbvBundle(doctor.getName());
@@ -71,7 +72,8 @@ public class PrescribeUseCase {
   public static Response issuePrescription(
       Doctor doctor, KbvErpBundle kbvBundle, boolean isDirectAssignment) {
 
-    val insuranceKind = kbvBundle.getCoverage().getInsuranceKindOptional().orElse(VersicherungsArtDeBasis.GKV);
+    val insuranceKind =
+        kbvBundle.getCoverage().getInsuranceKindOptional().orElse(VersicherungsArtDeBasis.GKV);
     val flowType = PrescriptionFlowType.fromInsuranceKind(insuranceKind, isDirectAssignment);
     val create = new TaskCreateCommand(flowType);
     log.info(

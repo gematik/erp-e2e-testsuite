@@ -74,7 +74,7 @@ public class HasReceipts implements Question<Boolean> {
   public static HasReceipts forPatient(String adverb, long amount, String kvnr) {
     return forPatient(AmountAdverb.fromString(adverb), amount, KVNR.from(kvnr));
   }
-  
+
   public static HasReceipts forPatient(String adverb, long amount, KVNR kvnr) {
     return forPatient(AmountAdverb.fromString(adverb), amount, kvnr);
   }

@@ -66,7 +66,8 @@ public class DesiredCapabilitiesBuilder {
       // not required for iOS
       if (config.getEspressoServerUniqueName() == null) {
         throw new MissingRequiredConfigurationException(
-            "If Android is selected as platform, it is necessary to provide the espressoServerUniqueName capability.");
+            "If Android is selected as platform, it is necessary to provide the"
+                + " espressoServerUniqueName capability.");
       }
       caps.setCapability("espressoServerUniqueName", config.getEspressoServerUniqueName());
     }

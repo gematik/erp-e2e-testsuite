@@ -20,19 +20,17 @@ import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorModuleConfigurationDto;
 import de.gematik.test.konnektor.*;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /** Configured Factory for the Konnektor-Client Module */
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class KonnektorModuleFactory extends ConfiguredFactory {
 
-  @Delegate
-  private final KonnektorModuleConfigurationDto dto;
+  @Delegate private final KonnektorModuleConfigurationDto dto;
 
   public KonnektorConfiguration getKonnektorConfiguration(String name) {
     return this.getConfig(name, dto.getKonnektors());
@@ -47,7 +45,8 @@ public class KonnektorModuleFactory extends ConfiguredFactory {
     return KonnektorFactory.createSoftKon();
   }
 
-  public static KonnektorModuleFactory fromKonnektorConfigs(List<KonnektorConfiguration> konnektors) {
+  public static KonnektorModuleFactory fromKonnektorConfigs(
+      List<KonnektorConfiguration> konnektors) {
     val dto = new KonnektorModuleConfigurationDto();
     dto.setKonnektors(konnektors);
     return fromDto(dto);

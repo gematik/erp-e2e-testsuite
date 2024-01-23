@@ -21,11 +21,10 @@ import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.rest.param.SortParameter;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
-import org.hl7.fhir.r4.model.Task;
-
-import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nullable;
+import org.hl7.fhir.r4.model.Task;
 
 public class TaskSearch {
 
@@ -49,8 +48,7 @@ public class TaskSearch {
     }
 
     public Builder withStatus(@Nullable Task.TaskStatus status) {
-      if (status != null)
-        searchParams.add(new QueryParameter("status", status.toCode()));
+      if (status != null) searchParams.add(new QueryParameter("status", status.toCode()));
       return this;
     }
 

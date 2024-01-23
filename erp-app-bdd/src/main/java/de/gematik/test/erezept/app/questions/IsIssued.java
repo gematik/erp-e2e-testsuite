@@ -48,7 +48,6 @@ public class IsIssued implements Question<Boolean> {
     return new IsIssued(LocalDate.now());
   }
 
-
   public static IsIssued on(LocalDate date) {
     return new IsIssued(date);
   }

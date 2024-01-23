@@ -575,5 +575,4 @@ class KbvErpBundleTest extends ParsingTest {
       return new ConsumerExpectation<>(consumer, name, expectedResult);
     }
   }
-
 }

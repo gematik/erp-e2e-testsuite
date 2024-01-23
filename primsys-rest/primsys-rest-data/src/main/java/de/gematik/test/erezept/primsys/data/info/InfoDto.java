@@ -20,9 +20,9 @@ import lombok.Data;
 
 @Data
 public class InfoDto {
-    private int doctors;
-    private int pharmacies;
-    private BuildInfoDto build;
-    private FhirInfoDto fhir;
-    private TelematikInfoDto ti;
+  private int doctors;
+  private int pharmacies;
+  private BuildInfoDto build;
+  private FhirInfoDto fhir;
+  private TelematikInfoDto ti;
 }

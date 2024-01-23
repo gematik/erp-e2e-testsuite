@@ -50,6 +50,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -83,10 +84,10 @@ class EnsureThatThePrescriptionTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
-                    .withStatusCode(404)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(erpClientAbility.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
 
@@ -120,7 +121,7 @@ class EnsureThatThePrescriptionTest {
         .thenReturn(DateConverter.getInstance().localDateToDate(LocalDate.now().plusDays(3)));
     when(task.getAuthoredOn()).thenReturn(new Date());
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
@@ -167,7 +168,7 @@ class EnsureThatThePrescriptionTest {
         .thenReturn(DateConverter.getInstance().localDateToDate(LocalDate.now().plusDays(3)));
     when(task.getAuthoredOn()).thenReturn(new Date());
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
@@ -201,35 +202,35 @@ class EnsureThatThePrescriptionTest {
     val accessCode = AccessCode.random();
 
     val kbvBundle =
-            KbvBundleDummyFactory.createSimpleKbvBundle(
-                    prescriptionId,
-                    StatusCoPayment.STATUS_1,
-                    MultiplePrescriptionExtension.asNonMultiple());
+        KbvBundleDummyFactory.createSimpleKbvBundle(
+            prescriptionId,
+            StatusCoPayment.STATUS_1,
+            MultiplePrescriptionExtension.asNonMultiple());
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
     val task = mock(ErxTask.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
     when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
     when(task.getAcceptDate())
-            .thenReturn(DateConverter.getInstance().localDateToDate(LocalDate.now().plusDays(3)));
+        .thenReturn(DateConverter.getInstance().localDateToDate(LocalDate.now().plusDays(3)));
     when(task.getAuthoredOn()).thenReturn(new Date());
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-            ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-                    .withHeaders(Map.of())
-                    .withStatusCode(200)
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
+            .withHeaders(Map.of())
+            .withStatusCode(200)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
 
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_TITLE))
-            .thenReturn(kbvBundle.getMedicationName());
+        .thenReturn(kbvBundle.getMedicationName());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT))
-            .thenReturn("Noch 2 Tage einlösbar");
+        .thenReturn("Noch 2 Tage einlösbar");
     when(app.getText(PrescriptionDetails.PRESCRIPTION_ADDITIONAL_PAYMENT)).thenReturn("Nein");
     when(app.isPresent(PrescriptionDetails.DIRECT_ASSIGNMENT_BADGE)).thenReturn(true);
 
@@ -264,7 +265,7 @@ class EnsureThatThePrescriptionTest {
         .thenReturn(DateConverter.getInstance().localDateToDate(LocalDate.now().plusDays(3)));
     when(task.getAuthoredOn()).thenReturn(new Date());
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
@@ -308,16 +309,16 @@ class EnsureThatThePrescriptionTest {
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
     val getTaskResponse =
-            ErpResponse.forPayload(
-                            FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
-                    .withHeaders(Map.of())
-                    .withStatusCode(404)
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(
+                FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
+            .withHeaders(Map.of())
+            .withStatusCode(404)
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(appAbility.getText(PrescriptionTechnicalInformation.TASKID))
-            .thenReturn(PrescriptionId.random().getValue())
-            .thenReturn(PrescriptionId.random().getValue());
+        .thenReturn(PrescriptionId.random().getValue())
+        .thenReturn(PrescriptionId.random().getValue());
 
     val ensureTask = EnsureThatThePrescription.fromStack("letzte").isShownCorrectly();
     assertThrows(MissingPreconditionError.class, () -> ensureTask.performAs(actor));

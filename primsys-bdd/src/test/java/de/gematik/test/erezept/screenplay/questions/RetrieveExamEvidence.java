@@ -16,11 +16,14 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmChecksum;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.smartcard.Egk;
+import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +32,6 @@ import net.serenitybdd.core.Serenity;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import java.util.Base64;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,15 +52,15 @@ public class RetrieveExamEvidence implements Question<String> {
     val response = konnektor.requestEvidenceForEgk(egk).getPayload();
 
     val examEvidenceAsBase64 = Base64.getEncoder().encodeToString(response.getPruefungsnachweis());
-    examEvidenceInfo =
-        new StringBuilder(format("Prüfungsnachweis: {0} \n", examEvidenceAsBase64));
+    examEvidenceInfo = new StringBuilder(format("Prüfungsnachweis: {0} \n", examEvidenceAsBase64));
     val examEvidence = VsdmExamEvidence.parse(examEvidenceAsBase64);
     examEvidenceInfo.append(format("Prüfungsnachweis dekodiert: {0}\n\n", examEvidence));
 
-    examEvidence.getChecksum().ifPresentOrElse(
-            it-> verifyChecksum(pharmacy, it)
-     ,() -> examEvidenceInfo.append("Prüfziffer nicht vorhanden")
-    );
+    examEvidence
+        .getChecksum()
+        .ifPresentOrElse(
+            it -> verifyChecksum(pharmacy, it),
+            () -> examEvidenceInfo.append("Prüfziffer nicht vorhanden"));
 
     Serenity.recordReportData()
         .withTitle("Prüfungsnachweis")

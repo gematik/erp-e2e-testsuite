@@ -81,7 +81,8 @@ public class HandoverDispenseRequestAsRepresentative implements Task {
                 () ->
                     new MissingPreconditionError(
                         format(
-                            "The received Message with ID {0} from {1} does not contain an AccessCode",
+                            "The received Message with ID {0} from {1} does not contain an"
+                                + " AccessCode",
                             com.getUnqualifiedId(), owner.getName())));
 
     val pharmacyPrescriptions = SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class);

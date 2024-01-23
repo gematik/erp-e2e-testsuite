@@ -45,6 +45,7 @@ import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -110,7 +111,7 @@ class EnsureThatThePrescriptionValidityTest {
         .thenReturn(DateConverter.getInstance().localDateToDate(LocalDate.now().plusDays(3)));
     when(task.getAuthoredOn()).thenReturn(new Date());
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(prescriptionBundle.getKbvBundle()).thenReturn(kbvBundle);
+    when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)

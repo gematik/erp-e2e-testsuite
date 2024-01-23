@@ -32,8 +32,8 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
@@ -125,7 +125,7 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationBuilder.faker(pzn).build();
+    val medication = KbvErpMedicationPZNBuilder.faker(pzn).build();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -152,10 +152,7 @@ public class ActivateInvalidPZN extends ErpTest {
 
     patient.changePatientInsuranceType(insuranceType);
     val medication =
-        KbvErpMedicationCompoundingBuilder.faker(
-                PZN.from(pzn),
-                GemFaker.fakerName() + " als Zäpfchen",
-                GemFaker.fakerCommunicationRepresentativeMessage())
+        KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), GemFaker.fakerName(), "freitext")
             .build();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
@@ -182,9 +179,8 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationBuilder.faker(pzn).build();
+    val medication = KbvErpMedicationPZNBuilder.faker(pzn).build();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
-
 
     doc.attemptsTo(
         Verify.that(activation)
@@ -211,11 +207,9 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
+    // @ freetext is a maximum length of 20 digits allowed
     val medication =
-        KbvErpMedicationCompoundingBuilder.faker(
-                PZN.from(pzn),
-                "teurer und übel riechender Schleim",
-                "4 mal Täglich auf den gesamten Körper auftragen")
+        KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), "teurer Schleim", "4 mal täglich")
             .build();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 

@@ -41,19 +41,21 @@ public class HasDownloadableOpenTask implements Question<Boolean> {
     actor.attemptsTo(Ensure.that(erxTaskBundle.getSignature() != null).isTrue());
 
     // Ensure that all contained resource are instances of ErxTask
-    actor.attemptsTo(Ensure.that(
-            erxTaskBundle.getEntry().stream()
-                .map(BundleEntryComponent::getResource)
-                .anyMatch(r -> r instanceof ErxTask))
+    actor.attemptsTo(
+        Ensure.that(
+                erxTaskBundle.getEntry().stream()
+                    .map(BundleEntryComponent::getResource)
+                    .anyMatch(r -> r instanceof ErxTask))
             .isTrue());
 
     // Ensure that all contained Tasks do not contained resources like a binary resource for a
     // signature
-    actor.attemptsTo(Ensure.that(
-            erxTaskBundle.getEntry().stream()
-                .map(e -> (DomainResource) e.getResource())
-                .anyMatch(r -> r.getContained().isEmpty()))
-        .isTrue());
+    actor.attemptsTo(
+        Ensure.that(
+                erxTaskBundle.getEntry().stream()
+                    .map(e -> (DomainResource) e.getResource())
+                    .anyMatch(r -> r.getContained().isEmpty()))
+            .isTrue());
   }
 
   @Override

@@ -18,11 +18,10 @@ package de.gematik.test.konnektor.soap.mock.vsdm;
 
 import de.gematik.test.erezept.config.dto.konnektor.VsdmServiceConfiguration;
 import de.gematik.test.smartcard.Egk;
+import java.util.Base64;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Base64;
 
 @RequiredArgsConstructor()
 @Getter
@@ -43,6 +42,8 @@ public class VsdmService {
 
   public static VsdmService createFrom(VsdmServiceConfiguration config) {
     return new VsdmService(
-            Base64.getDecoder().decode(config.getHMacKey()), config.getOperator().charAt(0), config.getVersion().charAt(0));
+        Base64.getDecoder().decode(config.getHMacKey()),
+        config.getOperator().charAt(0),
+        config.getVersion().charAt(0));
   }
 }

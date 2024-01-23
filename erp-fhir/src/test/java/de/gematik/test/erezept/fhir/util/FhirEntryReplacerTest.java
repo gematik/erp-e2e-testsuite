@@ -16,11 +16,10 @@
 
 package de.gematik.test.erezept.fhir.util;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FhirEntryReplacerTest {
 

@@ -151,7 +151,8 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
 
   @Override
   public String toString() {
-    return "E-Rezepte Manager für die Verwaltung von zugewiesenen, akzeptierten und dispensierten E-Rezepten";
+    return "E-Rezepte Manager für die Verwaltung von zugewiesenen, akzeptierten und dispensierten"
+        + " E-Rezepten";
   }
 
   @Override
@@ -182,7 +183,9 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
                       errorMessage ->
                           log.warn(
                               format(
-                                  "Received OperationOutcome with HTTP Statuscode {0} while trying to abort accepted Prescription {1}: \n{2}",
+                                  "Received OperationOutcome with HTTP Statuscode {0} while trying"
+                                      + " to abort accepted Prescription {1}: \n"
+                                      + "{2}",
                                   response.getStatusCode(), accepted.getTaskId(), errorMessage)));
             });
   }

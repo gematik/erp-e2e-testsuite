@@ -27,25 +27,25 @@ public interface InsuranceCoverageInfo {
   String getName();
 
   String getIknr();
-  
+
   VersicherungsArtDeBasis getInsuranceType();
 
   static List<Class<? extends InsuranceCoverageInfo>> getImplementors() {
     return List.of(
-            GkvInsuranceCoverageInfo.class,
-            PkvInsuranceCoverageInfo.class,
-            BGInsuranceCoverageInfo.class);
+        GkvInsuranceCoverageInfo.class,
+        PkvInsuranceCoverageInfo.class,
+        BGInsuranceCoverageInfo.class);
   }
-  
+
   static <T extends InsuranceCoverageInfo> Optional<T> getByIknr(Class<T> clazz, String iknr) {
     return Arrays.stream(clazz.getEnumConstants())
         .filter(element -> element.getIknr().equals(iknr))
         .findFirst();
   }
-  
+
   static Optional<InsuranceCoverageInfo> getByIknr(String iknr) {
     val implementors = getImplementors();
-    
+
     Optional<InsuranceCoverageInfo> result = Optional.empty();
     for (val impl : implementors) {
       val intermediateResult = getByIknr(impl, iknr);

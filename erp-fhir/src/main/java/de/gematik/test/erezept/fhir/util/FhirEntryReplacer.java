@@ -27,9 +27,9 @@ public class FhirEntryReplacer {
   }
 
   /**
-   * When we use the FHIR-Parser, the profiled Parser will map the entries automatically.
-   * However, once we copy a resource, the child entries will be copied to their base classes.
-   * This method helps to cast and replace the resource within the entry to correct type
+   * When we use the FHIR-Parser, the profiled Parser will map the entries automatically. However,
+   * once we copy a resource, the child entries will be copied to their base classes. This method
+   * helps to cast and replace the resource within the entry to correct type
    *
    * @param childType is the expected resource type of the entry
    * @param entry is envelope entry containing the resource

@@ -74,7 +74,8 @@ class EnvironmentParameterTest {
   void shouldReadEnvironmentConfigurationViaSysProp(String env) {
     // prepare copy and system property
     val testConfiguration = copyDefaultConfiguration();
-    System.setProperty(ErpEnvironmentsConfiguration.CONF_SYS_PROP, testConfiguration.getAbsolutePath());
+    System.setProperty(
+        ErpEnvironmentsConfiguration.CONF_SYS_PROP, testConfiguration.getAbsolutePath());
 
     // execute the testcase
     val ep = new EnvironmentParameter();
@@ -89,7 +90,8 @@ class EnvironmentParameterTest {
   @ClearSystemProperty(key = ErpEnvironmentsConfiguration.CONF_SYS_PROP)
   void shouldFailOnMissingSysPropFile() {
     // prepare system property
-    System.setProperty(ErpEnvironmentsConfiguration.CONF_SYS_PROP, Path.of("a", "b", "c").toString());
+    System.setProperty(
+        ErpEnvironmentsConfiguration.CONF_SYS_PROP, Path.of("a", "b", "c").toString());
 
     // execute the testcase
     val ep = new EnvironmentParameter();
@@ -111,7 +113,8 @@ class EnvironmentParameterTest {
   @ClearSystemProperty(key = ErpEnvironmentsConfiguration.CONF_SYS_PROP)
   void shouldFailOnInvalidConfiguration() {
     val testConfiguration = createInvalidConfiguration();
-    System.setProperty(ErpEnvironmentsConfiguration.CONF_SYS_PROP, testConfiguration.getAbsolutePath());
+    System.setProperty(
+        ErpEnvironmentsConfiguration.CONF_SYS_PROP, testConfiguration.getAbsolutePath());
 
     val ep = new EnvironmentParameter();
     assertThrows(ConfigurationException.class, ep::getEnvironment);

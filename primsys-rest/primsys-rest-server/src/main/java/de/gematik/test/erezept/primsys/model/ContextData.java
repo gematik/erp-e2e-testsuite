@@ -54,7 +54,8 @@ public class ContextData {
   }
 
   public boolean removeAcceptedPrescription(String prescriptionId) {
-    return this.acceptedPrescriptions.removeIf(prescription -> prescription.getPrescriptionId().equals(prescriptionId));
+    return this.acceptedPrescriptions.removeIf(
+        prescription -> prescription.getPrescriptionId().equals(prescriptionId));
   }
 
   private void ensureMaxLength(List<?> list) {

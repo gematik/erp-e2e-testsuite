@@ -26,19 +26,16 @@ import org.junit.jupiter.api.Test;
 
 class PrescriptionsViewElementTest {
 
-
   @Test
   void shouldExtractOnlyPrescriptionName() {
-    val pe =
-        PrescriptionsViewElement.named("Ibuprofen");
+    val pe = PrescriptionsViewElement.named("Ibuprofen");
     assertEquals("Ibuprofen", pe.extractSourceLabel(PlatformType.IOS));
     assertEquals("Prescription Ibuprofen", pe.getElementName());
   }
 
   @Test
   void shouldExtractOnlyLocator() {
-    val pe =
-            PrescriptionsViewElement.withoutName();
+    val pe = PrescriptionsViewElement.withoutName();
     assertDoesNotThrow(() -> pe.extractSourceLabel(PlatformType.IOS));
     assertEquals("any Prescription", pe.getElementName());
   }
@@ -46,9 +43,10 @@ class PrescriptionsViewElementTest {
   @Test
   void shouldNotHaveAndroidImplementation() {
     val pe = PrescriptionsViewElement.named("Ibuprofen");
-    assertThrows(UnavailablePageElementLocatorException.class, () -> pe.forPlatform(PlatformType.ANDROID));
+    assertThrows(
+        UnavailablePageElementLocatorException.class, () -> pe.forPlatform(PlatformType.ANDROID));
   }
-  
+
   @Test
   void shouldHaveIosImplementation() {
     val pe = PrescriptionsViewElement.named("Ibuprofen");

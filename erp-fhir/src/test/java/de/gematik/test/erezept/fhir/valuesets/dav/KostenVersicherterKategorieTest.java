@@ -32,17 +32,23 @@ class KostenVersicherterKategorieTest {
     assertEquals(
         KostenVersicherterKategorie.EIGENBETEILIGUNG, KostenVersicherterKategorie.fromCode("2"));
   }
-  
+
   @Test
   void testFromName() {
-    assertEquals(KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromName("ZUZAHLUNG"));
-    assertEquals(KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromName("zuzahlung"));
-    assertEquals(KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromName("Zuzahlung"));
-
-    assertEquals(KostenVersicherterKategorie.MEHRKOSTEN, KostenVersicherterKategorie.fromName("MEHRKOSTEN"));
-    assertEquals(KostenVersicherterKategorie.MEHRKOSTEN, KostenVersicherterKategorie.fromName("mehrKOSTEN"));
     assertEquals(
-            KostenVersicherterKategorie.EIGENBETEILIGUNG, KostenVersicherterKategorie.fromName("EigenBeTeiligung"));
+        KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromName("ZUZAHLUNG"));
+    assertEquals(
+        KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromName("zuzahlung"));
+    assertEquals(
+        KostenVersicherterKategorie.ZUZAHLUNG, KostenVersicherterKategorie.fromName("Zuzahlung"));
+
+    assertEquals(
+        KostenVersicherterKategorie.MEHRKOSTEN, KostenVersicherterKategorie.fromName("MEHRKOSTEN"));
+    assertEquals(
+        KostenVersicherterKategorie.MEHRKOSTEN, KostenVersicherterKategorie.fromName("mehrKOSTEN"));
+    assertEquals(
+        KostenVersicherterKategorie.EIGENBETEILIGUNG,
+        KostenVersicherterKategorie.fromName("EigenBeTeiligung"));
   }
 
   @Test

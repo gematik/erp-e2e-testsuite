@@ -16,19 +16,18 @@
 
 package de.gematik.test.smartcard;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.crypto.certificate.Oid;
 import de.gematik.test.smartcard.cfg.LdapReader;
 import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import static java.text.MessageFormat.format;
 
 @EqualsAndHashCode
 @Slf4j
@@ -54,9 +53,9 @@ public abstract class Smartcard {
 
   public SmartcardCertificate getAutCertificate() {
     return this.getAutCertificate(Algorithm.ECC_256)
-            .or(() -> getAutCertificate(Algorithm.RSA_2048))
-            .or(() -> getAutCertificate(Algorithm.RSA_PSS_2048))
-            .orElseThrow(() -> new SmartCardKeyNotFoundException(this));
+        .or(() -> getAutCertificate(Algorithm.RSA_2048))
+        .or(() -> getAutCertificate(Algorithm.RSA_PSS_2048))
+        .orElseThrow(() -> new SmartCardKeyNotFoundException(this));
   }
 
   public Optional<SmartcardCertificate> getAutCertificate(Algorithm algorithm) {
@@ -84,6 +83,4 @@ public abstract class Smartcard {
   public String toString() {
     return format("Smartcard {0} [iccsn={1}]", type, iccsn);
   }
-
-
 }

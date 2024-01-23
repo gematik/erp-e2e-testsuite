@@ -16,8 +16,7 @@
 
 package de.gematik.test.erezept.app.mobile;
 
-
-
 public enum ScrollDirection {
-    UP, DOWN;
+  UP,
+  DOWN;
 }

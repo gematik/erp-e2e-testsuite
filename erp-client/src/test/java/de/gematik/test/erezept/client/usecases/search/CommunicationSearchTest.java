@@ -28,7 +28,7 @@ class CommunicationSearchTest {
   void shouldNotInstantiate() {
     assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(CommunicationSearch.class));
   }
-  
+
   @Test
   void getNewCommunications() {
     val cmd = CommunicationSearch.getNewCommunications();

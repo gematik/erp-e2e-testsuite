@@ -47,7 +47,7 @@ import lombok.val;
 public class ErpClientFactory {
 
   private static X509Certificate vauCertificate;
-  
+
   public static ErpClient createErpClient(
       EnvironmentConfiguration environment, PsActorConfiguration actor) {
     val erpClientConfig =
@@ -70,7 +70,8 @@ public class ErpClientFactory {
    * @param cfg is the given Configuration
    * @return a properly configured {@link ErpClient}
    */
-  private static ErpClient createErpClient(ErpClientConfiguration cfg, X509Certificate vauCertificate) {
+  private static ErpClient createErpClient(
+      ErpClientConfiguration cfg, X509Certificate vauCertificate) {
     // build and configure the IDP-Client
     val idp =
         IdpClient.builder()
@@ -83,7 +84,11 @@ public class ErpClientFactory {
     // build and configure the VAU-Client
     val vau =
         new VauClient(
-            cfg.getFdBaseUrl(), cfg.getClientType(), vauCertificate, cfg.getXApiKey(), cfg.getUserAgent());
+            cfg.getFdBaseUrl(),
+            cfg.getClientType(),
+            vauCertificate,
+            cfg.getXApiKey(),
+            cfg.getUserAgent());
 
     val fhir = new FhirParser(); // fhir parser which we will use for encode/decode and validation
     // build, configure and assemble the Erp-Client

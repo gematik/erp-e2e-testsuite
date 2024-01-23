@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class BaseMapperTest {
 
@@ -55,7 +55,8 @@ class BaseMapperTest {
     assertEquals(defaultInsuranceType, checkedInsuranceType);
 
     dto.setInsuranceType(InsuranceTypeDto.GKV);
-    val checkedInsuranceType2 = mapper.getOrDefault(dto.getInsuranceType(), () -> defaultInsuranceType);
+    val checkedInsuranceType2 =
+        mapper.getOrDefault(dto.getInsuranceType(), () -> defaultInsuranceType);
     assertEquals(InsuranceTypeDto.GKV, checkedInsuranceType2);
 
     dto.setFirstName("AnotherName");
@@ -65,12 +66,19 @@ class BaseMapperTest {
     dto.setFirstName("");
     val checkedName3 = mapper.getOrDefault(dto.getFirstName(), () -> defaultName);
     assertEquals(defaultName, checkedName3);
+  }
 
+  @Test
+  void shouldReturnDefaultValue() {
+    val dto = new PatientDto();
+    val mapper = new TestMapper(dto);
+    val defaultName = "Bernd";
 
+    val checkedName = mapper.getOrDefault(null, defaultName);
+    assertEquals(defaultName, checkedName);
 
-
-
-
+    val checkedName2 = mapper.getOrDefault("", defaultName);
+    assertEquals(defaultName, checkedName2);
   }
 
   @Test

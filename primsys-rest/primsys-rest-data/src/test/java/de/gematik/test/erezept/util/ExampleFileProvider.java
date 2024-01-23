@@ -35,6 +35,7 @@ public class ExampleFileProvider {
   public static Stream<File> getPznMedicationExamples() {
     return readResourceFiles("examples/medications/pzn");
   }
+
   public static Stream<File> getDispensedPznMedicationExamples() {
     return readResourceFiles("examples/medications/dispensed");
   }

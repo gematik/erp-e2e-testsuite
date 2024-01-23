@@ -22,8 +22,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.cardterminal.CardTerminalClientFactory;
-import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
 import de.gematik.test.cardterminal.exceptions.CardTerminalClientException;
+import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
 import de.gematik.test.smartcard.Egk;
 import de.gematik.test.smartcard.SmartcardArchive;
 import de.gematik.test.smartcard.SmartcardFactory;

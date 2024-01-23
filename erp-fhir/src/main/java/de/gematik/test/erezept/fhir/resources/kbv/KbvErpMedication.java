@@ -133,7 +133,6 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
         .toList();
   }
 
-
   public Optional<PZN> getPznOptional() {
     return this.getPznFromPznMedication().or(this::getPznFromCompounding);
   }

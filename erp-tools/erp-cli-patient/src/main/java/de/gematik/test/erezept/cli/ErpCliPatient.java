@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package de.gematik.test.erezept.cli.cmd;
+package de.gematik.test.erezept.cli;
 
+import de.gematik.test.erezept.cli.cmd.*;
 import picocli.CommandLine.Command;
 
 @Command(
@@ -27,7 +28,8 @@ import picocli.CommandLine.Command;
     subcommands = {
       AuditEventReader.class,
       PrescriptionsManager.class,
-      ChargeItemViewer.class,
+      ConsentManager.class,
+      ChargeItemReader.class,
       ListPatients.class,
       ListEnvironments.class
     })

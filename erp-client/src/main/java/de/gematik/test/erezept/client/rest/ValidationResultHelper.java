@@ -47,12 +47,19 @@ public class ValidationResultHelper {
               .collect(Collectors.joining("\n"));
       val errors =
           vr.getMessages().stream()
-              .filter(m -> m.getSeverity().ordinal() >= ResultSeverityEnum.ERROR.ordinal()).count();
-      val warnings = vr.getMessages().stream()
-              .filter(m -> m.getSeverity().ordinal() == ResultSeverityEnum.WARNING.ordinal()).count();
+              .filter(m -> m.getSeverity().ordinal() >= ResultSeverityEnum.ERROR.ordinal())
+              .count();
+      val warnings =
+          vr.getMessages().stream()
+              .filter(m -> m.getSeverity().ordinal() == ResultSeverityEnum.WARNING.ordinal())
+              .count();
       val errorMessage =
           format(
-              "FHIR Content of {0} is invalid with {1} errors and {2} warnings:\n----------\n{3}\n----------",
+              """
+                  FHIR Content of {0} is invalid with {1} errors and {2} warnings:
+                  ----------
+                  {3}
+                  ----------""",
               resourceType, errors, warnings, validationSummary);
       throw new FhirValidationException(errorMessage);
     }

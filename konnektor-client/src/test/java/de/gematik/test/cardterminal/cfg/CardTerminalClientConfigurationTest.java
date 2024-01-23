@@ -29,7 +29,8 @@ class CardTerminalClientConfigurationTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(CardTerminalClientFactory.class));
+    assertTrue(
+        PrivateConstructorsUtil.throwsInvocationTargetException(CardTerminalClientFactory.class));
   }
 
   @Test

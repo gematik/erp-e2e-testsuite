@@ -45,7 +45,7 @@ class ManagePharmacyPrescriptionsTest {
     assertTrue(ability.getDispensedPrescriptions().isEmpty());
     assertDoesNotThrow(ability::toString);
   }
-  
+
   @Test
   void shouldTeardown() {
     OnStage.setTheStage(new Cast() {});
@@ -53,28 +53,28 @@ class ManagePharmacyPrescriptionsTest {
     val actor = OnStage.theActor("Alice");
     val ability = spy(ManagePharmacyPrescriptions.itWorksWith());
     actor.can(ability);
-    
+
     val task = mock(ErxTask.class);
     val acceptBundle = mock(ErxAcceptBundle.class);
     when(acceptBundle.getTaskId()).thenReturn(TaskId.from(PrescriptionId.random()));
     when(acceptBundle.getSecret()).thenReturn(Secret.fromString("123"));
     when(acceptBundle.getTask()).thenReturn(task);
     when(task.getAccessCode()).thenReturn(AccessCode.random());
-    
+
     ability.appendAcceptedPrescription(acceptBundle);
-    
+
     val erpClient = mock(UseTheErpClient.class);
     actor.can(erpClient);
 
     val mockResponse =
-            ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
-                    .withStatusCode(404)
-                    .withHeaders(Map.of())
-                    .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
-    
+
     OnStage.drawTheCurtain();
-    
+
     verify(ability, times(1)).tearDown();
   }
 }

@@ -48,7 +48,7 @@ public class InfoResponseBuilder {
     ti.setDiscoveryDocument(ctx.getEnvironment().getTi().getDiscoveryDocumentUrl());
     ti.setTsl(ctx.getEnvironment().getTslBaseUrl());
     info.setTi(ti);
-    
+
     return info;
   }
 
@@ -60,7 +60,8 @@ public class InfoResponseBuilder {
 
     defaultConf
         .getProfiles()
-        .forEach(profile -> fhirInfo.getConfiguration().put(profile.getName(), profile.getVersion()));
+        .forEach(
+            profile -> fhirInfo.getConfiguration().put(profile.getName(), profile.getVersion()));
 
     val envSetVersion =
         System.getProperty(

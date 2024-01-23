@@ -120,7 +120,10 @@ class UseTheAppTest {
   void shouldThrowOnTappingDisabledElement() {
     val driver = mock(IOSDriver.class);
     val mockElement = WebElementMockFactory.getDisplayableMockElement(true, false);
+    doThrow(ElementClickInterceptedException.class).when(mockElement).click();
+
     val pageElement = Onboarding.NEXT_BUTTON;
+
     when(driver.findElement(pageElement.forPlatform(PlatformType.IOS))).thenReturn(mockElement);
     when(driver.getPageSource()).thenReturn("");
     val driverAbility = new UseIOSApp(driver, appiumConfig);
@@ -349,6 +352,52 @@ class UseTheAppTest {
   }
 
   @Test
+  void shouldWaitUntilElementIsSelected() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Onboarding.PASSWORD_INPUT_FIELD;
+    val locator = pageElement.forPlatform(driverAbility.getPlatformType());
+
+    val webElement = mock(WebElement.class);
+    when(webElement.isSelected()).thenReturn(false).thenReturn(true);
+    when(driver.findElement(locator))
+        .thenThrow(NoSuchElementException.class) // not found on the first try
+        .thenReturn(webElement);
+    val fluentDriver =
+        new AppiumFluentWait<>(driver)
+            .withTimeout(Duration.ofMillis(10))
+            .ignoring(NoSuchElementException.class)
+            .pollingEvery(Duration.ofMillis(1));
+    when(driverAbility.getFluentWaitDriver()).thenReturn(fluentDriver);
+
+    driverAbility.waitUntilElementIsSelected(pageElement);
+    verify(driverAbility, times(1)).waitUntilElementIsSelected(pageElement);
+    verify(driver, times(3)).findElement(locator);
+  }
+
+  @Test
+  void shouldRethrowOnWaitUntilTimeout() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Onboarding.PASSWORD_INPUT_FIELD;
+    val locator = pageElement.forPlatform(driverAbility.getPlatformType());
+
+    when(driver.getPageSource()).thenReturn("dummy page source");
+    when(driver.findElement(locator)).thenThrow(NoSuchElementException.class);
+    val fluentDriver =
+        new AppiumFluentWait<>(driver)
+            .withTimeout(Duration.ofMillis(10))
+            .ignoring(NoSuchElementException.class)
+            .pollingEvery(Duration.ofMillis(1));
+    when(driverAbility.getFluentWaitDriver()).thenReturn(fluentDriver);
+
+    assertThrows(
+        TimeoutException.class, () -> driverAbility.waitUntilElementIsSelected(pageElement));
+    verify(driverAbility, times(1)).waitUntilElementIsSelected(pageElement);
+    verify(driver, atMost(10)).findElement(locator);
+  }
+
+  @Test
   void checkIfTapWithTooltipAndDrawerIsWorkingForIOS() {
     val driver = mock(IOSDriver.class);
     UseIOSApp useIOSApp = new UseIOSApp(driver, appiumConfig);
@@ -412,5 +461,21 @@ class UseTheAppTest {
         .thenReturn(mockElement);
 
     assertThrows(AppErrorException.class, () -> app.tap(Onboarding.NEXT_BUTTON));
+  }
+
+  @Test
+  void shouldAcceptAlert() {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+
+    val targetLocator = mock(WebDriver.TargetLocator.class);
+    val alert = mock(Alert.class);
+    when(driver.switchTo()).thenReturn(targetLocator);
+    when(targetLocator.alert()).thenReturn(alert);
+
+    assertDoesNotThrow(app::acceptAlert);
+
+    verify(targetLocator, times(1)).alert();
+    verify(alert, times(1)).accept();
   }
 }

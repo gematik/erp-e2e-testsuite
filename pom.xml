@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -52,7 +52,7 @@
         <version.woodstox>4.4.1</version.woodstox>
         <version.serenity>4.0.12</version.serenity>
         <version.idp-client>22.0.4</version.idp-client>
-        <version.spotless>2.36.0</version.spotless>
+        <version.spotless>2.41.1</version.spotless>
         <version.fasterxml.jackson>2.16.0</version.fasterxml.jackson>
         <version.junit>5.9.3</version.junit>
         <version.assertj>3.24.2</version.assertj>
@@ -117,12 +117,12 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -134,74 +134,74 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-crypto</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>pharmacy-service-provider-ws-client</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -594,26 +594,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.cosium.code</groupId>
-                <artifactId>git-code-format-maven-plugin</artifactId>
-                <version>4.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>install-hooks</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>ensure-code-format</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>format-code</goal>
-                            <goal>validate-code-format</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>3.3.0</version>
@@ -669,6 +649,15 @@
                         <licenseHeader>
                             <file>COPYRIGHT_HEADER</file>
                         </licenseHeader>
+                        <googleJavaFormat>
+                            <version>1.18.1</version>
+                            <style>GOOGLE</style>
+                            <reflowLongStrings>true</reflowLongStrings>
+                            <formatJavadoc>true</formatJavadoc>
+                        </googleJavaFormat>
+                        <removeUnusedImports>
+                            <engine>google-java-format</engine>
+                        </removeUnusedImports>
                     </java>
                 </configuration>
             </plugin>

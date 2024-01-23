@@ -87,8 +87,7 @@ class FhirDumpStepListenerTest {
     val listener = spy(new FhirDumpStepListener(d));
 
     val appFeature = new ApplicationFeature("id", "name");
-    val userStory =
-        new Story("id", "name", "storyclassname", "display_name", "a/b/c", appFeature);
+    val userStory = new Story("id", "name", "storyclassname", "display_name", "a/b/c", appFeature);
     val testOutcome = new TestOutcome("testname");
     testOutcome.setDescription("description");
     testOutcome.setUserStory(userStory);
@@ -112,8 +111,7 @@ class FhirDumpStepListenerTest {
     val listener = spy(new FhirDumpStepListener(d));
 
     val appFeature = new ApplicationFeature("id", "name");
-    val userStory =
-        new Story("id", "name", "storyclassname", "display_name", "a/b/c", appFeature);
+    val userStory = new Story("id", "name", "storyclassname", "display_name", "a/b/c", appFeature);
     val testOutcome = new TestOutcome("testname");
     testOutcome.setDescription("description");
     testOutcome.setUserStory(userStory);

@@ -43,7 +43,8 @@ class RedeemButtonTest {
   @Test
   void shouldCheckRedeemButtonAvailability() {
     val useMockAppAbility = mock(UseAndroidApp.class);
-    when(useMockAppAbility.isPresent(Receipt.REDEEM_PRESCRIPTION_BTN)).thenReturn(true); // pretend to find one
+    when(useMockAppAbility.isPresent(Receipt.REDEEM_PRESCRIPTION_BTN))
+        .thenReturn(true); // pretend to find one
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
     assertTrue(actor.asksFor(IsRedeemable.inMainScreen()));
   }

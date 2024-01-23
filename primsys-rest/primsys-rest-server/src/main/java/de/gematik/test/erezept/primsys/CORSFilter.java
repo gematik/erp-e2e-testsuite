@@ -28,10 +28,9 @@ public class CORSFilter implements ContainerResponseFilter {
 
     val headers = responseContext.getHeaders();
     headers.add("Access-Control-Allow-Origin", "*");
-    headers.add("Access-Control-Allow-Headers",
-            "CSRF-Token, X-Requested-By, Authorization, Content-Type");
+    headers.add(
+        "Access-Control-Allow-Headers", "CSRF-Token, X-Requested-By, Authorization, Content-Type");
     headers.add("Access-Control-Allow-Credentials", "true");
-    headers.add("Access-Control-Allow-Methods",
-            "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+    headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
   }
 }

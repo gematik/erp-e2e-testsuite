@@ -23,25 +23,20 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * corresponding to FHIR-ValueSet {@link
- * de.gematik.test.erezept.fhir.valuesets.PayorType}
- */
+/** corresponding to FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.PayorType} */
 @Getter
 @RequiredArgsConstructor
 public enum PayorTypeDto {
-    SKT("Sonstige Kostenträger"),
-    UK("Unfallkassen")
-    ;
+  SKT("Sonstige Kostenträger"),
+  UK("Unfallkassen");
 
-    @JsonValue
-    private final String display;
+  @JsonValue private final String display;
 
-    @JsonCreator
-    public static PayorTypeDto fromCode(String code) {
-        return Arrays.stream(PayorTypeDto.values())
-                .filter(it -> it.name().equalsIgnoreCase(code) || it.getDisplay().equalsIgnoreCase(code))
-                .findFirst()
-                .orElseThrow(() -> new InvalidCodeValueException(PayorTypeDto.class, code));
-    }
+  @JsonCreator
+  public static PayorTypeDto fromCode(String code) {
+    return Arrays.stream(PayorTypeDto.values())
+        .filter(it -> it.name().equalsIgnoreCase(code) || it.getDisplay().equalsIgnoreCase(code))
+        .findFirst()
+        .orElseThrow(() -> new InvalidCodeValueException(PayorTypeDto.class, code));
+  }
 }

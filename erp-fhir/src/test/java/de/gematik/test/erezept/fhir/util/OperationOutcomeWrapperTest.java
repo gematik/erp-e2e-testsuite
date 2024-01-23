@@ -30,7 +30,7 @@ class OperationOutcomeWrapperTest {
     val wrapper = OperationOutcomeWrapper.from(oo);
     assertDoesNotThrow(wrapper::toString);
   }
-  
+
   @Test
   void shouldExtractDirectly() {
     val oo = FhirTestResourceUtil.createOperationOutcome();

@@ -140,8 +140,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
         .multiply(
             0,
             List.of(
-                /*VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,*/
+                VersicherungsArtDeBasis.BG,
+                VersicherungsArtDeBasis.PKV,
                 VersicherungsArtDeBasis.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .create();
@@ -256,7 +256,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
     val doc = this.getDoctorNamed("Adelheid Ulmenwald");
     SafeAbility.getAbility(doc, ProvideDoctorBaseData.class).setAsv(true);
-    val medication = KbvErpMedicationBuilder.faker().build();
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
     KbvErpMedicationRequest medicationRequest;
     patient.changePatientInsuranceType(insuranceType);
 
@@ -320,7 +320,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
   private IssuePrescription getIssuePrescription(
       PrescriptionAssignmentKind assignmentKind, String anr, DoctorActor doctorActor) {
-    val medication = KbvErpMedicationBuilder.faker().build();
+    val medication = KbvErpMedicationPZNBuilder.faker().build();
     AccidentExtension accident = null;
     if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();

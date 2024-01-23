@@ -95,7 +95,8 @@ public class MedicationRequestDataMapper
   public static Builder from(KbvErpMedicationRequest medicationRequest) {
     val dto = new MedicationRequestDto();
     dto.setDosage(medicationRequest.getDosageInstructionFirstRep().getText());
-    dto.setPackageQuantity(medicationRequest.getDispenseRequest().getQuantity().getValue().intValue());
+    dto.setPackageQuantity(
+        medicationRequest.getDispenseRequest().getQuantity().getValue().intValue());
     medicationRequest.getNoteText().ifPresent(dto::setNote);
     dto.setSubstitutionAllowed(medicationRequest.allowSubstitution());
     dto.setBvg(medicationRequest.isBvg());

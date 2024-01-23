@@ -16,21 +16,19 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import java.util.function.Supplier;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.By;
 
-import java.util.function.Supplier;
-
-
 class XpathElementTests {
-  @Mock
-  private By mockBy;
+  @Mock private By mockBy;
 
   @Test
   void shouldGetPageElementTest() {
@@ -40,7 +38,7 @@ class XpathElementTests {
 
       String xpathPageElement = XpathPageElement.xPathPageElement("xpath").getPage();
 
-      assertEquals("dynamic element",xpathPageElement);
+      assertEquals("dynamic element", xpathPageElement);
     }
   }
 
@@ -52,7 +50,7 @@ class XpathElementTests {
 
       String xpathPageElement = XpathPageElement.xPathPageElement("xpath").getElementName();
 
-      assertEquals("dynamic element",xpathPageElement);
+      assertEquals("dynamic element", xpathPageElement);
     }
   }
 
@@ -71,14 +69,14 @@ class XpathElementTests {
   @Test
   void shouldGetPageElementForPlatformTest() {
     val iosLocator = XpathPageElement.xPathPageElement("dd").forPlatform(PlatformType.IOS);
-     assertEquals("By.xpath: dd", iosLocator.toString());
+    assertEquals("By.xpath: dd", iosLocator.toString());
   }
 
   @Test
   void shouldGetPageElementgetIosLocatorTest() {
     Supplier<By> iosLocator = XpathPageElement.xPathPageElement("dd").getIosLocator();
     assertEquals("By.xpath: dd", iosLocator.get().toString());
-    }
+  }
 
   @Test
   void shouldGetPageElementgetAndroidLocatorTest() {

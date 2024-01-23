@@ -23,16 +23,16 @@ import picocli.CommandLine;
 
 public class EnvironmentParameter {
 
-    @CommandLine.Option(
-            names = {"--environment", "--env"},
-            paramLabel = "<TI ENV>",
-            type = String.class,
-            description = "The TI-Environment where the operation should be performed (default=${DEFAULT-VALUE})")
-    private String env = "TU";
+  @CommandLine.Option(
+      names = {"--environment", "--env"},
+      paramLabel = "<TI ENV>",
+      type = String.class,
+      description =
+          "The TI-Environment where the operation should be performed (default=${DEFAULT-VALUE})")
+  private String env = "TU";
 
-
-    public EnvironmentConfiguration getEnvironment() {
-        val cfg = new ErpEnvironmentsConfiguration();
-        return cfg.getEnvironment(env);
-    }
+  public EnvironmentConfiguration getEnvironment() {
+    val cfg = new ErpEnvironmentsConfiguration();
+    return cfg.getEnvironment(env);
+  }
 }

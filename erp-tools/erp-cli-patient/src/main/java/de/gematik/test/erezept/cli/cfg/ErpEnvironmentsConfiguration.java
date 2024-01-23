@@ -82,7 +82,6 @@ public class ErpEnvironmentsConfiguration {
     }
   }
 
-
   private File getDefault() {
     val envFileUrl = this.getClass().getResource("/erp_environments.yaml");
 

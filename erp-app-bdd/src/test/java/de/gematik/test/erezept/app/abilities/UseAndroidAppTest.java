@@ -37,7 +37,7 @@ class UseAndroidAppTest {
     val appiumConfig = new AppiumConfiguration();
     appiumConfig.setMaxWaitTimeout(10); // poll 10 times at maximum
     appiumConfig.setPollingInterval(5);
-    
+
     val driver = mock(AndroidDriver.class);
 
     val driverAbility = new UseAndroidApp(driver, appiumConfig);
@@ -75,7 +75,7 @@ class UseAndroidAppTest {
     val appiumConfig = new AppiumConfiguration();
     appiumConfig.setMaxWaitTimeout(50); // poll 10 times at maximum
     appiumConfig.setPollingInterval(5);
-    
+
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.findElement(any()))
@@ -92,7 +92,7 @@ class UseAndroidAppTest {
     val appiumConfig = new AppiumConfiguration();
     appiumConfig.setMaxWaitTimeout(10);
     appiumConfig.setPollingInterval(5);
-    
+
     val driver = mock(AndroidDriver.class);
     val webElement = mock(WebElement.class);
     when(driver.findElement(any()))

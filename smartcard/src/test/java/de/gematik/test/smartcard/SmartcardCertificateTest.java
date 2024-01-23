@@ -17,11 +17,10 @@
 package de.gematik.test.smartcard;
 
 import de.gematik.test.erezept.crypto.certificate.Oid;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigInteger;
 
 class SmartcardCertificateTest {
 

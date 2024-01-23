@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.cli.param;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ExclusiveEgkIdentifierGroupTest {
 

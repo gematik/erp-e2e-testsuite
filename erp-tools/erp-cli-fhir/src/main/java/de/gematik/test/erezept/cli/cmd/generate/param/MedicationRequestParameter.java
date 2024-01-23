@@ -21,11 +21,10 @@ import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
+import javax.annotation.Nullable;
 import lombok.*;
 import picocli.*;
 import picocli.CommandLine.*;
-
-import javax.annotation.Nullable;
 
 public class MedicationRequestParameter implements BaseResourceParameter {
 
@@ -96,7 +95,7 @@ public class MedicationRequestParameter implements BaseResourceParameter {
   }
 
   public KbvErpMedication getMedication() {
-    return this.getOrDefault(medication, () -> KbvErpMedicationBuilder.faker().build());
+    return this.getOrDefault(medication, () -> KbvErpMedicationPZNBuilder.faker().build());
   }
 
   public String getDosage() {

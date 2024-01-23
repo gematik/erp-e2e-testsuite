@@ -27,11 +27,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class MedicationRequestDtoTest {
 
-    @SneakyThrows
-    @ParameterizedTest(name = "Read example patient from {0}")
-    @MethodSource("de.gematik.test.erezept.util.ExampleFileProvider#getMedicationRequestExamples")
-    void shouldReadFromJson(File example) {
-        val om = new ObjectMapper();
-        assertDoesNotThrow(() -> om.readValue(example, MedicationRequestDto.class));
-    }
+  @SneakyThrows
+  @ParameterizedTest(name = "Read example patient from {0}")
+  @MethodSource("de.gematik.test.erezept.util.ExampleFileProvider#getMedicationRequestExamples")
+  void shouldReadFromJson(File example) {
+    val om = new ObjectMapper();
+    assertDoesNotThrow(() -> om.readValue(example, MedicationRequestDto.class));
+  }
 }

@@ -21,10 +21,10 @@ import lombok.SneakyThrows;
 
 public interface CommunicationStructuredMessage {
 
-    int DEFAULT_VERSION = 1;
+  int DEFAULT_VERSION = 1;
 
-    @SneakyThrows
-    default String asJson() {
-        return new ObjectMapper().writeValueAsString(this);
-    }
+  @SneakyThrows
+  default String asJson() {
+    return new ObjectMapper().writeValueAsString(this);
+  }
 }

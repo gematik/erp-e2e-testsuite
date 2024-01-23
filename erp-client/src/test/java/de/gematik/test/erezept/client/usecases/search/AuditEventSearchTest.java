@@ -16,29 +16,29 @@
 
 package de.gematik.test.erezept.client.usecases.search;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class AuditEventSearchTest {
 
-    @Test
-    void shouldNotInstantiate() {
-        assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AuditEventSearch.class));
-    }
+  @Test
+  void shouldNotInstantiate() {
+    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AuditEventSearch.class));
+  }
 
-    @Test
-    void shouldProvideDescendingByDefault() {
-        val cmd = AuditEventSearch.getAuditEvents();
-        assertTrue(cmd.getRequestLocator().contains("_sort=-date"));
-    }
+  @Test
+  void shouldProvideDescendingByDefault() {
+    val cmd = AuditEventSearch.getAuditEvents();
+    assertTrue(cmd.getRequestLocator().contains("_sort=-date"));
+  }
 
-    @Test
-    void shouldProvideWithOrder() {
-        val cmd = AuditEventSearch.getAuditEvents(SortOrder.ASCENDING);
-        assertTrue(cmd.getRequestLocator().contains("_sort=date"));
-    }
+  @Test
+  void shouldProvideWithOrder() {
+    val cmd = AuditEventSearch.getAuditEvents(SortOrder.ASCENDING);
+    assertTrue(cmd.getRequestLocator().contains("_sort=date"));
+  }
 }

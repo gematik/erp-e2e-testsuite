@@ -47,6 +47,7 @@ public class ErpClientConfiguration extends BaseActorConfiguration {
 
   /** Client-Type distinguishing FDV and PS clients */
   private String clientType;
+
   /** API-Key required for FDV-Clients which are routing via Internet */
   private String xApiKey;
 }

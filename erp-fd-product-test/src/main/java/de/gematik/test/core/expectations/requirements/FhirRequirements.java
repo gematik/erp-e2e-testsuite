@@ -23,7 +23,10 @@ public enum FhirRequirements implements RequirementsSet {
       "FHIR_2.26.3.3",
       "Each resource has an id element which contains the 'logical id' of the resource"),
   FHIR_PROFILES("FHIR_PROFILES", "FHIR Ressourcen müssen gegen die Profilierung validiert werden"),
-  NON_WHITESPACE_CONTENT("FHIR_2.6.1", "Attributes cannot be empty. Either they are absent, or they are present with at least one character of non-whitespace content"),
+  NON_WHITESPACE_CONTENT(
+      "FHIR_2.6.1",
+      "Attributes cannot be empty. Either they are absent, or they are present with at least one"
+          + " character of non-whitespace content"),
   FHIR_XML_PARSING("FHIR_XML_PARSING", "Invalide FHIR Ressourcen dürfen nicht zum Absturz führen"),
 
   FHIR_VALIDATION_ERROR("FHIR-Validation", "die Semantik entspricht nicht der Profilierung");

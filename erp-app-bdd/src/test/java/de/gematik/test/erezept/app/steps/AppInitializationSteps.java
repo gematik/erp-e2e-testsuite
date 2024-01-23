@@ -58,7 +58,8 @@ public class AppInitializationSteps {
   }
 
   @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat die E-Rezept App auf (?:seinem|ihrem) Smartphone eingerichtet$")
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat die E-Rezept App auf"
+          + " (?:seinem|ihrem) Smartphone eingerichtet$")
   public void initPatient(String insuranceType, String userName) {
     val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
 
@@ -81,7 +82,8 @@ public class AppInitializationSteps {
   }
 
   @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) legt sich ein Profil in der E-Rezept App von (.+) an$")
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) legt sich ein Profil in der"
+          + " E-Rezept App von (.+) an$")
   public void initPatientForExistingApp(
       String insuranceType, String userName, String deviceOwnerUserName) {
     val deviceOwner = OnStage.theActorCalled(deviceOwnerUserName);
@@ -157,7 +159,8 @@ public class AppInitializationSteps {
   }
 
   @Und(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat die Cardwall erfolgreich durchlaufen")
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat die Cardwall erfolgreich"
+          + " durchlaufen")
   public void userCanFinishCardwallSuccessfully(String insuranceType, String user) {
     val theAppUser = OnStage.theActorCalled(user);
     givenThat(theAppUser).can(ReceiveDispensedDrugs.forHimself());

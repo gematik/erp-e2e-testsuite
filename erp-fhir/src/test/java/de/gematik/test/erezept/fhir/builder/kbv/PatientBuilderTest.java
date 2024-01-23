@@ -73,7 +73,7 @@ class PatientBuilderTest extends ParsingTest {
   void shouldFailOnPkvPatientWithoutAssigner(KbvItaForVersion version) {
     val pb =
         PatientBuilder.faker(
-                        KVNR.random(), VersicherungsArtDeBasis.GKV) // GKV Faker won't set assigner!
+                KVNR.random(), VersicherungsArtDeBasis.GKV) // GKV Faker won't set assigner!
             .version(version);
     pb.kvnr(KVNR.random(), VersicherungsArtDeBasis.PKV); // setting PKV without assigner
 
@@ -83,7 +83,7 @@ class PatientBuilderTest extends ParsingTest {
       assertDoesNotThrow(pb::build);
     }
   }
-  
+
   @Test
   void shouldThrowOnInvalidDateFormat() {
     val builder = PatientBuilder.builder();

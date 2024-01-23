@@ -16,21 +16,19 @@
 
 package de.gematik.test.smartcard;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class EgkTest {
 
   private static SmartcardArchive archive;
 
   // TODO: missing p12 files for these eGKs
-  private static final List<String> FILTER_ICCSNS =
-      List.of("80276881040001935352");
+  private static final List<String> FILTER_ICCSNS = List.of("80276881040001935352");
 
   @BeforeAll
   static void setupArchive() {
@@ -48,8 +46,9 @@ class EgkTest {
   void shouldGetDefaultKey() {
     List.of(Algorithm.ECC_256, Algorithm.RSA_2048)
         .forEach(
-            crpyto -> archive.getEgkCards().stream()
-                .filter(egk -> !FILTER_ICCSNS.contains(egk.getIccsn()))
-                .forEach(egk -> assertTrue(egk.getAutCertificate(crpyto).isPresent())));
+            crpyto ->
+                archive.getEgkCards().stream()
+                    .filter(egk -> !FILTER_ICCSNS.contains(egk.getIccsn()))
+                    .forEach(egk -> assertTrue(egk.getAutCertificate(crpyto).isPresent())));
   }
 }

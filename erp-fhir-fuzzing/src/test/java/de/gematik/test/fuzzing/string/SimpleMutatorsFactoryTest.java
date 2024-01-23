@@ -27,7 +27,10 @@ import org.junit.jupiter.api.Test;
 class SimpleMutatorsFactoryTest {
 
   private static final String BUNDLE_INPUT =
-      "<Bundle xmlns=\"http://hl7.org/fhir\"><id value=\"80f212e1-42dc-4691-a257-0ef2f01de7fd\"/><meta><lastUpdated value=\"2021-11-12T11:08:17.2415449+01:00\"/><profile value=\"https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle|1.0.1\"/></meta><identifier>";
+      "<Bundle xmlns=\"http://hl7.org/fhir\"><id"
+          + " value=\"80f212e1-42dc-4691-a257-0ef2f01de7fd\"/><meta><lastUpdated"
+          + " value=\"2021-11-12T11:08:17.2415449+01:00\"/><profile"
+          + " value=\"https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle|1.0.1\"/></meta><identifier>";
 
   @Test
   void shouldUpperCaseAllBooleanValues() {

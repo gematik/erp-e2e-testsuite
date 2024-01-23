@@ -24,47 +24,51 @@ import lombok.Getter;
 @Getter
 public abstract class BaseMapper<D> {
 
-    protected final D dto;
+  protected final D dto;
 
-    protected BaseMapper(D dto) {
-        this.dto = dto;
-        complete();
+  protected BaseMapper(D dto) {
+    this.dto = dto;
+    complete();
+  }
+
+  protected abstract void complete();
+
+  protected final boolean isNullOrEmpty(String value) {
+    return value == null || value.isEmpty();
+  }
+
+  protected final <T> boolean isNullOrEmpty(T value) {
+    if (value == null) {
+      return true;
+    } else if (value instanceof String strValue) {
+      return isNullOrEmpty(strValue);
+    } else {
+      return false;
     }
+  }
 
-    protected abstract void complete();
+  protected final <T> T getOrDefault(T value, Supplier<T> defaultSupplier) {
+    if (value == null || (value instanceof String strValue && isNullOrEmpty(strValue)))
+      return defaultSupplier.get();
+    return value;
+  }
 
+  public String getOrDefault(String value, String defaultValue) {
+    if (value == null || value.isEmpty()) return defaultValue;
+    return value;
+  }
 
-    protected final boolean isNullOrEmpty(String value) {
-        return value == null || value.isEmpty();
+  protected final <T> void ensure(
+      Supplier<T> getter, Consumer<T> setter, Supplier<T> defaultSupplier) {
+    if (isNullOrEmpty(getter.get())) {
+      setter.accept(defaultSupplier.get());
     }
+  }
 
-    protected final <T> boolean isNullOrEmpty(T value) {
-        if (value == null) {
-            return true;
-        } else if (value instanceof String strValue) {
-            return isNullOrEmpty(strValue);
-        } else {
-            return false;
-        }
+  protected final <T> void ensure(
+      BooleanSupplier checker, Consumer<T> setter, Supplier<T> defaultSupplier) {
+    if (checker.getAsBoolean()) {
+      setter.accept(defaultSupplier.get());
     }
-    
-    protected final <T> T getOrDefault(T value, Supplier<T> defaultSupplier) {
-        if (value == null || (value instanceof String strValue && isNullOrEmpty(strValue)))
-            return defaultSupplier.get();
-        return value;
-    }
-
-    protected final <T> void ensure(
-            Supplier<T> getter, Consumer<T> setter, Supplier<T> defaultSupplier) {
-        if (isNullOrEmpty(getter.get())) {
-            setter.accept(defaultSupplier.get());
-        }
-    }
-
-    protected final <T> void ensure(
-            BooleanSupplier checker, Consumer<T> setter, Supplier<T> defaultSupplier) {
-        if (checker.getAsBoolean()) {
-            setter.accept(defaultSupplier.get());
-        }
-    }
+  }
 }

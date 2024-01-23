@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
+import static java.text.MessageFormat.format;
+
 import com.github.javafaker.Faker;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.FakerException;
@@ -29,8 +31,6 @@ import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
-import lombok.val;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,8 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static java.text.MessageFormat.format;
+import lombok.val;
 
 public class GemFaker {
   private static final String DATE_FORMAT_SIMPLE = "dd.MM.yyyy";
@@ -91,7 +90,6 @@ public class GemFaker {
   public static String fakerTelematikId() {
     return faker.regexify("[0-9]{8}");
   }
-  
 
   public static String fakerName() {
     return faker.funnyName().name();
@@ -177,6 +175,7 @@ public class GemFaker {
     String sectionNo = faker.regexify("[0-9]{2}");
     return format("{0}{1}{2}", docId, controlNumber, sectionNo);
   }
+
   /**
    * generate a controlNumber by multiply each first digit with 4 and each second digit with 9 until
    * reached last digit (6) result = 10 - ( sum() -> "% 10" );
@@ -238,6 +237,7 @@ public class GemFaker {
   public static PrescriptionId fakerPrescriptionId() {
     return fakerPrescriptionId(PrescriptionFlowType.FLOW_TYPE_160);
   }
+
   /**
    * Build a fake PrescriptionID with valid checking number
    *
@@ -509,7 +509,8 @@ public class GemFaker {
     if (included.isEmpty()) {
       throw new FakerException(
           format(
-              "List of included choices for {0} is empty: probably all possible choices are excluded {1}",
+              "List of included choices for {0} is empty: probably all possible choices are"
+                  + " excluded {1}",
               valueSet.getSimpleName(),
               exclude.stream().map(Enum::name).collect(Collectors.joining(", "))));
     }

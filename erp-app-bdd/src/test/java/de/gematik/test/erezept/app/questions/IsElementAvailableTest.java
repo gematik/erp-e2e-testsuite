@@ -45,7 +45,8 @@ class IsElementAvailableTest {
   @Test
   void shouldDetectAvailableElement() {
     val useMockAppAbility = mock(UseAndroidApp.class);
-    when(useMockAppAbility.isPresent(Onboarding.SKIP_BUTTON)).thenReturn(true); // pretend to find one
+    when(useMockAppAbility.isPresent(Onboarding.SKIP_BUTTON))
+        .thenReturn(true); // pretend to find one
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
     assertTrue(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP_BUTTON)));
   }
@@ -53,7 +54,8 @@ class IsElementAvailableTest {
   @Test
   void shouldDetectUnAvailableElement() {
     val useMockAppAbility = mock(UseAndroidApp.class);
-    when(useMockAppAbility.isPresent(Onboarding.SKIP_BUTTON)).thenReturn(false); // pretend the element not found
+    when(useMockAppAbility.isPresent(Onboarding.SKIP_BUTTON))
+        .thenReturn(false); // pretend the element not found
     val actor = OnStage.theActor("Alice").can(useMockAppAbility);
     assertFalse(actor.asksFor(IsElementAvailable.withName(Onboarding.SKIP_BUTTON)));
   }

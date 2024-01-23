@@ -19,34 +19,43 @@ package de.gematik.test.erezept.fhir.values.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CommunicationDisReqMessage(int version, String supplyOptionsType, String name, List<String> address,
-                                         String hint, String phone) implements CommunicationStructuredMessage {
+public record CommunicationDisReqMessage(
+    int version,
+    String supplyOptionsType,
+    String name,
+    List<String> address,
+    String hint,
+    String phone)
+    implements CommunicationStructuredMessage {
 
-    public CommunicationDisReqMessage(SupplyOptionsType supplyOptionsType, String name, List<String> address,
-                                      String hint, String phone) {
-        this(CommunicationStructuredMessage.DEFAULT_VERSION,
-                supplyOptionsType.getLabel(),
-                name,
-                address,
-                hint,
-                phone);
-    }
+  public CommunicationDisReqMessage(
+      SupplyOptionsType supplyOptionsType,
+      String name,
+      List<String> address,
+      String hint,
+      String phone) {
+    this(
+        CommunicationStructuredMessage.DEFAULT_VERSION,
+        supplyOptionsType.getLabel(),
+        name,
+        address,
+        hint,
+        phone);
+  }
 
-    public CommunicationDisReqMessage(SupplyOptionsType supplyOptionsType, String hint) {
-        this(supplyOptionsType, null, null, hint, null);
-    }
+  public CommunicationDisReqMessage(SupplyOptionsType supplyOptionsType, String hint) {
+    this(supplyOptionsType, null, null, hint, null);
+  }
 
-    public CommunicationDisReqMessage() {
-        this(GemFaker.randomElement(SupplyOptionsType.values()),
-                GemFaker.fakerName(),
-                List.of(GemFaker.fakerStreetName(),
-                        GemFaker.fakerZipCode(),
-                        GemFaker.fakerCity()),
-                GemFaker.getFaker().dune().quote(),
-                GemFaker.fakerPhone());
-    }
+  public CommunicationDisReqMessage() {
+    this(
+        GemFaker.randomElement(SupplyOptionsType.values()),
+        GemFaker.fakerName(),
+        List.of(GemFaker.fakerStreetName(), GemFaker.fakerZipCode(), GemFaker.fakerCity()),
+        GemFaker.getFaker().dune().quote(),
+        GemFaker.fakerPhone());
+  }
 }

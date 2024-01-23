@@ -21,8 +21,9 @@ import lombok.Data;
 
 @Data
 public class BuildInfoDto {
-    private String hash;
-    private String version;
-    @JsonProperty("build-date")
-    private String buildDate;
+  private String hash;
+  private String version;
+
+  @JsonProperty("build-date")
+  private String buildDate;
 }

@@ -105,9 +105,8 @@ class PageElementTest {
 
   static Stream<Arguments> shouldExtractLabelFromAccessibilityId() {
     return Stream.of(
-            arguments(Utility.TOOLTIPS, "ctl_tooltip_container"),
-            arguments(Receipt.RESERVE_IN_PHARMACY, "rdm_btn_delivery_tile")
-    );
+        arguments(Utility.TOOLTIPS, "ctl_tooltip_container"),
+        arguments(Receipt.RESERVE_IN_PHARMACY, "rdm_btn_delivery_tile"));
   }
 
   @ParameterizedTest
@@ -119,8 +118,8 @@ class PageElementTest {
 
   static Stream<Arguments> shouldExtractLabelFromName() {
     return Stream.of(
-            arguments(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON, "sec_btn_system_pin_done"),
-            arguments(Receipt.INPUT_SEARCH_BOX, "Nach Name oder Adresse suchen"));
+        arguments(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON, "sec_btn_system_pin_done"),
+        arguments(Receipt.INPUT_SEARCH_BOX, "Nach Name oder Adresse suchen"));
   }
 
   @ParameterizedTest
@@ -132,10 +131,10 @@ class PageElementTest {
 
   static Stream<Arguments> shouldExtractLabelFromXpath() {
     return Stream.of(
-            arguments(CardWall.CARD_PARING_GO_BACK_BUTTON, "Zurück"),
-            arguments(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON, "debug_enable_virtual_egk"));
+        arguments(CardWall.CARD_PARING_GO_BACK_BUTTON, "Zurück"),
+        arguments(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON, "debug_enable_virtual_egk"));
   }
-  
+
   @Test
   void shouldProvideRandomUUIDOnUnmatchingXpath() {
     assertNotEquals("abc", FakeElement.INVALID_XPATH.extractSourceLabel(PlatformType.ANDROID));
@@ -147,7 +146,7 @@ class PageElementTest {
     val label = DebugSettings.ENVIRONMENT_SELECTOR.extractSourceLabel(PlatformType.IOS);
     assertFalse(label.contains("=="));
   }
-  
+
   @Getter
   @RequiredArgsConstructor
   private enum FakeElement implements PageElement {

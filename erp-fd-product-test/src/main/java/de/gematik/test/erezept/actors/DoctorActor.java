@@ -45,7 +45,7 @@ public class DoctorActor extends ErpActor {
   public void changeQualificationType(QualificationType type) {
     val bd = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
     bd.setQualificationType(type);
-    if(type != QualificationType.MIDWIFE) {
+    if (type != QualificationType.MIDWIFE) {
       bd.setDoctorNumber(BaseANR.randomFromQualification(type));
     }
   }

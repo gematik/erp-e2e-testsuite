@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AbdaErpPkvVersion implements ProfileVersion<AbdaErpPkvVersion> {
+  V1_1_0("1.1.0", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2023, Month.JUNE, 30)),
   V1_2_0("1.2.0", LocalDate.of(2023, Month.JULY, 1), LocalDate.of(2070, Month.DECEMBER, 31));
 
   private final String version;

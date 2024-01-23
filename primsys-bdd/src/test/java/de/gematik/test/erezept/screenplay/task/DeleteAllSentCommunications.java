@@ -50,7 +50,8 @@ public class DeleteAllSentCommunications implements Task {
                             204,
                             response.getStatusCode(),
                             format(
-                                "Communication with ID {0} was not deleted as the backend answered with return code {1}",
+                                "Communication with ID {0} was not deleted as the backend answered"
+                                    + " with return code {1}",
                                 id, response.getStatusCode()));
                       });
             });

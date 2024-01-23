@@ -18,6 +18,7 @@ package de.gematik.test.erezept.fhir.extensions.erp;
 
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,17 +26,13 @@ import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Extension;
 
-import java.util.Arrays;
-
 @Getter
 @Slf4j
 @RequiredArgsConstructor
 public enum SupplyOptionsType {
-
   ON_PREMISE("onPremise"),
   DELIVERY("delivery"),
-  SHIPMENT("shipment")
-  ;
+  SHIPMENT("shipment");
 
   private final String label;
 
@@ -66,6 +63,9 @@ public enum SupplyOptionsType {
   }
 
   public static SupplyOptionsType getSupplyOptionType(String label) {
-    return Arrays.stream(SupplyOptionsType.values()).filter(it -> it.label.equalsIgnoreCase(label)).findFirst().orElse(SupplyOptionsType.createDefault());
+    return Arrays.stream(SupplyOptionsType.values())
+        .filter(it -> it.label.equalsIgnoreCase(label))
+        .findFirst()
+        .orElse(SupplyOptionsType.createDefault());
   }
 }

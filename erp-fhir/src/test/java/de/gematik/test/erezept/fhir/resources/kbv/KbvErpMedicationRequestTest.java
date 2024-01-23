@@ -142,12 +142,12 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     assertNotNull(medicationRequest.getDescription());
     assertTrue(medicationRequest.getDescription().contains("mit aut-idem"));
   }
-  
+
   @Test
   void shouldDefaultSubstitutionToFalse() {
     val bundle = KbvErpBundleBuilder.faker().build();
     val medicationRequest = bundle.getMedicationRequest();
-    
+
     medicationRequest.setSubstitution(null);
     assertFalse(bundle.isSubstitutionAllowed());
   }

@@ -21,28 +21,35 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CommunicationReplyMessage(int version, String supplyOptionsType, String info_text, String url,
-                                        String pickUpCodeHR, String pickUpCodeDMC) implements CommunicationStructuredMessage{
+public record CommunicationReplyMessage(
+    int version,
+    String supplyOptionsType,
+    String info_text,
+    String url,
+    String pickUpCodeHR,
+    String pickUpCodeDMC)
+    implements CommunicationStructuredMessage {
 
-    public CommunicationReplyMessage(SupplyOptionsType supplyOptionsType, String infoText, String url,
-                                     String pickUpCodeHR, String pickUpCodeDMC) {
-        this(CommunicationStructuredMessage.DEFAULT_VERSION,
-                supplyOptionsType.getLabel(),
-                infoText,
-                url,
-                pickUpCodeHR,
-                pickUpCodeDMC);
-    }
+  public CommunicationReplyMessage(
+      SupplyOptionsType supplyOptionsType,
+      String infoText,
+      String url,
+      String pickUpCodeHR,
+      String pickUpCodeDMC) {
+    this(
+        CommunicationStructuredMessage.DEFAULT_VERSION,
+        supplyOptionsType.getLabel(),
+        infoText,
+        url,
+        pickUpCodeHR,
+        pickUpCodeDMC);
+  }
 
-    public CommunicationReplyMessage(SupplyOptionsType supplyOptionsType, String infoText) {
-        this(supplyOptionsType,
-                infoText,
-                null,
-                null,
-                null);
-    }
+  public CommunicationReplyMessage(SupplyOptionsType supplyOptionsType, String infoText) {
+    this(supplyOptionsType, infoText, null, null, null);
+  }
 
-    public CommunicationReplyMessage() {
-        this(GemFaker.randomElement(SupplyOptionsType.values()),GemFaker.getFaker().dune().quote());
-    }
+  public CommunicationReplyMessage() {
+    this(GemFaker.randomElement(SupplyOptionsType.values()), GemFaker.getFaker().dune().quote());
+  }
 }

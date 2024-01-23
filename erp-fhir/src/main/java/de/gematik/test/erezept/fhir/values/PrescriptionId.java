@@ -36,10 +36,10 @@ public class PrescriptionId extends Value<String> {
 
   public PrescriptionId(final String value) {
     this(
-            ErpWorkflowVersion.getDefaultVersion().isEqual("1.1.1")
-                    ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
-                    : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121,
-            value);
+        ErpWorkflowVersion.getDefaultVersion().isEqual("1.1.1")
+            ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
+            : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121,
+        value);
   }
 
   public PrescriptionId(final ErpWorkflowNamingSystem system, final String value) {
@@ -136,11 +136,9 @@ public class PrescriptionId extends Value<String> {
   }
 
   public static boolean isPrescriptionId(String system) {
-    if (system == null)
-      return false;
+    if (system == null) return false;
 
     return system.equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl())
         || system.equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.getCanonicalUrl());
   }
-
 }

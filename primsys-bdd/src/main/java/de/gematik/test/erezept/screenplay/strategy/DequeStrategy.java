@@ -18,8 +18,8 @@ package de.gematik.test.erezept.screenplay.strategy;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.exceptions.InvalidStrategyMappingException;
+import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
 import java.util.Comparator;
 import java.util.List;
@@ -74,7 +74,7 @@ public enum DequeStrategy {
       case FIFO -> "erste(n)";
     };
   }
-  
+
   public static DequeStrategy fromString(String value) {
     return switch (value.toLowerCase()) {
       case "letzte", "letzten", "letztes", "jüngstes" -> LIFO;

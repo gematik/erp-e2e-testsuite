@@ -18,9 +18,7 @@ package de.gematik.test.erezept.fhir.values;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 
-/**
- * <a href="https://de.wikipedia.org/wiki/Lebenslange_Arztnummer">Lebenslange Arztnummer</a>
- */
+/** <a href="https://de.wikipedia.org/wiki/Lebenslange_Arztnummer">Lebenslange Arztnummer</a> */
 public class LANR extends BaseANR {
   public LANR(String value) {
     super(ANRType.LANR, value);

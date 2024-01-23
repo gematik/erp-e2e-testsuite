@@ -16,6 +16,8 @@
 
 package de.gematik.test.konnektor.commands;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.konnektor.commands.options.SignatureType;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
@@ -24,6 +26,7 @@ import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7_4.BinaryDocumentType;
 import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.OptionalInputs;
+import javax.xml.ws.Holder;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -31,18 +34,12 @@ import oasis.names.tc.dss._1_0.core.schema.Base64Data;
 import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.xml.ws.Holder;
-
-import static java.text.MessageFormat.format;
-
 @Slf4j
 public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]> {
 
   private final CardInfo cardInfo;
   private final Algorithm algorithm;
-  @Setter
-  private byte[] toBeSignedData;
-
+  @Setter private byte[] toBeSignedData;
 
   public ExternalAuthenticateCommand(CardInfo cardInfo, Algorithm algorithm) {
     this.cardInfo = cardInfo;

@@ -45,8 +45,7 @@ class KvnrParameterTest {
 
     assertEquals("X123456789", kvidp.getKvnr().getValue());
     assertEquals(VersicherungsArtDeBasis.GKV, kvidp.getInsuranceType());
-    assertEquals(
-        VersicherungsArtDeBasis.GKV, kvidp.getInsuranceType(VersicherungsArtDeBasis.PKV));
+    assertEquals(VersicherungsArtDeBasis.GKV, kvidp.getInsuranceType(VersicherungsArtDeBasis.PKV));
     assertEquals(IdentifierTypeDe.GKV, kvidp.getIdentifierTypeDe());
   }
 
@@ -56,8 +55,7 @@ class KvnrParameterTest {
     val cmdline = new CommandLine(kvidp);
     assertDoesNotThrow(() -> cmdline.parseArgs());
 
-    assertEquals(
-        VersicherungsArtDeBasis.PKV, kvidp.getInsuranceType(VersicherungsArtDeBasis.PKV));
+    assertEquals(VersicherungsArtDeBasis.PKV, kvidp.getInsuranceType(VersicherungsArtDeBasis.PKV));
     assertEquals(IdentifierTypeDe.GKV, kvidp.getIdentifierTypeDe());
   }
 

@@ -16,15 +16,15 @@
 
 package de.gematik.test.erezept.crypto;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import java.security.Provider;
 import java.security.Security;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class BC {
   private static final Provider SECURITY_PROVIDER = new BouncyCastleProvider();
 
   private static boolean initialized;
+
   public static void init() {
     if (!initialized) {
       Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);

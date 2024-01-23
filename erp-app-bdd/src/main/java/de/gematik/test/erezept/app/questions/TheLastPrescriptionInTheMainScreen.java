@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.app.questions;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.elements.XpathPageElement;
 import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mobile.elements.XpathPageElement;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,8 +32,6 @@ import net.serenitybdd.screenplay.Question;
 public class TheLastPrescriptionInTheMainScreen implements Question<Boolean> {
 
   private final String xpath;
-
-
 
   @Override
   public Boolean answeredBy(Actor actor) {
@@ -53,14 +51,13 @@ public class TheLastPrescriptionInTheMainScreen implements Question<Boolean> {
     return isPresent;
   }
 
-  public static TheLastPrescriptionInTheMainScreen isPresent(String prescription, String validityDate, String status) {
+  public static TheLastPrescriptionInTheMainScreen isPresent(
+      String prescription, String validityDate, String status) {
     String xPathLabel = "//*[@label='" + prescription + ", " + validityDate + ", " + status + "']";
     return new TheLastPrescriptionInTheMainScreen(xPathLabel);
   }
 
-
   public static TheLastPrescriptionInTheMainScreen waitTillIsGone() {
     return new TheLastPrescriptionInTheMainScreen("fake_fake");
   }
-
 }

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
@@ -43,8 +45,6 @@ import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommunication> {
@@ -158,14 +158,18 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val task = taskBundle.getTasks().get(0);
     val prescription = actor.asksFor(FullPrescriptionBundle.forTask(task));
 
-    return ErxCommunicationBuilder.builder()
-        .recipient(receiverId)
-        .basedOnTaskId(prescription.getTask().getTaskId())
-        .medication(prescription.getKbvBundle().getMedication())
-        .supplyOptions(SupplyOptionsType.ON_PREMISE)
-        .insurance(baseData.getInsuranceIknr())
-        .flowType(task.getFlowType())
-        .buildInfoReq(builder.message);
+    val erxBuilder =
+        ErxCommunicationBuilder.builder()
+            .recipient(receiverId)
+            .basedOnTaskId(prescription.getTask().getTaskId())
+            .supplyOptions(SupplyOptionsType.ON_PREMISE)
+            .insurance(baseData.getInsuranceIknr())
+            .flowType(task.getFlowType());
+
+    prescription
+        .getKbvBundle()
+        .ifPresent(kbvErpBundle -> erxBuilder.medication(kbvErpBundle.getMedication()));
+    return erxBuilder.buildInfoReq(builder.message);
   }
 
   private ErxCommunication createDispenseRequestAs(Actor actor) {
@@ -176,8 +180,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val dmc = builder.basedOnDequeStrategy.chooseFrom(dmcAbility.getDmcs());
     val prescription = actor.asksFor(FullPrescriptionBundle.forTask(dmc.getTaskId()));
 
-    val message = new CommunicationDisReqMessage( SupplyOptionsType.ON_PREMISE,
-            builder.message);
+    val message = new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, builder.message);
 
     val accessCode = prescription.getTask().getAccessCode();
     return ErxCommunicationBuilder.builder()
@@ -331,7 +334,8 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
             () ->
                 new MissingPreconditionError(
                     format(
-                        "The expected {0} Message with ID {1} from {2} was not found within fetched Communications from Backend",
+                        "The expected {0} Message with ID {1} from {2} was not found within fetched"
+                            + " Communications from Backend",
                         expected.getType(),
                         expected.getCommunicationId(),
                         builder.receiver.getName())));

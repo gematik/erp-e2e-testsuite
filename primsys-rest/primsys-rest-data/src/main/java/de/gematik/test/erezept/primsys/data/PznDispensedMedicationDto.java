@@ -46,7 +46,7 @@ public class PznDispensedMedicationDto extends PznMedicationDto {
       dto.setAmountUnit(medication.getAmountUnit());
       dto.setPzn(medication.getPzn());
       dto.setName(medication.getName());
-      
+
       return dto;
     }
   }

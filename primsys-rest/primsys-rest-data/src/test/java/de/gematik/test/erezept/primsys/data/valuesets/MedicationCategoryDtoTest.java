@@ -16,10 +16,10 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import lombok.val;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class MedicationCategoryDtoTest {
 

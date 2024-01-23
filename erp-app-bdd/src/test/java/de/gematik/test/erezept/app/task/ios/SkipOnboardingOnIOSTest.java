@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 class SkipOnboardingOnIOSTest {
 
   private String userName;
-  
+
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});

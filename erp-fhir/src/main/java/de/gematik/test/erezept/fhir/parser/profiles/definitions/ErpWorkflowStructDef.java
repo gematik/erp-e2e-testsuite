@@ -46,7 +46,8 @@ public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVers
   MEDICATION_DISPENSE("https://gematik.de/fhir/StructureDefinition/ErxMedicationDispense"),
   MEDICATION_DISPENSE_12(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense"),
-  CLOSE_OPERATION_BUNDLE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_CloseOperationInputBundle"),
+  CLOSE_OPERATION_BUNDLE(
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_CloseOperationInputBundle"),
   RECEIPT("https://gematik.de/fhir/StructureDefinition/ErxReceipt"),
   GEM_ERP_PR_BUNDLE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle"),
 

@@ -66,41 +66,29 @@ public class FhirParser {
    */
   public ValidationResult validate(@NonNull final String content) {
     if (ProfileExtractor.isUnprofiledSearchSet(content)) {
-      val bundle = decode(Bundle.class, content);
-      return validate(bundle);
+      return validateSearchsetBundle(content);
     } else {
       val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
       return p.validate(content);
     }
   }
 
-  private ValidationResult validate(final Bundle bundle) {
+  private ValidationResult validateSearchsetBundle(final String bundle) {
     // 1. validate the whole bundle without any profiles
     var vrBundle = this.genericValidator.validateWithResult(bundle);
     vrBundle = genericValidatorMode.adjustResult(vrBundle);
     val validationMessages = new LinkedList<>(vrBundle.getMessages());
 
     // 2. now validate each entry with a profiled validator
-    bundle
-        .getEntry()
+    val parser =
+        EncodingType.guessFromContent(bundle).choose(this::getXmlParser, this::getJsonParser);
+    parser.parseResource(Bundle.class, bundle).getEntry().stream()
+        .map(Bundle.BundleEntryComponent::getResource)
+        .map(parser::encodeToString)
         .forEach(
-            entry -> {
-              val resource = entry.getResource();
-
-              // this hack here is required because HAPI uses here still the fullUrl from the entry
-              // by splitting the fullUrl and taking the last part, we get the correct ID of this
-              // resource
-              val originalId = resource.getId();
-              val idTokens = originalId.split("[/|:]");
-              val idPart = idTokens[idTokens.length - 1];
-              resource.setId(idPart);
-
-              val profile = resource.getMeta().getProfile();
-              val profileUrl = profile.isEmpty() ? "" : profile.get(0).asStringValue();
-              val validator = chooseProfileValidator(profileUrl);
-              val result = validator.validate(resource);
-
-              validationMessages.addAll(result.getMessages());
+            r -> {
+              val vr = this.validate(r);
+              validationMessages.addAll(vr.getMessages());
             });
     return new ValidationResult(this.getCtx(), validationMessages);
   }

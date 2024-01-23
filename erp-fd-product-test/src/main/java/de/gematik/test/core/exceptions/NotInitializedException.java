@@ -18,9 +18,9 @@ package de.gematik.test.core.exceptions;
 
 import static java.text.MessageFormat.format;
 
-public class NotInitializedException extends RuntimeException{
+public class NotInitializedException extends RuntimeException {
 
-    public NotInitializedException(Class<?> clazz) {
-        super(format("Component {0} has not been initialized", clazz.getSimpleName()));
-    }
+  public NotInitializedException(Class<?> clazz) {
+    super(format("Component {0} has not been initialized", clazz.getSimpleName()));
+  }
 }

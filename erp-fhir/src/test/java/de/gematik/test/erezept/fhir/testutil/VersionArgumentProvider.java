@@ -52,6 +52,8 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> abdaErpPkvVersions() {
-    return Arrays.stream(AbdaErpPkvVersion.values()).map(Arguments::of);
+    return Arrays.stream(AbdaErpPkvVersion.values())
+        .filter(v -> !v.equals(AbdaErpPkvVersion.V1_1_0)) // not supported!!
+        .map(Arguments::of);
   }
 }

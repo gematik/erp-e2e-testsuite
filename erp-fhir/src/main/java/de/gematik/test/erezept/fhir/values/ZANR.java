@@ -17,14 +17,11 @@
 package de.gematik.test.erezept.fhir.values;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 
-/**
- * <a href="https://de.wikipedia.org/wiki/Lebenslange_Arztnummer">Lebenslange Zahnarztnummer</a>
- */
+/** <a href="https://de.wikipedia.org/wiki/Lebenslange_Arztnummer">Lebenslange Zahnarztnummer</a> */
 public class ZANR extends BaseANR {
 
   @RequiredArgsConstructor
@@ -41,7 +38,6 @@ public class ZANR extends BaseANR {
     static boolean isValid(String value) {
       return Arrays.stream(values()).anyMatch(it -> it.pattern.matcher(value).matches());
     }
-
   }
 
   public ZANR(String value) {

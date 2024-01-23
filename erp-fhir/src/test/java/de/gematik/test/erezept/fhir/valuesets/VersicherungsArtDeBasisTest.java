@@ -16,18 +16,18 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class VersicherungsArtDeBasisTest {
 
-    @Test
-    void shouldGetGkvOptions() {
-        val options = VersicherungsArtDeBasis.GKV.getCoverageOptions();
-        assertTrue(options.isPresent());
-        options.ifPresent(c -> assertEquals(c, GkvInsuranceCoverageInfo.class));
-    }
+  @Test
+  void shouldGetGkvOptions() {
+    val options = VersicherungsArtDeBasis.GKV.getCoverageOptions();
+    assertTrue(options.isPresent());
+    options.ifPresent(c -> assertEquals(c, GkvInsuranceCoverageInfo.class));
+  }
 }

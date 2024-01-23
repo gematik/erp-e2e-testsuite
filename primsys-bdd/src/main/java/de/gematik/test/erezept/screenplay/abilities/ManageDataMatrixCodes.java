@@ -112,7 +112,9 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActo
                         errorMessage ->
                             log.warn(
                                 format(
-                                    "Received OperationOutcome with HTTP Statuscode {0} while trying to abort Prescription {1}: \n{2}",
+                                    "Received OperationOutcome with HTTP Statuscode {0} while"
+                                        + " trying to abort Prescription {1}: \n"
+                                        + "{2}",
                                     response.getStatusCode(), dmc.getTaskId(), errorMessage)));
               });
     }

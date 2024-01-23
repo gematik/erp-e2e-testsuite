@@ -48,10 +48,11 @@ public class SignDocumentOptions {
   }
 
   public static SignDocumentOptions withAlgorithm(Algorithm algorithm) {
-    val cryptType = switch (algorithm) {
-      case RSA_2048, RSA_PSS_2048 -> SigningCryptType.RSA;
-      case ECC_256 -> SigningCryptType.ECC;
-    };
+    val cryptType =
+        switch (algorithm) {
+          case RSA_2048, RSA_PSS_2048 -> SigningCryptType.RSA;
+          case ECC_256 -> SigningCryptType.ECC;
+        };
     return getDefaultOptions(cryptType);
   }
 }

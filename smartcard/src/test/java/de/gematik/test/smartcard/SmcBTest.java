@@ -17,12 +17,11 @@
 package de.gematik.test.smartcard;
 
 import de.gematik.test.erezept.crypto.certificate.Oid;
+import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 class SmcBTest {
 

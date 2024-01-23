@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ActorDto {
 
-    private ActorType type;
-    private String name;
-    private String id;
+  private ActorType type;
+  private String name;
+  private String id;
 }

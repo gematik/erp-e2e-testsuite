@@ -16,21 +16,20 @@
 
 package de.gematik.test.core.expectations.verifier;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
-import org.openqa.selenium.InvalidArgumentException;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.text.MessageFormat.format;
+import lombok.val;
+import org.hl7.fhir.r4.model.Resource;
+import org.openqa.selenium.InvalidArgumentException;
 
 /*
 Why is java:S1452 suppressed?

@@ -27,9 +27,7 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
-/**
- * <a href="https://de.wikipedia.org/wiki/Betriebsst%C3%A4ttennummer">Betriebsstättennummer</a>
- */
+/** <a href="https://de.wikipedia.org/wiki/Betriebsst%C3%A4ttennummer">Betriebsstättennummer</a> */
 public class BSNR {
 
   private static final KbvNamingSystem NAMING_SYSTEM = KbvNamingSystem.BASE_BSNR;

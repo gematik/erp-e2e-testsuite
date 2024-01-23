@@ -75,6 +75,7 @@ class ParserConfigurationsTest {
     val psc = pc.getDefaultConfiguration();
     assertTrue(psc.isEmpty());
   }
+
   @Test
   @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "")
   void shouldNotHaveDefaultOnEmptyValue() {
@@ -82,5 +83,4 @@ class ParserConfigurationsTest {
     val psc = pc.getDefaultConfiguration();
     assertTrue(psc.isEmpty());
   }
-
 }

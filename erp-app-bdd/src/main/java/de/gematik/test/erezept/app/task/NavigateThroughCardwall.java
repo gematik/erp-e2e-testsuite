@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.gematik.test.erezept.app.task;
 
 import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
@@ -103,8 +104,9 @@ public class NavigateThroughCardwall implements Task {
     }
 
     public NavigateThroughCardwall byMappingVirtualEgkFrom(
-            SmartcardArchive sca, VersicherungsArtDeBasis insuranceKind) {
-      return Instrumented.instanceOf(NavigateThroughCardwall.class).withProperties(environment, sca, insuranceKind);
+        SmartcardArchive sca, VersicherungsArtDeBasis insuranceKind) {
+      return Instrumented.instanceOf(NavigateThroughCardwall.class)
+          .withProperties(environment, sca, insuranceKind);
     }
   }
 }

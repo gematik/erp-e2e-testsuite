@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
@@ -31,8 +33,6 @@ import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

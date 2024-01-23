@@ -16,15 +16,14 @@
 
 package de.gematik.test.smartcard;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import de.gematik.test.erezept.crypto.certificate.Oid;
 import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
+import java.io.IOException;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class HbaTest {
 

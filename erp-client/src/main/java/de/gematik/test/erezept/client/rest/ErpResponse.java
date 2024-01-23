@@ -210,7 +210,8 @@ public class ErpResponse<R extends Resource> {
     }
 
     public ErpResponse<E> andValidationResult(ValidationResult vr) {
-      return new ErpResponse<>(statusCode, duration, usedJwt, fixHeaders(headers), vr, resource, expectType);
+      return new ErpResponse<>(
+          statusCode, duration, usedJwt, fixHeaders(headers), vr, resource, expectType);
     }
 
     /**

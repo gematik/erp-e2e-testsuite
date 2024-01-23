@@ -60,7 +60,8 @@ public class ExternalAuthenticateCommandTest {
     val hba = sca.getHbaByICCSN("80276883110000121166");
     val cardHandle = mockKonnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
 
-    val externalAuthenticateCommand = new ExternalAuthenticateCommand(cardHandle, Algorithm.ECC_256);
+    val externalAuthenticateCommand =
+        new ExternalAuthenticateCommand(cardHandle, Algorithm.ECC_256);
     val toBeSignedData = new byte[0];
     externalAuthenticateCommand.setToBeSignedData(toBeSignedData);
     assertNotNull(mockKonnektor.execute(externalAuthenticateCommand).getPayload());

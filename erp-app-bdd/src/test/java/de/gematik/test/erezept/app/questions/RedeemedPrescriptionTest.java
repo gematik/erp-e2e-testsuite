@@ -93,7 +93,7 @@ class RedeemedPrescriptionTest {
 
     when(driverAbility.getText(Receipt.TASKID)).thenReturn("label");
     when(driverAbility.isPresent(Receipt.PRESCRIPTION_STATUS_LABEL)).thenReturn(false);
-    
+
     assertTrue(actor.asksFor(question).equals("label"));
   }
 }

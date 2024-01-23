@@ -144,7 +144,8 @@ public class GrizzlyWsServerApp extends WebSocketApplication implements WsServer
 
     if (!hasSpecificWsConnected(pspMessage.getClientId())) {
       log.info(
-          "!getInstance().connectionIsActive() not connected! getPspMessageMessageQueueList().add(pspMessage) for "
+          "!getInstance().connectionIsActive() not connected!"
+              + " getPspMessageMessageQueueList().add(pspMessage) for "
               + pspMessage.getClientId());
       this.prescriptionMessageQueue.getPspMessageMessageQueueList().add(pspMessage);
       throw new WebApplicationException(

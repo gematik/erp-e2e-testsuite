@@ -39,9 +39,9 @@ public class ListPatients implements Callable<Integer> {
 
   @CommandLine.ArgGroup(exclusive = true, multiplicity = "0..1")
   private ExclusiveEgkIdentifierGroup egkIdentifier;
-  
+
   @CommandLine.Option(
-        names = "--cert",
+      names = "--cert",
       required = false,
       description = "Print the complete X509 Certificate")
   private boolean printCertificate = false;
@@ -49,9 +49,9 @@ public class ListPatients implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     val sca = SmartcardFactory.getArchive();
-    
+
     val smartcards = hasFilter() ? egkIdentifier.getEgks(sca) : sca.getEgkCards();
-    
+
     smartcards.stream()
         .filter(egk -> !FILTER_ICCSNS.contains(egk.getIccsn()))
         .forEach(this::printInformation);

@@ -17,10 +17,10 @@
 package de.gematik.test.erezept.fhir.values;
 
 public interface WithChecksum {
-    boolean isValid();
+  boolean isValid();
 
-    static int crossSum(int number) {
-        if (number <= 9) return number;
-        return number % 10 + crossSum(number/10);
-    }
+  static int crossSum(int number) {
+    if (number <= 9) return number;
+    return number % 10 + crossSum(number / 10);
+  }
 }

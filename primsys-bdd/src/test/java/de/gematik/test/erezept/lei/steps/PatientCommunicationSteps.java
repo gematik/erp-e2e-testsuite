@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.task.*;
@@ -24,9 +27,6 @@ import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.ensure.Ensure;
-
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 public class PatientCommunicationSteps {
 
@@ -38,7 +38,8 @@ public class PatientCommunicationSteps {
    * @param pharmName
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept der Apotheke (.+) per Nachricht zuweist$")
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept der Apotheke (.+) per"
+          + " Nachricht zuweist$")
   public void whenRequestDispenseViaCommunication(
       String patientName, String order, String pharmName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -60,7 +61,8 @@ public class PatientCommunicationSteps {
    * @param pharmName
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) zu (?:seinem|ihrem) (letzten|ersten) E-Rezept der Apotheke (.+) eine Anfrage schickt$")
+      "^(?:der|die) Versicherte (.+) zu (?:seinem|ihrem) (letzten|ersten) E-Rezept der Apotheke"
+          + " (.+) eine Anfrage schickt$")
   public void whenRequestInformationViaCommunication(
       String patientName, String order, String pharmName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -75,7 +77,8 @@ public class PatientCommunicationSteps {
   }
 
   @Wenn(
-      "^(?:der|die) Versicherte zu (?:seinem|ihrem) (letzten|ersten) E-Rezept der Apotheke (.+) eine Anfrage schickt$")
+      "^(?:der|die) Versicherte zu (?:seinem|ihrem) (letzten|ersten) E-Rezept der Apotheke (.+)"
+          + " eine Anfrage schickt$")
   public void whenRequestInformationViaCommunication(String order, String pharmName) {
     val thePatient = OnStage.theActorInTheSpotlight();
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -103,7 +106,8 @@ public class PatientCommunicationSteps {
   }
 
   @Dann(
-      "^hat (?:der|die) Versicherte (.+) keine Antwort von der Apotheke (.+) für das (letzte|erste) E-Rezept erhalten$")
+      "^hat (?:der|die) Versicherte (.+) keine Antwort von der Apotheke (.+) für das (letzte|erste)"
+          + " E-Rezept erhalten$")
   public void thenHasNotReceivedResponseFrom(String patientName, String pharmName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -129,7 +133,8 @@ public class PatientCommunicationSteps {
    * @param representativeName
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept per Nachricht an (?:den Vertreter|die Vertreterin) (.+) schickt$")
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept per Nachricht an (?:den"
+          + " Vertreter|die Vertreterin) (.+) schickt$")
   public void whenSendCommunicationRepresentative(
       String patientName, String order, String representativeName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -144,7 +149,8 @@ public class PatientCommunicationSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht per Nachricht an (?:den Vertreter|die Vertreterin) (.+) schicken$")
+      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht per"
+          + " Nachricht an (?:den Vertreter|die Vertreterin) (.+) schicken$")
   public void thenCannotSendCommunicationRepresentative400(
       String patientName, String order, String representativeName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -167,7 +173,8 @@ public class PatientCommunicationSteps {
    * @param pharmName ist der Name der Apotheke, von der die Antwort erwartet wird
    */
   @Dann(
-      "^hat (?:der|die) Versicherte (.+) eine Antwort auf (?:seinen|ihren) Änderungswunsch von der Apotheke (.+) erhalten$")
+      "^hat (?:der|die) Versicherte (.+) eine Antwort auf (?:seinen|ihren) Änderungswunsch von der"
+          + " Apotheke (.+) erhalten$")
   public void thenHasReceivedResponseToChangeRequestFrom(String patientName, String pharmName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -177,7 +184,8 @@ public class PatientCommunicationSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) nicht mehr die Nachrichten zu (?:seinem|ihrem) (ersten|letzten) E-Rezept abrufen$")
+      "^kann (?:der|die) Versicherte (.+) nicht mehr die Nachrichten zu (?:seinem|ihrem)"
+          + " (ersten|letzten) E-Rezept abrufen$")
   public void thenPatientCannotGetCommunicationsBasedOnTask(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -197,7 +205,8 @@ public class PatientCommunicationSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) keine (?:ihrer|seiner) versendeten Nachrichten mehr abrufen$")
+      "^kann (?:der|die) Versicherte (.+) keine (?:ihrer|seiner) versendeten Nachrichten mehr"
+          + " abrufen$")
   public void thenPatientCannotGetAnyCommunications(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -205,7 +214,8 @@ public class PatientCommunicationSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:ihre|seine) (letzte|erste) Nachricht nicht mehr abrufen$")
+      "^kann (?:der|die) Versicherte (.+) (?:ihre|seine) (letzte|erste) Nachricht nicht mehr"
+          + " abrufen$")
   public void thenPatientCannotGetASentCommunication(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
@@ -214,7 +224,8 @@ public class PatientCommunicationSteps {
   }
 
   @Wenn(
-      "^(?:der|die) Versicherte (.+) das (letztes|erstes) heruntergeladene E-Rezept der Apotheke (.+) zuweist$")
+      "^(?:der|die) Versicherte (.+) das (letztes|erstes) heruntergeladene E-Rezept der Apotheke"
+          + " (.+) zuweist$")
   public void whenAssignPrescription(String patientName, String order, String pharmName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacist = OnStage.theActorCalled(pharmName);
@@ -223,7 +234,8 @@ public class PatientCommunicationSteps {
   }
 
   @Wenn(
-      "^(?:der|die) Versicherte (.+) für das (letztes|erstes) heruntergeladene E-Rezept eine Anfrage an die Apotheke (.+) schickt$")
+      "^(?:der|die) Versicherte (.+) für das (letztes|erstes) heruntergeladene E-Rezept eine"
+          + " Anfrage an die Apotheke (.+) schickt$")
   public void whenReserveRequest(String patientName, String order, String pharmName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val thePharmacist = OnStage.theActorCalled(pharmName);

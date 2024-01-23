@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMABLE_PRESCRIPTION_CARD_BUTTON;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
@@ -26,9 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMABLE_PRESCRIPTION_CARD_BUTTON;
-import static java.text.MessageFormat.format;
 
 @Slf4j
 public class DeleteBatchRedeemablePrescriptions implements Task {

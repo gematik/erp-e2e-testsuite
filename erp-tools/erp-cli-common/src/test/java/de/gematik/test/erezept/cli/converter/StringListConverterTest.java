@@ -18,7 +18,6 @@ package de.gematik.test.erezept.cli.converter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.cli.converter.StringListConverter;
 import de.gematik.test.erezept.cli.exceptions.CliException;
 import lombok.val;
 import org.junit.jupiter.api.Test;

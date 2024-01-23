@@ -17,11 +17,10 @@
 package de.gematik.test.erezept.app.mobile.elements;
 
 import io.appium.java_client.AppiumBy;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
-
-import java.util.function.Supplier;
 
 @Getter
 @RequiredArgsConstructor

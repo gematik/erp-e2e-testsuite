@@ -21,10 +21,10 @@ import lombok.val;
 
 public class ConfigurationMocker {
 
-    public static ErpActorConfiguration createErpActorConfig(String iccsn, boolean shouldUseVeGK) {
-        val cfg = new ErpActorConfiguration();
-        cfg.setEgkIccsn(iccsn);
-        cfg.setUseVirtualEgk(shouldUseVeGK);
-        return cfg;
-    }
+  public static ErpActorConfiguration createErpActorConfig(String iccsn, boolean shouldUseVeGK) {
+    val cfg = new ErpActorConfiguration();
+    cfg.setEgkIccsn(iccsn);
+    cfg.setUseVirtualEgk(shouldUseVeGK);
+    return cfg;
+  }
 }

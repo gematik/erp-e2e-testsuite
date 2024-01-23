@@ -22,5 +22,5 @@ import picocli.CommandLine;
     name = "prescriptions",
     description = "Manage Prescriptions",
     mixinStandardHelpOptions = true,
-    subcommands = {PrescriptionsViewer.class, PrescriptionsDeleter.class})
+    subcommands = {PrescriptionsReader.class, PrescriptionsDeleter.class})
 public class PrescriptionsManager {}

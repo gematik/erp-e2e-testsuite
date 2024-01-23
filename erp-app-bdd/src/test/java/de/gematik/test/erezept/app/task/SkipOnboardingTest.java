@@ -39,7 +39,6 @@ class SkipOnboardingTest {
   private String androidUserName;
   private String iosUserName;
 
-
   @BeforeEach
   void setUp() {
     OnStage.setTheStage(new Cast() {});
@@ -68,7 +67,7 @@ class SkipOnboardingTest {
   void shouldProxyToAndroidWithSwipes() {
     val actor = OnStage.theActorCalled(androidUserName);
     val app = actor.abilityTo(UseAndroidApp.class);
-    
+
     actor.attemptsTo(SkipOnboarding.bySwiping());
     verify(app, times(4)).swipe(any());
     verify(app, times(1)).tap(Onboarding.SKIP_BUTTON);
@@ -78,7 +77,7 @@ class SkipOnboardingTest {
   void shouldProxyToAndroidWithoutSwipes() {
     val actor = OnStage.theActorCalled(androidUserName);
     val app = actor.abilityTo(UseAndroidApp.class);
-    
+
     actor.attemptsTo(SkipOnboarding.directly());
     verify(app, times(0)).swipe(any());
     verify(app, times(1)).tap(Onboarding.SKIP_BUTTON);

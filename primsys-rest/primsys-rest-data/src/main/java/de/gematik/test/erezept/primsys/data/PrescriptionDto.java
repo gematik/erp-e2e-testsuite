@@ -30,14 +30,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PrescriptionDto {
 
-    private String prescriptionId;
-    private String taskId;
-    private String accessCode;
-    private DoctorDto practitioner;
-    private PatientDto patient;
-    private PznMedicationDto medication;
-    private MedicationRequestDto medicationRequest;
-    private CoverageDto coverage;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date authoredOn;
+  private String prescriptionId;
+  private String taskId;
+  private String accessCode;
+  private DoctorDto practitioner;
+  private PatientDto patient;
+  private PznMedicationDto medication;
+  private MedicationRequestDto medicationRequest;
+  private CoverageDto coverage;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+  private Date authoredOn;
 }

@@ -23,13 +23,16 @@ import lombok.Getter;
 @Getter
 public enum VsdmErrorMessage {
   PROOF_OF_PRESENCE_ERROR_SIG(
-      "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Fehler bei Prüfung der HMAC-Sicherung)."),
+      "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Fehler bei Prüfung der"
+          + " HMAC-Sicherung)."),
   PROOF_OF_PRESENCE_WITHOUT_CHECKSUM(
-      "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Prüfziffer fehlt im VSDM Prüfungsnachweis)."),
+      "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Prüfziffer fehlt im VSDM"
+          + " Prüfungsnachweis)."),
   INVALID_PNW("Missing or invalid PNW query parameter"),
   INVALID_CHECKSUM_SIZE("Invalid size of Prüfziffer"),
   PROOF_OF_PRESENCE_INVALID_TIMESTAMP(
-      "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Zeitliche Gültigkeit des Anwesenheitsnachweis überschritten)."),
+      "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Zeitliche Gültigkeit des"
+          + " Anwesenheitsnachweis überschritten)."),
   FAILED_PARSING_PNW("Failed parsing PNW XML.");
   private final String text;
 }

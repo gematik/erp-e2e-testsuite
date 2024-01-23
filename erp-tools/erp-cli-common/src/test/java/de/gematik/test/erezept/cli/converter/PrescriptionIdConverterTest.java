@@ -18,7 +18,6 @@ package de.gematik.test.erezept.cli.converter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.cli.converter.PrescriptionIdConverter;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import lombok.val;
 import org.junit.jupiter.api.Test;

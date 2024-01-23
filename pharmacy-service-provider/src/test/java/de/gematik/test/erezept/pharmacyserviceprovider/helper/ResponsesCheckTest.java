@@ -50,7 +50,8 @@ public class ResponsesCheckTest {
   public void getResponseNoBodyNoTransaction() {
     var resp = ResponsesCheck.generateResponse(null, null, 100);
     assertEquals(
-        "404 erfolgreiche Datenübermittlung, no telematikID, no transactionID arrived, no body arrived",
+        "404 erfolgreiche Datenübermittlung, no telematikID, no transactionID arrived, no body"
+            + " arrived",
         resp.getStatus() + " " + resp.getEntity());
   }
 

@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.exceptions.InvalidStrategyMappingException;
+import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
 import java.util.Comparator;
 import java.util.List;

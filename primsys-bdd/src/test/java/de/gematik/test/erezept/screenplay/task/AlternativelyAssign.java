@@ -16,6 +16,9 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.crypto.encryption.cms.CmsAuthEnvelopedData;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -28,6 +31,8 @@ import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.smartcard.Algorithm;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -36,12 +41,6 @@ import net.serenitybdd.core.Serenity;
 import net.serenitybdd.rest.SerenityRest;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Alternative Zuweisung über den Apothekendienstleister */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -138,7 +137,8 @@ public class AlternativelyAssign implements Task {
 
     Serenity.recordReportData()
         .withTitle(
-            "Create PrescriptionInformation for the alternative assignment via PharmacyServiceProvider")
+            "Create PrescriptionInformation for the alternative assignment via"
+                + " PharmacyServiceProvider")
         .andContents(jsonInfo);
 
     return jsonInfo.getBytes(StandardCharsets.UTF_8);

@@ -27,7 +27,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class MvoDataMapperTest {
 
-  private final static int REPETITIONS = 5;
+  private static final int REPETITIONS = 5;
 
   @RepeatedTest(value = REPETITIONS)
   void shouldGenerateValidRandomMvo() {
@@ -131,16 +131,16 @@ class MvoDataMapperTest {
 
   @ParameterizedTest
   @CsvSource({
-          "0,3",
-          "1,1",
-          "2,1 ",
-          "3,2",
-          "4,3",
-          "1,0",
-          "100000000, -1100000000",
-          "4,5",
-          "5,4",
-          "5,5"
+    "0,3",
+    "1,1",
+    "2,1 ",
+    "3,2",
+    "4,3",
+    "1,0",
+    "100000000, -1100000000",
+    "4,5",
+    "5,4",
+    "5,5"
   })
   void shouldDetectInvalidRatio(int num, int denom) {
     val dto = new MvoDto();
@@ -153,7 +153,7 @@ class MvoDataMapperTest {
 
   @ParameterizedTest
   @CsvSource({
-          "2,2", "1,2", "1,4", "1,3", "2,4 ", "4,4", "3,4", "2,3",
+    "2,2", "1,2", "1,4", "1,3", "2,4 ", "4,4", "3,4", "2,3",
   })
   void shouldDetectValidRatio(int num, int denom) {
     val dto = new MvoDto();

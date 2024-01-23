@@ -47,12 +47,14 @@ public class ActorTypeTest {
           assertFalse(ActorType.optionalFromString(inv).isPresent());
         });
   }
+
   @Test
-  public void shouldReturnReadable(){
+  public void shouldReturnReadable() {
     assertNotNull(ActorType.DOCTOR.toString());
   }
+
   @Test
-  public void createValidOptionalDoctor(){
+  public void createValidOptionalDoctor() {
     assertTrue(ActorType.optionalFromString("Doctor").isPresent());
   }
 }

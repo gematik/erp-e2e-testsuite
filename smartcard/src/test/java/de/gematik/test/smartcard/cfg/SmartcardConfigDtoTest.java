@@ -46,10 +46,10 @@ class SmartcardConfigDtoTest {
               assertEquals(smt, smConf.getCardType());
             });
   }
-  @Test
-  void shouldGetKeyStoreTypeP12(){
-      val smConf = new SmartcardConfigDto();
-      assertEquals(KeystoreType.P12,smConf.getKeystoreType() );
 
+  @Test
+  void shouldGetKeyStoreTypeP12() {
+    val smConf = new SmartcardConfigDto();
+    assertEquals(KeystoreType.P12, smConf.getKeystoreType());
   }
 }

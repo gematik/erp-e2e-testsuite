@@ -28,14 +28,13 @@ import net.serenitybdd.screenplay.Ability;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class UseAppUserConfiguration implements Ability {
 
-    @Delegate
-    private final ErpActorConfiguration configuration;
+  @Delegate private final ErpActorConfiguration configuration;
 
-    public static UseAppUserConfiguration forUser(String userName, ErpAppConfiguration config) {
-        return from(config.getAppUserByName(userName));
-    }
+  public static UseAppUserConfiguration forUser(String userName, ErpAppConfiguration config) {
+    return from(config.getAppUserByName(userName));
+  }
 
-    public static UseAppUserConfiguration from(ErpActorConfiguration configuration) {
-        return new UseAppUserConfiguration(configuration);
-    }
+  public static UseAppUserConfiguration from(ErpActorConfiguration configuration) {
+    return new UseAppUserConfiguration(configuration);
+  }
 }

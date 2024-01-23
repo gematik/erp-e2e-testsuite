@@ -57,11 +57,11 @@ public enum KostenVersicherterKategorie implements IValueSet {
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(KostenVersicherterKategorie.class, code));
   }
-  
+
   public static KostenVersicherterKategorie fromName(String name) {
     return Arrays.stream(KostenVersicherterKategorie.values())
-            .filter(kvk -> kvk.name().equalsIgnoreCase(name))
-            .findFirst()
-            .orElseThrow(() -> new InvalidValueSetException(KostenVersicherterKategorie.class, name));
+        .filter(kvk -> kvk.name().equalsIgnoreCase(name))
+        .findFirst()
+        .orElseThrow(() -> new InvalidValueSetException(KostenVersicherterKategorie.class, name));
   }
 }

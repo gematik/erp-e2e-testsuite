@@ -16,19 +16,18 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
-
-import java.util.List;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @ResourceDef(name = "Practitioner")

@@ -37,7 +37,6 @@ import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
-import org.mockito.*;
 
 class ReplyUseCaseTest extends TestWithActorContext {
 
@@ -61,7 +60,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(1);
     val mockClient = pharmacy.getClient();
-    
+
     val resource =
         FhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
@@ -70,8 +69,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
             .withStatusCode(204)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
-    when(mockClient.request(any(CommunicationPostCommand.class)))
-        .thenReturn(mockResponse);
+    when(mockClient.request(any(CommunicationPostCommand.class))).thenReturn(mockResponse);
     try (val response =
         ReplyUseCase.replyPrescription(
             pharmacy, "taskId", "KVNR", supplyType, "Hello World - Message")) {
@@ -84,7 +82,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(1);
     val mockClient = pharmacy.getClient();
-    
+
     val mockResponse =
         ErpResponse.forPayload(
                 FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
@@ -114,7 +112,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(1);
     val mockClient = pharmacy.getClient();
-    
+
     val mockResponse =
         ErpResponse.forPayload(
                 FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)

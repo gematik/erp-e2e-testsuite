@@ -55,7 +55,8 @@ public class PrescriptionsDeleter implements Callable<Integer> {
       paramLabel = "<SORT>",
       type = SortOrder.class,
       description =
-          "Sort-Order by Date from ${COMPLETION-CANDIDATES} for the Query (default=${DEFAULT-VALUE})")
+          "Sort-Order by Date from ${COMPLETION-CANDIDATES} for the Query"
+              + " (default=${DEFAULT-VALUE})")
   private SortOrder sortOrder = SortOrder.DESCENDING;
 
   @CommandLine.Option(
@@ -69,7 +70,10 @@ public class PrescriptionsDeleter implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     if (taskStatus == TaskStatusWrapper.INPROGRESS) {
-      System.out.println(format("ERROR: TaskStatus not allowed - delete prescriptions from status {0} is impossible", taskStatus));
+      System.out.println(
+          format(
+              "ERROR: TaskStatus not allowed - delete prescriptions from status {0} is impossible",
+              taskStatus));
       return -1;
     }
 
@@ -101,7 +105,8 @@ public class PrescriptionsDeleter implements Callable<Integer> {
                 task ->
                     task.getStatus() != Task.TaskStatus.INPROGRESS
                         && task.getStatus() != Task.TaskStatus.CANCELLED)
-                .filter(task -> !PrescriptionId.from(task.getTaskId()).getFlowType().isDirectAssignment())
+            .filter(
+                task -> !PrescriptionId.from(task.getTaskId()).getFlowType().isDirectAssignment())
             .toList();
     val size = tasks.size();
     val ownerName = egk.getOwner().getOwnerName();

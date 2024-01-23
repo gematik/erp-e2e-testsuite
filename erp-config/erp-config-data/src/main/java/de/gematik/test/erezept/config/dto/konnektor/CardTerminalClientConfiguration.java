@@ -16,7 +16,4 @@
 
 package de.gematik.test.erezept.config.dto.konnektor;
 
-
-public record CardTerminalClientConfiguration(String ctId, String url) {
-
-}
+public record CardTerminalClientConfiguration(String ctId, String url) {}

@@ -28,7 +28,7 @@ public class AuditEventGetCommand extends BaseCommand<ErxAuditEventBundle> {
   public AuditEventGetCommand(IQueryParameter... param) {
     this(List.of(param));
   }
-  
+
   public AuditEventGetCommand(List<IQueryParameter> param) {
     super(ErxAuditEventBundle.class, HttpRequestMethod.GET, "AuditEvent");
     queryParameters.addAll(param);

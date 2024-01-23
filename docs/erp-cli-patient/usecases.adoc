@@ -81,3 +81,21 @@ erpp auditevent --env TU --kvnr X110406067
 ----
 erpp chargeitems --env RU --kvnr X110488614
 ----
+
+=== PKV-Consent
+Über das Sub-Kommando `consent` kann die Einwilligung für PKV-Versicherte abgerufen, gesetzt und gelöscht werden:
+
+[source,shell]
+----
+erpp consent show --env RU --kvnr X110488614
+----
+
+[source,shell]
+----
+erpp consent set --env RU --kvnr X110488614
+----
+
+[source,shell]
+----
+erpp consent delete --env RU --kvnr=X110406067,X110499478,X110498565,X110488614
+----

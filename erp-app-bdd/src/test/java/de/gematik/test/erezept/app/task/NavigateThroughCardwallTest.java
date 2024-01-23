@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.gematik.test.erezept.app.task;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import de.gematik.test.erezept.PrimSysBddFactory;
 import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.cfg.ErpAppConfiguration;
@@ -29,9 +31,7 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.PrimSysBddFactory;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.smartcard.SmartcardArchive;
 import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
@@ -49,7 +49,6 @@ class NavigateThroughCardwallTest {
   private final PrimSysBddFactory primsysConfig =
       ConfigurationReader.forPrimSysConfiguration()
           .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, sca));
-
 
   private String userName;
 
@@ -84,8 +83,8 @@ class NavigateThroughCardwallTest {
     try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {
       val erpClient = mock(ErpClient.class);
       erpClientFactory
-              .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
-              .thenReturn(erpClient);
+          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
+          .thenReturn(erpClient);
       assertDoesNotThrow(() -> actor.attemptsTo(task));
     }
     verify(app, times(1)).tap(Mainscreen.LOGIN_BUTTON);

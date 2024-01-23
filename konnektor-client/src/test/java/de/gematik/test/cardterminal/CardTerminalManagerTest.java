@@ -16,11 +16,16 @@
 
 package de.gematik.test.cardterminal;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import de.gematik.test.cardterminal.cats.CatsClient;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.KonnektorImpl;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorContextConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorType;
+import de.gematik.test.konnektor.Konnektor;
+import de.gematik.test.konnektor.KonnektorImpl;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
 import de.gematik.test.konnektor.util.CardsUtil;
 import de.gematik.test.smartcard.SmartcardArchive;
@@ -29,19 +34,13 @@ import de.gematik.ws.conn.cardservice.v8.CardInfoType;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.eventservice.wsdl.v7.EventServicePortType;
+import java.time.ZonedDateTime;
+import java.util.GregorianCalendar;
+import java.util.List;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class CardTerminalManagerTest {
 

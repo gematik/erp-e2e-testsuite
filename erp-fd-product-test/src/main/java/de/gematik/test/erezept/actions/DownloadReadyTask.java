@@ -34,8 +34,6 @@ public class DownloadReadyTask extends ErpAction<ErxTaskBundle> {
 
   private final TaskGetCommand cmd;
 
-
-
   public static DownloadReadyTask withExamEvidence(String examEvidence) {
     log.info(format("Request Get /Task as pharmacy with exam evidence {0} ", examEvidence));
     val cmd = new TaskGetByExamEvidenceCommand(examEvidence);

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
@@ -34,8 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

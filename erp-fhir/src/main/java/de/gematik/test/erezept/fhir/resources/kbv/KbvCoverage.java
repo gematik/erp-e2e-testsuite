@@ -62,9 +62,9 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
 
   public Optional<PayorType> getPayorType() {
     return this.getType().getCoding().stream()
-            .filter(coding -> PayorType.CODE_SYSTEM.match(coding.getSystem()))
-            .map(coding -> PayorType.fromCode(coding.getCode()))
-            .findFirst();
+        .filter(coding -> PayorType.CODE_SYSTEM.match(coding.getSystem()))
+        .map(coding -> PayorType.fromCode(coding.getCode()))
+        .findFirst();
   }
 
   public IKNR getIknr() {
@@ -85,11 +85,11 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
 
   public Optional<IKNR> getAlternativeIknr() {
     return this.getPayor().stream()
-            .flatMap(p -> p.getIdentifier().getExtension().stream())
-            .filter(ext -> KbvItaForStructDef.ALTERNATIVE_IK.match(ext.getUrl()))
-            .map(ext -> ext.castToIdentifier(ext.getValue()).getValue())
-            .map(IKNR::from)
-            .findFirst();
+        .flatMap(p -> p.getIdentifier().getExtension().stream())
+        .filter(ext -> KbvItaForStructDef.ALTERNATIVE_IK.match(ext.getUrl()))
+        .map(ext -> ext.castToIdentifier(ext.getValue()).getValue())
+        .map(IKNR::from)
+        .findFirst();
   }
 
   public String getName() {
@@ -121,9 +121,11 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
 
   @Override
   public String getDescription() {
-    val type = this.getInsuranceKindOptional()
+    val type =
+        this.getInsuranceKindOptional()
             .map(VersicherungsArtDeBasis::getDisplay)
-            .or(() -> this.getPayorType().map(PayorType::getDisplay)).orElse("N/A");
+            .or(() -> this.getPayorType().map(PayorType::getDisplay))
+            .orElse("N/A");
     val iknr = this.getIknr().getValue();
     return format("{1} ''{0}'' (IKNR: {2})", getName(), type, iknr);
   }

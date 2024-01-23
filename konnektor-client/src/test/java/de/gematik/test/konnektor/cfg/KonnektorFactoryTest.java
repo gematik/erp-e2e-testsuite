@@ -16,7 +16,6 @@
 
 package de.gematik.test.konnektor.cfg;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.config.dto.konnektor.*;
@@ -155,7 +154,5 @@ class KonnektorFactoryTest {
     assertNotNull(softKonn);
   }
 
-  private static class UnsupportedKonnektorConfig extends KonnektorConfiguration {
-
-  }
+  private static class UnsupportedKonnektorConfig extends KonnektorConfiguration {}
 }

@@ -16,11 +16,11 @@
 
 package de.gematik.test.erezept.app.mocker;
 
-import lombok.val;
-import org.openqa.selenium.WebElement;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import lombok.val;
+import org.openqa.selenium.WebElement;
 
 public class WebElementMockFactory {
 

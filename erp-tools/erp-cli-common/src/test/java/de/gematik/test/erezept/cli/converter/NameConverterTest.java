@@ -19,7 +19,6 @@ package de.gematik.test.erezept.cli.converter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.cli.converter.NameConverter;
 import lombok.*;
 import org.junit.jupiter.api.*;
 

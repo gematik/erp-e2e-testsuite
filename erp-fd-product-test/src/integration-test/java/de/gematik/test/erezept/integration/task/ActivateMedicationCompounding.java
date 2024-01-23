@@ -70,18 +70,17 @@ public class ActivateMedicationCompounding extends ErpTest {
     return ArgumentComposer.composeWith()
         .arguments("Salbe", "2 Komponenten Salbe")
         .arguments("Creme", "3 Komponenten Creme")
-        .arguments("Pomade", "die 80er sind zurück")
+        .arguments("Pomade", "die 60er sind zurück")
         .arguments("Uran Spray", "leuchtet so schön")
         .multiply(0, List.of(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
-        // .multiply(2, KbvItaForVersion.class)
         .create();
   }
 
   @TestcaseId("ERP_ACTIVATE_MEDICATION_COMPOUNDING_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe ob beim akzeptieren für {0} als {1} in der KbvItaForVersion {2} die MedicationCompounding mit {3} korrekt übermittelt wurde")
+          "[{index}] -> Prüfe ob beim akzeptieren für {0} als {1} die MedicationCompounding mit {2} korrekt übermittelt wurde")
   @DisplayName(
       "Prüfe den Inhalt der MedicationCompounding als Patient und die Signatur als Apotheke")
   @MethodSource("medicationCompoundingComposer")
