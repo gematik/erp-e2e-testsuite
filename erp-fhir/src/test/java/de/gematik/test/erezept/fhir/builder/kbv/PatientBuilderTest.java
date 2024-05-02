@@ -37,7 +37,10 @@ class PatientBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildGkvPatientWithFaker(KbvItaForVersion version) {
     val patient =
-        PatientBuilder.faker(KVNR.random(), VersicherungsArtDeBasis.GKV).version(version).build();
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+            .withVersion(version)
+            .fake();
     log.info(format("Validating Faker Patient with ID {0}", patient.getLogicalId()));
     val result = ValidatorUtil.encodeAndValidate(parser, patient);
     assertTrue(result.isSuccessful());
@@ -51,7 +54,10 @@ class PatientBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildPkvPatientWithFaker(KbvItaForVersion version) {
     val patient =
-        PatientBuilder.faker(KVNR.random(), VersicherungsArtDeBasis.PKV).version(version).build();
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.PKV)
+            .withVersion(version)
+            .fake();
     log.info(format("Validating Faker Patient with ID {0}", patient.getLogicalId()));
     val result = ValidatorUtil.encodeAndValidate(parser, patient);
     assertTrue(result.isSuccessful());
@@ -76,7 +82,6 @@ class PatientBuilderTest extends ParsingTest {
                 KVNR.random(), VersicherungsArtDeBasis.GKV) // GKV Faker won't set assigner!
             .version(version);
     pb.kvnr(KVNR.random(), VersicherungsArtDeBasis.PKV); // setting PKV without assigner
-
     if (version.compareTo(KbvItaForVersion.V1_1_0) < 0) {
       assertThrows(BuilderException.class, pb::build);
     } else {

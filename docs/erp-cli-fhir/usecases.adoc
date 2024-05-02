@@ -113,6 +113,23 @@ erpf replace kvnr --to X123123123,Z000111222 ./kbv_bundles ./kbv_bundles_replace
 Damit werden sämtliche KbvBundles innerhalb von `./kbv_bundles` eingelesen und die KVNR des Versicherten durch KVNR(s) aus dem Parameter `--to` ersetzt.
 Der Parameter `--to` akzeptiert sowohl eine komma-separierte Liste an KVNRs als auch eine einzelne KVNR. Im Fall einer komma-separierten Liste an KVNRs werden pro KVNR eine neue Kopie des ursprünglichen KbvBundles angelegt. Konkret heißt das: wenn sich im Input-Verzeichnis `./kbv_bundles` z.B. 5 KbvBundles befinden und über den Parameter `--to` werden 2 KVNRs übergeben, dann werden im Ziel-Verzeichnis `./kbv_bundles_replaced` insgesamt 10 KbvBundles generiert.
 
+=== KBV-Bundles anonymisieren
+Vorhandene KBV-Bundles können persönliche Daten über Patient oder verordnende Ärzte enthalten. Bei der Fehler-Analyse (insbesondere bei PU-Rezepten) und Weitergabe von KBV-Bundles mit persönlichen Daten müssen diese zunächst _anonymisiert_ werden. Über das Kommando `anonymize` können die persönlichen Daten automatisiert anonymisiert werden:
+
+[source,shell]
+----
+erpf anonymize ./kbv_bundles ./kbv_bundles_anonymized
+----
+
+In der Standardkonfiguration werden die Identifikatoren (z.B. KVNR und LANR) durch valide Zufallswerte ersetzt und sonstige persönliche Daten nach einer `CharacterReplacementStrategy` ersetzt. Alternativ kann man mit der folgenden Konfiguration eine vollständige "Schwärzung" der persönlichen Daten erzwingen:
+
+[source,shell]
+----
+erpf anonymize --blacking --id-anonymization=BLACKING ./kbv_bundles ./kbv_bundles_anonymized
+----
+
+Mittels `--blacking` wird konfiguriert, dass persönliche Daten wie z.B. Namen und Adressen mit `*` "geschwärzt" werden. Separat dazu wird über `--id-anonymization=BLACKING` konfiguriert, dass auch die Identifikatoren (z.B. KVNR und LANR) komplett "geschwärzt" werden.
+
 === Krankenkasse auflisten [[list_insurances_cmd]]
 Mit dem nachfolgenden Kommando können die Krankenkassen die {APP} bekannt sind aufgelistet werden:
 

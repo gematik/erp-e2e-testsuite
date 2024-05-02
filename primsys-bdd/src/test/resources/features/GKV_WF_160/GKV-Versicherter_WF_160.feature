@@ -196,6 +196,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
 
+
   @TCID:ERP_EE_WF160_11
   @TESTFALL:negativ
   @AFO-ID:A_19168
@@ -412,4 +413,52 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und der Vertreter Günther Angermänn hat die Nachricht mit dem Rezept der Versicherten Sina Hüllmann empfangen
     Dann kann der Vertreter Günther Angermänn das letzte von Sina Hüllmann zugewiesene E-Rezept ohne AccessCode nicht löschen
     Aber der Vertreter Günther Angermänn kann das letzte von Sina Hüllmann zugewiesene E-Rezept mit AccessCode löschen
+
+  @TCID:ERP_EE_WF160_25
+  @TESTFALL:positiv
+  @AFO-ID:A_24179
+  @Hauptdarsteller:Apotheke
+  Szenario: Zweimaliges Akzeptieren des E-Rezepts durch gleiche Apotheke nach Datenverlust möglich
+  Die Apotheke akzeptiert das zugewiesene Rezept. Aus technischen unverschuldeten Gründen erhält oder speichert sie das Secret jedoch nicht.
+  So kann sie erneut ihr Secret beim FachDienst abrufen.
+
+    Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
+      | Name             | PZN      |
+      | Harnsäure Hemmer | 16588573 |
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
+    Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept verliert
+    Dann kann die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst erneut abrufen
+    Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
+
+  @TCID:ERP_EE_WF160_26
+  @TESTFALL:negativ
+  @AFO-ID:A_24176
+  @Hauptdarsteller:Apotheke
+  Szenario: Abrufen eines E-Rezeptes ohne vorheriges Akzeptieren
+  Die Apotheke versucht ein E-Rezept einzulösen. Sie hat aber vorher vergessen es zu akzeptieren.
+  Das wird durch den Fachdienst verhindert. (GetTaskById -> dafür ResponseOfGetTaskById) ohne vorher zu akzeptieren (AcceptTask)
+
+    Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
+      | Name             | PZN      |
+      | Harnsäure Hemmer | 16588573 |
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Dann kann die Apotheke Am Flughafen das letzte zugewiesene E-Rezept nicht beim Fachdienst abrufen, weil das E-Rezept noch nicht akzeptiert ist
+
+  @TCID:ERP_EE_WF160_27
+  @TESTFALL:negativ
+  @AFO-ID:A_24176
+  @Hauptdarsteller:Apotheke
+  Szenario: Abrufen des E-Rezepts nach Akzeptieren durch Apotheke A durch Apotheke B nicht möglich
+  Die Versicherte schickt das Rezept via DMC zu einer Apotheke (A).
+  Auf dem Weg dorthin geht sie in eine andere Apotheke (B) und weist dieser Das Rezept via DMC zu.
+  Die Apotheke versucht das zugewiesene Rezept abzurufen. Das wird durch den Fachdienst verhindert.
+
+    Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
+      | Name             | PZN      |
+      | Harnsäure Hemmer | 16588573 |
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Stadtapotheke via Data Matrix Code zuweist
+    Dann kann die Apotheke Stadtapotheke das letzte zugewiesene E-Rezept nicht beim Fachdienst abrufen, weil das E-Rezept noch nicht akzeptiert ist
 

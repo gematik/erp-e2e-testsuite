@@ -26,12 +26,7 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.SupplyRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
@@ -66,29 +61,35 @@ public class DeclinePrescriptionWithPracticeSupply extends ErpTest {
     @Test
     void activateInvalidPrescriptionWithPracticeSupplyAndMedicationRequest() {
         sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
-        val coverage = KbvCoverageBuilder.faker().build();
-        val kbvBundleBuilder = generateKbvBundle(
-                UUID.randomUUID().toString(),
-                coverage,
-                medication,
-                MedicalOrganizationBuilder.faker().build(),
-                supplyRequest);
-        kbvBundleBuilder.medicationRequest(MedicationRequestBuilder
-                .faker(sina.getPatientData()).medication(medication).requester(doctor.getPractitioner()).build());
+    val coverage = KbvCoverageBuilder.faker().build();
+    val kbvBundleBuilder =
+        generateKbvBundle(
+            UUID.randomUUID().toString(),
+            coverage,
+            medication,
+            MedicalOrganizationFaker.builder().fake(),
+            supplyRequest);
 
-        val issuePrescription = IssuePrescription.forPatient(sina)
-                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY);
+    kbvBundleBuilder.medicationRequest(
+        MedicationRequestFaker.builder(sina.getPatientData())
+            .withMedication(medication)
+            .withRequester(doctor.getPractitioner())
+            .fake());
 
-        val activation = doctor.performs(issuePrescription.withKbvBundleFrom(kbvBundleBuilder));
+    val issuePrescription =
+        IssuePrescription.forPatient(sina)
+            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY);
+    val activation = doctor.performs(issuePrescription.withKbvBundleFrom(kbvBundleBuilder));
 
-        doctor.attemptsTo(
-                Verify.that(activation)
-                        .withIndefiniteType()
-                        .hasResponseWith(returnCodeIs(400, KbvProfileRules.SUPPLY_REQUEST_AND_MEDICATION_REQUEST))
-                        .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withIndefiniteType()
+            .hasResponseWith(
+                returnCodeIs(400, KbvProfileRules.SUPPLY_REQUEST_AND_MEDICATION_REQUEST))
+            .isCorrect());
+  }
 
 
     @TestcaseId("ERP_TASK_VALID_PRESCRIPTION_WITH_SUPPLY_REQUEST_02")
@@ -96,13 +97,13 @@ public class DeclinePrescriptionWithPracticeSupply extends ErpTest {
     @Test
     void activateValidPrescriptionWithPracticeSupply() {
         sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
         val kbvBundleBuilder = generateKbvBundle(
                 UUID.randomUUID().toString(),
                 KbvCoverageBuilder.faker().build(),
                 medication,
-                MedicalOrganizationBuilder.faker().build(),
+                MedicalOrganizationFaker.builder().fake(),
                 supplyRequest);
 
         val issuePrescription = IssuePrescription.forPatient(sina)

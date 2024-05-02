@@ -15,6 +15,7 @@
 #
 # language: de
 
+@PRODUKT:eRp_FdV
 @iosNightly
 @Funktionalität:Dispensierung
 Funktionalität: E-Rezepte dispensieren
@@ -24,6 +25,7 @@ Funktionalität: E-Rezepte dispensieren
     Angenommen die Ärztin Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
 
+  @TCID:ERP_FDV_GKV_STANDARDDISPENSIERUNG_01
   @Funktionalität:Standarddispensierung
   Szenario: Dispensierung des E-Rezeptes mit dem verschriebenen Medikament
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
@@ -34,6 +36,7 @@ Funktionalität: E-Rezepte dispensieren
     Dann hat die Apotheke Am Flughafen genau 1 Quittung für Alice vorliegen
     Dann hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten
 
+  @TCID:ERP_FDV_GKV_MEHRFACHDISPENSIERUNG_01
   @Funktionalität:Mehrfachdispensierung
   Szenario: Dispensierung des E-Rezeptes mit mehreren Medikamenten
   Die Apotheke dispensiert das akzeptierte E-Rezept über mehrere Ersatzpräparate.
@@ -43,14 +46,14 @@ Funktionalität: E-Rezepte dispensieren
 
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
     Wenn die Ärztin Adelheid Ulmenwald folgendes E-Rezept an die Versicherte Alice verschreibt:
-      | Name         | PZN      | Substitution | Normgröße | Darreichungsform | Dosierung | Menge |
-      | IBUFLAM akut | 11648419 | true         | N3        | FTA              | 1-0-0-1   | 50    |
+      | Name         | PZN      | Kategorie | Substitution | Normgröße | Darreichungsform | Dosierung | Menge |
+      | IBUFLAM akut | 11648419 | 00        | true         | N3        | FTA              | 1-0-0-1   | 50    |
     Wenn die Versicherte Alice ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke das letzte akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an Alice dispensiert:
-      | Name         | PZN      | Normgröße | Menge | Einheit | Darreichungsform |
-      | IBUFLAM akut | 04100230 | N1       | 10    | Stk     | FTA              |
-      | IBUFLAM akut | 04100218 | N2       | 20    | Stk     | FTA              |
-      | IBUFLAM akut | 04100218 | N2       | 20    | Stk     | FTA              |
+      | Name         | PZN      | Kategorie | Normgröße | Menge | Einheit | Darreichungsform |
+      | IBUFLAM akut | 04100230 | 00        | N1        | 10    | Stk     | FTA              |
+      | IBUFLAM akut | 04100218 | 00        | N2        | 20    | Stk     | FTA              |
+      | IBUFLAM akut | 04100218 | 00        | N2        | 20    | Stk     | FTA              |
     Dann hat die Apotheke Am Flughafen genau 1 Quittung für Alice vorliegen
     Dann hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten

@@ -166,7 +166,13 @@ public class ErpClientFactory {
     val req = Unirest.get(certUrl).headers(headers);
 
     try {
-      val data = req.asBytes().getBody();
+      val response = req.asBytes();
+      val data = response.getBody();
+      log.info(
+          "Received response with {} bytes ({}) from VAU-Certificate with status code {}",
+          data.length,
+          response.getHeaders().getFirst("content-type"),
+          response.getStatus());
       val byteArrayInputStream = new ByteArrayInputStream(data);
       val cert = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
       log.info("Received VAU-Certificate successfully");

@@ -17,99 +17,159 @@
 package de.gematik.test.erezept.primsys
 
 import arrow.core.Either
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import de.gematik.test.erezept.primsys.PrimSysClientFactory.ClientData
 import de.gematik.test.erezept.primsys.data.error.ErrorDto
 import de.gematik.test.erezept.primsys.rest.*
-import io.restassured.http.ContentType
-import io.restassured.mapper.ObjectMapper
-import io.restassured.mapper.ObjectMapperDeserializationContext
-import io.restassured.mapper.ObjectMapperSerializationContext
-import io.restassured.response.Response
-import io.restassured.specification.RequestSpecification
-import java.util.function.Supplier
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 
-abstract class PrimSysClient(val requestSpecSupplier: Supplier<RequestSpecification>) {
+abstract class PrimSysClient(
+    val httpClient: HttpClient, val clientData: ClientData
+) {
 
-    fun <T> perform(request: PrimSysBaseGenericRequest<T>): PrimSysResponse<T> {
-        val response = request.performOn(requestSpec())
-        return unwrapResponse(request, response)
+    protected val objectMapper: ObjectMapper = ObjectMapper()
+    private val contentType: ContentType = ContentType.Application.Json
+
+
+    protected fun initRequestBuilder(): HttpRequestBuilder {
+        val rb = HttpRequestBuilder()
+        rb.url.protocol = clientData.protocol
+        rb.url.host = clientData.host
+
+        clientData.port?.let { rb.url.port = it }
+        clientData.env?.let { rb.url.appendEncodedPathSegments(it) }
+
+        clientData.apiKey?.let { rb.header("apiKey", it) }
+
+        rb.header(HttpHeaders.ContentType, contentType)
+        rb.header(HttpHeaders.Accept, contentType)
+        return rb
     }
 
-    protected fun requestSpec(): RequestSpecification =
-         requestSpecSupplier.get()
-            .accept(ContentType.JSON)       // by default, JSON can be changed later on
-            .contentType(ContentType.JSON)  // by default, JSON can be changed later on
+    suspend fun <T> perform(request: PrimSysBaseGenericRequest<T>): PrimSysResponse<T> {
+        val rb = this.initRequestBuilder()
+        request.finalizeRequest(rb, this.objectMapper)
+        return performHttpRequest(request.responseType, rb)
+    }
 
-    protected fun <R: PrimSysBaseRequest<T>, T> unwrapResponse(request: R, response: Response): PrimSysResponse<T> {
+    fun <T> performBlocking(request: PrimSysBaseGenericRequest<T>): PrimSysResponse<T> = runBlocking {
+        perform(request)
+    }
+
+    protected suspend fun <T> performHttpRequest(
+        expectedType: TypeReference<T>, rb: HttpRequestBuilder
+    ): PrimSysResponse<T> {
+        val response = httpClient.prepareRequest(rb).execute()
+        return unwrapResponse(expectedType, response)
+    }
+
+
+    private suspend fun <R : PrimSysBaseRequest<T>, T> unwrapResponse(
+        expectedType: TypeReference<T>, response: HttpResponse
+    ): PrimSysResponse<T> {
         try {
-            val body = when(request.responseType.type == Unit.javaClass && response.isEmpty()) {
-                true -> response.body.`as`(request.responseType.type, EmptyResponseMapper())
-                false -> response.body.`as`<T>(request.responseType.type)
+            return when (response.status.value < 300) {
+                true -> {
+                    when (expectedType.type) {
+                        Unit::class.java -> return PrimSysResponse(
+                            response.status.value,
+                            response.headers,
+                            @Suppress("UNCHECKED_CAST")
+                            Either.Right(Unit as T)
+                        )
+
+                        else -> {
+                            val body = objectMapper.readValue(response.bodyAsText(), expectedType)
+                            return PrimSysResponse(response.status.value, response.headers, Either.Right(body))
+                        }
+                    }
+                }
+
+                false -> handleErrorResponse(response)
             }
-            return PrimSysResponse(response.statusCode, response.headers, Either.Right(body))
         } catch (e: Exception) {
             return handleErrorResponse(response)
         }
     }
 
 
-    private fun <T> handleErrorResponse(response: Response): PrimSysResponse<T> =
+    private suspend fun <T> handleErrorResponse(response: HttpResponse): PrimSysResponse<T> =
         when {
-            response.isEmpty() ->
-                PrimSysResponse(response.statusCode, response.headers, Either.Left(ErrorDto.internalError("no error message")))
-
             response.isHtml() -> PrimSysResponse(
-                response.statusCode, response.headers,
-                Either.Left(ErrorDto.internalError(response.then().extract().htmlPath().getString("")))
+                response.status.value, response.headers,
+                Either.Left(ErrorDto.internalError(response.bodyAsText()))
             )
+
+            response.isEmpty() ->
+                PrimSysResponse(
+                    response.status.value,
+                    response.headers,
+                    Either.Left(ErrorDto.internalError("no error message"))
+                )
 
             else -> handlePrimsysErrorResponse(response)
         }
 
 
-    private fun <T> handlePrimsysErrorResponse(response: Response): PrimSysResponse<T> {
+    private suspend fun <T> handlePrimsysErrorResponse(response: HttpResponse): PrimSysResponse<T> {
         return try {
-            val body = response.body.`as`(ErrorDto::class.java)
-            PrimSysResponse(response.statusCode, response.headers, Either.Left(body))
+            val body = this.objectMapper.readValue(response.bodyAsText(), ErrorDto::class.java)
+            PrimSysResponse(response.status.value, response.headers, Either.Left(body))
         } catch (e: Exception) {
-            PrimSysResponse(response.statusCode, response.headers, Either.Left(ErrorDto.internalError(e.message)))
+            PrimSysResponse(response.status.value, response.headers, Either.Left(ErrorDto.internalError(e.message)))
         }
     }
 }
 
-class PrimSysDoctor(val doctorId: String, requestSpecSupplier: Supplier<RequestSpecification>) :
-    PrimSysClient(requestSpecSupplier) {
 
-    fun <T> perform(request: PrimSysBaseDoctorRequest<T>): PrimSysResponse<T> {
-        val response = request.performOn(doctorId, requestSpec())
-        return unwrapResponse(request, response)
+class PrimSysDoctor(
+    val doctorId: String, httpClient: HttpClient, clientData: ClientData
+) : PrimSysClient(httpClient, clientData) {
+
+    private fun setActorId(rb: HttpRequestBuilder) {
+        rb.url.appendEncodedPathSegments("doc", doctorId)
+    }
+
+    suspend fun <T> perform(request: PrimSysBaseDoctorRequest<T>): PrimSysResponse<T> {
+        val rb = this.initRequestBuilder()
+        this.setActorId(rb)
+        request.finalizeRequest(rb, this.objectMapper)
+        return performHttpRequest(request.responseType, rb)
+    }
+
+    fun <T> performBlocking(request: PrimSysBaseDoctorRequest<T>): PrimSysResponse<T> = runBlocking {
+        perform(request)
     }
 }
 
-class PrimSysPharmacy(val pharmacyId: String, requestSpecSupplier: Supplier<RequestSpecification>) :
-    PrimSysClient(requestSpecSupplier) {
+class PrimSysPharmacy(private val pharmacyId: String, httpClient: HttpClient, clientData: ClientData) :
+    PrimSysClient(httpClient, clientData) {
 
-    fun <T> perform(request: PrimSysBasePharmacyRequest<T>): PrimSysResponse<T> {
-        val response = request.performOn(pharmacyId, requestSpec())
-        return unwrapResponse(request, response)
+    private fun setActorId(rb: HttpRequestBuilder) {
+        rb.url.appendEncodedPathSegments("pharm", pharmacyId)
+    }
+
+    suspend fun <T> perform(request: PrimSysBasePharmacyRequest<T>): PrimSysResponse<T> {
+        val rb = this.initRequestBuilder()
+        this.setActorId(rb)
+        request.finalizeRequest(rb, this.objectMapper)
+        return performHttpRequest(request.responseType, rb)
+    }
+
+    fun <T> performBlocking(request: PrimSysBasePharmacyRequest<T>): PrimSysResponse<T> = runBlocking {
+        perform(request)
     }
 }
 
-fun Response.isEmpty(): Boolean {
-    val bodyString = this.body.asString()
-    return bodyString.isNullOrEmpty() || bodyString.isBlank()
+fun HttpResponse.isEmpty(): Boolean {
+    return this.headers[HttpHeaders.ContentLength]?.equals("0") ?: true // no Content-Length will result in empty body
 }
 
-fun Response.isHtml(): Boolean {
-    return ContentType.HTML.matches(this.contentType)
-}
-
-private class EmptyResponseMapper() : ObjectMapper {
-    override fun deserialize(p0: ObjectMapperDeserializationContext?) {
-        return  // deserialize empty responses
-    }
-
-    override fun serialize(p0: ObjectMapperSerializationContext?): Any {
-        return Unit
-    }
-
+fun HttpResponse.isHtml(): Boolean {
+    return this.headers[HttpHeaders.ContentType]?.contains("html") ?: false
 }

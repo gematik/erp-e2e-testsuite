@@ -28,37 +28,69 @@ import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
+import de.gematik.test.smartcard.Egk;
+import java.util.List;
 import java.util.Map;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class DownloadReadyTaskTest {
 
-  @Test
-  void shouldPerformCorrectCommand() {
+  private static VsdmExamEvidence examEvidence;
+  private static PharmacyActor pharmacist;
+  private static PatientActor sina;
+
+  @BeforeAll
+  static void setup() {
     val useErpClient = mock(UseTheErpClient.class);
-    val pharmacist = new PharmacyActor("PhaMoc");
+    pharmacist = new PharmacyActor("PhaMoc");
     pharmacist.can(useErpClient);
 
-    val sina = new PatientActor("sina");
-    val providePatientBaseData = ProvidePatientBaseData.forGkvPatient(KVNR.random(), "sina");
+    sina = new PatientActor("sina");
+    val egk = new Egk(List.of(), "80276883110000113298", "X110498565");
+    sina.can(ProvideEGK.sheOwns(egk));
+    val providePatientBaseData =
+        ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), "sina");
     sina.can(providePatientBaseData);
 
-    val examEvidence =
-        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES).build().encodeAsBase64();
+    examEvidence =
+        VsdmExamEvidence.asOnlineTestMode(sina.getEgk())
+            .generate(VsdmExamEvidenceResult.NO_UPDATES);
 
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTaskBundle.class)
-            .withStatusCode(404)
+        ErpResponse.forPayload(new ErxTaskBundle(), ErxTaskBundle.class)
+            .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(useErpClient.request(any(TaskGetByExamEvidenceCommand.class))).thenReturn(mockResponse);
+  }
 
+  @Test
+  void withExamEvidence() {
     assertDoesNotThrow(() -> pharmacist.performs(DownloadReadyTask.withExamEvidence(examEvidence)));
-    assertDoesNotThrow(() -> pharmacist.performs(DownloadReadyTask.withoutExamEvidence()));
+  }
+
+  @Test
+  void withExamEvidenceAndKVNR() {
+    assertDoesNotThrow(
+        () ->
+            pharmacist.performs(DownloadReadyTask.withExamEvidence(examEvidence, sina.getKvnr())));
+  }
+
+  @Test
+  void withoutExamEvidence() {
+    assertDoesNotThrow(
+        () -> pharmacist.performs(DownloadReadyTask.withoutExamEvidence(sina.getKvnr())));
+  }
+
+  @Test
+  void withInvalidExamEvidence() {
+    assertDoesNotThrow(() -> pharmacist.performs(DownloadReadyTask.withInvalidExamEvidence()));
   }
 }

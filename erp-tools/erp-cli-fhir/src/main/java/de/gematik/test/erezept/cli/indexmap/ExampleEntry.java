@@ -29,21 +29,21 @@ public class ExampleEntry {
   private String fileName;
   private EncodingType fileType;
   private String description;
-  private boolean validationResult;
+  private boolean validationSuccessful;
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private List<HapiValidationError> errors = new LinkedList<>();
+  private List<HapiValidationResult> validationResults = new LinkedList<>();
 
-  public void addError(HapiValidationError error) {
-    this.errors.add(error);
+  public void addResult(HapiValidationResult error) {
+    this.validationResults.add(error);
   }
 
-  public void addErrors(List<HapiValidationError> errors) {
-    this.errors.addAll(errors);
+  public void addResults(List<HapiValidationResult> errors) {
+    this.validationResults.addAll(errors);
   }
 
-  public void setErrors(ValidationResult result) {
-    this.setValidationResult(result.isSuccessful());
-    this.addErrors(HapiValidationError.from(result));
+  public void setValidationResults(ValidationResult result) {
+    this.setValidationSuccessful(result.isSuccessful());
+    this.addResults(HapiValidationResult.from(result));
   }
 }

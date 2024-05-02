@@ -27,7 +27,6 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.PZN;
 import java.util.Date;
 import lombok.val;
 import org.hl7.fhir.r4.model.Practitioner;
@@ -46,8 +45,8 @@ class SupplyRequestBuilderTest extends ParsingTest {
   @BeforeAll
   static void setup() {
     coverage = KbvCoverageBuilder.faker().build();
-    medication = KbvErpMedicationPZNBuilder.faker().pzn(PZN.random(), "randomMedication").build();
-    practitioner = PractitionerBuilder.faker().build();
+    medication = KbvErpMedicationPZNFaker.builder().fake();
+    practitioner = PractitionerFaker.builder().fake();
   }
 
   @Test
@@ -75,7 +74,7 @@ class SupplyRequestBuilderTest extends ParsingTest {
   @Test
   void fakeForPatientShouldWork() {
     val sr =
-        SupplyRequestBuilder.fakeForPatient(PatientBuilder.faker().build())
+        SupplyRequestBuilder.fakeForPatient(PatientFaker.builder().fake())
             .medication(medication)
             .requester(practitioner)
             .coverage(coverage)
@@ -87,8 +86,8 @@ class SupplyRequestBuilderTest extends ParsingTest {
   void supplyRequestShouldBeValid() {
     val supplyRequest =
         SupplyRequestBuilder.withCoverage(coverage)
-            .medication(KbvErpMedicationPZNBuilder.faker().build())
-            .requester(PractitionerBuilder.faker().build())
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .requester(PractitionerFaker.builder().fake())
             .build();
     val resultSupplyRequest = ValidatorUtil.encodeAndValidate(parser, supplyRequest);
     assertTrue(resultSupplyRequest.isSuccessful());
@@ -96,7 +95,7 @@ class SupplyRequestBuilderTest extends ParsingTest {
 
   @Test
   void shouldThrowNullPointerExcCausedByMissingCoverage() {
-    val patient = PatientBuilder.faker().build();
+    val patient = PatientFaker.builder().fake();
     var sr = SupplyRequestBuilder.fakeForPatient(patient).requester(practitioner);
     assertThrows(BuilderException.class, sr::build);
   }
@@ -130,8 +129,8 @@ class SupplyRequestBuilderTest extends ParsingTest {
   void authoredOnShouldWork() {
     val supplyRequest =
         SupplyRequestBuilder.withCoverage(coverage)
-            .medication(KbvErpMedicationPZNBuilder.faker().build())
-            .requester(PractitionerBuilder.faker().build())
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .requester(PractitionerFaker.builder().fake())
             .authoredOn(new Date())
             .build();
     assertNotNull(supplyRequest);
@@ -141,8 +140,8 @@ class SupplyRequestBuilderTest extends ParsingTest {
   void authoredOnShouldWorkWithTemporalPrecision() {
     val supplyRequest =
         SupplyRequestBuilder.withCoverage(coverage)
-            .medication(KbvErpMedicationPZNBuilder.faker().build())
-            .requester(PractitionerBuilder.faker().build())
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .requester(PractitionerFaker.builder().fake())
             .authoredOn(new Date(), TemporalPrecisionEnum.DAY)
             .build();
     assertNotNull(supplyRequest);

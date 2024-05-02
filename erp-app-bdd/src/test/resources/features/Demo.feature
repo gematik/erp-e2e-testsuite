@@ -15,8 +15,10 @@
 #
 # language: de
 
+@PRODUKT:eRp_FdV
 @Demo
 Funktionalität: Demo Feature
 
+  @TCID:ERP_FDV_DEMO_01
   Szenario: App Konfiguration initialisieren
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet

@@ -47,7 +47,7 @@ class KbvErpMedicationIngredientBuilderTest extends ParsingTest {
 
   @Test
   void shouldFakeCorrect() {
-    val mI = KbvErpMedicationIngredientBuilder.faker().build();
+    val mI = KbvErpMedicationIngredientFaker.builder().fake();
     val result = ValidatorUtil.encodeAndValidate(parser, mI);
     assertTrue(result.isSuccessful());
   }
@@ -55,7 +55,7 @@ class KbvErpMedicationIngredientBuilderTest extends ParsingTest {
   @Test
   void shouldFakeCorrectWithDrugName() {
     val drugName = "TestName";
-    val mI = KbvErpMedicationIngredientBuilder.faker(drugName).build();
+    val mI = KbvErpMedicationIngredientFaker.builder().withDrugName(drugName).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, mI);
     assertEquals(
         drugName,
@@ -67,7 +67,11 @@ class KbvErpMedicationIngredientBuilderTest extends ParsingTest {
   void shouldFakeCorrectWithDrugNameAndConsumeDescription() {
     val drugName = "TestName";
     val darreichung = "darreichungsform";
-    val mI = KbvErpMedicationIngredientBuilder.faker(darreichung, drugName).build();
+    val mI =
+        KbvErpMedicationIngredientFaker.builder()
+            .withDosageForm(darreichung)
+            .withDrugName(drugName)
+            .fake();
     assertEquals(
         drugName,
         mI.getIngredientFirstRep().getItem().getChildByName("text").getValues().get(0).toString());

@@ -35,7 +35,7 @@ class KbvCoverageBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Coverage with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFixedValues(KbvItaForVersion version) {
-    val patient = PatientBuilder.faker().version(version).build();
+    val patient = PatientFaker.builder().withVersion(version).fake();
     val coverage =
         KbvCoverageBuilder.insurance(GkvInsuranceCoverageInfo.TK)
             .version(version)
@@ -59,7 +59,7 @@ class KbvCoverageBuilderTest extends ParsingTest {
       name = "[{index}] -> Build KBV Coverage with UK PayorType with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithUKPayorType(KbvItaForVersion version) {
-    val patient = PatientBuilder.faker().version(version).build();
+    val patient = PatientFaker.builder().withVersion(version).fake();
     val tkCoverageInfo = GkvInsuranceCoverageInfo.TK;
     val coverage =
         KbvCoverageBuilder.insurance(tkCoverageInfo)
@@ -87,7 +87,7 @@ class KbvCoverageBuilderTest extends ParsingTest {
       name = "[{index}] -> Build KBV Coverage with SKT PayorType with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithSKTPayorType(KbvItaForVersion version) {
-    val patient = PatientBuilder.faker().version(version).build();
+    val patient = PatientFaker.builder().withVersion(version).fake();
     val tkCoverageInfo = GkvInsuranceCoverageInfo.TK;
     val coverage =
         KbvCoverageBuilder.insurance(tkCoverageInfo)

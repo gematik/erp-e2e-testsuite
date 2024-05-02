@@ -75,6 +75,9 @@ public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
   public static ResponseOfGetTask asPharmacy(String examEvidence) {
     log.info(format("Download all open task with exam evidence {0}", examEvidence));
     return new ResponseOfGetTask(
-        ActorRole.PHARMACY, new TaskGetByExamEvidenceCommand(examEvidence));
+        ActorRole.PHARMACY,
+        examEvidence != null
+            ? new TaskGetByExamEvidenceCommand(examEvidence)
+            : new TaskGetByExamEvidenceCommand());
   }
 }

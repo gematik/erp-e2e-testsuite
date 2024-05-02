@@ -54,6 +54,8 @@ import de.gematik.test.fuzzing.fhirfuzz.FhirFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
 import de.gematik.test.smartcard.Algorithm;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -292,13 +294,15 @@ class IssuePrescriptionTest {
     val doc = mockUtil.actorStage.getDoctorNamed("Adelheid Ulmenwald");
     when(mockUtil.erpClientMock.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockUtil.erpClientMock.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
-
+    val sigObserver = new ByteArrayOutputStream();
     val isPr =
         IssuePrescription.forPatient(patient)
             .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
             .withSmartFuzzer(new FhirFuzzImpl(new FuzzerContext(FuzzConfig.getRandom())))
-            .withRandomKbvBundle();
+            .withRandomKbvBundle()
+            .setSignatureObserver(sigObserver);
     assertDoesNotThrow(() -> doc.performs(isPr));
+    assertTrue((Base64.getEncoder().encodeToString(sigObserver.toByteArray())).length() > 20);
   }
 
   private ErpResponse<ErxTask> createErpResponse(ErxTask draftTask) {

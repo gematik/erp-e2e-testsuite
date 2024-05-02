@@ -31,7 +31,7 @@ class ErxAuditEventBundleTest {
     val agentId = TelematikID.from("3-SMC-B-Testkarte-883110000116873");
     val erxAuditEventBundle = FhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName);
 
-    assertEquals(2, erxAuditEventBundle.getAuditEvents().size());
-    assertEquals(2, erxAuditEventBundle.getAuditEvents(agentId).size());
+    assertEquals(4, erxAuditEventBundle.getAuditEvents().size());
+    assertEquals(4, erxAuditEventBundle.getAuditEvents(agentId).size());
   }
 }

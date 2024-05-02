@@ -15,6 +15,7 @@
 #
 # language: de
 
+@PRODUKT:eRp_FdV
 @iosNightly
 @Einstellungen
 Funktionalität: Einstellungen
@@ -23,13 +24,14 @@ Funktionalität: Einstellungen
   Grundlage: Rezept wird erzeugt, geladen und ist auf dem Mainscreen
     Angenommen die GKV Versicherte Alice öffnet das Onboarding
 
-
+  @TCID:ERP_FDV_GKV_RECHTLICHES_01
   @Rechtliches
   Szenario:  Verifikation Datenschutzerklärung und Nutzungsbedingungen während des Onboarding
     Wenn die Versicherte das Impressum während des Onboarding überprüfen möchte
     Dann sind die Nutzungsbedingungen und den Datenschutz sichtbar
 
 
+  @TCID:ERP_FDV_GKV_RECHTLICHES_02
   @Rechtliches
   Szenario: Verifikation von Einstellungen - Rechtliches
     Wenn die Versicherte das Impressum nach dem Onboarding überprüfen möchte

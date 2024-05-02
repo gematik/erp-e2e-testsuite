@@ -18,6 +18,8 @@ package de.gematik.test.erezept.actions;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
+import static de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil.createOperationOutcome;
+import static org.junit.Assert.*;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -48,8 +50,7 @@ class VerifyTest {
   @Test
   void shouldVerifyOperationOutcomeInteraction() {
     val response =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), OperationOutcome.class)
+        ErpResponse.forPayload(createOperationOutcome(), OperationOutcome.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -85,5 +86,37 @@ class VerifyTest {
                     PrescriptionFlowType
                         .FLOW_TYPE_160)) // sounds stupid but covers an additional method call
             .isCorrect());
+  }
+
+  @Test
+  void shouldVerifyWithoutBody() {
+    val task = new ErxTask();
+    val response =
+        ErpResponse.forPayload(task, ErxTask.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
+    actor.attemptsTo(
+        Verify.that(interaction).withoutBody().hasResponseWith(returnCode(201)).isCorrect());
+    actor.attemptsTo(
+        Verify.that(interaction).withoutBody().responseWith(returnCode(201)).isCorrect());
+    actor.attemptsTo(
+        Verify.that(interaction).withoutBody().andResponse(returnCode(201)).isCorrect());
+  }
+
+  @Test
+  void shouldVerifyIsFromExpectedType() {
+    val task = new ErxTask();
+    val coding = PrescriptionFlowType.FLOW_TYPE_160.asCoding(true);
+    task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
+
+    val response =
+        ErpResponse.forPayload(task, ErxTask.class)
+            .withStatusCode(201)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    val interaction = new ErpInteraction<>(response);
+    actor.attemptsTo(Verify.that(interaction).isFromExpectedType());
   }
 }

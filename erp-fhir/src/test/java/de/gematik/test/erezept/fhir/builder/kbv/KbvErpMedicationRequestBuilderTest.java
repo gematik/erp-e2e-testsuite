@@ -36,10 +36,10 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithAccident(KbvItaErpVersion version) {
     val medicationRequest =
-        MedicationRequestBuilder.faker()
-            .version(version)
-            .accident(AccidentExtension.accident())
-            .build();
+        MedicationRequestFaker.builder()
+            .withVersion(version)
+            .withAccident(AccidentExtension.accident())
+            .fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -52,10 +52,10 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithStatusCoPayment(KbvItaErpVersion version) {
     val medicationRequest =
-        MedicationRequestBuilder.faker()
-            .version(version)
-            .coPaymentStatus(StatusCoPayment.STATUS_0)
-            .build();
+        MedicationRequestFaker.builder()
+            .withVersion(version)
+            .withCoPaymentStatus(StatusCoPayment.STATUS_0)
+            .fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -70,10 +70,10 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithAccidentAtWork(KbvItaErpVersion version) {
     val medicationRequest =
-        MedicationRequestBuilder.faker()
-            .version(version)
-            .accident(AccidentExtension.accidentAtWork().atWorkplace())
-            .build();
+        MedicationRequestFaker.builder()
+            .withVersion(version)
+            .withAccident(AccidentExtension.accidentAtWork().atWorkplace())
+            .fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -86,10 +86,10 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithOccupationalDisease(KbvItaErpVersion version) {
     val medicationRequest =
-        MedicationRequestBuilder.faker()
-            .version(version)
-            .accident(AccidentExtension.occupationalDisease())
-            .build();
+        MedicationRequestFaker.builder()
+            .withVersion(version)
+            .withAccident(AccidentExtension.occupationalDisease())
+            .fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -102,10 +102,10 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithFakerAccident(KbvItaErpVersion version) {
     val medicationRequest =
-        MedicationRequestBuilder.faker()
-            .version(version)
-            .accident(AccidentExtension.faker())
-            .build();
+        MedicationRequestFaker.builder()
+            .withVersion(version)
+            .withAccident(AccidentExtension.faker())
+            .fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -118,10 +118,11 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithMvoIdentifier(KbvItaErpVersion version) {
     val medicationRequest =
-        MedicationRequestBuilder.faker()
-            .version(version)
-            .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).withRandomId().validForDays(365))
-            .build();
+        MedicationRequestFaker.builder()
+            .withVersion(version)
+            .withMvo(
+                MultiplePrescriptionExtension.asMultiple(1, 4).withRandomId().validForDays(365))
+            .fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -133,20 +134,20 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
               + " {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestWithFaker(KbvItaErpVersion version) {
-    val medicationRequest = MedicationRequestBuilder.faker().version(version).build();
+    val medicationRequest = MedicationRequestFaker.builder().withVersion(version).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
   }
 
   @Test
   void shouldUseUnknownStatusOnInvalidCode() {
-    val medicationRequest = MedicationRequestBuilder.faker().status("abc").build();
+    val medicationRequest = MedicationRequestFaker.builder().withStatus("abc").fake();
     assertEquals(MedicationRequest.MedicationRequestStatus.UNKNOWN, medicationRequest.getStatus());
   }
 
   @Test
   void shouldUseNullIntentOnInvalidCode() {
-    val medicationRequest = MedicationRequestBuilder.faker().intent("abc").build();
+    val medicationRequest = MedicationRequestFaker.builder().withIntent("abc").fake();
     assertEquals(MedicationRequest.MedicationRequestIntent.NULL, medicationRequest.getIntent());
   }
 }

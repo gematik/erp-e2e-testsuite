@@ -17,32 +17,70 @@
 package de.gematik.test.erezept.primsys.rest
 
 import com.fasterxml.jackson.core.type.TypeReference
-import io.restassured.http.ContentType
-import io.restassured.response.Response
-import io.restassured.specification.RequestSpecification
+import com.fasterxml.jackson.databind.ObjectMapper
+import de.gematik.test.erezept.primsys.data.PrescriptionDto
+import de.gematik.test.erezept.primsys.data.actors.ActorDto
+import de.gematik.test.erezept.primsys.data.info.InfoDto
+import io.ktor.client.request.*
+import io.ktor.http.*
+
 
 abstract class PrimSysBaseRequest<R>(val responseType: TypeReference<R>) {
+    abstract fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper)
+}
 
-    fun getAcceptContentType(): ContentType {
-        return ContentType.JSON
+abstract class PrimSysBaseGenericRequest<R>(responseType: TypeReference<R>) : PrimSysBaseRequest<R>(responseType)
+
+abstract class PrimSysBaseDoctorRequest<R>(responseType: TypeReference<R>) : PrimSysBaseRequest<R>(responseType)
+
+abstract class PrimSysBasePharmacyRequest<R>(responseType: TypeReference<R>) : PrimSysBaseRequest<R>(responseType)
+
+
+class InfoRequest: PrimSysBaseGenericRequest<InfoDto>(object : TypeReference<InfoDto>() {}) {
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Get
+        rb.url.appendEncodedPathSegments("info")
     }
+}
 
-    open fun getContentType(): ContentType {
-        return ContentType.JSON
+class ActorsRequest: PrimSysBaseGenericRequest<List<ActorDto>>(object : TypeReference<List<ActorDto>>() {}) {
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Get
+        rb.url.appendEncodedPathSegments("actors")
     }
 }
 
-abstract class PrimSysBaseGenericRequest<R>(responseType: TypeReference<R>): PrimSysBaseRequest<R>(responseType) {
+class GetReadyPrescriptionByIdRequest(private val prescriptionId: String) :
+    PrimSysBaseGenericRequest<PrescriptionDto>(object : TypeReference<PrescriptionDto>() {}) {
 
-    abstract fun performOn(reqSpec: RequestSpecification): Response
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Get
+        rb.url.appendEncodedPathSegments("prescription", "prescribed", prescriptionId)
+    }
 }
 
-abstract class PrimSysBaseDoctorRequest<R>(responseType: TypeReference<R>): PrimSysBaseRequest<R>(responseType) {
+class GetAllReadyPrescriptions :
+    PrimSysBaseGenericRequest<List<PrescriptionDto>>(object: TypeReference<List<PrescriptionDto>>() {}) {
 
-    abstract fun performOn(doctorId: String, reqSpec: RequestSpecification): Response
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Get
+        rb.url.appendEncodedPathSegments("prescription", "prescribed")
+    }
 }
 
-abstract class PrimSysBasePharmacyRequest<R>(responseType: TypeReference<R>): PrimSysBaseRequest<R>(responseType) {
+object BasicRequests {
 
-    abstract fun performOn(pharmacyId: String, reqSpec: RequestSpecification): Response
+    @JvmStatic
+    fun getInfo() = InfoRequest()
+
+    @JvmStatic
+    fun getActors() = ActorsRequest()
+
+    @JvmStatic
+    fun getReadyPrescription(id: String) = GetReadyPrescriptionByIdRequest(id)
+
+    @JvmStatic
+    fun getReadyPrescriptions() = GetAllReadyPrescriptions()
 }

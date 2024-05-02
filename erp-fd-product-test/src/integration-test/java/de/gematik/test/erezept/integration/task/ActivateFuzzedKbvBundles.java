@@ -31,7 +31,6 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.erezept.toggle.FuzzingIncrementsToggle;
 import de.gematik.test.erezept.toggle.FuzzingIterationsToggle;
 import de.gematik.test.fuzzing.core.ByteArrayMutator;
@@ -211,12 +210,12 @@ class ActivateFuzzedKbvBundles extends ErpTest {
       name = "[{index}] -> Verordnender Arzt stellt ein smartFuzzed E-Rezept mit ''{0}'' aus")
   @MethodSource("fuzzingContextProvider")
   void activatePrescriptionWithSmartFuzzer(FuzzConfig fuzzConfig) {
-    var assignmentKind = PrescriptionAssignmentKind.PHARMACY_ONLY;
-    var insuranceType = VersicherungsArtDeBasis.GKV;
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-      insuranceType = GemFaker.randomElement(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV);
-      assignmentKind = GemFaker.randomElement(PrescriptionAssignmentKind.PHARMACY_ONLY, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-    }
+    var insuranceType =
+        GemFaker.randomElement(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV);
+    var assignmentKind =
+        GemFaker.randomElement(
+            PrescriptionAssignmentKind.PHARMACY_ONLY, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
     sina.changePatientInsuranceType(insuranceType);
     val fuzzerContext = new FuzzerContext(fuzzConfig);
     val fhirFuzzer = new FhirFuzzImpl(fuzzerContext);

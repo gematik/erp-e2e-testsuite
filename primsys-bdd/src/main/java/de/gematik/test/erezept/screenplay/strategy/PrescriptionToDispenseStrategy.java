@@ -37,7 +37,6 @@ public class PrescriptionToDispenseStrategy {
   private KVNR kvnr;
   private Actor patient;
   private Secret secret;
-
   private AccessCode accessCode;
   private PrescriptionId prescriptionId;
   private ManagePharmacyPrescriptions prescriptionManager;

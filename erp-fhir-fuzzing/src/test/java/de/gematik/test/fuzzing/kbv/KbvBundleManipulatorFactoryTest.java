@@ -56,7 +56,7 @@ class KbvBundleManipulatorFactoryTest extends ParsingTest {
 
     val executables =
         manipulators.stream()
-            //            .filter(m -> m.getName().contains("Leerzeichen nach der Patient-Adresse"))
+            // .filter(m -> m.getName().contains("MedicationCategory-manipulator"))
             .map(
                 m ->
                     (Executable)

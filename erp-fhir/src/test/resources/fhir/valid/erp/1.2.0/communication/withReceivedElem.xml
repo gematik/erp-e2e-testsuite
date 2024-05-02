@@ -1,0 +1,29 @@
+<Communication xmlns="http://hl7.org/fhir">
+    <id value="01ebbefd-5181-4228-9461-e419ff6a5cea"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.2"/>
+    </meta>
+    <basedOn>
+        <reference
+                value="Task/160.000.086.669.204.72/$accept?ac=34a866883c327fc08db94c9411894fcc3908e2a805e9d313dd3a6083d7d42b4b"/>
+    </basedOn>
+    <status value="unknown"/>
+    <sent value="2024-04-02T16:19:28.361+00:00"/>
+    <received value="2024-04-02T16:19:30.251+00:00"/>
+    <recipient>
+        <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="3-SMC-B-Testkarte-883110000116873"/>
+        </identifier>
+    </recipient>
+    <sender>
+        <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110498565"/>
+        </identifier>
+    </sender>
+    <payload>
+        <contentString
+                value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;hint&quot;:&quot;Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??&quot;}"/>
+    </payload>
+</Communication>

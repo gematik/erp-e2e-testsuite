@@ -16,20 +16,20 @@
 
 package de.gematik.test.konnektor.soap;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.konnektor.profile.*;
+import de.gematik.test.konnektor.profile.MockProfile;
 import de.gematik.test.konnektor.soap.mock.*;
-import de.gematik.test.konnektor.soap.mock.vsdm.*;
-import de.gematik.test.smartcard.*;
-import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.*;
-import de.gematik.ws.conn.cardservice.wsdl.v8.*;
-import de.gematik.ws.conn.cardterminalservice.wsdl.v1.*;
-import de.gematik.ws.conn.certificateservice.wsdl.v6.*;
-import de.gematik.ws.conn.encryptionservice.wsdl.v6.*;
-import de.gematik.ws.conn.eventservice.wsdl.v7.*;
-import de.gematik.ws.conn.signatureservice.wsdl.v7.*;
-import de.gematik.ws.conn.vsds.vsdservice.v5.*;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
+import de.gematik.test.smartcard.SmartcardArchive;
+import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureServicePortType;
+import de.gematik.ws.conn.cardservice.wsdl.v8.CardServicePortType;
+import de.gematik.ws.conn.cardterminalservice.wsdl.v1.CardTerminalServicePortType;
+import de.gematik.ws.conn.certificateservice.wsdl.v6.CertificateServicePortType;
+import de.gematik.ws.conn.encryptionservice.wsdl.v6.EncryptionServicePortType;
+import de.gematik.ws.conn.eventservice.wsdl.v7.EventServicePortType;
+import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureServicePortType;
+import de.gematik.ws.conn.vsds.vsdservice.v5.VSDServicePortType;
 
 public class MockKonnektorServiceProvider extends ServicePortProvider {
 
@@ -43,7 +43,7 @@ public class MockKonnektorServiceProvider extends ServicePortProvider {
   }
 
   public MockKonnektorServiceProvider(SmartcardArchive smartcardArchive) {
-    this(smartcardArchive, new VsdmService(new byte[32], 'S', '1'));
+    this(smartcardArchive, VsdmService.instantiateWithTestKey());
   }
 
   @Override

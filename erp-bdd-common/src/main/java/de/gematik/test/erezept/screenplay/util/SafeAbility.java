@@ -28,7 +28,7 @@ public class SafeAbility {
   }
 
   /**
-   * Get an ability from a given Actor in safe manner. That means that only an ability is returned
+   * Get an ability from a given Actor in a safe manner. That means that only an ability is returned
    * if the Actor has this ability
    *
    * @param actor who should have a specific ability

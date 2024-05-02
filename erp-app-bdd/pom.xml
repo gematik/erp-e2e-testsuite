@@ -6,7 +6,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.8.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
@@ -54,6 +54,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
@@ -81,8 +86,55 @@
             <groupId>com.googlecode.plist</groupId>
             <artifactId>dd-plist</artifactId>
         </dependency>
-
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>sync-testcases</id>
+            <properties>
+                <polarion.ml-id>ERP_FDV_*</polarion.ml-id>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>de.gematik</groupId>
+                        <artifactId>gematik-polarion-maven-plugin</artifactId>
+                        <version>${version.poto}</version>
+                        <executions>
+                            <execution>
+                                <id>parse</id>
+                                <configuration>
+                                    <pathToBddFiles>${project.basedir}/src/test/resources/features</pathToBddFiles>
+                                    <destinationFilePath>${project.basedir}/target/polarion/testcase.json
+                                    </destinationFilePath>
+                                </configuration>
+                                <goals>
+                                    <goal>parse-bdd</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                            </execution>
+                            <execution>
+                                <id>sync</id>
+                                <configuration>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <username>${env.POLARION_CREDENTIALS_USR}</username>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <password>${env.POLARION_CREDENTIALS_PSW}</password>
+                                    <luceneQuery>cfInternalId:${polarion.ml-id}</luceneQuery>
+                                    <project>Mainline_OPB1</project>
+                                    <jsonFilePath>${project.basedir}/target/polarion/testcase.json</jsonFilePath>
+                                </configuration>
+                                <goals>
+                                    <goal>sync-testcases</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>

@@ -28,7 +28,7 @@ import java.nio.charset.*;
 import java.util.concurrent.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import org.apache.commons.lang3.tuple.Pair;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Help.Ansi.*;
 
@@ -68,10 +68,11 @@ public class Validator implements Callable<Integer> {
 
         val resource = fhir.decode(content);
         val description = descriptionCreator.acceptResource(resource);
-        val entry = createEntry(f, resource, description);
-        edm.addEntry(entry);
 
-        val vr = fhir.validate(content);
+        val validationPair = validate(f, content, description);
+        edm.addEntry(validationPair.getRight());
+
+        val vr = validationPair.getLeft();
         if (!vr.isSuccessful()) {
           val errors =
               vr.getMessages().stream()
@@ -95,7 +96,7 @@ public class Validator implements Callable<Integer> {
       }
     }
 
-    edm.write(directories.getOut());
+    edm.write(directories.getOut(), "validation_details.json");
     return 0;
   }
 
@@ -135,18 +136,18 @@ public class Validator implements Callable<Integer> {
     }
   }
 
-  private ExampleEntry createEntry(File sourceFile, Resource resource, String description) {
+  private Pair<ValidationResult, ExampleEntry> validate(
+      File sourceFile, String content, String description) {
     val fileName = relativize(sourceFile);
-    val encoding = EncodingType.fromString(sourceFile.getName());
-    val content = fhir.encode(resource, encoding, true);
+    val encoding = EncodingType.guessFromContent(content);
     val result = fhir.validate(content);
 
     val entry = new ExampleEntry();
-    entry.setFileType(EncodingType.XML);
+    entry.setFileType(encoding);
     entry.setFileName(fileName);
     entry.setDescription(description);
-    entry.setErrors(result);
-    return entry;
+    entry.setValidationResults(result);
+    return Pair.of(result, entry);
   }
 
   private String relativize(File sourceFile) {

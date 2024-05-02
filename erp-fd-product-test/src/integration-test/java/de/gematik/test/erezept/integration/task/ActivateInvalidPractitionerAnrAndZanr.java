@@ -32,6 +32,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
@@ -40,6 +41,7 @@ import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.toggle.AnrValidationConfigurationIsErrorToggle;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -60,13 +62,23 @@ import org.junit.runner.RunWith;
 public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
   /**
-   * Warning ResponseHeader ist in A_24033 genauer spezifiziert und wir nach nach RFC-2616
-   * "Warning": https://datatracker.ietf.org/doc/html/rfc2616#section-14.46
+   * Warning ResponseHeader ist in A_24033 genauer spezifiziert und wir nach RFC-2616 "Warning":
+   * https://datatracker.ietf.org/doc/html/rfc2616#section-14.46
    *
-   * <p>konstruiert. der folgende String hat demnach die Key-Value Paare: warn-code: 252 warn-agent:
+   * <p>konstruiert. Der folgende String hat demnach die Key-Value-Paare: warn-code: 252 warn-agent:
    * erp-server warn-text: "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer
    * entspricht nicht den Prüfziffer-Validierungsregeln"
+   *
+   * <p>Die Validierungsregeln besagen: Arztnummer: 1.-6. Stelle, Prüfziffer: 7.Stelle,
+   * Fachgruppennummer: 8.-9.Stelle "Die Prüfziffer wird mittels des Modulo 10-Verfahrens der
+   * Stellen 1-6 der Arztnummer ermittelt. Bei diesem Verfahren werden die Ziffern 1-6 von links
+   * nach rechts abwechselnd mit 4 und 9 multipliziert. Die Summe dieser Produkte wird Modulo 10
+   * berechnet. Die Prüfziffer ergibt sich aus der Differenz dieser Zahl zu 10 (ist die Differenz
+   * 10, so ist die Prüfziffer 0)."
    */
+  private static final Boolean EXPECTED_ANR_VALIDATION_CONFIG_ERROR =
+      featureConf.getToggle(new AnrValidationConfigurationIsErrorToggle());
+
   public static final String WARNING_RESPONSE_HEADER =
       "252 erp-server \"Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den Prüfziffer-Validierungsregeln.\"";
 
@@ -110,17 +122,10 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
   private static Stream<Arguments> exceptionAnrComposer() {
     return ArgumentComposer.composeWith()
-        .arguments("444444411", "A_24031 Ausnahmeregelung mit valider Prüfziffer")
-        // Ausnahmen folgend A_23891 Tabelle: NR.2 // Prüfziffer ist korrekt
-        .arguments("999999900", "A_24031 Ausnahmeregelung mit valider Prüfziffer")
-        // Ausnahmen folgend A_23891 Tabelle: NR.3 //Prüfziffer müsste 5 statt 0 sein
         .arguments(
-            "555555011",
-            "A_24031 Ausnahmeregelung mit invalider Prüfziffer, da an 7. Stelle '5' statt '0' korrekt wäre")
-        // Ausnahmen folgend A_23891 Tabelle: NR.4 // Prüfziffer ist korrekt
-        .arguments("000000000", "A_24031 Ausnahmeregelung mit valider Prüfziffer")
-        // Ausnahmen folgend A_23891 Tabelle: NR.5 // Prüfziffer ist korrekt
-        .arguments("999999991", "A_24031 Ausnahmeregelung mit valider Prüfziffer")
+            "555555", "A_23891-01 Ausnahmeregelung für Fachgruppennummern mit Ordnungszahl 1-9")
+        .arguments(
+            "5555550", "A_23891-01 Ausnahmeregelung für Fachgruppennummern mit Ordnungszahl 0")
         .multiply(
             0,
             List.of(
@@ -134,9 +139,9 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
   private static Stream<Arguments> exceptionNoAnrComposer() {
     return ArgumentComposer.composeWith()
-        // Ausnahmen folgend A_23891 -> Hinweis: Keine Prüfziffer, da Fachgruppennummer in seperatem
+        // Ausnahmen folgend A_23891 -> Hinweis: Keine Prüfziffer, da Fachgruppennummer in separatem
         // Element
-        .arguments("A_23891 Hinweis: Keine Prüfziffer, da Fachgruppennummer in seperatem Element")
+        .arguments("A_23891 Hinweis: Keine Prüfziffer, da Fachgruppennummer in separatem Element")
         .multiply(
             0,
             List.of(
@@ -147,12 +152,12 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
         .create();
   }
 
-  @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR/ZANR_01")
+  @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR_ZANR_01")
   @ParameterizedTest(
       name =
           "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit invalider ANR: {3} für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR im Sinne der AFO in Practitioner korrekt validiert und der entsprechende Warning Header zurück gegeben wird.")
+      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner entsprechen A_24032 validiert und mit Error-Configuration und OperationOutcome antwortet oder entsprechend A_24033 einen Warning Header zurück gibt")
   @MethodSource("afoInvalidANRComposer")
   void activateInvalidAnrZanrInPractitioner(
       VersicherungsArtDeBasis insuranceType,
@@ -167,23 +172,40 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
      * nach: Technische Anlage zum Vertrag über den Datenaustausch (Anlage 6 BMV-Ä)
      * https://www.gkv-datenaustausch.de/media/dokumente/leistungserbringer_1/aerzte/technische_anlagen___aktuell/20230522_TA1_21.pdf
      * "Aufbau der lebenslangen Arztnummer – LANR Die Arztnummer setzt sich aus insgesamt neun
-     * Ziffern zusammen:" A_23891 -> bei Auffälligkeiten und Konfiguraition 'Warnung' greift A_24033
+     * Ziffern zusammen:" A_23891 -> bei Auffälligkeiten und Konfiguration 'Warnung' greift A_24033
+     * A_23891 -> bei Auffälligkeiten und Konfiguration 'Error' greift A_24032
      */
-    val requirementsSet = ErpAfos.A_24033;
-    doc.attemptsTo(
-        Verify.that(activation)
-            .withExpectedType(requirementsSet)
-            .hasResponseWith(returnCode(252, requirementsSet))
-            .andResponse(headerContentContains("Warning", WARNING_RESPONSE_HEADER, requirementsSet))
-            .isCorrect());
+    if (EXPECTED_ANR_VALIDATION_CONFIG_ERROR) {
+      val requirementsSet = ErpAfos.A_24032;
+
+      doc.attemptsTo(
+          Verify.that(activation)
+              .withOperationOutcome(requirementsSet)
+              .hasResponseWith(returnCode(400, requirementsSet))
+              .and(
+                  operationOutcomeContainsInDetailText(
+                      "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den Prüfziffer-Validierungsregeln.",
+                      requirementsSet))
+              .isCorrect());
+
+    } else {
+      val requirementsSet = ErpAfos.A_24033;
+      doc.attemptsTo(
+          Verify.that(activation)
+              .withExpectedType(requirementsSet)
+              .hasResponseWith(returnCode(252, requirementsSet))
+              .andResponse(
+                  headerContentContains("Warning", WARNING_RESPONSE_HEADER, requirementsSet))
+              .isCorrect());
+    }
   }
 
-  @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR/ZANR_02")
+  @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR_ZANR_02")
   @ParameterizedTest(
       name =
           "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit invalider ANR: {3} für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert")
+      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner FHIR-Konform validiert")
   @MethodSource("fhirInvalidANRComposer")
   void activateFhirInvalidAnrZanrInPractitioner(
       VersicherungsArtDeBasis insuranceType,
@@ -212,12 +234,12 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
             .isCorrect());
   }
 
-  @TestcaseId("ERP_TASK_ACTIVATE_VALID_ANR/ZANR_03")
+  @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR_ZANR_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit valider ANR / ZANR: {3} für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
+          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit ANR / ZANR: {3} + xy für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert und Ausnahmen berücksichtigt")
+      "Es muss geprüft werden, dass der Fachdienst die ANR 555555 + xy in Practitioner als Ausnahme berücksichtigt")
   @MethodSource("exceptionAnrComposer")
   void activateValidAnrZanrInPractitioner(
       VersicherungsArtDeBasis insuranceType,
@@ -225,6 +247,13 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       DoctorActor doctors,
       String anr,
       String reason) {
+    int anrRandomPart;
+    if (anr.length() < 7) {
+      anrRandomPart = GemFaker.fakerAmount(100, 999);
+    } else {
+      anrRandomPart = GemFaker.fakerAmount(10, 99);
+    }
+    anr = anr.concat(String.valueOf(anrRandomPart));
     val doc = this.getDoctorNamed(doctors.getName());
     patient.changePatientInsuranceType(insuranceType);
 
@@ -242,10 +271,10 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
    * Variante ist eine Fachgruppennummer in einem gesonderten Element hinterlgt:
    * Practitioner.qualification:ASV-Fachgruppennummer
    */
-  @TestcaseId("ERP_TASK_ACTIVATE_VALID_ANR/ZANR_04")
+  @TestcaseId("ERP_TASK_ACTIVATE_VALID_ANR_ZANR_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt Adelheid Ulmenwald stellt ein E-Rezept mit ohne ANR für den Kostenträger {0} als Darreichungsform {1} aus, da {2}!")
+          "[{index}] -> Verordnender Arzt Adelheid Ulmenwald stellt ein E-Rezept mit invalider ANR für den Kostenträger {0} als Darreichungsform {1} aus, da {2}!")
   @DisplayName(
       "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert und die Ausnahme keine ANR durchleitet, da ASV berücksichtigt wird")
   @MethodSource("exceptionNoAnrComposer")
@@ -256,7 +285,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
     val doc = this.getDoctorNamed("Adelheid Ulmenwald");
     SafeAbility.getAbility(doc, ProvideDoctorBaseData.class).setAsv(true);
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     KbvErpMedicationRequest medicationRequest;
     patient.changePatientInsuranceType(insuranceType);
 
@@ -265,12 +294,12 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
     medicationRequest =
-        MedicationRequestBuilder.faker(patient.getPatientData())
-            .insurance(patient.getInsuranceCoverage())
-            .requester(doc.getPractitioner())
-            .accident(accident)
-            .medication(medication)
-            .build();
+        MedicationRequestFaker.builder(patient.getPatientData())
+            .withInsurance(patient.getInsuranceCoverage())
+            .withRequester(doc.getPractitioner())
+            .withAccident(accident)
+            .withMedication(medication)
+            .fake();
 
     val medicalOrganization =
         MedicalOrganizationBuilder.builder()
@@ -320,17 +349,17 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
 
   private IssuePrescription getIssuePrescription(
       PrescriptionAssignmentKind assignmentKind, String anr, DoctorActor doctorActor) {
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     AccidentExtension accident = null;
     if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient.getPatientData())
-            .insurance(patient.getInsuranceCoverage())
-            .requester(doctorActor.getPractitioner())
-            .accident(accident)
-            .medication(medication)
-            .build();
+        MedicationRequestFaker.builder(patient.getPatientData())
+            .withInsurance(patient.getInsuranceCoverage())
+            .withRequester(doctorActor.getPractitioner())
+            .withAccident(accident)
+            .withMedication(medication)
+            .fake();
     val kbvBundleBuilder =
         KbvErpBundleBuilder.faker(patient.getKvnr())
             .practitioner(doctorActor.getPractitioner())

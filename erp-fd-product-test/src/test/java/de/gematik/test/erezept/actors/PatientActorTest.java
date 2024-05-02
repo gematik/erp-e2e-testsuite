@@ -84,6 +84,11 @@ class PatientActorTest extends ParsingTest {
     patient.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
     assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
     assertEquals(VersicherungsArtDeBasis.BG, patient.getCoverageInsuranceType());
+
+    // change KVNR for TestCases
+    val kvnr = "X123456789";
+    patient.setKvnr(kvnr);
+    assertEquals(kvnr, patient.getPatientData().getKvnr().getValue());
   }
 
   @ParameterizedTest(name = "Create Coverage with PayorType {0}")

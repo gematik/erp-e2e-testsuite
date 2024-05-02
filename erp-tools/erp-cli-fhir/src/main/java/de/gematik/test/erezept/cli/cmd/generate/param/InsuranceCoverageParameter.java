@@ -21,6 +21,7 @@ import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
 import de.gematik.test.erezept.fhir.values.DynamicInsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.List;
 import java.util.Optional;
@@ -155,7 +156,12 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
   }
 
   private KbvPatient getPatient() {
-    return getOrDefault(patient, () -> PatientBuilder.faker(this.getInsuranceType()).build());
+    return getOrDefault(
+        patient,
+        () ->
+            PatientFaker.builder()
+                .withKvnrAndInsuranceType(KVNR.random(), this.getInsuranceType())
+                .fake());
   }
 
   public KbvCoverage createCoverage() {

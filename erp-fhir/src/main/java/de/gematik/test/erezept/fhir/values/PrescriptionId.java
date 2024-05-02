@@ -138,7 +138,7 @@ public class PrescriptionId extends Value<String> {
   public static boolean isPrescriptionId(String system) {
     if (system == null) return false;
 
-    return system.equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl())
-        || system.equals(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.getCanonicalUrl());
+    return ErpWorkflowNamingSystem.PRESCRIPTION_ID.match(system)
+        || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.match(system);
   }
 }

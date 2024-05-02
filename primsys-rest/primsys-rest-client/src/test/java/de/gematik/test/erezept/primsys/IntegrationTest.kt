@@ -17,12 +17,7 @@
 package de.gematik.test.erezept.primsys
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import de.gematik.test.erezept.primsys.data.CoverageDto
-import de.gematik.test.erezept.primsys.data.PrescribeRequestDto
-import de.gematik.test.erezept.primsys.data.PrescriptionDto
-import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto
-import de.gematik.test.erezept.primsys.data.valuesets.InsurantStateDto
-import de.gematik.test.erezept.primsys.data.valuesets.WopDto
+import de.gematik.test.erezept.primsys.rest.BasicRequests
 import de.gematik.test.erezept.primsys.rest.DoctorRequests
 import de.gematik.test.erezept.primsys.rest.PharmacyRequests
 import de.gematik.test.erezept.primsys.rest.PrimSysResponse
@@ -34,38 +29,53 @@ class IntegrationTest {
     @Test
     @Disabled(value = "only for manual test and demonstration purposes")
     fun shouldRunAgainstLocalPrimSys() {
-        val clientFactory = PrimSysClientFactory.withDefaultRequest("http://127.0.0.1:9095", apiKey = "dummy value")
+        val clientFactory = PrimSysClientFactory.forRemote("http://127.0.0.1").port(9095).build()
         println(clientFactory.actorsInfo)
 
         val doc = clientFactory.getDoctorClient(0)
         val pharm = clientFactory.getPharmacyClient(0)
 
-        val createResponse = doc.perform(DoctorRequests.prescribe("X110407073", true))
-        val d: PrimSysResponse<PrescriptionDto> = doc.perform(
-            DoctorRequests.prescribe(
-                PrescribeRequestDto.forKvnr("X110407073").coveredBy(
-                    CoverageDto.ofType(InsuranceTypeDto.PKV).insurantState(InsurantStateDto.MEMBERS)
-                        .resident(WopDto.BERLIN)
-                        .build()
-                )
-            )
-        )
+        val createResponse = doc.performBlocking(DoctorRequests.prescribe("X110407071", true))
+//        val d: PrimSysResponse<PrescriptionDto> = doc.perform(
+//            DoctorRequests.prescribe(
+//                PrescribeRequestDto.forKvnr("X110407073").coveredBy(
+//                    CoverageDto.ofType(InsuranceTypeDto.PKV).insurantState(InsurantStateDto.MEMBERS)
+//                        .resident(WopDto.BERLIN)
+//                        .build()
+//                )
+//            )
+//        )
 
         val createDto = printResponse("Create", createResponse)
 
-        val getResponse = doc.perform(DoctorRequests.getReadyPrescription(createDto.prescriptionId))
+        val getResponse = doc.performBlocking(BasicRequests.getReadyPrescription(createDto.prescriptionId))
         val getDto = printResponse("GET", getResponse)
 
-        val getAllResponse = doc.perform(DoctorRequests.getReadyPrescriptions())
+        val getAllResponse = doc.performBlocking(BasicRequests.getReadyPrescriptions())
         val getAll = printResponse("Got all prescriptions: ", getAllResponse)
         getAll.toList().forEach {
             println("\t-> $it")
         }
 
-        val acceptResponse = pharm.perform(PharmacyRequests.accept(getDto.prescriptionId, getDto.accessCode))
+        val acceptResponse = pharm.performBlocking(PharmacyRequests.accept(getDto.prescriptionId, getDto.accessCode))
         val acceptDto = printResponse("Accept", acceptResponse)
 
-        val dispenseResponse = pharm.perform(PharmacyRequests.dispense(acceptDto.prescriptionId, acceptDto.secret, 3))
+        // Note: no proper DTO for the body, needs to be implemented on the backend first!
+        val replyBody = """
+            {
+              "version": 1,
+              "supplyOptionsType": "onPremise",
+              "info_text": "Die Abholung ist ab sofort vor Ort möglich",
+              "url": "https://www.adler-apotheke-berlin-tegel.de/",
+              "pickUpCodeHR": "12345",
+              "pickUpCodeDMC": "6a3acd69-a01d-4780-885e-ea970b6aacdb"
+            }
+        """.trimIndent()
+        val replyResponse = pharm.performBlocking(PharmacyRequests.reply(getDto.prescriptionId, getDto.patient.kvnr, replyBody))
+        val replyDto = printResponse("Reply", replyResponse)
+
+        val dispenseResponse =
+            pharm.performBlocking(PharmacyRequests.dispense(acceptDto.prescriptionId, acceptDto.secret, 3))
         val dispenseDto = printResponse("Dispense", dispenseResponse)
 
         val om = ObjectMapper().writerWithDefaultPrettyPrinter()
@@ -77,7 +87,7 @@ class IntegrationTest {
     fun <T> printResponse(operation: String, response: PrimSysResponse<T>): T {
         println(">> $operation : ${response.statusCode}")
         response.body
-            .onLeft { println("Error: ${it.message}") }
+            .onLeft { println("${it.type} Error: ${it.message}") }
             .onRight { println(it) }
 
         return response.asExpectedPayload()

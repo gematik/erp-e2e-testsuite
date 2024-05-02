@@ -16,12 +16,10 @@
 
 package de.gematik.test.erezept.app.mocker;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
@@ -38,27 +36,29 @@ public class KbvBundleDummyFactory {
 
   public static KbvErpBundle createSimpleKbvBundle(
       PrescriptionId prescriptionId, StatusCoPayment coPayment, MultiplePrescriptionExtension mvo) {
-    val practitioner = PractitionerBuilder.faker().build();
-    val medicalOrganization = MedicalOrganizationBuilder.faker().build();
-    val assignerOrganization = AssignerOrganizationBuilder.faker().build();
+    val practitioner = PractitionerFaker.builder().fake();
+    val medicalOrganization = MedicalOrganizationFaker.builder().fake();
+    val assignerOrganization = AssignerOrganizationFaker.builder().fake();
+
     val patient =
-        PatientBuilder.faker(KVNR.random(), VersicherungsArtDeBasis.GKV)
-            .assigner(assignerOrganization)
-            .build();
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+            .withAssignerRef(assignerOrganization)
+            .fake();
     val insurance =
         KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
     val medication =
-        KbvErpMedicationPZNBuilder.faker(
-                PZN.random().getValue(), GemFaker.fakerDrugName(), MedicationCategory.C_00)
-            .build();
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient, new Date(), false)
-            .insurance(insurance)
-            .requester(practitioner)
-            .medication(medication)
-            .coPaymentStatus(coPayment)
-            .mvo(mvo)
-            .build();
+        MedicationRequestFaker.builder(patient)
+            .withInsurance(insurance)
+            .withRequester(practitioner)
+            .withMedication(medication)
+            .withCoPaymentStatus(coPayment)
+            .withMvo(mvo)
+            .withSubstitution(false)
+            .withAuthorDate(new Date())
+            .fake();
 
     return KbvErpBundleBuilder.forPrescription(prescriptionId.getValue())
         .practitioner(practitioner)

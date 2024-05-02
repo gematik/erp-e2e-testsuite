@@ -173,6 +173,8 @@ class KbvBuilderTest extends ParsingTest {
     assertEquals(VersicherungsArtDeBasis.GKV, kbvBundle.getPatient().getInsuranceKind());
     assertFalse(kbvBundle.getPatient().getPkvAssigner().isPresent());
     assertFalse(kbvBundle.getPatient().getPkvAssignerName().isPresent());
+    assertEquals(
+        "1-0-0-0", kbvBundle.getMedicationRequest().getDosageInstructionFirstRep().getText());
   }
 
   @ParameterizedTest(
@@ -426,7 +428,7 @@ class KbvBuilderTest extends ParsingTest {
     val prescriptionIdSystem = ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     assertEquals(
         new PrescriptionId(prescriptionIdSystem, prescriptionId), kbvBundle.getPrescriptionId());
-    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle, true);
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
     assertTrue(result.isSuccessful());
     assertEquals(VersicherungsArtDeBasis.PKV, kbvBundle.getPatient().getInsuranceKind());
     assertTrue(kbvBundle.getPatient().getPkvAssigner().isPresent());
@@ -727,28 +729,30 @@ class KbvBuilderTest extends ParsingTest {
 
     // bundle values
     val prescriptionId = "160.100.000.000.011.09";
-    val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
-    val medicalOrganization = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
-    val assignerOrganization = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
+    val practitioner = PractitionerFaker.builder().withVersion(kbvForVersion).fake();
+    val medicalOrganization = MedicalOrganizationFaker.builder().withVersion(kbvForVersion).fake();
+    val assignerOrganization =
+        AssignerOrganizationFaker.builder().withVersion(kbvForVersion).fake();
     val patient =
-        PatientBuilder.faker(VersicherungsArtDeBasis.PKV)
-            .version(kbvForVersion)
-            .assigner(assignerOrganization)
-            .build();
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.PKV)
+            .withVersion(kbvForVersion)
+            .withAssignerRef(assignerOrganization)
+            .fake();
     val insurance =
         KbvCoverageBuilder.faker(VersicherungsArtDeBasis.PKV)
             .version(kbvForVersion)
             .beneficiary(patient)
             .build();
-    val medication = KbvErpMedicationPZNBuilder.faker().version(kbvErpVersion).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withVersion(kbvErpVersion).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient)
-            .version(kbvErpVersion)
-            .insurance(insurance)
-            .requester(practitioner)
-            .medication(medication)
-            .accident(AccidentExtension.accidentAtWork().atWorkplace())
-            .build();
+        MedicationRequestFaker.builder(patient)
+            .withVersion(kbvErpVersion)
+            .withInsurance(insurance)
+            .withRequester(practitioner)
+            .withMedication(medication)
+            .withAccident(AccidentExtension.accidentAtWork().atWorkplace())
+            .fake();
 
     val kbvBundle =
         KbvErpBundleBuilder.forPrescription(prescriptionId)
@@ -781,21 +785,27 @@ class KbvBuilderTest extends ParsingTest {
   void buildKbvBundleWithFaker(KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
 
     for (int i = 0; i < 5; i++) {
-      val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
-      val medicalOrganization = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
-      val assignerOrganization = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
+      val practitioner = PractitionerFaker.builder().withVersion(kbvForVersion).fake();
+      val medicalOrganization =
+          MedicalOrganizationFaker.builder().withVersion(kbvForVersion).fake();
+      val assignerOrganization =
+          AssignerOrganizationFaker.builder().withVersion(kbvForVersion).fake();
+
       val patient =
-          PatientBuilder.faker().assigner(assignerOrganization).version(kbvForVersion).build();
+          PatientFaker.builder()
+              .withAssignerRef(assignerOrganization)
+              .withVersion(kbvForVersion)
+              .fake();
       val insurance =
           KbvCoverageBuilder.faker().beneficiary(patient).version(kbvForVersion).build();
-      val medication = KbvErpMedicationPZNBuilder.faker().version(kbvErpVersion).build();
+      val medication = KbvErpMedicationPZNFaker.builder().withVersion(kbvErpVersion).fake();
       val medicationRequest =
-          MedicationRequestBuilder.faker(patient)
-              .version(kbvErpVersion)
-              .insurance(insurance)
-              .requester(practitioner)
-              .medication(medication)
-              .build();
+          MedicationRequestFaker.builder(patient)
+              .withVersion(kbvErpVersion)
+              .withInsurance(insurance)
+              .withRequester(practitioner)
+              .withMedication(medication)
+              .fake();
 
       val kbvBundle =
           KbvErpBundleBuilder.faker()
@@ -946,16 +956,19 @@ class KbvBuilderTest extends ParsingTest {
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
 
     val medication =
-        KbvErpMedicationPZNBuilder.faker()
-            .version(kbvErpVersion)
-            .category(MedicationCategory.C_00)
-            .build();
-
+        KbvErpMedicationPZNFaker.builder()
+            .withVersion(kbvErpVersion)
+            .withCategory(MedicationCategory.C_00)
+            .fake();
     val coverage =
         KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).version(kbvForVersion).build();
-    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.GKV).version(kbvForVersion).build();
-    val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
-    val custodian = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
+    val patient =
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+            .withVersion(kbvForVersion)
+            .fake();
+    val practitioner = PractitionerFaker.builder().withVersion(kbvForVersion).fake();
+    val custodian = MedicalOrganizationFaker.builder().withVersion(kbvForVersion).fake();
 
     val mvo = MultiplePrescriptionExtension.asNonMultiple();
     val kbvBundleBuilder =
@@ -963,13 +976,13 @@ class KbvBuilderTest extends ParsingTest {
             .version(kbvErpVersion)
             .medication(medication)
             .medicationRequest(
-                MedicationRequestBuilder.faker(patient)
-                    .version(kbvErpVersion)
-                    .medication(medication)
-                    .mvo(mvo)
-                    .insurance(coverage)
-                    .requester(practitioner)
-                    .build());
+                MedicationRequestFaker.builder(patient)
+                    .withVersion(kbvErpVersion)
+                    .withMedication(medication)
+                    .withMvo(mvo)
+                    .withInsurance(coverage)
+                    .withRequester(practitioner)
+                    .fake());
 
     kbvBundleBuilder
         .insurance(coverage)
@@ -995,10 +1008,10 @@ class KbvBuilderTest extends ParsingTest {
     qualificationTypes.forEach(
         qt -> {
           val practitioner =
-              PractitionerBuilder.faker()
-                  .version(kbvForVersion)
-                  .anr(BaseANR.randomFromQualification(qt))
-                  .build();
+              PractitionerFaker.builder()
+                  .withVersion(kbvForVersion)
+                  .withAnr(BaseANR.randomFromQualification(qt))
+                  .fake();
           val kbvBundle =
               KbvErpBundleBuilder.faker(KVNR.random())
                   .version(kbvErpVersion)
@@ -1346,19 +1359,20 @@ class KbvBuilderTest extends ParsingTest {
   void fakerShouldWorkWithMedicationCompounding(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
     val medication = KbvErpMedicationCompoundingBuilder.faker().version(kbvErpVersion).build();
-    val assigner = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
-    val patient = PatientBuilder.faker().version(kbvForVersion).assigner(assigner).build();
+    val assigner = AssignerOrganizationFaker.builder().withVersion(kbvForVersion).fake();
+    val patient =
+        PatientFaker.builder().withVersion(kbvForVersion).withAssignerRef(assigner).fake();
     val insurance =
         KbvCoverageBuilder.faker(patient.getInsuranceKind()).version(kbvForVersion).build();
-    val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
+    val practitioner = PractitionerFaker.builder().withVersion(kbvForVersion).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient)
-            .medication(medication)
-            .requester(practitioner)
-            .insurance(insurance)
-            .version(kbvErpVersion)
-            .build();
-    val organisation = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
+        MedicationRequestFaker.builder(patient)
+            .withMedication(medication)
+            .withRequester(practitioner)
+            .withInsurance(insurance)
+            .withVersion(kbvErpVersion)
+            .fake();
+    val organisation = MedicalOrganizationFaker.builder().withVersion(kbvForVersion).fake();
     val bundle =
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
             .patient(patient)
@@ -1383,19 +1397,20 @@ class KbvBuilderTest extends ParsingTest {
   void fakerShouldWorkWithMedicationFreeText(
       KbvItaForVersion kbvForVersion, KbvItaErpVersion kbvErpVersion) {
     val medication = KbvErpMedicationFreeTextBuilder.faker().version(kbvErpVersion).build();
-    val assigner = AssignerOrganizationBuilder.faker().version(kbvForVersion).build();
-    val patient = PatientBuilder.faker().version(kbvForVersion).assigner(assigner).build();
+    val assigner = AssignerOrganizationFaker.builder().withVersion(kbvForVersion).fake();
+    val patient =
+        PatientFaker.builder().withVersion(kbvForVersion).withAssignerRef(assigner).fake();
     val insurance =
         KbvCoverageBuilder.faker(patient.getInsuranceKind()).version(kbvForVersion).build();
-    val practitioner = PractitionerBuilder.faker().version(kbvForVersion).build();
+    val practitioner = PractitionerFaker.builder().withVersion(kbvForVersion).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient)
-            .medication(medication)
-            .requester(practitioner)
-            .insurance(insurance)
-            .version(kbvErpVersion)
-            .build();
-    val organisation = MedicalOrganizationBuilder.faker().version(kbvForVersion).build();
+        MedicationRequestFaker.builder(patient)
+            .withMedication(medication)
+            .withRequester(practitioner)
+            .withInsurance(insurance)
+            .withVersion(kbvErpVersion)
+            .fake();
+    val organisation = MedicalOrganizationFaker.builder().withVersion(kbvForVersion).fake();
     val bundle =
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
             .patient(patient)

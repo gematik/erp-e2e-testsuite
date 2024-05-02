@@ -62,7 +62,6 @@ public class KbvPractitioner extends Practitioner implements ErpFhirResource {
   }
 
   public BaseANR getANR() {
-
     return this.identifier.stream()
         .filter(BaseANR::hasValidIdentifier)
         .map(BaseANR::fromIdentifier)

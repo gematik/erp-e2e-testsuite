@@ -73,13 +73,6 @@ public class TrustProvider {
     keyStore.load(keyStoreInputStream, ksp.toCharArray());
     keyManagerFactory.init(keyStore, ksp.toCharArray());
 
-    // build the TrustStore
-    val jreTrustManagerFactory =
-        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    jreTrustManagerFactory.init(
-        (KeyStore) null); // init jreTrustManagerFactory with default trust store!
-    val jreDefaultTrustManager = findX509TrustManager(jreTrustManagerFactory.getTrustManagers());
-
     val trustStoreFilename = Path.of("tls", tsf);
     val trustStoreInputStream =
         ClassLoader.getSystemResourceAsStream(trustStoreFilename.toString());
@@ -91,10 +84,7 @@ public class TrustProvider {
     val konnektorTrustManager =
         findX509TrustManager(konnektorTrustManagerFactory.getTrustManagers());
 
-    val trustManagers =
-        new X509TrustManager[] {
-          new KonnektorTrustManager(konnektorTrustManager, jreDefaultTrustManager)
-        };
+    val trustManagers = new X509TrustManager[] {new KonnektorTrustManager(konnektorTrustManager)};
     return new TrustProvider(keyManagerFactory.getKeyManagers(), trustManagers);
   }
 
@@ -141,6 +131,7 @@ public class TrustProvider {
 
     public void checkServerTrusted(X509Certificate[] chain, String authType)
         throws CertificateException {
+
       for (X509TrustManager tm : trustmanagers) {
         tm.checkServerTrusted(chain, authType);
       }

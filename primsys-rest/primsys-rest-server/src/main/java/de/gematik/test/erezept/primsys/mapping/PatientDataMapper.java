@@ -20,7 +20,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.PatientBuilder;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.KVNR;
@@ -58,8 +58,8 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
         .birthDate(dto.getBirthDate())
         .address(Country.D, dto.getCity(), dto.getPostal(), dto.getStreet())
         .assigner(
-            AssignerOrganizationBuilder.faker()
-                .build()) // will only be used for GKV with old profiles
+            AssignerOrganizationFaker.builder()
+                .fake()) // will only be used for GKV with old profiles
         .build();
   }
 

@@ -31,12 +31,11 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.erezept.toggle.FhirCloseSlicingToggle;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.kbv.KbvBundleManipulatorFactory;
@@ -78,16 +77,15 @@ class ActivateInvalidKbvBundles extends ErpTest {
   private PatientActor sina;
 
   private static ArgumentComposer baseComposer() {
-    val composer = ArgumentComposer.composeWith()
-        .arguments(
-            VersicherungsArtDeBasis.GKV, // given insurance kind
-            PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                VersicherungsArtDeBasis.GKV, // given insurance kind
+                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
+            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
 
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-        composer.arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-              .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-    }
     return composer;
   }
 
@@ -386,14 +384,14 @@ class ActivateInvalidKbvBundles extends ErpTest {
   @Disabled(value = "Wird vom FD aktuell so nicht gefordert")
   @DisplayName("Leere oder nur Whitespace enthaltende Notes in der MedicationRequest sind nicht zulässig")
   void activatePrescriptionWithWhitespaceNote() {
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(sina.getPatientData())
-            .insurance(sina.getInsuranceCoverage())
-            .requester(doctor.getPractitioner())
-            .medication(medication)
-            .note("!REPLACE!") // replace marker for StringFuzzer
-            .build();
+            MedicationRequestFaker.builder(sina.getPatientData())
+                    .withInsurance(sina.getInsuranceCoverage())
+                    .withRequester(doctor.getPractitioner())
+                    .withMedication(medication)
+                    .withNote("REPLACE!")
+                    .fake();
 
     val kbvBundleBuilder =
             KbvErpBundleBuilder.faker(sina.getKvnr())

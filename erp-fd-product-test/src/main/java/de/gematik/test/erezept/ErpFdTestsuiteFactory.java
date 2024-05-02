@@ -20,11 +20,15 @@ import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.erezept.abilities.RawHttpAbility;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.*;
+import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
@@ -38,6 +42,7 @@ import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
 import de.gematik.test.smartcard.Algorithm;
 import de.gematik.test.smartcard.SmartcardArchive;
 import de.gematik.test.smartcard.SmartcardFactory;
+import kong.unirest.Unirest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
@@ -108,6 +113,23 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .whoCan(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), name))
         .can(ProvideEGK.sheOwns(egk))
         .can(useTheErpClientFrom(cfg).authenticatingWith(egk));
+  }
+
+  public <A extends Actor> void equipWithRawHttp(A actor) {
+    val client = Unirest.spawnInstance();
+    BackendRouteConfiguration envConfig;
+    if (actor instanceof PharmacyActor || actor instanceof DoctorActor) {
+      envConfig = this.getActiveEnvironment().getTi();
+    } else {
+      envConfig = this.getActiveEnvironment().getInternet();
+    }
+    client
+        .config()
+        .defaultBaseUrl(envConfig.getFdBaseUrl())
+        .addDefaultHeader("X-api-key", envConfig.getXapiKey())
+        .addDefaultHeader("User-Agent", envConfig.getUserAgent());
+    val rawHttpAbility = new RawHttpAbility(client);
+    actor.can(rawHttpAbility);
   }
 
   public <A extends Actor> void equipAsApothecary(A actor) {

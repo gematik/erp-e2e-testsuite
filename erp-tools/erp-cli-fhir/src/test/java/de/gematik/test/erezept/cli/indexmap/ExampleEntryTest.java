@@ -18,6 +18,7 @@ package de.gematik.test.erezept.cli.indexmap;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import lombok.val;
@@ -31,7 +32,7 @@ class ExampleEntryTest {
     entry.setFileName("custom_file.json");
     entry.setFileType(EncodingType.JSON);
     entry.setDescription("custom file");
-    entry.setValidationResult(true);
+    entry.setValidationSuccessful(true);
 
     val mapper = new ObjectMapper();
     assertDoesNotThrow(() -> mapper.writeValueAsString(entry));
@@ -43,10 +44,12 @@ class ExampleEntryTest {
     entry.setFileName("custom_file.json");
     entry.setFileType(EncodingType.JSON);
     entry.setDescription("custom file");
-    entry.setValidationResult(false);
-    entry.addError(
-        HapiValidationError.from(
-            "some error message", "Bundle.entry[0].resource.ofType(Composition).subject"));
+    entry.setValidationSuccessful(false);
+    entry.addResult(
+        HapiValidationResult.from(
+            ResultSeverityEnum.ERROR,
+            "some error message",
+            "Bundle.entry[0].resource.ofType(Composition).subject"));
 
     val mapper = new ObjectMapper();
     assertDoesNotThrow(() -> mapper.writeValueAsString(entry));

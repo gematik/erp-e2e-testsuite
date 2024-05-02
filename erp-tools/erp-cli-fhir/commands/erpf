@@ -34,4 +34,4 @@ APP_ARGS=`echo $APP_ARGS | sed -e 's/^[[:space:]]*//'`
 JAR_APP=~/erp-cli-fhir.jar
 
 #echo "EXECUTE: >> " java $JAVA_ARGS -jar $JAR_APP ${APP_ARGS}
-sh -c "java $JAVA_ARGS -jar $JAR_APP ${APP_ARGS}"
+sh -c "java $JAVA_ARGS -Dpicocli.usage.width=180 -jar $JAR_APP ${APP_ARGS}"

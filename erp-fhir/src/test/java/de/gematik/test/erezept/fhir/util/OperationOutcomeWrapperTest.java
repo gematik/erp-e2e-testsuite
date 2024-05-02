@@ -32,6 +32,14 @@ class OperationOutcomeWrapperTest {
   }
 
   @Test
+  void shouldExtractErrorDetailsWithoutDiagnostics() {
+    val oo = FhirTestResourceUtil.createOperationOutcome();
+    oo.getIssueFirstRep().setDiagnostics(null);
+    val wrapper = OperationOutcomeWrapper.from(oo);
+    assertDoesNotThrow(wrapper::toString);
+  }
+
+  @Test
   void shouldExtractDirectly() {
     val oo = FhirTestResourceUtil.createOperationOutcome();
     assertDoesNotThrow(() -> OperationOutcomeWrapper.extractFrom(oo));

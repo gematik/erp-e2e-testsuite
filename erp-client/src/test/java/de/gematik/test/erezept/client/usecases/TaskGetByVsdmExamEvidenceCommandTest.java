@@ -19,6 +19,7 @@ package de.gematik.test.erezept.client.usecases;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.gematik.test.erezept.fhir.values.KVNR;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import lombok.val;
@@ -27,14 +28,23 @@ import org.junit.jupiter.api.Test;
 class TaskGetByVsdmExamEvidenceCommandTest {
 
   @Test
-  void getRequestLocator() {
+  void requestLocatorWithEvidenceAndKvnr() {
     val examplePN = "MTIzNDU2Nw==";
-    val cmd = new TaskGetByExamEvidenceCommand(examplePN);
+    val kvnr = KVNR.from("X110499478");
+    val cmd = new TaskGetByExamEvidenceCommand(examplePN).andKvnr(kvnr);
+
     val expected =
         format(
-            "/Task?_sort=-authored-on&pnw={0}",
-            URLEncoder.encode(examplePN, StandardCharsets.UTF_8));
+            "/Task?pnw={0}&kvnr={1}",
+            URLEncoder.encode(examplePN, StandardCharsets.UTF_8), kvnr.getValue());
     val actual = cmd.getRequestLocator();
     assertEquals(expected, actual);
+  }
+
+  @Test
+  void requestLocatorWithoutEvidence() {
+    val cmd = new TaskGetByExamEvidenceCommand();
+    val actual = cmd.getRequestLocator();
+    assertEquals("/Task", actual);
   }
 }

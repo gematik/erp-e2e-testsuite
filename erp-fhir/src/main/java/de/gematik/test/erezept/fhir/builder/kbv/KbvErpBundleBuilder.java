@@ -148,23 +148,29 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
       Date authoredOn,
       boolean substitution,
       PrescriptionId prescriptionId) {
-    val practitioner = PractitionerBuilder.faker().build();
-    val medicalOrganization = MedicalOrganizationBuilder.faker().build();
-    val assignerOrganization = AssignerOrganizationBuilder.faker().build();
+    val practitioner = PractitionerFaker.builder().fake();
+    val medicalOrganization = MedicalOrganizationFaker.builder().fake();
+    val assignerOrganization = AssignerOrganizationFaker.builder().fake();
     val patient =
-        PatientBuilder.faker(kvnr, VersicherungsArtDeBasis.GKV)
-            .assigner(assignerOrganization)
-            .build();
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(kvnr, VersicherungsArtDeBasis.GKV)
+            .withAssignerRef(assignerOrganization)
+            .fake();
     val insurance =
         KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
     val medication =
-        KbvErpMedicationPZNBuilder.faker(pzn, medicationName, MedicationCategory.C_00).build();
+        KbvErpMedicationPZNFaker.builder()
+            .withPznMedication(pzn, medicationName)
+            .withCategory(MedicationCategory.C_00)
+            .fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient, authoredOn, substitution)
-            .insurance(insurance)
-            .requester(practitioner)
-            .medication(medication)
-            .build();
+        MedicationRequestFaker.builder(patient)
+            .withInsurance(insurance)
+            .withRequester(practitioner)
+            .withMedication(medication)
+            .withAuthorDate(authoredOn)
+            .withSubstitution(substitution)
+            .fake();
     return KbvErpBundleBuilder.forPrescription(prescriptionId.getValue())
         .practitioner(practitioner)
         .custodian(medicalOrganization)

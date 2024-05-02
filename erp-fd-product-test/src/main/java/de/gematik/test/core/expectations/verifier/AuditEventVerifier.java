@@ -16,17 +16,20 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.core.expectations.requirements.*;
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
-import java.util.function.*;
+import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.*;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -49,7 +52,8 @@ public class AuditEventVerifier {
     return text.get();
   }
 
-  public VerificationStep<ErxAuditEventBundle> firstCorrespondsTo(Representation representation) {
+  public VerificationStep<ErxAuditEventBundle> firstElementCorrespondsTo(
+      Representation representation) {
     Predicate<ErxAuditEventBundle> predicate =
         bundle -> {
           val auditEvents = bundle.getAuditEvents();
@@ -58,13 +62,15 @@ public class AuditEventVerifier {
           }
           val firstAuditEvent = auditEvents.get(0);
           log.info(
-              format("Der erste Eintrag im Versichertenprotokoll entspricht {0}", firstAuditEvent));
+              format(
+                  "Der erste Eintrag im Versichertenprotokoll entspricht \"{0}\"",
+                  firstAuditEvent.getFirstText()));
           return corresponds(firstAuditEvent, representation);
         };
     return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
             ErpAfos.A_19284.getRequirement(),
             format(
-                "Der erste Eintrag im Versichertenprotokoll entspricht nicht {0}",
+                "Der erste Eintrag im Versichertenprotokoll entspricht nicht  \"{0}\"",
                 replacePlaceholder(representation.getText())))
         .predicate(predicate)
         .accept();
@@ -86,26 +92,24 @@ public class AuditEventVerifier {
         .accept();
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
+  @Getter
   public static class Builder {
 
     private final List<Function<String, String>> replacements = new ArrayList<>();
 
-    public Builder checksum(String checksum) {
+    public Builder withChecksum(String checksum) {
       replacements.add(text -> text.replace("{checksum}", checksum));
-      return this;
-    }
-
-    public Builder pharmacy(PharmacyActor pharmacy) {
-      replacements.add(text -> text.replace("{agentName}", pharmacy.getCommonName()));
       return this;
     }
 
     public AuditEventVerifier build() {
       return new AuditEventVerifier(replacements);
     }
+  }
+
+  public static @NonNull Builder forPharmacy(PharmacyActor pharmacy) {
+    val builder = new Builder();
+    builder.getReplacements().add(text -> text.replace("{agentName}", pharmacy.getCommonName()));
+    return builder;
   }
 }

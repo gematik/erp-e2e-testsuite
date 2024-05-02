@@ -20,13 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
-import de.gematik.test.erezept.primsys.model.AbortUseCase;
-import de.gematik.test.erezept.primsys.model.AcceptUseCase;
-import de.gematik.test.erezept.primsys.model.ActorContext;
-import de.gematik.test.erezept.primsys.model.ChargeItemUseCase;
-import de.gematik.test.erezept.primsys.model.CloseUseCase;
-import de.gematik.test.erezept.primsys.model.RejectUseCase;
-import de.gematik.test.erezept.primsys.model.ReplyUseCase;
+import de.gematik.test.erezept.primsys.model.*;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.*;
@@ -129,10 +123,10 @@ public class PharmacyResource {
                 + " {2}",
             id, taskId, body));
     val pharma = getPharmacy(id);
-    if (body != null) {
-      return CloseUseCase.closePrescription(pharma, taskId, secret, body);
-    } else {
+    if (body == null || body.isEmpty()) {
       return CloseUseCase.closePrescription(pharma, taskId, secret);
+    } else {
+      return CloseUseCase.closePrescription(pharma, taskId, secret, body);
     }
   }
 
@@ -159,5 +153,30 @@ public class PharmacyResource {
     val pharmacy = getPharmacy(id);
     log.info(format("Change ChargeItem {0} as Pharmacy {1}", taskId, pharmacy.getName()));
     return new ChargeItemUseCase(pharmacy).putChargeItem(taskId, accessCode, body);
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Path("{id}/withEvidence")
+  public Response getPrescriptionsByEvidence(
+      @PathParam("id") String id, @QueryParam("evidence") String examEvidence) {
+    val pharmacy = getPharmacy(id);
+    log.info(
+        format(
+            "get Prescriptions as Pharmacy: {0} with audit examEvidence:''{1}''",
+            id, examEvidence));
+    return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionsByEvidence(examEvidence);
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Path("{id}/withKvnr")
+  public Response getPrescriptionsByKvnr(
+      @PathParam("id") String id, @QueryParam("kvnr") String kvnr) {
+    val pharmacy = getPharmacy(id);
+    log.info(format("get Prescriptions as Pharmacy: with audit KVNR: {1}", id, kvnr));
+    return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionByKvnr(kvnr);
   }
 }

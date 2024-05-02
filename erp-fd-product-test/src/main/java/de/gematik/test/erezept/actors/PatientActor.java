@@ -57,6 +57,15 @@ public class PatientActor extends ErpActor {
     bd.setPayorType(payorType);
   }
 
+  public void setKvnr(String kvnr) {
+    this.setKvnr(KVNR.from(kvnr));
+  }
+
+  public void setKvnr(KVNR kvnr) {
+    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
+    bd.setKvnr(kvnr);
+  }
+
   public Optional<PayorType> getPayorType() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getPayorType();
@@ -97,7 +106,7 @@ public class PatientActor extends ErpActor {
       // Reference + Name
       // build a faked one matching the Reference of the patient
       val fakedAssignerOrganization =
-          AssignerOrganizationBuilder.faker(this.getPatientData()).build();
+          AssignerOrganizationFaker.builder().forPatient(this.getPatientData()).fake();
       ret = Optional.of(fakedAssignerOrganization);
     }
     return ret;

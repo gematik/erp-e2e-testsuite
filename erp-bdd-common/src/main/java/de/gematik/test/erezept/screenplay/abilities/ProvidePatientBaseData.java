@@ -121,7 +121,7 @@ public class ProvidePatientBaseData implements Ability {
       if (pkvAssignerOrganization == null) {
         // create Assigner on first call and reuse on later calls to prevent non-deterministic
         // behaviour!
-        pkvAssignerOrganization = AssignerOrganizationBuilder.faker().build();
+        pkvAssignerOrganization = AssignerOrganizationFaker.builder().fake();
       }
       pb.assigner(pkvAssignerOrganization);
     }

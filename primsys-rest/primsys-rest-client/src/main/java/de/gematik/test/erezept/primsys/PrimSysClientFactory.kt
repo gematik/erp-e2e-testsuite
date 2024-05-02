@@ -20,18 +20,17 @@ import arrow.core.Either
 import de.gematik.test.erezept.primsys.data.actors.ActorDto
 import de.gematik.test.erezept.primsys.data.actors.ActorType
 import de.gematik.test.erezept.primsys.data.info.InfoDto
-import de.gematik.test.erezept.primsys.rest.ActorsRequest
-import de.gematik.test.erezept.primsys.rest.InfoRequest
-import io.restassured.RestAssured
-import io.restassured.http.ContentType
-import io.restassured.specification.RequestSpecification
-import java.util.function.Supplier
+import de.gematik.test.erezept.primsys.rest.BasicRequests
+import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.http.*
 import kotlin.random.Random
 
 
 class PrimSysClientFactory(
-    requestSpecSupplier: Supplier<RequestSpecification>
-) : PrimSysClient(requestSpecSupplier) {
+    httpClient: HttpClient,
+    clientData: ClientData
+) : PrimSysClient(httpClient, clientData) {
 
     val primsysInfo: InfoDto
     val actorsInfo: List<ActorDto>
@@ -39,13 +38,13 @@ class PrimSysClientFactory(
     private val pharmacies: List<ActorDto>
 
     init {
-        val infoResponse = perform(InfoRequest())
+        val infoResponse = performBlocking(BasicRequests.getInfo())
         primsysInfo = when (infoResponse.body) {
             is Either.Left -> throw PrimSysRestException(infoResponse.statusCode, infoResponse.body.value)
             is Either.Right -> infoResponse.body.value
         }
 
-        val actorsResponse = perform(ActorsRequest())
+        val actorsResponse = performBlocking(BasicRequests.getActors())
         actorsInfo = when (actorsResponse.body) {
             is Either.Left -> throw PrimSysRestException(actorsResponse.statusCode, actorsResponse.body.value)
             is Either.Right -> actorsResponse.body.value
@@ -57,55 +56,79 @@ class PrimSysClientFactory(
 
     fun getDoctorClient(identifier: String): PrimSysDoctor {
         val doctorDto = findActorDto(ActorType.DOCTOR, identifier)
-        return PrimSysDoctor(doctorDto.id, requestSpecSupplier)
+        return PrimSysDoctor(doctorDto.id, httpClient, clientData)
     }
 
     fun getDoctorClient(idx: Int): PrimSysDoctor =
-        PrimSysDoctor(doctors[idx].id, requestSpecSupplier)
+        PrimSysDoctor(doctors[idx].id, httpClient, clientData)
 
 
     fun getRandomDoctorClient(): PrimSysDoctor =
         getDoctorClient(Random.nextInt(doctors.size))
 
     fun getPharmacyClient(idx: Int): PrimSysPharmacy =
-        PrimSysPharmacy(pharmacies[idx].id, requestSpecSupplier)
+        PrimSysPharmacy(pharmacies[idx].id, httpClient, clientData)
 
     fun getPharmacyClient(identifier: String): PrimSysPharmacy {
         val pharmacyDto = findActorDto(ActorType.PHARMACY, identifier)
-        return PrimSysPharmacy(pharmacyDto.id, requestSpecSupplier)
+        return PrimSysPharmacy(pharmacyDto.id, httpClient, clientData)
     }
 
     fun getRandomPharmacyClient(): PrimSysPharmacy = getPharmacyClient(Random.nextInt(pharmacies.size))
 
     private fun findActorDto(type: ActorType, identifier: String): ActorDto =
-        actorsInfo.find { it.type == type && (it.id == identifier || it.name.lowercase() == identifier.lowercase()) }
+        actorsInfo.find { it.type == type && (it.id == identifier || it.name.equals(identifier, ignoreCase = true)) }
             ?: throw UnknownActorException(type, identifier)
 
     companion object {
-
         @JvmStatic
-        fun withDefaultRequest(baseUri: String, env: String = "", apiKey: String = ""): PrimSysClientFactory {
-            return withCustomRequest(baseUri, env, apiKey) {
-                RestAssured.given()
+        fun forRemote(baseUrl: String): ClientBuilder {
+            val url = URLBuilder(baseUrl)
+            val rd = ClientBuilder(url.protocol, url.host)
+
+            if (url.port > 0) {
+                rd.port(url.port)
             }
+
+            return rd
+        }
+    }
+
+    class ClientBuilder(protocol: URLProtocol, host: String) {
+
+        val data: ClientData = ClientData(protocol, host)
+
+        private var timeoutMillis: Long = 15000
+
+        fun env(env: String) = apply { data.env(env.lowercase()) }
+        fun port(port: Int) = apply { data.port(port) }
+        fun apiKey(apiKey: String) = apply { data.apiKey(apiKey) }
+
+        fun timeoutMillis(timeout: Long) = apply {
+            this.timeoutMillis = timeout
         }
 
-        @JvmStatic
-        fun withCustomRequest(
-            baseUri: String,
-            env: String = "",
-            apiKey: String = "",
-            reqSpec: Supplier<RequestSpecification>
-        ): PrimSysClientFactory {
-            val envUri: String = if (env.isEmpty()) baseUri else "$baseUri/$env"
-
-            return PrimSysClientFactory {
-                reqSpec.get().baseUri(envUri)
-                    .header("apiKey", apiKey)
-                    .accept(ContentType.JSON)       // by default, JSON can be changed later on
-                    .contentType(ContentType.JSON)  // by default, JSON can be changed later on
+        fun build(): PrimSysClientFactory {
+            val http = HttpClient {
+                install(HttpTimeout) {
+                    connectTimeoutMillis = timeoutMillis
+                    requestTimeoutMillis = timeoutMillis
+                }
             }
+            return PrimSysClientFactory(http, data)
         }
+    }
+
+    data class ClientData(
+        val protocol: URLProtocol,
+        val host: String,
+        var port: Int? = null,
+        var env: String? = null,
+        var apiKey: String? = null
+    ) {
+        fun env(env: String) = apply { this.env = env.lowercase() }
+        fun port(port: Int) = apply { this.port = port }
+        fun apiKey(apiKey: String) = apply { this.apiKey = apiKey }
     }
 }
 

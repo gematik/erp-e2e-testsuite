@@ -60,7 +60,7 @@ class ErxChargeItemBundleTest extends ParsingTest {
   }
 
   @Test
-  void shouldThrowExeption() {
+  void shouldThrowException() {
     val fileName = "InValidBundle_40057350-a305-11ed-a8fc-0242ac120002.xml";
     String BASE_PATH_INVALID = "fhir/invalid/erp/1.2.0/chargeitembundle/";
     val content = ResourceUtils.readFileFromResource(BASE_PATH_INVALID + fileName);

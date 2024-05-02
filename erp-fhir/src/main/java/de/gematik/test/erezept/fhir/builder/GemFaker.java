@@ -31,6 +31,7 @@ import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
+import dev.codesoapbox.dummy4j.Dummy4j;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -44,21 +45,9 @@ public class GemFaker {
   private static final String DATE_FORMAT_SIMPLE = "dd.MM.yyyy";
 
   private static final Faker faker = new Faker(new Locale("de"));
+  private static final Dummy4j dummy = new Dummy4j();
   private static final List<String> HEALTH_INSURANCE_NAMES =
       List.of("KOA", "Farmer", "Künstler-Krankenkasse", "KVED Krankenversicherungs-AG");
-  private static final List<String> DRUG_NAME_PREFIXES =
-      List.of(
-          "Aba", "Aca", "Ace", "Aci", "Ada", "Amo", "Aze", "Bac", "Bec", "Bel", "Ben", "Bet", "Bus",
-          "Cab", "Cal", "Can", "Cap", "Dab", "Def", "Dex", "Dic", "Dox", "Ecal", "Ecul", "Elag",
-          "Enox", "Eren", "Fam", "Fen", "Fes", "Fex", "Flur", "Fom", "Gab", "Gem", "Glim", "Gos",
-          "Hem", "Hep", "Hem", "Hom", "Hyd", "Ibal", "Iban", "Ibu", "Ilop");
-  private static final List<String> DRUG_NAME_INFIXES =
-      List.of("abra", "ali", "ami", "ame", "gluco", "imo", "ter", "vomil", "voflox");
-  private static final List<String> DRUG_NAME_POSTFIXES =
-      List.of(
-          "ab", "an", "at", "cain", "en", "fen", "ib", "id", "um", "mus", "mid", "mib", "nat",
-          "nin", "or", "ol", "säure", "tal", "pa", "pam", "pin", "proston", "rat", "zol", "xalon",
-          "xital", "xin");
 
   private GemFaker() {
     throw new AssertionError();
@@ -69,12 +58,7 @@ public class GemFaker {
   }
 
   public static String fakerDrugName() {
-    val prefix = randomElement(DRUG_NAME_PREFIXES);
-
-    val infix = randomElement(DRUG_NAME_INFIXES);
-
-    val postfix = randomElement(DRUG_NAME_POSTFIXES);
-    return prefix + infix + postfix;
+    return dummy.expressionResolver().resolve("#{drugs.drug_full_name}");
   }
 
   public static String fakerLotNumber() {

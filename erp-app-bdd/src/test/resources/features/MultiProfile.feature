@@ -15,9 +15,11 @@
 #
 # language: de
 
+@PRODUKT:eRp_FdV
 @iosNightly
 Funktionalität: Mehrbenutzer mit App-Profilen
 
+  @TCID:ERP_FDV_GKV_MULTIPROFIL_01
   @Funktionalität:MultiProfile
   Szenario: Zwei Benutzer teilen sich ein Gerät
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet

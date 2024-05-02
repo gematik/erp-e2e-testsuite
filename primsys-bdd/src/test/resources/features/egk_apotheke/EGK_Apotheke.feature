@@ -21,8 +21,7 @@
 @Versicherung:GKV
 Funktionalität: eGK in der Apotheke
   Der Versicherte soll durch die Vorlage seiner EGK eine Apotheke dazu berechtigen,
-  seine einlösbaren E-Rezepte aus dem E-Rezept-Fachdienst abrufen zu können. Aus technischer Sicht ist es dabei
-  unerheblich, ob es sich um einen GKV- oder PKV-Versicherten handelt.
+  seine einlösbaren E-Rezepte aus dem E-Rezept-Fachdienst abrufen zu können.
 
   Grundlage: Die Ärztin Dr. Straßer verschreibt der Versicherten Aenna Gondern ein E-Rezept als Grundlage für
   die Testszenarien

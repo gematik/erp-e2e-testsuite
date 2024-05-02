@@ -29,8 +29,8 @@ public enum FhirRequirements implements RequirementsSet {
           + " character of non-whitespace content"),
   FHIR_XML_PARSING("FHIR_XML_PARSING", "Invalide FHIR Ressourcen dürfen nicht zum Absturz führen"),
 
-  FHIR_VALIDATION_ERROR("FHIR-Validation", "die Semantik entspricht nicht der Profilierung");
-
+  FHIR_VALIDATION_ERROR("FHIR-Validation", "die Semantik entspricht nicht der Profilierung"),
+  ;
   @Getter private final Requirement requirement;
 
   FhirRequirements(String id, String description) {

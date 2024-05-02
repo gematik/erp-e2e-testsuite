@@ -16,9 +16,10 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
@@ -42,7 +43,11 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val pzn = "06313728";
     val kbvItaVersion =
         ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
-    val medication = KbvErpMedicationPZNBuilder.faker(pzn).version(kbvItaVersion).build();
+    val medication =
+        KbvErpMedicationPZNFaker.builder()
+            .withPznMedication(pzn, fakerDrugName())
+            .withVersion(kbvItaVersion)
+            .fake();
 
     val kvnr = KVNR.from("X234567890");
     val telematikId = "606358757";

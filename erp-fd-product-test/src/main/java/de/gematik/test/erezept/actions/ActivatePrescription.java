@@ -26,8 +26,10 @@ import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
 import de.gematik.test.fuzzing.core.*;
+import java.io.ByteArrayOutputStream;
 import java.nio.file.*;
 import java.util.*;
+import javax.annotation.Nullable;
 import lombok.*;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.*;
@@ -43,6 +45,12 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
 
   private final List<StringMutator> stringBundleMutators;
   private final List<ByteArrayMutator> signedBundleMutators;
+  @Nullable private ByteArrayOutputStream signatureObserver;
+
+  public ActivatePrescription setSignatureObserver(ByteArrayOutputStream signatureObserver) {
+    this.signatureObserver = signatureObserver;
+    return this;
+  }
 
   public static Builder forGiven(ErpInteraction<ErxTask> interaction) {
     return forGiven(interaction.getExpectedResponse());
@@ -56,6 +64,7 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
     return new Builder(taskId);
   }
 
+  @SneakyThrows
   @Override
   @Step("{0} aktiviert Task #taskId mit #accessCode und #kbvBundle")
   public ErpInteraction<ErxTask> answeredBy(Actor actor) {
@@ -68,6 +77,11 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
     }
 
     val signedKbv = konnektor.signDocumentWithHba(encodedKbv).getPayload();
+    if (signatureObserver != null) {
+      signatureObserver.writeBytes(signedKbv);
+      signatureObserver.flush();
+      signatureObserver.close();
+    }
     signedBundleMutators.forEach(m -> m.accept(signedKbv));
 
     val cmd = new TaskActivateCommand(taskId, accessCode, signedKbv);

@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.app.questions;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.Receipt;

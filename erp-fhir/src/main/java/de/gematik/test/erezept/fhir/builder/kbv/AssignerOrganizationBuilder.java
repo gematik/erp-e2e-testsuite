@@ -47,12 +47,14 @@ public class AssignerOrganizationBuilder
     return new AssignerOrganizationBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static AssignerOrganizationBuilder faker() {
     return faker(
         new OrganizationReference(UUID.randomUUID().toString()).asReference(),
         GemFaker.insuranceName());
   }
 
+  @Deprecated(forRemoval = true)
   public static AssignerOrganizationBuilder faker(@NonNull KbvPatient pkvPatient) {
     if (!pkvPatient.hasPkvKvnr()) {
       throw new BuilderException(
@@ -83,11 +85,13 @@ public class AssignerOrganizationBuilder
     return faker(assignerRef, assignerName);
   }
 
+  @Deprecated(forRemoval = true)
   public static AssignerOrganizationBuilder faker(
       @NonNull OrganizationReference reference, String name) {
     return faker(reference.asReference(), name);
   }
 
+  @Deprecated(forRemoval = true)
   public static AssignerOrganizationBuilder faker(@NonNull Reference reference, String name) {
     val builder = builder();
 

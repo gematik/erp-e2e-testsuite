@@ -65,8 +65,15 @@ public class FhirTestResourceUtil {
             format(
                 "{0} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit"
                     + " Ihrer eGK abrufen.",
+                agentName),
+            format(
+                "{0} hat mit Ihrer eGK die Liste der offenen E-Rezepte abgerufen. (Offline-Check"
+                    + " wurde akzeptiert)",
+                agentName),
+            format(
+                "{0} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit"
+                    + " Ihrer eGK abrufen. (Offline-Check wurde nicht akzeptiert)",
                 agentName));
-
     val erxAuditEventBundle = new ErxAuditEventBundle();
     textItems.forEach(
         i ->

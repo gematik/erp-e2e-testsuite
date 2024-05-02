@@ -48,6 +48,10 @@ public class Verify<T extends Resource> implements Performable {
   public static class PreBuilder<R extends Resource> {
     private final ErpInteraction<R> interaction;
 
+    public Verify<R> isFromExpectedType() {
+      return new Builder<>(interaction.expectation()).isCorrect();
+    }
+
     public Builder<R> withExpectedType() {
       return new Builder<>(interaction.expectation());
     }
@@ -60,6 +64,10 @@ public class Verify<T extends Resource> implements Performable {
       val exp = withExpectedType();
       exp.andResponse(payloadIsOfType(interaction.getExpectedType(), req));
       return exp;
+    }
+
+    public EmptyBodyBuilder withoutBody() {
+      return new EmptyBodyBuilder(interaction.asEmptyResource());
     }
 
     public Builder<Resource> withIndefiniteType() {
@@ -114,6 +122,35 @@ public class Verify<T extends Resource> implements Performable {
     public Builder<R> is(VerificationStep<R> step) {
       this.expectation.is(step);
       return this;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public <V extends Resource> Verify<V> isCorrect() {
+      Object[] params = {expectation};
+      val kl = (Class<Verify<V>>) (Object) Verify.class;
+      return new Instrumented.InstrumentedBuilder<>(kl, params).newInstance();
+    }
+  }
+
+  public static class EmptyBodyBuilder {
+    private final ErpResponseExpectation<Resource> expectation;
+
+    private EmptyBodyBuilder(ErpResponseExpectation<Resource> expectation) {
+      this.expectation = expectation;
+    }
+
+    public EmptyBodyBuilder responseWith(VerificationStep<ErpResponse<? extends Resource>> step) {
+      this.expectation.responseWith(step);
+      return this;
+    }
+
+    public EmptyBodyBuilder hasResponseWith(
+        VerificationStep<ErpResponse<? extends Resource>> step) {
+      return responseWith(step);
+    }
+
+    public EmptyBodyBuilder andResponse(VerificationStep<ErpResponse<? extends Resource>> step) {
+      return responseWith(step);
     }
 
     @SuppressWarnings({"unchecked"})

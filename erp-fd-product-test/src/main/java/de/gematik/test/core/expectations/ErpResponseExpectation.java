@@ -96,7 +96,7 @@ public class ErpResponseExpectation<T extends Resource> {
           format("+- [{0}] {1}: {2}", stepIdx++, step.getRequirement(), step.getExpectation()));
       step.apply(actual);
     }
-
+    if (expectedPayloadType == null) return;
     /*
     Throw an AssertionError if the payload does not match the expected payload because it is not ensured
     that the payload was checked already. If the payload was not checked and did not match the expected payload,

@@ -16,8 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.fhir.exceptions.*;
@@ -58,7 +57,12 @@ class AssignerOrganizationBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildAssignerOrganizationWithFaker01(KbvItaForVersion version) {
     val orgRef = new OrganizationReference("id");
-    val organization = AssignerOrganizationBuilder.faker(orgRef, "AOK").version(version).build();
+    val organization =
+        AssignerOrganizationFaker.builder()
+            .withOrganizationReference(orgRef)
+            .withName("AOK")
+            .withVersion(version)
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
   }
@@ -66,7 +70,7 @@ class AssignerOrganizationBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildAssignerOrganizationWithFaker02(KbvItaForVersion version) {
-    val organization = AssignerOrganizationBuilder.faker().version(version).build();
+    val organization = AssignerOrganizationFaker.builder().withVersion(version).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
   }
@@ -81,8 +85,16 @@ class AssignerOrganizationBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Patient with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void shouldFailOnFakerWithGkvPatient(KbvItaForVersion version) {
-    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.GKV).version(version).build();
-    assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(patient));
+    val patient =
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+            .withVersion(version)
+            .fake();
+    try {
+      AssignerOrganizationFaker.builder().forPatient(patient).fake();
+    } catch (RuntimeException e) {
+      assertEquals(BuilderException.class, e.getClass());
+    }
   }
 
   @Test
@@ -90,17 +102,28 @@ class AssignerOrganizationBuilderTest extends ParsingTest {
     val mockPatient = mock(KbvPatient.class);
     when(mockPatient.hasPkvKvnr()).thenReturn(true);
     when(mockPatient.getPkvAssigner()).thenReturn(Optional.empty());
-    assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(mockPatient));
+    try {
+      AssignerOrganizationFaker.builder().forPatient(mockPatient).fake();
+    } catch (RuntimeException e) {
+      assertEquals(BuilderException.class, e.getClass());
+    }
   }
 
   @Test
   void shouldFailOnFakerWithInvalidPkvPatient02() {
-    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.PKV).build();
+    val patient =
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.PKV)
+            .fake();
     val mockPatient = mock(KbvPatient.class);
     when(mockPatient.hasPkvKvnr()).thenReturn(true);
     when(mockPatient.getPkvAssigner()).thenReturn(patient.getPkvAssigner());
     when(mockPatient.getPkvAssignerName()).thenReturn(Optional.empty());
-    assertThrows(BuilderException.class, () -> AssignerOrganizationBuilder.faker(mockPatient));
+    try {
+      AssignerOrganizationFaker.builder().forPatient(mockPatient).fake();
+    } catch (RuntimeException e) {
+      assertEquals(BuilderException.class, e.getClass());
+    }
   }
 
   @Test

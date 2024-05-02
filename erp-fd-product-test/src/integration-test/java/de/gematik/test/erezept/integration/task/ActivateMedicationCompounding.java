@@ -93,16 +93,16 @@ public class ActivateMedicationCompounding extends ErpTest {
     val pzn = PZN.random();
     patient.changePatientInsuranceType(insuranceType);
     val medication = KbvErpMedicationCompoundingBuilder.faker(pzn, medicineName, freetext).build();
-
-    val assigner = AssignerOrganizationBuilder.faker().build();
+    val assigner = AssignerOrganizationFaker.builder().fake();
     val insurance = KbvCoverageBuilder.faker(patient.getCoverageInsuranceType()).build();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient.getPatientData())
-            .medication(medication)
-            .requester(doc.getPractitioner())
-            .insurance(insurance)
-            .build();
-    val organisation = MedicalOrganizationBuilder.faker().build();
+        MedicationRequestFaker.builder(patient.getPatientData())
+            .withMedication(medication)
+            .withRequester(doc.getPractitioner())
+            .withInsurance(insurance)
+            .fake();
+
+    val organisation = MedicalOrganizationFaker.builder().fake();
     val kbvBundleBuilder =
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
             .patient(patient.getPatientData())

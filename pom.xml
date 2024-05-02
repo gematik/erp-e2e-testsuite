@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -54,7 +54,7 @@
         <version.idp-client>22.0.4</version.idp-client>
         <version.spotless>2.41.1</version.spotless>
         <version.fasterxml.jackson>2.16.0</version.fasterxml.jackson>
-        <version.junit>5.9.3</version.junit>
+        <version.junit>5.10.2</version.junit>
         <version.assertj>3.24.2</version.assertj>
         <version.archunit>1.0.1</version.archunit>
         <version.junit-pioneer>2.0.1</version.junit-pioneer>
@@ -62,15 +62,15 @@
         <version.wiremock>3.2.0</version.wiremock>
         <version.faker>1.0.2</version.faker>
         <version.lombok>1.18.26</version.lombok>
-        <version.logback>1.4.7</version.logback>
+        <version.logback>1.5.6</version.logback>
         <version.slf4j-api>2.0.7</version.slf4j-api>
         <version.unirest>3.14.2</version.unirest>
         <version.dss>5.12</version.dss>
         <version.bouncycastle>1.73</version.bouncycastle>
         <version.zxing>3.5.1</version.zxing>
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
-        <version.jersey>3.1.1</version.jersey>
-        <version.poto>2.0.4-174</version.poto>
+        <version.jersey>4.0.0-M1</version.jersey>
+        <version.poto>3.0.0-185</version.poto>
 
         <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
 
@@ -117,12 +117,12 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -134,74 +134,74 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-crypto</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>pharmacy-service-provider-ws-client</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -505,30 +505,37 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit-pioneer</groupId>
             <artifactId>junit-pioneer</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

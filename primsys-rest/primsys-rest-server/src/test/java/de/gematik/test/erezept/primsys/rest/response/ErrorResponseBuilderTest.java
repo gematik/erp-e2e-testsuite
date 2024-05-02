@@ -67,6 +67,18 @@ class ErrorResponseBuilderTest {
   }
 
   @Test
+  void shouldCreateInternalErrorResponseFromThrowable() throws JsonProcessingException {
+    val throwable = new NullPointerException("for testing");
+    val response = ErrorResponseBuilder.createInternalError(throwable);
+    val entity = response.getEntity();
+
+    val json = mapper.writeValueAsString(entity);
+    assertNotNull(json);
+    val errorDto = mapper.readValue(json, ErrorDto.class);
+    assertEquals(ErrorType.INTERNAL, errorDto.getType());
+  }
+
+  @Test
   void shouldEncodeFachdienstErrorResponse() throws JsonProcessingException {
     val erpResponse =
         ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)

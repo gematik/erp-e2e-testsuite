@@ -41,10 +41,13 @@ public class OperationOutcomeWrapper {
   public String toString() {
     return this.operationOutcome.getIssue().stream()
         .map(
-            issue ->
-                format(
-                    "[{0}] {1}: {2}",
-                    issue.getSeverity(), issue.getDetails().getText(), issue.getDiagnostics()))
+            issue -> {
+              var message = format("[{0}] {1}", issue.getSeverity(), issue.getDetails().getText());
+              if (issue.hasDiagnostics()) {
+                message += format(": {0}", issue.getDiagnostics());
+              }
+              return message;
+            })
         .collect(Collectors.joining("\n"));
   }
 }

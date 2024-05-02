@@ -44,7 +44,7 @@ open class RestTest {
         om = ObjectMapper()
     }
 
-    fun setupPositiveInfo(): StubMapping {
+    fun setupPositiveInfo(env: String? = null): StubMapping {
         val infoDto = InfoDto()
         infoDto.doctors = 2
         infoDto.pharmacies = 2
@@ -54,8 +54,9 @@ open class RestTest {
 
         val info = om.writeValueAsString(infoDto)
 
+        val testUrl = env?.let { "/$it/info" } ?: "/info"
         return stubFor(
-            get(urlPathEqualTo("/info")).willReturn(
+            get(urlPathEqualTo(testUrl)).willReturn(
                 aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(info)
             )
         )
@@ -70,14 +71,15 @@ open class RestTest {
         )
     }
 
-    fun setupPositiveActors(): StubMapping {
+    fun setupPositiveActors(env: String? = null): StubMapping {
         val actorsDto = mutableListOf<ActorDto>()
         for (i in 0..1) actorsDto.add(ActorDto(ActorType.DOCTOR, "Doctor $i", "doc$i"))
         for (i in 0..1) actorsDto.add(ActorDto(ActorType.PHARMACY, "Pharmacy $i", "pharm$i"))
 
         val actors = om.writeValueAsString(actorsDto)
+        val testUrl = env?.let { "/$it/actors" } ?: "/actors"
         return stubFor(
-            get(urlPathEqualTo("/actors")).willReturn(
+            get(urlPathEqualTo(testUrl)).willReturn(
                 aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(actors)
             )
         )
@@ -92,9 +94,53 @@ open class RestTest {
         )
     }
 
-    fun setupPositiveStubs() {
-        setupPositiveInfo()
-        setupPositiveActors()
+    fun setupErrorActorsHtml(): StubMapping {
+        val error = "<html><body>internal error</body></html>"
+        return stubFor(
+            get(urlPathEqualTo("/actors")).willReturn(
+                aResponse().withStatus(400).withHeader("Content-Type", "text/html").withBody(error)
+            )
+        )
+    }
+
+    fun setupErrorActorsEmpty(): StubMapping {
+        return stubFor(
+            get(urlPathEqualTo("/actors")).willReturn(
+                aResponse().withStatus(400).withHeader("Content-Type", "application/json")
+            )
+        )
+    }
+
+    fun setupActorsInvalidErrorResponse(statusCode: Int): StubMapping {
+        return stubFor(
+            get(urlPathEqualTo("/actors")).willReturn(
+                aResponse().withStatus(statusCode).withHeader("Content-Type", "application/json")
+                    .withHeader("content-length", "20").withBody("{'a': 'b'}")
+            )
+        )
+    }
+
+    fun setupActorsValidErrorResponse(): StubMapping {
+        val errorJson = "{\"type\": \"INTERNAL\", \"message\": \"Test Message\"}"
+        return stubFor(
+            get(urlPathEqualTo("/actors")).willReturn(
+                aResponse().withStatus(400).withHeader("Content-Type", "application/json")
+                    .withHeader("content-length", errorJson.length.toString()).withBody(errorJson)
+            )
+        )
+    }
+
+    fun setupConnectionTimeout(): StubMapping {
+        return stubFor(
+            get(urlPathEqualTo("/info")).willReturn(
+                aResponse().withStatus(200).withFixedDelay(20000)
+            )
+        )
+    }
+
+    fun setupPositiveStubs(env: String? = null) {
+        setupPositiveInfo(env)
+        setupPositiveActors(env)
     }
 
     companion object {

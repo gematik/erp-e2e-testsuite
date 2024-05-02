@@ -21,6 +21,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.cli.param.TaskStatusWrapper;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
+import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
@@ -145,7 +146,32 @@ public class PrescriptionsReader extends BaseRemoteCommand {
     System.out.println(
         format("{0} / {1}", practitioner.getDescription(), practitionerOrg.getDescription()));
 
+    if (prescription.getTask().getStatus() == Task.TaskStatus.COMPLETED) {
+      printMedicationDispense(erpClient, task);
+    }
+
     System.out.println("-------------");
+  }
+
+  private void printMedicationDispense(ErpClient erpClient, ErxTask task) {
+    val cmd = new MedicationDispenseSearchCommand(task.getPrescriptionId());
+    val response = erpClient.request(cmd).getExpectedResource();
+
+    System.out.println("\nMedicationDispense:");
+    response
+        .getMedicationDispenses()
+        .forEach(
+            md -> {
+              System.out.println(
+                  format(
+                      "Abgabe durch: {0} am {1}",
+                      md.getPerformerIdFirstRep(), md.getZonedWhenHandedOver()));
+              md.getErpMedication()
+                  .forEach(
+                      med -> {
+                        System.out.println(format("\tMedikament: {0}", med.getMedicationName()));
+                      });
+            });
   }
 
   private void printSubLine(String line) {

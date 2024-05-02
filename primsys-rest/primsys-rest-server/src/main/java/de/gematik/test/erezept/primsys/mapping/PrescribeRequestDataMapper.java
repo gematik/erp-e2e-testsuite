@@ -17,10 +17,7 @@
 package de.gematik.test.erezept.primsys.mapping;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
@@ -92,8 +89,8 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
   }
 
   public KbvErpBundle createKbvBundle(String doctorName) {
-    val practitioner = PractitionerBuilder.faker(doctorName).build();
-    val organization = MedicalOrganizationBuilder.faker().build();
+    val practitioner = PractitionerFaker.builder().withName(doctorName).fake();
+    val organization = MedicalOrganizationFaker.builder().fake();
     val patient = this.getPatient();
     val coverage = this.getCoverage();
     val medication = this.getMedication();
@@ -121,7 +118,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
       // we do not have the AssignerOrganization (which was faked anyway for getting a Reference +
       // Name
       // build a faked one matching the Reference of the patient
-      builder.assigner(AssignerOrganizationBuilder.faker(patient).build());
+      builder.assigner(AssignerOrganizationFaker.builder().forPatient(patient).fake());
     }
 
     return builder.build();

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.android.AndroidDriver;
+import io.cucumber.java.Scenario;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class UseAndroidAppTest {
     assertEquals(10, driverAbility.getMaxWaitTimeout());
     assertEquals(5, driverAbility.getPollingInterval());
 
-    assertDoesNotThrow(driverAbility::tearDown);
+    assertDoesNotThrow(() -> driverAbility.finish(mock(Scenario.class)));
   }
 
   @Test

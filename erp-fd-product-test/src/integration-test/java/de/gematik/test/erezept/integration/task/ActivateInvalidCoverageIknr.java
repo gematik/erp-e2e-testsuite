@@ -24,6 +24,7 @@ import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.FhirRequirements;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.IssuePrescription;
@@ -31,8 +32,8 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
@@ -68,8 +69,8 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
 
   private static Stream<Arguments> baseIKNRComposer() {
     return ArgumentComposer.composeWith()
-        .arguments("123456789", "die ValidationNr. 0 statt 9")
-        .arguments("111111111", "die ValidationNr. 9 statt 1")
+        .arguments("123456789", "die Prüfziffer 0 statt 9")
+        .arguments("111111111", "die Prüfziffer 9 statt 1")
         .arguments("123456", "die IKNR zu kurz")
         .arguments("12119124", "die IKNR ohne Prüfziffer")
         .arguments("1234567891", "die IKNR zu lang")
@@ -116,7 +117,11 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
       kbvErpBundleConsumer =
           kbvBundle -> kbvBundle.getCoverage().getPayorFirstRep().getIdentifier().setValue(iknr);
     }
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    if (iknr.length() != 9) {
+      detailedText = "FHIR-Validation error";
+      requirementsSet = FhirRequirements.FHIR_VALIDATION_ERROR;
+    }
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medicationRequest = getMedicationRequest(accident, medication);
     val kbvBundleBuilder = getBundleBuilder(medication, medicationRequest);
     val issuePrescription =
@@ -143,12 +148,12 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
 
   private KbvErpMedicationRequest getMedicationRequest(
       AccidentExtension accident, KbvErpMedication medication) {
-    return MedicationRequestBuilder.faker(sina.getPatientData())
-        .insurance(sina.getInsuranceCoverage())
-        .requester(doctorActor.getPractitioner())
-        .accident(accident)
-        .medication(medication)
-        .build();
+    return MedicationRequestFaker.builder(sina.getPatientData())
+            .withInsurance(sina.getInsuranceCoverage())
+            .withRequester(doctorActor.getPractitioner())
+            .withAccident(accident)
+            .withMedication(medication)
+            .fake();
   }
 
   private KbvErpBundleBuilder getBundleBuilder(

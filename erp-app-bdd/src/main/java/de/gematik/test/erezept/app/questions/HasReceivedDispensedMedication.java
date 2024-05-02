@@ -30,14 +30,24 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 
+@Slf4j
 @RequiredArgsConstructor
 public class HasReceivedDispensedMedication implements Question<Boolean> {
 
   private final DequeStrategy deque;
+
+  public static Question<Boolean> fromStack(String order) {
+    return fromStack(DequeStrategy.fromString(order));
+  }
+
+  public static Question<Boolean> fromStack(DequeStrategy deque) {
+    return new HasReceivedDispensedMedication(deque);
+  }
 
   @Override
   public Boolean answeredBy(Actor actor) {
@@ -49,6 +59,10 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
     // first refresh the screen
     app.tap(Mainscreen.REFRESH_BUTTON);
     app.scrollIntoView(ScrollDirection.DOWN, Mainscreen.PRESCRIPTION_ARCHIVE);
+
+    // this scroll-down is required because occasionally the "Einlösen"-Button is hiding the
+    // "Archiv"-Button which results in clicking on the "Einlösen"-Button
+    app.scroll(ScrollDirection.DOWN, 0.1f);
     app.tap(Mainscreen.PRESCRIPTION_ARCHIVE);
     actor
         .asksFor(MovingToPrescription.withTaskId(prescriptionId.getValue()))
@@ -73,13 +87,5 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
     val sizeFromApp = app.getWebElementListLen(MedicationDispenseDetails.DISPENSED);
 
     return sizeFromBackend == sizeFromApp;
-  }
-
-  public static Question<Boolean> fromStack(String order) {
-    return fromStack(DequeStrategy.fromString(order));
-  }
-
-  public static Question<Boolean> fromStack(DequeStrategy deque) {
-    return new HasReceivedDispensedMedication(deque);
   }
 }

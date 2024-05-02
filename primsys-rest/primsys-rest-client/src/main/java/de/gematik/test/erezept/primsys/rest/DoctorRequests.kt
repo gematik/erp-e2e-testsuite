@@ -17,34 +17,26 @@
 package de.gematik.test.erezept.primsys.rest
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto
 import de.gematik.test.erezept.primsys.data.PrescriptionDto
-import io.restassured.response.Response
-import io.restassured.specification.RequestSpecification
+import io.ktor.client.request.*
+import io.ktor.http.*
 
 class PrescribeRequest(private val body: PrescribeRequestDto, private val asDirectAssignment: Boolean = false) :
     PrimSysBaseDoctorRequest<PrescriptionDto>(object : TypeReference<PrescriptionDto>() {}) {
 
-    override fun performOn(doctorId: String, reqSpec: RequestSpecification): Response {
-        return reqSpec.queryParam("direct", asDirectAssignment)
-            .body(body)
-            .post("/doc/$doctorId/prescribe")
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Post
+        rb.url.appendEncodedPathSegments("prescribe")
+        rb.url.parameters.append("direct", asDirectAssignment.toString())
+
+        val requestBody = bodyMapper.writeValueAsString(body)
+        rb.setBody(requestBody)
     }
 }
 
-class GetReadyPrescriptionByIdRequest(private val prescriptionId: String) :
-    PrimSysBaseGenericRequest<PrescriptionDto>(object : TypeReference<PrescriptionDto>() {}) {
-    override fun performOn(reqSpec: RequestSpecification): Response {
-        return reqSpec.get("/prescription/prescribed/$prescriptionId")
-    }
-}
 
-class GetAllReadyPrescriptions :
-    PrimSysBaseGenericRequest<List<PrescriptionDto>>(object : TypeReference<List<PrescriptionDto>>() {}) {
-    override fun performOn(reqSpec: RequestSpecification): Response {
-        return reqSpec.get("/prescription/prescribed")
-    }
-}
 
 object DoctorRequests {
 
@@ -56,11 +48,4 @@ object DoctorRequests {
 
     @JvmStatic
     fun prescribe(body: PrescribeRequestDto, asDirectAssignment: Boolean = false) = PrescribeRequest(body, asDirectAssignment)
-
-
-    @JvmStatic
-    fun getReadyPrescription(id: String) = GetReadyPrescriptionByIdRequest(id)
-
-    @JvmStatic
-    fun getReadyPrescriptions() = GetAllReadyPrescriptions()
 }

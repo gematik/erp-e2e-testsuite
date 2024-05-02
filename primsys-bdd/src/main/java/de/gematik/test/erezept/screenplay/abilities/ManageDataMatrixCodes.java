@@ -35,14 +35,22 @@ import org.hl7.fhir.r4.model.OperationOutcome;
 @Slf4j
 public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActor {
 
-  private Actor actor;
-
   @Getter private final ManagedList<DmcPrescription> dmcs;
   @Getter private final ManagedList<DmcPrescription> deletedDmcs;
+  private Actor actor;
 
   private ManageDataMatrixCodes() {
     this.dmcs = new ManagedList<>(() -> "No Prescriptions via DataMatrixCode received so far");
     this.deletedDmcs = new ManagedList<>(() -> "No DataMatrixCode were deleted so far");
+  }
+
+  public static ManageDataMatrixCodes heGetsPrescribed() {
+    return new ManageDataMatrixCodes();
+  }
+
+  public static ManageDataMatrixCodes sheGetsPrescribed() {
+    // gender-sensitive Java :)
+    return heGetsPrescribed();
   }
 
   public ManagedList<DmcPrescription> chooseStack(DmcStack stack) {
@@ -83,15 +91,6 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActo
   @Override
   public String toString() {
     return "DataMatrixCode Manager für die Verwaltung von verschriebenen E-Rezepten auf Papier";
-  }
-
-  public static ManageDataMatrixCodes heGetsPrescribed() {
-    return new ManageDataMatrixCodes();
-  }
-
-  public static ManageDataMatrixCodes sheGetsPrescribed() {
-    // gender-sensitive Java :)
-    return heGetsPrescribed();
   }
 
   @Override

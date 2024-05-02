@@ -65,7 +65,9 @@ public class OperationOutcomeVerifier {
   public static VerificationStep<OperationOutcome> operationOutcomeContainsInDiagnostics(
       String text, RequirementsSet req) {
     Predicate<OperationOutcome> predicate =
-        oo -> oo.getIssue().stream().anyMatch(issue -> issue.getDiagnostics().contains(text));
+        oo ->
+            oo.getIssue().stream()
+                .anyMatch(issue -> issue.hasDiagnostics() && issue.getDiagnostics().contains(text));
 
     val step =
         new VerificationStep.StepBuilder<OperationOutcome>(

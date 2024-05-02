@@ -19,7 +19,8 @@ package de.gematik.test.erezept.primsys.rest
 import arrow.core.Either
 import de.gematik.test.erezept.primsys.PrimSysRestException
 import de.gematik.test.erezept.primsys.data.error.ErrorDto
-import io.restassured.http.Headers
+import io.ktor.http.*
+
 
 class PrimSysResponse<T>(val statusCode: Int, val headers: Headers, val body: Either<ErrorDto, T>) {
 

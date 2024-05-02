@@ -21,10 +21,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.serenitybdd.screenplay.Ability;
 
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProvideApoVzdInformation implements Ability {
 
-  @Getter private final String apoVzdName;
+  private final String apoVzdName;
 
   public static ProvideApoVzdInformation withName(String name) {
     return new ProvideApoVzdInformation(name);

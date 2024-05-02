@@ -17,35 +17,57 @@
 package de.gematik.test.erezept.primsys.rest
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto
-import de.gematik.test.erezept.primsys.data.PznMedicationDto
-import io.restassured.response.Response
-import io.restassured.specification.RequestSpecification
+import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto
+import io.ktor.client.request.*
+import io.ktor.http.*
 
 class AcceptRequest(private val prescriptionId: String, private val accessCode: String) :
     PrimSysBasePharmacyRequest<AcceptedPrescriptionDto>(object : TypeReference<AcceptedPrescriptionDto>() {}) {
 
-    override fun performOn(pharmacyId: String, reqSpec: RequestSpecification): Response {
-        return reqSpec.post("pharm/$pharmacyId/accept?taskId=$prescriptionId&ac=$accessCode")
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Post
+        rb.url.appendEncodedPathSegments("accept")
+        rb.url.parameters.append("taskId", prescriptionId)
+        rb.url.parameters.append("ac", accessCode)
     }
 }
 
-class CloseRequest(private val prescriptionId: String, private val secret: String, private val body: List<PznMedicationDto>) :
+class CloseRequest(private val prescriptionId: String, private val secret: String, private val body: List<PznDispensedMedicationDto>) :
         PrimSysBasePharmacyRequest<DispensedMedicationDto>(object : TypeReference<DispensedMedicationDto>() {}) {
-    override fun performOn(pharmacyId: String, reqSpec: RequestSpecification): Response {
-        if (body.isNotEmpty()) {
-            reqSpec.body(body)
-        }
-        return reqSpec.post("pharm/$pharmacyId/close?taskId=$prescriptionId&secret=$secret")
-    }
 
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Post
+        rb.url.appendEncodedPathSegments("close")
+        rb.url.parameters.append("taskId", prescriptionId)
+        rb.url.parameters.append("secret", secret)
+
+        val requestBody = bodyMapper.writeValueAsString(body)
+        rb.setBody(requestBody)
+    }
 }
 
 class RejectRequest(private val prescriptionId: String, private val accessCode: String, private val secret: String) :
         PrimSysBasePharmacyRequest<Unit>(object : TypeReference<Unit>() {}) {
-    override fun performOn(pharmacyId: String, reqSpec: RequestSpecification): Response {
-        return reqSpec.post("pharm/$pharmacyId/reject?taskId=$prescriptionId&ac=$accessCode&secret=$secret")
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Post
+        rb.url.appendEncodedPathSegments("reject")
+        rb.url.parameters.append("taskId", prescriptionId)
+        rb.url.parameters.append("ac", accessCode)
+        rb.url.parameters.append("secret", secret)
+    }
+}
+
+class ReplyRequest(private val prescriptionId: String, private val kvnr: String, private val body: String): PrimSysBasePharmacyRequest<Unit>(object : TypeReference<Unit>() {}) {
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Post
+        rb.url.appendEncodedPathSegments("reply")
+        rb.url.parameters.append("taskId", prescriptionId)
+        rb.url.parameters.append("kvnr", kvnr)
+        rb.setBody(body)
     }
 }
 
@@ -55,26 +77,27 @@ object PharmacyRequests {
     fun accept(prescriptionId: String, accessCode: String) = AcceptRequest(prescriptionId, accessCode)
 
     @JvmStatic
-    fun dispense(prescriptionId: String, secret: String) = CloseRequest(prescriptionId, secret, listOf())
+    fun dispense(prescriptionId: String, secret: String) = dispense(prescriptionId, secret, listOf())
 
     @JvmStatic
-    fun dispense(prescriptionId: String, secret: String, medication: PznMedicationDto) {
-        val body = listOf(medication)
-        CloseRequest(prescriptionId, secret, body)
-    }
+    fun dispense(prescriptionId: String, secret: String, medication: PznDispensedMedicationDto) = dispense(prescriptionId, secret, listOf(medication))
 
     @JvmStatic
     fun dispense(prescriptionId: String, secret: String, num: Int) : CloseRequest {
-        val body = mutableListOf<PznMedicationDto>()
+        val body = mutableListOf<PznDispensedMedicationDto>()
+        assert (num >= 0) { "Amount of dispensed Medications must be >= 0" }
         for (i in 1..num) {
-            body.add(PznMedicationDto())
+            body.add(PznDispensedMedicationDto())
         }
-        return CloseRequest(prescriptionId, secret, body)
+        return dispense(prescriptionId, secret, body)
     }
 
     @JvmStatic
-    fun dispense(prescriptionId: String, secret: String, body: List<PznMedicationDto>) = CloseRequest(prescriptionId, secret, body)
+    fun dispense(prescriptionId: String, secret: String, body: List<PznDispensedMedicationDto>) = CloseRequest(prescriptionId, secret, body)
 
     @JvmStatic
     fun reject(prescriptionId: String, accessCode: String, secret: String) = RejectRequest(prescriptionId, accessCode, secret)
+
+    @JvmStatic
+    fun reply(prescriptionId: String, kvnr: String, body: String) = ReplyRequest(prescriptionId, kvnr, body)
 }

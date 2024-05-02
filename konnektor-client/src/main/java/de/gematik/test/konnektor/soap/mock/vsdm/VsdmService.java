@@ -17,33 +17,41 @@
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
 import de.gematik.test.erezept.config.dto.konnektor.VsdmServiceConfiguration;
-import de.gematik.test.smartcard.Egk;
 import java.util.Base64;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor()
-@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class VsdmService {
 
   private final byte[] hMacKey;
   private final char operator;
   private final char version;
 
-  public VsdmChecksum requestFor(@NonNull Egk egk, VsdmUpdateReason updateReason) {
-    return VsdmChecksum.builder(egk.getKvnr())
-        .identifier(operator)
-        .version(version)
-        .updateReason(updateReason)
-        .key(hMacKey)
-        .build();
-  }
-
   public static VsdmService createFrom(VsdmServiceConfiguration config) {
     return new VsdmService(
         Base64.getDecoder().decode(config.getHMacKey()),
         config.getOperator().charAt(0),
         config.getVersion().charAt(0));
+  }
+
+  public static VsdmService instantiateWithTestKey() {
+    return new VsdmService(new byte[32], 's', '1');
+  }
+
+  public VsdmChecksum checksumFor(String kvnr) {
+    return new VsdmChecksum(kvnr).setVersion(version).setIdentifier(operator);
+  }
+
+  public VsdmChecksum checksumWithInvalidManufacturer(String kvnr) {
+    return new VsdmChecksum(kvnr).setVersion(version).setIdentifier('y');
+  }
+
+  public VsdmChecksum checksumWithInvalidVersion(String kvnr) {
+    return new VsdmChecksum(kvnr).setVersion('0').setIdentifier(operator);
+  }
+
+  public String sign(VsdmChecksum checksum) {
+    return checksum.sign(hMacKey);
   }
 }

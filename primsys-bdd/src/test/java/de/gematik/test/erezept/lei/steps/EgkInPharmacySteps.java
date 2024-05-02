@@ -60,13 +60,15 @@ public class EgkInPharmacySteps {
       String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
+    val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
     val examEvidence =
-        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
+        VsdmExamEvidence.asOnlineTestMode(egk)
             .withExpiredTimestamp()
-            .build()
-            .encodeAsBase64();
+            .generate(VsdmExamEvidenceResult.NO_UPDATES);
     when(thePharmacy)
-        .attemptsTo(Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence)).isFalse());
+        .attemptsTo(
+            Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence.encodeAsBase64()))
+                .isFalse());
   }
 
   @Dann(
@@ -97,9 +99,14 @@ public class EgkInPharmacySteps {
   public void thenHospitalPharmacyCanNotRequestPrescriptions(String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
+    val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
     val examEvidence =
-        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES).build().encodeAsBase64();
+        VsdmExamEvidence.asOnlineTestMode(egk)
+            .withExpiredTimestamp()
+            .generate(VsdmExamEvidenceResult.NO_UPDATES);
     when(thePharmacy)
-        .attemptsTo(Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence)).isFalse());
+        .attemptsTo(
+            Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence.encodeAsBase64()))
+                .isFalse());
   }
 }

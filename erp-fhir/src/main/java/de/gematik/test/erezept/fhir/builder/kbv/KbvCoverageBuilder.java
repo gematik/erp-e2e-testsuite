@@ -79,7 +79,8 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
 
     builder
         .personGroup(fakerValueSet(PersonGroup.class))
-        .beneficiary(PatientBuilder.faker(insuranceType).build())
+        .beneficiary(
+            PatientFaker.builder().withKvnrAndInsuranceType(KVNR.random(), insuranceType).fake())
         .dmpKennzeichen(fakerValueSet(DmpKennzeichen.class))
         .wop(fakerValueSet(Wop.class))
         .versichertenStatus(fakerValueSet(VersichertenStatus.class));

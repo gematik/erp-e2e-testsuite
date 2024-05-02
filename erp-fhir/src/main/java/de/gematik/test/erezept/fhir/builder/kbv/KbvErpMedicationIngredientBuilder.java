@@ -52,14 +52,17 @@ public class KbvErpMedicationIngredientBuilder
     return new KbvErpMedicationIngredientBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationIngredientBuilder faker() {
     return faker("MonsterPille");
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationIngredientBuilder faker(String drugName) {
     return faker("aufs Auge legen", drugName);
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationIngredientBuilder faker(String darreichungsform, String drugName) {
     return new KbvErpMedicationIngredientBuilder()
         .darreichungsform(darreichungsform)

@@ -59,18 +59,22 @@ public class KbvErpMedicationPZNBuilder
     return new KbvErpMedicationPZNBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationPZNBuilder faker() {
     return faker(PZN.random().getValue());
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationPZNBuilder faker(String pzn) {
     return faker(pzn, fakerDrugName());
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationPZNBuilder faker(String pzn, String name) {
     return faker(pzn, name, MedicationCategory.C_00);
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationPZNBuilder faker(
       String pzn, String name, MedicationCategory category) {
     return builder()

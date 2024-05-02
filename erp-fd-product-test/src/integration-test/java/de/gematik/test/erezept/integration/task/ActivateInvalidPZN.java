@@ -19,6 +19,7 @@ package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
 
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
@@ -31,10 +32,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PZN;
@@ -125,7 +123,7 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationPZNBuilder.faker(pzn).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -152,8 +150,9 @@ public class ActivateInvalidPZN extends ErpTest {
 
     patient.changePatientInsuranceType(insuranceType);
     val medication =
-        KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), GemFaker.fakerName(), "freitext")
-            .build();
+            KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), GemFaker.fakerName(), "freitext")
+                    .build();
+
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -179,7 +178,7 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationPZNBuilder.faker(pzn).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -209,8 +208,9 @@ public class ActivateInvalidPZN extends ErpTest {
     patient.changePatientInsuranceType(insuranceType);
     // @ freetext is a maximum length of 20 digits allowed
     val medication =
-        KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), "teurer Schleim", "4 mal täglich")
-            .build();
+            KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), "teurer Schleim", "4 mal täglich")
+                    .build();
+
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -232,12 +232,12 @@ public class ActivateInvalidPZN extends ErpTest {
     if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
     val medicationRequest =
-        MedicationRequestBuilder.faker(patient.getPatientData())
-            .insurance(patient.getInsuranceCoverage())
-            .requester(doctorActor.getPractitioner())
-            .accident(accident)
-            .medication(medication)
-            .build();
+            MedicationRequestFaker.builder(patient.getPatientData())
+                    .withInsurance(patient.getInsuranceCoverage())
+                    .withRequester(doctorActor.getPractitioner())
+                    .withAccident(accident)
+                    .withMedication(medication)
+                    .fake();
     val kbvBundleBuilder =
         KbvErpBundleBuilder.faker(patient.getKvnr())
             .practitioner(doctorActor.getPractitioner())

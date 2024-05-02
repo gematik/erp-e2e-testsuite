@@ -36,8 +36,6 @@ public enum KbvProfileRules implements RequirementsSet {
       "IKNR_LENGTH_VALIDATION",
       "Die IK-Nr. muss genau 9 Stellen lang sein ('/KBV_PR_FOR_Coverage') und darf nur aus Zahlen"
           + " bestehen (HL7-DE 'identifier-iknr' ('[0-9]{9}')"),
-  // "http://fhir.de/StructureDefinition/identifier-iknr" +
-  // "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage"
 
   KVNR_VALIDATION(
       "KVNR_VALIDATION",

@@ -16,6 +16,13 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsIn;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -26,8 +33,9 @@ import de.gematik.test.erezept.actors.ActorStage;
 import de.gematik.test.erezept.actors.ActorType;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
@@ -39,16 +47,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
-
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsIn;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
-import static java.text.MessageFormat.format;
 
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
@@ -90,51 +88,47 @@ class TaskCreateUsecase extends ErpTest {
     }
 
     static Stream<Arguments> taskCreateProvider() {
-        val composer = ArgumentComposer.composeWith()
-                .arguments(
-                        NamedEnvelope.of(
-                                format("{0} Sina Hüllmann", ActorType.PATIENT),
-                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-                        PrescriptionFlowType.FLOW_TYPE_160)
-                .arguments(
-                        NamedEnvelope.of(
-                                format("{0} Sina Hüllmann", ActorType.PATIENT),
-                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-                        PrescriptionFlowType.FLOW_TYPE_169)
-                .arguments(
-                        NamedEnvelope.of(
-                                format("{0} Am Flughafen", ActorType.PHARMACY),
-                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-                        PrescriptionFlowType.FLOW_TYPE_160)
-                .arguments(
-                        NamedEnvelope.of(
-                                format("{0} Am Flughafen", ActorType.PHARMACY),
-                                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-                        PrescriptionFlowType.FLOW_TYPE_169);
-
-        if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-            composer.arguments(
-                            NamedEnvelope.of(
-                                    format("{0} Sina Hüllmann", ActorType.PATIENT),
-                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-                            PrescriptionFlowType.FLOW_TYPE_200)
-                    .arguments(
-                            NamedEnvelope.of(
-                                    format("{0} Sina Hüllmann", ActorType.PATIENT),
-                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
-                            PrescriptionFlowType.FLOW_TYPE_209)
-                    .arguments(
-                            NamedEnvelope.of(
-                                    format("{0} Am Flughafen", ActorType.PHARMACY),
-                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-                            PrescriptionFlowType.FLOW_TYPE_200)
-                    .arguments(
-                            NamedEnvelope.of(
-                                    format("{0} Am Flughafen", ActorType.PHARMACY),
-                                    (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
-                            PrescriptionFlowType.FLOW_TYPE_209);
-        }
-
-        return composer.create();
-    }
+    return ArgumentComposer.composeWith()
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Sina Hüllmann", ActorType.PATIENT),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+            PrescriptionFlowType.FLOW_TYPE_160)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Sina Hüllmann", ActorType.PATIENT),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+            PrescriptionFlowType.FLOW_TYPE_169)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Am Flughafen", ActorType.PHARMACY),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+            PrescriptionFlowType.FLOW_TYPE_160)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Am Flughafen", ActorType.PHARMACY),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+            PrescriptionFlowType.FLOW_TYPE_169)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Sina Hüllmann", ActorType.PATIENT),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+            PrescriptionFlowType.FLOW_TYPE_200)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Sina Hüllmann", ActorType.PATIENT),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")),
+            PrescriptionFlowType.FLOW_TYPE_209)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Am Flughafen", ActorType.PHARMACY),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+            PrescriptionFlowType.FLOW_TYPE_200)
+        .arguments(
+            NamedEnvelope.of(
+                format("{0} Am Flughafen", ActorType.PHARMACY),
+                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")),
+            PrescriptionFlowType.FLOW_TYPE_209)
+        .create();
+  }
 }

@@ -23,10 +23,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.DocumentType;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a>
@@ -51,25 +48,41 @@ public class ErxReceipt extends Bundle {
   }
 
   public DocumentType getDocumentType() {
+    val docType =
+        this.getComposition().getType().getCoding().stream()
+            .filter(
+                coding ->
+                    ErpWorkflowCodeSystem.DOCUMENT_TYPE.match(coding.getSystem())
+                        || ErpWorkflowCodeSystem.GEM_ERP_CS_DOCUMENT_TYPE.match(coding.getSystem()))
+            .findFirst()
+            .orElseThrow(
+                () -> new MissingFieldException(ErxReceipt.class, DocumentType.CODE_SYSTEM));
+    return DocumentType.fromCode(docType.getCode());
+  }
+
+  public Composition getComposition() {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Composition))
         .map(Composition.class::cast)
-        .map(Composition::getType)
-        .map(
-            compositionType ->
-                compositionType.getCoding().stream()
-                    .filter(
-                        coding ->
-                            ErpWorkflowCodeSystem.DOCUMENT_TYPE.match(coding.getSystem())
-                                || ErpWorkflowCodeSystem.GEM_ERP_CS_DOCUMENT_TYPE.match(
-                                    coding.getSystem()))
-                    .findFirst()
-                    .orElseThrow(
-                        () ->
-                            new MissingFieldException(ErxReceipt.class, DocumentType.CODE_SYSTEM)))
-        .map(documentType -> DocumentType.fromCode(documentType.getCode()))
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(ErxReceipt.class, DocumentType.CODE_SYSTEM));
+        .orElseThrow(() -> new MissingFieldException(ErxReceipt.class, ResourceType.Composition));
+  }
+
+  public Composition.SectionComponent getQesDigestRefInComposSect() {
+    return this.getComposition().getSectionFirstRep();
+  }
+
+  public Reference getAuthor() {
+    return this.getComposition().getAuthorFirstRep();
+  }
+
+  public Binary getQesDigestBinary() {
+    return this.getEntry().stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(resource -> resource.getResourceType().equals(ResourceType.Binary))
+        .map(Binary.class::cast)
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(ErxReceipt.class, ResourceType.Binary));
   }
 }

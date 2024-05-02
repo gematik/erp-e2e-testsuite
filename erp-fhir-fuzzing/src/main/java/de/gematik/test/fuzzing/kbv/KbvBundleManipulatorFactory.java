@@ -19,13 +19,10 @@ package de.gematik.test.fuzzing.kbv;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.PractitionerFaker;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
@@ -36,13 +33,12 @@ import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.values.ZANR;
-import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import de.gematik.test.erezept.fhir.valuesets.MedicationType;
+import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -207,8 +203,24 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
-            "Darreichungsform mit invalidem Code XYZ",
+            "Darreichungsform mit Code XYZ",
             b -> b.getMedication().getForm().getCodingFirstRep().setCode("XYZ")));
+    manipulators.add(
+        NamedEnvelope.of(
+            "Darreichungsform mit invalidem random Code",
+            b -> {
+              String invalidCode;
+              boolean isNotUnique;
+              do {
+                invalidCode = GemFaker.getFaker().regexify(("[A-Z]{3,4}"));
+                final String invalidFinalCode = invalidCode;
+                isNotUnique =
+                    Arrays.stream(Darreichungsform.values())
+                        .anyMatch(darr -> darr.getCode().equals(invalidFinalCode));
+              } while (isNotUnique);
+
+              b.getMedication().getForm().getCodingFirstRep().setCode(invalidCode);
+            }));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -247,6 +259,19 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
+            "Normgröße 'random'",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(
+                        ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
+                    .forEach(
+                        ext ->
+                            ext.getValue()
+                                .castToCode(ext.getValue())
+                                .setValue(GemFaker.getFaker().regexify(("\\w{3,100}"))))));
+
+    manipulators.add(
+        NamedEnvelope.of(
             "Vaccine-Extension mit StringType",
             b ->
                 b.getMedication().getExtension().stream()
@@ -263,6 +288,63 @@ public class KbvBundleManipulatorFactory {
     manipulators.add(
         NamedEnvelope.of(
             "Medication mit fehlender ID", b -> b.getMedication().setId((String) null)));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationType-manipulator RandomValue",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(ext -> KbvBasisStructDef.BASE_MEDICATION_TYPE.match(ext.getUrl()))
+                    .forEach(
+                        ext -> {
+                          String newCode;
+                          do {
+                            newCode = String.valueOf(GemFaker.fakerAmount(10, 990000000));
+                          } while (BaseMedicationType.MEDICAL_PRODUCT.getCode() == newCode
+                              || BaseMedicationType.PHARM_BIO_PRODUCT.getCode() == newCode);
+                          ext.setValue(new CodeType(newCode));
+                        })));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationType-manipulator Null-Setter",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(ext -> KbvBasisStructDef.BASE_MEDICATION_TYPE.match(ext.getUrl()))
+                    .forEach(ext -> ext.setValue(new CodeType(null)))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationCategory-manipulator set 0",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .forEach(ext -> ext.setValue(new CodeType("0")))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationCategory-manipulator set null",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .forEach(ext -> ext.setValue(new CodeType(null)))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationCategory-manipulator set 04",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .forEach(ext -> ext.setValue(new CodeType("04")))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationCategory-manipulator set the 100",
+            b ->
+                b.getMedication().getExtension().stream()
+                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .forEach(ext -> ext.setValue(new CodeType("the 100")))));
+
     return manipulators;
   }
 
@@ -689,7 +771,7 @@ public class KbvBundleManipulatorFactory {
                 b.getEntry()
                     .add(
                         new Bundle.BundleEntryComponent()
-                            .setResource(PractitionerBuilder.faker().build()))));
+                            .setResource(PractitionerFaker.builder().fake()))));
 
     manipulators.add(
         NamedEnvelope.of(

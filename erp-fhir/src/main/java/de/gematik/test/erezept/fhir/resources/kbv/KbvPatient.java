@@ -119,7 +119,7 @@ public class KbvPatient extends Patient implements ErpFhirResource {
     return opt.map(identifier -> KVNR.from(identifier.getValue()));
   }
 
-  private Optional<Identifier> getGkvIdentifier() {
+  public Optional<Identifier> getGkvIdentifier() {
     return this.getIdentifier().stream()
         .filter(
             identifier ->
@@ -128,7 +128,7 @@ public class KbvPatient extends Patient implements ErpFhirResource {
         .findFirst();
   }
 
-  private Optional<Identifier> getPkvIdentifier() {
+  public Optional<Identifier> getPkvIdentifier() {
     /*
     Why is the identifier not fetched identically as the GKV one?
     - because on old profiles (1.0.2) PKV-Identifier didn't contain a system-value,

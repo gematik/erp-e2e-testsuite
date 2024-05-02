@@ -29,13 +29,36 @@ public enum ErpAfos implements RequirementsSet {
   A_19114("A_19114", "Task im Status Draft nach Erstellung"),
   A_19128("A_19128", "Task im Status Ready nach Aktivierung"),
   A_19166("A_19166", "Rollenprüfung Abgebender ruft Rezept ab"),
+  A_19168_01("A_1968-01", "Task akzeptieren - Rezept bereits in Abgabe oder Bearbeitung"),
   A_19169("A_19169", "Generierung Secret, Statuswechsel in Abgabe und Rückgabewert"),
   A_19230("A_19230", "Rollenprüfung Abgebender vollzieht Abgabe des Rezepts"),
   A_19248_02("A_19248-02", "Schemaprüfung und Speicherung MedicationDispense"),
+  A_19233(
+      "A_19233_05",
+      "Base64Binary-Ressource mit Binary.data = <base64-codierter Hashwert aus der QES-Signatur des"
+          + " dem Task zugrunde liegenden Verordnungsdatensatzes>"),
+
+  A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
   A_19514_02("A_19514-02", "HTTP Status-Codes"),
   A_19514_03("A_19514-03", "HTTP Status-Codes"),
+  A_19520_01("A_19520_01", "E-Rezept-Fachdienst - Nachrichten abrufen - für Empfänger filtern"),
+  A_19521("A_19521", "E-Rezept-Fachdienst - Nachrichten als abgerufen markieren"),
+  A_19522_01("A_19522_01", " E-Rezept-Fachdienst - Nachrichtenabruf Suchparameter"),
+  A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
+  A_21782_01("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
   A_22110("A_22110", "Task akzeptieren - Flowtype 200/209 - Einwilligung ermitteln"),
+  A_22154("A_22154", " Consent löschen - alles Löschen verbieten ohne QuerryParam ?category"),
+  A_22155("A_22155", "E-Rezept-Fachdienst - Consent löschen - Rollenprüfung Versicherter"),
+  A_22158("A_22158", "E-Rezept-Fachdienst - Consent löschen - Löschen der Consent"),
+  A_22159("A_22159", "E-Rezept-Fachdienst - Consent lesen - Rollenprüfung Versicherter"),
+  A_22160(
+      "A_22160", "E-Rezept-Fachdienst - Consent lesen - Filter Consent auf KVNR des Versicherten"),
+  A_22161("A_22161", "E-Rezept-Fachdienst - Consent schreiben - Rollenprüfung Versicherter"),
+  A_22162(
+      "A_22162",
+      "E-Rezept-Fachdienst - Consent schreiben – nur eine Einwilligung CHARGCONS pro KVNR"),
+  A_22289("A_22289", "E-Rezept-Fachdienst - Consent schreiben - Prüfung KVNR"),
   A_22487("A_22487", "Prüfregel Ausstellungsdatum"),
   A_22627_01("A_22627-01", "Mehrfachverordnung - zulässige Flowtype"),
   A_22628("A_22628", "Mehrfachverordnung - Numerator-Denominator kleiner 5"),
@@ -46,16 +69,27 @@ public enum ErpAfos implements RequirementsSet {
   A_22633("A_22633", "Mehrfachverordnung - keine Ersatzverordnung"),
   A_22634("A_22634", "Mehrfachverordnung - Beginn Einlösefrist-Pflicht"),
   A_22704("A_22704", "Mehrfachverordnung - Numerator größer 0"),
+  A_22874("A_22874-01", "E-Rezept-Fachdienst - Consent löschen - Prüfung category"),
   A_22927("A_22927", "Ausschluss unspezifizierter Extensions"),
   A_23443("A_23443", "Task aktivieren – Flowtype 160/169 - Prüfung Coverage Type"),
   A_22347("A_22347-01", "Task aktivieren – Flowtype 200/209 - Prüfung Coverage Type"),
-  A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
-  A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
+  A_22350("A_22350", "E-Rezept-Fachdienst - Consent schreiben – Persistieren"),
+  A_22351("A_22351", "E-Rezept-Fachdienst - Consent schreiben - FHIR-Validierung"),
   A_23455("A_23455", "E-Rezept-Fachdienst - Prüfung Prüfziffer - keine Prüfziffer"),
   A_23450(
       "A_23450",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Prüfung Prüfungsnachweis"),
+  A_23451(
+      "A_23451-01",
+      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Zeitraum Akzeptanz"
+          + " Prüfungsnachweis"),
+  A_23452(
+      "A_23452-02",
+      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Filter Status, KVNR und"
+          + " Workflowtype"),
   A_23454("A_23454", "E-Rezept-Fachdienst - Prüfung Prüfziffer"),
+  A_23456(
+      "A_23456-01", "E-Rezept-Fachdienst - Prüfung Prüfziffer - Berechnung HMAC der Prüfziffer"),
   A_23878("A_23878", "E-RezeptFachdienst, validierung des Payload des DispenseRequest"),
   A_23879("A_23879", "E-RezeptFachdienst, validierung des Payload des CommunicationReply"),
   A_23888(
@@ -67,14 +101,17 @@ public enum ErpAfos implements RequirementsSet {
       "Überprüfung der KVNR in KBV_PR_FOR_Patient - gemäß der Anlage 1 der 'Prüfziffernberechnung"
           + " für die Krankenversichertennummer nach § 290 SGB V' vom 26.02.2019"),
 
-  A_23891("A_23891", "Validierung der ANR / ZANR"),
+  A_23891(
+      "A_23891",
+      "E-Rezept-Fachdienst - Task aktivieren – Überprüfung der ANR und ZANR im Profil"
+          + " KBV_PR_FOR_Practitioner"),
   A_23892("A_23892", "Überprüfung der PZN-Prüfziffer im Medication_PZN"),
   A_23936(
       "A_23936",
       "E-Rezept-Fachdienst - Task aktivieren - Versicherten-ID als Identifikator von Versicherten"),
   A_24030(
       "A_24030",
-      "Validierung der IK Nummer im Profil KBV_PR_FOR_Coverage, bei einem Unfall (BG-ABrechnung) ->"
+      "Validierung der IK Nummer im Profil KBV_PR_FOR_Coverage, bei einem Unfall (BG-Abrechnung) ->"
           + " payor.identifier.extension:alternativeID.value[x]:valueIdentifier"),
   A_24032(
       "A_24032",
@@ -84,10 +121,27 @@ public enum ErpAfos implements RequirementsSet {
       "Auffälligkeit für ANR & ZANR validierung, invalide Prüfziffer bei Konfiguration Warnung"),
 
   A_24034("A_24034", "Überprüfung der PZN-Prüfziffer im Medication_Compounding"),
+  A_24175("A_24175", "Löschen des Owner beim FD nach Reject"),
   A_24176(
       "A_24176",
       "Apotheke - Verordnung abrufen - Prüfung der Telematik-ID in ACCESS_TOKEN und Task.owner"),
-  ;
+  A_24177(
+      "A_24177",
+      "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung AccessCode"),
+  A_24178(
+      "A_24178",
+      "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"
+          + " in-progress"),
+  A_24466("A_24466", "E-Rezept-Fachdienst - Bereitstellung von Cross Zertifikaten"),
+  A_25057("A_25057", "Deprecation Header für die Endpunkte /OCSPList und /CertList"),
+  A_25206("A_25206", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3"),
+  A_25207(
+      "A_25207", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - AcceptPN3 false"),
+  A_25208("A_25208", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - URL kvnr"),
+  A_25209(
+      "A_25209",
+      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - AcceptPN3 true- Filter Status,"
+          + " KVNR und Workflowtype");
   @Getter private final Requirement requirement;
 
   ErpAfos(String id, String description) {

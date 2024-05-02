@@ -15,6 +15,7 @@
 #
 # language: de
 
+@PRODUKT:eRp_FdV
 @iosNightly
 @Funktionalität:Direktzuweisung
 Funktionalität: E-Rezepte als Direktzuweisung
@@ -24,6 +25,7 @@ Funktionalität: E-Rezepte als Direktzuweisung
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
 
+  @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_01
   @Versicherung:GKV
   Szenario: Anzeigen von direkt zugewiesenen E-Rezepten für GKV-Versicherte
     Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung.
@@ -37,6 +39,7 @@ Funktionalität: E-Rezepte als Direktzuweisung
     Dann hat die Apotheke genau eine Quittung vorliegen
     # TODO: check prescription archive as Alice
 
+  @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_02
   @Versicherung:PKV
   Szenario: Anzeigen von direkt zugewiesenen E-Rezepten für PKV-Versicherte
     Der Arzt verschreibt der PKV-Versicherten ein Medikament als Direktzuweisung.

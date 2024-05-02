@@ -17,16 +17,20 @@
 package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
-import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.client.rest.param.SortParameter;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import lombok.NonNull;
 
 public class TaskGetByExamEvidenceCommand extends TaskGetCommand {
 
+  public TaskGetByExamEvidenceCommand() {}
+
   /** Get all Tasks without any sorting or filtering */
-  public TaskGetByExamEvidenceCommand(String examEvidence) {
-    queryParameters.add(new SortParameter("authored-on", SortOrder.DESCENDING));
-    if (examEvidence != null) {
-      queryParameters.add(new QueryParameter("pnw", examEvidence));
-    }
+  public TaskGetByExamEvidenceCommand(@NonNull String examEvidence) {
+    queryParameters.add(new QueryParameter("pnw", examEvidence));
+  }
+
+  public TaskGetByExamEvidenceCommand andKvnr(@NonNull KVNR kvnr) {
+    queryParameters.add(new QueryParameter("kvnr", kvnr.getValue()));
+    return this;
   }
 }

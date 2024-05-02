@@ -16,9 +16,10 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.AcceptBundleVerifier.consentIsPresent;
 import static de.gematik.test.core.expectations.verifier.AcceptBundleVerifier.isInProgressStatus;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
 import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.*;
@@ -40,8 +41,6 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.tasks.EnsureConsent;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -49,6 +48,7 @@ import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -107,78 +107,36 @@ class TaskAcceptUsecase extends ErpTest {
     // cleanup
     flughafen.performs(DispensePrescription.acceptedWith(acceptance));
   }
-  
+
   @TestcaseId("ERP_TASK_ACCEPT_02")
-  @ParameterizedTest(name = "[{index}] -> Prüfe ob beim akzeptieren der Consent {2}")
-  @DisplayName("Prüfe den Consent beim Accept als abgebende Apotheke")
-  @MethodSource("prescriptionConsent")
-  void checkConsentOnAccept(
-      VersicherungsArtDeBasis insuranceType,
-      PrescriptionAssignmentKind assignmentKind,
-      boolean shouldHaveConsent) {
-
-    sina.changePatientInsuranceType(insuranceType);
-    if (insuranceType == PKV) {
-      // only PKV patients can set/revoke a consent
-      sina.attemptsTo(EnsureConsent.shouldBeSet(shouldHaveConsent));
-    }
-
-    val activation =
-        doctor.performs(
-            IssuePrescription.forPatient(sina)
-                .ofAssignmentKind(assignmentKind)
-                .withRandomKbvBundle());
-    doctor.attemptsTo(
-        Verify.that(activation)
-            .withExpectedType(ErpAfos.A_19022)
-            .hasResponseWith(returnCode(200))
-            .and(isInReadyStatus())
-            .isCorrect());
-
-    val acceptance =
-        flughafen.performs(AcceptPrescription.forTheTask(activation.getExpectedResponse()));
-
+  @Test
+  @DisplayName("Wiederholtes ACCEPT von Rezepten als Apotheker nicht möglich")
+  void acceptTwiceShouldNotWork() {
+    val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
+    val activation = doctor.performs(IssuePrescription.forPatient(sina).withRandomKbvBundle());
+    val task = activation.getExpectedResponse();
+    flughafen.performs(AcceptPrescription.forTheTask(task));
+    val accepted2 = flughafen.performs(AcceptPrescription.forTheTask(task));
     flughafen.attemptsTo(
-        Verify.that(acceptance)
-            .withExpectedType(ErpAfos.A_19166)
-            .hasResponseWith(returnCode(200))
-            .and(isInProgressStatus())
-            .and(consentIsPresent(shouldHaveConsent))
+        Verify.that(accepted2)
+            .withOperationOutcome(ErpAfos.A_19168_01)
+            .responseWith(returnCodeIs(409))
+            .and(
+                operationOutcomeHasDetailsText(
+                    "Task is processed by requesting institution", ErpAfos.A_19168_01))
             .isCorrect());
-
-    // cleanup
-    flughafen.performs(DispensePrescription.acceptedWith(acceptance));
   }
 
   static Stream<Arguments> prescriptionTypesProvider() {
     val composer =
         ArgumentComposer.composeWith()
             .arguments(GKV, PHARMACY_ONLY, FLOW_TYPE_160)
-            .arguments(GKV, DIRECT_ASSIGNMENT, FLOW_TYPE_169);
-
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-      composer
-          .arguments(PKV, PHARMACY_ONLY, FLOW_TYPE_200)
-          .arguments(PKV, DIRECT_ASSIGNMENT, FLOW_TYPE_209);
-    }
+            .arguments(GKV, DIRECT_ASSIGNMENT, FLOW_TYPE_169)
+            .arguments(PKV, PHARMACY_ONLY, FLOW_TYPE_200)
+            .arguments(PKV, DIRECT_ASSIGNMENT, FLOW_TYPE_209);
 
     return composer.create();
   }
 
-  static Stream<Arguments> prescriptionConsent() {
-    val composer =
-        ArgumentComposer.composeWith()
-            .arguments(GKV, PHARMACY_ONLY, false)
-            .arguments(GKV, DIRECT_ASSIGNMENT, false);
 
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-      composer
-          .arguments(PKV, PHARMACY_ONLY, false)
-          .arguments(PKV, PHARMACY_ONLY, true)
-          .arguments(PKV, DIRECT_ASSIGNMENT, false)
-          .arguments(PKV, DIRECT_ASSIGNMENT, true);
-    }
-
-    return composer.create();
-  }
 }

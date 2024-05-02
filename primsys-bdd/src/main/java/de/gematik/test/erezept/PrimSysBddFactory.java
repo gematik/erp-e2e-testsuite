@@ -18,7 +18,6 @@ package de.gematik.test.erezept;
 
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
@@ -69,7 +68,9 @@ public class PrimSysBddFactory extends ConfiguredFactory {
             .andConfig(dto.getPspClientConfig());
 
     // check psp connected successfully
-    assertTrue(pspClient.isConnected());
+    if (!pspClient.isConnected()) {
+      throw new AssertionError("PSP-Client could not connect to PSP-Server");
+    }
     return pspClient;
   }
 

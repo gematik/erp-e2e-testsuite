@@ -52,10 +52,12 @@ public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBui
     return new PractitionerBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static PractitionerBuilder faker() {
     return faker(fakerFirstName(), fakerLastName());
   }
 
+  @Deprecated(forRemoval = true)
   public static PractitionerBuilder faker(String fullName) {
     val tokens = fullName.split(" ");
     val firstName = tokens[0] != null ? tokens[0] : fakerFirstName();
@@ -63,6 +65,7 @@ public class PractitionerBuilder extends AbstractResourceBuilder<PractitionerBui
     return faker(firstName, lastName);
   }
 
+  @Deprecated(forRemoval = true)
   public static PractitionerBuilder faker(String firstName, String lastName) {
     val builder = builder();
     val qualificationType = randomElement(QualificationType.DOCTOR, QualificationType.DENTIST);

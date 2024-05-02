@@ -19,6 +19,7 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.*;
 import org.junit.jupiter.api.*;
@@ -47,7 +48,7 @@ class InsuranceCoverageParameterTest {
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs());
 
-    val patient = PatientBuilder.faker().build();
+    val patient = PatientFaker.builder().fake();
     icp.setPatient(patient);
     val coverage = icp.createCoverage();
     // only possible to check if insurance kind is the same as we don't have a getter for patient
@@ -121,7 +122,10 @@ class InsuranceCoverageParameterTest {
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692"));
 
-    val patient = PatientBuilder.faker(VersicherungsArtDeBasis.PKV).build();
+    val patient =
+        PatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.PKV)
+            .fake();
     icp.setPatient(patient);
     val coverage = icp.createCoverage();
     assertEquals("104127692", coverage.getIknr().getValue());

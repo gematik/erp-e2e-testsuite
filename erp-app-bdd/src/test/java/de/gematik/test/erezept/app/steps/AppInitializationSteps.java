@@ -31,6 +31,7 @@ import de.gematik.test.smartcard.*;
 import io.cucumber.java.*;
 import io.cucumber.java.de.*;
 import lombok.*;
+import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.*;
 
 public class AppInitializationSteps {
@@ -40,6 +41,9 @@ public class AppInitializationSteps {
 
   private PrimSysBddFactory primsysConfig;
   private String scenarioName;
+
+  /* the actor who is responsible for reporting the test result to the MDC */
+  private Actor testReporter;
 
   @Before
   public void setUp(Scenario scenario) {
@@ -53,7 +57,9 @@ public class AppInitializationSteps {
   }
 
   @After
-  public void tearDown() {
+  public void tearDown(Scenario scenario) {
+    val driver = SafeAbility.getAbility(this.testReporter, UseTheApp.class);
+    driver.finish(scenario);
     OnStage.drawTheCurtain();
   }
 
@@ -65,6 +71,8 @@ public class AppInitializationSteps {
 
     // assemble the screenplay
     val theAppUser = OnStage.theActorCalled(userName);
+    this.testReporter =
+        theAppUser; // remember the app user for reporting the final test result to MDC
     theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));
     givenThat(theAppUser).can(UseAppUserConfiguration.forUser(userName, config));
     givenThat(theAppUser).can(useTheAppiumDriver);
@@ -128,6 +136,8 @@ public class AppInitializationSteps {
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) öffnet das Onboarding$")
   public void initPatientOpenOnboarding(String insuranceType, String userName) {
     val theAppUser = OnStage.theActorCalled(userName);
+    this.testReporter =
+        theAppUser; // remember the app user for reporting the final test result to MDC
     val useTheApp = AppiumDriverFactory.forUser(scenarioName, userName, config);
 
     theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));

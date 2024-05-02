@@ -41,7 +41,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.konnektor.KonnektorResponse;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -78,30 +77,24 @@ class TaskActivatePerformanceUseCase extends ErpTest {
 
   static Stream<Arguments> prescriptionTypesProvider() {
 
-    val composer =
-        ArgumentComposer.composeWith()
-            .arguments(
-                VersicherungsArtDeBasis.GKV, // given insurance kind
-                PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
-                DurationOperationRequirement.ACTIVATE_FLOWTYPE_160) // expected flow type
-            .arguments(
-                VersicherungsArtDeBasis.GKV,
-                PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-                DurationOperationRequirement.ACTIVATE_FLOWTYPE_169);
-
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-      composer
-          .arguments(
-              VersicherungsArtDeBasis.PKV,
-              PrescriptionAssignmentKind.PHARMACY_ONLY,
-              DurationOperationRequirement.ACTIVATE_FLOWTYPE_200)
-          .arguments(
-              VersicherungsArtDeBasis.PKV,
-              PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-              DurationOperationRequirement.ACTIVATE_FLOWTYPE_209);
-    }
-
-    return composer.create();
+    return ArgumentComposer.composeWith()
+        .arguments(
+            VersicherungsArtDeBasis.GKV, // given insurance kind
+            PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
+            DurationOperationRequirement.ACTIVATE_FLOWTYPE_160) // expected flow type
+        .arguments(
+            VersicherungsArtDeBasis.GKV,
+            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+            DurationOperationRequirement.ACTIVATE_FLOWTYPE_169)
+        .arguments(
+            VersicherungsArtDeBasis.PKV,
+            PrescriptionAssignmentKind.PHARMACY_ONLY,
+            DurationOperationRequirement.ACTIVATE_FLOWTYPE_200)
+        .arguments(
+            VersicherungsArtDeBasis.PKV,
+            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+            DurationOperationRequirement.ACTIVATE_FLOWTYPE_209)
+        .create();
   }
 
   @TestcaseId("ERP_PERFORMANCE_TASK_ACTIVATE_01")

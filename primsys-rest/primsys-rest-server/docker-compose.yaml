@@ -1,7 +1,4 @@
-version: '3'
-
 services:
-
   nginx:
     image: eu.gcr.io/gematik-all-infra-prod/erezept/primsys-nginx
     container_name: webserver
@@ -18,7 +15,6 @@ services:
       - ERP_FHIR_PROFILE=1.2.0
     env_file:
       - .env
-
 
   primsys-tu:
     image: eu.gcr.io/gematik-all-infra-prod/erezept/primsys-rest

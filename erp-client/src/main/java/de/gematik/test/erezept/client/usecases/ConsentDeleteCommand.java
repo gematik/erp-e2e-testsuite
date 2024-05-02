@@ -18,14 +18,19 @@ package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.test.erezept.client.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
+import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 public class ConsentDeleteCommand extends BaseCommand<Resource> {
 
   public ConsentDeleteCommand() {
+    this(List.of(new QueryParameter("category", "CHARGCONS")));
+  }
+
+  public ConsentDeleteCommand(List<QueryParameter> queryList) {
     super(Resource.class, HttpRequestMethod.DELETE, "Consent");
-    this.queryParameters.add(new QueryParameter("category", "CHARGCONS"));
+    this.queryParameters.addAll(queryList);
   }
 
   /**

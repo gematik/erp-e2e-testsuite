@@ -34,8 +34,8 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
@@ -46,7 +46,6 @@ import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.core.ParameterPair;
 import java.util.List;
@@ -98,14 +97,14 @@ class ActivateAccidentPrescription extends ErpTest {
       sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
     }
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(sina.getPatientData())
-            .insurance(sina.getInsuranceCoverage())
-            .requester(doctor.getPractitioner())
-            .accident(accident)
-            .medication(medication)
-            .build();
+        MedicationRequestFaker.builder(sina.getPatientData())
+            .withInsurance(sina.getInsuranceCoverage())
+            .withRequester(doctor.getPractitioner())
+            .withAccident(accident)
+            .withMedication(medication)
+            .fake();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.faker(sina.getKvnr())
@@ -152,14 +151,14 @@ class ActivateAccidentPrescription extends ErpTest {
       sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
     }
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
     val medicationRequest =
-        MedicationRequestBuilder.faker(sina.getPatientData())
-            .insurance(sina.getInsuranceCoverage())
-            .requester(doctor.getPractitioner())
-            .accident(accident)
-            .medication(medication)
-            .build();
+        MedicationRequestFaker.builder(sina.getPatientData())
+            .withInsurance(sina.getInsuranceCoverage())
+            .withRequester(doctor.getPractitioner())
+            .withAccident(accident)
+            .withMedication(medication)
+            .fake();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.faker(sina.getKvnr())
@@ -189,18 +188,15 @@ class ActivateAccidentPrescription extends ErpTest {
             AccidentExtension.accidentAtWork().atWorkplace(),
             AccidentExtension.occupationalDisease());
 
-    val composer = ArgumentComposer.composeWith()
-        .arguments(
-            VersicherungsArtDeBasis.GKV, // given insurance kind
-            PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                VersicherungsArtDeBasis.GKV, // given insurance kind
+                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
+            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
 
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-              composer.arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-              .arguments(
-                      VersicherungsArtDeBasis.PKV,
-                      PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-    }
         return composer.multiplyAppend(accidentTypes).create();
   }
 
@@ -255,18 +251,14 @@ class ActivateAccidentPrescription extends ErpTest {
                           outerAccidentExtension.getExtension().remove(unfallbetriebExtension);
                         })));
 
-    val composer = ArgumentComposer.composeWith()
-        .arguments(
-            VersicherungsArtDeBasis.GKV, // given insurance kind
-            PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
-      composer
-              .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-              .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-
-    }
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                VersicherungsArtDeBasis.GKV, // given insurance kind
+                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
+            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
 
         return composer.multiplyAppend(accidentTypes).create();
   }

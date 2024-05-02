@@ -19,6 +19,7 @@ package de.gematik.test.erezept.primsys;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.config.ConfigurationReader;
+import de.gematik.test.erezept.primsys.exceptions.PrimSysErrorPageGenerator;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.smartcard.SmartcardFactory;
 import java.net.URI;
@@ -43,6 +44,9 @@ public class Main {
     // create and start a new instance of grizzly http server
     // exposing the Jersey application at BASE_URI
     val server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc, false);
+
+    // prevent Grizzly from leaking internal information to the client
+    server.getServerConfiguration().setDefaultErrorPageGenerator(new PrimSysErrorPageGenerator());
 
     Runtime.getRuntime().addShutdownHook(new GrizzlyServerShutdownHook(server));
     server.start();

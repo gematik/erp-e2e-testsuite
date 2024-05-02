@@ -59,56 +59,54 @@ public class ActivateInvalidPatientKvnr extends ErpTest {
   private static PatientActor patient;
 
   private static Stream<Arguments> baseKVNRComposer() {
-    var res =
-        ArgumentComposer.composeWith()
-            .arguments(
-                "1234567890",
-                "der führende Buchstabe fehlt",
-                KbvProfileRules.KVNR_VALIDATION,
-                "FHIR-Validation error")
-            .arguments(
-                "B123456789",
-                "die Prüfziffer 9 statt 2 ist",
-                ErpAfos.A_23890,
-                "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten entspricht nicht den Prüfziffer-Validierungsregeln.")
-            .arguments(
-                "A111111111",
-                "die Prüfziffer 1 statt 4 ist",
-                ErpAfos.A_23890,
-                "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten entspricht nicht den Prüfziffer-Validierungsregeln.")
-            .arguments(
-                "a123456789",
-                "die Prüfziffer 9 statt 2 ist und mit einem Kleinbuchstabe beginnt",
-                KbvProfileRules.KVNR_VALIDATION,
-                "FHIR-Validation error")
-            .arguments(
-                "X1234567890",
-                "die Prüfziffer 9 statt 2 ist und die KVNR zu lang ist",
-                KbvProfileRules.KVNR_VALIDATION,
-                "FHIR-Validation error")
-            .arguments(
-                "E12345678",
-                "die Prüfziffer fehlt",
-                KbvProfileRules.KVNR_VALIDATION,
-                "FHIR-Validation error")
-            .arguments(
-                "E1234567",
-                "die KVNR zu kurz ist und die Prüfziffer fehlt",
-                KbvProfileRules.KVNR_VALIDATION,
-                "FHIR-Validation error")
-            .arguments(
-                "B123C56789",
-                "ein 'C' an 5. Stelle ist",
-                KbvProfileRules.KVNR_VALIDATION,
-                "FHIR-Validation error")
-            .multiply(
-                List.of(
-                    VersicherungsArtDeBasis.PKV,
-                    VersicherungsArtDeBasis.GKV,
-                    VersicherungsArtDeBasis.BG))
-            .multiply(PrescriptionAssignmentKind.class)
-            .create();
-    return res;
+    return ArgumentComposer.composeWith()
+        .arguments(
+            "1234567890",
+            "der führende Buchstabe fehlt",
+            KbvProfileRules.KVNR_VALIDATION,
+            "FHIR-Validation error")
+        .arguments(
+            "B123456789",
+            "die Prüfziffer 9 statt 2 ist",
+            ErpAfos.A_23890,
+            "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten entspricht nicht den Prüfziffer-Validierungsregeln.")
+        .arguments(
+            "A111111111",
+            "die Prüfziffer 1 statt 4 ist",
+            ErpAfos.A_23890,
+            "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten entspricht nicht den Prüfziffer-Validierungsregeln.")
+        .arguments(
+            "a123456789",
+            "die Prüfziffer 9 statt 2 ist und mit einem Kleinbuchstabe beginnt",
+            KbvProfileRules.KVNR_VALIDATION,
+            "FHIR-Validation error")
+        .arguments(
+            "X1234567890",
+            "die Prüfziffer 9 statt 2 ist und die KVNR zu lang ist",
+            KbvProfileRules.KVNR_VALIDATION,
+            "FHIR-Validation error")
+        .arguments(
+            "E12345678",
+            "die Prüfziffer fehlt",
+            KbvProfileRules.KVNR_VALIDATION,
+            "FHIR-Validation error")
+        .arguments(
+            "E1234567",
+            "die KVNR zu kurz ist und die Prüfziffer fehlt",
+            KbvProfileRules.KVNR_VALIDATION,
+            "FHIR-Validation error")
+        .arguments(
+            "B123C56789",
+            "ein 'C' an 5. Stelle ist",
+            KbvProfileRules.KVNR_VALIDATION,
+            "FHIR-Validation error")
+        .multiply(
+            List.of(
+                VersicherungsArtDeBasis.PKV,
+                VersicherungsArtDeBasis.GKV,
+                VersicherungsArtDeBasis.BG))
+        .multiply(PrescriptionAssignmentKind.class)
+        .create();
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_KVNR_01")

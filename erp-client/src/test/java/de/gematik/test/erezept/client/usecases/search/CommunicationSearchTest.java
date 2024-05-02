@@ -47,4 +47,18 @@ class CommunicationSearchTest {
     assertTrue(cmd.getRequestLocator().contains("_sort=-sent"));
     assertTrue(cmd.getRequestLocator().contains("?received=NULL"));
   }
+
+  @Test
+  void getRecipientCommunicationShouldWork() {
+    val cmd = CommunicationSearch.getRecipientCommunications("TestId");
+    assertTrue(cmd.getRequestLocator().contains("TestId"));
+    assertTrue(cmd.getRequestLocator().contains("recipient"));
+  }
+
+  @Test
+  void getSenderCommunicationShouldWork() {
+    val cmd = CommunicationSearch.getSenderCommunications("TestId");
+    assertTrue(cmd.getRequestLocator().contains("TestId"));
+    assertTrue(cmd.getRequestLocator().contains("sender"));
+  }
 }

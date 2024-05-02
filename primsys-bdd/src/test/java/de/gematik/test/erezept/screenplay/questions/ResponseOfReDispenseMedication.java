@@ -19,7 +19,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispenseMedicationCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
@@ -67,7 +67,8 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
     val prescriptionId = receipt.getPrescriptionId();
     val kvnr = receipt.getReceiverKvnr();
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val medicationDispense =
         ErxMedicationDispenseBuilder.forKvnr(kvnr)

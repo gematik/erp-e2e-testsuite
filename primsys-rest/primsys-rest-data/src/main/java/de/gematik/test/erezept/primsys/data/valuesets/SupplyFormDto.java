@@ -153,6 +153,8 @@ public enum SupplyFormDto {
   LTA("LTA", "Lacktabletten"),
   LUP("LUP", "Lutschpastillen"),
   LUT("LUT", "Lutschtabletten"),
+  LYO("LYO", "Lyophilisat zur Herstellung einer Infusionslösung"), // ab eRp-FD v1.14.0 verfügbar
+  // offizieller start 01.07.24
   MIL("MIL", "Milch"),
   MIS("MIS", "Mischung"),
   MIX("MIX", "Mixtur"),

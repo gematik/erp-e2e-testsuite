@@ -22,6 +22,8 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +36,37 @@ public class DownloadReadyTask extends ErpAction<ErxTaskBundle> {
 
   private final TaskGetCommand cmd;
 
-  public static DownloadReadyTask withExamEvidence(String examEvidence) {
-    log.info(format("Request Get /Task as pharmacy with exam evidence {0} ", examEvidence));
-    val cmd = new TaskGetByExamEvidenceCommand(examEvidence);
+  /**
+   * This method is mainly intended for PN3 with kvnr
+   *
+   * @param examEvidence
+   * @param kvnr
+   * @return
+   */
+  public static DownloadReadyTask withExamEvidence(VsdmExamEvidence examEvidence, KVNR kvnr) {
+    log.info(
+        format(
+            "Request Get /Task as pharmacy with exam evidence {0} and kvnr {1} ",
+            examEvidence, kvnr));
+    val cmd = new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64()).andKvnr(kvnr);
     return new DownloadReadyTask(cmd);
   }
 
-  public static DownloadReadyTask withoutExamEvidence() {
-    log.info(format("Request Get /Task as pharmacy without exam evidence"));
-    val cmd = new TaskGetByExamEvidenceCommand(null);
+  public static DownloadReadyTask withExamEvidence(VsdmExamEvidence examEvidence) {
+    log.info(format("Request Get /Task as pharmacy with exam evidence {0}", examEvidence));
+    val cmd = new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64());
+    return new DownloadReadyTask(cmd);
+  }
+
+  public static DownloadReadyTask withoutExamEvidence(KVNR kvnr) {
+    log.info(format("Request Get /Task as pharmacy without exam evidence but with kvnr {0}", kvnr));
+    val cmd = new TaskGetByExamEvidenceCommand().andKvnr(kvnr);
+    return new DownloadReadyTask(cmd);
+  }
+
+  public static DownloadReadyTask withInvalidExamEvidence() {
+    log.info(format("Request Get /Task as pharmacy with invalid exam evidence"));
+    val cmd = new TaskGetByExamEvidenceCommand("abc");
     return new DownloadReadyTask(cmd);
   }
 

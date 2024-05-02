@@ -35,6 +35,7 @@ import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.ByteArrayMutator;
 import de.gematik.test.fuzzing.core.StringMutator;
 import de.gematik.test.fuzzing.fhirfuzz.FhirResourceFuzz;
+import java.io.ByteArrayOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -59,8 +60,15 @@ public class IssuePrescription extends ErpAction<ErxTask> {
   private final List<ByteArrayMutator> signedBundleMutators;
   @Nullable private final FhirResourceFuzz<Bundle> smartFuzzer;
 
+  @Nullable private ByteArrayOutputStream signatureObserver;
+
   public static Builder forPatient(PatientActor patient) {
     return new Builder(patient);
+  }
+
+  public IssuePrescription setSignatureObserver(ByteArrayOutputStream signatureObserver) {
+    this.signatureObserver = signatureObserver;
+    return this;
   }
 
   @Override
@@ -113,7 +121,8 @@ public class IssuePrescription extends ErpAction<ErxTask> {
         ActivatePrescription.forGiven(draftTask)
             .withStringMutator(stringMutators)
             .withByteArrayMutator(signedBundleMutators)
-            .withKbvBundle(kbvBundle));
+            .withKbvBundle(kbvBundle)
+            .setSignatureObserver(signatureObserver));
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

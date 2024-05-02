@@ -31,12 +31,11 @@ class GenericExceptionMapperTest {
     val exception = new NullPointerException("test exception");
     try (val response = mapper.toResponse(exception)) {
       val entity = response.getEntity();
-      assertEquals(500, response.getStatus());
+      assertEquals(400, response.getStatus());
       assertEquals(ErrorDto.class, entity.getClass());
       val dto = (ErrorDto) entity;
       assertEquals(ErrorType.INTERNAL, dto.getType());
-      assertTrue(dto.getMessage().contains("Unexpected Error"));
-      assertTrue(dto.getMessage().contains("test exception"));
+      assertFalse(dto.getMessage().contains("test exception"));
     }
   }
 }

@@ -162,7 +162,7 @@ public abstract class BaseResourceGenerator implements Callable<Integer> {
     entry.setFileType(encodingType);
     entry.setFileName(relativeFileName);
     entry.setDescription(description);
-    entry.setErrors(result);
+    entry.setValidationResults(result);
     return entry;
   }
 

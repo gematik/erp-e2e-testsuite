@@ -29,7 +29,7 @@ public enum PrescriptionTechnicalInformation implements PageElement {
   BACK(
       "Back to Detail",
       () -> null,
-      () -> AppiumBy.xpath("//XCUIElementTypeButton[@name='Detail']"));
+      () -> AppiumBy.xpath("//XCUIElementTypeButton[@name='Rezeptdetails']"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

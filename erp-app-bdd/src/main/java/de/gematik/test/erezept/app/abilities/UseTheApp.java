@@ -27,6 +27,7 @@ import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.*;
 import io.appium.java_client.serverevents.CustomEvent;
+import io.cucumber.java.Scenario;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,7 +37,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
-import net.serenitybdd.screenplay.HasTeardown;
 import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
@@ -45,7 +45,7 @@ import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.*;
 
 @Slf4j
-public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasTeardown {
+public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
 
   protected final T driver;
   @Getter @Setter private String currentUserProfile;
@@ -230,13 +230,15 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
 
   public void scrollIntoView(ScrollDirection direction, PageElement pageElement) {
     log.info(format("Scroll {0} until element {1} is found", direction, pageElement.getFullName()));
-    var scrollCounter = 5;
-    boolean isDisplayed = this.getOptionalWebElement(pageElement).isPresent();
+    var scrollCounter = 20;
+    boolean isDisplayed =
+        this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
     while (!isDisplayed && scrollCounter >= 0) {
       scrollCounter--;
       driver.executeScript(
-          "mobile:scroll", Map.of("direction", direction.name().toLowerCase(), "distance", "0.25"));
-      isDisplayed = this.getOptionalWebElement(pageElement).isPresent();
+          "mobile:scroll", Map.of("direction", direction.name().toLowerCase(), "distance", "0.6"));
+      isDisplayed =
+          this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
     }
   }
 
@@ -360,17 +362,22 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
         .pollingEvery(Duration.ofMillis(pollingInterval));
   }
 
-  @Override
-  public void tearDown() {
-    driver.quit();
-  }
-
   public void logEvent(String message) {
     log.info(message);
     val event = new CustomEvent();
     event.setVendor("gematik");
     event.setEventName(message);
     driver.logEvent(event);
+  }
+
+  public void finish(Scenario scenario) {
+    val status = scenario.getStatus();
+    log.info(format("Report Status: {0}", status));
+    val message = format("Scenario {0}: {1}", scenario.getId(), status);
+    val reportScript =
+        format("seetest:client.setReportStatus(\"{0}\", \"{1}\", \"\")", status, message);
+    driver.executeScript(reportScript);
+    driver.quit();
   }
 
   @Override

@@ -37,6 +37,10 @@ public class ErrorResponseBuilder {
     return Response.status(statusCode).entity(ErrorDto.internalError(message)).build();
   }
 
+  public static Response createInternalError(Throwable throwable) {
+    return Response.status(400).entity(ErrorDto.internalError(throwable.getMessage())).build();
+  }
+
   public static WebApplicationException createInternalErrorException(
       int statusCode, String message) {
     return new WebApplicationException(createInternalError(statusCode, message));

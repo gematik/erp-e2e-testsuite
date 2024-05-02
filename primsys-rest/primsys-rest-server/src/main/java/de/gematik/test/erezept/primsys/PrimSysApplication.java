@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.gematik.test.erezept.primsys.exceptions.GenericExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.JacksonExceptionMapper;
+import de.gematik.test.erezept.primsys.exceptions.NotFoundExceptionMapper;
 import io.swagger.v3.jaxrs2.SwaggerSerializers;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -37,6 +38,7 @@ import jakarta.ws.rs.ApplicationPath;
 import lombok.val;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 
 @OpenAPIDefinition(
     info =
@@ -85,6 +87,9 @@ public class PrimSysApplication extends ResourceConfig {
     register(new CORSFilter());
     register(JacksonExceptionMapper.class);
     register(GenericExceptionMapper.class);
+    register(NotFoundExceptionMapper.class);
+
+    property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 
     // swagger
     register(OpenApiResource.class);

@@ -43,6 +43,7 @@ public class MedicalOrganizationBuilder
     return new MedicalOrganizationBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static MedicalOrganizationBuilder faker() {
     val builder = builder();
     builder

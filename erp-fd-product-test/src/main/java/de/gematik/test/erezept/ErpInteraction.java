@@ -53,6 +53,10 @@ public class ErpInteraction<R extends Resource> {
     return ErpResponseExpectation.expectFor(response, Resource.class);
   }
 
+  public final ErpResponseExpectation<Resource> asEmptyResource() {
+    return ErpResponseExpectation.expectFor(response, null);
+  }
+
   public final ErpResponseExpectation<OperationOutcome> asOperationOutcome() {
     return ErpResponseExpectation.expectFor(response, OperationOutcome.class);
   }

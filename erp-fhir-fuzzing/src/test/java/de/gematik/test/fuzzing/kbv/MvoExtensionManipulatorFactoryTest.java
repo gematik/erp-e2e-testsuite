@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.lang.reflect.Constructor;
@@ -53,22 +54,26 @@ class MvoExtensionManipulatorFactoryTest {
 
     manipulators.forEach(
         m -> {
-          val patient = PatientBuilder.faker(VersicherungsArtDeBasis.GKV).build();
+          val patient =
+              PatientFaker.builder()
+                  .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+                  .fake();
           val coverage = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
-          val practitioner = PractitionerBuilder.faker().build();
+          val practitioner = PractitionerFaker.builder().fake();
           val medication =
-              KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+              KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
           val kbvBundle =
               KbvErpBundleBuilder.faker(patient.getGkvId().orElseThrow())
                   .medication(medication)
                   .medicationRequest(
-                      MedicationRequestBuilder.faker(patient)
-                          .medication(medication)
-                          .insurance(coverage)
-                          .requester(practitioner)
-                          .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
-                          .build())
+                      MedicationRequestFaker.builder(patient)
+                          .withMedication(medication)
+                          .withInsurance(coverage)
+                          .withRequester(practitioner)
+                          .withMvo(
+                              MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
+                          .fake())
                   .patient(patient)
                   .insurance(coverage)
                   .build();

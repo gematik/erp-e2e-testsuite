@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
@@ -28,7 +29,9 @@ import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.exceptions.MissingAbilityException;
 import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -113,6 +116,49 @@ class ErpFdTestsuiteFactoryTest {
       assertNotNull(patient.getDescription());
       assertDoesNotThrow(patient::toString);
     }
+  }
+
+  @Test
+  void shouldEquipPatientActorWithRawHttp() {
+    val actorName = "Fridolin Straßer";
+    val patient = new PatientActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(patient, RawHttpAbility.class));
+    assertDoesNotThrow(() -> config.equipWithRawHttp(patient));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(patient, RawHttpAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getInternet().getFdBaseUrl());
+  }
+
+  @Test
+  void shouldEquipPharmaActorWithRawHttp() {
+    val actorName = "Am Flughafen";
+    val pharmacy = new PharmacyActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class,
+        () -> SafeAbility.getAbility(pharmacy, RawHttpAbility.class));
+    assertDoesNotThrow(() -> config.equipWithRawHttp(pharmacy));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(pharmacy, RawHttpAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getTi().getFdBaseUrl());
+  }
+
+  @Test
+  void shouldEquipDoctorActorWithRawHttp() {
+    val actorName = "Adelheid Ulmenwald";
+    val doc = new DoctorActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(doc, RawHttpAbility.class));
+    assertDoesNotThrow(() -> config.equipWithRawHttp(doc));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(doc, RawHttpAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getTi().getFdBaseUrl());
   }
 
   @Test

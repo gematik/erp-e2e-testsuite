@@ -16,9 +16,9 @@
 
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
-import de.gematik.test.erezept.config.dto.konnektor.VsdmServiceConfiguration;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,15 +29,16 @@ class VsdmServiceTest {
 
   @BeforeAll
   public static void setup() {
-    vsdmService = VsdmService.createFrom(VsdmServiceConfiguration.createDefault());
+    vsdmService = VsdmService.instantiateWithTestKey();
   }
 
   @Test
-  void invalidEgk() {
-    for (VsdmUpdateReason reason : VsdmUpdateReason.values()) {
-      log.debug(reason.toString());
-      Assertions.assertThrows(
-          NullPointerException.class, () -> vsdmService.requestFor(null, reason));
-    }
+  void checksumWithInvalidManufacturer() {
+    assertEquals('y', vsdmService.checksumWithInvalidManufacturer("A111111111").getIdentifier());
+  }
+
+  @Test
+  void checksumWithInvalidVersion() {
+    assertEquals('0', vsdmService.checksumWithInvalidVersion("A111111111").getVersion());
   }
 }

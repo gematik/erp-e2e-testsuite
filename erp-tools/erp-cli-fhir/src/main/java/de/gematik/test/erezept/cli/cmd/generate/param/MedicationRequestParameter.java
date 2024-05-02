@@ -83,7 +83,7 @@ public class MedicationRequestParameter implements BaseResourceParameter {
   @Setter private KbvErpMedication medication;
 
   public KbvPatient getPatient() {
-    return this.getOrDefault(patient, () -> PatientBuilder.faker().build());
+    return this.getOrDefault(patient, () -> PatientFaker.builder().fake());
   }
 
   public KbvCoverage getInsurance() {
@@ -91,11 +91,11 @@ public class MedicationRequestParameter implements BaseResourceParameter {
   }
 
   public KbvPractitioner getPractitioner() {
-    return this.getOrDefault(practitioner, () -> PractitionerBuilder.faker().build());
+    return this.getOrDefault(practitioner, () -> PractitionerFaker.builder().fake());
   }
 
   public KbvErpMedication getMedication() {
-    return this.getOrDefault(medication, () -> KbvErpMedicationPZNBuilder.faker().build());
+    return this.getOrDefault(medication, () -> KbvErpMedicationPZNFaker.builder().fake());
   }
 
   public String getDosage() {

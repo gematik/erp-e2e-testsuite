@@ -82,22 +82,27 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return mrb;
   }
 
+  @Deprecated(forRemoval = true)
   public static MedicationRequestBuilder faker() {
-    return faker(PatientBuilder.faker().build());
+    return faker(PatientFaker.builder().fake());
   }
 
+  @Deprecated(forRemoval = true)
   public static MedicationRequestBuilder faker(@NonNull KbvPatient patient) {
     return faker(patient, fakerBool());
   }
 
+  @Deprecated(forRemoval = true)
   public static MedicationRequestBuilder faker(@NonNull KbvPatient patient, Date authoredOn) {
     return faker(patient, authoredOn, fakerBool());
   }
 
+  @Deprecated(forRemoval = true)
   public static MedicationRequestBuilder faker(@NonNull KbvPatient patient, boolean substitution) {
     return faker(patient, new Date(), substitution);
   }
 
+  @Deprecated(forRemoval = true)
   public static MedicationRequestBuilder faker(
       @NonNull KbvPatient patient, Date authoredOn, boolean substitution) {
     return forPatient(patient)
@@ -106,8 +111,8 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
         .isBVG(fakerBool())
         .hasEmergencyServiceFee(fakerBool())
         .insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build())
-        .requester(PractitionerBuilder.faker().build())
-        .medication(KbvErpMedicationPZNBuilder.faker().build())
+        .requester(PractitionerFaker.builder().fake())
+        .medication(KbvErpMedicationPZNFaker.builder().fake())
         .substitution(substitution)
         .authoredOn(authoredOn)
         .coPaymentStatus(fakerValueSet(StatusCoPayment.class));
@@ -300,6 +305,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     }
     if (this.medicationType == null) {
       medReq.setSubstitution(substitution);
+      medReq.setDosageInstruction(List.of(createFlagedDosage()));
     } else {
       medicationTypeConfig(medReq);
     }

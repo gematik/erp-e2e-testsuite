@@ -52,7 +52,7 @@ class MedicalOrganizationBuilderTest extends ParsingTest {
       name = "[{index}] -> Build KBV MedicalOrganization with Faker and KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildMedicalOrganizationWithFaker(KbvItaForVersion version) {
-    val organization = MedicalOrganizationBuilder.faker().version(version).build();
+    val organization = MedicalOrganizationFaker.builder().withVersion(version).fake();
     System.out.println(organization.getStreet());
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());

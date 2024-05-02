@@ -32,15 +32,14 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.E2ECucumberTag;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.kbv.MvoExtensionManipulatorFactory;
 import java.util.ArrayList;
@@ -86,18 +85,18 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
             .medication(medication)
             .medicationRequest(
-                MedicationRequestBuilder.faker(sina.getPatientData())
-                    .medication(medication)
-                    .insurance(sina.getInsuranceCoverage())
-                    .requester(doctor.getPractitioner())
-                    .mvo(mvo.getParameter())
-                    .build());
+                MedicationRequestFaker.builder(sina.getPatientData())
+                    .withMedication(medication)
+                    .withInsurance(sina.getInsuranceCoverage())
+                    .withRequester(doctor.getPractitioner())
+                    .withMvo(mvo.getParameter())
+                    .fake());
 
     val activation =
         doctor.performs(
@@ -130,18 +129,18 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
             .medication(medication)
             .medicationRequest(
-                MedicationRequestBuilder.faker(sina.getPatientData())
-                    .medication(medication)
-                    .insurance(sina.getInsuranceCoverage())
-                    .requester(doctor.getPractitioner())
-                    .mvo(mvo.getParameter())
-                    .build());
+                MedicationRequestFaker.builder(sina.getPatientData())
+                    .withMedication(medication)
+                    .withInsurance(sina.getInsuranceCoverage())
+                    .withRequester(doctor.getPractitioner())
+                    .withMvo(mvo.getParameter())
+                    .fake());
 
     val activation =
         doctor.performs(
@@ -168,18 +167,18 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
             .medication(medication)
             .medicationRequest(
-                MedicationRequestBuilder.faker(sina.getPatientData())
-                    .medication(medication)
-                    .insurance(sina.getInsuranceCoverage())
-                    .requester(doctor.getPractitioner())
-                    .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
-                    .build());
+                MedicationRequestFaker.builder(sina.getPatientData())
+                    .withMedication(medication)
+                    .withInsurance(sina.getInsuranceCoverage())
+                    .withRequester(doctor.getPractitioner())
+                    .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
+                    .fake());
 
     val activation =
         doctor.performs(
@@ -209,19 +208,19 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNBuilder.faker().category(MedicationCategory.C_00).build();
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
         KbvErpBundleBuilder.builder()
             .statusKennzeichen(statusKennzeichen)
             .medication(medication)
             .medicationRequest(
-                MedicationRequestBuilder.faker(sina.getPatientData())
-                    .medication(medication)
-                    .insurance(sina.getInsuranceCoverage())
-                    .requester(doctor.getPractitioner())
-                    .mvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
-                    .build());
+                MedicationRequestFaker.builder(sina.getPatientData())
+                    .withMedication(medication)
+                    .withInsurance(sina.getInsuranceCoverage())
+                    .withRequester(doctor.getPractitioner())
+                    .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
+                    .fake());
 
     val activation =
         doctor.performs(
@@ -324,9 +323,7 @@ class TaskActivateMvoUsecase extends ErpTest {
   private static Stream<Arguments> multiplyWithFlowTypes(ArgumentComposer composer) {
     val insuranceArguments = new ArrayList<VersicherungsArtDeBasis>(2);
     insuranceArguments.add(VersicherungsArtDeBasis.GKV);
-    if (cucumberFeatures.isFeatureActive(E2ECucumberTag.INSURANCE_PKV)) {
       insuranceArguments.add(VersicherungsArtDeBasis.PKV);
-    }
     composer.multiply(
         List.of(
             PrescriptionAssignmentKind.PHARMACY_ONLY,

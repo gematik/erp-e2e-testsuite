@@ -1,0 +1,3069 @@
+{
+  "id": "b8031217-57ca-4ab8-8283-dadf28421e1f",
+  "type": "searchset",
+  "timestamp": "2024-03-27T09:19:28.283+00:00",
+  "resourceType": "Bundle",
+  "total": 84,
+  "entry": [
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-2410-b770-a49f-d3134a3f4472",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-2410-b770-a49f-d3134a3f4472",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.082.34/$accept?ac=9830e80480f09986c8586b62a0819dd7425b21807b99d182ae10e87c33d3e6f2"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"Parting with friends is a sadness. A place is only a place.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:53:35.622+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d377-de78-b848-a1bef6be3f71",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d377-de78-b848-a1bef6be3f71",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.079.91/$accept?ac=531c6ff0a2992ea8837853b8fcc3832c3e103349c891679970f928507b6e4966"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:38.395+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:42:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-eb5a-e108-9bf4-4aba4e7a984a",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-eb5a-e108-9bf4-4aba4e7a984a",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.051.78/$accept?ac=62bc9abb1575c32eb9ecca10cfbbe9e712d44bd9c34b631ea2ea0f8060345cb3"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"Let us not rail about justice as long as we have arms and the freedom to use them.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:37:44.181+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d3fd-8938-23be-cd3b71fa9423",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d3fd-8938-23be-cd3b71fa9423",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.102.71/$accept?ac=b3acac23f0f9ed6bad46060babd39688d9bb50dbc3877fbba7bf178e81570759"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:47.155+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-27T00:30:42.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d03a-2450-86c3-88eca8a60f2c",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d03a-2450-86c3-88eca8a60f2c",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.098.83/$accept?ac=a133360ec70b745c5843ba97804e7b6ca80c05f12d482dad2ebf39a9b0a65db7"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:41:44.018+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:41:44.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-2302-54b0-3bc9-31270dac977d",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-2302-54b0-3bc9-31270dac977d",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.081.37/$accept?ac=83029f863e1768ea1c412a3ee1d90dfbcae5448c8e92ac58ae424c183468a375"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"But I can tell you, dear God, for the father, nothing.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:53:17.902+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T15:53:20.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-9dcf-1930-e226-66b8b2fa8d02",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-9dcf-1930-e226-66b8b2fa8d02",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.068.27/$accept?ac=e767adf90a28daeaed89860044a0f7b1d389bce6b64f6c20dd4fccf57136d7ba"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:27:38.142+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe7e-c052-6490-c078-52dfb0e429e3",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe7e-c052-6490-c078-52dfb0e429e3",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.409.23/$accept?ac=01013f04507eccc45b1ee2f05da3ed1d4f02038e9148f2de2c0dd157d7c78986"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-27T09:19:26.714+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-27T09:19:28.266+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-eac4-1390-27de-79ff54e2b133",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-eac4-1390-27de-79ff54e2b133",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.077.49/$accept?ac=a60861ddec77a0f619348f7dad67408f58b88328688360a992875f3c3c0b077a"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"A dead man, surely, no longer requires that water.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:37:34.298+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d130-3c50-b76f-ca6edd971776",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d130-3c50-b76f-ca6edd971776",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.099.80/$accept?ac=6f65bd7eb11f5022cebd18a2ce6b6d044628d943b614c8414e68599315f9944a"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:00.146+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:42:00.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d287-6fb0-b167-a234cc4f750a",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d287-6fb0-b167-a234cc4f750a",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.078.94/$accept?ac=4e788b02b54fc21eddfc8f32ac8ec08443852764dd73fe4e6975af4122ea4be3"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:22.638+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-27T00:30:42.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d0b4-e230-5db9-d42c3fb0ee88",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d0b4-e230-5db9-d42c3fb0ee88",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.076.03/$accept?ac=71f4e7031ec7626f659561cbd266ceb11028d909ba61168d9a861ffc484116e3"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:41:52.062+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:41:52.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d30d-39b0-07e1-917fcc99e98f",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d30d-39b0-07e1-917fcc99e98f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.101.74/$accept?ac=063245579a1fae3d44fc80a370252a12e003153ebf9aff1dab3c833163695476"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:31.406+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:42:32.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-251f-fcc0-98fe-e4d48116f2d3",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-251f-fcc0-98fe-e4d48116f2d3",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.083.31/$accept?ac=419de9a55705c069a15ab72f00639e2f6aca43d3b5bd657470769d186d213636"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"A beginning is the time for taking the most delicate care that the balances are correct.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:53:53.400+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T15:53:55.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-dc33-4c00-c1ee-576de90a658c",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-dc33-4c00-c1ee-576de90a658c",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.103.68/$accept?ac=be4f2268822747b1c2485e76729a9df5b70475a5a9551b7ebae893eb16710d5b"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:45:04.896+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:45:05.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d224-9318-a1ad-4b04c719b029",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d224-9318-a1ad-4b04c719b029",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.100.77/$accept?ac=0bef40f29e2fd65363af0889ca82034d92334ec358d570844c349b75b497820c"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:16.159+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:42:16.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d0a4-1d38-6709-d62e291e8f8c",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d0a4-1d38-6709-d62e291e8f8c",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.076.03/$accept?ac=71f4e7031ec7626f659561cbd266ceb11028d909ba61168d9a861ffc484116e3"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:41:50.963+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:41:52.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-cfba-9410-43c8-e3b6e66cc3b7",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-cfba-9410-43c8-e3b6e66cc3b7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.075.06/$accept?ac=a38a587daaf763be44008548567d8d7f7de57f946f60f0bf9d9f97851cb81bb4"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:41:35.658+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:41:36.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-36da-7080-72d0-3458725404a2",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-36da-7080-72d0-3458725404a2",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.065.36/$accept?ac=c9245ad053f4aceeb8a619e94b6412d8b402a48c14e4859668c7b75a342b397a"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"When your opponent fears you, then's the moment when you give the fear its own rein, give it the time to work on him. Let it become terror. The terrified man fights himself. Eventually, he attacks in desperation. That is the most dangerous moment, but the terrified man can be trusted usually to make a fatal mistake.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:58:50.832+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-ec7d-f0c0-88f0-c0ad62989ee4",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-ec7d-f0c0-88f0-c0ad62989ee4",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.052.75/$accept?ac=10aea785dcac34f4b812e35efee6ee148facb163302b09c940e36b6691f1dfde"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"A popular man arouses the jealousy of the powerful.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:38:03.256+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-9e63-6608-40e8-c5ee84a2f1d9",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-9e63-6608-40e8-c5ee84a2f1d9",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.094.95/$accept?ac=cd0192a0db0572343f3d1860e10e96759524742f0845b572c3f91a60350c15cc"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:27:47.861+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:49.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-2736-6d28-27e4-45de59bb4ab9",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-2736-6d28-27e4-45de59bb4ab9",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.085.25/$accept?ac=18dc4f51b2331807bc10b21def3c2b6e9c9da8a3cacc02890b6757f2e7df2815"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"The Guild... they're fighting me in the mental vaults. They're behind everything. They fear the one who will come, who will know more, who will see more. The Guild is behind everything. It's not finished yet. I'm not formed.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:54:28.425+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T15:54:30.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-331b-1aa8-eb3d-598002635b5b",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-331b-1aa8-eb3d-598002635b5b",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.062.45/$accept?ac=b009136709c056673694b60f2427177aa5254a94f0b5635c5f4c1350bf40e7cc"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"Bring in that floating fat man, the Baron!\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:57:47.961+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-33e5-e8a0-387e-69bbc535d8ce",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-33e5-e8a0-387e-69bbc535d8ce",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.086.22/$accept?ac=f520c0f94c27713d05990607117550c291010ff05fe3a4ff556f983d601e165e"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"To attempt an understanding of Muad'Dib without understanding his mortal enemies, the Harkonnens, is to attempt seeing Truth without knowing Falsehood. It is the attempt to see the Light without knowing Darkness. It cannot be.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:58:01.252+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-c0a4-d698-0813-dd0abe460981",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-c0a4-d698-0813-dd0abe460981",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.072.15/$accept?ac=4a293a529d467d5ad1851369e3b33cd60efba4b12f1bc083306a7dcd9ca8299a"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:37:22.575+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:37:23.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-ea32-9960-fcfa-eaeb74cd451b",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-ea32-9960-fcfa-eaeb74cd451b",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.050.81/$accept?ac=76e2668f11062a4ab7038a445cb5c219c9f98040dd8f97cc36e4a4cdd94fa513"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"Vendetta, he says, using the ancient tongue. The art of kanly is still alive in the Universe. He does not wish to meet or speak with you.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:37:24.764+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-26b4-7f70-7dbd-cb27474a7b9e",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-26b4-7f70-7dbd-cb27474a7b9e",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.061.48/$accept?ac=40f642ae88b1f89417531b2e72b04686356436ebdfadae2b1a06506b27b20161"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"To save one from a mistake is a gift of paradise.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:54:19.910+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-c9be-e2c8-9143-855b3e6e13ea",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-c9be-e2c8-9143-855b3e6e13ea",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.073.12/$accept?ac=337dffc423c9738539e82ec163fcc956be2aa369738d1f156878ecad22154530"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:39:55.277+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:40:00.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-249e-3de8-5fd2-5d1a84f7ed7b",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-249e-3de8-5fd2-5d1a84f7ed7b",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.059.54/$accept?ac=a5fbd1a9d815dd9dbf77587128ecb8ba224d1b9079eb9c47f1a8d1f9c7125c5a"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"My lord, I suspect an incredible secret has been kept on this planet: that the Fremen exist in vast numbers - vast. And it is they who control Arrakis.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:53:44.897+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-389c-e100-59d7-c0422f91316c",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-389c-e100-59d7-c0422f91316c",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.090.10/$accept?ac=b8e4815c512f4d3defabb8097fb1c9eff0fd1acd33ed7c0109bada0708ffb8c0"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"To attempt an understanding of Muad'Dib without understanding his mortal enemies, the Harkonnens, is to attempt seeing Truth without knowing Falsehood. It is the attempt to see the Light without knowing Darkness. It cannot be.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:59:20.352+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-e908-2ed8-7733-495b1cfe7220",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-e908-2ed8-7733-495b1cfe7220",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.049.84/$accept?ac=05939ff84e86c4fe91a4c176797f6fe3c62bbd00e6452135cba405bfe9115eda"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"Mood? What has mood to do with it? You fight when the necessity arises — no matter the mood! Mood's a thing for cattle or making love or playing the baliset. It's not for fighting.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:37:05.207+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-e85a-b898-0229-33272fa160a1",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-e85a-b898-0229-33272fa160a1",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.075.55/$accept?ac=cd5f258b5ef7fc2d790179b9c07a98d8837084a21c713928b7858cf62adbc0f2"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"You dare suggest a Duke's son is an animal?\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:36:53.839+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-25a2-0da0-ac5c-d4df66108b2f",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-25a2-0da0-ac5c-d4df66108b2f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.060.51/$accept?ac=7572c782e384bd96eb0d025eec37dac2b4d8d526f6a43f87261ca269bbbd2ec8"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"Those are date palms. One date palm requires forty liters of water a day. A man requires but eight liters. A palm, then, equals five men. There are twenty palms out there—one hundred men.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:54:01.924+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T15:54:03.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe7d-ed1f-b258-0ace-bc41e079895f",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe7d-ed1f-b258-0ace-bc41e079895f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.408.26/$accept?ac=377796b0d3f10fdcca032d5a4fa3bb8dec6afab749faf39e8021a8a1aea04b53"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-27T08:20:23.399+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-27T08:20:24.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-e7c6-d028-9a38-cf42f4a3d3d7",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-e7c6-d028-9a38-cf42f4a3d3d7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.105.62/$accept?ac=fbedbaa9f913efc41776c041ca697a558263b11d277254ca824d2cd5b460ac83"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:48:19.113+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:49:04.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d029-4bd0-43f0-4de8ce550f2e",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d029-4bd0-43f0-4de8ce550f2e",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.098.83/$accept?ac=a133360ec70b745c5843ba97804e7b6ca80c05f12d482dad2ebf39a9b0a65db7"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"does it rain tomorrow\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:41:42.914+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:41:44.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-eb01-0fb0-6427-01811deafbb7",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-eb01-0fb0-6427-01811deafbb7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.106.59/$accept?ac=1679ab37b8ceba5ce2f98e446f996f2c65b3d53a4db8c5e519c1342e46f524c7"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:49:13.262+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:49:14.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-c9dc-32b0-faa2-6447adcf7ff2",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-c9dc-32b0-faa2-6447adcf7ff2",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.073.12/$accept?ac=337dffc423c9738539e82ec163fcc956be2aa369738d1f156878ecad22154530"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:39:57.198+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:40:00.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-f71d-4d00-d1e4-eb260a8a1daa",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-f71d-4d00-d1e4-eb260a8a1daa",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.054.69/$accept?ac=f21d3c03aded42b59833a6c0ae708342f3d6391a68a11f9884cb8219c4f5d8b2"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"Usul has called a big one. Again, it is the legend.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:41:01.472+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-eb86-3988-8401-1be0d4d6e77f",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-eb86-3988-8401-1be0d4d6e77f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.085.73/$accept?ac=51381155523bb213be4965a296e1cd9be3f92f845def8cbbbf8887069e3e58df"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:49:21.989+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-27T00:30:42.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-dd37-90e8-fbe6-a27388bc88b1",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-dd37-90e8-fbe6-a27388bc88b1",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.104.65/$accept?ac=1893c60fc38f5a7b7a791a13c5561bba7278282fffe7d265494cc9e99f8ebc47"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:45:21.953+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:45:22.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe6f-ee50-f370-17c7-c2e6b3b34670",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe6f-ee50-f370-17c7-c2e6b3b34670",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.053.72/$accept?ac=b1a30047afe08a8638db34637400142d6f6e947ee09d5d1613e1b7934729b9a4"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"Many machines on Ix. New machines, better than those on Richesse.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:38:33.862+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-f8de-ddb0-776a-7f172b2ec7c5",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-f8de-ddb0-776a-7f172b2ec7c5",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.086.70/$accept?ac=02414cdecfa659c0d1d1d92cb144213a71014c6d7360b80c06be229f5f628ab9"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:53:05.902+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:53:38.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-ea61-f920-2ace-6efd9b056859",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-ea61-f920-2ace-6efd9b056859",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.084.76/$accept?ac=7f117c8c05069fe2b0f2710eb3c21fbb4857b3a553edc412f9ab23f294bc6735"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:49:02.836+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:49:04.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-d389-7278-6ad4-10ee1b857334",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-d389-7278-6ad4-10ee1b857334",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.079.91/$accept?ac=531c6ff0a2992ea8837853b8fcc3832c3e103349c891679970f928507b6e4966"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:42:39.547+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:42:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-348b-7f40-27bd-2c4f04e1ce9d",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-348b-7f40-27bd-2c4f04e1ce9d",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.063.42/$accept?ac=e14b68d72f0e24ea9ab9445832dd1e5e8a913bb63458a8ef7190be495d2e907c"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"To attempt an understanding of Muad'Dib without understanding his mortal enemies, the Harkonnens, is to attempt seeing Truth without knowing Falsehood. It is the attempt to see the Light without knowing Darkness. It cannot be.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:58:12.104+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-3809-ad68-8c2a-db8e831d8b2e",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-3809-ad68-8c2a-db8e831d8b2e",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.066.33/$accept?ac=7beb5ce8beee5bbbdcf5de10bb3fa0cd30861aaec354b4bd6fa5d0c6d51fefdb"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "shipment",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"shipment\",\"info_text\":\"A popular man arouses the jealousy of the powerful.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:59:10.705+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-21e6-51a8-5904-3f2a52770058",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-21e6-51a8-5904-3f2a52770058",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/169.000.000.100.080.40/$accept?ac=ad37c5c2794b5cafd65318055e2f3cfd519db4b1eba7150500a4861102ceefeb"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"What delicious abandon in the sleep of the child. Where do we lose it?\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:52:59.289+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T16:27:40.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-392f-d618-e331-244edff78bfc",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-392f-d618-e331-244edff78bfc",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.067.30/$accept?ac=7426a147e34f9c6e5131d5889d43cae85136123ff2287a82a60b193fdaf5f773"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "delivery",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"delivery\",\"info_text\":\"Men and their works have been a disease on the surface of their planets before now. Nature tends to compensate for diseases, to remove or encapsulate them, to incorporate them into the system in her own way.\"}"
+          }
+        ],
+        "sent": "2024-03-26T15:59:29.983+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-26T15:59:32.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebbe70-db8a-a438-a3fd-f40f28a95043",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebbe70-db8a-a438-a3fd-f40f28a95043",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.2"
+          ]
+        },
+        "basedOn": [
+          {
+            "reference": "Task/160.000.006.510.080.88/$accept?ac=105e48532302d01c97180c46abaacfee68e7f1064c297b397938dc61786714b8"
+          }
+        ],
+        "status": "unknown",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "http://fhir.de/sid/gkv/kvid-10",
+              "value": "X110498565"
+            }
+          }
+        ],
+        "payload": [
+          {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+                "extension": [
+                  {
+                    "url": "onPremise",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "delivery",
+                    "valueBoolean": false
+                  },
+                  {
+                    "url": "shipment",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"info_text\":\"We can deliver a mask, too\"}"
+          }
+        ],
+        "sent": "2024-03-26T16:44:53.843+00:00",
+        "sender": {
+          "identifier": {
+            "value": "5-2-KH-APO-Waldesrand-01",
+            "system": "https://gematik.de/fhir/sid/telematik-id"
+          }
+        },
+        "received": "2024-03-27T00:30:42.000+00:00"
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ],
+  "link": [
+    {
+      "relation": "next",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=5-2-KH-APO-Waldesrand-01&_count=50&__offset=50"
+    },
+    {
+      "relation": "self",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=5-2-KH-APO-Waldesrand-01"
+    }
+  ]
+}

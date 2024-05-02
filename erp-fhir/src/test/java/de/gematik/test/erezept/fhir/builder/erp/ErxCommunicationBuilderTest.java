@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
@@ -46,7 +46,7 @@ class ErxCommunicationBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildCommunicationInfoReqFixedValues(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     val infoReq =
         ErxCommunicationBuilder.builder()
             .basedOnTaskId(TaskId.from("4711"))
@@ -87,7 +87,7 @@ class ErxCommunicationBuilderTest extends ParsingTest {
   @ClearSystemProperty(key = "erp.fhir.profile")
   void shouldThrowOnMissingFlowTypeForInfoReq(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val medication = KbvErpMedicationPZNBuilder.faker().build();
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
     val builder =
         ErxCommunicationBuilder.builder()
             .basedOnTaskId(TaskId.from("4711"))

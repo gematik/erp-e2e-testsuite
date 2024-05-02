@@ -17,6 +17,7 @@
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
 import de.gematik.test.konnektor.exceptions.ParsingExamEvidenceException;
+import de.gematik.test.smartcard.Egk;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -115,8 +116,16 @@ public class VsdmExamEvidence {
     return Base64.getEncoder().encodeToString(encode());
   }
 
-  public static VsdmExamEvidenceBuilder builder(VsdmExamEvidenceResult result) {
-    return new VsdmExamEvidenceBuilder(result);
+  public static VsdmExamEvidenceBuilder asOnlineMode(VsdmService service, Egk egk) {
+    return new VsdmExamEvidenceBuilder(service, egk);
+  }
+
+  public static VsdmExamEvidenceBuilder asOnlineTestMode(Egk egk) {
+    return new VsdmExamEvidenceBuilder(VsdmService.instantiateWithTestKey(), egk);
+  }
+
+  public static VsdmExamEvidenceBuilder asOfflineMode() {
+    return new VsdmExamEvidenceBuilder();
   }
 
   @Override
@@ -136,36 +145,82 @@ public class VsdmExamEvidence {
         + '}';
   }
 
-  @RequiredArgsConstructor
   public static class VsdmExamEvidenceBuilder {
+
+    private final VsdmService vsdmService;
+    private final Egk egk;
+    private VsdmChecksum checksum;
 
     private final DateTimeFormatter timestampFormatter =
         DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.from(ZoneOffset.UTC));
 
-    private final VsdmExamEvidenceResult result;
-    private VsdmChecksum checksum;
     private Instant timestamp = Instant.now();
 
-    public VsdmExamEvidenceBuilder checksum(VsdmChecksum checksum) {
-      this.checksum = checksum;
-      return this;
+    protected VsdmExamEvidenceBuilder(VsdmService service, Egk egk) {
+      this.vsdmService = service;
+      this.egk = egk;
     }
 
-    public VsdmExamEvidenceBuilder timestamp(Instant timestamp) {
-      this.timestamp = timestamp;
-      return this;
+    protected VsdmExamEvidenceBuilder() {
+      this(null, null);
     }
 
     public VsdmExamEvidenceBuilder withExpiredTimestamp() {
       this.timestamp = this.timestamp.minus(30, ChronoUnit.MINUTES).minus(1, ChronoUnit.SECONDS);
+      if (isOnlineMode()) {
+        checksum.setTimestamp(timestamp);
+      }
       return this;
     }
 
-    public VsdmExamEvidence build() {
+    public VsdmExamEvidenceBuilder withInvalidTimestamp() {
+      this.timestamp = this.timestamp.plus(31, ChronoUnit.MINUTES);
+      if (isOnlineMode()) {
+        checksum.setTimestamp(timestamp);
+      }
+      return this;
+    }
+
+    public VsdmExamEvidenceBuilder checksumWithInvalidManufacturer() {
+      if (isOnlineMode()) {
+        this.checksum = vsdmService.checksumWithInvalidManufacturer(egk.getKvnr());
+      }
+      return this;
+    }
+
+    public VsdmExamEvidenceBuilder checksumWithInvalidVersion() {
+      if (isOnlineMode()) {
+        this.checksum = vsdmService.checksumWithInvalidVersion(egk.getKvnr());
+      }
+      return this;
+    }
+
+    public VsdmExamEvidenceBuilder checksumWithUpdateReason(VsdmUpdateReason reason) {
+      if (isOnlineMode()) {
+        checksum.setUpdateReason(reason);
+      }
+      return this;
+    }
+
+    private boolean isOnlineMode() {
+      if (checksum == null && vsdmService != null) {
+        checksum = vsdmService.checksumFor(egk.getKvnr());
+      }
+      return vsdmService != null;
+    }
+
+    public VsdmExamEvidenceBuilder checksumWithInvalidKvnr() {
+      if (isOnlineMode()) {
+        this.checksum = vsdmService.checksumFor("ABC");
+      }
+      return this;
+    }
+
+    public VsdmExamEvidence generate(VsdmExamEvidenceResult result) {
       return new VsdmExamEvidence(
           timestampFormatter.format(timestamp),
           BigInteger.valueOf(result.getResult()),
-          checksum != null ? checksum.generate() : null,
+          isOnlineMode() ? vsdmService.sign(checksum) : null,
           "1.0.0");
     }
   }

@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 # language: de
+
+@PRODUKT:eRp_FdV
 @iosNightly
 @Versicherung:PKV
 @Funktionalität:RezeptDarstellung
@@ -26,6 +28,7 @@ Funktionalität: Darstellung von PKV E-Rezepten
     Angenommen die PKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
     Und die Ärztin Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
 
+  @TCID:ERP_FDV_PKV_LÖSCHEN_01
   @Funktionalität:Löschen
   Szenario: Ausgestelltes PKV E-Rezept löschen ohne Einlösen
   Die PKV Versicherte löscht das E-Rezept ohne diese in einer Apotheke einzulösen
@@ -34,6 +37,7 @@ Funktionalität: Darstellung von PKV E-Rezepten
     Und die Versicherte Alice ihr letztes E-Rezept in der App löscht
     Dann wird das letzte gelöschte E-Rezept der Versicherten in der App nicht mehr angezeigt
 
+  @TCID:ERP_FDV_PKV_REZEPTINFORMATION_01
   @Funktionalität:RezeptInformationen
   Szenario: E-Rezept verschreiben und dem PKV Versicherten Anzeigen
   Der Arzt verschreibt der PKV-Versicherten ein E-Rezept für ein apothekenpflichtiges Rezept.
@@ -42,6 +46,7 @@ Funktionalität: Darstellung von PKV E-Rezepten
     Wenn die Ärztin Adelheid Ulmenwald der Versicherten Alice ein apothekenpflichtiges Medikament verschreibt
     Dann wird der Versicherten Alice das letzte E-Rezept in der App angezeigt
 
+  @TCID:ERP_FDV_PKV_MEHRFACHVERORDNUNG_01
   @Funktionalität:MVO
   Szenario: Mehrfachverordnung für PKV-Versicherte
   Zwei E-Rezepte für PKV-Versicherte als Mehrfachverordnung

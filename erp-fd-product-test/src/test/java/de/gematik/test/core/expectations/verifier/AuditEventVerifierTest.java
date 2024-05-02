@@ -16,14 +16,17 @@
 
 package de.gematik.test.core.expectations.verifier;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
+
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
+import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmChecksum;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 class AuditEventVerifierTest {
+  private PatientActor patient;
 
   private PharmacyActor pharmacy;
 
@@ -44,26 +48,30 @@ class AuditEventVerifierTest {
     pharmacy = new PharmacyActor("Am Flughafen");
     val pharmacyConfig = config.getPharmacyConfig(pharmacy.getName());
     val smcb = config.getSmcbByICCSN(pharmacyConfig.getSmcbIccsn());
-
     val useSmcb = UseSMCB.itHasAccessTo(smcb);
     pharmacy.can(useSmcb);
+
+    patient = new PatientActor("Hanna Bäcker");
+    val patientConfig = config.getPatientConfig(patient.getName());
+    val egk = config.getEgkByICCSN(patientConfig.getEgkIccsn());
+    givenThat(patient).can(ProvideEGK.sheOwns(egk));
   }
 
   @Test
   void shouldDetectAllRepresentations() {
     val checksum =
-        VsdmExamEvidence.builder(VsdmExamEvidenceResult.NO_UPDATES)
-            .checksum(VsdmChecksum.builder("X12345678").build())
-            .build()
+        VsdmExamEvidence.asOnlineTestMode(patient.getEgk())
+            .generate(VsdmExamEvidenceResult.NO_UPDATES)
             .getChecksum()
             .orElseThrow();
-    val verifier = AuditEventVerifier.builder().pharmacy(pharmacy).checksum(checksum).build();
+
+    val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
     val testData =
         FhirTestResourceUtil.createErxAuditEventBundle(
             pharmacy.getTelematikId(), pharmacy.getCommonName());
     for (Representation rep : Representation.values()) {
       verifier.contains(rep).apply(testData);
     }
-    verifier.firstCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL).apply(testData);
+    verifier.firstElementCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL).apply(testData);
   }
 }

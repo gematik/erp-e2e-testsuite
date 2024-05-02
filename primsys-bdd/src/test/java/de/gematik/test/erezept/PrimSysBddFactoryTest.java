@@ -185,4 +185,16 @@ class PrimSysBddFactoryTest {
       assertNull(patient.abilityTo(ManageChargeItems.class));
     }
   }
+
+  @Test
+  void shouldThrowWhenPspDoesNotConnect() {
+    val name = factory.getDto().getActors().getPharmacies().get(0).getName();
+    val pharmacy = OnStage.theActorCalled(name);
+    pharmacy.can(UseSMCB.itHasAccessTo(sca.getSmcbCards().get(0)));
+
+    // manipulate the psp address to provoke the exception
+    factory.getDto().getPspClientConfig().setUrl("http://localhost:1234");
+
+    assertThrows(AssertionError.class, () -> factory.equipPharmacyWithPspClient(pharmacy));
+  }
 }

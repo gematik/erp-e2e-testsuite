@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.8.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -77,7 +77,7 @@
             <id>polarion-upload</id>
             <properties>
                 <!-- testRun will be provided from executor, e.g., Jenkinsfile-->
-                <testRun>testruns</testRun>
+                <testRun>testrun</testRun>
                 <polarion.projectname>beauftragungeRpFD2022Q2</polarion.projectname>
             </properties>
             <build>
@@ -155,10 +155,7 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit-pioneer</groupId>
-            <artifactId>junit-pioneer</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -281,7 +278,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.8.0-SNAPSHOT</version>
             </plugin>
         </plugins>
     </build>

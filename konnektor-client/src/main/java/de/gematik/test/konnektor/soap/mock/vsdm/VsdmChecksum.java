@@ -22,39 +22,50 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor()
 @Getter
 public class VsdmChecksum {
 
   /** Field 1 len: 10 */
-  @NonNull private String kvnr;
+  @NonNull private final String kvnr;
 
   /** Field 2 Unix timestamp len: 10 */
-  @Builder.Default private Instant timestamp = Instant.now();
+  private Instant timestamp = Instant.now();
 
   /** Field 3 len: 1 */
-  @Builder.Default private VsdmUpdateReason updateReason = VsdmUpdateReason.UFS_UPDATE;
+  private VsdmUpdateReason updateReason = VsdmUpdateReason.UFS_UPDATE;
 
   /** Field 4 len: 1 */
-  @Builder.Default private char identifier = 'S';
+  private char identifier;
 
   /** Field 5 len: 1 */
-  @Builder.Default private char version = '1';
+  private char version;
 
-  @Builder.Default private byte[] key = new byte[32];
-
-  public static VsdmChecksumBuilder builder(String kvnr) {
-    return new VsdmChecksumBuilder().kvnr(kvnr);
+  public VsdmChecksum setTimestamp(Instant timestamp) {
+    this.timestamp = timestamp;
+    return this;
   }
 
-  public VsdmChecksum setKey(byte @NonNull [] key) {
-    this.key = key;
+  public VsdmChecksum setUpdateReason(VsdmUpdateReason reason) {
+    this.updateReason = reason;
+    return this;
+  }
+
+  public VsdmChecksum setIdentifier(char identifier) {
+    this.identifier = identifier;
+    return this;
+  }
+
+  public VsdmChecksum setVersion(char version) {
+    this.version = version;
     return this;
   }
 
@@ -68,12 +79,11 @@ public class VsdmChecksum {
     val reason = VsdmUpdateReason.fromChecksum(copyCharFrom(checksum, 20));
     val identifier = copyCharFrom(checksum, 21);
     val version = copyCharFrom(checksum, 22);
-    return VsdmChecksum.builder(kvnr)
-        .timestamp(timestamp)
-        .updateReason(reason)
-        .identifier(identifier)
-        .version(version)
-        .build();
+    return new VsdmChecksum(kvnr)
+        .setTimestamp(timestamp)
+        .setUpdateReason(reason)
+        .setIdentifier(identifier)
+        .setVersion(version);
   }
 
   private static byte[] copyByteArrayFrom(byte[] data, int from, int to)
@@ -99,7 +109,7 @@ public class VsdmChecksum {
    *
    * @return a base64 encoded checksum
    */
-  public String generate() {
+  public String sign(byte[] key) {
     if (key.length != 32) {
       throw new InvalidKeyLengthException(key, 32);
     }
@@ -118,13 +128,7 @@ public class VsdmChecksum {
   }
 
   private String genPayload() {
-    val ret = new StringBuilder();
-    ret.append(kvnr)
-        .append(timestamp.getEpochSecond())
-        .append(updateReason.getIdentifier())
-        .append(identifier)
-        .append(version);
-    return ret.toString();
+    return kvnr + timestamp.getEpochSecond() + updateReason.getIdentifier() + identifier + version;
   }
 
   @Override

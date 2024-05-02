@@ -154,6 +154,7 @@ public enum Darreichungsform implements IValueSet {
   LTA("LTA", "Lacktabletten"),
   LUP("LUP", "Lutschpastillen"),
   LUT("LUT", "Lutschtabletten"),
+  LYO("LYO", "Lyophilisat zur Herstellung einer Infusionslösung"), // ab eRp-FD v1.14.0 verfügbar
   MIL("MIL", "Milch"),
   MIS("MIS", "Mischung"),
   MIX("MIX", "Mixtur"),

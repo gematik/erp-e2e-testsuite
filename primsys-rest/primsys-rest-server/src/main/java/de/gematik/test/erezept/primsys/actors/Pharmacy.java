@@ -25,8 +25,11 @@ import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.data.actors.PharmacyDto;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.commands.GetCardHandleCommand;
+import de.gematik.test.konnektor.commands.ReadVsdCommand;
 import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
+import de.gematik.test.smartcard.Egk;
 import de.gematik.test.smartcard.SmartcardArchive;
+import java.util.Base64;
 import lombok.val;
 
 public class Pharmacy extends BaseActor {
@@ -60,5 +63,12 @@ public class Pharmacy extends BaseActor {
 
   public PharmacyOrganization createPharmacyOrganization() {
     return PharmacyOrganizationBuilder.faker().name(this.getName()).build();
+  }
+
+  public String requestEvidenceForEgk(Egk egk) {
+    val egkCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(egk)).getPayload();
+    val readVsdCommand = new ReadVsdCommand(egkCardHandle, smcbHandle, true, true);
+    val pruefnachweis = konnektor.execute(readVsdCommand).getPayload().getPruefungsnachweis();
+    return Base64.getEncoder().encodeToString(pruefnachweis);
   }
 }

@@ -122,7 +122,7 @@
           <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag">
             <valueBoolean value="true" />
           </extension>
-          <text value="2mal tägl. 5ml" />
+          <text value="2mal tägl. 5ml"/>
         </dosageInstruction>
         <dispenseRequest>
           <quantity>

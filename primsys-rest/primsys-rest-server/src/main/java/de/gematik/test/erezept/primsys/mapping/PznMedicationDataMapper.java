@@ -47,7 +47,10 @@ public class PznMedicationDataMapper extends DataMapper<PznMedicationDto, KbvErp
     if (dto.getType().equals(MedicationTypeDto.PZN)) {
       ensure(
           dto::getStandardSize, dto::setStandardSize, () -> fakerValueSet(StandardSizeDto.class));
-      ensure(dto::getSupplyForm, dto::setSupplyForm, () -> fakerValueSet(SupplyFormDto.class));
+      ensure(
+          dto::getSupplyForm,
+          dto::setSupplyForm,
+          () -> fakerValueSet(SupplyFormDto.class, SupplyFormDto.LYO));
       ensure(dto::getPzn, dto::setPzn, () -> PZN.random().getValue());
       ensure(dto::getAmount, dto::setAmount, () -> fakerAmount(1, 20));
       ensure(dto::getAmountUnit, dto::setAmountUnit, () -> "Stk");

@@ -21,7 +21,7 @@
 @Versicherung:GKV
 Funktionalität: eGK in der Apotheke mit VSDM++
   Der Versicherte soll durch die Vorlage seiner EGK eine Apotheke dazu berechtigen,
-  seine einlösbaren E-Rezepte aus dem E-Rezept-Fachdienst mit Hilfs des VSDM Prüfungsnachweis abrufen zu können.
+  seine einlösbaren E-Rezepte aus dem E-Rezept-Fachdienst mit Hilfe des VSDM Prüfungsnachweis abrufen zu können.
   Aus technischer Sicht ist es dabei unerheblich, ob es sich um einen GKV- oder PKV-Versicherten handelt.
 
 

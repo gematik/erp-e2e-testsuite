@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,7 @@ class ExampleDetailsMapTest {
     entry.setFileName("custom_file.json");
     entry.setFileType(EncodingType.JSON);
     entry.setDescription("custom file");
-    entry.setValidationResult(false);
+    entry.setValidationSuccessful(false);
 
     val vm = new SingleValidationMessage();
     vm.setMessage("Validation Message");
@@ -49,12 +50,14 @@ class ExampleDetailsMapTest {
     when(vr.isSuccessful()).thenReturn(false);
     when(vr.getMessages()).thenReturn(List.of(vm));
 
-    entry.setErrors(vr);
-    entry.addError(
-        HapiValidationError.from(
-            "some error message", "Bundle.entry[0].resource.ofType(Composition).subject"));
+    entry.setValidationResults(vr);
+    entry.addResult(
+        HapiValidationResult.from(
+            ResultSeverityEnum.WARNING,
+            "some error message",
+            "Bundle.entry[0].resource.ofType(Composition).subject"));
 
-    assertEquals(2, entry.getErrors().size());
+    assertEquals(2, entry.getValidationResults().size());
 
     edm.addEntry(entry);
 
@@ -70,7 +73,7 @@ class ExampleDetailsMapTest {
     entry.setFileName("custom_file.json");
     entry.setFileType(EncodingType.JSON);
     entry.setDescription("custom file");
-    entry.setValidationResult(false);
+    entry.setValidationSuccessful(false);
 
     val vm = new SingleValidationMessage();
     vm.setMessage("Validation Message");
@@ -79,12 +82,14 @@ class ExampleDetailsMapTest {
     when(vr.isSuccessful()).thenReturn(false);
     when(vr.getMessages()).thenReturn(List.of(vm));
 
-    entry.setErrors(vr);
-    entry.addError(
-        HapiValidationError.from(
-            "some error message", "Bundle.entry[0].resource.ofType(Composition).subject"));
+    entry.setValidationResults(vr);
+    entry.addResult(
+        HapiValidationResult.from(
+            ResultSeverityEnum.FATAL,
+            "some error message",
+            "Bundle.entry[0].resource.ofType(Composition).subject"));
 
-    assertEquals(2, entry.getErrors().size());
+    assertEquals(2, entry.getValidationResults().size());
 
     edm.addEntry(entry);
     val mapper = new ObjectMapper();

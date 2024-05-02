@@ -1,10 +1,32 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.7.0
+
+
+Implemented Features:
+
+- PrimSysRest - Add a new Endpoint (pharm{id}/withEvidence) to call a list of prescriptions that fits to the given evidence
+- Add verification steps, to check if Receipts has "fullUrl as urn:uuid", references in composition as "urn:uuid"
+- C_11669 - Extends test cases for the feature “Egk in der Pharmacy” with PN3
+- C_11595 - Add test case to verify that only e-prescriptions with workflow 160 are retrieved with the feature "eGK in pharmacy"
+- Implemented _anonymization_ feature for KBV-Bundles in `erp-cli-fhir`
+- Implenmented TestSzenario to validate QES-HASH from activated Prescription and Receipt-Binary
+- C_11582: Add toggle to activate Validation for ANR-Validation in Error-Configuration
+- Add Manipulators in KbvBundleManipulatorFactory.class for MedicationCategory, MedicationType, StandardSize and
+  Darreichungsform
+- Add actions for RejectConsent, ReadConsent, DeposeConsent, extends their Builder classes and Constructors, add Verifier
+  for Consent
+- CR0071: Extension of the key table "Darreichungsform" to include "Lyophilizate for the preparation of a solution for infusion"
+- Add action "GetMessage" (as Communications)
+- Add actions to call the endpoints OCSPList and CertList from Backend 
+
 ## Release 0.6.0
 
 Implemented Features:
+
 - TSERP-8: Create different medication types (Medication_Ingredient, Medication_Free_Text und Medication_Compounding)
 - TMD-2341: OpenAPI for test drivers of the FdVs
+- Implements Testcases to check if PZN, ANR, IKNR, KVNR will validate correctly
 
 ## Release 0.5.0
 

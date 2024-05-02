@@ -30,6 +30,7 @@ import picocli.CommandLine.Command;
       Generator.class,
       Replacer.class,
       EncodingTranscoder.class,
+      CliAnonymizer.class,
       Validator.class,
       ListProfiles.class,
       ListCoverages.class,

@@ -34,9 +34,15 @@ class VsdmChecksumTest {
 
   @Test
   void generateValidChecksum() {
-    assertDoesNotThrow(() -> VsdmChecksum.builder("X123456789").build().generate());
+    assertDoesNotThrow(() -> new VsdmChecksum("X123456789").sign(new byte[32]));
 
-    val checksum = VsdmChecksum.builder("X123456789").timestamp(Instant.now()).build().generate();
+    val checksum =
+        new VsdmChecksum("X123456789")
+            .setIdentifier('S')
+            .setUpdateReason(VsdmUpdateReason.UFS_UPDATE)
+            .setVersion('1')
+            .sign(new byte[32]);
+
     assertNotNull(checksum);
     val decodeChecksum = Base64.getDecoder().decode(checksum);
     assertEquals(47, decodeChecksum.length);
@@ -58,13 +64,12 @@ class VsdmChecksumTest {
 
   @Test
   void invalidKey() {
-    val checksum = VsdmChecksum.builder("X123456789").build();
+    val checksum = new VsdmChecksum("X123456789");
     List.of(0, 31, 33)
         .forEach(
-            keyLen -> {
-              checksum.setKey(new byte[keyLen]);
-              assertThrows(InvalidKeyLengthException.class, checksum::generate);
-            });
+            keyLen ->
+                assertThrows(
+                    InvalidKeyLengthException.class, () -> checksum.sign(new byte[keyLen])));
   }
 
   @SneakyThrows

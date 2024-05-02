@@ -103,7 +103,7 @@ actors:
     - name: Günther Angermänn
       egkIccsn: 80276883110000113323
 
-    - name: Aenna Gondern
+    - name: Aenna Gondern # Kassenidentität ohne validen privaten Schlüssel
       egkIccsn: 80276881040001935352
 
     - name: Gerda 'kkh' Galle
@@ -276,7 +276,7 @@ konnektors:
   - name: KOCO@kon7
     type: remote
     profile: CGM
-    address: gltu1184.mgm1.telematik-test/kon7
+    address: ksp.ltuzd.telematik-test/kon7
     protocol: https
     context:
       mandantId: Mandant1
@@ -300,7 +300,7 @@ konnektors:
   - name: RISE@kon8
     type: remote
     profile: RISE
-    address: gltu1184.mgm1.telematik-test/kon8
+    address: ksp.ltuzd.telematik-test/kon8
     protocol: https
     context:
       mandantId: Mandant1
@@ -324,7 +324,7 @@ konnektors:
   - name: SECUNET@kon9
     type: remote
     profile: SECUNET
-    address: gltu1184.mgm1.telematik-test/kon9
+    address: ksp.ltuzd.telematik-test/kon9
     protocol: https
     context:
       mandantId: Mandant1
@@ -348,7 +348,7 @@ konnektors:
   - name: KocoRu@kon19
     type: remote
     profile: CGM
-    address: gltu1184.mgm1.telematik-test/kon19
+    address: ksp.ltuzd.telematik-test/kon19
     protocol: https
     context:
       mandantId: m1

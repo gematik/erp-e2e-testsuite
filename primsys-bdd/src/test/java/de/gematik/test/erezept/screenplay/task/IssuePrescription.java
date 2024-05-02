@@ -257,8 +257,8 @@ public class IssuePrescription implements Task {
         // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
         // Reference + Name
         // build a faked one matching the Reference of the patient
-        val fakedAssignerOrganization = AssignerOrganizationBuilder.faker(patient);
-        kbvBuilder.assigner(fakedAssignerOrganization.build());
+        val fakedAssignerOrganization = AssignerOrganizationFaker.builder().forPatient(patient);
+        kbvBuilder.assigner(fakedAssignerOrganization.fake());
       }
     }
 
@@ -306,7 +306,10 @@ public class IssuePrescription implements Task {
               baseData.getFullName(), baseData.getPatientInsuranceType()));
       ret = baseData.getPatient();
     } else {
-      ret = PatientBuilder.faker(patientKvnr, VersicherungsArtDeBasis.GKV).build();
+      ret =
+          PatientFaker.builder()
+              .withKvnrAndInsuranceType(patientKvnr, VersicherungsArtDeBasis.GKV)
+              .fake();
       log.info(
           format(
               "Issue ePrescription to KVNR {0} with insurance type {1}",

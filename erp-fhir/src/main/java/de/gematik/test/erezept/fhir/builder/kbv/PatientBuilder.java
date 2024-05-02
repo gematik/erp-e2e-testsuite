@@ -40,11 +40,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.val;
+import lombok.*;
 import org.hl7.fhir.r4.model.*;
 
+@Getter(AccessLevel.PACKAGE)
 public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
 
   private final List<Identifier> identifiers = new LinkedList<>();
@@ -248,14 +247,17 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
     return new PatientBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static PatientBuilder faker() {
     return faker(KVNR.random());
   }
 
+  @Deprecated(forRemoval = true)
   public static PatientBuilder faker(VersicherungsArtDeBasis insuranceType) {
     return faker(KVNR.random(), insuranceType);
   }
 
+  @Deprecated(forRemoval = true)
   public static PatientBuilder faker(KVNR kvnr) {
     return faker(kvnr, randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV));
   }
@@ -273,7 +275,7 @@ public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {
             ? IdentifierTypeDe.GKV
             : IdentifierTypeDe.PKV;
     if (builder.identifierTypeDe == IdentifierTypeDe.PKV) {
-      builder.assigner(AssignerOrganizationBuilder.faker().build());
+      builder.assigner(AssignerOrganizationFaker.builder().fake());
     }
 
     return builder;

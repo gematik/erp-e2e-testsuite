@@ -497,6 +497,10 @@
       "display": "LUTSCHTABLETTEN"
     },
     {
+      "code": "LYO",
+      "display": "LYO - Lyophilisat zur Herstellung einer Infusionslösung"
+    },
+    {
       "code": "MIL",
       "display": "MILCH"
     },

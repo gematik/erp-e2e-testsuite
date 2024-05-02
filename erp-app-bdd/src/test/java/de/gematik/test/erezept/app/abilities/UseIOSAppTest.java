@@ -29,6 +29,7 @@ import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.ios.IOSDriver;
+import io.cucumber.java.Scenario;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class UseIOSAppTest {
     assertEquals(10, driverAbility.getMaxWaitTimeout());
     assertEquals(5, driverAbility.getPollingInterval());
 
-    assertDoesNotThrow(driverAbility::tearDown);
+    assertDoesNotThrow(() -> driverAbility.finish(mock(Scenario.class)));
   }
 
   @Test

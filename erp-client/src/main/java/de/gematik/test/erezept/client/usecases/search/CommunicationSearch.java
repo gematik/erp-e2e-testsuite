@@ -43,6 +43,18 @@ public class CommunicationSearch {
     return new CommunicationGetCommand(searchParams);
   }
 
+  public static CommunicationGetCommand getRecipientCommunications(String id) {
+    val searchParams = new ArrayList<IQueryParameter>();
+    searchParams.add(new QueryParameter("recipient", id));
+    return new CommunicationGetCommand(searchParams);
+  }
+
+  public static CommunicationGetCommand getSenderCommunications(String id) {
+    val searchParams = new ArrayList<IQueryParameter>();
+    searchParams.add(new QueryParameter("sender", id));
+    return new CommunicationGetCommand(searchParams);
+  }
+
   public static CommunicationGetCommand getLatestCommunications() {
     return getAllCommunications(SortOrder.DESCENDING);
   }

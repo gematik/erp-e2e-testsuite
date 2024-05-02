@@ -30,6 +30,8 @@ import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.AppiumFluentWait;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.cucumber.java.Scenario;
+import io.cucumber.java.Status;
 import java.time.Duration;
 import java.util.List;
 import lombok.val;
@@ -477,5 +479,19 @@ class UseTheAppTest {
 
     verify(targetLocator, times(1)).alert();
     verify(alert, times(1)).accept();
+  }
+
+  @Test
+  void shouldReportScenarioStatus() {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+    val scenario = mock(Scenario.class);
+    when(scenario.getStatus()).thenReturn(Status.PASSED);
+    assertDoesNotThrow(() -> app.finish(scenario));
+    verify(driver, times(1))
+        .executeScript(
+            (String)
+                argThat(
+                    argument -> ((String) argument).startsWith("seetest:client.setReportStatus")));
   }
 }

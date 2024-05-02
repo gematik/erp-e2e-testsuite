@@ -18,11 +18,13 @@ package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,6 +56,12 @@ class OperationOutcomeVerifierTest {
   void setupReporter() {
     // need to start a testcase manually as we are not using the ErpTestExtension here
     CoverageReporter.getInstance().startTestcase("not needed");
+  }
+
+  @Test
+  void shouldNotInstantiate() {
+    assertTrue(
+        PrivateConstructorsUtil.throwsInvocationTargetException(OperationOutcomeVerifier.class));
   }
 
   @Test
@@ -128,6 +136,24 @@ class OperationOutcomeVerifierTest {
     val step =
         operationOutcomeContainsInDiagnostics("Die IK-Nummer muss 9-stellig sein", ErpAfos.A_23888);
     step.apply(oOResource);
+  }
+
+  @Test
+  void shouldDetectInvalidDiagnostics() {
+    val oOResource = parser.decode(OperationOutcome.class, oo.trim());
+    oOResource.getIssueFirstRep().setDiagnostics("random invalid diagnostics text");
+    val step =
+        operationOutcomeContainsInDiagnostics("Die IK-Nummer muss 9-stellig sein", ErpAfos.A_23888);
+    assertThrows(AssertionError.class, () -> step.apply(oOResource));
+  }
+
+  @Test
+  void shouldVerifyWithMissingDiagnostics() {
+    val oOResource = parser.decode(OperationOutcome.class, oo.trim());
+    oOResource.getIssueFirstRep().setDiagnostics(null);
+    val step =
+        operationOutcomeContainsInDiagnostics("Die IK-Nummer muss 9-stellig sein", ErpAfos.A_23888);
+    assertThrows(AssertionError.class, () -> step.apply(oOResource));
   }
 
   @Test
