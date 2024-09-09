@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.values.*;
 import lombok.*;
@@ -46,7 +46,7 @@ class ChargeItemPutCommandTest {
   void shouldBuildRequestWithPrescriptionIdFromChargeItem() {
     val prescriptionId = PrescriptionId.random();
     val accessCode = AccessCode.fromString("123");
-    val chargeItem = ErxChargeItemBuilder.faker(prescriptionId).build();
+    val chargeItem = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId).fake();
 
     val cmd = new ChargeItemPutCommand(accessCode, chargeItem);
     assertTrue(cmd.getRequestLocator().contains(format("ac={0}", accessCode.getValue())));

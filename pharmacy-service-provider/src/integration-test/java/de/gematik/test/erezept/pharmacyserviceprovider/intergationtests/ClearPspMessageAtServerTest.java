@@ -16,21 +16,20 @@
 
 package de.gematik.test.erezept.pharmacyserviceprovider.intergationtests;
 
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.test.erezept.pspwsclient.PSPClient;
 import de.gematik.test.erezept.pspwsclient.PharmaServiceProviderWSClient;
-import kong.unirest.Unirest;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import kong.unirest.core.Unirest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 class ClearPspMessageAtServerTest {

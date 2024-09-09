@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@ package de.gematik.test.core.expectations.verifier;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.function.Predicate;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
@@ -33,7 +37,7 @@ public class TaskBundleVerifier {
     throw new AssertionError("do not instantiate!");
   }
 
-  public static VerificationStep<ErxTaskBundle> doesContainsErxTasksWithoutQES() {
+  public static VerificationStep<ErxTaskBundle> doesContainsErxTasksWithoutQES(ErpAfos afo) {
     Predicate<Resource> isErxTask =
         resource ->
             resource instanceof Task && ErpWorkflowStructDef.TASK_12.match(resource.getMeta());
@@ -51,11 +55,34 @@ public class TaskBundleVerifier {
 
     val step =
         new VerificationStep.StepBuilder<ErxTaskBundle>(
-            ErpAfos.A_23452.getRequirement(),
+            afo.getRequirement(),
             format(
                 "Das  ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf keine"
                     + " QES (Binary) zu den E-Rezepten enthalten."));
     return step.predicate(onlyErxTaskInEntries.and(noContainedResources)).accept();
+  }
+
+  public static VerificationStep<ErxTaskBundle> authoredOnDateIsEqual(LocalDate date) {
+    return verifyAuthoredOnDateWithPredicate(
+        ld -> ld.isEqual(date),
+        "Die enthaltenen Tasks müssen das AuthoredOn Datum " + date.toString() + " enthalten");
+  }
+
+  /**
+   * @param localDatePredicate // example: ld -> ld.isBefore(LocalDate.now())
+   * @param description // the description of expected behavior as String
+   * @return VerificationStep
+   */
+  public static VerificationStep<ErxTaskBundle> verifyAuthoredOnDateWithPredicate(
+      Predicate<LocalDate> localDatePredicate, String description) {
+    Predicate<ErxTaskBundle> predicate =
+        bundle ->
+            bundle.getTasks().stream()
+                .map(tsk -> DateConverter.getInstance().dateToLocalDate(tsk.getAuthoredOn()))
+                .allMatch(localDatePredicate);
+    return new VerificationStep.StepBuilder<ErxTaskBundle>(ErpAfos.A_25515, description)
+        .predicate(predicate)
+        .accept();
   }
 
   public static VerificationStep<ErxTaskBundle> containsExclusivelyTasksWithGKVInsuranceType() {
@@ -67,6 +94,20 @@ public class TaskBundleVerifier {
             format(
                 "Das ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf nur"
                     + " E-Rezepte mit Workflow 160 enthalten."));
+    return step.predicate(verify).accept();
+  }
+
+  public static VerificationStep<ErxTaskBundle> doesNotContainsExpiredErxTasks(ErpAfos afo) {
+    val compareDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+    Predicate<ErxTaskBundle> verify =
+        bundle ->
+            bundle.getTasks().stream().noneMatch(it -> it.getExpiryDate().before(compareDate));
+    val step =
+        new VerificationStep.StepBuilder<ErxTaskBundle>(
+            afo.getRequirement(),
+            format(
+                "Das ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf keine"
+                    + " abgelaufenden E-Rezepte enthalten."));
     return step.predicate(verify).accept();
   }
 }

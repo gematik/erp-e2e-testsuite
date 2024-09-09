@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,11 +58,6 @@ public enum Receipt implements PageElement {
       "after redeem the prescription go to the main page",
       () -> null,
       () -> AppiumBy.xpath("//*[@label='Zur Startseite']")),
-
-  FULL_DAYS_VALID_RECEIPT(
-      "28 days validity recipt",
-      () -> null,
-      () -> AppiumBy.xpath("//*[@label='Noch 28 Tage gültig']")),
 
   ARCHIVED_PRESCRIPTIONS_BTN(
       "Eingelöste Rezepte", () -> null, () -> AppiumBy.xpath("//*[@label='Eingelöste Rezepte']")),

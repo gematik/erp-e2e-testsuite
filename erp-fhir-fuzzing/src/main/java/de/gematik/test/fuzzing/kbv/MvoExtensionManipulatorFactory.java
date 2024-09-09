@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.fuzzing.kbv;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionIdExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
@@ -44,9 +45,11 @@ public class MvoExtensionManipulatorFactory {
         NamedEnvelope.of(
             "MVO Kennzeichen = false mit Nummerierung und Zeitraum",
             b -> {
-              val mvoExt = getMvoExtensionFrom(b);
-              val flagExt = mvoExt.getExtensionByUrl("Kennzeichen");
-              flagExt.getValue().castToBoolean(flagExt.getValue()).setValue(false);
+              val mvoKennzeichenExt = getMvoKennzeichenExtensionFrom(b);
+              mvoKennzeichenExt
+                  .getValue()
+                  .castToBoolean(mvoKennzeichenExt.getValue())
+                  .setValue(false);
             }));
 
     manipulators.add(
@@ -140,7 +143,14 @@ public class MvoExtensionManipulatorFactory {
               periodExt.setValue(
                   new StringType(new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
             }));
-
+    manipulators.add(
+        NamedEnvelope.of(
+            "MVO ohne ID",
+            b -> {
+              val mvoExt = getMvoExtensionFrom(b);
+              val flagExt = mvoExt.getExtensionByUrl(MultiplePrescriptionIdExtension.URL);
+              mvoExt.getExtension().remove(flagExt);
+            }));
     return manipulators;
   }
 
@@ -156,6 +166,11 @@ public class MvoExtensionManipulatorFactory {
             () ->
                 new MissingFieldException(
                     KbvErpBundle.class, KbvItaErpStructDef.MULTIPLE_PRESCRIPTION));
+  }
+
+  private static Extension getMvoKennzeichenExtensionFrom(KbvErpBundle bundle) {
+    val mvo = getMvoExtensionFrom(bundle);
+    return mvo.getExtensionByUrl("Kennzeichen");
   }
 
   private static Extension getMvoPeriodExtensionFrom(KbvErpBundle bundle) {

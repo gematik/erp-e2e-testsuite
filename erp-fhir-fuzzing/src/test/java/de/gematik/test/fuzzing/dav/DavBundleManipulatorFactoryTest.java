@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import java.lang.reflect.Constructor;
@@ -67,7 +67,7 @@ class DavBundleManipulatorFactoryTest extends ParsingTest {
                 m ->
                     (Executable)
                         () -> {
-                          val davBundle = DavAbgabedatenBuilder.faker().build();
+                          val davBundle = DavAbgabedatenFaker.builder().fake();
                           assertDoesNotThrow(() -> m.getParameter().accept(davBundle));
                           val encoded = parser.encode(davBundle, EncodingType.XML);
                           val result = parser.validate(encoded);

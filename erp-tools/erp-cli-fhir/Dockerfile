@@ -19,29 +19,33 @@ LABEL de.gematik.version=$VERSION
 
 RUN apk update  \
     && apk upgrade  \
-    && apk add --no-cache alpine-zsh-config curl git man-db man-pages less less-doc musl-locales \
+    && apk add --no-cache zsh alpine-zsh-config curl git man-db man-pages less less-doc musl-locales \
     && addgroup -g $GID $GROUP \
     && adduser -D -h $USER_HOME -G $GROUP -u $UID $USER
 
 # install the erpf command
 COPY target/*_completion.sh /etc/bash-completion.d/
-COPY --chown=$USER:$GROUP commands/erpf /usr/bin/
+COPY target/erp-cli-fhir.zip /tmp/erp-cli-fhir.zip
+RUN unzip /tmp/erp-cli-fhir.zip -d /tmp/erpf \
+    && mv /tmp/erpf/bin/* /usr/bin \
+    && mv /tmp/erpf/lib/* /usr/lib \
+    && rm -rf /tmp/erpf \
+    && rm /tmp/erp-cli-fhir.zip
+
+# install manpages and bash-completion
 COPY target/generated-docs/*.1 /usr/man/man1/
 RUN echo 'for bcfile in /etc/bash-completion.d/* ; do . ${bcfile}; done' >> /etc/zsh/zshrc \
     && mandb \
     && export LC_CTYPE=en_US.UTF-8
 
+# install oh-my-zsh as gematik user
 USER gematik
-
-# install oh-my-zsh
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" --\
             -x \
-            -t fletcherm \
+            -t robbyrussell \
             -p https://github.com/zsh-users/zsh-history-substring-search \
             -p https://github.com/zsh-users/zsh-autosuggestions \
             -p https://github.com/zsh-users/zsh-completions
 
-# install the main app
-COPY --chown=$USER:$GROUP target/erp-cli-fhir-jar-with-dependencies.jar $USER_HOME/erp-cli-fhir.jar
-
-WORKDIR /mnt/shared
+WORKDIR /home/gematik
+CMD ["/bin/zsh"]

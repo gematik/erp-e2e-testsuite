@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,9 +130,7 @@ class PageElementTest {
   }
 
   static Stream<Arguments> shouldExtractLabelFromXpath() {
-    return Stream.of(
-        arguments(CardWall.CARD_PARING_GO_BACK_BUTTON, "Zurück"),
-        arguments(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON, "debug_enable_virtual_egk"));
+    return Stream.of(arguments(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON, "debug_enable_virtual_egk"));
   }
 
   @Test

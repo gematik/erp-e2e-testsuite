@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 package de.gematik.test.erezept.client.usecases;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -46,5 +47,14 @@ class TaskGetByVsdmExamEvidenceCommandTest {
     val cmd = new TaskGetByExamEvidenceCommand();
     val actual = cmd.getRequestLocator();
     assertEquals("/Task", actual);
+  }
+
+  @Test
+  void ShouldBuildAdditionalQuery() {
+    val cmd =
+        new TaskGetByExamEvidenceCommand("")
+            .andAdditionalQuery(IQueryParameter.search().withOffset(5).createParameter());
+    assertNotNull(cmd);
+    assertEquals("/Task?pnw=&__offset=5", cmd.getRequestLocator());
   }
 }

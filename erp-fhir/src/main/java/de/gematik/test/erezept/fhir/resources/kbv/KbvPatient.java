@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import de.gematik.test.erezept.fhir.resources.*;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.*;
-import java.util.concurrent.atomic.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.hl7.fhir.r4.model.*;
@@ -72,11 +72,7 @@ public class KbvPatient extends Patient implements ErpFhirResource {
   private String getInsuranceKindCode() {
     return this.getIdentifier().stream()
         .map(id -> id.getType().getCodingFirstRep())
-        .filter(
-            coding ->
-                coding
-                    .getSystem()
-                    .equals(DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl()))
+        .filter(DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS::match)
         .map(Coding::getCode)
         .findFirst()
         .orElseThrow(
@@ -156,6 +152,29 @@ public class KbvPatient extends Patient implements ErpFhirResource {
   public String getFullname() {
     val hn = this.getNameFirstRep();
     return format("{0}, {1}", hn.getFamily(), hn.getGivenAsSingleString());
+  }
+
+  public String getFamilyName() {
+    return this.getNameFirstRep().getFamily();
+  }
+
+  public String getGivenName() {
+    val given = this.getNameFirstRep().getGiven().stream().map(PrimitiveType::getValue).toList();
+    return String.join(" ", given);
+  }
+
+  public String getAddressCity() {
+    return this.getAddressFirstRep().getCity();
+  }
+
+  public String getAddressPostalCode() {
+    return this.getAddressFirstRep().getPostalCode();
+  }
+
+  public String getAddressStreet() {
+    return this.getAddressFirstRep().getLine().stream()
+        .map(PrimitiveType::getValue)
+        .collect(Collectors.joining(" "));
   }
 
   @Override

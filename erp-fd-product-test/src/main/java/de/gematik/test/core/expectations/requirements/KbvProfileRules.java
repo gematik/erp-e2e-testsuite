@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ public enum KbvProfileRules implements RequirementsSet {
       "UNFALLKENNZEICHEN", "Unfallkennzeichen müssen den Regeln der Profiling entsprechen"),
   EXTENDED_VALUE_SET_DARREICHUNGSFORMEN(
       "EXTENDED_DARREICHUNG", "Aktualisierte Schlüsseltabelle für Darreichungsformen"),
+  EXTENDED_VALUE_SET_DMPKENNZEICHEN(
+      "EXTENDED_DMPKENNZEICHEN", "Aktualisierte Schlüsseltabelle für DmpKennzeichen"),
 
   SUPPLY_REQUEST_AND_MEDICATION_REQUEST(
       "VERORDNUNGSDATENSATZ_OHNE_MEDICATION_REQUEST",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package de.gematik.test.konnektor.commands;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.Hba;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.konnektor.PinType;
 import de.gematik.test.konnektor.cfg.KonnektorModuleFactory;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.SmartcardFactory;
+import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import java.nio.file.Path;
 import lombok.val;
@@ -41,9 +43,9 @@ class ReadVsdCommandTest {
 
   @BeforeAll
   static void setUp() {
-    val smartCardArchive = SmartcardFactory.getArchive();
+    val smartCardArchive = SmartcardArchive.fromResources();
     hba = smartCardArchive.getHbaByICCSN("80276883110000095767");
-    egk = smartCardArchive.getEgkByICCSN("80276881040001935352");
+    egk = smartCardArchive.getEgkByICCSN("80276883110000113311");
 
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
 
@@ -61,6 +63,7 @@ class ReadVsdCommandTest {
 
     val pinResponseType =
         new VerifyPinCommand(hbaCardHandle, PinType.PIN_CH).execute(ctx, mockKonnektor);
+    assertEquals(PinResultEnum.OK, pinResponseType.getPinResult());
 
     val readVsdCommand =
         new ReadVsdCommand(egkCardHandle, hbaCardHandle, true, true).execute(ctx, mockKonnektor);

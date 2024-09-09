@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.fhir.parser;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
@@ -29,7 +30,6 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.RegExUtil;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ class ParserTest extends ParsingTest {
 
     auditEvents.stream()
         .map(filename -> basePath + filename)
-        .map(ResourceUtils::readFileFromResource)
+        .map(ResourceLoader::readFileFromResource)
         .forEach(
             content -> {
               val auditEvent = parser.decode(ErxAuditEvent.class, content);
@@ -96,12 +96,12 @@ class ParserTest extends ParsingTest {
   @Test
   void shouldParseOfficialOldKbvBundleResources() {
     val kbvBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
+        ResourceLoader.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
 
     kbvBundleResources.forEach(
         file -> {
           log.info(format("Parse KBV Bundle {0}", file.getName()));
-          val content = ResourceUtils.readFileFromResource(file);
+          val content = ResourceLoader.readString(file);
           val kbvBundle = parser.decode(KbvErpBundle.class, content);
           assertNotNull(kbvBundle);
 
@@ -132,12 +132,12 @@ class ParserTest extends ParsingTest {
   @Test
   void shouldParseOfficialNewKbvBundleResources() {
     val kbvBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.1.0/bundle");
+        ResourceLoader.getResourceFilesInDirectory("fhir/valid/kbv/1.1.0/bundle");
 
     kbvBundleResources.forEach(
         file -> {
           log.info(format("Parse KBV Bundle {0}", file.getName()));
-          val content = ResourceUtils.readFileFromResource(file);
+          val content = ResourceLoader.readString(file);
           val kbvBundle = parser.decode(KbvErpBundle.class, content);
           assertNotNull(kbvBundle);
 
@@ -166,7 +166,7 @@ class ParserTest extends ParsingTest {
   void shouldParseResourceWithoutExpectedClass() {
     val id = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
     val content =
-        ResourceUtils.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
+        ResourceLoader.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
 
     val r1 = parser.decode(content, EncodingType.XML);
     assertTrue(r1.getId().contains(id));
@@ -182,7 +182,7 @@ class ParserTest extends ParsingTest {
         .forEach(
             encoding -> {
               val content =
-                  ResourceUtils.readFileFromResource(
+                  ResourceLoader.readFileFromResource(
                       format("fhir/valid/dav/{0}.{1}", id, encoding.toFileExtension()));
               val resource = parser.decode(content);
               assertTrue(resource.getId().contains(id));
@@ -194,7 +194,7 @@ class ParserTest extends ParsingTest {
   void shouldGetConcreteKbvTypeFromTypeHints() {
     val id = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
     val content =
-        ResourceUtils.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
+        ResourceLoader.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
     val resource = parser.decode(content);
     assertTrue(resource.getId().contains(id));
     assertEquals(KbvErpBundle.class, resource.getClass());
@@ -210,7 +210,7 @@ class ParserTest extends ParsingTest {
   @Disabled("cost too much test-time and is not very useful")
   void roundtripAllKbvBundles() {
     val basePath = "fhir/valid/kbv/1.0.2/bundle/";
-    val kbvBundle = ResourceUtils.getResourceFilesInDirectory(basePath);
+    val kbvBundle = ResourceLoader.getResourceFilesInDirectory(basePath);
 
     kbvBundle.stream()
         .map(file -> basePath + file.getName())

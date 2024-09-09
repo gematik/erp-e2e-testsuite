@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,6 @@ import org.openqa.selenium.By;
 @RequiredArgsConstructor
 @SuppressWarnings({"java:S1192"}) // it's okay to duplicate string literals here
 public enum CardWall implements PageElement {
-  SIGN_IN_SCREEN(
-      "Sign in",
-      () -> By.tagName("cardWall/next"),
-      () -> AppiumBy.accessibilityId("cdw_txt_intro_description")),
   NEXT_BUTTON(
       "Next Button",
       () -> By.tagName("CardWall.ContinueButton"),
@@ -68,9 +64,6 @@ public enum CardWall implements PageElement {
           AppiumBy.iOSNsPredicateString(
               "type == \"XCUIElementTypeButton\" AND name == \"cdw_btn_rc_next\" AND label =="
                   + " \"Karte verbinden\"")),
-
-  CARD_PARING_GO_BACK_BUTTON(
-      "Go back button in card paring screen", null, () -> AppiumBy.xpath("//*[@label='Zurück']")),
   ;
 
   private final String elementName;

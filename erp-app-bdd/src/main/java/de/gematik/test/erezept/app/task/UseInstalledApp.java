@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package de.gematik.test.erezept.app.task;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.DebugSettings;
@@ -28,7 +29,6 @@ import de.gematik.test.erezept.app.task.ios.SetVirtualEgkOnIOS;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.SmartcardArchive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -49,7 +49,7 @@ public class UseInstalledApp implements Task {
   @Step("{0} erstellt sich ein Benutzerprofil in der App von #deviceOwner")
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(deviceOwner, UseIOSApp.class);
-    val userConfig = SafeAbility.getAbility(actor, UseAppUserConfiguration.class);
+    val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
     app.logEvent(format("Erstellen eines zweiten Benutzerprofils für {0}", actor.getName()));
 
     actor.can(app); // new the actor should be able to use the app of the device owner

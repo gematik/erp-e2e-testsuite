@@ -32,6 +32,7 @@ import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -39,7 +40,8 @@ import org.junit.runner.RunWith;
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
-@DisplayName("E-Rezept Reject als Apotheke")
+@DisplayName("E-Rezept als Apotheke zurückgeben")
+@Tag("UseCase:Reject")
 public class TaskRejectUsecase extends ErpTest {
 
   @Actor(name = "Hanna Bäcker")

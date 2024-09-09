@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import java.time.Period;
@@ -35,14 +35,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class KbvErpMedicationRequestTest extends ParsingTest {
-  private final String BASE_PATH = "fhir/valid/kbv/1.0.2/medicationrequest/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.0.2/medicationrequest/";
 
   @Test
   void encodingSingleValidMedicationRequest() {
     val expectedID = "0587787f-3f1b-4578-a412-ce5bae8215b9";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertNotNull(medicationRequest);
@@ -65,7 +65,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
         "fhir/valid/kbv/1.1.0/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml"
       })
   void shouldFindAccidents(String file) {
-    val content = ResourceUtils.readFileFromResource(file);
+    val content = ResourceLoader.readFileFromResource(file);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val medicationRequest = kbvBundle.getMedicationRequest();
 
@@ -83,7 +83,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
         "fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"
       })
   void shouldFindAccidentsAtWork(String file) {
-    val content = ResourceUtils.readFileFromResource(file);
+    val content = ResourceLoader.readFileFromResource(file);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val medicationRequest = kbvBundle.getMedicationRequest();
 
@@ -102,7 +102,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
         "fhir/valid/kbv/1.1.0/bundle/218b581d-ccbe-480e-b8d7-f5f9b925e8c4.xml"
       })
   void shouldFindAccidentsOccupationalDisease(String file) {
-    val content = ResourceUtils.readFileFromResource(file);
+    val content = ResourceLoader.readFileFromResource(file);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val medicationRequest = kbvBundle.getMedicationRequest();
 
@@ -119,7 +119,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertFalse(medicationRequest.getNoteText().isPresent());
@@ -133,7 +133,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertTrue(medicationRequest.isMultiple());
@@ -145,11 +145,11 @@ class KbvErpMedicationRequestTest extends ParsingTest {
 
   @Test
   void shouldDefaultSubstitutionToFalse() {
-    val bundle = KbvErpBundleBuilder.faker().build();
+    val bundle = KbvErpBundleFaker.builder().fake();
     val medicationRequest = bundle.getMedicationRequest();
 
     medicationRequest.setSubstitution(null);
-    assertFalse(bundle.isSubstitutionAllowed());
+    assertFalse(bundle.getMedicationRequest().isSubstitutionAllowed());
   }
 
   @Test
@@ -157,7 +157,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertTrue(medicationRequest.isMultiple());
@@ -173,7 +173,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertTrue(medicationRequest.isMultiple());
@@ -201,7 +201,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertTrue(medicationRequest.isMultiple());
@@ -232,7 +232,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d5e";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertTrue(medicationRequest.isMultiple());
@@ -251,7 +251,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertFalse(medicationRequest.getNoteText().isPresent());
@@ -274,7 +274,7 @@ class KbvErpMedicationRequestTest extends ParsingTest {
     val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertFalse(medicationRequest.getNoteText().isPresent());

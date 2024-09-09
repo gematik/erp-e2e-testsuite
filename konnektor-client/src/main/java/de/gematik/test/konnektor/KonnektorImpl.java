@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,9 +89,9 @@ public class KonnektorImpl implements Konnektor {
     val start = Instant.now();
     val response = cmd.execute(ctx, serviceProvider);
     val duration = Duration.between(start, Instant.now());
-    log.info(
+    log.trace(
         format(
-            "Received Response for {0} from {1} within ",
+            "Received Response for {0} from {1} within {2}",
             cmd.getClass().getSimpleName(), this, duration.toMillis()));
     return new KonnektorResponse<>(response, duration);
   }

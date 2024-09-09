@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,17 @@
 package de.gematik.test.erezept.fhir.parser.profiles;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.util.*;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
-import lombok.*;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.ResourceLoader;
+import lombok.val;
 import org.hl7.fhir.r4.model.Configuration;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -48,12 +52,13 @@ class ProfileExtractorTest {
       strings = {
         "fhir/valid/erp/1.2.0/chargeitembundle/a05a235a-a214-11ed-a8fc-0242ac120002.xml",
         "fhir/invalid/no_profiles_bundle.xml",
+        "fhir/invalid/no_profile_value_bundle.xml",
         "fhir/invalid/no_metas_bundle.xml",
         "fhir/invalid/invalid_bundle_type.xml",
         "simple/sample_01.xml"
       })
   void shouldNotFailOnNoProfilesInSearchsets(String filePath) {
-    val content = ResourceUtils.readFileFromResource(filePath);
+    val content = ResourceLoader.readFileFromResource(filePath);
     val p = ProfileExtractor.extractProfile(content);
     assertTrue(p.isEmpty());
   }
@@ -65,7 +70,7 @@ class ProfileExtractorTest {
         "fhir/invalid/missing_root_profile_collection.xml"
       })
   void shouldFindProfileFromCollectionChildren(String filePath) {
-    val content = ResourceUtils.readFileFromResource(filePath);
+    val content = ResourceLoader.readFileFromResource(filePath);
     val p = ProfileExtractor.extractProfile(content);
     assertTrue(p.isPresent());
   }
@@ -73,12 +78,12 @@ class ProfileExtractorTest {
   @Test
   void shouldExtractXmlProfiles() {
     val kbvBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
+        ResourceLoader.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
     val expectedProfile = "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle|1.0.2";
 
     kbvBundleResources.forEach(
         file -> {
-          val content = ResourceUtils.readFileFromResource(file);
+          val content = ResourceLoader.readString(file);
           val profile = ProfileExtractor.extractProfile(content);
           assertEquals(expectedProfile, profile.orElseThrow());
         });
@@ -88,7 +93,7 @@ class ProfileExtractorTest {
   void shouldExtractJsonProfiles() {
     val basePath = "fhir/valid/erp/1.1.1/";
     val fileName = "Task.json";
-    val content = ResourceUtils.readFileFromResource(basePath + fileName);
+    val content = ResourceLoader.readFileFromResource(basePath + fileName);
     val profile = ProfileExtractor.extractProfile(content);
 
     val expectedProfile = "https://gematik.de/fhir/StructureDefinition/ErxTask|1.1.1";
@@ -111,7 +116,7 @@ class ProfileExtractorTest {
   void shouldUnprofiledDetectSearchSets(String resourcePath) {
     val base = "fhir/valid";
     val resource = format("{0}/{1}", base, resourcePath);
-    val content = ResourceUtils.readFileFromResource(resource);
+    val content = ResourceLoader.readFileFromResource(resource);
     assertTrue(ProfileExtractor.isUnprofiledSearchSet(content));
   }
 
@@ -126,12 +131,12 @@ class ProfileExtractorTest {
   void shouldPassOtherResources(String resourcePath) {
     val base = "fhir/valid";
     val resource = format("{0}/{1}", base, resourcePath);
-    val content = ResourceUtils.readFileFromResource(resource);
+    val content = ResourceLoader.readFileFromResource(resource);
     assertFalse(ProfileExtractor.isUnprofiledSearchSet(content));
   }
 
   @Test
   void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(ProfileExtractor.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ProfileExtractor.class));
   }
 }

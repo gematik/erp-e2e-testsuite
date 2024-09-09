@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,33 +21,33 @@ import lombok.Getter;
 public enum ErpAfos implements RequirementsSet {
   A_19018("A_19018", "Rollenprüfung Verordnender stellt Rezept ein"),
   A_19019("A_19019", "Generierung Rezept-ID"),
-  A_19569_03("A_19569_03", "Task abrufen - Versicherter - Suchparameter Task"),
+  A_19569("A_19569-03", "Task abrufen - Versicherter - Suchparameter Task"),
   A_19021("A_19021", "Generierung AccessCode"),
   A_19022("A_19022", "Rollenprüfung Verordnender aktiviert Rezept"),
   A_19112("A_19112", "Parametrierung Task für Workflow-Typ"),
-  A_19113_01("A_19113-01", "Rollenprüfung Versicherter oder Apotheker liest Rezept"),
+  A_19113("A_19113-01", "Rollenprüfung Versicherter oder Apotheker liest Rezept"),
   A_19114("A_19114", "Task im Status Draft nach Erstellung"),
   A_19128("A_19128", "Task im Status Ready nach Aktivierung"),
   A_19166("A_19166", "Rollenprüfung Abgebender ruft Rezept ab"),
-  A_19168_01("A_1968-01", "Task akzeptieren - Rezept bereits in Abgabe oder Bearbeitung"),
+  A_19168("A_1968-01", "Task akzeptieren - Rezept bereits in Abgabe oder Bearbeitung"),
   A_19169("A_19169", "Generierung Secret, Statuswechsel in Abgabe und Rückgabewert"),
   A_19230("A_19230", "Rollenprüfung Abgebender vollzieht Abgabe des Rezepts"),
-  A_19248_02("A_19248-02", "Schemaprüfung und Speicherung MedicationDispense"),
+  A_19248("A_19248-02", "Schemaprüfung und Speicherung MedicationDispense"),
   A_19233(
-      "A_19233_05",
+      "A_19233-05",
       "Base64Binary-Ressource mit Binary.data = <base64-codierter Hashwert aus der QES-Signatur des"
           + " dem Task zugrunde liegenden Verordnungsdatensatzes>"),
 
   A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
-  A_19514_02("A_19514-02", "HTTP Status-Codes"),
-  A_19514_03("A_19514-03", "HTTP Status-Codes"),
-  A_19520_01("A_19520_01", "E-Rezept-Fachdienst - Nachrichten abrufen - für Empfänger filtern"),
+  A_19514("A_19514-03", "HTTP Status-Codes"),
+  A_19520("A_19520-01", "E-Rezept-Fachdienst - Nachrichten abrufen - für Empfänger filtern"),
   A_19521("A_19521", "E-Rezept-Fachdienst - Nachrichten als abgerufen markieren"),
-  A_19522_01("A_19522_01", " E-Rezept-Fachdienst - Nachrichtenabruf Suchparameter"),
+  A_19522("A_19522-01", " E-Rezept-Fachdienst - Nachrichtenabruf Suchparameter"),
   A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
-  A_21782_01("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
+  A_21782("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
   A_22110("A_22110", "Task akzeptieren - Flowtype 200/209 - Einwilligung ermitteln"),
+  A_22136_01("A_22136_01", "Abrechnungsinformation bereitstellen – FHIR-Validierung ChargeItem"),
   A_22154("A_22154", " Consent löschen - alles Löschen verbieten ohne QuerryParam ?category"),
   A_22155("A_22155", "E-Rezept-Fachdienst - Consent löschen - Rollenprüfung Versicherter"),
   A_22158("A_22158", "E-Rezept-Fachdienst - Consent löschen - Löschen der Consent"),
@@ -60,7 +60,7 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Consent schreiben – nur eine Einwilligung CHARGCONS pro KVNR"),
   A_22289("A_22289", "E-Rezept-Fachdienst - Consent schreiben - Prüfung KVNR"),
   A_22487("A_22487", "Prüfregel Ausstellungsdatum"),
-  A_22627_01("A_22627-01", "Mehrfachverordnung - zulässige Flowtype"),
+  A_22627("A_22627-01", "Mehrfachverordnung - zulässige Flowtype"),
   A_22628("A_22628", "Mehrfachverordnung - Numerator-Denominator kleiner 5"),
   A_22629("A_22629", "Mehrfachverordnung - Denominator größer 1"),
   A_22630("A_22630", "Mehrfachverordnung - Numerator kleiner / gleich Denominator"),
@@ -132,7 +132,35 @@ public enum ErpAfos implements RequirementsSet {
       "A_24178",
       "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"
           + " in-progress"),
+  A_24436(
+      "A_24436",
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filter- und"
+          + " Sortierkriterien"),
+  A_24438(
+      "A_24438",
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Sortieren von"
+          + " Einträgen"),
+  A_24441(
+      "A_24441-01",
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - URL-Parameter"
+          + " für Paginierung"),
+  A_24442(
+      "A_24442-01",
+      "Handhabung der Rückgabe von mehreren FHIR-Objekten - Link Relations für Paginierung"),
+  A_24443(
+      "A_24443",
+      " E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Paginierung"),
+  A_24444(
+      "A_24444",
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Erhalten von"
+          + " URL-Parametern"),
+  A_24465("A_24465", "E-Rezept-Fachdienst - Bereitstellung von CA-Zertifikaten"),
   A_24466("A_24466", "E-Rezept-Fachdienst - Bereitstellung von Cross Zertifikaten"),
+  A_24467("A_24467", "E-Rezept-Fachdienst - Bereitstellung von OCSP Responses"),
+  A_24471(
+      "A_24471",
+      "E-Rezept-Fachdienst - Abrechnungsinformation bereitstellen - ChargeItem-ID=Rezept-ID"),
+  A_24901("A_24901", "E-Rezept-Fachdienst - Task aktivieren - Mehrfachverordnung - Schema ID"),
   A_25057("A_25057", "Deprecation Header für die Endpunkte /OCSPList und /CertList"),
   A_25206("A_25206", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3"),
   A_25207(
@@ -141,7 +169,12 @@ public enum ErpAfos implements RequirementsSet {
   A_25209(
       "A_25209",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - AcceptPN3 true- Filter Status,"
-          + " KVNR und Workflowtype");
+          + " KVNR und Workflowtype"),
+  A_25515(
+      "A_25515",
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filteroperatoren"
+          + " für Datumsabfragen"),
+  ;
   @Getter private final Requirement requirement;
 
   ErpAfos(String id, String description) {

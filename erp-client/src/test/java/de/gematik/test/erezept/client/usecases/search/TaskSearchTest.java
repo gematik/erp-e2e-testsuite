@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package de.gematik.test.erezept.client.usecases.search;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.Test;
@@ -28,13 +28,19 @@ class TaskSearchTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(TaskSearch.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(TaskSearch.class));
   }
 
   @Test
   void shouldBuildSimpleSortByAuthoredOn() {
     val cmd = TaskSearch.getSortedByAuthoredOn(SortOrder.ASCENDING);
     assertTrue(cmd.getRequestLocator().contains("_sort=authored-on"));
+  }
+
+  @Test
+  void shouldBuildSimpleSortByModified() {
+    val cmd = TaskSearch.builder().sortedByModified(SortOrder.DESCENDING).createCommand();
+    assertTrue(cmd.getRequestLocator().contains("_sort=-modified"));
   }
 
   @Test
@@ -46,6 +52,25 @@ class TaskSearchTest {
             .createCommand();
     assertTrue(cmd.getRequestLocator().contains("status=ready"));
     assertTrue(cmd.getRequestLocator().contains("_sort=-authored-on"));
+  }
+
+  @Test
+  void shouldBuildBundlePagingQuery() {
+    val cmd =
+        TaskSearch.builder()
+            .sortedByModified(SortOrder.DESCENDING)
+            .withOffset(50)
+            .withMaxCount(50)
+            .createCommand();
+    assertTrue(cmd.getRequestLocator().contains("__offset=50"));
+    assertTrue(cmd.getRequestLocator().contains("_count=50"));
+    assertTrue(cmd.getRequestLocator().contains("_sort=-modified"));
+  }
+
+  @Test
+  void shouldBuildCustomQuery() {
+    val cmd = TaskSearch.builder().withParameter("hello", "world").createCommand();
+    assertTrue(cmd.getRequestLocator().contains("hello=world"));
   }
 
   @Test

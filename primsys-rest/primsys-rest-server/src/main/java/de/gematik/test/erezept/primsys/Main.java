@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package de.gematik.test.erezept.primsys;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.primsys.exceptions.PrimSysErrorPageGenerator;
 import de.gematik.test.erezept.primsys.model.ActorContext;
-import de.gematik.test.smartcard.SmartcardFactory;
 import java.net.URI;
 import java.nio.file.Path;
 import lombok.SneakyThrows;
@@ -63,7 +63,7 @@ public class Main {
    */
   @SuppressWarnings("java:S4823")
   public static void main(String[] args) {
-    val sca = SmartcardFactory.getArchive();
+    val sca = SmartcardArchive.fromResources();
     PrimSysRestFactory factory;
 
     if (args.length > 0) {

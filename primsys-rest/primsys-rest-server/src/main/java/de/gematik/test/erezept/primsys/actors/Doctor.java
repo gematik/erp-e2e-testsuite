@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import de.gematik.bbriccs.smartcards.Hba;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
@@ -25,8 +27,6 @@ import de.gematik.test.erezept.primsys.data.actors.DoctorDto;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.SmartcardArchive;
 import lombok.Getter;
 import lombok.val;
 

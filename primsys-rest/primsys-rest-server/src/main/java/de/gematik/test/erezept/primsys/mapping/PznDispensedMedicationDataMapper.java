@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,23 +32,48 @@ public class PznDispensedMedicationDataMapper
   private final KVNR forKvnr;
   private final PrescriptionId forPrescription;
   private final String performerTelematikId;
+  private final boolean isSubstituted;
 
   public PznDispensedMedicationDataMapper(
       PznDispensedMedicationDto dto,
       KVNR forKvnr,
       PrescriptionId forPrescription,
-      String performerTelematikId) {
+      String performerTelematikId,
+      boolean isSubstituted) {
     super(dto);
     this.forKvnr = forKvnr;
     this.forPrescription = forPrescription;
     this.performerTelematikId = performerTelematikId;
+    this.isSubstituted = isSubstituted;
+  }
+
+  public static PznDispensedMedicationDataMapper from(
+      PznDispensedMedicationDto dto,
+      KVNR forKvnr,
+      PrescriptionId forPrescription,
+      String performerTelematikId,
+      boolean isSubstituted) {
+    return new PznDispensedMedicationDataMapper(
+        dto, forKvnr, forPrescription, performerTelematikId, isSubstituted);
+  }
+
+  public static PznDispensedMedicationDataMapper random() {
+    val dto = randomDto();
+    return new PznDispensedMedicationDataMapper(
+        dto, KVNR.random(), PrescriptionId.random(), GemFaker.fakerTelematikId(), true);
+  }
+
+  public static PznDispensedMedicationDto randomDto() {
+    return new PznDispensedMedicationDto();
   }
 
   @Override
   protected void complete() {
-    // simply reuse the PznMedicationDataMapper here!
+    // reuse the PznMedicationDataMapper here!
     PznMedicationDataMapper.from(dto);
     ensure(dto::getBatch, dto::setBatch, PznMedicationBatchDto::new);
+    ensure(dto::getWhenHandedOver, dto::setWhenHandedOver, Date::new);
+    ensure(dto::getWhenPrepared, dto::setWhenPrepared, Date::new);
 
     val batch = dto.getBatch();
     ensure(batch::getLotNumber, batch::setLotNumber, GemFaker::fakerLotNumber);
@@ -57,32 +82,20 @@ public class PznDispensedMedicationDataMapper
 
   @Override
   protected ErxMedicationDispense convertInternal() {
-    return ErxMedicationDispenseBuilder.forKvnr(forKvnr)
-        .performerId(performerTelematikId)
-        .prescriptionId(forPrescription)
-        .medication(PznMedicationDataMapper.from(dto).convert())
-        .status("completed")
-        .whenPrepared(new Date())
-        .batch(dto.getBatch().getLotNumber(), dto.getBatch().getExpiryDate())
-        .build();
-  }
+    val mdb =
+        ErxMedicationDispenseBuilder.forKvnr(forKvnr)
+            .performerId(performerTelematikId)
+            .prescriptionId(forPrescription)
+            .medication(PznMedicationDataMapper.from(dto).convert())
+            .status("completed")
+            .whenPrepared(dto.getWhenPrepared())
+            .whenHandedOver(dto.getWhenHandedOver())
+            .batch(dto.getBatch().getLotNumber(), dto.getBatch().getExpiryDate())
+            .wasSubstituted(isSubstituted);
 
-  public static PznDispensedMedicationDataMapper from(
-      PznDispensedMedicationDto dto,
-      KVNR forKvnr,
-      PrescriptionId forPrescription,
-      String performerTelematikId) {
-    return new PznDispensedMedicationDataMapper(
-        dto, forKvnr, forPrescription, performerTelematikId);
-  }
+    dto.getDosageInstructions().forEach(mdb::dosageInstruction);
+    dto.getNotes().forEach(mdb::note);
 
-  public static PznDispensedMedicationDataMapper random() {
-    val dto = randomDto();
-    return new PznDispensedMedicationDataMapper(
-        dto, KVNR.random(), PrescriptionId.random(), GemFaker.fakerTelematikId());
-  }
-
-  public static PznDispensedMedicationDto randomDto() {
-    return new PznDispensedMedicationDto();
+    return mdb.build();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ package de.gematik.test.erezept.primsys.actors;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.parser.DataFormatException;
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -30,12 +33,10 @@ import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmcB;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Base64;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -44,12 +45,13 @@ import org.hl7.fhir.r4.model.Resource;
 @Getter
 public abstract class BaseActor {
 
+  protected final CryptoSystem algorithm;
   private final ActorType type;
   private final String name;
   private final String identifier;
   private final ErpClient client;
   private final SmcB smcb;
-  protected final Algorithm algorithm;
+  private final ActorDto actorInfo;
 
   protected BaseActor(DoctorConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
     this.name = cfg.getName();
@@ -59,7 +61,8 @@ public abstract class BaseActor {
 
     this.client = ErpClientFactory.createErpClient(env, cfg);
     this.client.authenticateWith(smcb);
-    this.algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    this.algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+    this.actorInfo = this.initActorSummary();
   }
 
   protected BaseActor(
@@ -71,7 +74,14 @@ public abstract class BaseActor {
 
     this.client = ErpClientFactory.createErpClient(env, cfg);
     this.client.authenticateWith(smcb);
-    this.algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    this.algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+    this.actorInfo = this.initActorSummary();
+  }
+
+  @SneakyThrows
+  private static String createIdentifier(String name) {
+    val md = MessageDigest.getInstance("MD5"); // NOSONAR no cryptography involved here!
+    return new BigInteger(1, md.digest(name.getBytes(StandardCharsets.UTF_8))).toString(16);
   }
 
   public final <R extends Resource> ErpResponse<R> erpRequest(final ICommand<R> command) {
@@ -99,16 +109,26 @@ public abstract class BaseActor {
   }
 
   public ActorDto getActorSummary() {
+    return this.actorInfo;
+  }
+
+  private ActorDto initActorSummary() {
     val summary = new ActorDto();
     summary.setType(this.getType());
     summary.setName(this.getName());
     summary.setId(this.getIdentifier());
-    return summary;
-  }
+    summary.setTid(this.getSmcb().getTelematikId());
+    summary.setSmcb(this.getSmcb().getIccsn());
 
-  @SneakyThrows
-  private static String createIdentifier(String name) {
-    val md = MessageDigest.getInstance("MD5"); // NOSONAR no cryptography involved here!
-    return new BigInteger(1, md.digest(name.getBytes(StandardCharsets.UTF_8))).toString(16);
+    val pubk =
+        Base64.getEncoder()
+            .encodeToString(
+                this.getSmcb()
+                    .getAutCertificate()
+                    .getX509Certificate()
+                    .getPublicKey()
+                    .getEncoded());
+    summary.setPublicKey(pubk);
+    return summary;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 class AssignerOrganizationTest extends ParsingTest {
 
-  private final String BASE_PATH_1_0_2 = "fhir/valid/kbv/1.0.2/bundle/";
+  private static final String BASE_PATH_1_0_2 = "fhir/valid/kbv/1.0.2/bundle/";
 
   @Test
   void shouldGenerateAssignerOrganizationFromResource() {
@@ -42,7 +42,7 @@ class AssignerOrganizationTest extends ParsingTest {
     val expectedID = "sdf6s75f-d959-43f0-8ac4-sd6f7sd6";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_0_2 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_0_2 + fileName);
     assertTrue(parser.isValid(content));
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
 

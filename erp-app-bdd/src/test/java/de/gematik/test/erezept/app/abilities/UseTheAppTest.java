@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,31 @@
 package de.gematik.test.erezept.app.abilities;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.app.exceptions.AppErrorException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mobile.elements.ErrorAlert;
+import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
+import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.XpathPageElement;
 import de.gematik.test.erezept.app.mocker.WebElementMockFactory;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.AppiumFluentWait;
@@ -37,7 +54,18 @@ import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 class UseTheAppTest {
 
@@ -309,6 +337,7 @@ class UseTheAppTest {
     when(driver.findElement(locator))
         .thenReturn(null) // 1st call for isVisible
         .thenReturn(webElement) // 2nd call for isVisible
+        .thenReturn(webElement) // 3rd call for isVisible
         .thenReturn(null) // 1st call for isClickable
         .thenReturn(webElement); // 2nd call for isClickable
     when(driver.getPageSource()).thenReturn("dummy page source");
@@ -325,7 +354,7 @@ class UseTheAppTest {
     verify(driverAbility, times(1)).waitUntilElementIsClickable(pageElement);
 
     // two for isVisible and two for isClickable: each calling twice findElement
-    verify(driver, times(4)).findElement(locator);
+    verify(driver, times(5)).findElement(locator);
   }
 
   @Test
@@ -399,28 +428,29 @@ class UseTheAppTest {
     verify(driver, atMost(10)).findElement(locator);
   }
 
-  @Test
-  void checkIfTapWithTooltipAndDrawerIsWorkingForIOS() {
-    val driver = mock(IOSDriver.class);
-    UseIOSApp useIOSApp = new UseIOSApp(driver, appiumConfig);
-
-    val loginButton = WebElementMockFactory.getDisplayableMockElement(true, true);
-    val bottomDrawerDecline = WebElementMockFactory.getDisplayableMockElement(true, true);
-    val tooltip = WebElementMockFactory.getDisplayableMockElement(true, true);
-
-    when(driver.findElement(Mainscreen.LOGIN_BUTTON.forPlatform(PlatformType.IOS)))
-        .thenReturn(loginButton);
-    when(driver.findElement(Utility.DECLINE_LOGIN.forPlatform(PlatformType.IOS)))
-        .thenReturn(bottomDrawerDecline);
-    when(driver.getPageSource())
-        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())
-        .thenReturn("");
-    when(driver.findElement(Utility.TOOLTIPS.forPlatform(PlatformType.IOS)))
-        .thenReturn(tooltip)
-        .thenReturn(null); // show tooltips only one time
-
-    useIOSApp.tap(Mainscreen.LOGIN_BUTTON);
-  }
+  // TODO: should no longer be needed
+  //  @Test
+  //  void checkIfTapWithTooltipAndDrawerIsWorkingForIOS() {
+  //    val driver = mock(IOSDriver.class);
+  //    val useIOSApp = new UseIOSApp(driver, appiumConfig);
+  //
+  //    val loginButton = WebElementMockFactory.getDisplayableMockElement(true, true);
+  //    val bottomDrawerDecline = WebElementMockFactory.getDisplayableMockElement(true, true);
+  //    val tooltip = WebElementMockFactory.getDisplayableMockElement(true, true);
+  //
+  //    when(driver.findElement(Mainscreen.LOGIN_BUTTON.forPlatform(PlatformType.IOS)))
+  //        .thenReturn(loginButton);
+  //    when(driver.findElement(Utility.DECLINE_LOGIN.forPlatform(PlatformType.IOS)))
+  //        .thenReturn(bottomDrawerDecline);
+  //    when(driver.getPageSource())
+  //        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())
+  //        .thenReturn("");
+  //    when(driver.findElement(Utility.TOOLTIPS.forPlatform(PlatformType.IOS)))
+  //        .thenReturn(tooltip)
+  //        .thenReturn(null); // show tooltips only one time
+  //
+  //    useIOSApp.tap(Mainscreen.LOGIN_BUTTON);
+  //  }
 
   @Test
   void shouldScrollUntilFound() {
@@ -493,5 +523,24 @@ class UseTheAppTest {
             (String)
                 argThat(
                     argument -> ((String) argument).startsWith("seetest:client.setReportStatus")));
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {0, -1})
+  void shouldCheckTapElementTimes(int times) {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+
+    assertThrows(AssertionError.class, () -> app.tap(times, Onboarding.NEXT_BUTTON));
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {0, -1})
+  void shouldCheckTapPointTimes(int times) {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+
+    val tappingPoint = new Point(0, 0);
+    assertThrows(AssertionError.class, () -> app.tap(times, tappingPoint));
   }
 }

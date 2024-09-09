@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.cli.cfg;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
-import de.gematik.test.smartcard.Egk;
 import lombok.val;
 
 public class ConfigurationFactory {
@@ -28,7 +28,7 @@ public class ConfigurationFactory {
 
   public static PatientConfiguration createPatientConfigurationFor(Egk egk) {
     val pcfg = new PatientConfiguration();
-    pcfg.setName(egk.getOwner().getGivenName());
+    pcfg.setName(egk.getOwnerData().getGivenName());
     pcfg.setValidateResponse(false);
     return pcfg;
   }

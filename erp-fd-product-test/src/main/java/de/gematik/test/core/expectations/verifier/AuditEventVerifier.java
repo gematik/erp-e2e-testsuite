@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AuditEventVerifier {
-
   private final List<Function<String, String>> replacements;
 
   private boolean corresponds(ErxAuditEvent event, Representation representation) {
@@ -92,9 +91,22 @@ public class AuditEventVerifier {
         .accept();
   }
 
+  public static VerificationStep<ErxAuditEventBundle> hasAuditEventAtPosition(
+      ErxAuditEvent auditEvent, int position) {
+    Predicate<ErxAuditEventBundle> predicate =
+        bundle -> bundle.getAuditEvents().get(position).getId().equals(auditEvent.getId());
+    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
+            ErpAfos.A_24441.getRequirement(),
+            format(
+                "Die übergebenen AuditEventBundle muss an position {0} ein AuditEvent mit Id"
+                    + " {1} enthalten",
+                position, auditEvent.getId()))
+        .predicate(predicate)
+        .accept();
+  }
+
   @Getter
   public static class Builder {
-
     private final List<Function<String, String>> replacements = new ArrayList<>();
 
     public Builder withChecksum(String checksum) {

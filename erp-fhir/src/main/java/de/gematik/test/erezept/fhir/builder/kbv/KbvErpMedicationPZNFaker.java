@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,16 +27,16 @@ import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.val;
 
 public class KbvErpMedicationPZNFaker {
-  private final KbvErpMedicationPZNBuilder builder;
   private final Map<String, Consumer<KbvErpMedicationPZNBuilder>> builderConsumers =
       new HashMap<>();
 
-  private KbvErpMedicationPZNFaker(KbvErpMedicationPZNBuilder builder) {
-    this.builder = builder;
+  private KbvErpMedicationPZNFaker() {
     builderConsumers.put("pznMedication", b -> b.pzn(PZN.random(), fakerDrugName()));
     builderConsumers.put("type", b -> b.type(BaseMedicationType.MEDICAL_PRODUCT));
     builderConsumers.put("category", b -> b.category(MedicationCategory.C_00));
@@ -46,12 +46,14 @@ public class KbvErpMedicationPZNFaker {
         "supplyForm",
         b ->
             b.darreichungsform(
-                GemFaker.fakerValueSet(Darreichungsform.class, Darreichungsform.LYO)));
+                GemFaker.fakerValueSet(
+                    Darreichungsform.class,
+                    List.of(Darreichungsform.LIV, Darreichungsform.IID, Darreichungsform.LYO))));
     builderConsumers.put("amount", b -> b.amount(fakerAmount(), "Stk"));
   }
 
   public static KbvErpMedicationPZNFaker builder() {
-    return new KbvErpMedicationPZNFaker(KbvErpMedicationPZNBuilder.builder());
+    return new KbvErpMedicationPZNFaker();
   }
 
   public KbvErpMedicationPZNFaker withVersion(KbvItaErpVersion version) {
@@ -107,7 +109,12 @@ public class KbvErpMedicationPZNFaker {
   }
 
   public KbvErpMedication fake() {
+    return this.toBuilder().build();
+  }
+
+  public KbvErpMedicationPZNBuilder toBuilder() {
+    val builder = KbvErpMedicationPZNBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

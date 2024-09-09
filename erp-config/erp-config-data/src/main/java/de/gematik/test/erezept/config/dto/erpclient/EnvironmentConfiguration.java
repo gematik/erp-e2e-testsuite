@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import lombok.Data;
 public class EnvironmentConfiguration implements INamedConfigurationElement {
 
   private String name;
-  private String tslBaseUrl;
   private BackendRouteConfiguration ti;
   private BackendRouteConfiguration internet;
 }

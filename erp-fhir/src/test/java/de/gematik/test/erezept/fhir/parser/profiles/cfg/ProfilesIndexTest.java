@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ class ProfilesIndexTest {
   void shouldFindByVersionedProfile() {
     val index = ProfilesIndex.getInstance();
 
-    val exp = new VersionedProfile(CustomProfiles.KBV_ITA_ERP, KbvItaErpVersion.V1_0_2);
+    val exp = new VersionedProfile<>(CustomProfiles.KBV_ITA_ERP, KbvItaErpVersion.V1_0_2);
     val source = index.getProfile(exp);
     val match = source.getVersionedProfile();
     assertEquals(exp, match);

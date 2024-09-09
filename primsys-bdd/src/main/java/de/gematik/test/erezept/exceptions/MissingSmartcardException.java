@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,9 @@ package de.gematik.test.erezept.exceptions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.smartcard.SmartcardType;
-import net.serenitybdd.model.exceptions.TestCompromisedException;
+import de.gematik.bbriccs.smartcards.SmartcardType;
 
-public class MissingSmartcardException extends TestCompromisedException {
+public class MissingSmartcardException extends RuntimeException {
 
   public MissingSmartcardException(SmartcardType expected, String operation) {
     super(format("Smartcard of Type {0} required for {1} but not present", expected, operation));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetCommand;
 import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.values.Value;
-import de.gematik.test.smartcard.Egk;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import picocli.CommandLine;

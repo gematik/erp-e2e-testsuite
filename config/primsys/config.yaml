@@ -131,64 +131,70 @@ actors:
       egkIccsn: 80276881129999213224
 
     - name: Lucius 'ITSC' Fox
-      egkIccsn: 80276882250000100221
+      egkIccsn: 80276881700000400001
+
 
 environments:
   - name: TU
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     ti:
+      tslBaseUrl: http://download-test.tsl.telematik-test/ECC
       discoveryDocumentUrl: https://idp-test.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-test.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-test.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
     internet:
+      tslBaseUrl: https://download-test.tsl.ti-dienste.de/ECC
       discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-test.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
 
   - name: RU
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     ti:
+      tslBaseUrl: http://download-ref.tsl.telematik-test/ECC
       discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-ref.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
 
   - name: RU-DEV
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     ti:
+      tslBaseUrl: http://download-ref.tsl.telematik-test/ECC
       discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-dev.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
 
   - name: TITUS
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+
     ti:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://fd.erezept-instanz1.titus.gematik.solutions
       subscriptionServiceUrl: wss://subscription.erezept-instanz1.titus.gematik.solutions/subscription  # TODO: needs to be fixed!
       userAgent: DUMMY VALUE
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
 
   - name: LOCAL
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     ti:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
       fdBaseUrl: http://127.0.0.1:3000
       subscriptionServiceUrl: wss://127.0.0.1:3000/subscription
@@ -366,3 +372,27 @@ konnektors:
     cats:
       - ctId: CT_ID_0001
         url: https://ksp.ltuzd.telematik-test/kon19/cats
+
+  - name: RISE@hsk2
+    type: remote
+    profile: RISE
+    address: kon2.rise-tu.hsk.ltuzd.telematik-test
+    protocol: https
+    context:
+      mandantId: M1
+      clientSystemId: C1
+      workplaceId: W1
+      userId: user1
+    tls:
+      keyStore: hsk2_C1_ECC.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "123456"
+    basicAuth:
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: 02:42:0A:64:00:03
+        url: https://rise-tu.hsk.ltuzd.telematik-test:443/kon2/cats
+      - ctId: 02:42:0A:64:00:04
+        url: https://rise-tu.hsk.ltuzd.telematik-test:443/kon2/cats2

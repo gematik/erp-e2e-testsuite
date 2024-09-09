@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.val;
@@ -31,12 +31,14 @@ class ErxChargeItemSetTest {
     val set = new ErxChargeItemSet();
     set.addEntry()
         .setResource(
-            ErxChargeItemBuilder.faker(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_200))
-                .build());
+            ErxChargeItemFaker.builder()
+                .withPrescriptionId(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_200))
+                .fake());
     set.addEntry()
         .setResource(
-            ErxChargeItemBuilder.faker(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_200))
-                .build());
+            ErxChargeItemFaker.builder()
+                .withPrescriptionId(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_200))
+                .fake());
 
     assertEquals(2, set.getChargeItems().size());
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,34 @@
 package de.gematik.test.erezept.app.task;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.PrimSysBddFactory;
-import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.cfg.ErpAppConfiguration;
 import de.gematik.test.erezept.app.mobile.PlatformType;
-import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
+import de.gematik.test.erezept.app.mobile.elements.CardWall;
+import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
+import de.gematik.test.erezept.app.mobile.elements.Profile;
+import de.gematik.test.erezept.app.mobile.elements.ProfileSelectorElement;
+import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -43,7 +54,7 @@ import org.junit.jupiter.api.Test;
 
 class NavigateThroughCardwallTest {
 
-  private final SmartcardArchive sca = SmartcardFactory.getArchive();
+  private final SmartcardArchive sca = SmartcardArchive.fromResources();
   private final ErpAppConfiguration config =
       ConfigurationReader.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
   private final PrimSysBddFactory primsysConfig =
@@ -62,7 +73,7 @@ class NavigateThroughCardwallTest {
     val testActor = OnStage.theActorCalled((userName));
     givenThat(testActor).can(app);
     // simply take the config from alice for the tests
-    givenThat(testActor).can(UseAppUserConfiguration.forUser("Alice", config));
+    givenThat(testActor).can(UseConfigurationData.forUser("Alice", config));
   }
 
   @AfterEach
@@ -76,6 +87,7 @@ class NavigateThroughCardwallTest {
     val app = actor.abilityTo(UseIOSApp.class);
 
     when(app.getText(Profile.USER_KVNR)).thenReturn("X110406067");
+    when(app.isPresent(Settings.SETTINGS_HEADER_LINE)).thenReturn(false).thenReturn(true);
 
     val task =
         NavigateThroughCardwall.forEnvironment(primsysConfig.getActiveEnvironment())
@@ -90,7 +102,7 @@ class NavigateThroughCardwallTest {
     verify(app, times(1)).tap(Mainscreen.LOGIN_BUTTON);
     verify(app, times(1)).tap(CardWall.ADD_HEALTH_CARD_BUTTON);
 
-    verify(app, times(1)).input("123123", CardWall.CAN_INPUT_FIELD);
+    verify(app, times(1)).inputPassword("123123", CardWall.CAN_INPUT_FIELD);
     verify(app, times(1)).tap(CardWall.CAN_ACCEPT_BUTTON);
     verify(app, times(1)).inputPassword("123456", CardWall.PIN_INPUT_FIELD);
     verify(app, times(1)).tap(CardWall.PIN_ACCEPT_BUTTON);
@@ -99,7 +111,8 @@ class NavigateThroughCardwallTest {
     verify(app, times(1)).tap(CardWall.CONTINUE_AFTER_BIOMETRY_CHECK_BUTTON);
     verify(app, times(1)).tap(CardWall.START_NFC_READOUT_BUTTON);
 
-    verify(app, times(1)).tap(BottomNav.SETTINGS_BUTTON);
+    // clicked twice to ensure the SETTINGS_HEADER_LINE is present
+    verify(app, times(2)).tap(BottomNav.SETTINGS_BUTTON);
     verify(app, times(1)).tap(any(ProfileSelectorElement.class));
 
     val aliceIos = OnStage.theActorCalled((userName));

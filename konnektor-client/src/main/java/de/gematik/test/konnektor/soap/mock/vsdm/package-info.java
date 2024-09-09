@@ -19,4 +19,4 @@
     elementFormDefault = XmlNsForm.QUALIFIED)
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;

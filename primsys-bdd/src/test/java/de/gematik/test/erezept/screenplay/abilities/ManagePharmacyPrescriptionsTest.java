@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -23,7 +25,6 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -42,7 +43,9 @@ class ManagePharmacyPrescriptionsTest {
     val ability = ManagePharmacyPrescriptions.itWorksWith();
     assertTrue(ability.getAcceptedPrescriptions().isEmpty());
     assertTrue(ability.getAssignedPrescriptions().isEmpty());
-    assertTrue(ability.getDispensedPrescriptions().isEmpty());
+    assertTrue(ability.getClosedPrescriptions().isEmpty());
+    assertTrue(ability.getDispenseTimestamps().isEmpty());
+    assertTrue(ability.getReceiptsList().isEmpty());
     assertDoesNotThrow(ability::toString);
   }
 
@@ -67,10 +70,10 @@ class ManagePharmacyPrescriptionsTest {
     actor.can(erpClient);
 
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     OnStage.drawTheCurtain();

@@ -42,7 +42,7 @@ konnektors:
   - name: KOCO@kon7
     type: remote
     profile: CGM
-    address: eau.dev.top.local/kon7
+    address: ksp.ltuzd.telematik-test/kon7
     protocol: https
     context:
       mandantId: Mandant1
@@ -51,12 +51,41 @@ konnektors:
       userId: user1
     tls:
       keyStore: kon7_CS1.p12
-      keyStorePassword: "123123"
+      keyStorePassword: "DUMMY VALUE"
       trustStore: erpe2e_truststore.p12
-      trustStorePassword: "123123"
+      trustStorePassword: "DUMMY VALUE"
     basicAuth:
-      username: "user"
-      password: "123123"
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: CT_ID_0000
+        url: https://ksp.ltuzd.telematik-test/kon7/cats
+      - ctId: CT_ID_0001
+        url: https://ksp.ltuzd.telematik-test/kon7/cats2
+
+  - name: SECUNET@kon9
+    type: remote
+    profile: SECUNET
+    address: ksp.ltuzd.telematik-test/kon9
+    protocol: https
+    context:
+      mandantId: Mandant1
+      clientSystemId: CS1
+      workplaceId: AP1
+      userId: user1
+    tls:
+      keyStore: kon9_CS1.p12
+      keyStorePassword: "DUMMY VALUE"
+      trustStore: erpe2e_truststore.p12
+      trustStorePassword: "DUMMY VALUE"
+    basicAuth:
+      username: "DUMMY VALUE"
+      password: "DUMMY VALUE"
+    cats:
+      - ctId: daca044c-16df-4f5e-82c6-592d2590040a
+        url: https://ksp.ltuzd.telematik-test/kon9/cats
+      - ctId: 59e0cc5a-89f8-4b68-86df-487b036bb849
+        url: https://ksp.ltuzd.telematik-test/kon9/cats2
 
   - name: Soft-Konn
     type: local

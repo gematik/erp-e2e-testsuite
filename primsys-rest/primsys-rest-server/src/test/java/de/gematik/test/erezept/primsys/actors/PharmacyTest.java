@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package de.gematik.test.erezept.primsys.actors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.model.ActorContext;
-import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -29,8 +29,8 @@ class PharmacyTest extends TestWithActorContext {
   @Test
   void shouldGenerateEvidenceForEgk() {
     val pharma = ActorContext.getInstance().getPharmacies().get(0);
-    val eGK = SmartcardFactory.getArchive().getEgkCards().get(0);
-    val resp = pharma.requestEvidenceForEgk(eGK);
+    val egk = SmartcardArchive.fromResources().getEgk(0);
+    val resp = pharma.requestEvidenceForEgk(egk);
     assertNotNull(resp);
   }
 }

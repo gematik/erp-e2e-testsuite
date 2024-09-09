@@ -16,9 +16,17 @@
 
 package de.gematik.test.erezept.pharmacyserviceprovider.intergationtests;
 
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.test.erezept.pspwsclient.PharmaServiceProviderWSClient;
 import de.gematik.test.erezept.pspwsclient.dataobjects.DeliveryOption;
-import kong.unirest.Unirest;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import kong.unirest.core.Unirest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -29,15 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 class PSPIntegrationTest {

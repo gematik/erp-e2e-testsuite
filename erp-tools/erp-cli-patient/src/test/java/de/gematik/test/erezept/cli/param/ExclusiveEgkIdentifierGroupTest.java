@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.cli.param;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.smartcard.SmartcardFactory;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -45,9 +45,9 @@ class ExclusiveEgkIdentifierGroupTest {
 
   @Test
   void shouldAllowBoth() {
-    val sca = SmartcardFactory.getArchive();
-    val egk1 = sca.getEgkCards().get(0);
-    val egk2 = sca.getEgkCards().get(0);
+    val sca = SmartcardArchive.fromResources();
+    val egk1 = sca.getEgk(0);
+    val egk2 = sca.getEgk(0);
 
     val eegkip = new ExclusiveEgkIdentifierGroup();
     val cmdline = new CommandLine(eegkip);

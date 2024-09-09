@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,21 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class ErxAuditEventBundleTest {
+class ErxAuditEventBundleTest extends ParsingTest {
 
   @Test
   void shouldCorrectFilterAuditEvents() {
     val agentName = "Am Flughafen";
     val agentId = TelematikID.from("3-SMC-B-Testkarte-883110000116873");
-    val erxAuditEventBundle = FhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName);
+    val erxAuditEventBundle = ErxFhirTestResourceUtil.createErxAuditEventBundle(agentId, agentName);
 
     assertEquals(4, erxAuditEventBundle.getAuditEvents().size());
     assertEquals(4, erxAuditEventBundle.getAuditEvents(agentId).size());

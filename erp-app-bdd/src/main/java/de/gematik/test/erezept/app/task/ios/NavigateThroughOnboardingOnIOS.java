@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
-import static de.gematik.test.erezept.app.mobile.OnboardingScreen.*;
+import static de.gematik.test.erezept.app.mobile.OnboardingScreen.ANALYTICS_SCREEN;
+import static de.gematik.test.erezept.app.mobile.OnboardingScreen.FINISH_ALL;
+import static de.gematik.test.erezept.app.mobile.OnboardingScreen.SECURITY_SCREEN;
+import static de.gematik.test.erezept.app.mobile.OnboardingScreen.TERMS_AND_PRIVACY_SCREEN;
+import static de.gematik.test.erezept.app.mobile.OnboardingScreen.WELCOME_SCREEN;
 
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.OnboardingScreen;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,8 +83,16 @@ public class NavigateThroughOnboardingOnIOS implements Task {
         app.tap(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON);
         app.tap(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON);
       }
-    }
 
-    if (onboardingScreen.getiOSOrdinal() >= FINISH_ALL.getiOSOrdinal()) app.removeTooltips();
+      app.logEvent("Remove all Tooltips");
+      if (onboardingScreen.getiOSOrdinal() >= FINISH_ALL.getiOSOrdinal()) app.removeTooltips();
+
+      // in most cases a login overlay appears after that randomly: enforce the app to show it here
+      // to get rid of that overlay in the following steps
+      app.logEvent("Remove Login Overlay");
+      app.tap(BottomNav.PHARMACY_SEARCH_BUTTON);
+      app.tap(BottomNav.PRESCRIPTION_BUTTON);
+      app.tapIfDisplayed(2, Utility.DECLINE_LOGIN);
+    }
   }
 }

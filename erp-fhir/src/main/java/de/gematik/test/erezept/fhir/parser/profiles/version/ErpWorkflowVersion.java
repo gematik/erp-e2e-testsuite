@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErpWorkflowVersion implements ProfileVersion<ErpWorkflowVersion> {
   V1_1_1("1.1.1", LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2023, Month.JULY, 31)),
-  V1_2_0("1.2.0", LocalDate.of(2023, Month.AUGUST, 1), LocalDate.of(2070, Month.DECEMBER, 31));
+  V1_2_0("1.2.0", LocalDate.of(2023, Month.AUGUST, 1), LocalDate.of(2024, Month.OCTOBER, 31)),
+  V1_3_0("1.3.0", LocalDate.of(2024, Month.NOVEMBER, 1), LocalDate.of(2070, Month.JANUARY, 1));
 
   private final String version;
   private final LocalDate validFromDate;

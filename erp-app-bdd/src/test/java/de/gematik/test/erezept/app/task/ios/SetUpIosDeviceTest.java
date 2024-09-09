@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
-import static de.gematik.test.erezept.app.mocker.ConfigurationMocker.createErpActorConfig;
+import static de.gematik.test.erezept.app.mocker.ConfigurationMocker.createDefaultTestConfiguration;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
-import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.Profile;
@@ -35,29 +41,27 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SerenityJUnit5Extension.class)
 class SetUpIosDeviceTest {
 
-  private final SmartcardArchive smartcards = SmartcardFactory.getArchive();
+  private final SmartcardArchive smartcards = SmartcardArchive.fromResources();
   private Egk egk;
   private EnvironmentConfiguration environment;
-
   private String userName;
 
   @BeforeEach
   void init() {
     OnStage.setTheStage(new Cast() {});
-    this.egk = smartcards.getEgkCards().get(0);
+    this.egk = smartcards.getEgk(0);
     this.environment = new EnvironmentConfiguration();
     this.environment.setName("TU");
 
@@ -65,13 +69,12 @@ class SetUpIosDeviceTest {
     when(appAbility.getPlatformType()).thenReturn(PlatformType.IOS);
 
     // assemble the screenplay
-    userName = GemFaker.fakerName();
-    val theAppUser = OnStage.theActorCalled(userName);
+    this.userName = GemFaker.fakerName();
+    val theAppUser = OnStage.theActorCalled(this.userName);
     givenThat(theAppUser).can(appAbility);
     givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
 
-    egk = smartcards.getEgkCards().get(0);
-    givenThat(theAppUser).can(ProvideEGK.sheOwns(egk));
+    givenThat(theAppUser).can(ProvideEGK.sheOwns(this.egk));
   }
 
   @AfterEach
@@ -84,8 +87,9 @@ class SetUpIosDeviceTest {
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
 
-    val userConfigAbility =
-        UseAppUserConfiguration.from(createErpActorConfig(egk.getIccsn(), true));
+    val config = createDefaultTestConfiguration("Bob", egk.getIccsn(), true);
+
+    val userConfigAbility = UseConfigurationData.forUser("Bob", config);
     actor.can(userConfigAbility);
     when(app.getText(Profile.USER_KVNR)).thenReturn(egk.getKvnr());
 
@@ -113,8 +117,9 @@ class SetUpIosDeviceTest {
 
     when(app.getText(Profile.USER_KVNR)).thenReturn("X110406067");
 
-    val userConfigAbility =
-        UseAppUserConfiguration.from(createErpActorConfig(egk.getIccsn(), false));
+    val config = createDefaultTestConfiguration("Bob", egk.getIccsn(), true);
+
+    val userConfigAbility = UseConfigurationData.forUser("Bob", config);
     actor.can(userConfigAbility);
 
     try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {

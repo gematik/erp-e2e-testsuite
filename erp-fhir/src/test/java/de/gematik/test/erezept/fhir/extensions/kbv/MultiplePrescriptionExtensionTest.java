@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,11 @@
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import java.math.BigDecimal;
@@ -147,20 +151,26 @@ class MultiplePrescriptionExtensionTest {
 
   @Test
   void shouldCreateWithId() {
-    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).withId("123").withoutEndDate(false);
+    val mvo =
+        MultiplePrescriptionExtension.asMultiple(1, 4)
+            .withId(MultiplePrescriptionIdExtension.invalidId())
+            .withoutEndDate(false);
     val ext = mvo.asExtension(KbvItaErpVersion.V1_1_0);
 
-    val idExt = ext.getExtensionByUrl("ID");
+    val idExt = ext.getExtensionByUrl(MultiplePrescriptionIdExtension.URL);
     val mvoId = idExt.getValue().castToIdentifier(idExt.getValue()).getValue();
-    assertTrue(mvoId.contains("123"));
+    assertTrue(mvoId.contains("13061707"));
   }
 
   @Test
   void shouldIgnoreIdOnOldProfiles() {
-    val mvo = MultiplePrescriptionExtension.asMultiple(1, 4).withId("123").withoutEndDate(false);
+    val mvo =
+        MultiplePrescriptionExtension.asMultiple(1, 4)
+            .withId(MultiplePrescriptionIdExtension.invalidId())
+            .withoutEndDate(false);
     val ext = mvo.asExtension(KbvItaErpVersion.V1_0_2);
 
-    val idExt = ext.getExtensionByUrl("ID");
+    val idExt = ext.getExtensionByUrl(MultiplePrescriptionIdExtension.URL);
     assertNull(idExt);
   }
 }

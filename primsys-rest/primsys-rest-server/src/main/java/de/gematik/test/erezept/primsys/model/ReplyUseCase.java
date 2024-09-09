@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,38 @@ public class ReplyUseCase {
   public static Response replyPrescription(
       Pharmacy actor, String taskId, String kvnr, String supplyOption, String message) {
     var supplyOptionType = SupplyOptionsType.getSupplyOptionType(supplyOption);
-    return replyPrescription(actor, taskId, kvnr, supplyOptionType, message);
+    val sender = actor.getSmcb().getTelematikId();
+    return replyPrescription(actor, taskId, kvnr, supplyOptionType, message, sender);
+  }
+
+  public static Response replyPrescriptionWithSender(
+      Pharmacy actor,
+      String taskId,
+      String kvnr,
+      String supplyOption,
+      String message,
+      String sender) {
+    var supplyOptionType = SupplyOptionsType.getSupplyOptionType(supplyOption);
+    return replyPrescription(actor, taskId, kvnr, supplyOptionType, message, sender);
   }
 
   private static Response replyPrescription(
-      Pharmacy actor, String taskId, String kvnr, SupplyOptionsType type, String message) {
-    val erxComunication =
+      Pharmacy actor,
+      String taskId,
+      String kvnr,
+      SupplyOptionsType type,
+      String message,
+      String sender) {
+    val erxCommunication =
         ErxCommunicationBuilder.builder()
             .basedOnTaskId(taskId)
             .recipient(kvnr)
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(type)
+            .sender(sender)
             .buildReply(message);
-    val communicationPostCommand = new CommunicationPostCommand(erxComunication);
+
+    val communicationPostCommand = new CommunicationPostCommand(erxCommunication);
     val replyResponse = actor.erpRequest(communicationPostCommand);
 
     return Response.status(replyResponse.getStatusCode()).build();

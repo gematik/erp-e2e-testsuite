@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,13 @@ package de.gematik.test.konnektor.soap.mock;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.smartcard.*;
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.DummyEgk;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.Hba;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.SmartcardType;
+import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.ws.conn.cardservice.v8.Cards;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.FaultMessage;
@@ -57,7 +63,20 @@ public class MockKonnektor {
   }
 
   private void initCardsMap() {
-    val egks = smartcards.getEgkCards().stream().map(SmartcardWrapper::new);
+    // Note: this workaround here is required because we have eGKs without any stores which lead to
+    // Exceptions being thrown
+    val egks =
+        smartcards.getConfigsFor(SmartcardType.EGK).stream()
+            .map(
+                c -> {
+                  Egk egk;
+                  if (c.getStores().isEmpty()) {
+                    egk = DummyEgk.fromConfig(c);
+                  } else {
+                    egk = smartcards.getEgkByICCSN(c.getIccsn());
+                  }
+                  return new SmartcardWrapper(egk);
+                });
     val hbas = smartcards.getHbaCards().stream().map(SmartcardWrapper::new);
     val smcbs = smartcards.getSmcbCards().stream().map(SmartcardWrapper::new);
 
@@ -66,7 +85,8 @@ public class MockKonnektor {
     smcbs.forEach(smcb -> cardsMap.put(smcb.getCardHandle(), smcb));
   }
 
-  public byte[] signDocumentWith(String cardHandle, Algorithm algorithm, byte[] data)
+  public byte[] signDocumentWith(
+      String cardHandle, CryptoSystem algorithm, boolean isIncludeRevocationInfo, byte[] data)
       throws FaultMessage {
     val wrapper = cardsMap.get(cardHandle);
     if (wrapper == null) {
@@ -86,7 +106,7 @@ public class MockKonnektor {
             ? LocalSigner.signQES((Hba) smartcard, algorithm)
             : LocalSigner.signNonQES((SmcB) smartcard, algorithm);
 
-    return signer.signDocument(data);
+    return signer.signDocument(isIncludeRevocationInfo, data);
   }
 
   public boolean verifyDocument(byte[] data) {

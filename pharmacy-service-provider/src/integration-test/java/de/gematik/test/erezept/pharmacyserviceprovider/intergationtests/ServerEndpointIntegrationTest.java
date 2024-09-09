@@ -16,7 +16,12 @@
 
 package de.gematik.test.erezept.pharmacyserviceprovider.intergationtests;
 
-import kong.unirest.Unirest;
+import static de.gematik.test.erezept.pharmacyserviceprovider.Main.VERSIONNUMBER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Map;
+import java.util.Random;
+import kong.unirest.core.Unirest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -24,12 +29,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.Map;
-import java.util.Random;
-
-import static de.gematik.test.erezept.pharmacyserviceprovider.Main.VERSIONNUMBER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 class ServerEndpointIntegrationTest {

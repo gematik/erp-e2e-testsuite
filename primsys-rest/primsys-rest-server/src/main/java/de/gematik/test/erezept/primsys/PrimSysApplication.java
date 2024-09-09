@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.primsys;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.gematik.test.erezept.primsys.exceptions.GenericExceptionMapper;
+import de.gematik.test.erezept.primsys.exceptions.IdpClientExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.JacksonExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.NotFoundExceptionMapper;
 import io.swagger.v3.jaxrs2.SwaggerSerializers;
@@ -86,8 +87,9 @@ public class PrimSysApplication extends ResourceConfig {
     register(provider);
     register(new CORSFilter());
     register(JacksonExceptionMapper.class);
-    register(GenericExceptionMapper.class);
     register(NotFoundExceptionMapper.class);
+    register(IdpClientExceptionMapper.class);
+    register(GenericExceptionMapper.class);
 
     property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, "true");
 

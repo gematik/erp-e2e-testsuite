@@ -1,0 +1,54 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "DispenseOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/DispenseOperationDefinition",
+  "status": "active",
+  "version": "1.3",
+  "date": "2024-05-21",
+  "name": "Dispense",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "The operation $dispense lets the pharmacy perform a dispense for a medication without changing the status of the task. This actions lets a frontend display that a medication has been dispensed before it is closed by the pharmacy.",
+  "code": "dispense",
+  "outputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense",
+  "parameter": [
+    {
+      "name": "secret",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "The secret parameter that lets a pharmacy access the Task exclusively as part of the URL. This paramter must be equal to the value stored in Task.identifier:Secret. Otherwise the Operation aborts with an error.",
+      "type": "string"
+    },
+    {
+      "name": "MedicationDispense",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Information on dispensed Medication(s)",
+      "type": "canonical",
+      "targetProfile": [
+        "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.3",
+        "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_CloseOperationInputBundle|1.3"
+      ]
+    },
+    {
+      "name": "MedicationDispense",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The MedicationDispense that has been transmitted by the pharmacy as a confirmation, that it has been successfully uploaded.",
+      "type": "canonical",
+      "targetProfile": [
+        "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.3",
+        "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_CloseOperationInputBundle|1.3"
+      ]
+    }
+  ]
+}

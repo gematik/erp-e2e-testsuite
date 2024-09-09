@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ import lombok.*;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 
+@Getter
 @AllArgsConstructor
 public class VerificationStep<T> {
-  @Getter private final Predicate<T> predicate;
-  @Getter private final Requirement requirement;
-  @Getter private final String expectation;
+  private final Predicate<T> predicate;
+  private final Requirement requirement;
+  private final String expectation;
 
   private Supplier<String> failMessageSupplier(T actual) {
     return () -> format("{1} hat die Erwartung ''{0}'' nicht erfüllt", expectation, actual);

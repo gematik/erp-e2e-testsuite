@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class ProfileExtractor {
   public static boolean isUnprofiledSearchSet(String content) {
     return encodeContent(content)
         .filter(root -> extractProfileFromRoot(root).isEmpty())
-        .map(root -> isOfType(root, BundleType.SEARCHSET))
+        .map(root -> isOfType(root, BundleType.SEARCHSET) || isOfType(root, BundleType.COLLECTION))
         .orElse(false);
   }
 
@@ -171,7 +171,8 @@ public class ProfileExtractor {
     var profile = meta.findValue(PROFILE_LITERAL);
     if (profile == null) return false;
     profile = profile.isArray() ? profile.get(0) : profile.get(VALUE_LITERAL);
-    return !profile.asText().isEmpty();
+    if (profile == null) return false;
+    return !profile.asText("").isEmpty();
   }
 
   private static boolean isOfType(JsonNode root, BundleType type) {

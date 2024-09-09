@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@ package de.gematik.test.cardterminal;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.cats.CatsClient;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorContextConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorType;
@@ -28,8 +32,6 @@ import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.KonnektorImpl;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
 import de.gematik.test.konnektor.util.CardsUtil;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.cardservice.v8.CardInfoType;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
@@ -69,7 +71,7 @@ class CardTerminalManagerTest {
   @SneakyThrows
   @BeforeEach
   void setUp() {
-    smartcards = SmartcardFactory.getArchive();
+    smartcards = SmartcardArchive.fromResources();
 
     context = new KonnektorContextConfiguration();
     context.setMandantId("Mandant1");

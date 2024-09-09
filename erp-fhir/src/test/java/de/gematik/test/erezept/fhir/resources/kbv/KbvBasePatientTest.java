@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
@@ -29,14 +29,14 @@ import org.junit.jupiter.api.Test;
 
 class KbvBasePatientTest extends ParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/kbv/1.0.2/patient/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.0.2/patient/";
 
   @Test
   void encodeErwinFischer() {
     val fileExtension = ".xml";
     val fileName = "erwin_fleischer" + fileExtension;
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val erwin = parser.decode(KbvPatient.class, content);
     assertNotNull(erwin);
 
@@ -63,7 +63,7 @@ class KbvBasePatientTest extends ParsingTest {
     val fileExtension = ".xml";
     val fileName = "erwin_fleischer" + fileExtension;
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val erwin = parser.decode(content);
     assertNotNull(erwin);
     assertEquals(Patient.class, erwin.getClass());

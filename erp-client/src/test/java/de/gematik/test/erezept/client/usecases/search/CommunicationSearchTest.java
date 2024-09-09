@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package de.gematik.test.erezept.client.usecases.search;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class CommunicationSearchTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(CommunicationSearch.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(CommunicationSearch.class));
   }
 
   @Test
@@ -59,6 +60,15 @@ class CommunicationSearchTest {
   void getSenderCommunicationShouldWork() {
     val cmd = CommunicationSearch.getSenderCommunications("TestId");
     assertTrue(cmd.getRequestLocator().contains("TestId"));
+    assertTrue(cmd.getRequestLocator().contains("sender"));
+  }
+
+  @Test
+  void withAdditionalQueryShouldWorkWithoutParam() {
+    val cmd =
+        CommunicationSearch.withAdditionalQuery(
+            IQueryParameter.search().hasSender("id").createParameter());
+    assertTrue(cmd.getRequestLocator().contains("id"));
     assertTrue(cmd.getRequestLocator().contains("sender"));
   }
 }

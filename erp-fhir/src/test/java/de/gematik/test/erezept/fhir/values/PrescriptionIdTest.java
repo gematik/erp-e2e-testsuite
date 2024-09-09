@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,13 @@ class PrescriptionIdTest {
   void checkInvalidPrescriptionId() {
     val id = "160.000.000.000.123.77";
     assertFalse(PrescriptionId.checkId(id));
+  }
+
+  @Test
+  void shouldTranslateToTaskId() {
+    val pid = PrescriptionId.random();
+    val tid = pid.toTaskId();
+    assertEquals(pid.getValue(), tid.getValue());
   }
 
   @Test

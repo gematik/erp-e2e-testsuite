@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchCommand;
+import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -59,13 +59,13 @@ public class GetMedicationDispense implements Question<ErxMedicationDispenseBund
           format(
               "{0} {1} looks for the {2} of the {3} dispensed receipts",
               role, actor.getName(), deque, receipts.getReceiptsList().size()));
-      val dispensed = deque.chooseFrom(receipts.getDispensedPrescriptions());
+      val dispensed = deque.chooseFrom(receipts.getClosedPrescriptions());
       prescriptionId = dispensed.getPrescriptionId();
     } else {
       throw new FeatureNotImplementedException(format("Get MedicationDispense as {0}", role));
     }
 
-    val cmd = new MedicationDispenseSearchCommand(prescriptionId);
+    val cmd = new MedicationDispenseSearchByIdCommand(prescriptionId);
     val response = erpClient.request(cmd);
     return response.getExpectedResource();
   }

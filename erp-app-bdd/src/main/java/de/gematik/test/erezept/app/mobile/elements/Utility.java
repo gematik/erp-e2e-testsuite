@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.openqa.selenium.By;
 @RequiredArgsConstructor
 public enum Utility implements PageElement {
   TOOLTIPS("Tooltip", null, () -> AppiumBy.accessibilityId("ctl_tooltip_container")),
-  SAVE_PASSWORD_LATER("Save Password later", () -> null, () -> AppiumBy.accessibilityId("Später")),
+  LATER("Perform something later", () -> null, () -> AppiumBy.accessibilityId("Später")),
   DECLINE_LOGIN("Decline Cardwall Login", null, () -> AppiumBy.accessibilityId("wlcd_btn_decline"));
 
   private final String elementName;

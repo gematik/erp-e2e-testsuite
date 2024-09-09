@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import de.gematik.test.core.expectations.verifier.VerificationStep;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-import kong.unirest.HttpResponse;
+import kong.unirest.core.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 

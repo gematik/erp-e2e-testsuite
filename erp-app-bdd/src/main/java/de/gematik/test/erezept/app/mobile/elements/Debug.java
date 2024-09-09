@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public enum Debug implements PageElement {
   LEAVE_BUTTON(
       "Leave Debug Menu",
       () -> AppiumBy.accessibilityId("TopNavigation.BackButton"),
-      () -> By.xpath("(//XCUIElementTypeButton[@name='Einstellungen'])[1]")),
+      () -> AppiumBy.name("Einstellungen")),
   SET_VIRTUAL_EGK_FIELD(
       "Set virtual eGK Field",
       () -> By.tagName("DebugMenu.SetVirtualHealthCardButton"),
@@ -43,6 +43,12 @@ public enum Debug implements PageElement {
       () ->
           AppiumBy.xpath(
               "//XCUIElementTypeSwitch[@name='debug_enable_virtual_egk']/XCUIElementTypeSwitch")),
+  FAKE_DEVICE_CAPABILITIES(
+      "Fake Device Capabilities",
+      () -> null,
+      () ->
+          AppiumBy.xpath(
+              "//XCUIElementTypeSwitch[@name='Fake Device Capabilities']/XCUIElementTypeSwitch")),
   EGK_PRIVATE_KEY(
       "Input Private Key of eGK",
       () ->
@@ -63,7 +69,6 @@ public enum Debug implements PageElement {
           By.xpath(
               "//XCUIElementTypeCell[@name='Current access"
                   + " token']/XCUIElementTypeOther[2]/XCUIElementTypeOther")),
-  LOGIN("Login with virtual eGK", null, () -> By.xpath("//XCUIElementTypeButton[@name=\"Login\"]")),
   HIDE_INTRO(
       "Hide Intro",
       null,

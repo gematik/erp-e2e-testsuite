@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,25 +58,21 @@ class MvoExtensionManipulatorFactoryTest {
               PatientFaker.builder()
                   .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
                   .fake();
-          val coverage = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
+          val coverage =
+              KbvCoverageFaker.builder().withInsuranceType(VersicherungsArtDeBasis.GKV).fake();
           val practitioner = PractitionerFaker.builder().fake();
           val medication =
               KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
           val kbvBundle =
-              KbvErpBundleBuilder.faker(patient.getGkvId().orElseThrow())
-                  .medication(medication)
-                  .medicationRequest(
-                      MedicationRequestFaker.builder(patient)
-                          .withMedication(medication)
-                          .withInsurance(coverage)
-                          .withRequester(practitioner)
-                          .withMvo(
-                              MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
-                          .fake())
-                  .patient(patient)
-                  .insurance(coverage)
-                  .build();
+              KbvErpBundleFaker.builder()
+                  .withKvnr(patient.getGkvId().orElseThrow())
+                  .withMedication(medication)
+                  .withPatient(patient)
+                  .withPractitioner(practitioner)
+                  .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
+                  .withInsurance(coverage, patient)
+                  .fake();
 
           assertDoesNotThrow(() -> m.getParameter().accept(kbvBundle));
         });

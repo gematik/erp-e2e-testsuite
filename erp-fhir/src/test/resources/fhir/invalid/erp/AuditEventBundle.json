@@ -6,12 +6,13 @@
   },
   "type": "searchset",
   "link": [ {
-    "relation": "self",
+    "relation": "nonsense",
     "url": "https://prescriptionserver.telematik/AuditEvent"
-  }, {
-    "relation": "next",
-    "url": "https://prescriptionserver.telematik/AuditEvent?_getpages=12653b13-5fca-4e3b-860c-9558bdfef9a1&_getpagesoffset=20&_count=20"
-  } ],
+  },
+    {
+      "relation": "nonsense2",
+      "url": "https://prescriptionserver.telematik/AuditEvent?_getpages=12653b13-5fca-4e3b-860c-9558bdfef9a1&_getpagesoffset=20&_count=20"
+    } ],
   "entry": [ {
     "fullUrl": "https://prescriptionserver.telematik/AuditEvent/58862",
     "resource": {

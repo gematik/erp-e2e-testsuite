@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,12 @@ class PrescribeRequestDataMapperTest extends ParsingTest {
     val patientDto = new PatientDto();
     patientDto.setKvnr("X110407071");
     val requestDto = new PrescribeRequestDto();
-    val medicationRequestDto = new MedicationRequestDto();
     val mvo = new MvoDto();
     mvo.setDenominator(7);
     mvo.setNumerator(10);
-    medicationRequestDto.setMvo(mvo);
+
+    val medicationRequestDto = MedicationRequestDto.medicationRequest().mvo(mvo).build();
+
     requestDto.setMedicationRequest(medicationRequestDto);
     requestDto.setPatient(patientDto);
     val prescribeMapper = PrescribeRequestDataMapper.from(requestDto);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,10 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
   protected void complete() {
     ensure(dto::getPatient, dto::setPatient, PatientDto::new);
     ensure(dto::getMedication, dto::setMedication, PznMedicationDataMapper::randomDto);
-    ensure(dto::getMedicationRequest, dto::setMedicationRequest, MedicationRequestDto::new);
+    ensure(
+        dto::getMedicationRequest,
+        dto::setMedicationRequest,
+        () -> MedicationRequestDto.medicationRequest().build());
     this.completeInternal();
   }
 

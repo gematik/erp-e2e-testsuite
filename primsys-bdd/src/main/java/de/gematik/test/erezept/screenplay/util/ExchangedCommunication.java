@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,57 +19,101 @@ package de.gematik.test.erezept.screenplay.util;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExchangedCommunication {
 
   @Nullable private final String communicationId;
+  private final PrescriptionId basedOn;
   private final ICommunicationType<?> type;
   private final String senderName;
+  private final String senderId;
   private final String receiverName;
+  private final String receiverId;
 
   public Optional<String> getCommunicationId() {
     return Optional.ofNullable(this.communicationId);
   }
 
-  public static ExchangedCommunication.Builder from(String senderName) {
-    return new Builder(senderName);
+  public static ExchangedCommunication.ErxCommunicationBuilder from(ErxCommunication com) {
+    return new ErxCommunicationBuilder(com);
   }
 
-  public static class Builder {
-    private final String senderName;
-    private String receiverName;
+  public static ExchangedCommunication.FdvCommunicationBuilder sentBy(Actor fdvPatient) {
+    val egkAbility = SafeAbility.getAbility(fdvPatient, ProvideEGK.class);
+    return sentBy(fdvPatient.getName(), egkAbility);
+  }
 
-    private Builder(String senderName) {
-      this.senderName = senderName;
+  public static ExchangedCommunication.FdvCommunicationBuilder sentBy(
+      String senderActorName, ProvideEGK egkAbility) {
+    return sentBy(senderActorName, egkAbility.getKvnr());
+  }
+
+  public static ExchangedCommunication.FdvCommunicationBuilder sentBy(
+      String senderActorName, KVNR kvnr) {
+    return new FdvCommunicationBuilder(senderActorName, kvnr.getValue());
+  }
+
+  /**
+   * Builder for ExchangedCommunication when based on an ErxCommunication. This provides a shortcut
+   * because the concrete ID of the ErxCommunication is known.
+   */
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class ErxCommunicationBuilder {
+    private final ErxCommunication com;
+
+    public ExchangedCommunication withActorNames(Actor sender, Actor receiver) {
+      return withActorNames(sender.getName(), receiver.getName());
     }
 
-    public Builder to(String receiverName) {
-      this.receiverName = receiverName;
+    public ExchangedCommunication withActorNames(String senderName, String receiverName) {
+      val prescriptionId = com.getBasedOnReferenceId().toPrescriptionId();
+      return new ExchangedCommunication(
+          com.getUnqualifiedId(),
+          prescriptionId,
+          com.getType(),
+          senderName,
+          com.getSenderId(),
+          receiverName,
+          com.getRecipientId());
+    }
+  }
+
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class FdvCommunicationBuilder {
+    private final String senderName;
+    private final String senderId;
+    private String receiverName;
+    private String receiverId;
+
+    public FdvCommunicationBuilder to(Actor receiverPharmacy) {
+      this.receiverName = receiverPharmacy.getName();
+      this.receiverId = SafeAbility.getAbility(receiverPharmacy, UseSMCB.class).getTelematikID();
       return this;
     }
 
-    public ExchangedCommunication sent(ErxCommunication com) {
+    public ExchangedCommunication dispenseRequestBasedOn(PrescriptionId prescriptionId) {
       return new ExchangedCommunication(
-          com.getUnqualifiedId(), com.getType(), senderName, receiverName);
-    }
-
-    public ExchangedCommunication dispenseRequest() {
-      return ofType(CommunicationType.DISP_REQ);
-    }
-
-    public ExchangedCommunication infoRequest() {
-      return ofType(CommunicationType.INFO_REQ);
-    }
-
-    public <T extends ICommunicationType<?>> ExchangedCommunication ofType(T type) {
-      return new ExchangedCommunication(null, type, senderName, receiverName);
+          null,
+          prescriptionId,
+          CommunicationType.DISP_REQ,
+          senderName,
+          senderId,
+          receiverName,
+          receiverId);
     }
   }
 }

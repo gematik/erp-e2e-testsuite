@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package de.gematik.test.erezept.client.rest;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createFailingValidationResult;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.*;
 import org.junit.jupiter.api.*;
 
@@ -29,13 +30,12 @@ class ValidationResultHelperTest {
 
   @Test
   void coverPrivateConstructor() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(ValidationResultHelper.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ValidationResultHelper.class));
   }
 
   @Test
   void shouldThrowOnBaseInvalidResult() {
-    val vr = FhirTestResourceUtil.createFailingValidationResult();
+    val vr = createFailingValidationResult();
     assertThrows(
         FhirValidationException.class,
         () -> ValidationResultHelper.throwOnInvalidValidationResult(vr));
@@ -43,13 +43,13 @@ class ValidationResultHelperTest {
 
   @Test
   void shouldNotThrowOnBaseValidResult() {
-    val vr = FhirTestResourceUtil.createEmptyValidationResult();
+    val vr = createEmptyValidationResult();
     assertDoesNotThrow(() -> ValidationResultHelper.throwOnInvalidValidationResult(vr));
   }
 
   @Test
   void shouldThrowOnConcreteInvalidResult() {
-    val vr = FhirTestResourceUtil.createFailingValidationResult();
+    val vr = createFailingValidationResult();
     assertThrows(
         FhirValidationException.class,
         () -> ValidationResultHelper.throwOnInvalidValidationResult(KbvErpBundle.class, vr));
@@ -57,7 +57,7 @@ class ValidationResultHelperTest {
 
   @Test
   void shouldNotThrowOnConcreteValidResult() {
-    val vr = FhirTestResourceUtil.createEmptyValidationResult();
+    val vr = createEmptyValidationResult();
     assertDoesNotThrow(
         () -> ValidationResultHelper.throwOnInvalidValidationResult(KbvErpBundle.class, vr));
   }

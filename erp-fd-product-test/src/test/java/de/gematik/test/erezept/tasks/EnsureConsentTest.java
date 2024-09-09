@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.tasks;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,7 +31,6 @@ import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.ConsentPostCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsentBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -62,11 +63,10 @@ class EnsureConsentTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     val getConsentResponse =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxConsentBundle.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxConsentBundle.class)
             .withStatusCode(400)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     val task = EnsureConsent.shouldBePresent();
@@ -89,7 +89,7 @@ class EnsureConsentTest {
         ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     assertDoesNotThrow(() -> patient.attemptsTo(EnsureConsent.shouldBePresent()));
@@ -111,14 +111,14 @@ class EnsureConsentTest {
         ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     val postConsentResponse =
         ErpResponse.forPayload(mock(ErxConsent.class), ErxConsent.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentPostCommand.class))).thenReturn(postConsentResponse);
 
     assertDoesNotThrow(() -> patient.attemptsTo(EnsureConsent.shouldBePresent()));
@@ -140,7 +140,7 @@ class EnsureConsentTest {
         ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     assertDoesNotThrow(() -> patient.attemptsTo(EnsureConsent.shouldBeUnset()));
@@ -162,14 +162,14 @@ class EnsureConsentTest {
         ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     val postConsentResponse =
         ErpResponse.forPayload(mock(Resource.class), Resource.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentDeleteCommand.class))).thenReturn(postConsentResponse);
 
     assertDoesNotThrow(() -> patient.attemptsTo(EnsureConsent.shouldBeUnset()));

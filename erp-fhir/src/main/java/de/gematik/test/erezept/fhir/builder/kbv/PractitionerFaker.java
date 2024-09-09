@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,23 +31,23 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class PractitionerFaker {
-  private final PractitionerBuilder builder;
   private final Map<String, Consumer<PractitionerBuilder>> builderConsumers = new HashMap<>();
-  private static final String QUALIFICATION_TYPE = "qualificationType";
-  private static final String BASE_ANR = "baseAnr";
+  private static final String KEY_QUALIFICATION_TYPE =
+      "qualificationType"; // key used for builderConsumers map
+  private static final String KEY_BASE_ANR = "baseAnr"; // key used for builderConsumers map
 
-  private PractitionerFaker(PractitionerBuilder builder) {
-    this.builder = builder;
+  private PractitionerFaker() {
     val qualificationType = randomElement(QualificationType.DOCTOR, QualificationType.DENTIST);
     builderConsumers.put("name", b -> b.name(fakerFirstName(), fakerLastName()));
     builderConsumers.put("jobTitle", b -> b.addQualification(fakerProfession()));
-    builderConsumers.put(QUALIFICATION_TYPE, b -> b.addQualification(qualificationType));
+    builderConsumers.put(KEY_QUALIFICATION_TYPE, b -> b.addQualification(qualificationType));
     builderConsumers.put("version", b -> b.version(KbvItaForVersion.getDefaultVersion()));
-    builderConsumers.put(BASE_ANR, b -> b.anr(BaseANR.randomFromQualification(qualificationType)));
+    builderConsumers.put(
+        KEY_BASE_ANR, b -> b.anr(BaseANR.randomFromQualification(qualificationType)));
   }
 
   public static PractitionerFaker builder() {
-    return new PractitionerFaker(PractitionerBuilder.builder());
+    return new PractitionerFaker();
   }
 
   public PractitionerFaker withName(String firstName, String lastName) {
@@ -65,9 +65,9 @@ public class PractitionerFaker {
 
   public PractitionerFaker withQualificationType(QualificationType qualificationType) {
     builderConsumers.computeIfPresent(
-        QUALIFICATION_TYPE, (key, defaultValue) -> b -> b.addQualification(qualificationType));
+        KEY_QUALIFICATION_TYPE, (key, defaultValue) -> b -> b.addQualification(qualificationType));
     builderConsumers.computeIfPresent(
-        BASE_ANR,
+        KEY_BASE_ANR,
         (key, defaultValue) -> b -> b.anr(BaseANR.randomFromQualification(qualificationType)));
     return this;
   }
@@ -98,9 +98,9 @@ public class PractitionerFaker {
         (anr.getType() == BaseANR.ANRType.LANR)
             ? QualificationType.DOCTOR
             : QualificationType.DENTIST;
-    builderConsumers.computeIfPresent(BASE_ANR, (key, defaultValue) -> b -> b.anr(anr));
+    builderConsumers.computeIfPresent(KEY_BASE_ANR, (key, defaultValue) -> b -> b.anr(anr));
     builderConsumers.computeIfPresent(
-        QUALIFICATION_TYPE, (key, defaultValue) -> b -> b.addQualification(qualificationType));
+        KEY_QUALIFICATION_TYPE, (key, defaultValue) -> b -> b.addQualification(qualificationType));
     return this;
   }
 
@@ -110,7 +110,12 @@ public class PractitionerFaker {
   }
 
   public KbvPractitioner fake() {
+    return this.toBuilder().build();
+  }
+
+  public PractitionerBuilder toBuilder() {
+    val builder = PractitionerBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

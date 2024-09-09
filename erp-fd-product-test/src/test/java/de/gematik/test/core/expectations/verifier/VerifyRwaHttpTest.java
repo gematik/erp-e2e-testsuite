@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static de.gematik.test.core.expectations.rawhttpverifier.RawHttpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -29,8 +29,8 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.actions.rawhttpactions.GetOcspListResponse;
 import de.gematik.test.erezept.actions.rawhttpactions.VerifyRawHttp;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestInstance;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -73,7 +73,7 @@ class VerifyRwaHttpTest {
 
     actor.attemptsTo(
         VerifyRawHttp.that(response, String.class)
-            .hasResponseWith(containsHeaderWith("1", "2", ErpAfos.A_19248_02))
+            .hasResponseWith(containsHeaderWith("1", "2", ErpAfos.A_19248))
             .andHttp(returnCode(200))
             .isCorrect());
   }
@@ -90,9 +90,9 @@ class VerifyRwaHttpTest {
 
     actor.attemptsTo(
         VerifyRawHttp.that(response, String.class)
-            .and(stringBodyContains("123456TestBody", ErpAfos.A_19248_02))
-            .has(stringBodyContains("123456TestBody", ErpAfos.A_19248_02))
-            .is(stringBodyContains("123456TestBody", ErpAfos.A_19248_02))
+            .and(stringBodyContains("123456TestBody", ErpAfos.A_19248))
+            .has(stringBodyContains("123456TestBody", ErpAfos.A_19248))
+            .is(stringBodyContains("123456TestBody", ErpAfos.A_19248))
             .isCorrect());
   }
 }

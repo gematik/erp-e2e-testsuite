@@ -5,7 +5,7 @@
   <parent>
     <artifactId>erezept-testsuite</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -26,16 +26,30 @@
     <dependency>
       <groupId>de.gematik.test.erezept</groupId>
       <artifactId>smartcard</artifactId>
-      <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>de.gematik.test.erezept</groupId>
-      <artifactId>erp-crypto</artifactId>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>crypto-brick</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
+      <version>4.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>4.0.2</version>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.ws</groupId>
-      <artifactId>jaxws-ri</artifactId>
-      <type>pom</type>
+      <artifactId>jaxws-rt</artifactId>
+      <version>4.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2</groupId>
+      <artifactId>hk2</artifactId>
+      <version>4.0.0-M2</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -56,10 +70,6 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-ext-${artefact.bouncycastle}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -85,6 +95,10 @@
     </dependency>
     <dependency>
       <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+      <artifactId>dss-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>eu.europa.ec.joinup.sd-dss</groupId>
       <artifactId>dss-utils-apache-commons</artifactId>
     </dependency>
 
@@ -92,10 +106,21 @@
       <groupId>com.github.javafaker</groupId>
       <artifactId>javafaker</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.konghq</groupId>
-      <artifactId>unirest-java</artifactId>
+      <artifactId>unirest-java-core</artifactId>
     </dependency>
     <dependency>
       <groupId>de.gematik.test.erezept</groupId>
@@ -103,6 +128,12 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>resource-loader-brick</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <build>
@@ -147,8 +178,30 @@
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxb2-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>xjc</id>
+            <goals>
+              <goal>xjc</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/resources/gematik_schemes/conn/ServiceDirectory.xsd</source>
+              </sources>
+              <xjbSources>src/jaxws/serviceDirectory.jaxws.xjb</xjbSources>
+              <outputDirectory>${project.build.directory}/generated/src/main/java</outputDirectory>
+              <clearOutputDir>false</clearOutputDir>
+              <packageName>de.gematik.ws.conn.servicedirectory</packageName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-maven-plugin</artifactId>
-        <version>2.6</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>general</id>
@@ -159,9 +212,6 @@
               <wsdlDirectory>
                 src/main/resources/gematik_schemes
               </wsdlDirectory>
-              <wsdlLocation>
-                /gematik_schemes/*
-              </wsdlLocation>
               <wsdlFiles>
                 <wsdlFile>conn/SignatureService_V7_5_5.wsdl</wsdlFile>
                 <wsdlFile>conn/EventService.wsdl</wsdlFile>
@@ -182,17 +232,17 @@
             </goals>
             <configuration>
               <wsdlDirectory>
-                ${project.basedir}/../${project.artifactId}/src/main/resources/gematik_schemes
+                src/main/resources/gematik_schemes
               </wsdlDirectory>
               <wsdlFiles>
                 <wsdlFile>conn/AuthSignatureService_v7_4_1.wsdl</wsdlFile>
               </wsdlFiles>
-              <keep>true</keep>
-              <sourceDestDir>${project.build.directory}/generated/src/main/java</sourceDestDir>
               <bindingFiles>
                 <bindingFile>authSignatureService_V7_4.jaxws.xjb</bindingFile>
                 <bindingFile>signatureService_V7_4.jaxws.xjb</bindingFile>
               </bindingFiles>
+              <keep>true</keep>
+              <sourceDestDir>${project.build.directory}/generated/src/main/java</sourceDestDir>
             </configuration>
           </execution>
         </executions>

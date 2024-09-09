@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package de.gematik.test.erezept.actions.communication;
 
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
+import de.gematik.test.erezept.actors.ErpActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
@@ -48,6 +50,16 @@ public class SendMessages extends ErpAction<ErxCommunication> {
     return new Builder(receiver);
   }
 
+  public static SendMessages withCommunication(ErxCommunication communication) {
+    return withCommunication(communication, List.of());
+  }
+
+  public static SendMessages withCommunication(
+      ErxCommunication communication,
+      List<NamedEnvelope<FuzzingMutator<ErxCommunication>>> fuzzingMutators) {
+    return new SendMessages(communication, fuzzingMutators);
+  }
+
   @Override
   public ErpInteraction<ErxCommunication> answeredBy(Actor actor) {
     fuzzingMutators.forEach(m -> m.getParameter().accept(communication));
@@ -73,15 +85,16 @@ public class SendMessages extends ErpAction<ErxCommunication> {
       return this;
     }
 
-    public SendMessages asReply(CommunicationReplyMessage message) {
+    public SendMessages asReply(CommunicationReplyMessage message, ErpActor sender) {
       val patientBaseData = SafeAbility.getAbility(receiver, ProvidePatientBaseData.class);
       val communication =
           ErxCommunicationBuilder.builder()
+              .sender(((PharmacyActor) sender).getTelematikId().getValue())
               .recipient(patientBaseData.getKvnr().getValue())
               .basedOnTask(erxTask.getTaskId(), erxTask.getAccessCode())
               .supplyOptions(SupplyOptionsType.getSupplyOptionType(message.supplyOptionsType()))
               .buildReply(message);
-      return new SendMessages(communication, fuzzingMutators);
+      return withCommunication(communication, fuzzingMutators);
     }
 
     public SendMessages asDispenseRequest(CommunicationDisReqMessage message) {
@@ -92,7 +105,7 @@ public class SendMessages extends ErpAction<ErxCommunication> {
               .recipient(telematikId.getValue())
               .basedOnTask(erxTask.getTaskId(), erxTask.getAccessCode())
               .buildDispReq(message);
-      return new SendMessages(communication, fuzzingMutators);
+      return withCommunication(communication, fuzzingMutators);
     }
   }
 }

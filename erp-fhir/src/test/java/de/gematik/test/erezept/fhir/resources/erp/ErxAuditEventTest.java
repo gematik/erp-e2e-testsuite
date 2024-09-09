@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.Arrays;
 import lombok.val;
 import org.hl7.fhir.r4.model.AuditEvent;
@@ -45,7 +45,7 @@ class ErxAuditEventTest extends ParsingTest {
     val originalEncoding = EncodingType.JSON;
     val flippedEncoding = originalEncoding.flipEncoding();
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val auditEvent = parser.decode(ErxAuditEvent.class, content);
 
     assertDoesNotThrow(auditEvent::toString);
@@ -86,7 +86,7 @@ class ErxAuditEventTest extends ParsingTest {
   void shouldDecodeAuditEventWithoutProfile() {
     val fileName = "AuditEventBundle.json";
 
-    val content = ResourceUtils.readFileFromResource(format("fhir/invalid/erp/{0}", fileName));
+    val content = ResourceLoader.readFileFromResource(format("fhir/invalid/erp/{0}", fileName));
     val bundle = parser.decode(content);
     assertEquals(ResourceType.Bundle, bundle.getResourceType());
   }

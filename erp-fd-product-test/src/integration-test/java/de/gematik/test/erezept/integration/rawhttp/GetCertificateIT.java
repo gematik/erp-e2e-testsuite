@@ -17,16 +17,16 @@
 
 package de.gematik.test.erezept.integration.rawhttp;
 
-import static de.gematik.test.core.expectations.rawhttpverifier.RawHttpRespBodyCertVerifier.bodyContainsAddRoots;
-import static de.gematik.test.core.expectations.rawhttpverifier.RawHttpRespBodyCertVerifier.bodyContainsCaCerts;
-import static de.gematik.test.core.expectations.rawhttpverifier.RawHttpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpRespBodyCertVerifier.bodyContainsAddRoots;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpRespBodyCertVerifier.bodyContainsCaCerts;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.returnCode;
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.rawhttpactions.CallCertificateFromBackend;
 import de.gematik.test.erezept.actions.rawhttpactions.VerifyRawHttp;
-import de.gematik.test.erezept.actions.rawhttpactions.dto.PKICertificatesDTOEnvelop;
+import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
 import de.gematik.test.erezept.actors.PatientActor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -52,7 +52,7 @@ public class GetCertificateIT extends ErpTest {
   void verifyOcspResponse() {
     this.config.equipWithRawHttp(patient);
 
-    val resp = patient.performs(CallCertificateFromBackend.named("GEM.RCA3%20TEST-ONLY"));
+    val resp = patient.performs(CallCertificateFromBackend.withRootCa("GEM.RCA3 TEST-ONLY"));
 
     patient.attemptsTo(
         VerifyRawHttp.that(resp, PKICertificatesDTOEnvelop.class)

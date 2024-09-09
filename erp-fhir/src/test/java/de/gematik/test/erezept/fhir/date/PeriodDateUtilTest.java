@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -32,7 +32,7 @@ class PeriodDateUtilTest {
 
   @Test
   void shouldNotCallConstructor() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(PeriodDateUtil.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(PeriodDateUtil.class));
   }
 
   @Test

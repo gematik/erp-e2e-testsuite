@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
@@ -57,7 +57,7 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     // use a random faked DavBundle for now
-    val davBundle = DavAbgabedatenBuilder.faker(strategy.getPrescriptionId()).build();
+    val davBundle = DavAbgabedatenFaker.builder(strategy.getPrescriptionId()).fake();
     Function<DavAbgabedatenBundle, byte[]> signer;
     if (apothecary != null) {
       // sign as apothecary with HBA

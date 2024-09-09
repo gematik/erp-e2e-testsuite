@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package de.gematik.test.core.expectations.verifier;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsentBundle;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,14 +42,13 @@ class ConsentBundleVerifierTest extends ParsingTest {
 
   @Test
   void shouldNotInstantiateUtilityClass() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(ConsentBundleVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ConsentBundleVerifier.class));
   }
 
   @Test
   void shouldValidateCorrect() {
     val validConsent =
-        parser.decode(ErxConsentBundle.class, ResourceUtils.readFileFromResource(CONSENT_PATH));
+        parser.decode(ErxConsentBundle.class, ResourceLoader.readFileFromResource(CONSENT_PATH));
     val step = ConsentBundleVerifier.containsKvnr(KVNR.from("X110465770"), ErpAfos.A_19018);
     step.apply(validConsent);
   }
@@ -57,18 +56,15 @@ class ConsentBundleVerifierTest extends ParsingTest {
   @Test
   void shouldThrowWhileInvalidKvnr() {
     val validConsent =
-        parser.decode(ErxConsentBundle.class, ResourceUtils.readFileFromResource(CONSENT_PATH));
+        parser.decode(ErxConsentBundle.class, ResourceLoader.readFileFromResource(CONSENT_PATH));
     val step = ConsentBundleVerifier.containsKvnr(KVNR.from("X110465779"), ErpAfos.A_19018);
     assertThrows(AssertionError.class, () -> step.apply(validConsent));
   }
 
-  private static final String CHARGE_ITEM =
-      "fhir/valid/erp/1.2.0/chargeitembundle/a05a235a-a214-11ed-a8fc-0242ac120002.xml";
-
   @Test
   void shouldHasConsentTrue() {
     val validConsent =
-        parser.decode(ErxConsentBundle.class, ResourceUtils.readFileFromResource(CONSENT_PATH));
+        parser.decode(ErxConsentBundle.class, ResourceLoader.readFileFromResource(CONSENT_PATH));
     val step = ConsentBundleVerifier.hasConsent(ErpAfos.A_22160);
     step.apply(validConsent);
   }
@@ -83,7 +79,7 @@ class ConsentBundleVerifierTest extends ParsingTest {
   @Test
   void shouldHasNoConsentFalse() {
     val validConsent =
-        parser.decode(ErxConsentBundle.class, ResourceUtils.readFileFromResource(CONSENT_PATH));
+        parser.decode(ErxConsentBundle.class, ResourceLoader.readFileFromResource(CONSENT_PATH));
     val step = ConsentBundleVerifier.hasNoConsent(ErpAfos.A_22160);
     assertThrows(AssertionError.class, () -> step.apply(validConsent));
   }

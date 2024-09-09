@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import java.time.LocalDate;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
@@ -107,6 +108,7 @@ public enum Darreichungsform implements IValueSet {
   IFS("IFS", "Infusionsset"),
   IHA("IHA", "Inhalationsampullen"),
   IHP("IHP", "Inhalationspulver"),
+  IID("IID", "Injektions- und Infusionsdispersion", LocalDate.of(2024, 10, 1)),
   IIE("IIE", "Injektions- oder Infusionslösung oder Lösung zum Einnehmen"),
   IIL("IIL", "Injektions-, Infusionslösung"),
   IIM("IIM", "Injektionslösung zur intramuskulären Anwendung"),
@@ -147,6 +149,7 @@ public enum Darreichungsform implements IValueSet {
   LAN("LAN", "Lanzetten"),
   LII("LII", "Lösung zur Injektion, Infusion und Inhalation"),
   LIQ("LIQ", "Liquidum"),
+  LIV("LIV", "Lösung zur intravesikalen Anwendung", LocalDate.of(2024, 10, 1)),
   LOE("LOE", "Lösung"),
   LOT("LOT", "Lotion"),
   LOV("LOV", "Lösung für einen Vernebler"),
@@ -327,10 +330,16 @@ public enum Darreichungsform implements IValueSet {
   private final String code;
   private final String display;
   private final String definition = "N/A definition in profile";
+  private final LocalDate validFrom;
 
   Darreichungsform(String code, String display) {
+    this(code, display, LocalDate.of(1970, 1, 1));
+  }
+
+  Darreichungsform(String code, String display, LocalDate validFrom) {
     this.code = code;
     this.display = display;
+    this.validFrom = validFrom;
   }
 
   @Override

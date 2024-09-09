@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,5 +50,15 @@ public class QueryParameter implements IQueryParameter {
         "{0}={1}",
         URLEncoder.encode(parameter, StandardCharsets.UTF_8),
         URLEncoder.encode(value, StandardCharsets.UTF_8));
+  }
+
+  @Override
+  public String parameter() {
+    return parameter;
+  }
+
+  @Override
+  public String value() {
+    return value;
   }
 }

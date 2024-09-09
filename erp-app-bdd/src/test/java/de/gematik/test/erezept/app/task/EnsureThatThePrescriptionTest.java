@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
@@ -37,7 +38,6 @@ import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -134,7 +134,7 @@ class EnsureThatThePrescriptionTest {
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_TITLE))
-        .thenReturn(kbvBundle.getMedicationName());
+        .thenReturn(kbvBundle.getMedication().getMedicationName());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT))
         .thenReturn("Noch 2 Tage einlösbar");
     when(app.getText(PrescriptionDetails.PRESCRIPTION_ADDITIONAL_PAYMENT)).thenReturn("Ja");
@@ -181,7 +181,7 @@ class EnsureThatThePrescriptionTest {
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_TITLE))
-        .thenReturn(kbvBundle.getMedicationName());
+        .thenReturn(kbvBundle.getMedication().getMedicationName());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT))
         .thenReturn("Noch 89 Tage einlösbar");
     when(app.getText(PrescriptionDetails.PRESCRIPTION_ADDITIONAL_PAYMENT)).thenReturn("Teilweise");
@@ -228,7 +228,7 @@ class EnsureThatThePrescriptionTest {
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_TITLE))
-        .thenReturn(kbvBundle.getMedicationName());
+        .thenReturn(kbvBundle.getMedication().getMedicationName());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT))
         .thenReturn("Noch 2 Tage einlösbar");
     when(app.getText(PrescriptionDetails.PRESCRIPTION_ADDITIONAL_PAYMENT)).thenReturn("Nein");
@@ -278,7 +278,7 @@ class EnsureThatThePrescriptionTest {
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_TITLE))
-        .thenReturn(kbvBundle.getMedicationName());
+        .thenReturn(kbvBundle.getMedication().getMedicationName());
     when(app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT))
         .thenReturn(
             format(

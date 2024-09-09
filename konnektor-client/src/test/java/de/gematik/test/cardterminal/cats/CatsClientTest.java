@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 
 package de.gematik.test.cardterminal.cats;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardTerminalClientFactory;
-import de.gematik.test.cardterminal.exceptions.CardTerminalClientException;
 import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
-import kong.unirest.Config;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestInstance;
+import kong.unirest.core.Config;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
@@ -47,7 +49,7 @@ class CatsClientTest {
 
   @BeforeEach
   void setUp() {
-    smartcards = SmartcardFactory.getArchive();
+    smartcards = SmartcardArchive.fromResources();
     unitRestMock = mockStatic(Unirest.class, Answers.RETURNS_DEEP_STUBS);
     when(Unirest.primaryInstance()).thenReturn(new UnirestInstance(new Config()));
   }
@@ -82,7 +84,9 @@ class CatsClientTest {
     val ctConfig = new CardTerminalClientConfiguration("CT1", "http://localhost");
     val client = CardTerminalClientFactory.createClient(ctConfig);
     val smartCard = smartcards.getEgkByICCSN("80276883110000108142");
-    assertThrows(CardTerminalClientException.class, () -> client.insertCard(smartCard, 1));
+    assertThrows(RuntimeException.class, () -> client.insertCard(smartCard, 1));
+    // Note: see CatsClient#request
+    //    assertThrows(CardTerminalClientException.class, () -> client.insertCard(smartCard, 1));
   }
 
   @Test

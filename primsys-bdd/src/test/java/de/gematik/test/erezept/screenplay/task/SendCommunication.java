@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,7 @@ public class SendCommunication implements Task {
     val response = actor.asksFor(question);
     val communication = response.getExpectedResource();
     val exchanged =
-        ExchangedCommunication.from(actor.getName())
-            .to(question.getReceiver().getName())
-            .sent(communication);
+        ExchangedCommunication.from(communication).withActorNames(actor, question.getReceiver());
 
     val receiverStack = SafeAbility.getAbility(question.getReceiver(), ManageCommunications.class);
     val senderStack = SafeAbility.getAbility(actor, ManageCommunications.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import net.serenitybdd.screenplay.Task;
 
 @RequiredArgsConstructor
 public class DeleteRedeemablePrescription implements Task {
+
   private static final DmcStack DMC_STACK = DmcStack.ACTIVE;
   private final DequeStrategy deque;
 
@@ -60,12 +61,20 @@ public class DeleteRedeemablePrescription implements Task {
                     format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
 
     app.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
-    app.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
+    app.tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
     app.acceptAlert();
+
+    if (dmc.getTaskId().getFlowType().isPkvType()) {
+      // on PKV-prescriptions, a second alert is shown which also needs to be accepted
+      app.acceptAlert();
+    }
 
     // move the dmc to the deleted stack
     deque.removeFrom(dmcAbility.getDmcs());
     dmcAbility.getDeletedDmcs().append(dmc);
+
+    // Note: wait until the App finished the delete and moved back to the main screen
+    app.waitUntilElementIsVisible(Mainscreen.REFRESH_BUTTON);
   }
 
   public static DeleteRedeemablePrescription fromStack(String order) {

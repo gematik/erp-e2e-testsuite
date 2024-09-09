@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@ package de.gematik.test.cardterminal;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Smartcard;
+import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.cardterminal.exceptions.NoAppropriateSlotException;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorType;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.commands.GetCardsCommand;
-import de.gematik.test.smartcard.Smartcard;
-import de.gematik.test.smartcard.SmartcardType;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

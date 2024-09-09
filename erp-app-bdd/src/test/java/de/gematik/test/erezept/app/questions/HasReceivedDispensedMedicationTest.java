@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.MedicationDispenseDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchCommand;
+import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
@@ -114,12 +114,20 @@ class HasReceivedDispensedMedicationTest {
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.isMultiple()).thenReturn(false);
-    when(kbvBundle.isMultiple()).thenReturn(false);
+    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
     when(medicationDispenses.getMedicationDispenses())
         .thenReturn(
             List.of(
-                ErxMedicationDispenseBuilder.faker(kvnr, "123", prescriptionId).build(),
-                ErxMedicationDispenseBuilder.faker(kvnr, "123", prescriptionId).build()));
+                ErxMedicationDispenseFaker.builder()
+                    .withKvnr(kvnr)
+                    .withPerfomer("123")
+                    .withPrescriptionId(prescriptionId)
+                    .fake(),
+                ErxMedicationDispenseFaker.builder()
+                    .withKvnr(kvnr)
+                    .withPerfomer("123")
+                    .withPrescriptionId(prescriptionId)
+                    .fake()));
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
@@ -138,7 +146,7 @@ class HasReceivedDispensedMedicationTest {
         .thenReturn(prescriptionId.getValue());
     when(app.getWebElementListLen(MedicationDispenseDetails.DISPENSED)).thenReturn(1);
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
-    when(erpClient.request(any(MedicationDispenseSearchCommand.class)))
+    when(erpClient.request(any(MedicationDispenseSearchByIdCommand.class)))
         .thenReturn(medicationDispenseResponse);
 
     val hasReceived = HasReceivedDispensedMedication.fromStack("erste");
@@ -169,12 +177,20 @@ class HasReceivedDispensedMedicationTest {
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.isMultiple()).thenReturn(false);
-    when(kbvBundle.isMultiple()).thenReturn(false);
+    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
     when(medicationDispenses.getMedicationDispenses())
         .thenReturn(
             List.of(
-                ErxMedicationDispenseBuilder.faker(kvnr, "123", prescriptionId).build(),
-                ErxMedicationDispenseBuilder.faker(kvnr, "123", prescriptionId).build()));
+                ErxMedicationDispenseFaker.builder()
+                    .withKvnr(kvnr)
+                    .withPerfomer("123")
+                    .withPrescriptionId(prescriptionId)
+                    .fake(),
+                ErxMedicationDispenseFaker.builder()
+                    .withKvnr(kvnr)
+                    .withPerfomer("123")
+                    .withPrescriptionId(prescriptionId)
+                    .fake()));
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
@@ -193,7 +209,7 @@ class HasReceivedDispensedMedicationTest {
         .thenReturn(prescriptionId.getValue());
     when(app.getWebElementListLen(MedicationDispenseDetails.DISPENSED)).thenReturn(2);
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
-    when(erpClient.request(any(MedicationDispenseSearchCommand.class)))
+    when(erpClient.request(any(MedicationDispenseSearchByIdCommand.class)))
         .thenReturn(medicationDispenseResponse);
 
     val hasReceived = HasReceivedDispensedMedication.fromStack("erste");
@@ -248,7 +264,7 @@ class HasReceivedDispensedMedicationTest {
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.isMultiple()).thenReturn(false);
-    when(kbvBundle.isMultiple()).thenReturn(false);
+    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
@@ -268,7 +284,7 @@ class HasReceivedDispensedMedicationTest {
         .thenReturn(prescriptionId.getValue());
     when(app.getWebElementListLen(MedicationDispenseDetails.DISPENSED)).thenReturn(2);
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
-    when(erpClient.request(any(MedicationDispenseSearchCommand.class)))
+    when(erpClient.request(any(MedicationDispenseSearchByIdCommand.class)))
         .thenReturn(medicationDispenseResponse);
 
     val hasReceived = HasReceivedDispensedMedication.fromStack("erste");

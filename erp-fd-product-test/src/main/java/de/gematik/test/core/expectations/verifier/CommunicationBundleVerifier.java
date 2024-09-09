@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,13 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
+import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunicationBundle;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.TelematikID;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -75,30 +79,125 @@ public class CommunicationBundleVerifier {
       String id, RequirementsSet req) {
     Predicate<ErxCommunicationBundle> predicate =
         bundle ->
-            bundle.getCommunications().stream().anyMatch(com -> com.getRecipientId().equals(id));
+            bundle.getCommunications().stream().allMatch(com -> com.getRecipientId().equals(id));
     val step =
         new VerificationStep.StepBuilder<ErxCommunicationBundle>(
             req.getRequirement(), "Alle Communications im Bundle haben als Recipient: " + id);
     return step.predicate(predicate).accept();
   }
 
+  public static VerificationStep<ErxCommunicationBundle> containsOnlyIdentifierWith(String id) {
+    Predicate<ErxCommunicationBundle> predicate =
+        bundle ->
+            bundle.getCommunications().stream()
+                .anyMatch(
+                    com ->
+                        Optional.ofNullable(com.getIdentifierFirstRep())
+                            .map(identifier -> identifier.getValue().equals(id))
+                            .orElse(false));
+    val step =
+        new VerificationStep.StepBuilder<ErxCommunicationBundle>(
+            ErpAfos.A_24436.getRequirement(),
+            "Alle Communications im Bundle haben als Recipient: " + id);
+    return step.predicate(predicate).accept();
+  }
+
   public static VerificationStep<ErxCommunicationBundle> onlySenderWith(KVNR kvnr) {
-    return onlySenderWith(kvnr.getValue(), ErpAfos.A_19522_01);
+    return onlySenderWith(kvnr.getValue(), ErpAfos.A_19522);
   }
 
   public static VerificationStep<ErxCommunicationBundle> onlySenderWith(TelematikID id) {
-    return onlySenderWith(id.getValue(), ErpAfos.A_19522_01);
+    return onlySenderWith(id.getValue(), ErpAfos.A_19522);
   }
 
   public static VerificationStep<ErxCommunicationBundle> onlySenderWith(
       String id, RequirementsSet req) {
     Predicate<ErxCommunicationBundle> predicate =
-        bundle ->
-            bundle.getCommunications().stream()
-                .anyMatch(com -> com.getSender().getIdentifier().getValue().equals(id));
+        bundle -> bundle.getCommunications().stream().anyMatch(com -> com.getSenderId().equals(id));
     val step =
         new VerificationStep.StepBuilder<ErxCommunicationBundle>(
             req.getRequirement(), "Alle Communications im Bundle haben als Sender: " + id);
     return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxCommunicationBundle> sentDateIsEqual(LocalDate date) {
+    return verifySentDateWithPredicate(
+        ld -> ld.isEqual(date),
+        "Die enthaltenen Tasks müssen das AuthoredOn Datum " + date.toString() + " enthalten");
+  }
+
+  /**
+   * @param localDatePredicate // example: ld -> ld.isBefore(LocalDate.now())
+   * @param description // the description of expected behavior as String
+   * @return VerificationStep
+   */
+  public static VerificationStep<ErxCommunicationBundle> verifySentDateWithPredicate(
+      Predicate<LocalDate> localDatePredicate, String description) {
+    Predicate<ErxCommunicationBundle> predicate =
+        bundle ->
+            bundle.getCommunications().stream()
+                .map(com -> DateConverter.getInstance().dateToLocalDate(com.getSent()))
+                .allMatch(localDatePredicate);
+    return new VerificationStep.StepBuilder<ErxCommunicationBundle>(ErpAfos.A_25515, description)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxCommunicationBundle> verifySentDateIsAfter(LocalDate date) {
+    return verifySentDateWithPredicate(
+        ld -> ld.isAfter(date), format("das enthaltene send datum muss nach {0} liegen ", date));
+  }
+
+  public static VerificationStep<ErxCommunicationBundle> verifySentDateIsBefore(LocalDate date) {
+    return verifySentDateWithPredicate(
+        ld -> ld.isBefore(date), format("das enthaltene send datum muss vor {0} liegen ", date));
+  }
+
+  public static VerificationStep<ErxCommunicationBundle> receivedDateIsEqualTo(LocalDate date) {
+    return verifyReceivedDateWithPredicate(
+        ld -> ld.isEqual(date),
+        "Die enthaltenen Communications müssen das Communication.received Datum "
+            + date.toString()
+            + " enthalten");
+  }
+
+  /**
+   * @param localDatePredicate // example: ld -> ld.isBefore(LocalDate.now())
+   * @param description // the description of expected behavior as String
+   * @return VerificationStep
+   */
+  public static VerificationStep<ErxCommunicationBundle> verifyReceivedDateWithPredicate(
+      Predicate<LocalDate> localDatePredicate, String description) {
+    Predicate<ErxCommunicationBundle> predicate =
+        bundle ->
+            bundle.getCommunications().stream()
+                .map(com -> DateConverter.getInstance().dateToLocalDate(com.getReceived()))
+                .allMatch(localDatePredicate);
+    return new VerificationStep.StepBuilder<ErxCommunicationBundle>(ErpAfos.A_25515, description)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxCommunicationBundle> verifySentDateIsSortedAscend() {
+    Predicate<ErxCommunicationBundle> predicate =
+        bundle -> {
+          val handedOverTimes =
+              bundle.getCommunications().stream()
+                  .map(medDisp -> DateConverter.getInstance().dateToLocalDate(medDisp.getSent()))
+                  .toList();
+          return isSortedAscend(handedOverTimes);
+        };
+    return new VerificationStep.StepBuilder<ErxCommunicationBundle>(
+            ErpAfos.A_24438,
+            "Die Default Sortierrichtung muss aufsteigend auf dem Wert sent erfolgen ")
+        .predicate(predicate)
+        .accept();
+  }
+
+  private static boolean isSortedAscend(List<LocalDate> sentDates) {
+    for (int i = 0; i <= sentDates.size() - 2; i++) {
+      if (sentDates.get(i).isAfter(sentDates.get(i + 1))) return false;
+    }
+    return true;
   }
 }

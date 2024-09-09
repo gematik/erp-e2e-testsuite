@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.idp.client.IdpClient;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.UnirestRetryWrapper;
 import de.gematik.test.erezept.client.rest.ErpResponseFactory;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.client.vau.VauException;
@@ -36,7 +37,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
-import kong.unirest.Unirest;
+import kong.unirest.core.Unirest;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -46,20 +47,18 @@ import lombok.val;
 @UtilityClass
 public class ErpClientFactory {
 
+  private static final UnirestRetryWrapper retryWrapper = new UnirestRetryWrapper();
   private static X509Certificate vauCertificate;
 
   public static ErpClient createErpClient(
       EnvironmentConfiguration environment, PsActorConfiguration actor) {
-    val erpClientConfig =
-        toErpClientConfig(environment.getTslBaseUrl(), environment.getTi(), ClientType.PS, actor);
+    val erpClientConfig = toErpClientConfig(environment.getTi(), ClientType.PS, actor);
     return createErpClient(erpClientConfig, getVauCertificate(erpClientConfig));
   }
 
   public static ErpClient createErpClient(
       EnvironmentConfiguration environment, PatientConfiguration actor) {
-    val erpClientConfig =
-        toErpClientConfig(
-            environment.getTslBaseUrl(), environment.getInternet(), ClientType.FDV, actor);
+    val erpClientConfig = toErpClientConfig(environment.getInternet(), ClientType.FDV, actor);
     erpClientConfig.setXApiKey(environment.getInternet().getXapiKey());
     return createErpClient(erpClientConfig, getVauCertificate(erpClientConfig));
   }
@@ -107,15 +106,12 @@ public class ErpClientFactory {
   }
 
   private static ErpClientConfiguration toErpClientConfig(
-      String tslBaseUrl,
-      BackendRouteConfiguration route,
-      ClientType type,
-      BaseActorConfiguration actor) {
+      BackendRouteConfiguration route, ClientType type, BaseActorConfiguration actor) {
     val erpClientConfig = initializeBaseConfiguration(actor, type);
 
     erpClientConfig.setDiscoveryDocumentUrl(route.getDiscoveryDocumentUrl());
     erpClientConfig.setFdBaseUrl(route.getFdBaseUrl());
-    erpClientConfig.setTslBaseUrl(tslBaseUrl);
+    erpClientConfig.setTslBaseUrl(route.getTslBaseUrl());
     erpClientConfig.setUserAgent(route.getUserAgent());
     erpClientConfig.setClientId(route.getClientId());
     erpClientConfig.setRedirectUrl(route.getRedirectUrl());
@@ -166,7 +162,7 @@ public class ErpClientFactory {
     val req = Unirest.get(certUrl).headers(headers);
 
     try {
-      val response = req.asBytes();
+      val response = retryWrapper.requestWithRetries(req);
       val data = response.getBody();
       log.info(
           "Received response with {} bytes ({}) from VAU-Certificate with status code {}",

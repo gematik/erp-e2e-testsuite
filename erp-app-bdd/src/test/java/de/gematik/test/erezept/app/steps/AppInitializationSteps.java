@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,44 @@
 
 package de.gematik.test.erezept.app.steps;
 
-import static java.text.MessageFormat.*;
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static java.text.MessageFormat.format;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.PrimSysBddFactory;
-import de.gematik.test.erezept.app.abilities.*;
-import de.gematik.test.erezept.app.cfg.*;
+import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
+import de.gematik.test.erezept.app.abilities.UseTheApp;
+import de.gematik.test.erezept.app.cfg.AppiumDriverFactory;
+import de.gematik.test.erezept.app.cfg.ErpAppConfiguration;
 import de.gematik.test.erezept.app.mobile.Environment;
-import de.gematik.test.erezept.app.task.*;
+import de.gematik.test.erezept.app.task.ChangeTheEnvironment;
+import de.gematik.test.erezept.app.task.NavigateThroughCardwall;
+import de.gematik.test.erezept.app.task.NavigateThroughOnboarding;
+import de.gematik.test.erezept.app.task.SetUpDevice;
+import de.gematik.test.erezept.app.task.SetVirtualEgk;
+import de.gematik.test.erezept.app.task.SkipOnboarding;
+import de.gematik.test.erezept.app.task.UseInstalledApp;
+import de.gematik.test.erezept.app.task.ios.NavigateThroughOnboardingOnIOS;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.*;
-import io.cucumber.java.*;
-import io.cucumber.java.de.*;
-import lombok.*;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import io.cucumber.java.de.Angenommen;
+import io.cucumber.java.de.Dann;
+import io.cucumber.java.de.Und;
+import io.cucumber.java.de.Wenn;
+import java.util.Optional;
+import lombok.val;
 import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.actors.*;
+import net.serenitybdd.screenplay.actors.Cast;
+import net.serenitybdd.screenplay.actors.OnStage;
 
 public class AppInitializationSteps {
 
@@ -48,7 +69,7 @@ public class AppInitializationSteps {
   @Before
   public void setUp(Scenario scenario) {
     scenarioName = scenario.getName();
-    smartcards = SmartcardFactory.getArchive();
+    smartcards = SmartcardArchive.fromResources();
     config = ConfigurationReader.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
     primsysConfig =
         ConfigurationReader.forPrimSysConfiguration()
@@ -58,23 +79,30 @@ public class AppInitializationSteps {
 
   @After
   public void tearDown(Scenario scenario) {
-    val driver = SafeAbility.getAbility(this.testReporter, UseTheApp.class);
-    driver.finish(scenario);
+    Optional.ofNullable(this.testReporter)
+        .map(actor -> actor.abilityTo(UseTheApp.class))
+        .ifPresent(driver -> driver.finish(scenario));
+
     OnStage.drawTheCurtain();
   }
 
   @Angenommen(
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat die E-Rezept App auf"
           + " (?:seinem|ihrem) Smartphone eingerichtet$")
+  @Wenn(
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) die E-Rezept App auf"
+          + " (?:seinem|ihrem) Smartphone eingerichtet hat$")
   public void initPatient(String insuranceType, String userName) {
     val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
 
     // assemble the screenplay
     val theAppUser = OnStage.theActorCalled(userName);
-    this.testReporter =
-        theAppUser; // remember the app user for reporting the final test result to MDC
+
+    // remember the app user for reporting the final test result to MDC
+    this.testReporter = theAppUser;
+
     theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));
-    givenThat(theAppUser).can(UseAppUserConfiguration.forUser(userName, config));
+    givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
     givenThat(theAppUser).can(useTheAppiumDriver);
 
     givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
@@ -90,17 +118,42 @@ public class AppInitializationSteps {
   }
 
   @Angenommen(
+      "^(?:der|die) Versicherte (.+) hat die E-Rezept App auf"
+          + " (?:seinem|ihrem) Smartphone für die Nutzung ohne TI eingerichtet$")
+  @Wenn(
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) Smartphone für die Nutzung ohne TI eingerichtet"
+          + " hat$")
+  public void initPatientWithoutTi(String userName) {
+    val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
+
+    // assemble the screenplay
+    val theAppUser = OnStage.theActorCalled(userName);
+    // remember the app user for reporting the final test result to MDC
+    this.testReporter = theAppUser;
+
+    theAppUser.describedAs(format("Eine App-Nutzer des E-Rezept ohne eGK"));
+    givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
+    givenThat(theAppUser).can(useTheAppiumDriver);
+
+    givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
+
+    // walk through onboarding
+    givenThat(theAppUser).attemptsTo(NavigateThroughOnboardingOnIOS.entirely());
+  }
+
+  @Angenommen(
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) legt sich ein Profil in der"
           + " E-Rezept App von (.+) an$")
   public void initPatientForExistingApp(
       String insuranceType, String userName, String deviceOwnerUserName) {
     val deviceOwner = OnStage.theActorCalled(deviceOwnerUserName);
+    val deviceName = SafeAbility.getAbility(deviceOwner, UseConfigurationData.class).getDevice();
     val theAppUser = OnStage.theActorCalled(userName);
     theAppUser.describedAs(
         format(
             "Eine {0} App-Nutzer der E-Rezept auf dem Gerät von {1} mitnutzt",
             insuranceType, deviceOwnerUserName));
-    givenThat(theAppUser).can(UseAppUserConfiguration.forUser(userName, config));
+    givenThat(theAppUser).can(UseConfigurationData.asCoUser(userName, deviceName, config));
     givenThat(theAppUser).can(ManageDataMatrixCodes.sheGetsPrescribed());
     givenThat(theAppUser).can(ReceiveDispensedDrugs.forHimself());
 
@@ -116,7 +169,7 @@ public class AppInitializationSteps {
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) überspringt das Onboarding")
   public void initPatientWithoutOnboarding(String insuranceType, String userName) {
     val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
-    val userConfiguration = UseAppUserConfiguration.forUser(userName, config);
+    val userConfiguration = UseConfigurationData.forUser(userName, config);
 
     // assemble the screenplay
     val theAppUser = OnStage.theActorCalled(userName);
@@ -136,16 +189,15 @@ public class AppInitializationSteps {
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) öffnet das Onboarding$")
   public void initPatientOpenOnboarding(String insuranceType, String userName) {
     val theAppUser = OnStage.theActorCalled(userName);
-    this.testReporter =
-        theAppUser; // remember the app user for reporting the final test result to MDC
     val useTheApp = AppiumDriverFactory.forUser(scenarioName, userName, config);
+    // remember the app user for reporting the final test result to MDC
+    this.testReporter = theAppUser;
 
     theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));
-    givenThat(theAppUser).can(UseAppUserConfiguration.forUser(userName, config));
+    givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
     givenThat(theAppUser).can(useTheApp);
 
     givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
-    givenThat(theAppUser).can(ManageDataMatrixCodes.sheGetsPrescribed());
   }
 
   @Dann("^kann (?:der|die) Versicherte (.+) das Onboarding erfolgreich durchlaufen$")
@@ -161,7 +213,7 @@ public class AppInitializationSteps {
             ChangeTheEnvironment.bySwitchInTheDebugMenuTo(
                 Environment.fromString(primsysConfig.getActiveEnvironment().getName())));
 
-    val userConfiguration = SafeAbility.getAbility(theAppUser, UseAppUserConfiguration.class);
+    val userConfiguration = SafeAbility.getAbility(theAppUser, UseConfigurationData.class);
     if (userConfiguration.useVirtualEgk()) {
       val egk = smartcards.getEgkByICCSN(userConfiguration.getEgkIccsn());
       when(theAppUser).attemptsTo(SetVirtualEgk.withEgk(egk));

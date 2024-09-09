@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ class ChargeItemChangeAuthorizationTest {
   void shouldCreateFromChargeItem() {
     val prescriptionId = PrescriptionId.random();
     val chargeItem =
-        ErxChargeItemBuilder.faker(prescriptionId)
-            .accessCode("123") // this is not the value which will be used!!
-            .build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(prescriptionId)
+            .withAccessCode("123") // this is not the value which will be used!!
+            .fake();
     val accessCode = AccessCode.random();
     val authorization = ChargeItemChangeAuthorization.forChargeItem(chargeItem, accessCode);
     assertEquals(prescriptionId, authorization.getPrescriptionId());
@@ -41,7 +42,7 @@ class ChargeItemChangeAuthorizationTest {
   @Test
   void shouldNotThrowOnChargeItemWithoutAccessCode() {
     val prescriptionId = PrescriptionId.random();
-    val chargeItem = ErxChargeItemBuilder.faker(prescriptionId).build();
+    val chargeItem = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId).fake();
     assertDoesNotThrow(
         () -> ChargeItemChangeAuthorization.forChargeItem(chargeItem, AccessCode.random()));
   }

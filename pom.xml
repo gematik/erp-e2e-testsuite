@@ -7,14 +7,13 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>bdd-javadocs</module>
         <module>erp-config</module>
         <module>smartcard</module>
-        <module>erp-crypto</module>
         <module>erp-client</module>
         <module>erp-fhir</module>
         <module>erp-fhir-fuzzing</module>
@@ -27,6 +26,7 @@
         <module>pharmacy-service-provider-ws-client</module>
         <module>erp-tools</module>
         <module>primsys-rest</module>
+        <module>openapi</module>
     </modules>
 
     <properties>
@@ -48,29 +48,30 @@
         <version.surefire-report>3.0.0-M2</version.surefire-report>
         <version.maven-javadoc-plugin>3.5.0</version.maven-javadoc-plugin>
         <version.maven-owasp-plugin>8.2.1</version.maven-owasp-plugin>
-        <version.hapi-fhir>6.8.3</version.hapi-fhir>
-        <version.woodstox>4.4.1</version.woodstox>
-        <version.serenity>4.0.12</version.serenity>
-        <version.idp-client>22.0.4</version.idp-client>
+        <version.hapi-fhir>7.2.1</version.hapi-fhir>
+        <version.serenity>4.1.20</version.serenity>
+        <version.appium>9.2.2</version.appium>
+        <version.idp-client>28.0.2</version.idp-client>
         <version.spotless>2.41.1</version.spotless>
-        <version.fasterxml.jackson>2.16.0</version.fasterxml.jackson>
+        <version.fasterxml.jackson>2.17.1</version.fasterxml.jackson>
         <version.junit>5.10.2</version.junit>
         <version.assertj>3.24.2</version.assertj>
         <version.archunit>1.0.1</version.archunit>
         <version.junit-pioneer>2.0.1</version.junit-pioneer>
-        <version.mockito>5.2.0</version.mockito>
-        <version.wiremock>3.2.0</version.wiremock>
+        <version.mockito>5.12.0</version.mockito>
+        <version.wiremock>3.8.0</version.wiremock>
         <version.faker>1.0.2</version.faker>
         <version.lombok>1.18.26</version.lombok>
         <version.logback>1.5.6</version.logback>
         <version.slf4j-api>2.0.7</version.slf4j-api>
-        <version.unirest>3.14.2</version.unirest>
-        <version.dss>5.12</version.dss>
-        <version.bouncycastle>1.73</version.bouncycastle>
+        <version.unirest>4.4.0</version.unirest>
+        <version.dss>6.0</version.dss>
+        <version.bouncycastle>1.78.1</version.bouncycastle>
         <version.zxing>3.5.1</version.zxing>
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
         <version.jersey>4.0.0-M1</version.jersey>
         <version.poto>3.0.0-185</version.poto>
+        <version.bricks>0.1.1-SNAPSHOT</version.bricks>
 
         <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
 
@@ -117,91 +118,81 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
-                <artifactId>primsys-factory</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>de.gematik.test.erezept</groupId>
-                <artifactId>erp-crypto</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>pharmacy-service-provider-ws-client</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -250,6 +241,11 @@
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
                 <version>${version.fasterxml.jackson}</version>
             </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+                <version>${version.fasterxml.jackson}</version>
+            </dependency>
 
             <!-- Serenity-BDD -->
             <dependency>
@@ -257,6 +253,12 @@
                 <artifactId>serenity-core</artifactId>
                 <version>${version.serenity}</version>
             </dependency>
+            <dependency>
+                <groupId>net.serenity-bdd</groupId>
+                <artifactId>serenity-model</artifactId>
+                <version>${version.serenity}</version>
+            </dependency>
+
             <dependency>
                 <groupId>net.serenity-bdd</groupId>
                 <artifactId>serenity-cucumber</artifactId>
@@ -292,6 +294,60 @@
                 <artifactId>serenity-junit</artifactId>
                 <version>${version.serenity}</version>
             </dependency>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-junit-platform-engine</artifactId>
+                <version>7.18.0</version>
+            </dependency>
+
+            <!--
+            NOTE: appium-client is already included in serenity-core,
+            but by this we can explicitly control the version
+            -->
+            <dependency>
+                <groupId>io.appium</groupId>
+                <artifactId>java-client</artifactId>
+                <version>${version.appium}</version>
+            </dependency>
+
+
+            <!-- Briccss -->
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-hapi-fuzzing-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-codec-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-codec-brick</artifactId>
+                <version>${version.bricks}</version>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>unit-test-utility-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>resource-loader-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>smartcards-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>crypto-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
 
             <!-- HAPI FHIR -->
             <dependency>
@@ -315,6 +371,11 @@
                 <artifactId>hapi-fhir-validation-resources-r4</artifactId>
                 <version>${version.hapi-fhir}</version>
             </dependency>
+            <dependency>
+                <groupId>ca.uhn.hapi.fhir</groupId>
+                <artifactId>hapi-fhir-caching-caffeine</artifactId>
+                <version>${version.hapi-fhir}</version>
+            </dependency>
 
             <!-- DSS and Crypto -->
             <dependency>
@@ -329,17 +390,17 @@
             </dependency>
             <dependency>
                 <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+                <artifactId>dss-service</artifactId>
+                <version>${version.dss}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.europa.ec.joinup.sd-dss</groupId>
                 <artifactId>dss-utils-apache-commons</artifactId>
                 <version>${version.dss}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
-                <version>${version.bouncycastle}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-${artefact.bouncycastle}</artifactId>
                 <version>${version.bouncycastle}</version>
             </dependency>
             <dependency>
@@ -351,6 +412,11 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-${artefact.bouncycastle}</artifactId>
                 <version>${version.bouncycastle}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.pki</groupId>
+                <artifactId>gemLibPki</artifactId>
+                <version>2.1.4</version>
             </dependency>
 
             <!-- zxing required for creating Data Matrix Codes -->
@@ -364,26 +430,30 @@
                 <artifactId>javase</artifactId>
                 <version>${version.zxing}</version>
             </dependency>
-            <dependency>
-                <groupId>com.googlecode.plist</groupId>
-                <artifactId>dd-plist</artifactId>
-                <version>1.27</version>
-            </dependency>
 
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>2.2</version>
+            </dependency>
+            <!-- data fakers/generators -->
             <dependency>
                 <groupId>com.github.javafaker</groupId>
                 <artifactId>javafaker</artifactId>
                 <version>${version.faker}</version>
             </dependency>
             <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>5.3.2</version>
+                <groupId>dev.codesoapbox</groupId>
+                <artifactId>dummy4j</artifactId>
+                <version>0.11.0</version>
             </dependency>
+
             <dependency>
                 <groupId>com.konghq</groupId>
-                <artifactId>unirest-java</artifactId>
+                <artifactId>unirest-java-bom</artifactId>
                 <version>${version.unirest}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.java-websocket</groupId>
@@ -391,24 +461,9 @@
                 <version>1.5.3</version>
             </dependency>
             <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>20230227</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.10.1</version>
-            </dependency>
-            <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
                 <version>73.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>${version.woodstox}</version>
             </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
@@ -416,7 +471,7 @@
                 <version>4.7.3</version>
             </dependency>
             <dependency>
-                <groupId>javax.xml.bind</groupId>
+                <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
             </dependency>
@@ -463,12 +518,6 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>${version.mockito}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
                 <version>${version.mockito}</version>
                 <scope>test</scope>
             </dependency>
@@ -533,8 +582,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>unit-test-utility-brick</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

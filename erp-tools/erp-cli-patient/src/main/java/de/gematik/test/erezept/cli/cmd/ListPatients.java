@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.erezept.cli.param.ExclusiveEgkIdentifierGroup;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardFactory;
 import java.util.List;
 import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +49,14 @@ public class ListPatients implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    val sca = SmartcardFactory.getArchive();
+    val sca = SmartcardArchive.fromResources();
 
-    val smartcards = hasFilter() ? egkIdentifier.getEgks(sca) : sca.getEgkCards();
+    val smartcards =
+        hasFilter()
+            ? egkIdentifier.getEgks(sca)
+            : sca.getConfigsFor(SmartcardType.EGK).stream()
+                .map(cfg -> sca.getEgkByICCSN(cfg.getIccsn()))
+                .toList();
 
     smartcards.stream()
         .filter(egk -> !FILTER_ICCSNS.contains(egk.getIccsn()))
@@ -68,8 +74,8 @@ public class ListPatients implements Callable<Integer> {
       System.out.println(egk.getAutCertificate().getX509Certificate());
     } else {
       System.out.println(format("{0} : {1}", egk.getIccsn(), egk.getKvnr()));
-      System.out.println(format("\tOwner:        {0}", egk.getOwner().getOwnerName()));
-      System.out.println(format("\tKrankenkasse: {0}", egk.getOwner().getOrganization()));
+      System.out.println(format("\tOwner:        {0}", egk.getOwnerData().getOwnerName()));
+      System.out.println(format("\tKrankenkasse: {0}", egk.getOwnerData().getOrganization()));
     }
 
     System.out.println("----------------");

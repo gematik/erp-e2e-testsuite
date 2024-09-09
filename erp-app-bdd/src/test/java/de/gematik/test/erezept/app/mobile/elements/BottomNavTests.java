@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,22 @@ class BottomNavTests {
   void checkPrescriptionButton() {
     val element = BottomNav.PRESCRIPTION_BUTTON;
     assertTrue(element.name().toLowerCase().contains("button"));
-    assertEquals(element.getIosLocator().get(), AppiumBy.accessibilityId("Rezepte"));
+    assertEquals(element.getIosLocator().get(), AppiumBy.name("Rezepte"));
     assertNull(element.getAndroidLocator().get());
+  }
+
+  @Test
+  void checkPharmacySearchButton() {
+    var element = BottomNav.PHARMACY_SEARCH_BUTTON;
+    assertTrue(element.name().toLowerCase().contains("button"));
+    assertEquals(element.getIosLocator().get(), AppiumBy.name("Apothekensuche"));
+  }
+
+  @Test
+  void checkPrescriptionOrdersButton() {
+    var element = BottomNav.PRESCRIPTION_ORDERS_BUTTON;
+    assertTrue(element.name().toLowerCase().contains("button"));
+    assertEquals(element.getIosLocator().get(), AppiumBy.name("Bestellungen"));
   }
 
   @Test

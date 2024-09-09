@@ -25,7 +25,7 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -42,6 +42,7 @@ import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -53,6 +54,7 @@ import org.junit.runner.RunWith;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName(
     "QES_Hash der Signatur des Arztes muss dem in der Quittung hinterlegtem Hash entsprechen")
+@Tag("QES")
 public class ValidateReceiptQESHashes extends ErpTest {
 
   @Actor(name = "Adelheid Ulmenwald")
@@ -102,7 +104,7 @@ public class ValidateReceiptQESHashes extends ErpTest {
     val docSignedDocument = sigObserver.toByteArray();
 
     val acceptation = pharmacyActor.performs(AcceptPrescription.forTheTask(activationTask));
-    val dispensation = pharmacyActor.performs(DispensePrescription.acceptedWith(acceptation));
+    val dispensation = pharmacyActor.performs(ClosePrescription.acceptedWith(acceptation));
 
     pharmacyActor.attemptsTo(
         Verify.that(dispensation)

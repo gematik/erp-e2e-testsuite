@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,26 @@
 package de.gematik.test.erezept.app.abilities;
 
 import static java.text.MessageFormat.format;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.exceptions.AppErrorException;
-import de.gematik.test.erezept.app.mobile.*;
+import de.gematik.test.erezept.app.mobile.ListPageElement;
+import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.ErrorAlert;
 import de.gematik.test.erezept.app.mobile.elements.PageElement;
 import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
-import io.appium.java_client.*;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.AppiumFluentWait;
 import io.appium.java_client.serverevents.CustomEvent;
 import io.cucumber.java.Scenario;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,15 +44,22 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
+import net.serenitybdd.screenplay.HasTeardown;
 import org.jetbrains.annotations.NotNull;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 
 @Slf4j
-public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
+public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasTeardown {
 
   protected final T driver;
   @Getter @Setter private String currentUserProfile;
@@ -150,7 +164,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
   }
 
   public void tap(int times, PageElement pageElement) {
-    assertThat(times).isGreaterThan(0);
+    assertTrue(times > 0, "Tap times must be greater than 0");
     for (int i = 0; i < times; i++) {
       this.tap(pageElement);
     }
@@ -169,7 +183,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
   }
 
   public void tap(int times, Point point) {
-    assertThat(times).isGreaterThan(0);
+    assertTrue(times > 0, "Tap times must be greater than 0");
     for (int i = 0; i < times; i++) {
       this.tap(point);
     }
@@ -286,7 +300,8 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
 
   public final void waitUntilElementIsVisible(PageElement pageElement) {
     log.info(format("Wait until element {0} is visible", pageElement.getFullName()));
-    waitUntil(ExpectedConditions.visibilityOf(getWebElement(pageElement)));
+    waitUntil(ExpectedConditions.presenceOfElementLocated(this.getLocator(pageElement)));
+    waitUntil(ExpectedConditions.visibilityOfElementLocated(this.getLocator(pageElement)));
   }
 
   public final void waitUntilElementIsPresent(PageElement pageElement) {
@@ -377,6 +392,11 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
     val reportScript =
         format("seetest:client.setReportStatus(\"{0}\", \"{1}\", \"\")", status, message);
     driver.executeScript(reportScript);
+  }
+
+  @Override
+  public void tearDown() {
+    log.info("Quit driver");
     driver.quit();
   }
 

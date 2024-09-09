@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package de.gematik.test.konnektor.soap;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.erezept.config.dto.konnektor.TLSConfiguration;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TrustProviderTest {
+class TrustProviderTest {
 
   @Test
-  public void shouldCreateTrustStoreFromConfig() {
+  void shouldCreateTrustStoreFromConfig() {
     val cfg = new TLSConfiguration();
     cfg.setKeyStore("konsim_mandant1_keystore.p12");
     cfg.setKeyStorePassword("00");

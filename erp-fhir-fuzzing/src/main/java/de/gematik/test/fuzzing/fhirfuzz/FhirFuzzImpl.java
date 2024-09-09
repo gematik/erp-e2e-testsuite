@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.fuzzing.fhirfuzz;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzOperationResult;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
@@ -51,7 +51,7 @@ public class FhirFuzzImpl implements FhirResourceFuzz<Bundle> {
 
   @Override
   public Bundle generateRandom() {
-    return KbvErpBundleBuilder.faker().build();
+    return KbvErpBundleFaker.builder().fake();
   }
 
   private List<FuzzingMutator<Bundle>> getMutators() {

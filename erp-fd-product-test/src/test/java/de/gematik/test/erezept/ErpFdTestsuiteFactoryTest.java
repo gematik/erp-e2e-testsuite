@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.erezept.abilities.OCSPAbility;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
+import de.gematik.test.erezept.abilities.TSLAbility;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
@@ -162,11 +164,55 @@ class ErpFdTestsuiteFactoryTest {
   }
 
   @Test
+  void shouldEquipPatientActorForTslDownload() {
+    val actorName = "Fridolin Straßer";
+    val patient = new PatientActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(patient, RawHttpAbility.class));
+    assertDoesNotThrow(() -> config.equipForTslDownload(patient));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(patient, TSLAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getInternet().getTslBaseUrl());
+  }
+
+  @Test
+  void shouldEquipPharmaActorForTslDownload() {
+    val actorName = "Am Flughafen";
+    val pharmacy = new PharmacyActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class,
+        () -> SafeAbility.getAbility(pharmacy, RawHttpAbility.class));
+    assertDoesNotThrow(() -> config.equipForTslDownload(pharmacy));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(pharmacy, TSLAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getTi().getTslBaseUrl());
+  }
+
+  @Test
+  void shouldEquipDoctorActorForTslDownload() {
+    val actorName = "Adelheid Ulmenwald";
+    val doc = new DoctorActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(doc, RawHttpAbility.class));
+    assertDoesNotThrow(() -> config.equipForTslDownload(doc));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(doc, TSLAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getTi().getTslBaseUrl());
+  }
+
+  @Test
   void shouldEquipAsApothecary() {
     val apothecaryName = "Amanda Albrecht";
     val config = ErpFdTestsuiteFactory.create();
     val apothecary = new Actor(apothecaryName); // currently no specific class for apothecary
 
+    config.equipAsApothecary(apothecary);
     assertDoesNotThrow(() -> config.equipAsApothecary(apothecary));
     assertNotNull(apothecary.abilityTo(UseTheKonnektor.class));
   }
@@ -176,5 +222,47 @@ class ErpFdTestsuiteFactoryTest {
     val config = ErpFdTestsuiteFactory.create();
     val vsdmService = assertDoesNotThrow(config::getSoftKonnVsdmService);
     assertNotNull(vsdmService);
+  }
+
+  @Test
+  void shouldEquipDoctorActorForOCSP() {
+    val actorName = "Adelheid Ulmenwald";
+    val actor = new DoctorActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(actor, OCSPAbility.class));
+    assertDoesNotThrow(() -> config.equipForOCSP(actor));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(actor, OCSPAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getTi().getFdBaseUrl());
+  }
+
+  @Test
+  void shouldEquipPatientActorForOCSP() {
+    val actorName = "Günther Angermänn";
+    val actor = new PatientActor("");
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(actor, OCSPAbility.class));
+    assertDoesNotThrow(() -> config.equipForOCSP(actor));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(actor, OCSPAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getInternet().getFdBaseUrl());
+  }
+
+  @Test
+  void shouldEquipPharmaActorForOCSP() {
+    val actorName = "Am Flughafen";
+    val actor = new PharmacyActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertThrows(
+        MissingAbilityException.class, () -> SafeAbility.getAbility(actor, OCSPAbility.class));
+    assertDoesNotThrow(() -> config.equipForOCSP(actor));
+    assertDoesNotThrow(
+        () -> SafeAbility.getAbility(actor, OCSPAbility.class).config().getDefaultBaseUrl());
+    assertNotNull(config.getActiveEnvironment().getTi().getFdBaseUrl());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class BooleanToggleTest {
         Arguments.of(new AbsoluteReferencesAsUUIDToggle()),
         Arguments.of(new AnrValidationConfigurationIsErrorToggle()),
         Arguments.of(new EgkPharmacyAcceptPN3Toggle()),
-        Arguments.of(new DarreichungsformLyonsActive()),
+        Arguments.of(new ErpDarreichungsformOctoberActive()),
         Arguments.of(new FhirCloseSlicingToggle()));
   }
 }

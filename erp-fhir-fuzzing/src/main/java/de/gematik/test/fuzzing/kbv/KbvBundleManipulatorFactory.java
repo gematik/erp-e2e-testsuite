@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.values.ZANR;
 import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.fuzzing.FuzzingUtils;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.sql.Date;
@@ -83,8 +84,31 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
-            "DMP Code 42",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "42")));
+            "DMP Code 59",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "59")));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "DMP Code 15",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "15")));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "DMP Code 99",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "99")));
+    manipulators.add(
+        NamedEnvelope.of(
+            "DMP Code 29",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "29")));
+    manipulators.add(
+        NamedEnvelope.of(
+            "DMP Code ' '",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, " ")));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "DMP Code ?",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "?")));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -93,8 +117,8 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
-            "DMP Code 12",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "12")));
+            "DMP Code 13",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "13")));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -148,6 +172,32 @@ public class KbvBundleManipulatorFactory {
             b -> {
               val iknrIdentifier = b.getCoverage().getPayorFirstRep().getIdentifier();
               iknrIdentifier.setValue("0721111100");
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Reguläre StructureDefinition als ModifierExtension in der Versicherung",
+            b -> {
+              val sd = FuzzingUtils.randomStructureDefinition();
+              b.getCoverage()
+                  .getModifierExtension()
+                  .add(new Extension(sd.getCanonicalUrl(), new StringType("ABC")));
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Invalide ModifierExtension in der Versicherung",
+            b -> {
+              val url = GemFaker.getFaker().internet().url();
+              b.getCoverage()
+                  .getModifierExtension()
+                  .add(
+                      new Extension(
+                          url,
+                          new IntegerType(
+                              GemFaker.getFaker()
+                                  .number()
+                                  .numberBetween(Integer.MIN_VALUE, Integer.MAX_VALUE))));
             }));
 
     return manipulators;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.konnektor.commands;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.konnektor.PinType;
 import de.gematik.test.konnektor.cfg.KonnektorModuleFactory;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.SmartcardFactory;
-import de.gematik.test.smartcard.SmcB;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -50,7 +50,7 @@ class EncryptDocumentCommandTest {
 
   @BeforeEach
   void setUp() {
-    val smartCardArchive = SmartcardFactory.getArchive();
+    val smartCardArchive = SmartcardArchive.fromResources();
     smcb = smartCardArchive.getSmcbByICCSN("80276883110000116873");
     val templatePath =
         Path.of(this.getClass().getClassLoader().getResource("config.yaml").getPath());
@@ -70,11 +70,12 @@ class EncryptDocumentCommandTest {
         konnektor
             .execute(
                 new EncryptDocumentCommand(
-                    smcbCardHandle, Base64.getDecoder().decode(data), Algorithm.RSA_2048))
+                    smcbCardHandle, Base64.getDecoder().decode(data), CryptoSystem.RSA_2048))
             .getPayload();
     val decrypted =
         konnektor
-            .execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData, Algorithm.RSA_2048))
+            .execute(
+                new DecryptDocumentCommand(smcbCardHandle, encryptedData, CryptoSystem.RSA_2048))
             .getPayload();
     Assertions.assertEquals(
         new String(Base64.getEncoder().encode(decrypted), StandardCharsets.UTF_8),
@@ -93,11 +94,12 @@ class EncryptDocumentCommandTest {
         konnektor
             .execute(
                 new EncryptDocumentCommand(
-                    smcbCardHandle, Base64.getDecoder().decode(data), Algorithm.RSA_2048))
+                    smcbCardHandle, Base64.getDecoder().decode(data), CryptoSystem.RSA_2048))
             .getPayload();
     val decrypted =
         konnektor
-            .execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData, Algorithm.RSA_2048))
+            .execute(
+                new DecryptDocumentCommand(smcbCardHandle, encryptedData, CryptoSystem.RSA_2048))
             .getPayload();
     Assertions.assertEquals(
         new String(Base64.getEncoder().encode(decrypted), StandardCharsets.UTF_8),
@@ -118,14 +120,15 @@ class EncryptDocumentCommandTest {
         softKon
             .execute(
                 new EncryptDocumentCommand(
-                    smcbCardHandle, Base64.getDecoder().decode(data), Algorithm.RSA_2048))
+                    smcbCardHandle, Base64.getDecoder().decode(data), CryptoSystem.RSA_2048))
             .getPayload();
 
     smcbCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
     konnektor.execute(new VerifyPinCommand(smcbCardHandle, PinType.PIN_SMC));
     val decrypted =
         konnektor
-            .execute(new DecryptDocumentCommand(smcbCardHandle, encryptedData, Algorithm.RSA_2048))
+            .execute(
+                new DecryptDocumentCommand(smcbCardHandle, encryptedData, CryptoSystem.RSA_2048))
             .getPayload();
     Assertions.assertEquals(
         new String(Base64.getEncoder().encode(decrypted), StandardCharsets.UTF_8),

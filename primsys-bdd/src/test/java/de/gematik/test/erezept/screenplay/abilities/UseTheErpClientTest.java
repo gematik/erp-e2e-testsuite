@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static java.text.MessageFormat.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -28,7 +29,6 @@ import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhir.builder.erp.*;
 import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.konnektor.*;
 import java.security.cert.*;
@@ -66,14 +66,15 @@ class UseTheErpClientTest {
 
   @Test
   void shouldReportRequestResponse() {
-    val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
+    val chargeItem =
+        ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     val cmd = new ChargeItemPostCommand(chargeItem, new Secret("123"));
     val expectedResponse =
         ErpResponse.forPayload(chargeItem, ErxChargeItem.class)
             .withStatusCode(201)
             .usedJwt(TEST_TOKEN)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(mockErpClient.request(cmd)).thenReturn(expectedResponse);
     when(mockFhir.encode(any(), any(), eq(true))).thenReturn("mock fhir resource");
@@ -94,7 +95,8 @@ class UseTheErpClientTest {
 
   @Test
   void shouldForwardDecodeToClient() {
-    val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
+    val chargeItem =
+        ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     when(mockFhir.decode(eq(ErxChargeItem.class), any())).thenReturn(chargeItem);
 
     val ret = ability.decode(ErxChargeItem.class, "don't care");

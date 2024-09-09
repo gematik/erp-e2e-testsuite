@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,25 @@
 
 package de.gematik.test.core.expectations.requirements;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.FileWriter;
 import java.util.LinkedList;
 import java.util.List;
+import lombok.SneakyThrows;
 import lombok.val;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class CoverageReporter {
 
   private static CoverageReporter instance;
 
+  private final ObjectMapper mapper;
   private final List<CoverageData> coverageData;
   private CoverageData currentCounter;
 
   private CoverageReporter() {
     this.coverageData = new LinkedList<>();
+    this.mapper = new ObjectMapper();
   }
 
   public static CoverageReporter getInstance() {
@@ -46,49 +50,57 @@ public class CoverageReporter {
     this.coverageData.add(currentCounter);
   }
 
-  public JSONObject finishTestcase() {
+  public ObjectNode finishTestcase() {
     return serializeData(currentCounter);
   }
 
-  public JSONObject serializeReport() {
-    val testcases = new JSONArray();
-    coverageData.forEach(data -> testcases.put(serializeData(data)));
+  private ObjectNode serializeReport() {
+    val testcases = this.mapper.createArrayNode();
+    coverageData.forEach(data -> testcases.add(serializeData(data)));
 
-    return new JSONObject().put("testcases", testcases);
+    return this.mapper.createObjectNode().set("testcases", testcases);
   }
 
-  private JSONObject serializeData(CoverageData data) {
-    val passed = new JSONArray();
+  @SneakyThrows
+  public void writeToFile(FileWriter fw) {
+    val json = this.mapper.writeValueAsString(this.serializeReport());
+    fw.write(json);
+  }
+
+  private ObjectNode serializeData(CoverageData data) {
+    val passed = this.mapper.createArrayNode();
     data.getPassed()
         .forEach(
             (req, num) -> {
-              val entry = new JSONObject();
+              val entry = this.mapper.createObjectNode();
               entry
                   .put("covered", num)
                   .put("description", req.getDescription())
                   .put("id", req.getId());
-              passed.put(entry);
+              passed.add(entry);
             });
 
-    val failed = new JSONArray();
+    val failed = this.mapper.createArrayNode();
     data.getFailed()
         .forEach(
             (req, num) -> {
-              val entry = new JSONObject();
+              val entry = this.mapper.createObjectNode();
               entry
                   .put("covered", num)
                   .put("description", req.getDescription())
                   .put("id", req.getId());
-              failed.put(entry);
+              failed.add(entry);
             });
 
-    val testcaseData = new JSONObject();
-    testcaseData.put("passed", passed).put("failed", failed).put("testcase", data.getTestcaseId());
+    val testcaseData = mapper.createObjectNode();
+    testcaseData.set("passed", passed);
+    testcaseData.set("failed", failed);
+    testcaseData.put("testcase", data.getTestcaseId());
     return testcaseData;
   }
 
   /**
-   * simply increment the number in which the requirement was covered
+   * increment the number in which the requirement was covered
    *
    * @param req to increment the coverage for
    * @param passed define if requirement was passed

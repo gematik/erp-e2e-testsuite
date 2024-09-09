@@ -1,4 +1,24 @@
+/*
+ *  Copyright 2024 gematik GmbH
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package de.gematik.test.erezept.integration.task;
+
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
 
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
@@ -11,9 +31,11 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
@@ -24,19 +46,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
-
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept Verordnung mit verantwortlichem Arzt")
 @Tag("Feature:ResponsibleDoctor")
-@WithTag("Feature:ResponsibleDoctor")
 class ActivateWithResponsablePractitioner extends ErpTest {
 
   @Actor(name = "Adelheid Ulmenwald")

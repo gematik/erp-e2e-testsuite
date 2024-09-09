@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.konnektor.commands.options;
 
-import de.gematik.test.smartcard.Algorithm;
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
@@ -47,7 +47,7 @@ public class SignDocumentOptions {
         .build();
   }
 
-  public static SignDocumentOptions withAlgorithm(Algorithm algorithm) {
+  public static SignDocumentOptions withAlgorithm(CryptoSystem algorithm) {
     val cryptType =
         switch (algorithm) {
           case RSA_2048, RSA_PSS_2048 -> SigningCryptType.RSA;

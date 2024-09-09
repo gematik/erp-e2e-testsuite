@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
-import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.rest.response.*;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import jakarta.ws.rs.*;
 import java.util.*;
 import lombok.*;
@@ -38,7 +39,7 @@ class AbortUseCaseTest extends TestWithActorContext {
 
   @Test
   void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AbortUseCase.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AbortUseCase.class));
   }
 
   @Test
@@ -48,7 +49,7 @@ class AbortUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val resource =
-        FhirTestResourceUtil.createErxAuditEvent(
+        ErxFhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
     val mockResponse =
         ErpResponse.forPayload(resource, Resource.class)

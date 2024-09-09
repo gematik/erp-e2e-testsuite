@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package de.gematik.test.erezept.cli.param;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.cli.converter.StringListConverter;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardArchive;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.val;

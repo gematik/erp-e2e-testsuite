@@ -32,7 +32,7 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -105,7 +105,7 @@ class TaskAcceptUsecase extends ErpTest {
             .and(isInProgressStatus())
             .isCorrect());
     // cleanup
-    flughafen.performs(DispensePrescription.acceptedWith(acceptance));
+    flughafen.performs(ClosePrescription.acceptedWith(acceptance));
   }
 
   @TestcaseId("ERP_TASK_ACCEPT_02")
@@ -119,11 +119,11 @@ class TaskAcceptUsecase extends ErpTest {
     val accepted2 = flughafen.performs(AcceptPrescription.forTheTask(task));
     flughafen.attemptsTo(
         Verify.that(accepted2)
-            .withOperationOutcome(ErpAfos.A_19168_01)
+            .withOperationOutcome(ErpAfos.A_19168)
             .responseWith(returnCodeIs(409))
             .and(
                 operationOutcomeHasDetailsText(
-                    "Task is processed by requesting institution", ErpAfos.A_19168_01))
+                    "Task is processed by requesting institution", ErpAfos.A_19168))
             .isCorrect());
   }
 

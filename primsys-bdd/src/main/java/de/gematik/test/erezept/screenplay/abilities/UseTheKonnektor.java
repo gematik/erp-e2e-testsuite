@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,12 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.Hba;
+import de.gematik.bbriccs.smartcards.Smartcard;
+import de.gematik.bbriccs.smartcards.SmartcardType;
+import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
 import de.gematik.test.erezept.exceptions.MissingSmartcardException;
@@ -36,12 +42,6 @@ import de.gematik.test.konnektor.commands.ReadVsdCommand;
 import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
 import de.gematik.test.konnektor.commands.VerifyDocumentCommand;
 import de.gematik.test.konnektor.commands.VerifyPinCommand;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.Hba;
-import de.gematik.test.smartcard.Smartcard;
-import de.gematik.test.smartcard.SmartcardType;
-import de.gematik.test.smartcard.SmcB;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
 import de.gematik.ws.conn.vsds.vsdservice.v5.ReadVSDResponse;
 import java.nio.charset.StandardCharsets;
@@ -61,16 +61,19 @@ public class UseTheKonnektor implements Ability {
   @Nullable private final SmcB smcb;
   @Nullable private final Hba hba;
   private final Konnektor konnektor;
-  @Nullable private final Algorithm algorithm;
+  @Nullable private final CryptoSystem algorithm;
   @Nullable private CardInfo smcbHandle;
   @Nullable private CardInfo hbaHandle;
 
   private UseTheKonnektor(
-      Konnektor konnektor, @Nullable SmcB smcb, @Nullable Hba hba, @Nullable Algorithm algorithm) {
+      Konnektor konnektor,
+      @Nullable SmcB smcb,
+      @Nullable Hba hba,
+      @Nullable CryptoSystem algorithm) {
     this.konnektor = konnektor;
     this.smcb = smcb;
     this.hba = hba;
-    this.algorithm = algorithm == null ? Algorithm.DEFAULT_ALGORITHM : algorithm;
+    this.algorithm = algorithm == null ? CryptoSystem.DEFAULT_CRYPTO_SYSTEM : algorithm;
     this.insertCards(smcb, hba);
     this.initCardHandles();
   }
@@ -203,7 +206,8 @@ public class UseTheKonnektor implements Ability {
     var ret = konnektor.toString();
 
     if (hba != null) {
-      ret += format(" / HBA (ICCSN {0}) von {1}", hba.getIccsn(), hba.getOwner().getCommonName());
+      ret +=
+          format(" / HBA (ICCSN {0}) von {1}", hba.getIccsn(), hba.getOwnerData().getCommonName());
     }
 
     if (smcb != null) {
@@ -217,7 +221,7 @@ public class UseTheKonnektor implements Ability {
 
     private SmcB smcb;
     private Hba hba;
-    private Algorithm algorithm;
+    private CryptoSystem algorithm;
 
     private KonnektorAbilityBuilder(SmcB smcb) {
       this.smcb = smcb;
@@ -232,7 +236,7 @@ public class UseTheKonnektor implements Ability {
       return this;
     }
 
-    public KonnektorAbilityBuilder and(Algorithm algorithm) {
+    public KonnektorAbilityBuilder and(CryptoSystem algorithm) {
       this.algorithm = algorithm;
       return this;
     }

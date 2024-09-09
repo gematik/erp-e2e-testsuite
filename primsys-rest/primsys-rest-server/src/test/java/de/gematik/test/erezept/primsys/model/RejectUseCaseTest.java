@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.Map;
 import lombok.val;
@@ -41,7 +42,7 @@ class RejectUseCaseTest extends TestWithActorContext {
 
   @Test
   void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(RejectUseCase.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(RejectUseCase.class));
   }
 
   @Test
@@ -51,7 +52,7 @@ class RejectUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val resource =
-        FhirTestResourceUtil.createErxAuditEvent(
+        ErxFhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
     val mockResponse =
         ErpResponse.forPayload(resource, Resource.class)

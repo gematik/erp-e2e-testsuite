@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.exceptions.*;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
@@ -50,7 +52,7 @@ class ErxChargeItemTest extends ParsingTest {
 
     rawFiles.forEach(
         fileName -> {
-          val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+          val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
           val chargeItem = parser.decode(ErxChargeItem.class, content);
           assertNotNull(chargeItem, "Valid ErxMedicationDispense must be parseable");
           assertFalse(chargeItem.hasInsuranceProvider());
@@ -60,7 +62,7 @@ class ErxChargeItemTest extends ParsingTest {
               new PrescriptionId("160.123.456.789.123.58"), chargeItem.getPrescriptionId());
           assertEquals(ChargeItem.ChargeItemStatus.BILLABLE, chargeItem.getStatus());
           assertEquals("X234567890", chargeItem.getSubjectKvnr().getValue());
-          assertEquals("606358757", chargeItem.getEntererTelematikId());
+          assertEquals("606358757", chargeItem.getEntererTelematikId().getValue());
           assertFalse(chargeItem.isFromNewProfiles());
         });
   }
@@ -71,7 +73,7 @@ class ErxChargeItemTest extends ParsingTest {
 
     rawFiles.forEach(
         fileName -> {
-          val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+          val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
           val chargeItem = parser.decode(content);
           assertNotNull(chargeItem, "Valid ChargeItem must be parseable");
           assertEquals(ResourceType.ChargeItem, chargeItem.getResourceType());
@@ -82,7 +84,7 @@ class ErxChargeItemTest extends ParsingTest {
   @Test
   @SetSystemProperty(key = "erp.fhir.profile", value = "1.2.0")
   void shouldFindNewProfilePrescriptionId() {
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
     val chargeItem = parser.decode(ErxChargeItem.class, content);
     // change system of the prescription id
     chargeItem.getIdentifier().stream()
@@ -102,7 +104,7 @@ class ErxChargeItemTest extends ParsingTest {
 
   @Test
   void shouldThrowOnMissingPrescriptionId() {
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
     val chargeItem = parser.decode(ErxChargeItem.class, content);
 
     // remove the prescription id
@@ -125,8 +127,8 @@ class ErxChargeItemTest extends ParsingTest {
   @Test
   void shouldChangeContainedData() {
     val prescriptionId = PrescriptionId.random();
-    val davBundle = DavAbgabedatenBuilder.faker(prescriptionId).build();
-    val kbvBundle = KbvErpBundleBuilder.faker().build();
+    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val kbvBundle = KbvErpBundleFaker.builder().fake();
     val erxReceipt = mock(ErxReceipt.class);
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
 
@@ -157,7 +159,7 @@ class ErxChargeItemTest extends ParsingTest {
 
   @Test
   void shouldThrowOnMissingAccessCode() {
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
     val chargeItem = parser.decode(ErxChargeItem.class, content);
 
     chargeItem.getIdentifier().clear();
@@ -166,7 +168,7 @@ class ErxChargeItemTest extends ParsingTest {
 
   @Test
   void shouldFindNewProfileMarkingFlags() {
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
     val chargeItem = parser.decode(ErxChargeItem.class, content);
 
     // remove the marking flags extension
@@ -182,7 +184,7 @@ class ErxChargeItemTest extends ParsingTest {
 
   @Test
   void shouldThrowOnMissingMarkingFlags() {
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + "ChargeItem_01.xml");
     val chargeItem = parser.decode(ErxChargeItem.class, content);
 
     // remove the marking flags extension
@@ -215,8 +217,9 @@ class ErxChargeItemTest extends ParsingTest {
   }
 
   private ErxChargeItem generateWithAccessCodeByFaker(String code) {
-    return ErxChargeItemBuilder.faker(new PrescriptionId("testIdForChargeItem123456789"))
-        .accessCode(code)
-        .build();
+    return ErxChargeItemFaker.builder()
+        .withPrescriptionId(new PrescriptionId("testIdForChargeItem123456789"))
+        .withAccessCode(code)
+        .fake();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
     this.compositionBuilder = DavCompositionBuilder.builder();
   }
 
+  @Deprecated(forRemoval = true)
   public static DavAbgabedatenBuilder faker() {
     return faker(
         PrescriptionId.random(
@@ -64,9 +65,10 @@ public class DavAbgabedatenBuilder extends AbstractResourceBuilder<DavAbgabedate
                 PrescriptionFlowType.FLOW_TYPE_200, PrescriptionFlowType.FLOW_TYPE_209)));
   }
 
+  @Deprecated(forRemoval = true)
   public static DavAbgabedatenBuilder faker(PrescriptionId prescriptionId) {
     val b = builder(prescriptionId);
-    val pharmacy = PharmacyOrganizationBuilder.faker().build();
+    val pharmacy = PharmacyOrganizationFaker.builder().fake();
 
     val invoiceBuilder =
         DavInvoiceBuilder.builder()

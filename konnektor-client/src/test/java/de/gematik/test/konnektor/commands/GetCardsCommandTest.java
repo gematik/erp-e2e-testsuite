@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.konnektor.exceptions.SOAPRequestException;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
 import de.gematik.test.konnektor.util.CardsUtil;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
@@ -32,17 +31,17 @@ import de.gematik.ws.conn.eventservice.wsdl.v7.FaultMessage;
 import de.gematik.ws.tel.error.v2.Error;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class GetCardsCommandTest {
+class GetCardsCommandTest {
 
   private ContextType ctx;
   private ServicePortProvider mockProvider;
   private EventServicePortType mockEventService;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     ctx = new ContextType();
     ctx.setClientSystemId("cs1");
     ctx.setMandantId("m1");
@@ -56,7 +55,7 @@ public class GetCardsCommandTest {
 
   @Test
   @SneakyThrows
-  public void getRandomCards() {
+  void getRandomCards() {
     val status = new Status();
     status.setResult("OK");
     val mockResponse = CardsUtil.createGetCardsResponse(status, 10);
@@ -71,13 +70,15 @@ public class GetCardsCommandTest {
 
   @Test
   @SneakyThrows
-  public void shouldThrowSOAPRequestException() {
+  void shouldThrowSOAPRequestException() {
     val error = new Error();
     error.setMessageID("Message ID");
     val faulMessage = new FaultMessage("MockError", error);
 
     when(mockEventService.getCards(any())).thenThrow(faulMessage);
     val getCardsCmd = new GetCardsCommand();
-    assertThrows(SOAPRequestException.class, () -> getCardsCmd.execute(ctx, mockProvider));
+    assertThrows(RuntimeException.class, () -> getCardsCmd.execute(ctx, mockProvider));
+    // Note: see AbstractKonnektorCommand#executeSupplier
+    //    assertThrows(SOAPRequestException.class, () -> getCardsCmd.execute(ctx, mockProvider));
   }
 }

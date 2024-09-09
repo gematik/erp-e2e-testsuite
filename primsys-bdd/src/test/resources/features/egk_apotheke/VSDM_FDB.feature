@@ -55,6 +55,3 @@ Funktionalität: eGK in der Apotheke mit VSDM++
       | Maria 'Mobil ISC' Neumann    |
       | Julian 'Arge AOK' Nagelsmann |
       | Lucius 'ITSC' Fox            |
-
-
-

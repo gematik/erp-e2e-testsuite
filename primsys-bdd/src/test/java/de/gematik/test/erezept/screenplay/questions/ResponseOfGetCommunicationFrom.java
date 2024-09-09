@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,15 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
+import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -56,18 +59,38 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
     // make sure we have at least one expected message from the sender
     assertFalse(expectedCommunications.isEmpty());
 
-    // now try to fetch
     val com = deque.chooseFrom(expectedCommunications);
-    val id =
-        com.getCommunicationId()
+    return com.getCommunicationId()
+        .map(id -> fetchCommunicationById(erpClient, id))
+        .orElseGet(() -> fetchCommunicationByBasedOn(erpClient, com));
+  }
+
+  private ErpResponse<ErxCommunication> fetchCommunicationById(
+      UseTheErpClient erpClient, String id) {
+    val cmd = new CommunicationGetByIdCommand(id);
+    return erpClient.request(cmd);
+  }
+
+  private ErpResponse<ErxCommunication> fetchCommunicationByBasedOn(
+      UseTheErpClient erpClient, ExchangedCommunication expectedCommunication) {
+    // first find the expected communication
+    val cmd =
+        CommunicationSearch.searchFor()
+            .sender(expectedCommunication.getSenderId())
+            .sortedBySendDate(SortOrder.DESCENDING);
+    val communication =
+        erpClient.request(cmd).getExpectedResource().getCommunications().stream()
+            .filter(com -> com.getBasedOnReferenceId().equals(com.getBasedOnReferenceId()))
+            .findFirst()
             .orElseThrow(
                 () ->
                     new MissingPreconditionError(
                         format(
-                            "Expected communication from {0} with Type {1} does not have an ID",
-                            com.getSenderName(), com.getType())));
-    val cmd = new CommunicationGetByIdCommand(id);
-    return erpClient.request(cmd);
+                            "Communication based on {0} from {1} ({2}) not found",
+                            expectedCommunication.getBasedOn(),
+                            expectedCommunication.getSenderName(),
+                            expectedCommunication.getSenderId())));
+    return fetchCommunicationById(erpClient, communication.getUnqualifiedId());
   }
 
   public static Builder sender(Actor sender) {
@@ -76,6 +99,7 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
+
     private final Actor sender;
 
     public ResponseOfGetCommunicationFrom onStack(String order) {

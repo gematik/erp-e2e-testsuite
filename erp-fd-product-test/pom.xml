@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.8.0-SNAPSHOT</version>
+        <version>0.9.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
@@ -22,7 +22,6 @@
         <encoding>UTF-8</encoding>
 
         <junit.tags/>
-        <serenity.tags/>
         <skip.unittests/>
     </properties>
 
@@ -35,8 +34,6 @@
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
         </dependency>
-
-        <!-- is required for the config only! -->
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
@@ -70,27 +67,36 @@
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir-fuzzing</artifactId>
         </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>fhir-hapi-fuzzing-brick</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>fhir-codec-brick</artifactId>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
         <!-- this one is only required to mock FHIR resources from erp-fhir/util! can be removed in the future!! -->
         <dependency>
-            <artifactId>erp-fhir</artifactId>
             <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>erp-config-data</artifactId>
-            <type>test-jar</type>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>resource-loader-brick</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -124,9 +130,23 @@
             <artifactId>junit-jupiter-params</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.pki</groupId>
+            <artifactId>gemLibPki</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.konghq</groupId>
+                    <artifactId>unirest-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -217,8 +237,9 @@
                 <artifactId>serenity-maven-plugin</artifactId>
                 <version>${version.serenity}</version>
                 <configuration>
-                    <tags>${serenity.tags}</tags>
-                    <reports>single-page-html</reports>
+                    <tags/>
+<!--                    <tags>${junit.tags}</tags>--> <!-- this does not work properly yet -->
+                    <reports>single-page-html,json-summary</reports>
                     <systemPropertyVariables>
                         <report.customfields.Testsuite>Produkt-TestSuite v${project.version}</report.customfields.Testsuite>
                         <report.customfields.Tester>${user.name}</report.customfields.Tester>
@@ -239,33 +260,12 @@
                         <artifactId>serenity-single-page-report</artifactId>
                         <version>${version.serenity}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>net.serenity-bdd</groupId>
+                        <artifactId>serenity-json-summary-report</artifactId>
+                        <version>${version.serenity}</version>
+                    </dependency>
                 </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
-                <configuration>
-                    <ignoreMissingFile>true</ignoreMissingFile>
-                    <file>${project.parent.basedir}/${project.artifactId}/target/site/serenity/index.html</file>
-                    <replacements>
-                        <replacement>
-                            <token>&lt;!-- Required Javascript --&gt;</token>
-                            <value>
-                                &lt;script type="text/javascript" src="coverage/coverage.js"&gt;&lt;/script&gt;
-                            </value>
-                        </replacement>
-                    </replacements>
-                    <skip>${skip.inttests}</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import static java.text.MessageFormat.format;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
@@ -52,7 +52,7 @@ public class ValidatorUtil {
       FhirParser parser, File file, Consumer<Boolean> validationAssertion, boolean printResult) {
 
     log.info(format("Validate {0}", file.getName()));
-    val content = ResourceUtils.readFileFromResource(file);
+    val content = ResourceLoader.readString(file);
     val vr = parser.validate(content);
     if (printResult) {
       printValidationResult(vr);

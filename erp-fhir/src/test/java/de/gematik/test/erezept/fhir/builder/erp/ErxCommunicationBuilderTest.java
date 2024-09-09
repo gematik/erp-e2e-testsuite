@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,7 +192,8 @@ class ErxCommunicationBuilderTest extends ParsingTest {
       name = "[{index}] -> Build CommunicationChangeRequest with E-Rezept FHIR Profiles {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
   void buildCommunicationChargeChangeRequest(ErpWorkflowVersion version) {
-    val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
+    val chargeItem =
+        ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     val changeReq =
         ErxChargeItemCommunicationBuilder.builder()
             .version(version)
@@ -226,7 +227,8 @@ class ErxCommunicationBuilderTest extends ParsingTest {
       name = "[{index}] -> Build CommunicationChangeReply with E-Rezept FHIR Profiles {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
   void buildCommunicationChargeChangeReply(ErpWorkflowVersion version) {
-    val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
+    val chargeItem =
+        ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     val changeReply =
         ErxChargeItemCommunicationBuilder.builder()
             .version(version)

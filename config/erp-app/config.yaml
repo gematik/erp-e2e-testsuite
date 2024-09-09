@@ -11,7 +11,6 @@ users:
 
 apps:
   - platform: iOS
-#    appFile: cloud:uniqueName=202309181405
     packageName: de.gematik.erp4ios.eRezept
   - platform: Android
     appFile: cloud:uniqueName=debug-tsystems0001
@@ -23,9 +22,16 @@ appium:
     url: http://0.0.0.0:4723
   - name: t-systems
     url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
-    version: 2.0.0
+    version: 2.9.0
     maxWaitTimeout: 12000 # how many milliseconds to wait at maximum for an element
     pollingInterval: 100   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
+    provisioningProfilePostfix: ".mdc2"
+    accessKey: DUMMY VALUE
+  - name: t-systems-public
+    url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
+    version: 2.9.0
+    maxWaitTimeout: 12000
+    pollingInterval: 100
     accessKey: DUMMY VALUE
 
 devices:
@@ -41,20 +47,22 @@ devices:
     platformVersion: 16.4
     appium: local
 
-  - name: T-Systems iPhone 7 Plus
+  - name: T-Systems iPhone 14 # gematik exclusive device with real eGK
     platform: iOS
-    udid: b849ffff983020c610f1ec495dadd39cb9c828e1
-    platformVersion: 15.7.1
-    appium: t-systems
-
-  - name: T-Systems iPhone 12 Pro
-    platform: iOS
-    udid: 00008101-001469393A91001E
-    platformVersion: 16.1
-    appium: t-systems
-
-  - name: T-Systems iPhone 14
-    platform: iOS
+    hasNfc: true
     udid: 00008110-000249802299401E
-    platformVersion: 16.1
+    platformVersion: 17.2.1
     appium: t-systems
+
+  - name: T-Systems iPhone 15 # gematik exclusive device with real eGK
+    platform: iOS
+    hasNfc: true
+    udid: 00008130-0002482110EB8D3A
+    platformVersion: 17.4.1
+    appium: t-systems
+
+  - name: T-Systems iPhone 12 Pro Max1  # public device only with virtual eGK
+    platform: iOS
+    udid: 00008101-000C50382103001E
+    platformVersion: 17.3.1
+    appium: t-systems-public

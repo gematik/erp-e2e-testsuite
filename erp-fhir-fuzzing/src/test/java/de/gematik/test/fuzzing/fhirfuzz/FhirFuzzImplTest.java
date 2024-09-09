@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -38,7 +38,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 class FhirFuzzImplTest extends ParsingTest {
-  private static final String TESTSTRING = "very short TestSTRING";
+
   private static FuzzConfig fuzzConfig;
   private static FuzzerContext fuzzerContext;
   private static FhirFuzzImpl fhirFuzz;
@@ -156,7 +156,7 @@ class FhirFuzzImplTest extends ParsingTest {
 
   @RepeatedTest(REPETITIONS)
   void shouldFuzzUntilInvalidTrackValidation() {
-    val bundle = KbvErpBundleBuilder.faker().build();
+    val bundle = KbvErpBundleFaker.builder().fake();
     fhirFuzz.getContext().getFuzzConfig().setUseAllMutators(true);
     fhirFuzz.getContext().getFuzzConfig().setUsedPercentOfMutators(0.002f);
     fhirFuzz.getContext().getFuzzConfig().setPercentOfAll(100f);
@@ -168,7 +168,7 @@ class FhirFuzzImplTest extends ParsingTest {
 
   @RepeatedTest(REPETITIONS)
   void shouldFuzzUntilInvalidTrackCounter() {
-    val bundle = KbvErpBundleBuilder.faker().build();
+    val bundle = KbvErpBundleFaker.builder().fake();
     fhirFuzz.getContext().getFuzzConfig().setUseAllMutators(false);
     fhirFuzz.getContext().getFuzzConfig().setUsedPercentOfMutators(0.002f);
     fhirFuzz.getContext().getFuzzConfig().setPercentOfAll(0f);

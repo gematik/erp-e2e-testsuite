@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
@@ -167,5 +168,17 @@ class ProvidePatientBaseDataTest extends ParsingTest {
     assertNotEquals("", patient.getFullName());
     assertTrue(patient.getPatient().hasGkvKvnr());
     assertEquals("X123456789", patient.getPatient().getGkvId().orElseThrow().getValue());
+  }
+
+  @Test
+  void shouldCreateCoverageWithDmpKennzeichen() {
+    val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
+    patient.setDmpKennzeichen(DmpKennzeichen.DM1);
+
+    val coverage = patient.getInsuranceCoverage();
+    val result = ValidatorUtil.encodeAndValidate(parser, coverage);
+
+    assertTrue(result.isSuccessful());
+    assertEquals(DmpKennzeichen.DM1, coverage.getDmpKennzeichen());
   }
 }

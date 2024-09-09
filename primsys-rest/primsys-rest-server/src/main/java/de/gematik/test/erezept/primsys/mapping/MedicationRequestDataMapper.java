@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@ package de.gematik.test.erezept.primsys.mapping;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import de.gematik.test.erezept.primsys.data.MvoDto;
@@ -50,9 +53,33 @@ public class MedicationRequestDataMapper
     this.medication = medication;
   }
 
+  public static Builder from(KbvErpMedicationRequest medicationRequest) {
+    val builder =
+        MedicationRequestDto.medicationRequest()
+            .dosage(medicationRequest.getDosageInstructionFirstRep().getText())
+            .packageQuantity(
+                medicationRequest.getDispenseRequest().getQuantity().getValue().intValue())
+            .note(medicationRequest.getNoteText().orElse(""))
+            .substitutionAllowed(medicationRequest.allowSubstitution())
+            .bvg(medicationRequest.isBvg())
+            .emergencyFee(medicationRequest.hasEmergencyServiceFee());
+    if (medicationRequest.isMultiple()) {
+      val mvo = new MvoDto();
+      medicationRequest.getMvoStart().ifPresent(mvo::setStartDate);
+      medicationRequest.getMvoEnd().ifPresent(mvo::setEndDate);
+      medicationRequest.getNumerator().ifPresent(mvo::setNumerator);
+      medicationRequest.getDemoninator().ifPresent(mvo::setDenominator);
+      builder.mvo(mvo);
+    }
+    return from(builder.build());
+  }
+
+  public static Builder from(MedicationRequestDto dto) {
+    return new Builder(dto);
+  }
+
   @Override
   protected void complete() {
-    ensure(dto::getDosage, dto::setDosage, GemFaker::fakerDosage);
     ensure(dto::getPackageQuantity, dto::setPackageQuantity, () -> fakerAmount(1, 20));
   }
 
@@ -64,6 +91,7 @@ public class MedicationRequestDataMapper
             .requester(practitioner)
             .medication(medication)
             .dosage(dto.getDosage())
+            .note(dto.getNote())
             .quantityPackages(dto.getPackageQuantity())
             .status("active")
             .intent("order")
@@ -90,30 +118,6 @@ public class MedicationRequestDataMapper
 
   public boolean isMvoValid() {
     return dto.getMvo() == null || MvoDataMapper.from(dto.getMvo()).isValid();
-  }
-
-  public static Builder from(KbvErpMedicationRequest medicationRequest) {
-    val dto = new MedicationRequestDto();
-    dto.setDosage(medicationRequest.getDosageInstructionFirstRep().getText());
-    dto.setPackageQuantity(
-        medicationRequest.getDispenseRequest().getQuantity().getValue().intValue());
-    medicationRequest.getNoteText().ifPresent(dto::setNote);
-    dto.setSubstitutionAllowed(medicationRequest.allowSubstitution());
-    dto.setBvg(medicationRequest.isBvg());
-    dto.setEmergencyFee(medicationRequest.hasEmergencyServiceFee());
-    if (medicationRequest.isMultiple()) {
-      val mvo = new MvoDto();
-      medicationRequest.getMvoStart().ifPresent(mvo::setStartDate);
-      medicationRequest.getMvoEnd().ifPresent(mvo::setEndDate);
-      medicationRequest.getNumerator().ifPresent(mvo::setNumerator);
-      medicationRequest.getDemoninator().ifPresent(mvo::setDenominator);
-      dto.setMvo(mvo);
-    }
-    return from(dto);
-  }
-
-  public static Builder from(MedicationRequestDto dto) {
-    return new Builder(dto);
   }
 
   @RequiredArgsConstructor

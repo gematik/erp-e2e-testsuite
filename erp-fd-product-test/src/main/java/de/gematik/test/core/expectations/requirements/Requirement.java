@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,9 @@ public class Requirement {
   }
 
   /**
-   * @deprecated will be removed and shall not be used:
-   * @param description
-   * @return
+   * @param description of the requirement
+   * @return a new requirement with a unique id
    */
-  @Deprecated(forRemoval = true) // temporary workaround
   @SuppressWarnings({"java:S2676"})
   public static Requirement custom(String description) {
     val uniqueId =

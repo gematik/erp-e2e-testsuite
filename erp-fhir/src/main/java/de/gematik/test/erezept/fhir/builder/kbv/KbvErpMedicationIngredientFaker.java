@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,21 +25,20 @@ import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.val;
 
 public class KbvErpMedicationIngredientFaker {
-  private final KbvErpMedicationIngredientBuilder builder;
   private final Map<String, Consumer<KbvErpMedicationIngredientBuilder>> builderConsumers =
       new HashMap<>();
 
-  private KbvErpMedicationIngredientFaker(KbvErpMedicationIngredientBuilder builder) {
+  private KbvErpMedicationIngredientFaker() {
     builderConsumers.put("dosageForm", b -> b.darreichungsform(fakerDosage()));
     builderConsumers.put("ingredientComponent", b -> b.ingredientComponent(2, 1, "wölckhen"));
     builderConsumers.put("drugName", b -> b.drugName(fakerDrugName()));
-    this.builder = builder;
   }
 
   public static KbvErpMedicationIngredientFaker builder() {
-    return new KbvErpMedicationIngredientFaker(KbvErpMedicationIngredientBuilder.builder());
+    return new KbvErpMedicationIngredientFaker();
   }
 
   public KbvErpMedicationIngredientFaker withVersion(KbvItaErpVersion version) {
@@ -100,7 +99,12 @@ public class KbvErpMedicationIngredientFaker {
   }
 
   public KbvErpMedication fake() {
+    return this.toBuilder().build();
+  }
+
+  public KbvErpMedicationIngredientBuilder toBuilder() {
+    val builder = KbvErpMedicationIngredientBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

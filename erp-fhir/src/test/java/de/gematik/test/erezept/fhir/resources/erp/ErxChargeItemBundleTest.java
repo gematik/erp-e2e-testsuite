@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.exceptions.*;
 import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.util.*;
@@ -32,7 +33,7 @@ class ErxChargeItemBundleTest extends ParsingTest {
   void getChargeItemAsPharmacy() {
     val fileName = "ea33a992-a214-11ed-a8fc-0242ac120002.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_VALID + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_VALID + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     assertNotNull(bundle.getChargeItem());
@@ -45,7 +46,7 @@ class ErxChargeItemBundleTest extends ParsingTest {
   void getChargeItemAsPatient() {
     val fileName = "abc825bc-bc30-45f8-b109-1b343fff5c45.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_VALID + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_VALID + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     assertNotNull(bundle.getChargeItem());
@@ -63,7 +64,7 @@ class ErxChargeItemBundleTest extends ParsingTest {
   void shouldThrowException() {
     val fileName = "InValidBundle_40057350-a305-11ed-a8fc-0242ac120002.xml";
     String BASE_PATH_INVALID = "fhir/invalid/erp/1.2.0/chargeitembundle/";
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_INVALID + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_INVALID + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     assertThrows(MissingFieldException.class, bundle::getChargeItem);
   }

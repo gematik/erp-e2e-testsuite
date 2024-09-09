@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ public class DeviceConfiguration implements INamedConfigurationElement {
   private String platformVersion;
   private String udid;
   private String appium;
-  private boolean enforceInstall = true;
+  private boolean hasNfc = false;
+  private boolean enforceInstall = false;
   private boolean fullReset = true;
 }

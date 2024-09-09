@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,24 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static de.gematik.test.erezept.app.mocker.ConfigurationMocker.createDefaultTestConfiguration;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -45,8 +52,8 @@ class SetVirtualEgkTest {
   void setUp() {
     OnStage.setTheStage(new Cast() {});
 
-    val sma = SmartcardFactory.getArchive();
-    egk = sma.getEgkCards().get(1);
+    val sma = SmartcardArchive.fromResources();
+    egk = sma.getEgk(1);
     bobsPrivateKey = egk.getPrivateKeyBase64();
     iosAbility = mock(UseIOSApp.class);
     when(iosAbility.getPlatformType()).thenReturn(PlatformType.IOS);
@@ -54,6 +61,9 @@ class SetVirtualEgkTest {
     val bobIos = OnStage.theActorCalled(iosUserName);
     givenThat(bobIos).can(iosAbility);
     givenThat(bobIos).can(ProvideEGK.heOwns(egk));
+
+    val config = createDefaultTestConfiguration(iosUserName, egk.getIccsn(), true);
+    givenThat(bobIos).can(UseConfigurationData.forUser(iosUserName, config));
   }
 
   @AfterEach

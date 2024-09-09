@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,12 +91,13 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
         format(
             "Prescription {0} was found in backend: ensure its shown in the app",
             taskId.getValue()));
-    val isMvo = fdPrescription.getKbvBundle().map(KbvErpBundle::isMultiple).orElse(false);
+    val isMvo =
+        fdPrescription.getKbvBundle().map(x -> x.getMedicationRequest().isMultiple()).orElse(false);
     log.info(
         format(
             "Found {0}Prescription {1} in the backend",
             isMvo ? "MVO-" : "",
-            fdPrescription.getKbvBundle().map(KbvErpBundle::getMedicationName)));
+            fdPrescription.getKbvBundle().map(x -> x.getMedication().getMedicationName())));
 
     val medication =
         fdPrescription

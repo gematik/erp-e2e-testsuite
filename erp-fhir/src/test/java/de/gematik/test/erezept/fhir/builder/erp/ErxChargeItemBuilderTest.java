@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
@@ -49,8 +49,8 @@ class ErxChargeItemBuilderTest extends ParsingTest {
             ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
             : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     val prescriptionId = PrescriptionId.random(prescriptionIdSystem);
-    val davBundle = DavAbgabedatenBuilder.faker(prescriptionId).build();
-    val kbvBundle = KbvErpBundleBuilder.faker().build();
+    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val kbvBundle = KbvErpBundleFaker.builder().fake();
     val erxReceipt = mock(ErxReceipt.class);
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
 
@@ -82,7 +82,7 @@ class ErxChargeItemBuilderTest extends ParsingTest {
             ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
             : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     val prescriptionId = PrescriptionId.random(prescriptionIdSystem);
-    val davBundle = DavAbgabedatenBuilder.faker(prescriptionId).build();
+    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
     val erxReceipt = mock(ErxReceipt.class);
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
 
@@ -113,7 +113,7 @@ class ErxChargeItemBuilderTest extends ParsingTest {
             ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
             : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     val prescriptionId = PrescriptionId.random(prescriptionIdSystem);
-    val davBundle = DavAbgabedatenBuilder.faker(prescriptionId).build();
+    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
 
     val chargeItemBuilder =
         ErxChargeItemBuilder.forPrescription(prescriptionId)
@@ -133,7 +133,8 @@ class ErxChargeItemBuilderTest extends ParsingTest {
 
   @Test
   void shouldRemoveContainedResources() {
-    val chargeItem = ErxChargeItemBuilder.faker(PrescriptionId.random()).build();
+    val chargeItem =
+        ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     chargeItem.removeContainedResources();
     assertFalse(chargeItem.hasContained());
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
@@ -143,12 +144,13 @@ class ErxChargeItemBuilderTest extends ParsingTest {
   @Test
   void shouldRemoveAccessCode() {
     val chargeItem =
-        ErxChargeItemBuilder.faker(PrescriptionId.random())
-            .version(
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(PrescriptionId.random())
+            .withVersion(
                 PatientenrechnungVersion
                     .V1_0_0) // accesscode only when Patientrechnung 1.1.0 and above is set
-            .accessCode("123")
-            .build();
+            .withAccessCode("123")
+            .fake();
     assertTrue(chargeItem.isFromNewProfiles());
     assertTrue(chargeItem.getAccessCode().isPresent());
     chargeItem.removeAccessCode();
@@ -166,7 +168,7 @@ class ErxChargeItemBuilderTest extends ParsingTest {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
 
     val prescriptionId = PrescriptionId.random();
-    val davBundle = DavAbgabedatenBuilder.faker(prescriptionId).build();
+    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
 
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(prescriptionId)

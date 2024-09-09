@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,10 @@ public class AdminResource {
     V_1_1_1,
     @JsonProperty("1.2.0")
     @JsonAlias("1.2")
-    V_1_2_0;
+    V_1_2_0,
+    @JsonProperty("1.3.0")
+    @JsonAlias("1.3")
+    V_1_3_0;
 
     @Override
     public String toString() {

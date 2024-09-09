@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,15 @@ public class KbvBundleDummyFactory {
             .withAssignerRef(assignerOrganization)
             .fake();
     val insurance =
-        KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
+        KbvCoverageFaker.builder()
+            .withInsuranceType(VersicherungsArtDeBasis.GKV)
+            .withBeneficiary(patient)
+            .fake();
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
     val medicationRequest =
-        MedicationRequestFaker.builder(patient)
+        MedicationRequestFaker.builder()
+            .withPatient(patient)
             .withInsurance(insurance)
             .withRequester(practitioner)
             .withMedication(medication)

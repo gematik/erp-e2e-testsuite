@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,13 @@ package de.gematik.test.erezept.app.cfg;
 import static java.text.MessageFormat.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.config.dto.app.AppConfiguration;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import de.gematik.test.erezept.config.dto.app.DeviceConfiguration;
 import de.gematik.test.erezept.config.exceptions.MissingRequiredConfigurationException;
 import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.MobileCapabilityType;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,95 +44,12 @@ public class DesiredCapabilitiesBuilder {
     if (scenarioName != null) caps.setCapability("testName", scenarioName);
   }
 
-  public DesiredCapabilitiesBuilder app(AppConfiguration config) {
-    caps.setCapability("gematik:applicationName", "E-Rezept");
-    caps.setCapability("newCommandTimeout", 60 * 5);
-
-    if (config.getAppFile() == null) {
-      // no app file given: use the packageName and let appium/MDC decide about the latest available
-      // version
-      caps.setCapability(MobileCapabilityType.APP, format("cloud:{0}", config.getPackageName()));
-    } else {
-      // concrete appFile given in configuration, use this one instead!
-      caps.setCapability(MobileCapabilityType.APP, config.getAppFile());
-    }
-
-    if (PlatformType.IOS.is(config.getPlatform())) {
-      // not required for Android
-      caps.setCapability("appium:appPackage", config.getPackageName());
-    }
-    if (PlatformType.ANDROID.is(config.getPlatform())) {
-      // not required for iOS
-      if (config.getEspressoServerUniqueName() == null) {
-        throw new MissingRequiredConfigurationException(
-            "If Android is selected as platform, it is necessary to provide the"
-                + " espressoServerUniqueName capability.");
-      }
-      caps.setCapability("espressoServerUniqueName", config.getEspressoServerUniqueName());
-    }
-    return this;
-  }
-
-  public DesiredCapabilitiesBuilder device(DeviceConfiguration config) {
-    caps.setCapability(MobileCapabilityType.DEVICE_NAME, config.getName());
-    caps.setCapability(MobileCapabilityType.UDID, config.getUdid());
-    caps.setCapability(MobileCapabilityType.PLATFORM_VERSION, config.getPlatformVersion());
-    caps.setCapability("appium:enforceAppInstall", config.isEnforceInstall());
-    caps.setCapability("appium:fullReset", config.isFullReset());
-    caps.setCapability("appium:noReset", false);
-    caps.setCapability("gematik:session-override", true);
-    caps.setCapability("gematik:instrumentApp", true);
-    caps.setCapability(MobileCapabilityType.LANGUAGE, "de");
-
-    if (PlatformType.ANDROID.is(config.getPlatform())) {
-      caps.setCapability(CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-      caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ESPRESSO);
-      caps.setCapability("showGradleLog", true); // will show the log of gradle in Appium
-      caps.setCapability("appium:forceEspressoRebuild", false);
-      caps.setCapability("appium:espressoBuildConfig", createEspressoBuildConfig());
-    } else if (PlatformType.IOS.is(config.getPlatform())) {
-      caps.setCapability(CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-      caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
-    } else {
-      log.error(format("Given Platform {0} not yet supported", config.getPlatform()));
-      throw new UnsupportedPlatformException(config.getPlatform());
-    }
-
-    return this;
-  }
-
-  public DesiredCapabilitiesBuilder appium(AppiumConfiguration appiumConfiguration) {
-    if (appiumConfiguration.getAccessKey() != null
-        && !appiumConfiguration.getAccessKey().isEmpty()) {
-      caps.setCapability("accessKey", appiumConfiguration.getAccessKey());
-    }
-    if (appiumConfiguration.getVersion() != null) {
-      caps.setCapability("appium:appiumVersion", appiumConfiguration.getVersion());
-    }
-
-    caps.setCapability("attachCrashLogToReport", true);
-    return this;
-  }
-
-  @SneakyThrows
-  public String asJson() {
-    val mapper = new ObjectMapper();
-    val objectNode = mapper.createObjectNode();
-
-    caps.getCapabilityNames()
-        .forEach(name -> objectNode.put(name, caps.getCapability(name).toString()));
-    return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode);
-  }
-
-  public DesiredCapabilities create() {
-    return caps;
-  }
-
   /**
-   * This method should make sure the Android App is instrumented with the correct gradle settings.
-   * However, this needs be evaluated and ensured to be necessary and correct
+   * This method should make sure the Android App is instrumented with the correct Gradle settings.
+   * However, this needs to be evaluated and ensured to be necessary and correct
    *
-   * <p>https://github.com/appium/appium-espresso-driver#espresso-build-config
+   * <p><a href="https://github.com/appium/appium-espresso-driver#espresso-build-config">Espresso
+   * build config</a>
    */
   @SneakyThrows
   private static String createEspressoBuildConfig() {
@@ -160,5 +76,84 @@ public class DesiredCapabilitiesBuilder {
 
   public static DesiredCapabilitiesBuilder init() {
     return new DesiredCapabilitiesBuilder(null);
+  }
+
+  public DesiredCapabilitiesBuilder app(
+      AppConfiguration config, @Nullable String provisioningProfilePostfix) {
+    caps.setCapability("appium:newCommandTimeout", 60 * 5);
+
+    if (config.getAppFile() == null) {
+      // no app file given: use the packageName and let appium/MDC decide about the latest available
+      // version
+      caps.setCapability("app", format("cloud:{0}", config.getPackageName()));
+    } else {
+      // concrete appFile given in configuration, use this one instead!
+      caps.setCapability("app", config.getAppFile());
+    }
+
+    if (PlatformType.IOS.is(config.getPlatform())) {
+      // appending provisioning profile postfix is required to use the app with dedicated
+      // provisioning profile for iOS NFC
+      val bundleId =
+          Optional.ofNullable(provisioningProfilePostfix)
+              .map(postfix -> config.getPackageName() + postfix)
+              .orElse(config.getPackageName());
+      caps.setCapability("bundleId", bundleId);
+    }
+
+    if (PlatformType.ANDROID.is(config.getPlatform())) {
+      // not required for iOS
+      if (config.getEspressoServerUniqueName() == null) {
+        throw new MissingRequiredConfigurationException(
+            "If Android is selected as platform, it is necessary to provide the"
+                + " espressoServerUniqueName capability.");
+      }
+      caps.setCapability("espressoServerUniqueName", config.getEspressoServerUniqueName());
+    }
+    return this;
+  }
+
+  public DesiredCapabilitiesBuilder device(DeviceConfiguration config) {
+    caps.setCapability("udid", config.getUdid());
+    caps.setCapability("enforceAppInstall", config.isEnforceInstall());
+    caps.setCapability("fullReset", config.isFullReset());
+    caps.setCapability("noReset", false);
+
+    if (PlatformType.ANDROID.is(config.getPlatform())) {
+      caps.setCapability(CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+      caps.setCapability("automationName", AutomationName.ESPRESSO);
+      caps.setCapability("showGradleLog", true); // will show the log of gradle in Appium
+      caps.setCapability("appium:forceEspressoRebuild", false);
+      caps.setCapability("appium:espressoBuildConfig", createEspressoBuildConfig());
+    } else if (PlatformType.IOS.is(config.getPlatform())) {
+      caps.setCapability(CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
+      caps.setCapability("automationName", AutomationName.IOS_XCUI_TEST);
+      caps.setCapability("autoDissmissAlerts", true);
+    }
+
+    return this;
+  }
+
+  public DesiredCapabilitiesBuilder appium(AppiumConfiguration appiumConfiguration) {
+    if (appiumConfiguration.getAccessKey() != null
+        && !appiumConfiguration.getAccessKey().isEmpty()) {
+      caps.setCapability("accessKey", appiumConfiguration.getAccessKey());
+    }
+    if (appiumConfiguration.getVersion() != null) {
+      caps.setCapability("appiumVersion", appiumConfiguration.getVersion());
+    }
+
+    caps.setCapability("attachCrashLogToReport", true);
+    return this;
+  }
+
+  @SneakyThrows
+  public String asJson() {
+    val mapper = new ObjectMapper();
+    return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(caps.asMap());
+  }
+
+  public DesiredCapabilities create() {
+    return caps;
   }
 }

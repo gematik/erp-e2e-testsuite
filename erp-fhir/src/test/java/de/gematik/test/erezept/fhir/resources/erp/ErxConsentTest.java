@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
 import de.gematik.test.erezept.fhir.valuesets.ConsentType;
 import java.util.List;
@@ -37,7 +37,7 @@ class ErxConsentTest extends ParsingTest {
   void shouldEncodeSingleConsent() {
     val fileName = "Consent_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
@@ -51,7 +51,7 @@ class ErxConsentTest extends ParsingTest {
   void shouldThrowOnMissingConsentType() {
     val fileName = "Consent_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
@@ -63,7 +63,7 @@ class ErxConsentTest extends ParsingTest {
   void shouldThrowInvalidConsentTypeSystems() {
     val fileName = "Consent_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
@@ -85,7 +85,7 @@ class ErxConsentTest extends ParsingTest {
   void shouldGetConsentTypes() {
     val fileName = "bundle_6daaade4-6523-4136-94bf-cbc5a247cc7b.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val consentBundle = parser.decode(ErxConsentBundle.class, content);
     assertNotNull(consentBundle, "Valid ErxConsentBundle must be parseable");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,57 +16,65 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import static java.text.MessageFormat.format;
-
-import java.io.IOException;
-import java.security.Security;
-import java.security.cert.CertificateException;
+import de.gematik.test.konnektor.soap.mock.utils.BNetzAVLCa;
+import eu.europa.esig.dss.model.InMemoryDocument;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
+import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
+import eu.europa.esig.dss.validation.CommonCertificateVerifier;
+import eu.europa.esig.dss.validation.SignedDocumentValidator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 
 @Slf4j
 public class LocalVerifier {
 
-  static {
-    BouncyCastleProvider bouncyCastleProvider = new BouncyCastleProvider();
-    if (Security.getProvider(bouncyCastleProvider.getName()) == null) {
-      Security.addProvider(bouncyCastleProvider);
-    }
-  }
-
   public boolean verify(byte[] input) {
-    boolean isValid = false;
+
+    val cv = new CommonCertificateVerifier();
+    cv.setOcspSource(new OnlineOCSPSource());
+    val trustedCertSource = new CommonTrustedCertificateSource();
+    cv.setTrustedCertSources(trustedCertSource);
+    SignedDocumentValidator documentValidator;
     try {
-      val digestCalculatorProvider =
-          new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
-      val parser = new CMSSignedDataParser(digestCalculatorProvider, input);
-
-      val content = parser.getSignedContent();
-      content.drain();
-      val certStore = parser.getCertificates();
-
-      val signerInfoStore = parser.getSignerInfos();
-      val signerInfo = signerInfoStore.getSigners().stream().findFirst().orElseThrow();
-
-      val certCollection = certStore.getMatches(signerInfo.getSID());
-      val certIt = certCollection.iterator();
-      val certHolder = (X509CertificateHolder) certIt.next();
-
-      isValid =
-          signerInfo.verify(
-              new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certHolder));
-    } catch (OperatorCreationException | CMSException | IOException e) {
-      log.warn(format("Failed to read Signature or Certificate"));
-    } catch (CertificateException ce) {
-      log.warn("Failed to verify with a certificate exception");
+      documentValidator = SignedDocumentValidator.fromDocument(new InMemoryDocument(input));
+    } catch (java.lang.UnsupportedOperationException e) {
+      log.warn("Failed to read Signature or Certificate");
+      return false;
     }
+    documentValidator.setCertificateVerifier(cv);
+
+    val signature =
+        documentValidator.getSignatures().stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No signature found"));
+    signature.getCertificates().forEach(trustedCertSource::addCertificate);
+
+    val signingCertToken = signature.getSigningCertificateToken();
+
+    // this works only for QES Certs; NonQES Certs have to be handled with TSL
+    BNetzAVLCa.getBy(signingCertToken.getCertificate())
+        .ifPresent(
+            it -> {
+              val caToken = new CertificateToken(it.getCertificate());
+              val ocsp = signature.getOCSPSource().getRevocationToken(signingCertToken, caToken);
+              if (ocsp != null) {
+                log.info(
+                    "Ocsp Status for signing certificate with {} is {}",
+                    signingCertToken.getSubject().getCanonical(),
+                    ocsp.getStatus());
+              }
+            });
+
+    val reports = documentValidator.validateDocument();
+    val report = reports.getSimpleReport();
+
+    val isValid = report.isValid(signature.getId());
+
+    log.info(
+        "CAdES signature signed by {} is {}valid",
+        report.getSignedBy(signature.getId()),
+        !isValid ? "in" : "");
 
     return isValid;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,12 @@ import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.val;
 
 public class PatientFaker {
-  private final PatientBuilder builder;
   private final Map<String, Consumer<PatientBuilder>> builderConsumers = new HashMap<>();
 
-  private PatientFaker(PatientBuilder builder) {
-    this.builder = builder;
+  private PatientFaker() {
     builderConsumers.put("birthDate", b -> b.birthDate(fakerBirthday()));
     builderConsumers.put("address", b -> b.address(fakerCity(), fakerZipCode(), fakerStreetName()));
     builderConsumers.put("name", b -> b.name(fakerFirstName(), fakerLastName()));
@@ -48,7 +47,7 @@ public class PatientFaker {
   }
 
   public static PatientFaker builder() {
-    return new PatientFaker(PatientBuilder.builder());
+    return new PatientFaker();
   }
 
   public PatientFaker withKvnrAndInsuranceType(KVNR kvnr, VersicherungsArtDeBasis insuranceType) {
@@ -87,7 +86,12 @@ public class PatientFaker {
   }
 
   public KbvPatient fake() {
+    return this.toBuilder().build();
+  }
+
+  public PatientBuilder toBuilder() {
+    val builder = PatientBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

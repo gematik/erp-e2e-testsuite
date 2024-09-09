@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,17 @@ package de.gematik.test.konnektor.soap;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.konnektor.profile.MockProfile;
-import de.gematik.test.konnektor.soap.mock.*;
+import de.gematik.test.konnektor.soap.mock.MockAuthSignatureServicePortType;
+import de.gematik.test.konnektor.soap.mock.MockCardServicePortType;
+import de.gematik.test.konnektor.soap.mock.MockCertificateServicePortType;
+import de.gematik.test.konnektor.soap.mock.MockEncryptionPortType;
+import de.gematik.test.konnektor.soap.mock.MockEventServicePortType;
+import de.gematik.test.konnektor.soap.mock.MockKonnektor;
+import de.gematik.test.konnektor.soap.mock.MockSignatureServicePortType;
+import de.gematik.test.konnektor.soap.mock.MockVSDServicePortType;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
-import de.gematik.test.smartcard.SmartcardArchive;
 import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureServicePortType;
 import de.gematik.ws.conn.cardservice.wsdl.v8.CardServicePortType;
 import de.gematik.ws.conn.cardterminalservice.wsdl.v1.CardTerminalServicePortType;

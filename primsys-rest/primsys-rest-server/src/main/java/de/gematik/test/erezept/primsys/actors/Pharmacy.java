@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.builder.dav.PharmacyOrganizationBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.PharmacyOrganizationFaker;
 import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
-import de.gematik.test.erezept.primsys.data.actors.ActorType;
-import de.gematik.test.erezept.primsys.data.actors.PharmacyDto;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import de.gematik.test.konnektor.commands.ReadVsdCommand;
 import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardArchive;
 import java.util.Base64;
 import lombok.val;
 
@@ -36,7 +34,6 @@ public class Pharmacy extends BaseActor {
 
   private final Konnektor konnektor;
   private final CardInfo smcbHandle;
-  private final PharmacyDto baseData;
 
   public Pharmacy(
       PharmacyConfiguration cfg,
@@ -44,12 +41,6 @@ public class Pharmacy extends BaseActor {
       Konnektor konnektor,
       SmartcardArchive sca) {
     super(cfg, env, sca);
-
-    baseData = new PharmacyDto();
-    baseData.setId(this.getIdentifier());
-    baseData.setSmcb(cfg.getSmcbIccsn());
-    baseData.setType(ActorType.PHARMACY);
-    baseData.setName(cfg.getName());
 
     this.konnektor = konnektor;
     this.smcbHandle =
@@ -62,7 +53,7 @@ public class Pharmacy extends BaseActor {
   }
 
   public PharmacyOrganization createPharmacyOrganization() {
-    return PharmacyOrganizationBuilder.faker().name(this.getName()).build();
+    return PharmacyOrganizationFaker.builder().withName(this.getName()).fake();
   }
 
   public String requestEvidenceForEgk(Egk egk) {

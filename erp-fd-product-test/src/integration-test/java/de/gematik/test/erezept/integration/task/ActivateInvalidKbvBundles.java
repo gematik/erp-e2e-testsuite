@@ -30,13 +30,14 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.FhirCloseSlicingToggle;
+import de.gematik.test.fuzzing.FuzzingUtils;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.kbv.KbvBundleManipulatorFactory;
 import java.util.List;
@@ -45,10 +46,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -65,10 +66,10 @@ import org.junit.runner.RunWith;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Invalide Verordnungen")
 @Tag("Fuzzing")
-@WithTag("Fuzzing")
 class ActivateInvalidKbvBundles extends ErpTest {
 
-  private static final Boolean expectClosedSlicing = featureConf.getToggle(new FhirCloseSlicingToggle());
+  private static final Boolean expectClosedSlicing =
+      featureConf.getToggle(new FhirCloseSlicingToggle());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -77,25 +78,24 @@ class ActivateInvalidKbvBundles extends ErpTest {
   private PatientActor sina;
 
   private static ArgumentComposer baseComposer() {
-    val composer =
-        ArgumentComposer.composeWith()
-            .arguments(
-                VersicherungsArtDeBasis.GKV, // given insurance kind
-                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-
-    return composer;
+    return ArgumentComposer.composeWith()
+        .arguments(
+            VersicherungsArtDeBasis.GKV, // given insurance kind
+            PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
+        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
   }
 
   private static List<Extension> optionalExtensions() {
     return List.of(
         DmpKennzeichen.DM1.asExtension(),
-        // increase number of testdata by adding some other non-fitting extensions
-        //            StandardSize.KTP.asExtension(),
         StatusCoPayment.STATUS_2.asExtension(),
         StatusKennzeichen.TSS_SUBSTITUTE.asExtension(),
+        new Extension(
+            FuzzingUtils.randomStructureDefinition().getCanonicalUrl(),
+            new IntegerType(
+                GemFaker.getFaker().number().numberBetween(Integer.MIN_VALUE, Integer.MAX_VALUE))),
         new Extension("https://test.erp.gematik.de").setValue(new StringType("Just a Testvalue")));
   }
 
@@ -286,7 +286,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
     // this "trick" is required because the serenity report cannot handle that many parameters
     activatePrescriptionWithOptionalExtensions(insuranceType, assignmentKind, extensionProvider);
   }
-  
+
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_06")
   @ParameterizedTest(
       name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
@@ -382,34 +382,32 @@ class ActivateInvalidKbvBundles extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_13")
   @Test
   @Disabled(value = "Wird vom FD aktuell so nicht gefordert")
-  @DisplayName("Leere oder nur Whitespace enthaltende Notes in der MedicationRequest sind nicht zulässig")
+  @DisplayName(
+      "Leere oder nur Whitespace enthaltende Notes in der MedicationRequest sind nicht zulässig")
   void activatePrescriptionWithWhitespaceNote() {
-    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
-    val medicationRequest =
-            MedicationRequestFaker.builder(sina.getPatientData())
-                    .withInsurance(sina.getInsuranceCoverage())
-                    .withRequester(doctor.getPractitioner())
-                    .withMedication(medication)
-                    .withNote("REPLACE!")
-                    .fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
-            KbvErpBundleBuilder.faker(sina.getKvnr())
-                    .practitioner(doctor.getPractitioner())
-                    .medicationRequest(medicationRequest) // what is the medication
-                    .medication(medication);
+        KbvErpBundleFaker.builder()
+            .withKvnr(sina.getKvnr())
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withPractitioner(doctor.getPractitioner())
+            .withNote("REPLACE!")
+            .toBuilder();
 
     val activation =
-            doctor.performs(
-                    IssuePrescription.forPatient(sina)
-                            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                            .withStringFuzzing(input -> input.replace("!REPLACE!", "\t"))
-                            .withKbvBundleFrom(kbvBundleBuilder));
+        doctor.performs(
+            IssuePrescription.forPatient(sina)
+                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .withStringFuzzing(input -> input.replace("!REPLACE!", "\t"))
+                .withKbvBundleFrom(kbvBundleBuilder));
     doctor.attemptsTo(
-            Verify.that(activation)
-                    .withOperationOutcome(FhirRequirements.NON_WHITESPACE_CONTENT)
-                    .hasResponseWith(returnCodeIsBetween(400, 420))
-                    .isCorrect());
+        Verify.that(activation)
+            .withOperationOutcome(FhirRequirements.NON_WHITESPACE_CONTENT)
+            .hasResponseWith(returnCodeIsBetween(400, 420))
+            .isCorrect());
   }
 
   private void activateInvalidPrescription(
@@ -430,9 +428,9 @@ class ActivateInvalidKbvBundles extends ErpTest {
   }
 
   private void activatePrescriptionWithOptionalExtensions(
-          VersicherungsArtDeBasis insuranceType,
-          PrescriptionAssignmentKind assignmentKind,
-          NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
+      VersicherungsArtDeBasis insuranceType,
+      PrescriptionAssignmentKind assignmentKind,
+      NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
     sina.changePatientInsuranceType(insuranceType);
 
@@ -443,17 +441,17 @@ class ActivateInvalidKbvBundles extends ErpTest {
     if (!expectClosedSlicing) {
       // if closed slicing is expected to be deactivated
       doctor.attemptsTo(
-              Verify.that(activation)
-                      .withExpectedType()
-                      .hasResponseWith(returnCode(202, ErpAfos.A_22927))
-                      .isCorrect());
+          Verify.that(activation)
+              .withExpectedType()
+              .hasResponseWith(returnCode(202, ErpAfos.A_22927))
+              .isCorrect());
     } else {
       // closed slicing should be activated by default: in such cases RC 400 is expected
       doctor.attemptsTo(
-              Verify.that(activation)
-                      .withOperationOutcome(ErpAfos.A_22927)
-                      .hasResponseWith(returnCode(400, ErpAfos.A_22927))
-                      .isCorrect());
+          Verify.that(activation)
+              .withOperationOutcome(ErpAfos.A_22927)
+              .hasResponseWith(returnCode(400, ErpAfos.A_22927))
+              .isCorrect());
     }
   }
 }

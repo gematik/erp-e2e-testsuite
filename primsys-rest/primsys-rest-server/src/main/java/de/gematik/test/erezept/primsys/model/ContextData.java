@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,19 +28,19 @@ public class ContextData {
 
   public static final int FIRST_ENTRY = 0;
   public static final int MAX_QUEUE_LENGTH = 100;
-  private final List<PrescriptionDto> prescriptions;
+  private final List<PrescriptionDto> readyPrescriptions;
   private final List<AcceptedPrescriptionDto> acceptedPrescriptions;
   private final List<DispensedMedicationDto> dispensedMedications;
 
   public ContextData() {
-    this.prescriptions = new LinkedList<>();
+    this.readyPrescriptions = new LinkedList<>();
     this.acceptedPrescriptions = new LinkedList<>();
     this.dispensedMedications = new LinkedList<>();
   }
 
   public void addPrescription(PrescriptionDto prescription) {
-    ensureMaxLength(prescriptions);
-    this.prescriptions.add(prescription);
+    ensureMaxLength(readyPrescriptions);
+    this.readyPrescriptions.add(prescription);
   }
 
   public void addAcceptedPrescription(AcceptedPrescriptionDto prescription) {
@@ -56,6 +56,20 @@ public class ContextData {
   public boolean removeAcceptedPrescription(String prescriptionId) {
     return this.acceptedPrescriptions.removeIf(
         prescription -> prescription.getPrescriptionId().equals(prescriptionId));
+  }
+
+  public List<PrescriptionDto> getReadyPrescriptionsByKvnr(String kvnr) {
+    return readyPrescriptions.stream().filter(p -> p.getPatient().getKvnr().equals(kvnr)).toList();
+  }
+
+  public List<AcceptedPrescriptionDto> getAcceptedPrescriptionsByKvnr(String kvnr) {
+    return acceptedPrescriptions.stream().filter(p -> p.getForKvnr().equals(kvnr)).toList();
+  }
+
+  public List<DispensedMedicationDto> getDispensedPrescriptionsByKvnr(String kvnr) {
+    return dispensedMedications.stream()
+        .filter(p -> p.getAcceptData().getForKvnr().equals(kvnr))
+        .toList();
   }
 
   private void ensureMaxLength(List<?> list) {

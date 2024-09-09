@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
 import de.gematik.test.erezept.cli.param.EgkParameter;
 import de.gematik.test.erezept.cli.param.EnvironmentParameter;
@@ -31,8 +33,6 @@ import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardFactory;
 import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -77,7 +77,7 @@ public class PrescriptionsDeleter implements Callable<Integer> {
       return -1;
     }
 
-    val sca = SmartcardFactory.getArchive();
+    val sca = SmartcardArchive.fromResources();
     val egks = egkParameter.getEgks(sca);
     val env = environmentParameter.getEnvironment();
 
@@ -109,7 +109,7 @@ public class PrescriptionsDeleter implements Callable<Integer> {
                 task -> !PrescriptionId.from(task.getTaskId()).getFlowType().isDirectAssignment())
             .toList();
     val size = tasks.size();
-    val ownerName = egk.getOwner().getOwnerName();
+    val ownerName = egk.getOwnerData().getOwnerName();
 
     System.out.println(
         format(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,15 @@ class MedicationRequestDataMapperTest {
 
   @Test
   void shouldValidMvoOnNull() {
-    val mapper = MedicationRequestDataMapper.from(new MedicationRequestDto()).forMedication(null);
+    val mapper =
+        MedicationRequestDataMapper.from(MedicationRequestDto.medicationRequest().build())
+            .forMedication(null);
     assertTrue(mapper.isMvoValid());
   }
 
   @Test
   void shouldValidMvo() {
-    val mvoDto = MvoDataMapper.randomDto();
-    val medReqDto = new MedicationRequestDto();
-    medReqDto.setMvo(mvoDto);
+    val medReqDto = MedicationRequestDto.medicationRequest().mvo(MvoDataMapper.randomDto()).build();
     val mapper = MedicationRequestDataMapper.from(medReqDto).forMedication(null);
     assertTrue(mapper.isMvoValid());
   }
@@ -43,8 +43,8 @@ class MedicationRequestDataMapperTest {
   void shouldBeInvalidMvo() {
     val mvoDto = MvoDataMapper.randomDto();
     mvoDto.setNumerator(7);
-    val medReqDto = new MedicationRequestDto();
-    medReqDto.setMvo(mvoDto);
+    val medReqDto = MedicationRequestDto.medicationRequest().mvo(mvoDto).build();
+
     val mapper = MedicationRequestDataMapper.from(medReqDto).forMedication(null);
     assertFalse(mapper.isMvoValid());
   }

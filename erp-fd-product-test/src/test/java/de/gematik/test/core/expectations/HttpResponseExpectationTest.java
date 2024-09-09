@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package de.gematik.test.core.expectations;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static de.gematik.test.core.expectations.rawhttpverifier.RawHttpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -29,12 +29,13 @@ import de.gematik.test.core.extensions.ErpTestExtension;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.actions.rawhttpactions.GetOcspListResponse;
 import java.util.List;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestInstance;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
+import net.thucydides.core.steps.StepEventBus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -90,7 +91,7 @@ class HttpResponseExpectationTest {
     val expectation =
         HttpResponseExpectation.expectFor(response)
             .hasResponseWith(returnCode(200))
-            .andResponse(containsHeaderWith("1", "TestValue2", ErpAfos.A_19248_02))
+            .andResponse(containsHeaderWith("1", "TestValue2", ErpAfos.A_19248))
             .toString();
     assertTrue(expectation.contains("(A_19514-03; A_19248-02)"));
   }
@@ -107,6 +108,8 @@ class HttpResponseExpectationTest {
             .hasResponseWith(returnCode(200))
             .responseWith(returnCodeIs(201))
             .andResponse(returnCodeIsIn(List.of(202, 203, 204)));
+
+    StepEventBus.getParallelEventBus().disableSoftAsserts();
     assertThrows(AssertionError.class, expectation::ensure);
     int[] list = {1, 210};
     val expectation210 =

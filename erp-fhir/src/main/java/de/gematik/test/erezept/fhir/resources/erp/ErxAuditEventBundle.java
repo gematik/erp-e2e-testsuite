@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,13 @@ import java.util.*;
 import lombok.extern.slf4j.*;
 import org.hl7.fhir.r4.model.*;
 
+/**
+ * What is suppressed? Inheritance tree of classes should not be too deep, configured in deepness: 5
+ */
+@SuppressWarnings("java:S110")
 @Slf4j
 @ResourceDef(name = "Bundle")
-public class ErxAuditEventBundle extends Bundle {
+public class ErxAuditEventBundle extends ErxBundle {
 
   public List<ErxAuditEvent> getAuditEvents() {
     return this.getEntry().stream()

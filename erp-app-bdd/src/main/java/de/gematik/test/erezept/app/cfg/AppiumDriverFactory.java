@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,19 @@ import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import java.net.URL;
+import java.time.Duration;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.thucydides.core.webdriver.ThucydidesWebDriverSupport;
+import org.openqa.selenium.remote.http.ClientConfig;
 
 @Slf4j
-public class AppiumDriverFactory extends ThucydidesWebDriverSupport {
+public class AppiumDriverFactory {
 
   private AppiumDriverFactory() {
     throw new AssertionError("Do not instantiate");
@@ -50,9 +52,16 @@ public class AppiumDriverFactory extends ThucydidesWebDriverSupport {
     val appConfig = config.getAppConfiguration(platform);
     val appiumConfig = config.getAppiumConfiguration(userDeviceConfig.getAppium());
 
+    if (!userDeviceConfig.isHasNfc() && !userConfig.isUseVirtualEgk()) {
+      throw new ConfigurationException(
+          format(
+              "User {0} using {1} requires NFC for using a real eGK",
+              userName, userDeviceConfig.getName()));
+    }
+
     val capsBuilder =
         DesiredCapabilitiesBuilder.initForScenario(scenarioName)
-            .app(appConfig)
+            .app(appConfig, appiumConfig.getProvisioningProfilePostfix())
             .device(userDeviceConfig)
             .appium(appiumConfig);
     val caps = capsBuilder.create();
@@ -61,22 +70,31 @@ public class AppiumDriverFactory extends ThucydidesWebDriverSupport {
       val json = capsBuilder.asJson();
       log.info(
           format(
-              "DesiredCapabilities for {0} ({1})\n{2}",
-              userDeviceConfig.getName(), userDeviceConfig.getPlatform(), json));
+              "DesiredCapabilities for {0} ({1}) running on {2}\n{3}",
+              userDeviceConfig.getName(),
+              userDeviceConfig.getPlatform(),
+              userDeviceConfig.getAppium(),
+              json));
     }
 
     log.info(
         format("Create AppiumDriver for Platform {0} at {1}", platform, appiumConfig.getUrl()));
     if (platform == PlatformType.ANDROID) {
       val driver = new AndroidDriver(new URL(appiumConfig.getUrl()), caps);
-      useDriver(driver);
       driver.setSetting("driver", "compose");
       return (UseTheApp<T>) new UseAndroidApp(driver, appiumConfig);
     } else if (platform == PlatformType.IOS) {
-      val driver = new IOSDriver(new URL(appiumConfig.getUrl()), caps);
-      useDriver(driver);
+      val clientConfig =
+          ClientConfig.defaultConfig()
+              .baseUrl(new URL(appiumConfig.getUrl()))
+              .connectionTimeout(Duration.ofMinutes(3))
+              .readTimeout(Duration.ofMinutes(10))
+              .withRetries();
+      val driver = new IOSDriver(clientConfig, caps);
+      log.info("Driver connected for XCUITest");
       return (UseTheApp<T>) new UseIOSApp(driver, appiumConfig);
     } else {
+      log.error(format("Given Platform {0} not yet supported", platform));
       throw new UnsupportedPlatformException(platform);
     }
   }

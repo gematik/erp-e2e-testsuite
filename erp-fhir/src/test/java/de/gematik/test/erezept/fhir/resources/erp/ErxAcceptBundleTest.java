@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class ErxAcceptBundleTest extends ParsingTest {
   void shouldEncodeSingleAcceptBundle() {
     val fileName = "TaskAcceptBundle_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
     assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 
@@ -60,7 +60,7 @@ class ErxAcceptBundleTest extends ParsingTest {
   void shouldEncodeSingleAcceptBundle120() {
     val fileName = "cef4b960-7ce4-4755-b4ce-3b01a30ec2f0.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
     assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 
@@ -85,7 +85,7 @@ class ErxAcceptBundleTest extends ParsingTest {
   void shouldEncodeSingleAcceptBundleWithConsent() {
     val fileName = "TaskAcceptBundle_02.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
     assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 

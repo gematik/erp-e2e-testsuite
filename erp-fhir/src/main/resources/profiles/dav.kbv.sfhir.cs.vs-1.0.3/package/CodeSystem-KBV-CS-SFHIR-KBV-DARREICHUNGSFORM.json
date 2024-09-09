@@ -313,6 +313,10 @@
       "display": "INHALATIONS-PULVER"
     },
     {
+      "code": "IID",
+      "display": "Injektions- und Infusionsdispersion"
+    },
+    {
       "code": "IIE",
       "display": "Injektions- oder Infusionslösung oder Lösung zum Einnehmen"
     },
@@ -471,6 +475,10 @@
     {
       "code": "LIQ",
       "display": "LIQUIDUM"
+    },
+    {
+      "code": "LIV",
+      "display": "Lösung zur intravesikalen Anwendung"
     },
     {
       "code": "LOE",

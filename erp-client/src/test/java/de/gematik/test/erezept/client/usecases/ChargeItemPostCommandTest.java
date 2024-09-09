@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import lombok.val;
@@ -34,7 +34,7 @@ class ChargeItemPostCommandTest {
   }
 
   private ChargeItemPostCommand getChargeItemPostCommand(PrescriptionId prescriptionId) {
-    val erxChargeItem = ErxChargeItemBuilder.faker(prescriptionId).build();
+    val erxChargeItem = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId).fake();
     return new ChargeItemPostCommand(erxChargeItem, new Secret("123"));
   }
 

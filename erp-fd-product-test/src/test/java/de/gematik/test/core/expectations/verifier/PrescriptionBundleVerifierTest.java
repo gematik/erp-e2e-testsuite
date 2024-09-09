@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
@@ -32,7 +33,6 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PZN;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import java.util.Date;
 import java.util.Optional;
 import lombok.val;
@@ -51,8 +51,7 @@ class PrescriptionBundleVerifierTest {
 
   @Test
   void shouldNotInstantiateUtilityClass() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(PrescriptionBundleVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(PrescriptionBundleVerifier.class));
   }
 
   @Test

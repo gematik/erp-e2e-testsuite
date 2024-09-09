@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.cli.cmd;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
 import de.gematik.test.erezept.cli.param.EgkParameter;
 import de.gematik.test.erezept.cli.param.EnvironmentParameter;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardFactory;
 import java.util.concurrent.Callable;
 import lombok.val;
 import picocli.CommandLine;
@@ -36,7 +36,7 @@ public abstract class BaseRemoteCommand implements Callable<Integer> {
 
   @Override
   public final Integer call() {
-    val sca = SmartcardFactory.getArchive();
+    val sca = SmartcardArchive.fromResources();
     val egks = egkParameter.getEgks(sca);
     val env = this.getEnvironment();
 

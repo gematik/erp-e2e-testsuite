@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,10 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import de.gematik.test.erezept.screenplay.util.*;
+import java.time.Instant;
 import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +53,16 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
   /** Stores Prescriptions (ErxAcceptBundles) which has been digitally accepted at the FD */
   @Getter private final ManagedList<ErxAcceptBundle> acceptedPrescriptions;
 
-  /** Stores the Prescriptions (Quittungen/ErxReceipt) which has been dispensed at the FD */
-  @Getter private final ManagedList<DispenseReceipt> dispensedPrescriptions;
+  /**
+   * Stores the Prescriptions (Quittungen/ErxReceipt) which has been dispensed at the FD and closed
+   */
+  @Getter private final ManagedList<DispenseReceipt> closedPrescriptions;
+
+  /** Stores dispensed Prescriptions (Quittungen/ErxReceipt) which has been dispensed at the FD */
+  @Getter private final ManagedList<ErxMedicationDispenseBundle> dispensedPrescriptions;
+
+  /** Stores dispensed Prescriptions (Quittungen/ErxReceipt) which has been dispensed at the FD */
+  @Getter private final ManagedList<Instant> dispenseTimestamps;
 
   /**
    * Stores the AccessCodes/PrescriptionIDs for ChargeItems which the pharmacy was authorized to
@@ -63,6 +73,8 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
   private ManagePharmacyPrescriptions() {
     assignedPrescriptions = new ManagedList<>(() -> "No Prescriptions were assigned so far");
     acceptedPrescriptions = new ManagedList<>(() -> "No Prescriptions were accepted so far");
+    closedPrescriptions = new ManagedList<>(() -> "No Prescriptions were closed so far");
+    dispenseTimestamps = new ManagedList<>(() -> "No PrescriptionTimestamps were deposed so far");
     dispensedPrescriptions = new ManagedList<>(() -> "No Prescriptions were dispensed so far");
     chargeItemChangeAuthorizations =
         new ManagedList<>(() -> "No Authorizations for changing ChargeItems were given so far");
@@ -86,7 +98,7 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
   }
 
   public List<DispenseReceipt> getReceiptsList() {
-    return dispensedPrescriptions.getRawList();
+    return closedPrescriptions.getRawList();
   }
 
   /**
@@ -114,7 +126,7 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
    * @param receipt which acknowledges a dispensation of a medication
    */
   public void appendDispensedPrescriptions(DispenseReceipt receipt) {
-    dispensedPrescriptions.append(receipt);
+    closedPrescriptions.append(receipt);
   }
 
   /**

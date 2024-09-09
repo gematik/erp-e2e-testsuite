@@ -20,7 +20,10 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static java.text.MessageFormat.format;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -30,7 +33,13 @@ import de.gematik.test.core.expectations.verifier.AuditEventVerifier;
 import de.gematik.test.core.expectations.verifier.TaskBundleVerifier;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.DownloadReadyTask;
+import de.gematik.test.erezept.actions.GetPrescriptionById;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.TaskAbort;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
@@ -42,7 +51,6 @@ import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmUpdateReason;
-import de.gematik.test.smartcard.Egk;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -52,7 +60,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
@@ -71,7 +78,6 @@ import org.junit.runner.RunWith;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept abrufen als Apotheker")
 @Tag("Feature:EGKinApotheke")
-@WithTag("Feature:EGKinApotheke")
 class TaskGetAsPharmacyUseCase extends ErpTest {
   private static final Boolean pn3Activate =
       featureConf.getToggle(new EgkPharmacyAcceptPN3Toggle());
@@ -174,9 +180,10 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
     val response = pharmacy.performs(DownloadReadyTask.withExamEvidence(examEvidence));
     pharmacy.attemptsTo(
         Verify.that(response)
-            .withExpectedType(ErpAfos.A_23452)
+            .withExpectedType()
             .hasResponseWith(returnCode(200))
-            .and(TaskBundleVerifier.doesContainsErxTasksWithoutQES())
+            .and(TaskBundleVerifier.doesContainsErxTasksWithoutQES(ErpAfos.A_23452))
+                .and(TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_23452))
             .isCorrect());
     verifyAuditEvent(ErxAuditEvent.Representation.PHARMACY_GET_TASK_SUCCESSFUL);
   }
@@ -269,9 +276,10 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
     if (pn3Activate && withKvnr) {
       pharmacy.attemptsTo(
           Verify.that(response)
-              .withExpectedType(ErpAfos.A_25209)
+              .withExpectedType()
               .hasResponseWith(returnCode(202))
-              .and(TaskBundleVerifier.doesContainsErxTasksWithoutQES())
+              .and(TaskBundleVerifier.doesContainsErxTasksWithoutQES(ErpAfos.A_25209))
+                  .and(TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_25209))
               .isCorrect());
     } else {
       pharmacy.attemptsTo(
@@ -300,7 +308,7 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
         pharmacy.performs(GetPrescriptionById.withTaskId(task.getTaskId()).withoutAuthentication());
     pharmacy.attemptsTo(
         Verify.that(response)
-            .withOperationOutcome(ErpAfos.A_19113_01)
+            .withOperationOutcome(ErpAfos.A_19113)
             .responseWith(returnCodeIs(403))
             .isCorrect());
     patient.performs(TaskAbort.asPatient(activation.getExpectedResponse()));
@@ -357,7 +365,8 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
       names = {"UPDATES_SUCCESSFUL", "NO_UPDATES"},
       mode = EnumSource.Mode.INCLUDE)
   void useKvnrFromPN(VsdmExamEvidenceResult result) {
-    val egk = new Egk(List.of(), "", "C000500021");
+    val egk = mock(Egk.class);
+    when(egk.getKvnr()).thenReturn("C000500021");
     val examEvidence = VsdmExamEvidence.asOnlineMode(vsdmService, egk).generate(result);
     val response =
         pharmacy.performs(DownloadReadyTask.withExamEvidence(examEvidence, patient.getKvnr()));

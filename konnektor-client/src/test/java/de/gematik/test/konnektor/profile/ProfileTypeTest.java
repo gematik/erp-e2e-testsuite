@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package de.gematik.test.konnektor.profile;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.konnektor.exceptions.InvalidKonnektorProfileException;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ProfileTypeTest {
+class ProfileTypeTest {
 
   @Test
-  public void shouldParseValidProfileTypes() {
+  void shouldParseValidProfileTypes() {
     val inputs = List.of("KonSim", "KONSIM", "Secunet", "SECUNET", "Rise", "RISE", "CGM", "cgm");
     val expected =
         List.of(
@@ -49,7 +49,7 @@ public class ProfileTypeTest {
   }
 
   @Test
-  public void shouldCreateProfileFromType() {
+  void shouldCreateProfileFromType() {
     val inputs = List.of("KonSim", "KONSIM", "Secunet", "SECUNET", "Rise", "RISE", "CGM", "cgm");
     inputs.stream()
         .map(ProfileType::fromString)
@@ -64,7 +64,7 @@ public class ProfileTypeTest {
   }
 
   @Test
-  public void shouldThrowOnInvalidProfileTypes() {
+  void shouldThrowOnInvalidProfileTypes() {
     val inputs = List.of("KonSimulator", "SimKon", "Sekunet", "Reis", "GCM", "");
     inputs.forEach(
         input ->
@@ -73,7 +73,7 @@ public class ProfileTypeTest {
   }
 
   @Test
-  public void shouldThrowOnNullProfileType() {
+  void shouldThrowOnNullProfileType() {
     String input = null;
     assertNull(input);
     assertThrows(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.actions;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -41,10 +43,10 @@ class TaskAbortTest {
     val erxTask = new ErxTask();
     erxTask.setId("123");
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(() -> patient.performs(TaskAbort.asPatient(erxTask)));

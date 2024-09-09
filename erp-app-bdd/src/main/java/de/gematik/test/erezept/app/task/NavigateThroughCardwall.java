@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept.app.task;
 
-import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
+import de.gematik.test.erezept.app.mobile.elements.CardWall;
+import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.questions.UsedSessionKVNR;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
@@ -27,7 +30,6 @@ import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.SmartcardArchive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -47,20 +49,13 @@ public class NavigateThroughCardwall implements Task {
   @Step("{0} meldet sich mit seiner/ihrer eGK von der #insuranceKind in der E-Rezept App an")
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
-    val userConfig = SafeAbility.getAbility(actor, UseAppUserConfiguration.class);
+    val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
 
-    /*
-    here the bottom drawer pops up sporadically suggesting to log in:
-    1. tap two times on prescriptions to ensure the bottom drawer pops up
-    2. ensure the bottom drawer is declined by probing twice
-     */
-    app.tap(2, BottomNav.PRESCRIPTION_BUTTON);
-    app.tapIfDisplayed(2, Utility.DECLINE_LOGIN);
-
+    app.tap(BottomNav.PRESCRIPTION_BUTTON);
     app.tap(Mainscreen.LOGIN_BUTTON);
 
     app.tap(CardWall.ADD_HEALTH_CARD_BUTTON);
-    app.input("123123", CardWall.CAN_INPUT_FIELD);
+    app.inputPassword("123123", CardWall.CAN_INPUT_FIELD);
     app.tap(CardWall.CAN_ACCEPT_BUTTON);
     app.inputPassword("123456", CardWall.PIN_INPUT_FIELD);
     app.tap(CardWall.PIN_ACCEPT_BUTTON);
@@ -77,13 +72,10 @@ public class NavigateThroughCardwall implements Task {
     actor.can(provideEgk);
     actor.can(
         ProvidePatientBaseData.forPatient(
-            provideEgk.getKvnr(),
-            egk.getOwner().getGivenName(),
-            egk.getOwner().getSurname(),
-            insuranceKind));
+            provideEgk.getKvnr(), egk.getOwnerData().getCommonName(), insuranceKind));
 
     // now get the concrete eGK wich was chosen from the cardwall
-    val erpClient = ErpClientFactory.createErpClient(environment, userConfig.getConfiguration());
+    val erpClient = ErpClientFactory.createErpClient(environment, userConfig.getUserConfig());
     val useErpClient = UseTheErpClient.with(erpClient);
     useErpClient.authenticateWith(egk);
     actor.can(useErpClient);

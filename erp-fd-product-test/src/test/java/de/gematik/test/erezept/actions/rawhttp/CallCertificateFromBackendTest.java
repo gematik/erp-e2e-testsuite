@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,25 @@
 
 package de.gematik.test.erezept.actions.rawhttp;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.actions.rawhttpactions.CallCertificateFromBackend;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestInstance;
+import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import lombok.val;
-import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
 import org.junit.jupiter.api.AfterEach;
@@ -41,30 +45,24 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 class CallCertificateFromBackendTest {
 
-  private static final String CERT_BODY_PATH = "certexamples/86028_ExampleData.json";
+  private static final String CERT_BODY_PATH = "certexamples/ExampleCerts2.json";
 
   @RegisterExtension
   static WireMockExtension wiremockExtension =
       WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig()).build();
 
-  private Actor actor;
-  private HttpResponse<?> response;
-
   @BeforeEach
   void setup() {
     OnStage.setTheStage(Cast.ofStandardActors());
     CoverageReporter.getInstance().startTestcase("don't care");
-    val respBody = ResourceUtils.readFileFromResource(CERT_BODY_PATH);
+    val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH);
     wiremockExtension.stubFor(
-        get(urlEqualTo("/PKICertificates?currentRoot=GEM.RCA3%20TEST-ONLY"))
+        get(urlEqualTo("/PKICertificates?currentRoot=GEM.RCA3%2520TEST-ONLY"))
             .willReturn(aResponse().withHeader("1", "2").withBody(respBody).withStatus(200)));
-    actor = OnStage.theActor("Leonie");
+    val actor = OnStage.theActor("Leonie");
     UnirestInstance client = Unirest.spawnInstance();
     client.config().defaultBaseUrl(wiremockExtension.baseUrl());
     actor.can(new RawHttpAbility(client));
-    response =
-        assertDoesNotThrow(
-            () -> actor.asksFor(CallCertificateFromBackend.named("GEM.RCA3%20TEST-ONLY")));
   }
 
   @AfterEach
@@ -73,21 +71,22 @@ class CallCertificateFromBackendTest {
   }
 
   @Test
-  @TestcaseId("ut_httpResponseCertVerifier_01")
-  @DisplayName("Positive Unit Test for an RawHttpBodyCertVerify")
-  void verifierShouldWork() {
-    OnStage.setTheStage(Cast.ofStandardActors());
-    CoverageReporter.getInstance().startTestcase("don't care");
-    val respBody = ResourceUtils.readFileFromResource(CERT_BODY_PATH);
-    wiremockExtension.stubFor(
-        get(urlEqualTo("/PKICertificates?currentRoot=GEM.RCA3%20TEST-ONLY"))
-            .willReturn(aResponse().withHeader("1", "2").withBody(respBody).withStatus(200)));
-    actor = OnStage.theActor("Leonie");
-    UnirestInstance client = Unirest.spawnInstance();
-    client.config().defaultBaseUrl(wiremockExtension.baseUrl());
-    actor.can(new RawHttpAbility(client));
-    response =
+  @TestcaseId("ut_httpResponseCallCertificate_01")
+  @DisplayName("Positive Unit Test for an Get_Certificate with rootCa")
+  void callCertificateShouldWork() {
+
+    val actor = OnStage.theActorInTheSpotlight();
+    val response =
         assertDoesNotThrow(
-            () -> actor.asksFor(CallCertificateFromBackend.named("GEM.RCA3%20TEST-ONLY")));
+            () -> actor.asksFor(CallCertificateFromBackend.withRootCa("GEM.RCA3%20TEST-ONLY")));
+  }
+
+  @Test
+  void shouldMap() throws JsonProcessingException {
+    val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH);
+    val mapper = new ObjectMapper();
+    val content = mapper.readValue(respBody, PKICertificatesDTOEnvelop.class);
+    assertFalse(content.getAddRoots().isEmpty());
+    assertFalse(content.getCaCerts().isEmpty());
   }
 }

@@ -72,7 +72,7 @@ public class SendInvalidMessagesIT extends ErpTest {
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doc;
 
-  @Actor(name = "Stadtapotheke")
+  @Actor(name = "Am Flughafen")
   private PharmacyActor pharma;
 
   private static Stream<Arguments> communicationTestComposer() {
@@ -121,7 +121,7 @@ public class SendInvalidMessagesIT extends ErpTest {
         new CommunicationReplyMessage(
             supplyOptionsType, getRandomString(MAX_STRING_LENGTH_500 + 1));
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -129,8 +129,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_02")
@@ -157,8 +156,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_03")
@@ -182,7 +180,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             null,
             null);
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -191,8 +189,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_04")
@@ -224,8 +221,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_05_A")
@@ -245,7 +241,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             1, "zuwerfen", getRandomString(MAX_STRING_LENGTH_500), null, null, null);
 
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -254,8 +250,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_05_B")
@@ -275,7 +270,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             1, "", getRandomString(MAX_STRING_LENGTH_500), null, null, null);
 
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -284,8 +279,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_06_A")
@@ -313,8 +307,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_06_B")
@@ -341,8 +334,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_07")
@@ -366,7 +358,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             getRandomString(MAX_STRING_LENGTH_128 + 1)); // max allowed 128
 
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -375,8 +367,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_08")
@@ -408,8 +399,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_09")
@@ -439,7 +429,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             SendMessages.to(patient)
                 .forTask(prescTask)
                 .addManipulator(manipulator)
-                .asReply(replyMessage));
+                .asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -448,8 +438,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_10")
@@ -487,8 +476,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_11")
@@ -511,7 +499,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             null);
 
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -520,8 +508,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_12")
@@ -544,7 +531,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             null);
 
     val response2 =
-        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage));
+        pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
@@ -553,8 +540,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_13")
@@ -585,8 +571,7 @@ public class SendInvalidMessagesIT extends ErpTest {
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_14")
@@ -612,12 +597,11 @@ public class SendInvalidMessagesIT extends ErpTest {
             .hasResponseWith(returnCode(400))
             .and(
                 operationOutcomeHasDetailsText(
-                    "Header must contain an access code", ErpAfos.A_19520_01))
+                    "Header must contain an access code", ErpAfos.A_19520))
             .isCorrect());
     // cleanup
     pharma.performs(
-        DispensePrescription.acceptedWith(
-            pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   private ErxTask getTask(PrescriptionAssignmentKind assignmentKind) {

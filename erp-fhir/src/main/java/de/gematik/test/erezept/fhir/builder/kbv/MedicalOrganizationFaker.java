@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,13 @@ import de.gematik.test.erezept.fhir.values.BSNR;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.val;
 
 public class MedicalOrganizationFaker {
-  private final MedicalOrganizationBuilder builder;
   private final Map<String, Consumer<MedicalOrganizationBuilder>> builderConsumers =
       new HashMap<>();
 
-  private MedicalOrganizationFaker(MedicalOrganizationBuilder builder) {
-    this.builder = builder;
+  private MedicalOrganizationFaker() {
     builderConsumers.put("phone", b -> b.phone(fakerPhone()));
     builderConsumers.put("address", b -> b.address(fakerCity(), fakerZipCode(), fakerStreetName()));
     builderConsumers.put("name", b -> b.name(fakerName()));
@@ -40,7 +39,7 @@ public class MedicalOrganizationFaker {
   }
 
   public static MedicalOrganizationFaker builder() {
-    return new MedicalOrganizationFaker(MedicalOrganizationBuilder.builder());
+    return new MedicalOrganizationFaker();
   }
 
   public MedicalOrganizationFaker withVersion(KbvItaForVersion version) {
@@ -79,7 +78,12 @@ public class MedicalOrganizationFaker {
   }
 
   public MedicalOrganization fake() {
+    return this.toBuilder().build();
+  }
+
+  public MedicalOrganizationBuilder toBuilder() {
+    val builder = MedicalOrganizationBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

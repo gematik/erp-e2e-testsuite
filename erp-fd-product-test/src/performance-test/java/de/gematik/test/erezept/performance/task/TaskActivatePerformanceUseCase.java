@@ -31,7 +31,7 @@ import de.gematik.test.erezept.actions.TaskCreate;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -117,15 +117,15 @@ class TaskActivatePerformanceUseCase extends ErpTest {
     val draftTask = creation.getExpectedResponse();
     val prescriptionId = draftTask.getPrescriptionId();
 
-    val kbvBundleBuilder = KbvErpBundleBuilder.faker(sina.getKvnr());
-    kbvBundleBuilder
-        .prescriptionId(prescriptionId)
-        .practitioner(doctor.getPractitioner())
-        .custodian(doctor.getMedicalOrganization())
-        .patient(sina.getPatientData())
-        .insurance(sina.getInsuranceCoverage());
-    sina.getAssignerOrganization().ifPresent(kbvBundleBuilder::assigner);
-    val kbvBundle = kbvBundleBuilder.build();
+    val kbvBundleFaker = KbvErpBundleFaker.builder().withKvnr(sina.getKvnr());
+    kbvBundleFaker
+        .withPrescriptionId(prescriptionId)
+        .withPractitioner(doctor.getPractitioner())
+        .withCustodian(doctor.getMedicalOrganization())
+        .withPatient(sina.getPatientData())
+        .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData());
+    sina.getAssignerOrganization().ifPresent(kbvBundleFaker::withAssignerOrganization);
+    val kbvBundle = kbvBundleFaker.fake();
 
     // when built via withRandomKbvBundle, the practitioner reference does not match and needs to be
     // fixed

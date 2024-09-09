@@ -1,23 +1,23 @@
 environments:
   - name: TU
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-test.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
 
   - name: RU
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
 
   - name: RU-DEV
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
       xapiKey: DUMMY VALUE

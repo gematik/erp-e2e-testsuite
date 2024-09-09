@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ public class ProvidePatientBaseData implements Ability {
 
   @Getter private String iknr;
   private String insuranceName;
+
+  private DmpKennzeichen dmpKennzeichen;
 
   private AssignerOrganization pkvAssignerOrganization;
 
@@ -93,6 +95,10 @@ public class ProvidePatientBaseData implements Ability {
     this.payorType = payorType;
   }
 
+  public void setDmpKennzeichen(DmpKennzeichen dmpKennzeichen) {
+    this.dmpKennzeichen = dmpKennzeichen;
+  }
+
   public Optional<PayorType> getPayorType() {
     return Optional.ofNullable(this.payorType);
   }
@@ -135,6 +141,7 @@ public class ProvidePatientBaseData implements Ability {
         KbvCoverageBuilder.insurance(iknr, insuranceName)
             .beneficiary(this.getPatient())
             .wop(wop)
+            .dmpKennzeichen(dmpKennzeichen != null ? dmpKennzeichen : DmpKennzeichen.NOT_SET)
             .versichertenStatus(VersichertenStatus.MEMBERS);
 
     Optional.ofNullable(payorType)

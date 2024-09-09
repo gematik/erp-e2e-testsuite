@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@ package de.gematik.test.erezept.app.cfg;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.config.dto.app.AppConfiguration;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import de.gematik.test.erezept.config.dto.app.DeviceConfiguration;
 import de.gematik.test.erezept.config.exceptions.MissingRequiredConfigurationException;
 import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.MobileCapabilityType;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 
 class DesiredCapabilitiesBuilderTest {
 
@@ -37,13 +38,24 @@ class DesiredCapabilitiesBuilderTest {
     config.setPlatform("iOS");
     config.setPackageName("de.gematik.erezept");
 
-    val dc = DesiredCapabilitiesBuilder.init().app(config).create();
+    val dc = DesiredCapabilitiesBuilder.init().app(config, null).create();
 
-    val appName = dc.getCapability("gematik:applicationName");
-    assertEquals("E-Rezept", appName);
+    val bundleId = dc.getCapability("bundleId");
+    assertEquals("de.gematik.erezept", bundleId);
+  }
 
-    val packageName = dc.getCapability("appium:appPackage");
-    assertEquals("de.gematik.erezept", packageName);
+  @Test
+  void shouldAppendMdcPostfixForNfc() {
+    val config = new AppConfiguration();
+    config.setAppFile("test-app-file");
+    config.setPlatform("iOS");
+    config.setPackageName("de.gematik.erezept");
+
+    val postfix = ".mdc2";
+    val dc = DesiredCapabilitiesBuilder.init().app(config, postfix).create();
+
+    val bundleId = dc.getCapability("bundleId");
+    assertEquals("de.gematik.erezept" + postfix, bundleId);
   }
 
   @Test
@@ -54,13 +66,10 @@ class DesiredCapabilitiesBuilderTest {
     config.setPackageName("de.gematik.erezept");
     config.setEspressoServerUniqueName("initialOrchestratorTestAPK");
 
-    val dc = DesiredCapabilitiesBuilder.init().app(config).create();
+    val dc = DesiredCapabilitiesBuilder.init().app(config, null).create();
 
-    val appName = dc.getCapability("gematik:applicationName");
-    assertEquals("E-Rezept", appName);
-
-    val packageName = dc.getCapability("appium:appPackage");
-    assertNull(packageName);
+    val bundleId = dc.getCapability("bundleId");
+    assertNull(bundleId);
   }
 
   @Test
@@ -76,10 +85,7 @@ class DesiredCapabilitiesBuilderTest {
     val platform = dc.getCapability("platformName");
     assertEquals("IOS", platform.toString());
 
-    val platformVersion = dc.getCapability("platformVersion");
-    assertEquals("16", platformVersion);
-
-    val automationName = dc.getCapability(MobileCapabilityType.AUTOMATION_NAME);
+    val automationName = dc.getCapability("automationName");
     assertEquals(AutomationName.IOS_XCUI_TEST, automationName);
   }
 
@@ -96,13 +102,10 @@ class DesiredCapabilitiesBuilderTest {
     val platform = dc.getCapability("platformName");
     assertEquals("ANDROID", platform.toString());
 
-    val platformVersion = dc.getCapability("platformVersion");
-    assertEquals("10", platformVersion);
-
     val espressoBuildConfig = dc.getCapability("appium:espressoBuildConfig");
     assertNotNull(espressoBuildConfig);
 
-    val automationName = dc.getCapability(MobileCapabilityType.AUTOMATION_NAME);
+    val automationName = dc.getCapability("automationName");
     assertEquals("Espresso", automationName);
   }
 
@@ -115,25 +118,24 @@ class DesiredCapabilitiesBuilderTest {
     assertEquals("123", dc.getCapability("accessKey"));
   }
 
+  @ParameterizedTest
+  @NullSource
+  @EmptySource
+  void shouldCreateAndroidAppiumCapabilitiesWithoutAccessKey(String emptyAccessKey) {
+    val config = new AppiumConfiguration();
+    config.setAccessKey(emptyAccessKey);
+
+    val dc = DesiredCapabilitiesBuilder.init().appium(config).create();
+    assertNull(dc.getCapability("accessKey"));
+  }
+
   @Test
   void shouldCreateAndroidAppiumCapabilitiesWithAppiumVersion() {
     val config = new AppiumConfiguration();
     config.setVersion("1.2.3");
 
     val dc = DesiredCapabilitiesBuilder.init().appium(config).create();
-    assertEquals("1.2.3", dc.getCapability("appium:appiumVersion"));
-  }
-
-  @Test
-  void shouldThrowOnUnsupportedPlatform() {
-    val config = new DeviceConfiguration();
-    config.setName("AdV");
-    config.setPlatform("Desktop");
-    config.setUdid("123");
-    config.setPlatformVersion("10");
-
-    val builder = DesiredCapabilitiesBuilder.init();
-    assertThrows(UnsupportedPlatformException.class, () -> builder.device(config));
+    assertEquals("1.2.3", dc.getCapability("appiumVersion"));
   }
 
   @Test
@@ -145,7 +147,7 @@ class DesiredCapabilitiesBuilderTest {
     //    config.setEspressoServerUniqueName("initialOrchestratorTestAPK"); // this one is required!
 
     val builder = DesiredCapabilitiesBuilder.init();
-    assertThrows(MissingRequiredConfigurationException.class, () -> builder.app(config));
+    assertThrows(MissingRequiredConfigurationException.class, () -> builder.app(config, null));
   }
 
   @Test

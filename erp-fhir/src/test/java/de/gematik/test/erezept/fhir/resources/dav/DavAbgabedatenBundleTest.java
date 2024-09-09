@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.sql.Date;
@@ -44,7 +44,7 @@ class DavAbgabedatenBundleTest extends ParsingTest {
 
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val bundle = parser.decode(DavAbgabedatenBundle.class, content);
 
     assertEquals(expectedID, bundle.getLogicalId());
@@ -79,7 +79,7 @@ class DavAbgabedatenBundleTest extends ParsingTest {
     val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val bundle = parser.decode(content);
     assertEquals(ResourceType.Bundle, bundle.getResourceType());
     assertEquals(DavAbgabedatenBundle.class, bundle.getClass());
@@ -90,7 +90,7 @@ class DavAbgabedatenBundleTest extends ParsingTest {
     val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val bundleResource = parser.decode(content);
     assertDoesNotThrow(() -> DavAbgabedatenBundle.fromBundle(bundleResource));
   }

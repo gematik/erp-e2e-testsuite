@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,28 @@ package de.gematik.test.erezept.client.rest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 
 class ErpResponseTest {
 
   @Test
   void getOptionalResourceType() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -43,7 +49,7 @@ class ErpResponseTest {
   @Test
   void getEmptyOptionalResourceType() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -53,7 +59,7 @@ class ErpResponseTest {
   @Test
   void shouldThrowOnUnexpectedResource() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), ErxTask.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), ErxTask.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -174,7 +180,7 @@ class ErpResponseTest {
   @Test
   void doesNotThrowExceptionOnToString() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -184,7 +190,7 @@ class ErpResponseTest {
   @Test
   void shouldHaveValidPayloadOnEmptyValidationResult() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
@@ -194,7 +200,7 @@ class ErpResponseTest {
   @Test
   void shouldThrowOnInvalidPayload() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createFailingValidationResult());
@@ -210,5 +216,39 @@ class ErpResponseTest {
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createFailingValidationResult());
     assertTrue(response.getResourceOptional().isEmpty());
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @NullSource
+  void shouldThrowCustomExceptionOnUnexpected(Resource resource) {
+    val response =
+        ErpResponse.forPayload(resource, ErxTask.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    Function<ErpResponse<? extends Resource>, RuntimeException> errorFunction =
+        r -> new RuntimeException("test");
+    assertThrows(RuntimeException.class, () -> response.getExpectedOrThrow(errorFunction));
+  }
+
+  static Stream<Arguments> shouldThrowCustomExceptionOnUnexpected() {
+    return Stream.of(
+            KbvErpBundleFaker.builder().fake(), FhirTestResourceUtil.createOperationOutcome())
+        .map(Arguments::of);
+  }
+
+  @Test
+  void shouldNotThrowOnExpectedResource() {
+    val resource = KbvErpBundleFaker.builder().fake();
+    val response =
+        ErpResponse.forPayload(resource, KbvErpBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    Function<ErpResponse<? extends Resource>, RuntimeException> errorFunction =
+        r -> new RuntimeException("test");
+    val r2 = assertDoesNotThrow(() -> response.getExpectedOrThrow(errorFunction));
+    assertEquals(r2, resource);
   }
 }

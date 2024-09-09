@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.lei;
 
-import io.cucumber.junit.CucumberOptions;
-import net.serenitybdd.cucumber.CucumberWithSerenity;
-import org.junit.runner.RunWith;
+import static io.cucumber.junit.platform.engine.Constants.EXECUTION_DRY_RUN_PROPERTY_NAME;
+import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
 
-@RunWith(CucumberWithSerenity.class)
-@CucumberOptions(
-    features = "src/test/resources/features",
-    plugin = {"pretty"},
-    glue = {"de.gematik.test.erezept.lei.steps"},
-    dryRun = true)
+import org.junit.platform.suite.api.*;
+
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("/features")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "de.gematik.test.erezept.lei.steps")
+@ConfigurationParameter(key = EXECUTION_DRY_RUN_PROPERTY_NAME, value = "true")
 public class DryRunTestSuite {}

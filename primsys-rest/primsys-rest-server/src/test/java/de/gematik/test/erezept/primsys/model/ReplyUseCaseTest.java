@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.resources.erp.*;
@@ -29,7 +31,6 @@ import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.rest.response.*;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import jakarta.ws.rs.*;
 import java.util.*;
 import lombok.*;
@@ -42,7 +43,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
 
   @Test
   void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(ReplyUseCase.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ReplyUseCase.class));
   }
 
   @ParameterizedTest
@@ -62,7 +63,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val resource =
-        FhirTestResourceUtil.createErxAuditEvent(
+        ErxFhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
     val mockResponse =
         ErpResponse.forPayload(resource, ErxCommunication.class)
@@ -73,6 +74,38 @@ class ReplyUseCaseTest extends TestWithActorContext {
     try (val response =
         ReplyUseCase.replyPrescription(
             pharmacy, "taskId", "KVNR", supplyType, "Hello World - Message")) {
+      assertEquals(204, response.getStatus());
+    }
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "'onPremise', 'TestSender'",
+    "onpremise', 'TestSender'",
+    "ONPREMISE', ''",
+    "delivery', 'TestSender123456789'",
+    "DELIVERY', 'TestSenderMitSönd3rZ@ichen'",
+    "ShipMENT', 'TestSender'",
+    "shipment', 'TestSender'",
+    "null', 'TestSender'"
+  })
+  void shouldReplyPrescriptionWithSender(String supplyType, String sender) {
+    val ctx = ActorContext.getInstance();
+    val pharmacy = ctx.getPharmacies().get(1);
+    val mockClient = pharmacy.getClient();
+
+    val resource =
+        ErxFhirTestResourceUtil.createErxAuditEvent(
+            "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
+    val mockResponse =
+        ErpResponse.forPayload(resource, ErxCommunication.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    when(mockClient.request(any(CommunicationPostCommand.class))).thenReturn(mockResponse);
+    try (val response =
+        ReplyUseCase.replyPrescriptionWithSender(
+            pharmacy, "taskId", "KVNR", supplyType, "Hello World - Message", sender)) {
       assertEquals(204, response.getStatus());
     }
   }

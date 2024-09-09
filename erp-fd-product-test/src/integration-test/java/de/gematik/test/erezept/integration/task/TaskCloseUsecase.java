@@ -28,7 +28,7 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -47,6 +47,7 @@ import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -56,7 +57,9 @@ import org.junit.runner.RunWith;
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
-@DisplayName("E-Rezept ausstellen")
+@Tag("Smoketest")
+@Tag("UseCase:Close")
+@DisplayName("E-Rezept dispensieren")
 class TaskCloseUsecase extends ErpTest {
 
   private static final Boolean expectFullUrlAsUuidInReceipt =
@@ -126,7 +129,7 @@ class TaskCloseUsecase extends ErpTest {
             .and(isInProgressStatus())
             .isCorrect());
 
-    val dispensation = flughafen.performs(DispensePrescription.acceptedWith(acceptation));
+    val dispensation = flughafen.performs(ClosePrescription.acceptedWith(acceptation));
 
     val binary = dispensation.getExpectedResponse().getQesDigestBinary();
     val konnektor = flughafen.abilityTo(UseTheKonnektor.class);
@@ -185,12 +188,10 @@ class TaskCloseUsecase extends ErpTest {
     // see https://twitter.com/H3NK3P3NK/status/1543168037204918273?t=zwpWZN_6uvd54GlfA0gvxw&s=09
     val dispensation =
         flughafen.performs(
-            DispensePrescription.alternative()
-                .performer("I don't care!")
-                .acceptedWith(acceptation));
+            ClosePrescription.alternative().performer("I don't care!").acceptedWith(acceptation));
     flughafen.attemptsTo(
         Verify.that(dispensation)
-            .withOperationOutcome(ErpAfos.A_19248_02)
+            .withOperationOutcome(ErpAfos.A_19248)
             .hasResponseWith(returnCode(400))
             .isCorrect());
   }
@@ -232,12 +233,12 @@ class TaskCloseUsecase extends ErpTest {
 
     val dispensation =
         flughafen.performs(
-            DispensePrescription.alternative()
+            ClosePrescription.alternative()
                 .prescriptionId(PrescriptionId.random())
                 .acceptedWith(acceptation));
     flughafen.attemptsTo(
         Verify.that(dispensation)
-            .withOperationOutcome(ErpAfos.A_19248_02)
+            .withOperationOutcome(ErpAfos.A_19248)
             .hasResponseWith(returnCode(400))
             .isCorrect());
   }
@@ -279,10 +280,10 @@ class TaskCloseUsecase extends ErpTest {
 
     val dispensation =
         flughafen.performs(
-            DispensePrescription.alternative().kvnr(KVNR.random()).acceptedWith(acceptation));
+            ClosePrescription.alternative().kvnr(KVNR.random()).acceptedWith(acceptation));
     flughafen.attemptsTo(
         Verify.that(dispensation)
-            .withOperationOutcome(ErpAfos.A_19248_02)
+            .withOperationOutcome(ErpAfos.A_19248)
             .hasResponseWith(returnCode(400))
             .isCorrect());
   }

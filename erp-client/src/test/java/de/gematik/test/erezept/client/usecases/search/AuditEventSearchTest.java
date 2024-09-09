@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package de.gematik.test.erezept.client.usecases.search;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ class AuditEventSearchTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AuditEventSearch.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AuditEventSearch.class));
   }
 
   @Test

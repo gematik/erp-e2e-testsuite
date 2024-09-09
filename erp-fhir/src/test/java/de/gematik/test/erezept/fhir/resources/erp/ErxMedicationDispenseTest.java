@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -33,13 +33,13 @@ import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseTest extends ParsingTest {
-  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   @Test
   void shouldEncodeSingleMedicationDispense() {
     val fileName = "MedicationDispense_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationDispense = parser.decode(ErxMedicationDispense.class, content);
     assertNotNull(medicationDispense, "Valid MedicationDispense must be parseable");
     assertEquals(new PrescriptionId("12345678"), medicationDispense.getPrescriptionId());
@@ -67,7 +67,7 @@ class ErxMedicationDispenseTest extends ParsingTest {
   void shouldCastFromMedicationDispense() {
     val fileName = "MedicationDispense_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     Resource medicationDispense = parser.decode(MedicationDispense.class, content);
     val erxMedicationDispense = ErxMedicationDispense.fromMedicationDispense(medicationDispense);
     assertNotNull(erxMedicationDispense);

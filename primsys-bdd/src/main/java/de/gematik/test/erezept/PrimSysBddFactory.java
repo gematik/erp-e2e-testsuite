@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,13 @@ package de.gematik.test.erezept;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.DummyEgk;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.SmartcardType;
+import de.gematik.bbriccs.smartcards.SmcB;
+import de.gematik.bbriccs.smartcards.exceptions.CardNotFoundException;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
@@ -26,12 +33,25 @@ import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.pspwsclient.config.PSPClientFactory;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
+import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
+import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideApoVzdInformation;
+import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.UsePspClient;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseSubscriptionService;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.konnektor.cfg.KonnektorModuleFactory;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmcB;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -79,7 +99,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
     val cfg = this.getConfig(name, dto.getActors().getDoctors());
     val smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
     val hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
-    val algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb)
@@ -101,7 +121,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
     val name = thePharmacy.getName();
     val cfg = this.getConfig(name, dto.getActors().getPharmacies());
     val smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
-    val algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb)
@@ -124,7 +144,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
     val name = theApothecary.getName();
     val cfg = this.getConfig(name, dto.getActors().getApothecaries());
     val hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
-    val algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     // equip the apothecary with a konnektor-client ability
     givenThat(theApothecary)
@@ -142,7 +162,15 @@ public class PrimSysBddFactory extends ConfiguredFactory {
    * @param thePatient is the actor to be equipped as a patient without erp-client ability
    */
   public void equipAsPatientForVsdm(Actor thePatient, String insuranceType) {
-    this.equipAsBasePatient(thePatient, insuranceType);
+    val name = thePatient.getName();
+    val cfg = this.getConfig(name, dto.getActors().getPatients());
+    val egkConfig =
+        sca.getConfigsFor(SmartcardType.EGK).stream()
+            .filter(c -> c.getIccsn().equals(cfg.getEgkIccsn()))
+            .findFirst()
+            .orElseThrow(() -> new CardNotFoundException(SmartcardType.EGK, cfg.getEgkIccsn()));
+    val egk = DummyEgk.fromConfig(egkConfig);
+    this.equipAsBasePatient(thePatient, egk, insuranceType);
 
     // give the patient a proper description
     givenThat(thePatient)
@@ -153,11 +181,11 @@ public class PrimSysBddFactory extends ConfiguredFactory {
   }
 
   public void equipAsPatient(Actor thePatient, String insuranceType) {
-    this.equipAsBasePatient(thePatient, insuranceType);
     val name = thePatient.getName();
     val cfg = this.getConfig(name, dto.getActors().getPatients());
     val egk = sca.getEgkByICCSN(cfg.getEgkIccsn());
 
+    this.equipAsBasePatient(thePatient, egk, insuranceType);
     givenThat(thePatient)
         .describedAs(
             format(
@@ -169,10 +197,8 @@ public class PrimSysBddFactory extends ConfiguredFactory {
                 .authenticatingWith(egk));
   }
 
-  private void equipAsBasePatient(Actor thePatient, String insuranceType) {
+  private void equipAsBasePatient(Actor thePatient, Egk egk, String insuranceType) {
     val name = thePatient.getName();
-    val cfg = this.getConfig(name, dto.getActors().getPatients());
-    val egk = sca.getEgkByICCSN(cfg.getEgkIccsn());
 
     givenThat(thePatient)
         .whoCan(ProvideEGK.sheOwns(egk))

@@ -73,8 +73,9 @@ open class RestTest {
 
     fun setupPositiveActors(env: String? = null): StubMapping {
         val actorsDto = mutableListOf<ActorDto>()
-        for (i in 0..1) actorsDto.add(ActorDto(ActorType.DOCTOR, "Doctor $i", "doc$i"))
-        for (i in 0..1) actorsDto.add(ActorDto(ActorType.PHARMACY, "Pharmacy $i", "pharm$i"))
+        for (i in 0..1) actorsDto.add(ActorDto("doc$i", ActorType.DOCTOR, "Doctor $i", "tid_doc$i", "iccsn_doc$i", "pubkey_doc$i"))
+        for (i in 0..1) actorsDto.add(ActorDto("pharm$i", ActorType.PHARMACY, "Pharmacy $i", "tid_pharm$i", "iccsn_pharm$i", "pubkey_pharm$i"))
+
 
         val actors = om.writeValueAsString(actorsDto)
         val testUrl = env?.let { "/$it/actors" } ?: "/actors"

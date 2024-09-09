@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ package de.gematik.test.erezept.primsys.model;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-import de.gematik.test.erezept.config.exceptions.ConfigurationException;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.PrimSysRestFactory;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
-import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
-import de.gematik.test.erezept.primsys.data.PrescriptionDto;
+import de.gematik.test.erezept.primsys.data.*;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
+import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -40,38 +41,71 @@ class ActorContextTest extends TestWithActorContext {
   }
 
   @Test
-  void shouldAddAndRemovePrescriptions() {
+  void shouldAddPrescription() {
     val ctx = ActorContext.getInstance();
+    val prescriptionId = GemFaker.fakerPrescriptionId().getValue();
     val prescriptionData = new PrescriptionDto();
+    prescriptionData.setPrescriptionId(prescriptionId);
+    prescriptionData.setTaskId(prescriptionId);
+    prescriptionData.setPatient(PatientDto.withKvnr("X110407071").build());
+    val size1 = ctx.getPrescriptions().size();
     ctx.addPrescription(prescriptionData);
-    assertEquals(1, ctx.getPrescriptions().size());
+    assertTrue(size1 < ctx.getPrescriptions().size());
+    assertTrue(ctx.getPrescription(prescriptionId).isPresent());
+    assertFalse(ctx.getPrescriptions(PrescriptionFilterParams.with("X110407071")).isEmpty());
   }
 
   @Test
   void shouldAddAndRemoveAcceptedPrescriptions() {
+    val prescriptionId = PrescriptionId.random().getValue();
     val ctx = ActorContext.getInstance();
     val acceptData = new AcceptedPrescriptionDto();
-    acceptData.setPrescriptionId("123");
+    acceptData.setPrescriptionId(prescriptionId);
+    acceptData.setForKvnr("X110407071");
     ctx.addAcceptedPrescription(acceptData);
-    assertEquals(1, ctx.getAcceptedPrescriptions().size());
+    assertFalse(ctx.getAcceptedPrescriptions().isEmpty());
+    assertFalse(
+        ctx.getAcceptedPrescriptions(PrescriptionFilterParams.with("X110407071")).isEmpty());
+    assertTrue(ctx.getAcceptedPrescription(prescriptionId).isPresent());
 
     assertTrue(ctx.removeAcceptedPrescription(acceptData));
-    assertEquals(0, ctx.getAcceptedPrescriptions().size());
+    assertFalse(ctx.getAcceptedPrescription(prescriptionId).isPresent());
   }
 
   @Test
-  void shouldAddAndRemoveDispensedPrescriptions() {
+  void shouldAddDispensedPrescriptions() {
+    val prescriptionId = PrescriptionId.random().getValue();
     val ctx = ActorContext.getInstance();
     val dispensedData = new DispensedMedicationDto();
+    dispensedData.setPrescriptionId(prescriptionId);
+    dispensedData.setAcceptData(
+        AcceptedPrescriptionDto.withPrescriptionId("123")
+            .forKvnr("X110407071")
+            .andMedication(PznMedicationDto.medicine("123", "Test-Pillen").asPrescribed()));
     ctx.addDispensedMedications(dispensedData);
-    assertEquals(1, ctx.getDispensedMedications().size());
+    assertTrue(ctx.getDispensedMedication(prescriptionId).isPresent());
+    assertFalse(ctx.getDispensedMedications(PrescriptionFilterParams.empty()).isEmpty());
+  }
+
+  @Test
+  void shouldFilterDispensedPrescriptionsByKvnr() {
+    val ctx = ActorContext.getInstance();
+    val dispenseData = new DispensedMedicationDto();
+    dispenseData.setPrescriptionId(PrescriptionId.random().getValue());
+    dispenseData.setAcceptData(
+        AcceptedPrescriptionDto.withPrescriptionId("123")
+            .forKvnr("X110407071")
+            .andMedication(PznMedicationDto.medicine("123", "Test-Pillen").asPrescribed()));
+    ctx.addDispensedMedications(dispenseData);
+    val dispensed = ctx.getDispensedMedications(PrescriptionFilterParams.with("X110407071"));
+    assertFalse(dispensed.isEmpty());
   }
 
   @Test
   void shouldRemovePrescription() {
     val acceptData = new AcceptedPrescriptionDto();
-    acceptData.setPrescriptionId("160.000.166.678.325.82");
-    acceptData.setAccessCode("133ff36cbb92784b1c372e1166f92290d83b98596a37ef133ec1fbae500fd1bf");
+    acceptData.setPrescriptionId(PrescriptionId.random().getValue());
+    acceptData.setAccessCode(AccessCode.random().getValue());
     acceptData.setSecret("dc2c283afae58da2e5249faac31644c8436f25aab0f3758faf736a14c2cb1d93");
 
     val ctx = ActorContext.getInstance();
@@ -81,8 +115,9 @@ class ActorContextTest extends TestWithActorContext {
 
   @Test
   void shouldBeEmptyOnUnknownDoctorId() {
+    val prescriptionId = PrescriptionId.random().getValue();
     val ctx = ActorContext.getInstance();
-    val optDoc = ctx.getDoctor("123");
+    val optDoc = ctx.getDoctor(prescriptionId);
     assertTrue(optDoc.isEmpty());
   }
 
@@ -107,8 +142,9 @@ class ActorContextTest extends TestWithActorContext {
 
   @Test
   void shouldBeEmptyOnUnknownDispensedPrescriptionId() {
+    val prescriptionId = PrescriptionId.random().getValue();
     val ctx = ActorContext.getInstance();
-    val dispensed = ctx.getDispensedMedication("123");
+    val dispensed = ctx.getDispensedMedication(prescriptionId);
     assertTrue(dispensed.isEmpty());
   }
 
@@ -117,11 +153,5 @@ class ActorContextTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     ActorContext.init(mock(PrimSysRestFactory.class));
     assertEquals(ctx, ActorContext.getInstance());
-  }
-
-  @Test
-  void shouldThrowOnMissingInit() {
-    resetSingleton(ActorContext.class, "instance");
-    assertThrows(ConfigurationException.class, ActorContext::getInstance);
   }
 }

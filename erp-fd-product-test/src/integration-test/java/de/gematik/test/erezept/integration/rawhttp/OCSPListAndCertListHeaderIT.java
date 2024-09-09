@@ -17,7 +17,7 @@
 
 package de.gematik.test.erezept.integration.rawhttp;
 
-import static de.gematik.test.core.expectations.rawhttpverifier.RawHttpResponseVerifier.containsHeaderWith;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.containsHeaderWith;
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;

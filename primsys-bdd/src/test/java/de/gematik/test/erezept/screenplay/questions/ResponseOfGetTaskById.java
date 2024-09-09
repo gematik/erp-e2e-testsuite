@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,40 +18,72 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdAsAcceptBundleCommand;
+import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.strategy.ActorRole;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
-public class ResponseOfGetTaskById extends FhirResponseQuestion<ErxAcceptBundle> {
+public class ResponseOfGetTaskById {
 
-  private final ActorRole role;
-  private final DequeStrategy deque;
-
-  private ResponseOfGetTaskById(ActorRole role, DequeStrategy deque) {
-    super("GetTaskById");
-    this.role = role;
-    this.deque = deque;
+  public static ResponseOfGetTaskByIdAsPatient asPatient(String deque) {
+    return asPatient(DequeStrategy.fromString(deque));
   }
 
-  public static ResponseOfGetTaskById asPharmacy(String deque) {
-    return new ResponseOfGetTaskById(ActorRole.PHARMACY, DequeStrategy.fromString(deque));
+  public static ResponseOfGetTaskByIdAsPatient asPatient(DequeStrategy deque) {
+    return new ResponseOfGetTaskByIdAsPatient(deque);
   }
 
-  public static ResponseOfGetTaskById withActorRole(ActorRole actor, DequeStrategy deque) {
-    return new ResponseOfGetTaskById(actor, (deque));
+  public static ResponseOfGetTaskByIdAsPharmacy asPharmacy(String deque) {
+    return asPharmacy(DequeStrategy.fromString(deque));
   }
 
-  @Override
-  public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
-    val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
-    val dmc = deque.chooseFrom(prescriptionManager.getAssignedList());
-    val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
-    val cmd = new TaskGetByIdAsAcceptBundleCommand(dmc.getTaskId(), dmc.getAccessCode());
-    return erpClient.request(cmd);
+  public static ResponseOfGetTaskByIdAsPharmacy asPharmacy(DequeStrategy deque) {
+    return new ResponseOfGetTaskByIdAsPharmacy(deque);
+  }
+
+  public static class ResponseOfGetTaskByIdAsPharmacy
+      extends FhirResponseQuestion<ErxAcceptBundle> {
+
+    private final DequeStrategy deque;
+
+    private ResponseOfGetTaskByIdAsPharmacy(DequeStrategy deque) {
+      super("GetTaskById");
+      this.deque = deque;
+    }
+
+    @Override
+    public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
+      val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
+      val dmc = deque.chooseFrom(prescriptionManager.getAssignedList());
+      val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+      val cmd = new TaskGetByIdAsAcceptBundleCommand(dmc.getTaskId(), dmc.getAccessCode());
+      return erpClient.request(cmd);
+    }
+  }
+
+  public static class ResponseOfGetTaskByIdAsPatient
+      extends FhirResponseQuestion<ErxPrescriptionBundle> {
+
+    private final DequeStrategy deque;
+
+    private ResponseOfGetTaskByIdAsPatient(DequeStrategy deque) {
+      super("GetTaskById");
+      this.deque = deque;
+    }
+
+    @Override
+    public ErpResponse<ErxPrescriptionBundle> answeredBy(Actor actor) {
+      val dmcManager = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
+      val dmc = deque.chooseFrom(dmcManager.getDmcList());
+      val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+      val cmd = new TaskGetByIdCommand(dmc.getTaskId(), dmc.getAccessCode());
+      return erpClient.request(cmd);
+    }
   }
 }

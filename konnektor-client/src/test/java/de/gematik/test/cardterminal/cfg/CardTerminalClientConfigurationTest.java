@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package de.gematik.test.cardterminal.cfg;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.cardterminal.CardTerminalClientFactory;
 import de.gematik.test.cardterminal.cats.CatsClient;
 import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.*;
 import org.junit.jupiter.api.*;
 
@@ -29,8 +29,7 @@ class CardTerminalClientConfigurationTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(CardTerminalClientFactory.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(CardTerminalClientFactory.class));
   }
 
   @Test

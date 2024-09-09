@@ -6,6 +6,8 @@
 /.idea/*
 /.idea/sonarlint/**
 
+**/.DS_Store
+
 *.apk
 *.idsig
 *.ipa

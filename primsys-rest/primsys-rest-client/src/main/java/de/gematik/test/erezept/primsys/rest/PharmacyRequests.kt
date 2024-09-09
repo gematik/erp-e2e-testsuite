@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto
+import de.gematik.test.erezept.primsys.data.communication.CommunicationDto
 import io.ktor.client.request.*
 import io.ktor.http.*
 
@@ -71,6 +72,23 @@ class ReplyRequest(private val prescriptionId: String, private val kvnr: String,
     }
 }
 
+class CommunicationSearchRequest(private val sender: String?, private val receiver: String?): PrimSysBasePharmacyRequest<List<CommunicationDto>>(object : TypeReference<List<CommunicationDto>>() {}) {
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Get
+        rb.url.appendEncodedPathSegments("communications")
+        sender?.let { rb.url.parameters.append("sender", it) }
+        receiver?.let { rb.url.parameters.append("receiver", it) }
+    }
+}
+
+class CommunicationDeleteRequest(private val id: String): PrimSysBasePharmacyRequest<Unit>(object : TypeReference<Unit>() {}) {
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Delete
+        rb.url.appendEncodedPathSegments("communication")
+        rb.url.appendEncodedPathSegments(id)
+    }
+}
+
 object PharmacyRequests {
 
     @JvmStatic
@@ -97,7 +115,15 @@ object PharmacyRequests {
 
     @JvmStatic
     fun reject(prescriptionId: String, accessCode: String, secret: String) = RejectRequest(prescriptionId, accessCode, secret)
+}
 
+object PharmacyCommunicationRequests {
     @JvmStatic
     fun reply(prescriptionId: String, kvnr: String, body: String) = ReplyRequest(prescriptionId, kvnr, body)
+
+    @JvmStatic
+    fun search(sender: String? = null, receiver: String? = null) = CommunicationSearchRequest(sender, receiver)
+
+    @JvmStatic
+    fun delete(id: String) = CommunicationDeleteRequest(id)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.MedicationDispenseDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
-import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchCommand;
+import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -58,11 +58,12 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
 
     // first refresh the screen
     app.tap(Mainscreen.REFRESH_BUTTON);
-    app.scrollIntoView(ScrollDirection.DOWN, Mainscreen.PRESCRIPTION_ARCHIVE);
 
-    // this scroll-down is required because occasionally the "Einlösen"-Button is hiding the
-    // "Archiv"-Button which results in clicking on the "Einlösen"-Button
-    app.scroll(ScrollDirection.DOWN, 0.1f);
+    // because we know the prescription archive is at the very bottom of the screen
+    app.scroll(ScrollDirection.DOWN, Float.MAX_VALUE);
+
+    // and after that make only sure we have reached the archive button
+    app.scrollIntoView(ScrollDirection.DOWN, Mainscreen.PRESCRIPTION_ARCHIVE);
     app.tap(Mainscreen.PRESCRIPTION_ARCHIVE);
     actor
         .asksFor(MovingToPrescription.withTaskId(prescriptionId.getValue()))
@@ -76,7 +77,7 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
 
     val medReq =
         erpClient
-            .request(new MedicationDispenseSearchCommand(prescriptionId))
+            .request(new MedicationDispenseSearchByIdCommand(prescriptionId))
             .getResourceOptional()
             .orElseThrow(
                 () ->

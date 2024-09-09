@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
 import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
@@ -30,17 +28,8 @@ import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.BaseANR;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
-import de.gematik.test.erezept.fhir.valuesets.PayorType;
-import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.fhir.valuesets.Wop;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -168,72 +157,12 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
     return ret;
   }
 
-  public boolean isMultiple() {
-    return this.getMedicationRequest().isMultiple();
-  }
-
-  public boolean hasEmergencyServicesFee() {
-    boolean ret = false;
-    val medRequestOpt = this.getFirstMedicationRequest();
-    if (medRequestOpt.isPresent()) {
-      val medRequest = medRequestOpt.orElseThrow();
-      val extension =
-          medRequest.getExtensionByUrl(KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.getCanonicalUrl());
-      ret = extension.castToBoolean(extension.getValue()).booleanValue();
-    }
-
-    return ret;
-  }
-
   public KbvPatient getPatient() {
     return this.entry.stream()
         .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Patient))
         .map(entry -> FhirEntryReplacer.cast(KbvPatient.class, entry, KbvPatient::fromPatient))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Patient));
-  }
-
-  public KVNR getKvnr() {
-    val patient = this.getPatient();
-    return patient.getKvnr();
-  }
-
-  public String getFamilyName() {
-    val patient = this.getPatient();
-    return patient.getNameFirstRep().getFamily();
-  }
-
-  public String getPatientGivenName() {
-    val patient = this.getPatient();
-    val given = patient.getNameFirstRep().getGiven().stream().map(PrimitiveType::getValue).toList();
-    return String.join(" ", given);
-  }
-
-  public String getPatientFamilyName() {
-    val patient = this.getPatient();
-    return patient.getNameFirstRep().getFamilyElement().getValue();
-  }
-
-  public Date getPatientBirthDate() {
-    val patient = this.getPatient();
-    return patient.getBirthDate();
-  }
-
-  public String getPatientAddressCity() {
-    val patient = this.getPatient();
-    return patient.getAddressFirstRep().getCity();
-  }
-
-  public String getPatientAddressPostalCode() {
-    val patient = this.getPatient();
-    return patient.getAddressFirstRep().getPostalCode();
-  }
-
-  public String getPatientAddressStreet() {
-    val patient = this.getPatient();
-    return patient.getAddressFirstRep().getLine().stream()
-        .map(PrimitiveType::getValue)
-        .collect(Collectors.joining(" "));
   }
 
   /**
@@ -313,63 +242,6 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
         .setReference(newCoverageReference.getReference());
   }
 
-  public String getCoverageIknr() {
-    val coverage = this.getCoverage();
-    return coverage.getPayorFirstRep().getIdentifier().getValue();
-  }
-
-  public String getCoverageName() {
-    val coverage = this.getCoverage();
-    return coverage.getPayorFirstRep().getDisplay();
-  }
-
-  public VersicherungsArtDeBasis getCoverageKind() {
-    return getCoverageKindOptional()
-        .orElseThrow(
-            () -> new MissingFieldException(this.getClass(), VersicherungsArtDeBasis.CODE_SYSTEM));
-  }
-
-  public boolean hasCoverageKind() {
-    return getCoverageKindOptional().isPresent();
-  }
-
-  public Optional<VersicherungsArtDeBasis> getCoverageKindOptional() {
-    val coverage = this.getCoverage();
-    return coverage.getType().getCoding().stream()
-        .filter(
-            coding ->
-                coding.getSystem().equals(VersicherungsArtDeBasis.CODE_SYSTEM.getCanonicalUrl()))
-        .map(coding -> VersicherungsArtDeBasis.fromCode(coding.getCode()))
-        .findFirst();
-  }
-
-  public PayorType getPayorType() {
-    return getPayorTypeOptional()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), PayorType.CODE_SYSTEM));
-  }
-
-  public Optional<PayorType> getPayorTypeOptional() {
-    return this.getCoverage().getPayorType();
-  }
-
-  public Optional<Wop> getCoverageWop() {
-    return this.getCoverage().getWop();
-  }
-
-  public VersichertenStatus getCoverageState() {
-    return this.getCoverage()
-        .getInsurantState()
-        .orElseThrow(
-            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_VERSICHERTENART));
-  }
-
-  public PersonGroup getCoveragePersonGroup() {
-    return this.getCoverage()
-        .getPersonGroup()
-        .orElseThrow(
-            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_PERSON_GROUP));
-  }
-
   public KbvPractitioner getPractitioner() {
     return this.entry.stream()
         .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Practitioner))
@@ -446,40 +318,6 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
         .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Medication));
   }
 
-  public MedicationCategory getMedicationCategory() {
-    val medication = this.getMedication();
-    return medication.getCategoryFirstRep();
-  }
-
-  public StandardSize getMedicationStandardSize() {
-    val medication = this.getMedication();
-    return medication.getStandardSize();
-  }
-
-  public Optional<Darreichungsform> getMedicationSupplyForm() {
-    val medication = this.getMedication();
-    return medication.getDarreichungsformFirstRep();
-  }
-
-  public int getMedicationAmount() {
-    val medication = this.getMedication();
-    int ret = 0; // Note: return simply 0 if amount was given as this field is optional
-    if (medication.getAmount().getNumerator().getValue() != null) {
-      ret = medication.getAmount().getNumerator().getValue().intValue();
-    }
-    return ret;
-  }
-
-  public String getMedicationPzn() {
-    val medication = this.getMedication();
-    return medication.getPznFirstRep();
-  }
-
-  public String getMedicationName() {
-    val medication = this.getMedication();
-    return medication.getMedicationName();
-  }
-
   public KbvErpMedicationRequest getMedicationRequest() {
     return getMedicationRequestOptional()
         .orElseThrow(
@@ -513,22 +351,6 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
                       return sr;
                     }))
         .findFirst();
-  }
-
-  public int getDispenseQuantity() {
-    val request = this.getMedicationRequest();
-    return request.getDispenseRequest().getQuantity().getValue().intValue();
-  }
-
-  public String getDosageInstruction() {
-    val request = this.getMedicationRequest();
-    return request.getDosageInstructionFirstRep().getText();
-  }
-
-  public boolean isSubstitutionAllowed() {
-    val request = this.getMedicationRequest();
-    val allowedType = request.getSubstitution().getAllowedBooleanType();
-    return !allowedType.isEmpty() && allowedType.booleanValue();
   }
 
   /**
@@ -566,7 +388,8 @@ public class KbvErpBundle extends Bundle implements ErpFhirResource {
 
   @Override
   public String getDescription() {
-    val type = (this.isMultiple()) ? "MVO Verordnung" : "einfache Verordnung";
+    val type =
+        (this.getMedicationRequest().isMultiple()) ? "MVO Verordnung" : "einfache Verordnung";
     val workflow = this.getFlowType();
     return format(
         "{0} (Workflow {1}) {2} für {3}",

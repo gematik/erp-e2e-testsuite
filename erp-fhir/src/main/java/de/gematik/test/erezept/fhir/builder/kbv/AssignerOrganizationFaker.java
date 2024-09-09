@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,11 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Reference;
 
 public class AssignerOrganizationFaker {
-  private final AssignerOrganizationBuilder builder;
   private final Map<String, Consumer<AssignerOrganizationBuilder>> builderConsumers =
       new HashMap<>();
   private Reference assignerReference;
 
-  private AssignerOrganizationFaker(AssignerOrganizationBuilder builder) {
-    this.builder = builder;
+  private AssignerOrganizationFaker() {
     builderConsumers.put("address", b -> b.address(fakerCity(), fakerZipCode(), fakerStreetName()));
     builderConsumers.put("name", b -> b.name(fakerName()));
     builderConsumers.put("phone", b -> b.phone(fakerPhone()));
@@ -51,7 +49,7 @@ public class AssignerOrganizationFaker {
   }
 
   public static AssignerOrganizationFaker builder() {
-    return new AssignerOrganizationFaker(AssignerOrganizationBuilder.builder());
+    return new AssignerOrganizationFaker();
   }
 
   public AssignerOrganizationFaker withVersion(KbvItaForVersion version) {
@@ -131,6 +129,11 @@ public class AssignerOrganizationFaker {
   }
 
   public AssignerOrganization fake() {
+    return this.toBuilder().build();
+  }
+
+  public AssignerOrganizationBuilder toBuilder() {
+    val builder = AssignerOrganizationBuilder.builder();
     val ref =
         Objects.requireNonNullElseGet(
             assignerReference, () -> new Reference(UUID.randomUUID().toString()));
@@ -140,6 +143,6 @@ public class AssignerOrganizationFaker {
     val resourceId = refTokens.length > 1 ? refTokens[1] : refTokens[0];
     builder.setResourceId(resourceId);
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

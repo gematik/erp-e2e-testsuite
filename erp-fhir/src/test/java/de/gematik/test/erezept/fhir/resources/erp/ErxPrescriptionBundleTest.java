@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.valuesets.DocumentType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.val;
@@ -30,15 +30,15 @@ import org.junit.jupiter.api.Test;
 
 class ErxPrescriptionBundleTest extends ParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/";
-  private final String BASE_PATH_1_1_1 = BASE_PATH + "1.1.1/";
-  private final String BASE_PATH_1_2_0 = BASE_PATH + "1.2.0/prescriptionbundle/";
+  private static final String BASE_PATH = "fhir/valid/erp/";
+  private static final String BASE_PATH_1_1_1 = BASE_PATH + "1.1.1/";
+  private static final String BASE_PATH_1_2_0 = BASE_PATH + "1.2.0/prescriptionbundle/";
 
   @Test
   void shouldEncodeSinglePrescriptionBundle111() {
     val fileName = "PrescriptionBundle_01.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
     assertNotNull(prescriptionBundle, "Valid ErxPrescriptionBundle must be parseable");
 
@@ -66,7 +66,7 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   void shouldEncodeSinglePrescriptionBundle120() {
     val fileName = "51fe2824-aed7-4f6a-803b-3e351137d998.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
     assertNotNull(prescriptionBundle, "Valid ErxPrescriptionBundle must be parseable");
 
@@ -93,7 +93,7 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   void shouldGetKbvBundleFromPrescriptionBundle120() {
     val fileName = "51fe2824-aed7-4f6a-803b-3e351137d998.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
     assertNotNull(prescriptionBundle, "Valid ErxPrescriptionBundle must be parseable");
 
@@ -125,7 +125,7 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   void shouldEncodeSinglePrescriptionBundleXml120() {
     val fileName = "d95b3ece-cdd7-439d-a062-17bdc2253962.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
     assertNotNull(prescriptionBundle, "Valid ErxPrescriptionBundle must be parseable");
 
@@ -152,10 +152,10 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   void shouldFailOnMissingTask() {
     val fileName = "PrescriptionBundle_01.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
 
-    // remove the task from bundle
+    // remove the task from the bundle
     val taskResources =
         prescriptionBundle.getEntry().stream()
             .filter(resource -> resource.getResource().getResourceType().equals(ResourceType.Task))
@@ -169,7 +169,7 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   void shouldFailOnMissingKbvBundle() {
     val fileName = "PrescriptionBundle_01.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
 
     // remove the KbvBundle from bundle
@@ -186,7 +186,7 @@ class ErxPrescriptionBundleTest extends ParsingTest {
   void shouldFailOnInvalidKbvBundle() {
     val fileName = "PrescriptionBundle_01.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
 
     // invalidate the Profile in the KbvBundle from bundle

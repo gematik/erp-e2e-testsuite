@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.cli.param.TaskStatusWrapper;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchCommand;
+import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.smartcard.Egk;
 import java.text.SimpleDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -51,7 +51,7 @@ public class PrescriptionsReader extends BaseRemoteCommand {
       description =
           "Sort-Order by Date from ${COMPLETION-CANDIDATES} for the Query"
               + " (default=${DEFAULT-VALUE})")
-  private SortOrder sortOrder = SortOrder.DESCENDING;
+  private final SortOrder sortOrder = SortOrder.DESCENDING;
 
   @CommandLine.Option(
       names = {"--status"},
@@ -59,29 +59,27 @@ public class PrescriptionsReader extends BaseRemoteCommand {
       type = TaskStatusWrapper.class,
       description =
           "Task-Status from ${COMPLETION-CANDIDATES} for the Query (default=${DEFAULT-VALUE})")
-  private TaskStatusWrapper taskStatus = TaskStatusWrapper.ANY;
+  private final TaskStatusWrapper taskStatus = TaskStatusWrapper.ANY;
 
   @Override
   public void performFor(Egk egk, ErpClient erpClient) {
     log.info(
         format(
             "Show prescriptions for {0} ({1}) from {2}",
-            egk.getOwner().getOwnerName(), egk.getKvnr(), this.getEnvironmentName()));
+            egk.getOwnerData().getOwnerName(), egk.getKvnr(), this.getEnvironmentName()));
 
     val cmd =
         TaskSearch.builder()
-            .sortedByAuthoredOn(sortOrder)
+            .sortedByModified(sortOrder)
             .withStatus(taskStatus.getStatus())
             .createCommand();
+
     val response = erpClient.request(cmd);
     val bundle = response.getExpectedResource();
 
-    val tasks =
-        bundle.getTasks().stream()
-            .filter(task -> task.getStatus() != Task.TaskStatus.CANCELLED)
-            .toList();
+    val tasks = bundle.getTasks().stream().toList();
     val size = tasks.size();
-    val ownerName = egk.getOwner().getOwnerName();
+    val ownerName = egk.getOwnerData().getOwnerName();
 
     System.out.println(
         format(
@@ -91,6 +89,20 @@ public class PrescriptionsReader extends BaseRemoteCommand {
   }
 
   private void printPrescription(ErpClient erpClient, ErxTask task) {
+    if (task.getStatus() != Task.TaskStatus.CANCELLED) {
+      printPrescriptionAvailable(erpClient, task);
+    } else {
+      System.out.println(
+          format(
+              "=> {0} Prescription: {1} ({2}) authored-on: {3}",
+              task.getStatus(),
+              task.getPrescriptionId().getValue(),
+              task.getPrescriptionId().getSystemAsString(),
+              task.getAuthoredOn()));
+    }
+  }
+
+  private void printPrescriptionAvailable(ErpClient erpClient, ErxTask task) {
     val cmd = new TaskGetByIdCommand(task.getTaskId());
     val prescription = erpClient.request(cmd).getExpectedResource();
 
@@ -111,7 +123,7 @@ public class PrescriptionsReader extends BaseRemoteCommand {
             "=> {0} Prescription: {1} ({2})",
             prescription.getTask().getStatus(),
             prescriptionId.getValue(),
-            prescriptionId.getSystem().getCanonicalUrl()));
+            prescriptionId.getSystemAsString()));
     System.out.println(format("{0}", medicationRequest.getDescription()));
     System.out.println(
         format(
@@ -154,7 +166,7 @@ public class PrescriptionsReader extends BaseRemoteCommand {
   }
 
   private void printMedicationDispense(ErpClient erpClient, ErxTask task) {
-    val cmd = new MedicationDispenseSearchCommand(task.getPrescriptionId());
+    val cmd = new MedicationDispenseSearchByIdCommand(task.getPrescriptionId());
     val response = erpClient.request(cmd).getExpectedResource();
 
     System.out.println("\nMedicationDispense:");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package de.gematik.test.core.expectations.verifier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ class CommunicationVerifierTest extends ParsingTest {
       "fhir/valid/erp/1.2.0/communication/withReceivedElem.xml";
 
   private static ErxCommunication getDecodedCommunication(String path) {
-    return parser.decode(ErxCommunication.class, ResourceUtils.readFileFromResource(path));
+    return parser.decode(ErxCommunication.class, ResourceLoader.readFileFromResource(path));
   }
 
   @BeforeEach
@@ -48,15 +48,14 @@ class CommunicationVerifierTest extends ParsingTest {
 
   @Test
   void shouldNotInstantiateUtilityClass() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(CommunicationVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(CommunicationVerifier.class));
   }
 
   @Test
   void shouldFindId() {
     val validComBundle = getDecodedCommunication(COM_PATH);
     val step =
-        CommunicationVerifier.matchId("8ca3c379-ac86-470f-bc12-178c9008f5c9", ErpAfos.A_19520_01);
+        CommunicationVerifier.matchId("8ca3c379-ac86-470f-bc12-178c9008f5c9", ErpAfos.A_19520);
     step.apply(validComBundle);
   }
 
@@ -64,7 +63,7 @@ class CommunicationVerifierTest extends ParsingTest {
   void shouldThrowWhileMissingId() {
     val validComBundle = getDecodedCommunication(COM_PATH);
     val step =
-        CommunicationVerifier.matchId("01ebbe1d-b718-ec48-f02d-73a051be0000", ErpAfos.A_19520_01);
+        CommunicationVerifier.matchId("01ebbe1d-b718-ec48-f02d-73a051be0000", ErpAfos.A_19520);
     assertThrows(AssertionError.class, () -> step.apply(validComBundle));
   }
 
@@ -73,7 +72,7 @@ class CommunicationVerifierTest extends ParsingTest {
     val validComBundle = getDecodedCommunication(COM_PATH);
     val step =
         CommunicationVerifier.doesNotMatchThatId(
-            "8ca3c379-ac86-470f-bc12-178c9000000", ErpAfos.A_19520_01);
+            "8ca3c379-ac86-470f-bc12-178c9000000", ErpAfos.A_19520);
     step.apply(validComBundle);
   }
 
@@ -82,7 +81,7 @@ class CommunicationVerifierTest extends ParsingTest {
     val validComBundle = getDecodedCommunication(COM_PATH);
     val step =
         CommunicationVerifier.doesNotMatchThatId(
-            "8ca3c379-ac86-470f-bc12-178c9008f5c9", ErpAfos.A_19520_01);
+            "8ca3c379-ac86-470f-bc12-178c9008f5c9", ErpAfos.A_19520);
     assertThrows(AssertionError.class, () -> step.apply(validComBundle));
   }
 

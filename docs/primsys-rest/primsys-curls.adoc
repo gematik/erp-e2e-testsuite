@@ -66,6 +66,58 @@ curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST h
 [IMPORTANT]
 Der JSON-Body ist eine Liste von Medikamenten die dispensiert werden sollen. Hier muss also genau darauf geachtet werden, dass der Body innerhalb von `[]` steht, auch wenn nur ein Medikament dispensiert wird.
 
+=== Communications abrufen
+Um als Apotheke Nachrichten abzurufen, bietet {name-primsys} den Endpunkt `/communications` an.
+Im einfachsten Fall können für eine bestimmte Apotheke die *neuesten* (maximal 50) Nachrichten über den folgenden Aufruf abgerufen werden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X GET https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/communications | jq
+----
+
+Möchte man stattdessen die *ältesten* Nachrichten abrufen, dann kann der Query-Parameter `sort` verwendet werden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X GET https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/communications?sort=lifo | jq
+----
+
+[NOTE]
+====
+- Der Wert des Query-Parameters `sort` ist *case-insensitive*, d.h. sowohl "lifo", "Lifo" als auch "LIFO" sind valide Werte.
+
+- Neben "LIFO" können synonym auch "ASCENDING" und "OLDEST" verwendet werden
+
+- Die Sortierung nach dem FIFO-Prinzip ist der Default. Das heißt, wird *kein* `sort` Parameter oder ein invalider Wert angegeben, werden die neuesten Communications abgerufen.
+====
+
+Mittels der Query-Parameter `receiver` und `sender` können Communications für bestimmte Empfänger oder Sender gefiltert werden.
+
+Um z.B. Nachrichten abzurufen, die ein Versicherter mit der KVNR `X110407071` an die jeweilige Apotheke (mit der PrimSys-ID `84b5f179e0451d03ea8c8948f52687b8`) gesendet hat, kann mittels folgendem cURL erreicht werden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X GET https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/communications?sender=X110407071 | jq
+----
+
+Auf der anderen Seite können mittels `receiver=X110407071` Nachrichten abgerufen werden, welche die jeweilige Apotheke an den Versicherten gesendet hat:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X GET https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/communications?receiver=X110407071 | jq
+----
+
+[IMPORTANT]
+====
+Die Angabe der Query-Parameter `receiver` impliziert, dass damit nur `REPLY`-Nachrichten gefunden werden können.
+Auf der anderen Seite impliziert der Query-Parameter `sender`, dass damit nur `INFO_REQ`- und `DISP_REQ`-Nachrichten gefunden werden können.
+
+Um einen vollständigen Nachrichten-Verlauf zwischen der Apotheke und nur einem bestimmten Versicherten abzurufen, bedarf es daher mindestens von zwei Requests.
+
+Sowohl PrimSys als auch der Fachdienst erlauben es sowohl `receiver` als auch `sender` zusammen anzugeben.
+In diesem Fall MUSS dann aber immer einer der beiden Parameter die Telematik-ID der jeweiligen Apotheke enthalten, da sonst die Suchanfrage zu einem leeren Ergebnis führt.
+====
+
 === Lokalen Rezept-Speicher abrufen
 Mit {name-primsys} können auch alle E-Rezepte abgerufen werden, die dem Service bekannt sind.
 

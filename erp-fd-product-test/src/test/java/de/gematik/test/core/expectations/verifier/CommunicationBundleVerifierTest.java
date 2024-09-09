@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 
 package de.gematik.test.core.expectations.verifier;
 
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunicationBundle;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.TelematikID;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
+import java.time.LocalDate;
+import java.time.Month;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,21 +36,24 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 class CommunicationBundleVerifierTest extends ParsingTest {
-  private static final String DIS_REQ_BUNDLE_PATH =
-      "fhir/valid/erp/1.2.0/communicationbundle/2c565050-eefb-4d14-b00d-640a6e0cc677.xml";
 
-  private static final String REPLY_BUNDLE_PATH =
-      "fhir/valid/erp/1.2.0/communicationbundle/b8031217-57ca-4ab8-8283-dadf28421e1f.json";
+  private final ErxCommunicationBundle dipRequest =
+      parser.decode(
+          ErxCommunicationBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/erp/1.2.0/communicationbundle/2c565050-eefb-4d14-b00d-640a6e0cc677.xml"));
 
-  private static ErxCommunicationBundle getDecodedDipReqBundle() {
-    return parser.decode(
-        ErxCommunicationBundle.class, ResourceUtils.readFileFromResource(DIS_REQ_BUNDLE_PATH));
-  }
+  private final ErxCommunicationBundle replyBundle =
+      parser.decode(
+          ErxCommunicationBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/erp/1.2.0/communicationbundle/b8031217-57ca-4ab8-8283-dadf28421e1f.json"));
 
-  private static ErxCommunicationBundle getDecodedReplyBundle() {
-    return parser.decode(
-        ErxCommunicationBundle.class, ResourceUtils.readFileFromResource(REPLY_BUNDLE_PATH));
-  }
+  private final ErxCommunicationBundle shortValidComBundle =
+      parser.decode(
+          ErxCommunicationBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/erp/1.2.0/communicationbundle/2c565050-eefb-4d14-b00d-640a6e0cc677.xml"));
 
   @BeforeEach
   void init() {
@@ -56,103 +62,332 @@ class CommunicationBundleVerifierTest extends ParsingTest {
 
   @Test
   void shouldNotInstantiateUtilityClass() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(CommunicationBundleVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(CommunicationBundleVerifier.class));
   }
 
   @Test
   void shouldFindId() {
-    val validComBundle = getDecodedDipReqBundle();
     val step =
         CommunicationBundleVerifier.containsCommunicationWithId(
-            "01ebbe1d-b718-ec48-f02d-73a051be9e23", ErpAfos.A_19520_01);
-    step.apply(validComBundle);
+            "01ebbe1d-b718-ec48-f02d-73a051be9e23", ErpAfos.A_19520);
+    step.apply(dipRequest);
   }
 
   @Test
   void shouldThrowWhileMissingId() {
-    val validComBundle = getDecodedDipReqBundle();
     val step =
         CommunicationBundleVerifier.containsCommunicationWithId(
-            "01ebbe1d-b718-ec48-f02d-73a051be0000", ErpAfos.A_19520_01);
-    assertThrows(AssertionError.class, () -> step.apply(validComBundle));
+            "01ebbe1d-b718-ec48-f02d-73a051be0000", ErpAfos.A_19520);
+    assertThrows(AssertionError.class, () -> step.apply(dipRequest));
   }
 
   @Test
   void shouldFindNoId() {
-    val validComBundle = getDecodedDipReqBundle();
     val step =
         CommunicationBundleVerifier.containsNoCommunicationWithId(
-            "01ebbe1d-b718-ec48-f02d-73a051b0000", ErpAfos.A_19520_01);
-    step.apply(validComBundle);
+            "01ebbe1d-b718-ec48-f02d-73a051b0000", ErpAfos.A_19520);
+    step.apply(dipRequest);
   }
 
   @Test
   void shouldThrowWhileMissingNoId() {
-    val validComBundle = getDecodedDipReqBundle();
     val step =
         CommunicationBundleVerifier.containsNoCommunicationWithId(
-            "01ebbe1d-b718-ec48-f02d-73a051be9e23", ErpAfos.A_19520_01);
-    assertThrows(AssertionError.class, () -> step.apply(validComBundle));
+            "01ebbe1d-b718-ec48-f02d-73a051be9e23", ErpAfos.A_19520);
+    assertThrows(AssertionError.class, () -> step.apply(dipRequest));
   }
 
   @Test
   void shouldCountCorrect() {
-    val validComBundle = getDecodedDipReqBundle();
     val step = CommunicationBundleVerifier.containsCountOfCommunication(4, ErpAfos.A_19521);
-    step.apply(validComBundle);
+    step.apply(dipRequest);
   }
 
   @Test
   void shoulThrowWhileCounting() {
-    val validComBundle = getDecodedDipReqBundle();
     val step = CommunicationBundleVerifier.containsCountOfCommunication(5, ErpAfos.A_19521);
-    assertThrows(AssertionError.class, () -> step.apply(validComBundle));
+    assertThrows(AssertionError.class, () -> step.apply(dipRequest));
   }
 
   @Test
   void shouldCompareRecipientCorrect() {
-    val validComBundle = getDecodedDipReqBundle();
     val step =
         CommunicationBundleVerifier.containsOnlyRecipientWith(
             "5-2-KH-APO-Waldesrand-01", ErpAfos.A_19521);
-    step.apply(validComBundle);
+    step.apply(dipRequest);
   }
 
   @Test
   void shoulThrowWhileCompareRecipient() {
-    val validComBundle = getDecodedDipReqBundle();
     val step = CommunicationBundleVerifier.containsOnlyRecipientWith("X110499478", ErpAfos.A_19521);
-    assertThrows(AssertionError.class, () -> step.apply(validComBundle));
+    assertThrows(AssertionError.class, () -> step.apply(dipRequest));
   }
 
   @Test
   void shouldCompareSenderAsKvnrCorrect() {
-    val validComBundle = getDecodedDipReqBundle();
     val step = CommunicationBundleVerifier.onlySenderWith(KVNR.from("X110499478"));
-    step.apply(validComBundle);
+    step.apply(dipRequest);
   }
 
   @Test
   void shouldCompareSenderAsTelematikIdCorrect() {
-    val validComBundle = getDecodedReplyBundle();
     val step =
         CommunicationBundleVerifier.onlySenderWith(TelematikID.from("5-2-KH-APO-Waldesrand-01"));
-    step.apply(validComBundle);
+    step.apply(replyBundle);
   }
 
   @Test
   void shouldCompareSenderCorrect() {
-    val validComBundle = getDecodedDipReqBundle();
     val step = CommunicationBundleVerifier.onlySenderWith("X110499478", ErpAfos.A_19521);
-    step.apply(validComBundle);
+    step.apply(dipRequest);
   }
 
   @Test
   void shouldThrowWhileCompareSender() {
-    val validComBundle = getDecodedDipReqBundle();
     val step =
         CommunicationBundleVerifier.onlySenderWith("5-2-KH-APO-Waldesrand-01", ErpAfos.A_19521);
-    assertThrows(AssertionError.class, () -> step.apply(validComBundle));
+    assertThrows(AssertionError.class, () -> step.apply(dipRequest));
+  }
+
+  @Test
+  void shouldVerifySenDateIsEqual() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step = sentDateIsEqual(testDate);
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifySendDateIsNotEqualWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.JULY, 30);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> !ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(dipRequest));
+  }
+
+  @Test
+  void shouldVerifySendDateEqualsWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifySendDateBeforeWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 24);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isBefore(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifySendDateIsAfterWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isAfter(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyEqualsSendDateWithPredicate() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 24);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyEqualsSendDateWithPredicate2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySendDateBeforeWithPredicate() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 22);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isBefore(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySendDateBeforeWithPredicate2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isBefore(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySendDateIsAfterWithPredicate() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isAfter(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySendDateIsAfterWithPredicate2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step =
+        verifySentDateWithPredicate(
+            ld -> ld.isAfter(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifyReceivedDateEqualsWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 22);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifyReceivedDateEqualsCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 22);
+    val step = receivedDateIsEqualTo(testDate);
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyReceivedDateEqualsWithPredicate1() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyReceivedDateEqualsWithPredicate2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isEqual(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifyReceivedDateBeforeWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isBefore(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyReceivedDateBeforeWithPredicate1() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 22);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isBefore(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyReceivedDateBeforeWithPredicate2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isBefore(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifyReceivedDatAfterWithPredicateCorrect() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isAfter(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyReceivedDatAfterWithPredicate1() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 22);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isAfter(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyReceivedDateAfterWithPredicate2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step =
+        verifyReceivedDateWithPredicate(
+            ld -> ld.isAfter(testDate), "auch .." + testDate + " braucht nen Verifier...");
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifySendDateAscendSortedBundle() {
+    val ascendSortedBundle =
+        parser.decode(
+            ErxCommunicationBundle.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/erp/1.2.0/communicationbundle/2c565050-eefb-4d14-b00d-640a6e0cc677AscendSendDate.xml"));
+    val step = verifySentDateIsSortedAscend();
+    assertDoesNotThrow(() -> step.apply(ascendSortedBundle));
+  }
+
+  @Test
+  void shouldVerifySendDateAscendSortedBundle2() {
+    val ascendSortedBundle =
+        parser.decode(
+            ErxCommunicationBundle.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/erp/1.2.0/communicationbundle/2c565050-eefb-4d14-b00d-640a6e0cc677WithManipulattdIdentifier.xml"));
+    val step = containsOnlyIdentifierWith("169.000.000.098.463.41");
+    assertDoesNotThrow(() -> step.apply(ascendSortedBundle));
+  }
+
+  @Test
+  void shouldVerifySentDateIsAfterCorrect() {
+    val testDate = LocalDate.of(1, Month.MARCH, 21);
+    val step = verifySentDateIsAfter(testDate);
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldVerifySentDateIsBeforeCorrect() {
+    val testDate = LocalDate.of(2025, Month.MARCH, 23);
+    val step = verifySentDateIsBefore(testDate);
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySentDateIsBefore() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 21);
+    val step = verifySentDateIsBefore(testDate);
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySentDateIsAfter() {
+    val testDate = LocalDate.of(2025, Month.MARCH, 23);
+    val step = verifySentDateIsAfter(testDate);
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifySentDateIsAfter2() {
+    val testDate = LocalDate.of(2024, Month.MARCH, 23);
+    val step = verifySentDateIsAfter(testDate);
+    assertThrows(AssertionError.class, () -> step.apply(shortValidComBundle));
   }
 }

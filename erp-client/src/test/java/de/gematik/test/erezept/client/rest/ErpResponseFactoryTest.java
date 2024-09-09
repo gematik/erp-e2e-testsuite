@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.client.rest;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static java.text.MessageFormat.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.util.*;
 import java.time.Duration;
 import java.util.*;
 import lombok.*;
@@ -60,7 +60,7 @@ class ErpResponseFactoryTest {
 
     auditEvents.stream()
         .map(filename -> RESOURCE_PATH_ERP + filename)
-        .map(ResourceUtils::readFileFromResource)
+        .map(ResourceLoader::readFileFromResource)
         .forEach(
             content -> {
               val response =
@@ -81,8 +81,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void unexpectedOperationOutcomeResponse() {
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -105,8 +104,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void expectedOperationOutcome() {
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -128,7 +126,7 @@ class ErpResponseFactoryTest {
   @Test
   void shouldReceiveErxAuditEventAlthoughOperationOutcomeExpected() {
     val filename = "AuditEvent_01.json";
-    val auditEventContent = ResourceUtils.readFileFromResource(RESOURCE_PATH_ERP + filename);
+    val auditEventContent = ResourceLoader.readFileFromResource(RESOURCE_PATH_ERP + filename);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -143,8 +141,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void fetchUnexpectedResponseResource() {
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -158,8 +155,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void fetchUnexpectedResponseResourceOptional() {
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -174,8 +170,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void isResourceOfType() {
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -190,8 +185,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void isNotResourceOfType() {
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         responseFactory.createFrom(
             STATUS_ERROR,
@@ -213,8 +207,7 @@ class ErpResponseFactoryTest {
   @Test
   void shouldValidateOperationOutcomeCorrectly() {
     val rf = new ErpResponseFactory(fhir, true);
-    val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON);
+    val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
     assertTrue(response.isValidPayload());
@@ -224,8 +217,7 @@ class ErpResponseFactoryTest {
   void shouldFailOnInvalidOperationOutcomeCorrectly() {
     val rf = new ErpResponseFactory(fhir, true);
     val testOperationOutcome =
-        encodeTestRessource(FhirTestResourceUtil.createOperationOutcome(), EncodingType.JSON)
-            .replace("issue", "issues");
+        encodeTestRessource(createOperationOutcome(), EncodingType.JSON).replace("issue", "issues");
     val response =
         rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
     assertFalse(response.isValidPayload());

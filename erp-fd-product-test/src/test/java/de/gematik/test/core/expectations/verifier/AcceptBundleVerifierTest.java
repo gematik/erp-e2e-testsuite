@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +42,7 @@ class AcceptBundleVerifierTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AcceptBundleVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AcceptBundleVerifier.class));
   }
 
   @Test

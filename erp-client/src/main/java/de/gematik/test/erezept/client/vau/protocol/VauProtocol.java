@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.client.vau.protocol;
 
+import de.gematik.bbriccs.crypto.BC;
 import de.gematik.test.erezept.client.vau.protocol.exceptions.VauProtocolException;
-import de.gematik.test.erezept.crypto.BC;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;

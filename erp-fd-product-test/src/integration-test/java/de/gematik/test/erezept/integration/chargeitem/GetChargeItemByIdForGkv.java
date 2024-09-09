@@ -23,17 +23,21 @@ import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.chargeitem.GetChargeItemById;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 
+@Tag("CHARGE_ITEM")
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 public class GetChargeItemByIdForGkv extends ErpTest {
@@ -50,10 +54,11 @@ public class GetChargeItemByIdForGkv extends ErpTest {
   @TestcaseId("ERP_CHARGE_ITEM_GKV_01")
   @DisplayName("Abrufen von Abrechnungsinformation für einen GKV Versicherten")
   void getChargeItemForGkv() {
+    sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
     val activation = doctor.performs(IssuePrescription.forPatient(sina).withRandomKbvBundle());
     val task = activation.getExpectedResponse();
     val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task));
-    pharmacy.performs(DispensePrescription.acceptedWith(acceptation));
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptation));
 
     val chargeItem =
         sina.performs(
@@ -64,4 +69,5 @@ public class GetChargeItemByIdForGkv extends ErpTest {
             .hasResponseWith(returnCode(400))
             .isCorrect());
   }
+
 }

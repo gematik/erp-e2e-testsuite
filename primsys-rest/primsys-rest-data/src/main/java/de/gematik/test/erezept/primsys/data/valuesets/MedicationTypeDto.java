@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
 import java.util.Arrays;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
  * corresponding to WOP FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.MedicationType}
  */
+@Getter
 @RequiredArgsConstructor
 public enum MedicationTypeDto {
   PZN("PZN"),

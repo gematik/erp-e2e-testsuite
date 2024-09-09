@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package de.gematik.test.konnektor.cfg;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.config.dto.konnektor.*;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import de.gematik.test.konnektor.profile.*;
 import java.util.*;
 import lombok.*;
@@ -51,7 +51,7 @@ class KonnektorFactoryTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(KonnektorFactory.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(KonnektorFactory.class));
   }
 
   @Test

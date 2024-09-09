@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,7 @@ public class KbvPractitioner extends Practitioner implements ErpFhirResource {
 
   public QualificationType getQualificationType() {
     return this.getQualification().stream()
-        .filter(
-            quali ->
-                quali
-                    .getCode()
-                    .getCodingFirstRep()
-                    .getSystem()
-                    .equals(QualificationType.CODE_SYSTEM.getCanonicalUrl()))
+        .filter(quali -> QualificationType.CODE_SYSTEM.match(quali.getCode().getCodingFirstRep()))
         .map(quali -> QualificationType.fromCode(quali.getCode().getCodingFirstRep().getCode()))
         .findFirst()
         .orElseThrow(

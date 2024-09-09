@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class PharmacyOrganizationBuilderTest extends ParsingTest {
   @Test
   void buildPharmacyOrganizationWithFaker() {
     for (var i = 0; i < 5; i++) {
-      val pharmacy = PharmacyOrganizationBuilder.faker().build();
+      val pharmacy = PharmacyOrganizationFaker.builder().fake();
       val result = ValidatorUtil.encodeAndValidate(parser, pharmacy);
       assertTrue(result.isSuccessful());
     }

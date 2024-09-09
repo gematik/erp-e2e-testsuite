@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,17 @@
 package de.gematik.test.erezept.fhir.resources.erp;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.time.ZoneId;
@@ -46,7 +50,7 @@ class ErxCommunicationTest extends ParsingTest {
     List.of("CommunicationDispReq_01.xml", "CommunicationDispReq_01.json")
         .forEach(
             fileName -> {
-              val content = ResourceUtils.readFileFromResource(BASE_PATH_111 + fileName);
+              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
               val communication = parser.decode(ErxCommunication.class, content);
               assertNotNull(communication, "Valid ErxCommunicationDispReq must be parseable");
 
@@ -83,7 +87,7 @@ class ErxCommunicationTest extends ParsingTest {
     List.of("CommunicationInfoReq_01.xml", "CommunicationInfoReq_01.json")
         .forEach(
             fileName -> {
-              val content = ResourceUtils.readFileFromResource(BASE_PATH_111 + fileName);
+              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
               val communication = parser.decode(ErxCommunication.class, content);
               assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
@@ -118,7 +122,7 @@ class ErxCommunicationTest extends ParsingTest {
     List.of("CommunicationReply_01.xml", "CommunicationReply_01.json")
         .forEach(
             fileName -> {
-              val content = ResourceUtils.readFileFromResource(BASE_PATH_111 + fileName);
+              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
               val communication = parser.decode(ErxCommunication.class, content);
               assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
@@ -168,7 +172,7 @@ class ErxCommunicationTest extends ParsingTest {
         .forEach(
             fileName -> {
               val content =
-                  ResourceUtils.readFileFromResource(
+                  ResourceLoader.readFileFromResource(
                       format("{0}communication/{1}", BASE_PATH_120, fileName));
               val communication = parser.decode(ErxCommunication.class, content);
               assertEquals(
@@ -184,7 +188,7 @@ class ErxCommunicationTest extends ParsingTest {
     List.of("CommunicationReply_01.xml", "CommunicationReply_01.json")
         .forEach(
             fileName -> {
-              val content = ResourceUtils.readFileFromResource(BASE_PATH_111 + fileName);
+              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
               val communication = parser.decode(content);
               assertEquals(ResourceType.Communication, communication.getResourceType());
               assertEquals(ErxCommunication.class, communication.getClass());
@@ -196,7 +200,7 @@ class ErxCommunicationTest extends ParsingTest {
     List.of("CommunicationSearchBundle.json", "CommunicationSearchBundle.xml")
         .forEach(
             fileName -> {
-              val bundleContent = ResourceUtils.readFileFromResource(BASE_PATH_111 + fileName);
+              val bundleContent = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
               val bundle = parser.decode(Bundle.class, bundleContent);
 
               val firstEntry = bundle.getEntry().get(0);
@@ -231,7 +235,7 @@ class ErxCommunicationTest extends ParsingTest {
         type ->
             assertEquals(
                 DeBasisNamingSystem.KVID_PKV,
-                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_2_0)));
+                type.getRecipientNamingSystem(ErpWorkflowVersion.getDefaultVersion())));
   }
 
   @Test
@@ -251,6 +255,6 @@ class ErxCommunicationTest extends ParsingTest {
         type ->
             assertEquals(
                 ErpWorkflowNamingSystem.TELEMATIK_ID_SID,
-                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_2_0)));
+                type.getRecipientNamingSystem(ErpWorkflowVersion.getDefaultVersion())));
   }
 }

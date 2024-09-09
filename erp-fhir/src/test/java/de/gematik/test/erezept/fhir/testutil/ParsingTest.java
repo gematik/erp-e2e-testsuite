@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 
 package de.gematik.test.erezept.fhir.testutil;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.*;
+import lombok.NonNull;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.*;
 
 @SuppressWarnings({"java:S2187"})
 public class ParsingTest {
 
-  protected static FhirParser parser;
+  protected static FhirParser parser = new FhirParser();
 
-  @BeforeAll
-  public static void setUp() {
-    parser = new FhirParser();
+  protected <T extends Resource> T getDecodedFromPath(
+      Class<T> expectedClass, @NonNull final String path) {
+    return parser.decode(expectedClass, ResourceLoader.readFileFromResource(path));
   }
 }

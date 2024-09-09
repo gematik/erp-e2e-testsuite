@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,13 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum BottomNav implements PageElement {
-  PRESCRIPTION_BUTTON(
-      "Prescriptions Menu Button", () -> null, () -> AppiumBy.accessibilityId("Rezepte")),
+  PRESCRIPTION_BUTTON("Prescriptions Menu Button", () -> null, () -> AppiumBy.name("Rezepte")),
 
   PHARMACY_SEARCH_BUTTON(
-      "Pharmacy Search Menu Button", () -> null, () -> AppiumBy.accessibilityId("Apothekensuche")),
+      "Pharmacy Search Menu Button", () -> null, () -> AppiumBy.name("Apothekensuche")),
 
   PRESCRIPTION_ORDERS_BUTTON(
-      "Prescription Orders Menu Button",
-      () -> null,
-      () -> AppiumBy.accessibilityId("Bestellungen")),
+      "Prescription Orders Menu Button", () -> null, () -> AppiumBy.name("Bestellungen")),
 
   SETTINGS_BUTTON(
       "Settings Menu Button",

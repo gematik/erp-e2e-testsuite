@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
@@ -63,6 +65,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
             .whenPrepared(new Date())
             .whenHandedOver(new Date())
             .batch(lotNumber, new Date())
+            .wasSubstituted(true)
             .build();
 
     assertNotNull(medicationDispense.getId());
@@ -71,6 +74,56 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     assertEquals(new PrescriptionId(prescriptionId), medicationDispense.getPrescriptionId());
     assertEquals(
         lotNumber, medicationDispense.getErpMedicationFirstRep().getBatch().getLotNumber());
+    assertTrue(medicationDispense.getDosageInstruction().isEmpty());
+    assertTrue(medicationDispense.getNote().isEmpty());
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense, true);
+    assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildMedicationDispenseWithMultipleDosageInstructions(ErpWorkflowVersion version) {
+    val pzn = "06313728";
+    val kbvItaVersion =
+        ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
+    val medication =
+        KbvErpMedicationPZNFaker.builder()
+            .withPznMedication(pzn, fakerDrugName())
+            .withVersion(kbvItaVersion)
+            .fake();
+
+    val kvnr = KVNR.from("X234567890");
+    val telematikId = "606358757";
+    val prescriptionId = "160.100.000.000.011.09";
+    val lotNumber = "123456";
+    val medicationDispense =
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
+            .version(version)
+            .performerId(telematikId)
+            .prescriptionId(prescriptionId)
+            .medication(medication)
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
+            .batch(lotNumber, new Date())
+            .wasSubstituted(true)
+            .dosageInstruction("nur nach dem Essen")
+            .dosageInstruction("nicht vor dem Schlafen")
+            .note("in 7 Tagen Rücksprache mit dem Hausarzt halten")
+            .build();
+
+    assertNotNull(medicationDispense.getId());
+    assertEquals(1, medicationDispense.getErpMedication().size());
+    assertEquals(kvnr, medicationDispense.getSubjectId());
+    assertEquals(new PrescriptionId(prescriptionId), medicationDispense.getPrescriptionId());
+    assertEquals(
+        lotNumber, medicationDispense.getErpMedicationFirstRep().getBatch().getLotNumber());
+    assertEquals(2, medicationDispense.getDosageInstruction().size());
+    assertEquals("nur nach dem Essen", medicationDispense.getDosageInstructionText().get(0));
+    assertEquals("nicht vor dem Schlafen", medicationDispense.getDosageInstructionText().get(1));
+    assertEquals(1, medicationDispense.getNote().size());
+    assertEquals(
+        "in 7 Tagen Rücksprache mit dem Hausarzt halten",
+        medicationDispense.getNoteFirstRep().getText());
     val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
     assertTrue(result.isSuccessful());
   }
@@ -86,7 +139,11 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.random();
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build();
+        ErxMedicationDispenseFaker.builder()
+            .withKvnr(kvnr)
+            .withPerfomer(performerId)
+            .withPrescriptionId(prescriptionId)
+            .fake();
 
     assertNotNull(medicationDispense.getId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
@@ -109,7 +166,11 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("200.100.000.000.011.09");
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build();
+        ErxMedicationDispenseFaker.builder()
+            .withKvnr(kvnr)
+            .withPerfomer(performerId)
+            .withPrescriptionId(prescriptionId)
+            .fake();
 
     assertNotNull(medicationDispense.getId());
     assertEquals(kvnr, medicationDispense.getSubjectId());
@@ -132,7 +193,12 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseFaker.builder()
+            .withKvnr(kvnr)
+            .withPerfomer(performerId)
+            .withPzn(pzn)
+            .withPrescriptionId(prescriptionId)
+            .fake();
 
     assertNotNull(medicationDispense.getId());
     assertEquals(kvnr, medicationDispense.getSubjectId());
@@ -151,11 +217,16 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseFaker.builder()
+            .withKvnr(kvnr)
+            .withPerfomer(performerId)
+            .withPzn(pzn)
+            .withPrescriptionId(prescriptionId)
+            .fake();
 
     val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
     val profileVersion = profile.split("\\|")[1];
-    assertTrue(ErpWorkflowVersion.V1_2_0.isEqual(profileVersion));
+    assertTrue(ErpWorkflowVersion.getDefaultVersion().isEqual(profileVersion));
   }
 
   @Test
@@ -166,7 +237,12 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseFaker.builder()
+            .withKvnr(kvnr)
+            .withPerfomer(performerId)
+            .withPrescriptionId(prescriptionId)
+            .withPzn(pzn)
+            .fake();
 
     val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
     val profileVersion = profile.split("\\|")[1];
@@ -182,10 +258,15 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
     val pzn = "00111222";
     val medicationDispense =
-        ErxMedicationDispenseBuilder.faker(kvnr, performerId, pzn, prescriptionId).build();
+        ErxMedicationDispenseFaker.builder()
+            .withKvnr(kvnr)
+            .withPerfomer(performerId)
+            .withPzn(pzn)
+            .withPrescriptionId(prescriptionId)
+            .fake();
 
     val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
     val profileVersion = profile.split("\\|")[1];
-    assertTrue(ErpWorkflowVersion.V1_2_0.isEqual(profileVersion));
+    assertTrue(ErpWorkflowVersion.getDefaultVersion().isEqual(profileVersion));
   }
 }

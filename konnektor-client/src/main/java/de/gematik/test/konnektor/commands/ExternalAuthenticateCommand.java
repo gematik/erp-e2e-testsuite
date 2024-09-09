@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package de.gematik.test.konnektor.commands;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.konnektor.commands.options.SignatureType;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.test.smartcard.Algorithm;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7_4.BinaryDocumentType;
 import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.OptionalInputs;
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -38,10 +38,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]> {
 
   private final CardInfo cardInfo;
-  private final Algorithm algorithm;
+  private final CryptoSystem algorithm;
   @Setter private byte[] toBeSignedData;
 
-  public ExternalAuthenticateCommand(CardInfo cardInfo, Algorithm algorithm) {
+  public ExternalAuthenticateCommand(CardInfo cardInfo, CryptoSystem algorithm) {
     this.cardInfo = cardInfo;
     this.algorithm = algorithm;
   }
@@ -63,10 +63,10 @@ public class ExternalAuthenticateCommand extends AbstractKonnektorCommand<byte[]
 
     val optionalInputs = new OptionalInputs();
 
-    if (this.algorithm == Algorithm.RSA_2048 || this.algorithm == Algorithm.RSA_PSS_2048) {
+    if (this.algorithm == CryptoSystem.RSA_2048 || this.algorithm == CryptoSystem.RSA_PSS_2048) {
       optionalInputs.setSignatureType(SignatureType.RFC_3447.getUrn());
-      optionalInputs.setSignatureSchemes(Algorithm.RSA_PSS_2048.getAlgorithmName());
-    } else if (algorithm == Algorithm.ECC_256) {
+      optionalInputs.setSignatureSchemes(CryptoSystem.RSA_PSS_2048.getName());
+    } else if (algorithm == CryptoSystem.ECC_256) {
       optionalInputs.setSignatureType(SignatureType.BSI_TR_03111.getUrn());
     }
 

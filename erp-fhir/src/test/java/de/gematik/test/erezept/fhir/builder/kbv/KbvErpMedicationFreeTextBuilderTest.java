@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class KbvErpMedicationFreeTextBuilderTest extends ParsingTest {
 
   @Test
   void fakerShouldWork() {
-    val medFreeText = KbvErpMedicationFreeTextBuilder.faker().build();
+    val medFreeText = KbvErpMedicationFreeTextFaker.builder().fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medFreeText);
     assertTrue(result.isSuccessful());
   }
@@ -78,9 +78,9 @@ class KbvErpMedicationFreeTextBuilderTest extends ParsingTest {
   @Test
   void fakerWithTextShouldWork() {
     val medFreeText =
-        KbvErpMedicationFreeTextBuilder.faker(
-                "3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen")
-            .build();
+        KbvErpMedicationFreeTextFaker.builder()
+            .withFreeText("3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen")
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medFreeText);
     assertTrue(result.isSuccessful());
   }

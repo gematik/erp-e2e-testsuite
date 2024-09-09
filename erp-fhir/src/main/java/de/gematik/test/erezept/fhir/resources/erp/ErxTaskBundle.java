@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,11 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.hl7.fhir.r4.model.Bundle;
 
 @Slf4j
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
-public class ErxTaskBundle extends Bundle {
+public class ErxTaskBundle extends ErxBundle {
 
   public List<ErxTask> getTasks() {
     return this.getEntry().stream()

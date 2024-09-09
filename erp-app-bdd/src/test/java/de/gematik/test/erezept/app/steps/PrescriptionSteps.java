@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 import static org.junit.Assert.assertTrue;
 
+import de.gematik.test.erezept.app.questions.DeletingThePrescription;
 import de.gematik.test.erezept.app.questions.HasReceivedDispensedMedication;
 import de.gematik.test.erezept.app.questions.PrescriptionHasGone;
 import de.gematik.test.erezept.app.task.DeleteRedeemablePrescription;
@@ -45,6 +46,15 @@ public class PrescriptionSteps {
   public void whenDeletePrescription(String order) {
     val theAppUser = OnStage.theActorInTheSpotlight();
     when(theAppUser).attemptsTo(DeleteRedeemablePrescription.fromStack(order));
+  }
+
+  @Dann(
+      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept in der App nicht"
+          + " löschen")
+  public void thenCannotDeletePrescription(String userName, String order) {
+    val theAppUser = OnStage.theActorCalled(userName);
+    then(theAppUser)
+        .attemptsTo(Ensure.that(DeletingThePrescription.canNotBePerformedFor(order)).isTrue());
   }
 
   @Dann(

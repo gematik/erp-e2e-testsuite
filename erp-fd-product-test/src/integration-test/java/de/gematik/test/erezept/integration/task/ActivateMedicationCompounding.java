@@ -92,11 +92,16 @@ public class ActivateMedicationCompounding extends ErpTest {
 
     val pzn = PZN.random();
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationCompoundingBuilder.faker(pzn, medicineName, freetext).build();
+    val medication =
+        KbvErpMedicationCompoundingFaker.builder()
+            .withMedicationIngredient(pzn, medicineName, freetext)
+            .fake();
     val assigner = AssignerOrganizationFaker.builder().fake();
-    val insurance = KbvCoverageBuilder.faker(patient.getCoverageInsuranceType()).build();
+    val insurance =
+        KbvCoverageFaker.builder().withInsuranceType(patient.getCoverageInsuranceType()).fake();
     val medicationRequest =
-        MedicationRequestFaker.builder(patient.getPatientData())
+        MedicationRequestFaker.builder()
+            .withPatient(patient.getPatientData())
             .withMedication(medication)
             .withRequester(doc.getPractitioner())
             .withInsurance(insurance)
@@ -130,17 +135,17 @@ public class ActivateMedicationCompounding extends ErpTest {
 
     patient.attemptsTo(
         Verify.that(getTaskByIdInteraction)
-            .withExpectedType(ErpAfos.A_19113_01)
+            .withExpectedType(ErpAfos.A_19113)
             .hasResponseWith(returnCode(200))
             .and(bundleContainsPzn(pzn, ErpAfos.A_24034))
-            .and(bundleContainsNameInMedicationCompound(medicineName, ErpAfos.A_19113_01))
+            .and(bundleContainsNameInMedicationCompound(medicineName, ErpAfos.A_19113))
             .isCorrect());
     val acceptance =
         pharmacy.performs(AcceptPrescription.forTheTask(activation.getExpectedResponse()));
 
     pharmacy.attemptsTo(
         Verify.that(acceptance)
-            .withExpectedType(ErpAfos.A_19113_01)
+            .withExpectedType(ErpAfos.A_19113)
             .hasResponseWith(returnCode(200))
             .and(isInProgressStatus())
             .isCorrect());
@@ -149,7 +154,7 @@ public class ActivateMedicationCompounding extends ErpTest {
     val signedKbvBundle = acceptBundle.getSignedKbvBundle();
     pharmacy.attemptsTo(Ensure.that(IsValidSignature.forDocument(signedKbvBundle)).isTrue());
     // cleanup
-    pharmacy.performs(DispensePrescription.acceptedWith(acceptance));
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptance));
   }
 
 }

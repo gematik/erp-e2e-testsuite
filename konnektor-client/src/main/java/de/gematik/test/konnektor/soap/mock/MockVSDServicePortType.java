@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
-import de.gematik.test.smartcard.Egk;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.vsds.vsdservice.v5.FaultMessage;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDServicePortType;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDStatusType;
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 import lombok.val;
 
 public class MockVSDServicePortType extends AbstractMockService implements VSDServicePortType {
