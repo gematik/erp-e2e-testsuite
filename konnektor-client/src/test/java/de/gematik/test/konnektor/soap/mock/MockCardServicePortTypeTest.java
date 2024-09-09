@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import lombok.val;
 import org.apache.commons.lang3.NotImplementedException;
@@ -28,12 +27,11 @@ import org.junit.jupiter.api.Test;
 
 class MockCardServicePortTypeTest {
   private static ContextType ctx;
-  private static SmartcardArchive smartCardArchive;
   private static MockKonnektorServiceProvider mockKonnektor;
 
   @BeforeAll
   static void setup() {
-    smartCardArchive = SmartcardFactory.getArchive();
+    val smartCardArchive = SmartcardArchive.fromResources();
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);
 
     ctx = new ContextType();

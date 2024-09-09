@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package de.gematik.test.erezept.actions;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
@@ -32,13 +34,12 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -53,7 +54,6 @@ import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.fuzzing.fhirfuzz.FhirFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
-import de.gematik.test.smartcard.Algorithm;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.Date;
@@ -100,7 +100,7 @@ class IssuePrescriptionTest {
     val useKonnektor =
         UseTheKonnektor.with(smcb)
             .and(hba)
-            .and(Algorithm.RSA_2048)
+            .and(CryptoSystem.RSA_2048)
             .on(config.instantiateDoctorKonnektor(docConfig));
 
     prescribingDoctor.can(useErpClient);
@@ -138,7 +138,10 @@ class IssuePrescriptionTest {
                             .withResponsibleDoctor(responsibleDoctor)
                             .ofAssignmentKind(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
                             .withKbvBundleFrom(
-                                KbvErpBundleBuilder.faker(patient.getKvnr(), new Date())))));
+                                KbvErpBundleFaker.builder()
+                                    .withKvnr(patient.getKvnr())
+                                    .withAuthorDate(new Date())
+                                    .toBuilder()))));
   }
 
   @ParameterizedTest(name = "{index}: {0}")
@@ -309,6 +312,6 @@ class IssuePrescriptionTest {
     return ErpResponse.forPayload(draftTask, ErxTask.class)
         .withStatusCode(201)
         .withHeaders(Map.of())
-        .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+        .andValidationResult(createEmptyValidationResult());
   }
 }

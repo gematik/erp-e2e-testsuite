@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,33 @@
 
 package de.gematik.test.erezept.app.task.android;
 
-import de.gematik.test.erezept.app.abilities.*;
-import de.gematik.test.erezept.app.mobile.*;
-import de.gematik.test.erezept.app.mobile.elements.*;
-import de.gematik.test.erezept.exceptions.*;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
+import de.gematik.test.erezept.app.abilities.UseTheApp;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
+import de.gematik.test.erezept.app.mobile.elements.CardWall;
+import de.gematik.test.erezept.app.mobile.elements.Debug;
+import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
+import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.Settings;
+import de.gematik.test.erezept.exceptions.TestcaseAbortedException;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.jwt.*;
-import de.gematik.test.erezept.operator.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardArchive;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.jwt.JWTDecoder;
+import de.gematik.test.erezept.operator.UIProvider;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.Base64;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Task;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,7 +54,7 @@ public class SetUpAndroidDevice implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
-    val userConfig = SafeAbility.getAbility(actor, UseAppUserConfiguration.class);
+    val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
     val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
 
     // walk through onboarding
@@ -91,8 +102,8 @@ public class SetUpAndroidDevice implements Task {
     actor.can(
         ProvidePatientBaseData.forPatient(
             provideEgk.getKvnr(),
-            egk.getOwner().getGivenName(),
-            egk.getOwner().getSurname(),
+            egk.getOwnerData().getGivenName(),
+            egk.getOwnerData().getSurname(),
             insuranceKind));
 
     val autCertificate = egk.getAutCertificate();

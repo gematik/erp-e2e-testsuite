@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,27 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import ca.uhn.fhir.model.api.annotation.*;
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
-import de.gematik.test.erezept.fhir.values.*;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TelematikID;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.Binary;
+import org.hl7.fhir.r4.model.ChargeItem;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 
 /**
  * @see <a href="https://simplifier.net/erezept-workflow/erxchargeitem">ErxMedicationDispense</a>
@@ -73,9 +82,8 @@ public class ErxChargeItem extends ChargeItem {
     return this.getSubject().getIdentifier().getAssigner().getDisplay();
   }
 
-  public String getEntererTelematikId() {
-    // TODO: implement TelematikID as its own Type // NOSONAR still needs to be implemented
-    return this.getEnterer().getIdentifier().getValue();
+  public TelematikID getEntererTelematikId() {
+    return TelematikID.from(this.getEnterer().getIdentifier());
   }
 
   public boolean hasInsuranceProvider() {
@@ -172,7 +180,8 @@ public class ErxChargeItem extends ChargeItem {
     containedData
         .getMeta()
         .addProfile(
-            ErpWorkflowStructDef.BINARY_12.getVersionedUrl(ErpWorkflowVersion.V1_2_0, true));
+            ErpWorkflowStructDef.BINARY_12.getVersionedUrl(
+                ErpWorkflowVersion.getDefaultVersion(), true));
 
     val ret = ErxChargeItem.fromChargeItem(this);
     ret.removeContainedResources();

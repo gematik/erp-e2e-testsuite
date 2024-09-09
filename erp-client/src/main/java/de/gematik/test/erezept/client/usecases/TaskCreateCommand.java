@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,13 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 public class TaskCreateCommand extends BaseCommand<ErxTask> {
 
-  private final PrescriptionFlowType flowType;
+  private final Parameters parameters;
 
   /** Create a Task with the "default" FlowType 160 */
   public TaskCreateCommand() {
@@ -36,7 +37,7 @@ public class TaskCreateCommand extends BaseCommand<ErxTask> {
 
   public TaskCreateCommand(PrescriptionFlowType flowType) {
     super(ErxTask.class, HttpRequestMethod.POST, "Task");
-    this.flowType = flowType;
+    this.parameters = FlowTypeBuilder.build(flowType);
   }
 
   /**
@@ -51,6 +52,6 @@ public class TaskCreateCommand extends BaseCommand<ErxTask> {
   }
 
   public Optional<Resource> getRequestBody() {
-    return Optional.of(FlowTypeBuilder.build(flowType));
+    return Optional.of(parameters);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ public class PrescribeUseCase {
     kbvBundle.setId(taskId.getValue());
     // will update all dates contained within the KBV Bundle to current date
     kbvBundle.setAllDates();
-    if (kbvBundle.isMultiple()) {
+    if (kbvBundle.getMedicationRequest().isMultiple()) {
       val mr = kbvBundle.getMedicationRequest();
       mr.updateMvoDates();
     }
@@ -111,7 +111,7 @@ public class PrescribeUseCase {
 
     val activatedTask = activateResponse.getExpectedResource();
 
-    val kvnr = kbvBundle.getKvnr();
+    val kvnr = kbvBundle.getPatient().getKvnr();
     val patientMapper = PatientDataMapper.from(kbvBundle.getPatient());
     val coverageMapper = CoverageDataMapper.from(kbvBundle.getCoverage(), kbvBundle.getPatient());
     val medicationMapper = PznMedicationDataMapper.from(kbvBundle.getMedication());

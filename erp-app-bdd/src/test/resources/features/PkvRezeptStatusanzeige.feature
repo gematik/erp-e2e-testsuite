@@ -34,6 +34,7 @@ Funktionalität: Darstellung von PKV E-Rezepten
   Die PKV Versicherte löscht das E-Rezept ohne diese in einer Apotheke einzulösen
 
     Wenn die Ärztin Adelheid Ulmenwald der Versicherten Alice ein apothekenpflichtiges Medikament verschreibt
+    Dann wird der Versicherten Alice das letzte E-Rezept in der App angezeigt
     Und die Versicherte Alice ihr letztes E-Rezept in der App löscht
     Dann wird das letzte gelöschte E-Rezept der Versicherten in der App nicht mehr angezeigt
 
@@ -48,6 +49,7 @@ Funktionalität: Darstellung von PKV E-Rezepten
 
   @TCID:ERP_FDV_PKV_MEHRFACHVERORDNUNG_01
   @Funktionalität:MVO
+  @Funktionalität:Löschen
   Szenario: Mehrfachverordnung für PKV-Versicherte
   Zwei E-Rezepte für PKV-Versicherte als Mehrfachverordnung
 
@@ -57,3 +59,5 @@ Funktionalität: Darstellung von PKV E-Rezepten
       | true | 2         | 2           | 90                | leer             |
     Dann wird der Versicherten Alice das letzte E-Rezept in der App angezeigt
     Und der Versicherten wird das erste E-Rezept in der App angezeigt
+    Und die Versicherte ihr erstes E-Rezept in der App löscht
+    Dann wird das erste gelöschte E-Rezept der Versicherten in der App nicht mehr angezeigt

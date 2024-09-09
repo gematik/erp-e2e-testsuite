@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.val;
@@ -44,7 +44,7 @@ class TaskVerifierTest {
 
   @Test
   void shouldNotInstantiateTaskVerifier() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(TaskVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(TaskVerifier.class));
   }
 
   @Test

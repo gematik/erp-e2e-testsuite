@@ -50,6 +50,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
 
   @TCID:ERP_EE_NACHRICHTEN_02
   @TESTFALL:positiv
+  @Funktionalität:InfoReq
   @Hauptdarsteller:Versicherter
   Szenario: Anfrage zu einem E-Rezept und Antwort der Apotheke
   Der Versicherte stellt zum grad erhaltenen Rezept eine Anfrage an die Apotheke. Diese beantwortet die Anfrage.
@@ -115,6 +116,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TESTFALL:positiv
   @AFO-ID:A_20260
   @AFO-ID:A_20258
+  @Funktionalität:InfoReq
   @Hauptdarsteller:Versicherter
   Szenario: Versicherte löscht alle Nachrichten
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
@@ -127,6 +129,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TESTFALL:positiv
   @AFO-ID:A_20776
   @AFO-ID:A_20258
+  @Funktionalität:InfoReq
   @Hauptdarsteller:Apotheke
   Szenario: Apotheke löscht Nachricht
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt
@@ -138,6 +141,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TCID:ERP_EE_NACHRICHTEN_09
   @TESTFALL:negativ
   @AFO-ID:A_19446-01
+  @Funktionalität:InfoReq
   @Hauptdarsteller:Arztpraxis
   Szenario: Arztpraxis darf keine Nachricht versenden
   Der Versicherte schreibt eine Nachricht an eine Arztpraxis "Keine Apotheke". Der Fachdienst muss die Antwort ablehnen,
@@ -152,6 +156,7 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
   @TESTFALL:positiv
   @AFO-ID:A_20260
   @AFO-ID:A_20258
+  @Funktionalität:InfoReq
   @Hauptdarsteller:Versicherter
   Szenario: Versicherte löscht eine Nachricht
     Wenn die Versicherte Sina Hüllmann zu ihrem letzten E-Rezept der Apotheke Am Flughafen eine Anfrage schickt

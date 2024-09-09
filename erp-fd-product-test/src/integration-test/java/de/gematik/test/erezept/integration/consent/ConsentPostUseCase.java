@@ -122,7 +122,7 @@ public class ConsentPostUseCase extends ErpTest {
             .isCorrect());
 
     // cleanup
-    flughafenApo.performs(DispensePrescription.acceptedWith(acceptance));
+    flughafenApo.performs(ClosePrescription.acceptedWith(acceptance));
   }
 
   @TestcaseId("ERP_CONSENT_POST_02")
@@ -142,7 +142,7 @@ public class ConsentPostUseCase extends ErpTest {
     fridolin.attemptsTo(
         Verify.that(consentDeposit)
             .withoutBody() // body wird bewusst nicht validiert, da er nicht FHIR konform ist
-            .hasResponseWith( // returncode kann bei gesetzem Consent eine 409 sein, wenn schon ein
+            .hasResponseWith( // returncode kann bei gesetztem Consent eine 409 sein, wenn schon ein
                 // Consent gesetzt war
                 returnCodeIsBetween(200, 499, ErpAfos.A_22351))
             .isCorrect());

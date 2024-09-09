@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.model.ActorContext;
+import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
 import jakarta.ws.rs.*;
@@ -40,8 +41,8 @@ public class PrescriptionResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public List<PrescriptionDto> getPrescriptions() {
-    return getPrescribed();
+  public List<PrescriptionDto> getPrescriptions(@BeanParam PrescriptionFilterParams params) {
+    return getPrescribed(params);
   }
 
   @GET
@@ -54,18 +55,17 @@ public class PrescriptionResource {
   @GET
   @Path("prescribed")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<PrescriptionDto> getPrescribed() {
-    return ctx.getPrescriptions();
+  public List<PrescriptionDto> getPrescribed(@BeanParam PrescriptionFilterParams params) {
+    log.info("GET all open prescriptions with filter {}", params);
+    return ctx.getPrescriptions(params);
   }
 
   @GET
   @Path("prescribed/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public PrescriptionDto getPrescribed(@PathParam("id") String id) {
-    log.info("GET /prescription/" + id);
-    return ctx.getPrescriptions().stream()
-        .filter(p -> p.getTaskId().equals(id))
-        .findFirst()
+    log.info("GET open prescription with ID {}", id);
+    return ctx.getPrescription(id)
         .orElseThrow(
             () ->
                 ErrorResponseBuilder.createInternalErrorException(
@@ -75,14 +75,16 @@ public class PrescriptionResource {
   @GET
   @Path("accepted")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<AcceptedPrescriptionDto> getAccepted() {
-    return ctx.getAcceptedPrescriptions();
+  public List<AcceptedPrescriptionDto> getAccepted(@BeanParam PrescriptionFilterParams params) {
+    log.info("GET all accepted prescriptions with filter {}", params);
+    return ctx.getAcceptedPrescriptions(params);
   }
 
   @GET
   @Path("accepted/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public AcceptedPrescriptionDto getAccepted(@PathParam("id") String id) {
+    log.info("GET accepted prescription with ID {}", id);
     return ctx.getAcceptedPrescription(id)
         .orElseThrow(
             () ->
@@ -93,17 +95,17 @@ public class PrescriptionResource {
   @GET
   @Path("dispensed")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<DispensedMedicationDto> getDispensed() {
-    return ctx.getDispensedMedications();
+  public List<DispensedMedicationDto> getDispensed(@BeanParam PrescriptionFilterParams params) {
+    log.info("GET all dispensed prescriptions with filter {}", params);
+    return ctx.getDispensedMedications(params);
   }
 
   @GET
   @Path("dispensed/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public DispensedMedicationDto getDispensed(@PathParam("id") String id) {
-    return ctx.getDispensedMedications().stream()
-        .filter(p -> p.getPrescriptionId().equals(id))
-        .findFirst()
+    log.info("GET dispensed prescription with ID {}", id);
+    return ctx.getDispensedMedication(id)
         .orElseThrow(
             () ->
                 ErrorResponseBuilder.createInternalErrorException(
@@ -114,14 +116,7 @@ public class PrescriptionResource {
   @Path("dmc/{id}")
   @Produces("image/png")
   public Response getDataMatrixCode(@PathParam("id") String id) {
-    val prescription =
-        ctx.getPrescriptions().stream()
-            .filter(p -> p.getTaskId().equals(id))
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    ErrorResponseBuilder.createInternalErrorException(
-                        404, format("No Prescription found with ID {0}", id)));
+    val prescription = this.getPrescribed(id);
 
     val baoDmc =
         DataMatrixCodeGenerator.writeToStream(

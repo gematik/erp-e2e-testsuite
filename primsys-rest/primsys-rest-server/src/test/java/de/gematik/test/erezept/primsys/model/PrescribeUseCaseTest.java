@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -35,7 +36,6 @@ import de.gematik.test.erezept.primsys.data.*;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.mapping.MvoDataMapper;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import java.util.Date;
@@ -57,7 +57,7 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     val mockClient = doctor.getClient();
 
     val accessCode = AccessCode.random();
-    val taskId = TaskId.from("123");
+    val taskId = TaskId.from(PrescriptionId.random());
     val activatedErxTask = new ErxTask();
     activatedErxTask.setId(taskId.getValue());
     activatedErxTask.setAuthoredOn(new Date());
@@ -134,7 +134,7 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
 
-    val kbvBundle = fhir.encode(KbvErpBundleBuilder.faker().build(), EncodingType.XML);
+    val kbvBundle = fhir.encode(KbvErpBundleFaker.builder().fake(), EncodingType.XML);
     try (val response = PrescribeUseCase.issuePrescription(doctor, kbvBundle)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());
@@ -265,7 +265,7 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     val patient = new PatientDto();
     patient.setKvnr("X123123123");
     prescribeRequest.setPatient(patient);
-    prescribeRequest.setMedicationRequest(new MedicationRequestDto());
+    prescribeRequest.setMedicationRequest(MedicationRequestDto.medicationRequest().build());
     val mvoData = MvoDataMapper.randomDto();
     prescribeRequest.getMedicationRequest().setMvo(mvoData);
     try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
@@ -311,7 +311,7 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     val patient = new PatientDto();
     patient.setKvnr("X123123123");
     prescribeRequest.setPatient(patient);
-    prescribeRequest.setMedicationRequest(new MedicationRequestDto());
+    prescribeRequest.setMedicationRequest(MedicationRequestDto.medicationRequest().build());
     val mvoData = new MvoDto();
     mvoData.setNumerator(12);
     mvoData.setDenominator(11);
@@ -363,6 +363,6 @@ class PrescribeUseCaseTest extends TestWithActorContext {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(PrescribeUseCase.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(PrescribeUseCase.class));
   }
 }

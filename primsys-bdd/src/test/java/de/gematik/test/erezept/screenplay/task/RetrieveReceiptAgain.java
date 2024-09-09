@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public class RetrieveReceiptAgain implements Task {
   public <T extends Actor> void performAs(T actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val pharmacyStack = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
-    val receiptToRetrieve = deque.chooseFrom(pharmacyStack.getDispensedPrescriptions());
+    val receiptToRetrieve = deque.chooseFrom(pharmacyStack.getClosedPrescriptions());
 
     val prescriptionId = receiptToRetrieve.getReceipt().getPrescriptionId();
     val taskId = receiptToRetrieve.getTaskId();

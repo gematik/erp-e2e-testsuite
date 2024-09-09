@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ import org.junit.jupiter.params.provider.*;
 class ErpClientFactoryTest {
 
   @RegisterExtension
-  private WireMockExtension wiremockExtension =
+  private final WireMockExtension wiremockExtension =
       WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig()).build();
 
   private final String fdBaseUrl = "http://localhost:8081";
@@ -74,7 +74,6 @@ class ErpClientFactoryTest {
 
   private EnvironmentConfiguration createEnvironmentConfiguration() {
     val env = new EnvironmentConfiguration();
-    env.setTslBaseUrl("not required!!");
 
     val envRoute = new BackendRouteConfiguration();
     env.setTi(envRoute);

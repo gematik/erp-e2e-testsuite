@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@ package de.gematik.test.erezept.fhir.values;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TaskIdTest {
 
@@ -35,6 +40,27 @@ class TaskIdTest {
   void shouldToString() {
     val tid = TaskId.from("123");
     assertEquals("123", tid.toString());
+  }
+
+  @Test
+  void shouldTranslateToPrescriptionId() {
+    val tid = TaskId.from("123");
+    val pid = tid.toPrescriptionId();
+    assertEquals(tid.getValue(), pid.getValue());
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldMapToFlowType(TaskId tid, PrescriptionFlowType expected) {
+    assertEquals(expected, tid.getFlowType());
+  }
+
+  static Stream<Arguments> shouldMapToFlowType() {
+    return Stream.of(
+        Arguments.of(TaskId.from("160.0.0.1"), PrescriptionFlowType.FLOW_TYPE_160),
+        Arguments.of(TaskId.from("169.0.0.1"), PrescriptionFlowType.FLOW_TYPE_169),
+        Arguments.of(TaskId.from("200.0.0.1"), PrescriptionFlowType.FLOW_TYPE_200),
+        Arguments.of(TaskId.from("209.0.0.1"), PrescriptionFlowType.FLOW_TYPE_209));
   }
 
   @Test

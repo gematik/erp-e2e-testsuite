@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package de.gematik.test.erezept.app.questions;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Profile;
+import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -49,9 +53,23 @@ class UsedSessionKVNRTest {
   void shouldDetectAvailableKVNR() {
     val app = mock(UseIOSApp.class);
     when(app.getText(Profile.USER_KVNR)).thenReturn("X11551155"); // pretend to find one
+    when(app.isPresent(Settings.SETTINGS_HEADER_LINE)).thenReturn(true);
     val actor = OnStage.theActorCalled(GemFaker.fakerName());
     actor.can(app);
     val readKvnr = actor.asksFor(UsedSessionKVNR.fromUserProfile());
     assertEquals("X11551155", readKvnr);
+    verify(app, times(1)).tap(BottomNav.SETTINGS_BUTTON);
+  }
+
+  @Test
+  void shouldReTapSettingsButton() {
+    val app = mock(UseIOSApp.class);
+    when(app.getText(Profile.USER_KVNR)).thenReturn("X11551155"); // pretend to find one
+    when(app.isPresent(Settings.SETTINGS_HEADER_LINE)).thenReturn(false);
+    val actor = OnStage.theActorCalled(GemFaker.fakerName());
+    actor.can(app);
+    val readKvnr = actor.asksFor(UsedSessionKVNR.fromUserProfile());
+    assertEquals("X11551155", readKvnr);
+    verify(app, times(2)).tap(BottomNav.SETTINGS_BUTTON);
   }
 }

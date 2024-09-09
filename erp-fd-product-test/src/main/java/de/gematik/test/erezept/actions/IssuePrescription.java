@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
@@ -192,7 +193,7 @@ public class IssuePrescription extends ErpAction<ErxTask> {
     }
 
     public IssuePrescription withRandomKbvBundle() {
-      return withKbvBundleFrom(KbvErpBundleBuilder.faker(patient.getKvnr()));
+      return withKbvBundleFrom(KbvErpBundleFaker.builder().withKvnr(patient.getKvnr()).toBuilder());
     }
 
     public IssuePrescription withKbvBundleFrom(KbvErpBundleBuilder builder) {

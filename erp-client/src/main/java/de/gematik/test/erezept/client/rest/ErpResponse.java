@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import ca.uhn.fhir.validation.*;
 import de.gematik.test.erezept.client.exceptions.*;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
 import javax.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -80,6 +81,20 @@ public class ErpResponse<R extends Resource> {
 
   public OperationOutcome getAsOperationOutcome() {
     return getResourceAs(OperationOutcome.class);
+  }
+
+  /**
+   * Extract the Resource from the Response or throw a custom Exception if the Resource is not of
+   * the expected type
+   *
+   * @param errorFunction mapping the ErpResponse to a custom Exception
+   * @return the Resource
+   * @param <E> the type of the custom exception to be thrown if the Resource is not of the expected
+   *     type
+   */
+  public <E extends RuntimeException> R getExpectedOrThrow(
+      Function<ErpResponse<? extends Resource>, E> errorFunction) {
+    return getResourceOptional().orElseThrow(() -> errorFunction.apply(this));
   }
 
   public R getExpectedResource() {

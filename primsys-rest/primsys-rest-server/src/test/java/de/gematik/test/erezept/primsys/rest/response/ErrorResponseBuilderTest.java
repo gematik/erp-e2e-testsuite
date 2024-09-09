@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,32 +20,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.data.error.ErrorType;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.Map;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ErrorResponseBuilderTest {
 
-  private ObjectMapper mapper;
-
-  @BeforeEach
-  void setup() {
-    mapper = new ObjectMapper();
-  }
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @Test
   void shouldHavePrivateConstructor() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(ErrorResponseBuilder.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ErrorResponseBuilder.class));
   }
 
   @Test
@@ -53,9 +47,9 @@ class ErrorResponseBuilderTest {
     val response = ErrorResponseBuilder.createInternalError(400, "internal error");
     val entity = response.getEntity();
 
-    val json = mapper.writeValueAsString(entity);
+    val json = MAPPER.writeValueAsString(entity);
     assertNotNull(json);
-    val errorDto = mapper.readValue(json, ErrorDto.class);
+    val errorDto = MAPPER.readValue(json, ErrorDto.class);
     assertEquals(ErrorType.INTERNAL, errorDto.getType());
   }
 
@@ -72,9 +66,9 @@ class ErrorResponseBuilderTest {
     val response = ErrorResponseBuilder.createInternalError(throwable);
     val entity = response.getEntity();
 
-    val json = mapper.writeValueAsString(entity);
+    val json = MAPPER.writeValueAsString(entity);
     assertNotNull(json);
-    val errorDto = mapper.readValue(json, ErrorDto.class);
+    val errorDto = MAPPER.readValue(json, ErrorDto.class);
     assertEquals(ErrorType.INTERNAL, errorDto.getType());
   }
 
@@ -88,9 +82,9 @@ class ErrorResponseBuilderTest {
     val response = ErrorResponseBuilder.createFachdienstError(erpResponse);
     val entity = response.getEntity();
 
-    val json = mapper.writeValueAsString(entity);
+    val json = MAPPER.writeValueAsString(entity);
     assertNotNull(json);
-    val errorDto = mapper.readValue(json, ErrorDto.class);
+    val errorDto = MAPPER.readValue(json, ErrorDto.class);
     assertEquals(ErrorType.FACHDIENST, errorDto.getType());
   }
 
@@ -109,7 +103,7 @@ class ErrorResponseBuilderTest {
   @Test
   void shouldThrowInternalErrorOnMissingOperationOutcome() {
     val erpResponse =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of("content-length", "10"))
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());

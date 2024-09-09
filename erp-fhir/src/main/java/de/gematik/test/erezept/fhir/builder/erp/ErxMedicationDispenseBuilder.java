@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.toggle.FeatureConfiguration;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -53,23 +54,23 @@ public class ErxMedicationDispenseBuilder
   private KbvErpMedication medication;
   private Date whenHandedOver;
   private Date whenPrepared;
+  private Boolean wasSubstituted;
+  private final List<String> dosageInstructions = new LinkedList<>();
+  private final List<String> notes = new LinkedList<>();
 
   private Medication.MedicationBatchComponent batch;
 
   private ErxMedicationDispenseBuilder() {
-    val toggleConfig = new FeatureConfiguration();
-    if (toggleConfig.getBooleanToggle("erp.fhir.medicationdispense.default")) {
-      this.erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
-    } else {
-      this.erpWorkflowVersion = ErpWorkflowVersion.V1_2_0;
-    }
+    this.version(ErpWorkflowVersion.getDefaultVersion());
   }
 
+  @Deprecated(forRemoval = true)
   public static ErxMedicationDispenseBuilder faker(
       KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
     return faker(kvnr, performerId, PZN.random().getValue(), prescriptionId);
   }
 
+  @Deprecated(forRemoval = true)
   public static ErxMedicationDispenseBuilder faker(
       KVNR kvnr, String performerId, String pzn, PrescriptionId prescriptionId) {
     return faker(
@@ -79,6 +80,7 @@ public class ErxMedicationDispenseBuilder
         prescriptionId);
   }
 
+  @Deprecated(forRemoval = true)
   public static ErxMedicationDispenseBuilder faker(
       @NonNull KVNR kvnr,
       String performerId,
@@ -108,7 +110,15 @@ public class ErxMedicationDispenseBuilder
    * @return Builder
    */
   public ErxMedicationDispenseBuilder version(ErpWorkflowVersion version) {
-    this.erpWorkflowVersion = version;
+    val isOldProfile = version == ErpWorkflowVersion.V1_1_1;
+    val shouldOverwriteOldProfileVersion =
+        new FeatureConfiguration().getBooleanToggle("erp.fhir.medicationdispense.overwrite_111");
+    // this check is required because on old profiles we have 2 options here
+    if (isOldProfile && shouldOverwriteOldProfileVersion) {
+      this.erpWorkflowVersion = ErpWorkflowVersion.V1_2_0;
+    } else {
+      this.erpWorkflowVersion = version;
+    }
     return this;
   }
 
@@ -141,12 +151,12 @@ public class ErxMedicationDispenseBuilder
     return self();
   }
 
-  public ErxMedicationDispenseBuilder whenHandedOver(@NonNull Date whenHandedOver) {
+  public ErxMedicationDispenseBuilder whenHandedOver(Date whenHandedOver) {
     this.whenHandedOver = whenHandedOver;
     return self();
   }
 
-  public ErxMedicationDispenseBuilder whenPrepared(@NonNull Date whenPrepared) {
+  public ErxMedicationDispenseBuilder whenPrepared(Date whenPrepared) {
     this.whenPrepared = whenPrepared;
     return self();
   }
@@ -161,6 +171,21 @@ public class ErxMedicationDispenseBuilder
 
   public ErxMedicationDispenseBuilder batch(@NonNull Medication.MedicationBatchComponent batch) {
     this.batch = batch;
+    return self();
+  }
+
+  public ErxMedicationDispenseBuilder wasSubstituted(Boolean wasSubstituted) {
+    this.wasSubstituted = wasSubstituted;
+    return self();
+  }
+
+  public ErxMedicationDispenseBuilder dosageInstruction(String instruction) {
+    this.dosageInstructions.add(instruction);
+    return self();
+  }
+
+  public ErxMedicationDispenseBuilder note(String note) {
+    this.notes.add(note);
     return self();
   }
 
@@ -236,6 +261,16 @@ public class ErxMedicationDispenseBuilder
     if (batch != null) {
       medication.setBatch(batch);
     }
+
+    if (wasSubstituted != null) {
+      medDisp.getSubstitution().setWasSubstituted(wasSubstituted);
+    }
+
+    this.dosageInstructions.stream()
+        .map(instruction -> new Dosage().setText(instruction))
+        .forEach(medDisp::addDosageInstruction);
+
+    this.notes.stream().map(note -> new Annotation().setText(note)).forEach(medDisp::addNote);
 
     return medDisp;
   }

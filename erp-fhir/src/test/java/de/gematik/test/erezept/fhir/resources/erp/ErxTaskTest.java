@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -35,15 +35,15 @@ import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.Test;
 
 class ErxTaskTest extends ParsingTest {
-  private final String BASE_PATH = "fhir/valid/erp/";
-  private final String BASE_PATH_1_1_1 = BASE_PATH + "1.1.1/";
-  private final String BASE_PATH_1_2_0 = BASE_PATH + "1.2.0/task/";
+  private static final String BASE_PATH = "fhir/valid/erp/";
+  private static final String BASE_PATH_1_1_1 = BASE_PATH + "1.1.1/";
+  private static final String BASE_PATH_1_2_0 = BASE_PATH + "1.2.0/task/";
 
   @Test
   void shouldEncodeSingleTask111() {
     val fileName = "Task_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
@@ -83,7 +83,7 @@ class ErxTaskTest extends ParsingTest {
   void shouldEncodeExpiryAndAcceptDates() {
     val fileName = "Task_03.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
@@ -99,7 +99,7 @@ class ErxTaskTest extends ParsingTest {
   void shouldEncodeSingleTask120() {
     val fileName = "160_000_031_325_714_07.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
@@ -153,7 +153,7 @@ class ErxTaskTest extends ParsingTest {
   void shouldEncodeSinglePkvDraftTask120() {
     val fileName = "209_000_000_000_035_71.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
@@ -194,7 +194,7 @@ class ErxTaskTest extends ParsingTest {
     val fileExtensions = List.of(".xml", ".json");
 
     fileExtensions.stream()
-        .map(ext -> ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName + ext))
+        .map(ext -> ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName + ext))
         .forEach(
             content -> {
               val expectedSecret =
@@ -211,7 +211,7 @@ class ErxTaskTest extends ParsingTest {
   void shouldThrowOnMissingPrescriptionId() {
     val fileName = "Task_01.xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
     val task = parser.decode(ErxTask.class, content);
 
     // remove the prescription ID identifier

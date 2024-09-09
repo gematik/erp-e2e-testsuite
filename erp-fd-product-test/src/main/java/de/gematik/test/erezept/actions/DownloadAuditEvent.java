@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import de.gematik.test.erezept.*;
 import de.gematik.test.erezept.client.rest.param.*;
 import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
+import java.util.List;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import net.serenitybdd.screenplay.*;
@@ -47,6 +48,15 @@ public class DownloadAuditEvent extends ErpAction<ErxAuditEventBundle> {
 
   public static DownloadAuditEvent orderByDateDesc() {
     val cmd = new AuditEventGetCommand(new QueryParameter("_sort", "-date"));
+    return new DownloadAuditEvent(cmd);
+  }
+
+  public static DownloadAuditEvent withQueryParams(IQueryParameter... queryParameter) {
+    return withQueryParams(List.of(queryParameter));
+  }
+
+  public static DownloadAuditEvent withQueryParams(List<IQueryParameter> queryParameter) {
+    val cmd = new AuditEventGetCommand(queryParameter);
     return new DownloadAuditEvent(cmd);
   }
 }

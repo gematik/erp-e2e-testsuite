@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,15 @@ package de.gematik.test.erezept.app.task.android;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseAndroidApp;
-import de.gematik.test.erezept.app.abilities.UseAppUserConfiguration;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.app.task.SetUpDevice;
@@ -32,27 +36,26 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.operator.UIProvider;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SerenityJUnit5Extension.class)
 class SetUpAndroidDeviceTest {
-  private final SmartcardArchive smartcards = SmartcardFactory.getArchive();
+  private final SmartcardArchive smartcards = SmartcardArchive.fromResources();
   private Egk egk;
   private EnvironmentConfiguration environment;
 
   @BeforeEach
   void init() {
     OnStage.setTheStage(new Cast() {});
-    this.egk = smartcards.getEgkCards().get(0);
+    this.egk = smartcards.getEgk(0);
     this.environment = new EnvironmentConfiguration();
     this.environment.setName("TU");
   }
@@ -81,7 +84,7 @@ class SetUpAndroidDeviceTest {
   void shouldSetupAndroidDeviceWithVirtualEgk() {
     val theAppUser = createActor();
 
-    val userConfigAbility = mock(UseAppUserConfiguration.class);
+    val userConfigAbility = mock(UseConfigurationData.class);
     when(userConfigAbility.getEgkIccsn()).thenReturn(egk.getIccsn());
     when(userConfigAbility.useVirtualEgk()).thenReturn(true);
     theAppUser.can(userConfigAbility);
@@ -102,7 +105,7 @@ class SetUpAndroidDeviceTest {
     val expectedKvnr = "X110502414";
     val theAppUser = createActor();
 
-    val userConfigAbility = mock(UseAppUserConfiguration.class);
+    val userConfigAbility = mock(UseConfigurationData.class);
     when(userConfigAbility.getEgkIccsn()).thenReturn("80276883110000113311");
     when(userConfigAbility.useVirtualEgk()).thenReturn(false);
     theAppUser.can(userConfigAbility);

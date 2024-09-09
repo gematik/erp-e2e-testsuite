@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.gematik.test.erezept.screenplay.strategy.pharmacy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -37,7 +37,10 @@ class AuthorizedChargeItemStrategyTest {
     val prescriptionId = PrescriptionId.random();
     val accessCode = AccessCode.random();
     val chargeItem =
-        ErxChargeItemBuilder.faker(prescriptionId).version(PatientenrechnungVersion.V1_0_0).build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(prescriptionId)
+            .withVersion(PatientenrechnungVersion.V1_0_0)
+            .fake();
     val authorization = ChargeItemChangeAuthorization.forChargeItem(chargeItem, accessCode);
     val useThePharmacyStack = ManagePharmacyPrescriptions.itWorksWith();
     useThePharmacyStack.getChargeItemChangeAuthorizations().append(authorization);
@@ -61,10 +64,11 @@ class AuthorizedChargeItemStrategyTest {
     val prescriptionId = PrescriptionId.random();
     val accessCode = AccessCode.random();
     val chargeItem =
-        ErxChargeItemBuilder.faker(prescriptionId)
-            .version(PatientenrechnungVersion.V1_0_0)
-            .accessCode(accessCode)
-            .build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(prescriptionId)
+            .withVersion(PatientenrechnungVersion.V1_0_0)
+            .withAccessCode(accessCode)
+            .fake();
     val authorization =
         ChargeItemChangeAuthorization.forChargeItem(chargeItem, AccessCode.random());
     val useThePharmacyStack = ManagePharmacyPrescriptions.itWorksWith();

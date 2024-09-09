@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package de.gematik.test.erezept.fhir.util;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +26,14 @@ class OperationOutcomeWrapperTest {
 
   @Test
   void shouldExtractErrorDetails() {
-    val oo = FhirTestResourceUtil.createOperationOutcome();
+    val oo = createOperationOutcome();
     val wrapper = OperationOutcomeWrapper.from(oo);
     assertDoesNotThrow(wrapper::toString);
   }
 
   @Test
   void shouldExtractErrorDetailsWithoutDiagnostics() {
-    val oo = FhirTestResourceUtil.createOperationOutcome();
+    val oo = createOperationOutcome();
     oo.getIssueFirstRep().setDiagnostics(null);
     val wrapper = OperationOutcomeWrapper.from(oo);
     assertDoesNotThrow(wrapper::toString);
@@ -41,7 +41,7 @@ class OperationOutcomeWrapperTest {
 
   @Test
   void shouldExtractDirectly() {
-    val oo = FhirTestResourceUtil.createOperationOutcome();
+    val oo = createOperationOutcome();
     assertDoesNotThrow(() -> OperationOutcomeWrapper.extractFrom(oo));
   }
 }

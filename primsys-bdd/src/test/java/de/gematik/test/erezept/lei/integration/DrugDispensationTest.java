@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,38 @@
 
 package de.gematik.test.erezept.lei.integration;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.erp.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.smartcard.*;
-import java.util.*;
-import lombok.*;
-import net.serenitybdd.screenplay.*;
-import net.serenitybdd.screenplay.actors.*;
-import org.junit.jupiter.api.*;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
+import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.questions.HasChargeItemBundle;
+import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
+import java.util.Map;
+import java.util.Optional;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.actors.Cast;
+import net.serenitybdd.screenplay.actors.OnStage;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class DrugDispensationTest {
 
@@ -70,16 +81,17 @@ class DrugDispensationTest {
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
 
     val chargeItem =
-        ErxChargeItemBuilder.faker(prescriptionId)
-            .subject(egkAbility.getKvnr(), GemFaker.insuranceName())
-            .receipt(erxReceipt)
-            .build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(prescriptionId)
+            .withSubject(egkAbility.getKvnr(), GemFaker.insuranceName())
+            .withReceipt(erxReceipt)
+            .fake();
     val chargeItemBundle = mock(ErxChargeItemBundle.class);
     val response =
         ErpResponse.forPayload(chargeItemBundle, ErxChargeItemBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(chargeItemBundle.getChargeItem()).thenReturn(chargeItem);
     when(chargeItemBundle.getReceipt()).thenReturn(Optional.of(erxReceipt));
@@ -94,11 +106,10 @@ class DrugDispensationTest {
   @Test
   void thenReceivedDrugsWithoutChargeItem() {
     val response =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxChargeItemBundle.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxChargeItemBundle.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(useMockClientAbility.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
 
     dispensedDrugs.append(prescriptionId);

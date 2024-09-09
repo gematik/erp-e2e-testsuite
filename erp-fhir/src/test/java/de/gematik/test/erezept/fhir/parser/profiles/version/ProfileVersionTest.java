@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,23 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.*;
-import java.time.*;
-import java.util.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.fhir.exceptions.FhirValidatorException;
+import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.List;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class ProfileVersionTest {
 
@@ -98,7 +106,7 @@ class ProfileVersionTest {
   void shouldThrowOnVersionMismatch() {
     assertThrows(
         FhirValidatorException.class,
-        () -> ProfileVersion.fromString(ErpWorkflowVersion.class, "1.3.0"));
+        () -> ProfileVersion.fromString(ErpWorkflowVersion.class, "1.2.1"));
   }
 
   @Test

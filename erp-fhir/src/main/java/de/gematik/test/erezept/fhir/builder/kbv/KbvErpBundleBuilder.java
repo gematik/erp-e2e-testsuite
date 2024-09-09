@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,44 +94,54 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
    *
    * @return KbvErpBundleBuilder
    */
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker() {
     return faker(KVNR.random(), fakerPrescriptionId());
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(KVNR kvnr) {
     return faker(kvnr, new Date());
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(KVNR kvnr, Date authoredOn) {
     return faker(kvnr, authoredOn, PZN.random().getValue());
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(KVNR kvnr, String pzn) {
     return faker(kvnr, new Date(), pzn);
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(KVNR kvnr, Date authoredOn, String pzn) {
     return faker(kvnr, pzn, authoredOn, fakerPrescriptionId());
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(KVNR kvnr, PrescriptionId prescriptionId) {
     return faker(kvnr, new Date(), prescriptionId);
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(
       KVNR kvnr, Date authoredOn, PrescriptionId prescriptionId) {
     return faker(kvnr, PZN.random().getValue(), authoredOn, prescriptionId);
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(KVNR kvnr, String pzn, PrescriptionId prescriptionId) {
     return faker(kvnr, pzn, new Date(), prescriptionId);
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(
       KVNR kvnr, String pzn, Date authoredOn, PrescriptionId prescriptionId) {
     return faker(kvnr, pzn, fakerDrugName(), authoredOn, fakerBool(), prescriptionId);
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(
       KVNR kvnr,
       String pzn,
@@ -141,6 +151,7 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
     return faker(kvnr, pzn, medicationName, new Date(), substitution, prescriptionId);
   }
 
+  @Deprecated(since = "recently")
   public static KbvErpBundleBuilder faker(
       KVNR kvnr,
       String pzn,
@@ -157,14 +168,18 @@ public class KbvErpBundleBuilder extends AbstractResourceBuilder<KbvErpBundleBui
             .withAssignerRef(assignerOrganization)
             .fake();
     val insurance =
-        KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).beneficiary(patient).build();
+        KbvCoverageFaker.builder()
+            .withInsuranceType(VersicherungsArtDeBasis.GKV)
+            .withBeneficiary(patient)
+            .fake();
     val medication =
         KbvErpMedicationPZNFaker.builder()
             .withPznMedication(pzn, medicationName)
             .withCategory(MedicationCategory.C_00)
             .fake();
     val medicationRequest =
-        MedicationRequestFaker.builder(patient)
+        MedicationRequestFaker.builder()
+            .withPatient(patient)
             .withInsurance(insurance)
             .withRequester(practitioner)
             .withMedication(medication)

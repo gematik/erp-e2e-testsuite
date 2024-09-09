@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
@@ -65,19 +65,20 @@ public class ChargeItemParameter implements BaseResourceParameter {
     val fhir = new FhirParser();
 
     val prescriptionId = prescriptionIdParameter.getPrescriptionId();
-    val davBundle = DavAbgabedatenBuilder.faker(prescriptionId).build();
+    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
     // only encoded, but not signed because we don't have a signer here
     val encodedDavBundle =
         fhir.encode(davBundle, EncodingType.XML).getBytes(StandardCharsets.UTF_8);
-    return ErxChargeItemBuilder.faker(prescriptionId)
-        .enterer(telematikId)
-        .subject(kvnrParameter.getKvnr(), assignerName)
-        .accessCode(accessCode)
-        .abgabedatensatz(davBundle.getReference(), encodedDavBundle)
-        .markingFlag(
+    return ErxChargeItemFaker.builder()
+        .withPrescriptionId(prescriptionId)
+        .withEnterer(telematikId)
+        .withSubject(kvnrParameter.getKvnr(), assignerName)
+        .withAccessCode(accessCode)
+        .withAbgabedatensatz(davBundle.getReference(), encodedDavBundle)
+        .withMarkingFlag(
             Optional.ofNullable(markingFlagParameter)
                 .map(MarkingFlagParameter::createFlags)
                 .orElse(null)) // required to overwrite the faker value
-        .build();
+        .fake();
   }
 }

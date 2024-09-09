@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,10 +64,12 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
     return insurance;
   }
 
+  @Deprecated(since = "recently")
   public static KbvCoverageBuilder faker() {
     return faker(randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV));
   }
 
+  @Deprecated(since = "recently")
   public static KbvCoverageBuilder faker(VersicherungsArtDeBasis insuranceType) {
     val builder =
         switch (insuranceType) {

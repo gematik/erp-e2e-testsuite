@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.konnektor.commands;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.test.smartcard.Algorithm;
 import de.gematik.ws.conn.connectorcommon.v5.DocumentType;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.encryptionservice.v6.KeyOnCardType;
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.Base64Data;
 
@@ -31,9 +31,9 @@ public class DecryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 
   private final CardInfo cardInfo;
   private final byte[] encryptedData;
-  private final Algorithm algorithm;
+  private final CryptoSystem algorithm;
 
-  public DecryptDocumentCommand(CardInfo cardInfo, byte[] encryptedData, Algorithm algorithm) {
+  public DecryptDocumentCommand(CardInfo cardInfo, byte[] encryptedData, CryptoSystem algorithm) {
     this.cardInfo = cardInfo;
     this.encryptedData = encryptedData;
     this.algorithm = algorithm;
@@ -45,7 +45,7 @@ public class DecryptDocumentCommand extends AbstractKonnektorCommand<byte[]> {
 
     val keyOnCardType = new KeyOnCardType();
     keyOnCardType.setCardHandle(cardInfo.getHandle());
-    keyOnCardType.setCrypt(algorithm.getAlgorithmName());
+    keyOnCardType.setCrypt(algorithm.getName());
 
     val base64Data = new Base64Data();
     base64Data.setValue(encryptedData);

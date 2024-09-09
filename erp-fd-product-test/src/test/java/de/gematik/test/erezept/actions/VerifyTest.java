@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package de.gematik.test.erezept.actions;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
-import static de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil.createOperationOutcome;
-import static org.junit.Assert.*;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -29,7 +29,6 @@ import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Map;
 import lombok.val;
@@ -53,7 +52,7 @@ class VerifyTest {
         ErpResponse.forPayload(createOperationOutcome(), OperationOutcome.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
     actor.attemptsTo(
@@ -73,7 +72,7 @@ class VerifyTest {
         ErpResponse.forPayload(task, ErxTask.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
     actor.attemptsTo(
@@ -95,7 +94,7 @@ class VerifyTest {
         ErpResponse.forPayload(task, ErxTask.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
     actor.attemptsTo(
         Verify.that(interaction).withoutBody().hasResponseWith(returnCode(201)).isCorrect());
@@ -115,7 +114,7 @@ class VerifyTest {
         ErpResponse.forPayload(task, ErxTask.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
     actor.attemptsTo(Verify.that(interaction).isFromExpectedType());
   }

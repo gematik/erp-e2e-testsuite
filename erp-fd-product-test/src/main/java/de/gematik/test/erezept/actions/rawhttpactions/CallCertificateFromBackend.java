@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package de.gematik.test.erezept.actions.rawhttpactions;
 
 import de.gematik.test.erezept.abilities.RawHttpAbility;
-import de.gematik.test.erezept.actions.rawhttpactions.dto.PKICertificatesDTOEnvelop;
+import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Optional;
-import kong.unirest.HttpResponse;
+import kong.unirest.core.HttpResponse;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -31,7 +31,7 @@ public class CallCertificateFromBackend
     implements Question<HttpResponse<PKICertificatesDTOEnvelop>> {
   private String rootCA;
 
-  public static CallCertificateFromBackend named(String rootCA) {
+  public static CallCertificateFromBackend withRootCa(String rootCA) {
     return new CallCertificateFromBackend(rootCA);
   }
 
@@ -39,7 +39,8 @@ public class CallCertificateFromBackend
   public HttpResponse<PKICertificatesDTOEnvelop> answeredBy(Actor actor) {
     val httpClient = SafeAbility.getAbility(actor, RawHttpAbility.class);
     return httpClient
-        .get("/PKICertificates?currentRoot=" + rootCA)
+        .get("/PKICertificates")
+        .queryString("currentRoot", rootCA)
         .asObject(PKICertificatesDTOEnvelop.class)
         .map(actual -> Optional.ofNullable(actual).orElseGet(PKICertificatesDTOEnvelop::new));
   }

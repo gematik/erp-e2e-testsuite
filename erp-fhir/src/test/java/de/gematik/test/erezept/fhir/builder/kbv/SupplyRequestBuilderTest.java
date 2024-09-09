@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class SupplyRequestBuilderTest extends ParsingTest {
 
   @BeforeAll
   static void setup() {
-    coverage = KbvCoverageBuilder.faker().build();
+    coverage = KbvCoverageFaker.builder().fake();
     medication = KbvErpMedicationPZNFaker.builder().fake();
     practitioner = PractitionerFaker.builder().fake();
   }
@@ -60,7 +60,7 @@ class SupplyRequestBuilderTest extends ParsingTest {
 
   @Test
   void fakeSupplyRequestShouldWork() {
-    KbvCoverage coverage = KbvCoverageBuilder.faker().build();
+    KbvCoverage coverage = KbvCoverageFaker.builder().fake();
     SupplyRequest supplyRequest =
         SupplyRequestBuilder.withCoverage(coverage)
             .medication(medication)

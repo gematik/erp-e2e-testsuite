@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
-public class ErxCommunicationBundle extends Bundle {
+public class ErxCommunicationBundle extends ErxBundle {
 
   public List<ErxCommunication> getCommunications() {
     return this.getEntry().stream()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,25 @@
 
 package de.gematik.test.konnektor.soap.mock;
 
-import de.gematik.test.smartcard.Algorithm;
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
-import de.gematik.ws.conn.signatureservice.v7.*;
+import de.gematik.ws.conn.signatureservice.v7.ComfortSignatureStatusEnum;
+import de.gematik.ws.conn.signatureservice.v7.DocumentType;
+import de.gematik.ws.conn.signatureservice.v7.SessionInfo;
+import de.gematik.ws.conn.signatureservice.v7.SignRequest;
+import de.gematik.ws.conn.signatureservice.v7.SignResponse;
+import de.gematik.ws.conn.signatureservice.v7.SignatureModeEnum;
+import de.gematik.ws.conn.signatureservice.v7.VerificationResultType;
+import de.gematik.ws.conn.signatureservice.v7.VerifyDocument;
+import de.gematik.ws.conn.signatureservice.v7.VerifyDocumentResponse;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.FaultMessage;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureServicePortType;
 import de.gematik.ws.tel.error.v2.Error;
+import jakarta.xml.ws.Holder;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.datatype.Duration;
-import javax.xml.ws.Holder;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.Base64Signature;
 import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
@@ -80,7 +88,10 @@ public class MockSignatureServicePortType extends AbstractMockService
     for (val sr : signRequest) {
       val signedData =
           mockKonnektor.signDocumentWith(
-              cardHandle, Algorithm.fromString(crypt), sr.getDocument().getBase64Data().getValue());
+              cardHandle,
+              CryptoSystem.fromString(crypt),
+              sr.isIncludeRevocationInfo(),
+              sr.getDocument().getBase64Data().getValue());
 
       val signResponse = new SignResponse();
       signResponse.setRequestID(sr.getRequestID());

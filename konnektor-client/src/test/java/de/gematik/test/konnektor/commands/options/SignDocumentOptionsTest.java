@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package de.gematik.test.konnektor.commands.options;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SignDocumentOptionsTest {
+class SignDocumentOptionsTest {
 
   @Test
-  public void defaultSignDocumentOptions() {
+  void defaultSignDocumentOptions() {
     val opts = SignDocumentOptions.getDefaultOptions();
 
     assertEquals("NONE", opts.getTvMode());
@@ -37,7 +37,7 @@ public class SignDocumentOptionsTest {
   }
 
   @Test
-  public void SignDocumentOptionsWithSigningCrypto() {
+  void SignDocumentOptionsWithSigningCrypto() {
     val cryptos = List.of(SigningCryptType.RSA_ECC, SigningCryptType.RSA, SigningCryptType.ECC);
     cryptos.forEach(
         ct -> {

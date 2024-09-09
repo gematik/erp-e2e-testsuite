@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import de.gematik.test.cardterminal.*;
 import de.gematik.test.konnektor.soap.*;
 import de.gematik.ws.conn.connectorcontext.v2.*;
 import de.gematik.ws.conn.vsds.vsdservice.v5.*;
-import javax.xml.ws.*;
+import jakarta.xml.ws.*;
 import lombok.*;
 
 public class ReadVsdCommand extends AbstractKonnektorCommand<ReadVSDResponse> {

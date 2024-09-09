@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,24 @@ package de.gematik.test.erezept;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.erezept.abilities.OCSPAbility;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
+import de.gematik.test.erezept.abilities.TSLAbility;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
-import de.gematik.test.erezept.config.dto.actor.*;
+import de.gematik.test.erezept.config.dto.actor.ApothecaryConfiguration;
+import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
@@ -35,14 +44,18 @@ import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
-import kong.unirest.Unirest;
+import kong.unirest.core.Unirest;
+import kong.unirest.jackson.JacksonObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
@@ -71,7 +84,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     val cfg = this.getDoctorConfig(name);
     val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
     val hba = this.getHbaByICCSN(cfg.getHbaIccsn());
-    val algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(hba).and(algorithm).on(instantiateDoctorKonnektor(cfg));
@@ -89,7 +102,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
     val cfg = this.getPharmacyConfig(name);
     val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
-    val algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(algorithm).on(instantiatePharmacyKonnektor(cfg));
@@ -117,6 +130,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipWithRawHttp(A actor) {
     val client = Unirest.spawnInstance();
+    client.config().setObjectMapper(new JacksonObjectMapper());
     BackendRouteConfiguration envConfig;
     if (actor instanceof PharmacyActor || actor instanceof DoctorActor) {
       envConfig = this.getActiveEnvironment().getTi();
@@ -132,13 +146,55 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     actor.can(rawHttpAbility);
   }
 
+  public <A extends Actor> void equipForOCSP(A actor) {
+    val client = Unirest.spawnInstance();
+    client.config().setObjectMapper(new JacksonObjectMapper());
+    BackendRouteConfiguration envConfig;
+    if (actor instanceof PharmacyActor || actor instanceof DoctorActor) {
+      envConfig = this.getActiveEnvironment().getTi();
+    } else {
+      envConfig = this.getActiveEnvironment().getInternet();
+    }
+    client
+        .config()
+        .defaultBaseUrl(envConfig.getFdBaseUrl())
+        .addDefaultHeader("X-api-key", envConfig.getXapiKey())
+        .addDefaultHeader("User-Agent", envConfig.getUserAgent());
+    val oCSPAbility = new OCSPAbility(client, "/OCSPResponse");
+    actor.can(oCSPAbility);
+  }
+
+  public <A extends Actor> void equipForTslDownload(A actor) {
+    val client = Unirest.spawnInstance();
+    client.config().setObjectMapper(new JacksonObjectMapper());
+    BackendRouteConfiguration envConfig;
+    if (actor instanceof PharmacyActor || actor instanceof DoctorActor) {
+      envConfig = this.getActiveEnvironment().getTi();
+    } else {
+      envConfig = this.getActiveEnvironment().getInternet();
+    }
+    val environment = this.getActiveEnvironment().getName();
+    val r =
+        switch (environment.toUpperCase()) {
+          case "TU":
+            yield "/ECC-RSA_TSL-test.xml";
+          case "RU", "RU-DEV":
+            yield "/ECC-RSA_TSL-ref.xml";
+          default:
+            yield "/ECC-RSA_TSL-ref.xml";
+        };
+    client.config().defaultBaseUrl(envConfig.getTslBaseUrl());
+    val ocspAbility = new TSLAbility(client, r);
+    actor.can(ocspAbility);
+  }
+
   public <A extends Actor> void equipAsApothecary(A actor) {
     val name = actor.getName();
     log.info(format("Equip Apothecary {0}", name));
 
     val cfg = this.getApothecaryConfig(name);
     val hba = this.getHbaByICCSN(cfg.getHbaIccsn());
-    val algorithm = Algorithm.fromString(cfg.getAlgorithm());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     givenThat(actor)
         .describedAs(cfg.getDescription())
@@ -201,7 +257,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
   }
 
   public static ErpFdTestsuiteFactory create() {
-    val smartcards = SmartcardFactory.getArchive();
+    val smartcards = SmartcardArchive.fromResources();
     return ConfigurationReader.forPrimSysConfiguration()
         .wrappedBy(dto -> ErpFdTestsuiteFactory.fromDto(dto, smartcards));
   }

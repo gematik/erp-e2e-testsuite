@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,8 @@ class FhirDumpStepListenerTest {
     assertDoesNotThrow(listener::testRetried);
     assertDoesNotThrow(() -> listener.skippedStepStarted(mock(ExecutedStepDescription.class)));
     assertDoesNotThrow(() -> listener.stepFailed(mock(StepFailure.class)));
-    assertDoesNotThrow(() -> listener.stepFailed(mock(StepFailure.class), List.of()));
+    assertDoesNotThrow(
+        () -> listener.stepFailed(mock(StepFailure.class), List.of(), false, ZonedDateTime.now()));
     assertDoesNotThrow(() -> listener.lastStepFailed(mock(StepFailure.class)));
     assertDoesNotThrow(listener::stepIgnored);
     assertDoesNotThrow(() -> listener.stepPending());

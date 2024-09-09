@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.builder.QuantityBuilder;
@@ -27,48 +28,57 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Quantity;
 
+@Slf4j
 public class MedicationRequestFaker {
-  private final MedicationRequestBuilder builder;
-  private static KbvPatient patient;
+  private KbvPatient kbvPatient = PatientFaker.builder().fake();
   private final Map<String, Consumer<MedicationRequestBuilder>> builderConsumers = new HashMap<>();
+  private static final String KEY_AUTHOR_DATE = "authorDate"; // key used for builderConsumers map
 
-  private MedicationRequestFaker(MedicationRequestBuilder builder) {
-    this.builder = builder;
+  private MedicationRequestFaker() {
     builderConsumers.put("bvg", b -> b.isBVG(true));
     builderConsumers.put("emergencyServiceFee", b -> b.hasEmergencyServiceFee(false));
     builderConsumers.put("version", b -> b.version(KbvItaErpVersion.getDefaultVersion()));
     builderConsumers.put(
-        "medication", b -> b.medication(KbvErpMedicationPZNFaker.builder().fake()));
+        "medication",
+        b ->
+            b.medication(
+                KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake()));
     builderConsumers.put("requester", b -> b.requester(PractitionerFaker.builder().fake()));
     builderConsumers.put(
-        "insurance",
-        b -> b.insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build()));
+        "coverage",
+        b ->
+            b.insurance(
+                KbvCoverageFaker.builder()
+                    .withInsuranceType(kbvPatient.getInsuranceKind())
+                    .fake()));
     builderConsumers.put("requestQuantity", b -> b.quantityPackages(fakerAmount()));
     builderConsumers.put("dosage", b -> b.dosage(fakerDosage()));
     builderConsumers.put(
         "coPaymentStatus", b -> b.coPaymentStatus(fakerValueSet(StatusCoPayment.class)));
-    builderConsumers.put("authorDate", b -> b.authoredOn(new Date()));
+    builderConsumers.put(KEY_AUTHOR_DATE, b -> b.authoredOn(new Date()));
     builderConsumers.put("substitution", b -> b.substitution(true));
   }
 
   public static MedicationRequestFaker builder() {
-    patient = PatientFaker.builder().fake();
-    return new MedicationRequestFaker(MedicationRequestBuilder.forPatient(patient));
+    return new MedicationRequestFaker();
   }
 
-  public static MedicationRequestFaker builder(KbvPatient kbvPatient) {
-    patient = kbvPatient;
-    return new MedicationRequestFaker(MedicationRequestBuilder.forPatient(kbvPatient));
+  public MedicationRequestFaker withPatient(KbvPatient patient) {
+    kbvPatient = patient;
+    return this;
   }
 
   public MedicationRequestFaker withVersion(KbvItaErpVersion version) {
@@ -90,7 +100,7 @@ public class MedicationRequestFaker {
 
   public MedicationRequestFaker withInsurance(KbvCoverage coverage) {
     builderConsumers.computeIfPresent(
-        "insurance", (key, defaultValue) -> b -> b.insurance(coverage));
+        "coverage", (key, defaultValue) -> b -> b.insurance(coverage));
     return this;
   }
 
@@ -105,8 +115,16 @@ public class MedicationRequestFaker {
   }
 
   public MedicationRequestFaker withStatus(String code) {
-    builder.status(code);
-    return this;
+    var status = MedicationRequest.MedicationRequestStatus.fromCode(code);
+    if (status == null) {
+      log.warn(
+          format(
+              "Given code {0} cannot be converted to a MedicationRequestStatus: using UNKNOWN as"
+                  + " default",
+              code));
+      status = MedicationRequest.MedicationRequestStatus.UNKNOWN;
+    }
+    return this.withStatus(status);
   }
 
   public MedicationRequestFaker withIntent(MedicationRequest.MedicationRequestIntent intent) {
@@ -115,8 +133,16 @@ public class MedicationRequestFaker {
   }
 
   public MedicationRequestFaker withIntent(String code) {
-    builder.intent(code);
-    return this;
+    var intent = MedicationRequest.MedicationRequestIntent.fromCode(code);
+    if (intent == null) {
+      log.warn(
+          format(
+              "Given code {0} cannot be converted to a MedicationRequestIntent: using NULL as"
+                  + " default",
+              code));
+      intent = MedicationRequest.MedicationRequestIntent.NULL;
+    }
+    return this.withIntent(intent);
   }
 
   public MedicationRequestFaker withSubstitution(
@@ -178,13 +204,15 @@ public class MedicationRequestFaker {
   }
 
   public MedicationRequestFaker withAuthorDate(Date date) {
-    builderConsumers.computeIfPresent("authorDate", (key, defaultValue) -> b -> b.authoredOn(date));
+    builderConsumers.computeIfPresent(
+        KEY_AUTHOR_DATE, (key, defaultValue) -> b -> b.authoredOn(date));
     return this;
   }
 
   public MedicationRequestFaker withAuthorDate(
       Date date, TemporalPrecisionEnum temporalPrecisionEnum) {
-    builder.authoredOn(date, temporalPrecisionEnum);
+    builderConsumers.computeIfPresent(
+        KEY_AUTHOR_DATE, (key, defaultValue) -> b -> b.authoredOn(date, temporalPrecisionEnum));
     return this;
   }
 
@@ -194,7 +222,12 @@ public class MedicationRequestFaker {
   }
 
   public KbvErpMedicationRequest fake() {
+    return this.toBuilder().build();
+  }
+
+  public MedicationRequestBuilder toBuilder() {
+    val builder = MedicationRequestBuilder.forPatient(kbvPatient);
     builderConsumers.values().forEach(c -> c.accept(builder));
-    return builder.build();
+    return builder;
   }
 }

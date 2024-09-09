@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
@@ -37,10 +38,10 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
@@ -56,6 +57,8 @@ import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.WebElement;
 
 class PrescriptionTests {
@@ -83,13 +86,16 @@ class PrescriptionTests {
     OnStage.drawTheCurtain();
   }
 
-  @Test
-  void checkIfTheDeletionFlowIsCorrect() {
+  @ParameterizedTest
+  @EnumSource(
+      value = PrescriptionFlowType.class,
+      names = {"FLOW_TYPE_160", "FLOW_TYPE_200"})
+  void checkIfTheDeletionFlowIsCorrect(PrescriptionFlowType flowType) {
     val deletePrescriptionTask = DeleteRedeemablePrescription.fromStack("letzte");
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
 
-    val taskId = TaskId.from(PrescriptionId.random());
+    val taskId = TaskId.from(PrescriptionId.random(flowType));
     val dmcAbility = actor.abilityTo(ManageDataMatrixCodes.class);
     val dmc = DmcPrescription.ownerDmc(taskId, AccessCode.random());
     dmcAbility.appendDmc(dmc);
@@ -100,15 +106,15 @@ class PrescriptionTests {
     val medication = mock(KbvErpMedication.class);
     val medicationRequest = mock(KbvErpMedicationRequest.class);
     when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
-    when(kbvBundle.getMedicationName()).thenReturn("Schmerzmittel");
-    when(kbvBundle.isMultiple()).thenReturn(false);
+    when(kbvBundle.getMedication()).thenReturn(medication);
+    when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
+    when(kbvBundle.getMedication().getMedicationName()).thenReturn("Schmerzmittel");
+    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     when(prescriptionBundle.getTask()).thenReturn(task);
-    when(kbvBundle.getMedication()).thenReturn(medication);
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
-    when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.isMultiple()).thenReturn(false);
-    when(kbvBundle.isMultiple()).thenReturn(false);
+    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
     val taskGetResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())

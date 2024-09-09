@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,6 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
   private final List<ByteArrayMutator> signedBundleMutators;
   @Nullable private ByteArrayOutputStream signatureObserver;
 
-  public ActivatePrescription setSignatureObserver(ByteArrayOutputStream signatureObserver) {
-    this.signatureObserver = signatureObserver;
-    return this;
-  }
-
   public static Builder forGiven(ErpInteraction<ErxTask> interaction) {
     return forGiven(interaction.getExpectedResponse());
   }
@@ -64,6 +59,11 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
     return new Builder(taskId);
   }
 
+  public ActivatePrescription setSignatureObserver(ByteArrayOutputStream signatureObserver) {
+    this.signatureObserver = signatureObserver;
+    return this;
+  }
+
   @SneakyThrows
   @Override
   @Step("{0} aktiviert Task #taskId mit #accessCode und #kbvBundle")
@@ -71,7 +71,7 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val konnektor = SafeAbility.getAbility(actor, UseTheKonnektor.class);
 
-    var encodedKbv = erpClient.encode(kbvBundle, erpClient.getSendMime().toFhirEncoding());
+    var encodedKbv = this.encode(actor, kbvBundle, erpClient.getSendMime().toFhirEncoding());
     for (val fuzzingStep : stringBundleMutators) {
       encodedKbv = fuzzingStep.apply(encodedKbv);
     }

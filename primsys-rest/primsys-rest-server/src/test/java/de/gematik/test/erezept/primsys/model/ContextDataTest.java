@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
+import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
+import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +41,7 @@ class ContextDataTest {
 
   @BeforeAll
   static void setup() {
-    String oneToZero = "1234567890";
+    val oneToZero = "1234567890";
 
     contextData = new ContextData();
 
@@ -48,6 +50,7 @@ class ContextDataTest {
             .prescriptionId(oneToZero)
             .accessCode(oneToZero)
             .taskId(oneToZero)
+            .patient(PatientDto.withKvnr("X110407071").build())
             .build();
 
     prescriptionData2 =
@@ -55,26 +58,31 @@ class ContextDataTest {
             .prescriptionId(oneToZero)
             .accessCode(oneToZero)
             .taskId("testID")
+            .patient(PatientDto.withKvnr("X110407071").build())
             .build();
 
     acceptData = new AcceptedPrescriptionDto();
+    acceptData.setForKvnr("X110407071");
     acceptData.setPrescriptionId(oneToZero);
     acceptData.setSecret(oneToZero);
 
     acceptData2 = new AcceptedPrescriptionDto();
+    acceptData2.setForKvnr("X110407071");
     acceptData2.setPrescriptionId("testID");
     acceptData2.setSecret("testID");
 
     dispensedData = new DispensedMedicationDto();
+    dispensedData.setAcceptData(acceptData);
     dispensedData.setDispensedDate(GemFaker.fakerBirthday());
     dispensedData2 = new DispensedMedicationDto();
+    dispensedData2.setAcceptData(acceptData2);
     dispensedData2.setDispensedDate(GemFaker.fakerBirthday());
   }
 
   @Test
   void addPrescription() {
     contextData.addPrescription(prescriptionData);
-    assertTrue(contextData.getPrescriptions().contains(prescriptionData));
+    assertTrue(contextData.getReadyPrescriptions().contains(prescriptionData));
   }
 
   @Test
@@ -82,7 +90,7 @@ class ContextDataTest {
     for (int i = 0; i < ContextData.MAX_QUEUE_LENGTH; i++) {
       contextData.addPrescription(prescriptionData);
     }
-    assertEquals(ContextData.MAX_QUEUE_LENGTH, contextData.getPrescriptions().size());
+    assertEquals(ContextData.MAX_QUEUE_LENGTH, contextData.getReadyPrescriptions().size());
   }
 
   @Test
@@ -91,14 +99,28 @@ class ContextDataTest {
       contextData.addPrescription(prescriptionData);
     }
     contextData.addPrescription(prescriptionData2);
-    assertEquals(ContextData.MAX_QUEUE_LENGTH, contextData.getPrescriptions().size());
-    assertTrue(contextData.getPrescriptions().contains(prescriptionData2));
+    assertEquals(ContextData.MAX_QUEUE_LENGTH, contextData.getReadyPrescriptions().size());
+    assertTrue(contextData.getReadyPrescriptions().contains(prescriptionData2));
   }
 
   @Test
   void addAcceptedPrescription() {
     contextData.addAcceptedPrescription(acceptData);
     assertTrue(contextData.getAcceptedPrescriptions().contains(acceptData));
+  }
+
+  @Test
+  void shouldFilterReadyPrescriptionsByKvnr() {
+    contextData.addPrescription(prescriptionData);
+    val ready = contextData.getReadyPrescriptionsByKvnr(prescriptionData.getPatient().getKvnr());
+    assertFalse(ready.isEmpty());
+  }
+
+  @Test
+  void shouldFilterAcceptedPrescriptionsByKvnr() {
+    contextData.addAcceptedPrescription(acceptData);
+    val accepted = contextData.getAcceptedPrescriptionsByKvnr(acceptData.getForKvnr());
+    assertFalse(accepted.isEmpty());
   }
 
   @Test
@@ -123,6 +145,14 @@ class ContextDataTest {
   void addDispensedMedications() {
     contextData.addDispensedMedications(dispensedData);
     assertTrue(contextData.getDispensedMedications().contains(dispensedData));
+  }
+
+  @Test
+  void shouldFilterDispensedPrescriptionsByKvnr() {
+    contextData.addDispensedMedications(dispensedData);
+    val dispensed =
+        contextData.getDispensedPrescriptionsByKvnr(dispensedData.getAcceptData().getForKvnr());
+    assertFalse(dispensed.isEmpty());
   }
 
   @Test

@@ -55,8 +55,8 @@ import org.junit.runner.RunWith;
 public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
 
   /**
-   * Die Validierungsregeln besagen: Arztnummer: 1.-6. Stelle, Prüfziffer: 7.Stelle,
-   * Fachgruppennummer: 8.-9.Stelle "Die Prüfziffer wird mittels des Modulo 10-Verfahrens der
+   * Die Validierungsregeln besagen: Arztnummer: 1.-6. Stelle, Prüfziffer: 7. Stelle,
+   * Fachgruppennummer: 8.-9. Stelle "Die Prüfziffer wird mittels des Modulo 10-Verfahrens der
    * Stellen 1-6 der Arztnummer ermittelt. Bei diesem Verfahren werden die Ziffern 1-6 von links
    * nach rechts abwechselnd mit 4 und 9 multipliziert. Die Summe dieser Produkte wird Modulo 10
    * berechnet. Die Prüfziffer ergibt sich aus der Differenz dieser Zahl zu 10 (ist die Differenz
@@ -124,18 +124,15 @@ public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
     AccidentExtension accident = null;
     if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
-    val medicationRequest =
-        MedicationRequestFaker.builder(patient.getPatientData())
-            .withInsurance(patient.getInsuranceCoverage())
-            .withRequester(doctorActor.getPractitioner())
-            .withAccident(accident)
-            .withMedication(medication)
-            .fake();
+
     val kbvBundleBuilder =
-        KbvErpBundleBuilder.faker(patient.getKvnr())
-            .practitioner(doctorActor.getPractitioner())
-            .medicationRequest(medicationRequest) // what is the medication
-            .medication(medication);
+        KbvErpBundleFaker.builder()
+            .withKvnr(patient.getKvnr())
+            .withPractitioner(doctorActor.getPractitioner())
+            .withMedication(medication)
+            .withInsurance(patient.getInsuranceCoverage(), patient.getPatientData())
+            .withAccident(accident)
+            .toBuilder();
     return IssuePrescription.forPatient(patient)
         .ofAssignmentKind(assignmentKind)
         .withResourceManipulator(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package de.gematik.test.erezept.screenplay.task;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskById;
-import de.gematik.test.erezept.screenplay.strategy.ActorRole;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
@@ -27,21 +26,19 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
 public class GetPrescriptionById implements Task {
-  private final ActorRole role;
   private final DequeStrategy deque;
 
-  public GetPrescriptionById(ActorRole role, DequeStrategy deque) {
-    this.role = role;
+  public GetPrescriptionById(DequeStrategy deque) {
     this.deque = deque;
   }
 
   public static GetPrescriptionById asPharmacy(String deque) {
-    return new GetPrescriptionById(ActorRole.PHARMACY, DequeStrategy.fromString(deque));
+    return new GetPrescriptionById(DequeStrategy.fromString(deque));
   }
 
   @Override
   public <T extends Actor> void performAs(T actor) {
-    val acceptBundleResp = actor.asksFor(ResponseOfGetTaskById.withActorRole(role, deque));
+    val acceptBundleResp = actor.asksFor(ResponseOfGetTaskById.asPharmacy(deque));
     val erxAcceptBundle = acceptBundleResp.getExpectedResource();
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
 

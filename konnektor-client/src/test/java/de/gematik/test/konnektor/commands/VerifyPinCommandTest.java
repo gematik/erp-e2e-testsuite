@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,29 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.konnektor.*;
-import de.gematik.test.konnektor.soap.*;
-import de.gematik.test.smartcard.*;
-import de.gematik.ws.conn.cardservicecommon.v2.*;
-import de.gematik.ws.conn.connectorcontext.v2.*;
-import java.math.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.bbriccs.smartcards.Hba;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.konnektor.PinType;
+import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
+import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
+import de.gematik.ws.conn.connectorcontext.v2.ContextType;
+import java.math.BigInteger;
+import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class VerifyPinCommandTest {
 
   private static ContextType ctx;
-  private static SmartcardArchive smartCardArchive;
   private static Hba hba;
   private static MockKonnektorServiceProvider mockKonnektor;
 
   @BeforeAll
   static void setUp() {
-    smartCardArchive = SmartcardFactory.getArchive();
+    val smartCardArchive = SmartcardArchive.fromResources();
     hba = smartCardArchive.getHbaByICCSN("80276883110000095767");
 
     mockKonnektor = new MockKonnektorServiceProvider(smartCardArchive);

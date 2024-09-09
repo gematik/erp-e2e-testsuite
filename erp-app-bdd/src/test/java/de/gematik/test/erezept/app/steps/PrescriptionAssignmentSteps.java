@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,33 @@
 
 package de.gematik.test.erezept.app.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.junit.Assert.*;
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
+import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import de.gematik.test.erezept.app.questions.*;
+import de.gematik.test.erezept.app.questions.IsIssued;
+import de.gematik.test.erezept.app.questions.ListRedeemedPrescriptions;
+import de.gematik.test.erezept.app.questions.RedeemedPrescription;
+import de.gematik.test.erezept.app.questions.StatusAndValidity;
+import de.gematik.test.erezept.app.questions.TheLastPrescriptionInTheMainScreen;
+import de.gematik.test.erezept.app.questions.TheTaskId;
 import de.gematik.test.erezept.app.task.DeleteBatchArchivedPrescription;
 import de.gematik.test.erezept.app.task.DeleteBatchRedeemablePrescriptions;
 import de.gematik.test.erezept.app.task.DeleteRedeemedPrescription;
-import de.gematik.test.erezept.app.task.NavigateThroughRedeemablePrescriptions;
+import de.gematik.test.erezept.app.task.ios.AssignPrescriptionToPharmacyOnIos;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import io.cucumber.java.PendingException;
-import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.ensure.*;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
 @Slf4j
 public class PrescriptionAssignmentSteps {
-
-  @Angenommen(
-      "der Versicherte {string} löst das E-Rezept {string} per Reservierung bei der Apotheke"
-          + " {string} ein")
-  public void derUserLöstDasERezeptPerReservierungBeiDerEin(
-      String user, String eRezep, String pharmacy) {
-    val theAppUser = OnStage.theActorCalled(user);
-    val thePharmacyActor = OnStage.theActorCalled(pharmacy);
-    givenThat(theAppUser)
-        .attemptsTo(NavigateThroughRedeemablePrescriptions.redeemTo(thePharmacyActor));
-  }
 
   @Dann(
       "kann der Versicherte {string} den Status {string} und das Gültigkeitsdatum {string} des"
@@ -73,44 +67,24 @@ public class PrescriptionAssignmentSteps {
                 .matches(expectedTaskId.getValue()));
   }
 
-  @Und("das E-Rezept {string} kann nicht gelöscht werden")
-  public void dasERezeptKannNichtGelöschtWerden(String eRezep) {
-    val theAppUser = OnStage.theActorInTheSpotlight();
-    then(theAppUser)
-        .attemptsTo(Ensure.that(ThePrescriptionInRedemption.canNotBeDeleted(eRezep)).isTrue());
-  }
+  @Wenn(
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept in der App der Apotheke"
+          + " (.+) per Nachricht zuweist")
+  public void whenAssignPrescriptionViaDispReq(String userName, String order, String pharmacyName) {
+    val theAppUser = OnStage.theActorCalled(userName);
+    val thePharmacy = OnStage.theActorCalled(pharmacyName);
 
-  @Und("das E-Rezept {string} kann nicht eingelöst werden")
-  public void dasERezeptKannNichtEingelöstWerden(String eRezep) {
-    val theAppUser = OnStage.theActorInTheSpotlight();
+    // TODO: remove me later, this is just for debugging!
+    // 160.000.006.629.699.34 / 9de30f5c71eb0ea387251f628b8fd6f6fa2e5b8b2a675437c26f0eb77ad8ae0c
+    //        thePharmacy.can(ProvideApoVzdInformation.withName("Apotheke am FlughafenTEST-ONLY"));
+    //        thePharmacy.can(ManageCommunications.heExchanges());
+    //        theAppUser.abilityTo(ManageDataMatrixCodes.class).appendDmc(
+    //            DmcPrescription.ownerDmc(TaskId.from("160.000.006.629.697.40"),
+    // AccessCode.fromString(
+    //                "beede44bded27aa8e6fff8540ae1a86be7a25a789a36640b80541513a9390131")));
 
-    if (!theAppUser.asksFor(IsRedeemable.inMainScreen())) {
-      log.info("redeem button not present in the main screen");
-    } else {
-      throw new PendingException("accesibilityIds not implemented in cose yet");
-    }
-  }
-
-  @Deprecated
-  @Dann("ist das E-Rezept {string} nicht mehr in den Aktuellen Rezepten des Versicherte {string}")
-  public void istDasERezeptNichtMehrInDenAktuellenRezeptenDesVersicherte(
-      String receipt, String user) {
-    val theAppUser = OnStage.theActorCalled(user);
-    val expectedTaskId =
-        SafeAbility.getAbility(theAppUser, ManageDataMatrixCodes.class).getLastDmc().getTaskId();
-
-    then(theAppUser).asksFor(TheLastPrescriptionInTheMainScreen.waitTillIsGone());
-    if (then(theAppUser).asksFor(PrescriptionList.isThereElements()))
-      then(theAppUser)
-          .attemptsTo(
-              Ensure.that(TheTaskId.ofTheLastPrescriptionInTheMainScreen())
-                  .doesNotContain(expectedTaskId.getValue()));
-  }
-
-  @Deprecated
-  @Dann("kann die Versicherte {string} das letzte entfernte E-Rezept nicht mehr abrufen")
-  public void istDasERezeptInDenAktuellenRezeptenDesVersicherteNichtMehrAnrufen(String user) {
-    istDasERezeptNichtMehrInDenAktuellenRezeptenDesVersicherte(null, user);
+    when(theAppUser)
+        .attemptsTo(AssignPrescriptionToPharmacyOnIos.fromStack(order).toPharmacy(thePharmacy));
   }
 
   @Und("das E-Rezept {string} hat den Status {string}")

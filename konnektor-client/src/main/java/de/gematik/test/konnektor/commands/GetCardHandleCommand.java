@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,16 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.cardterminal.*;
-import de.gematik.test.konnektor.exceptions.*;
-import de.gematik.test.konnektor.soap.*;
-import de.gematik.test.smartcard.*;
-import de.gematik.ws.conn.connectorcontext.v2.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import de.gematik.bbriccs.smartcards.Smartcard;
+import de.gematik.test.cardterminal.CardInfo;
+import de.gematik.test.konnektor.exceptions.SmartcardMissmatchException;
+import de.gematik.test.konnektor.soap.ServicePortProvider;
+import de.gematik.ws.conn.connectorcontext.v2.ContextType;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 public class GetCardHandleCommand extends AbstractKonnektorCommand<CardInfo> {

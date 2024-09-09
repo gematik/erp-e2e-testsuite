@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,14 @@ import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.exceptions.MissingAnnotationException;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.thucydides.core.steps.StepEventBus;
-import org.json.JSONObject;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
@@ -58,7 +52,6 @@ public class ErpTestExtension
     log.info(format("# Start Testcase {0} / {1} #", id, context.getDisplayName()));
 
     CoverageReporter.getInstance().startTestcase(id);
-    StepEventBus.getEventBus().enableSoftAsserts();
   }
 
   @Override
@@ -81,46 +74,23 @@ public class ErpTestExtension
   @SneakyThrows
   @SuppressWarnings({"java:S6300"}) // writing to File by intention; not an issue!
   public void afterAll(ExtensionContext extensionContext) {
-    val coverageAsJson = CoverageReporter.getInstance().serializeReport();
+    val reporter = CoverageReporter.getInstance();
 
     val outDirPath = Path.of("target", "site", "serenity", "coverage");
     val rawJsonOutput = Path.of(outDirPath.toString(), "coverage_report.json");
-    val jsOutput = Path.of(outDirPath.toString(), "coverage.js");
 
     // make sure previous report data is deleted even if mvn clean was not executed!
     rawJsonOutput.toFile().delete();
-    jsOutput.toFile().delete();
     outDirPath.toFile().delete();
     if (outDirPath.toFile().mkdirs()) {
       try (val fw = new FileWriter(rawJsonOutput.toFile())) {
-        fw.write(coverageAsJson.toString(4));
+        reporter.writeToFile(fw);
       }
-      writeToJavaScript(coverageAsJson, jsOutput);
     } else {
       throw new IOException(format("Unable to write File {0} ", rawJsonOutput));
     }
 
     StopwatchProvider.close();
-  }
-
-  @SneakyThrows
-  @SuppressWarnings({"java:S6300"}) // writing to File by intention; not an issue!
-  private void writeToJavaScript(JSONObject coverage, Path jsOutput) {
-    val templateStream =
-        Objects.requireNonNull(
-            ErpTestExtension.class.getClassLoader().getResourceAsStream("coverage.js"));
-    try (val reader = new BufferedReader(new InputStreamReader(templateStream))) {
-      val script =
-          reader
-              .lines()
-              .collect(Collectors.joining("\n"))
-              .replace(
-                  "const rawCoverageData = {}", format("const rawCoverageData = {0}", coverage));
-
-      try (val fw = new FileWriter(jsOutput.toFile())) {
-        fw.write(script);
-      }
-    }
   }
 
   private Store getStore(ExtensionContext context) {

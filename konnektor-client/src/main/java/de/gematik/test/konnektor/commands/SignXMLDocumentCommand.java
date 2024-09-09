@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package de.gematik.test.konnektor.commands;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.konnektor.commands.options.SignDocumentOptions;
 import de.gematik.test.konnektor.exceptions.SOAPRequestException;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.test.smartcard.Algorithm;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7.ObjectFactory;
 import de.gematik.ws.conn.signatureservice.v7.SignRequest;
@@ -40,18 +40,30 @@ public class SignXMLDocumentCommand extends AbstractKonnektorCommand<byte[]> {
   private final SignRequest signRequest;
   private final SignDocumentOptions options;
 
-  public SignXMLDocumentCommand(CardInfo cardInfo, String content, Algorithm algorithm) {
+  public SignXMLDocumentCommand(CardInfo cardInfo, String content, CryptoSystem algorithm) {
+    this(cardInfo, content, algorithm, false);
+  }
+
+  public SignXMLDocumentCommand(
+      CardInfo cardInfo, String content, CryptoSystem algorithm, boolean isIncludeRevocationInfo) {
     this(
         cardInfo,
         content.getBytes(StandardCharsets.UTF_8),
-        SignDocumentOptions.withAlgorithm(algorithm));
+        SignDocumentOptions.withAlgorithm(algorithm),
+        isIncludeRevocationInfo);
   }
 
-  public SignXMLDocumentCommand(CardInfo cardInfo, byte[] content, SignDocumentOptions options) {
+  private SignXMLDocumentCommand(
+      CardInfo cardInfo,
+      byte[] content,
+      SignDocumentOptions options,
+      boolean isIncludeRevocationInfo) {
     val factory = new ObjectFactory();
     this.options = options;
     this.cardInfo = cardInfo;
     this.signRequest = factory.createSignRequest();
+    this.signRequest.setIncludeRevocationInfo(isIncludeRevocationInfo);
+
     val doctype = factory.createDocumentType();
     doctype.setID("CMS-Doc1"); // what about this one?
     doctype.setShortText("a CMSDocument2Sign");

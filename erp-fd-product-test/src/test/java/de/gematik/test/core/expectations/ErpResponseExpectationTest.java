@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.core.expectations;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,20 +26,18 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.extensions.ErpTestExtension;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import java.util.Map;
 import lombok.val;
+import net.thucydides.core.steps.StepEventBus;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(ErpTestExtension.class)
-// @RunWith(SerenityRunner.class)
-// @ExtendWith(SerenityJUnit5Extension.class)
 class ErpResponseExpectationTest {
 
   @Test
@@ -46,10 +45,10 @@ class ErpResponseExpectationTest {
   @DisplayName("Positive Unit Test for an Expectation")
   void shouldPassExpectation() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -65,10 +64,10 @@ class ErpResponseExpectationTest {
   @DisplayName("Negative Unit Test for an Expectation")
   void shouldFailExpectation() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -78,6 +77,7 @@ class ErpResponseExpectationTest {
             .andResponse(payloadIsNotOfType(OperationOutcome.class, ErpAfos.A_19230))
             .andResponse(payloadIsOfType(KbvErpBundle.class, ErpAfos.A_19230));
 
+    StepEventBus.getParallelEventBus().disableSoftAsserts();
     assertThrows(AssertionError.class, expectation::ensure);
   }
 
@@ -86,10 +86,10 @@ class ErpResponseExpectationTest {
   @DisplayName("Expectation contains Requirements in toString")
   void shouldHaveRequirements() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -106,10 +106,10 @@ class ErpResponseExpectationTest {
   @DisplayName("Expectation contains no Requirements in toString if no given")
   void shouldNotHaveRequirements() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val expectation = ErpResponseExpectation.expectFor(response, KbvErpBundle.class);
 
@@ -122,10 +122,10 @@ class ErpResponseExpectationTest {
   @DisplayName("Expectation contains no Requirements in toString if only custom requirements given")
   void shouldNotHaveCustomRequirements() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, KbvErpBundle.class)
@@ -143,14 +143,15 @@ class ErpResponseExpectationTest {
           + " geprüft")
   void shouldThrowOnUnexpectedPayloadWithoutExplicitVerification() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleBuilder.faker().build(), KbvErpBundle.class)
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val expectation =
         ErpResponseExpectation.expectFor(response, ErxTask.class).responseWith(returnCodeIs(200));
 
+    StepEventBus.getParallelEventBus().disableSoftAsserts();
     assertThrows(AssertionError.class, expectation::ensure);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
@@ -58,7 +58,7 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
   @Test
   void shouldGenerateResponseByEvidence() {
     val content =
-        ResourceUtils.readFileFromResource(
+        ResourceLoader.readFileFromResource(
             "fhir/valid/erp/1.2.0/taskbundle/289c56b8-e4de-4da8-8f87-dd55b37dd4ae.xml");
     val pharmacy = ActorContext.getInstance().getPharmacies().get(0);
     val mockErpClient = pharmacy.getClient();
@@ -66,7 +66,7 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
     val erpResponse = buildResponse(content);
     erpResponse
         .getResourceOptional()
-        .get()
+        .orElseThrow()
         .getTasks()
         .get(0)
         .getFor()
@@ -104,6 +104,6 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
     val pharmacy = ctx.getPharmacies().get(0);
     val response = new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionByKvnr(kvnr);
     assertEquals(400, response.getStatus());
-    assertEquals("not jet implemented", response.getEntity().toString());
+    assertEquals("not yet implemented", response.getEntity().toString());
   }
 }

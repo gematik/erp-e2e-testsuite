@@ -49,13 +49,14 @@ actors:
 
 environments:
   - name: LOCAL
-    tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
     ti:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
       fdBaseUrl: http://127.0.0.1:3000
       subscriptionServiceUrl: wss://127.0.0.1:3000/subscription
       userAgent: eRp-Testsuite
     internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
       fdBaseUrl: http://127.0.0.1:3000
       xapiKey: refimpldoesnotcheckanyways==

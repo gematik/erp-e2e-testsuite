@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,70 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.extensions.kbv.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import lombok.val;
+import org.hl7.fhir.r4.model.MedicationRequest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class KbvErpMedicationRequestBuilderTest extends ParsingTest {
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build KBV MedicationRequest with Accident in versions KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationRequestWithoutDosageInstruction(KbvItaErpVersion version) {
+    val medicationRequest =
+        MedicationRequestBuilder.forPatient(PatientFaker.builder().fake())
+            .version(version)
+            .insurance(KbvCoverageFaker.builder().fake())
+            .requester(PractitionerFaker.builder().fake())
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .quantityPackages(20)
+            .status("active") // default ACTIVE
+            .intent("order") // default ORDER
+            .isBVG(false) // Bundesversorgungsgesetz default true
+            .hasEmergencyServiceFee(true) // default false
+            .substitution(false) // default true
+            .coPaymentStatus(StatusCoPayment.STATUS_0) // default StatusCoPayment.STATUS_0
+            .build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
+    assertTrue(result.isSuccessful());
+
+    val dosage = medicationRequest.getDosageInstructionFirstRep();
+    assertFalse(dosage.hasText());
+    assertFalse(medicationRequest.hasNote());
+  }
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build KBV MedicationRequest with Accident in versions KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationRequestAndSkipEmptyDosageInstruction(KbvItaErpVersion version) {
+    val medicationRequest = MedicationRequestBuilder.faker().version(version).dosage("").build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
+    assertTrue(result.isSuccessful());
+
+    val dosage = medicationRequest.getDosageInstructionFirstRep();
+    assertFalse(dosage.hasText());
+    val dosageExtension =
+        dosage.getExtensionByUrl(KbvItaErpStructDef.DOSAGE_FLAG.getCanonicalUrl());
+    val hasDosageInstruction = dosageExtension.getValue().castToBoolean(dosageExtension.getValue());
+    assertFalse(hasDosageInstruction.booleanValue());
+  }
 
   @ParameterizedTest(
       name =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,22 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Binary;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.ChargeItem;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 
 public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemBuilder> {
 
@@ -207,7 +218,8 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
       containedDavBundle
           .getMeta()
           .addProfile(
-              ErpWorkflowStructDef.BINARY_12.getVersionedUrl(ErpWorkflowVersion.V1_2_0, true));
+              ErpWorkflowStructDef.BINARY_12.getVersionedUrl(
+                  ErpWorkflowVersion.getDefaultVersion(), true));
 
       val kvnrIdentifier = kvnr.asIdentifier(DeBasisNamingSystem.KVID_PKV);
       kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
@@ -261,6 +273,7 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
     }
   }
 
+  @Deprecated(forRemoval = true)
   public static ErxChargeItemBuilder faker(PrescriptionId prescriptionId) {
     val b = forPrescription(prescriptionId);
     b.subject(de.gematik.test.erezept.fhir.values.KVNR.random(), GemFaker.insuranceName())

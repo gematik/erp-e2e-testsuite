@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,11 @@
 
 package de.gematik.test.cardterminal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.konnektor.util.CardsUtil;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import lombok.val;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +44,6 @@ class CardTerminalTest {
     val ct1 = new CardTerminal("CT1");
     ct1.addCard(
         CardInfo.fromCardInfoType(CardsUtil.builder().type(CardTypeType.EGK).slot(1).build()));
-    Assertions.assertDoesNotThrow(ct1::resetSlots);
+    assertDoesNotThrow(ct1::resetSlots);
   }
 }

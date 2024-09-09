@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmChecksum;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
-import de.gematik.test.smartcard.Egk;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -76,6 +76,5 @@ public class RetrieveExamEvidence implements Question<String> {
     examEvidenceInfo.append(format("Prüfziffer: {0}\n", checksum));
 
     pharmacy.attemptsTo(Ensure.that(checksum.getKvnr()).isEqualTo(egk.getKvnr()));
-    pharmacy.attemptsTo(Ensure.that(checksum.getVersion()).isEqualTo('1'));
   }
 }

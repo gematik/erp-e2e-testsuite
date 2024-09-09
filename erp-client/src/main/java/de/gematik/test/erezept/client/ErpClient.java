@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.client;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.idp.client.IdpClient;
 import de.gematik.idp.client.IdpClientRuntimeException;
 import de.gematik.idp.client.IdpTokenResult;
@@ -31,7 +32,6 @@ import de.gematik.test.erezept.client.vau.InnerHttp;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.smartcard.Smartcard;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;

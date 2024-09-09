@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.lei.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static net.serenitybdd.screenplay.ensure.Ensure.*;
 
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.task.*;
@@ -181,6 +182,23 @@ public class PatientSteps {
                     MedicationDispenseContains.forThePatient()
                         .andPrescription(order)
                         .numberOfMedicationDispenses(amount))
+                .isTrue());
+  }
+
+  @Und(
+      "^(?:der|die) Versicherte (.+) kann im FdV einsehen, dass ihr (erstes|letztes) E-Rezept "
+          + "von der Apotheke (.+) abgegeben wurde$")
+  public void thePatientChecksDispenseInformationInFdV(
+      String patientName, String order, String pharmacyName) {
+    val thePharmacy = OnStage.theActorCalled(pharmacyName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    and(thePatient)
+        .attemptsTo(
+            Ensure.that(
+                    CheckDispenseStatusAsPatient.forThePatient()
+                        .andPrescription(order)
+                        .byPharmacy(thePharmacy)
+                        .build())
                 .isTrue());
   }
 }

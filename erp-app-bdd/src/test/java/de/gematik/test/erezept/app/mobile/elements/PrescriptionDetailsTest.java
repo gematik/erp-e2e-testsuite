@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ class PrescriptionDetailsTest {
     assertEquals(
         element.getIosLocator().get(),
         By.xpath(
-            "(//XCUIElementTypeAlert[@name='Das Rezept ist gerade in Bearbeitung durch eine"
-                + " Apotheke und kann nicht gelöscht werden.'])"));
+            "(//XCUIElementTypeAlert[@name='Dieses Rezept wird im Rahmen einer Behandlung für Sie"
+                + " eingelöst und kann währenddessen nicht gelöscht werden.'])"));
     assertNull(element.getAndroidLocator().get());
   }
 
@@ -53,7 +53,9 @@ class PrescriptionDetailsTest {
     val element = PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM;
     assertTrue(element.getFullName().contains("Delete Prescription button"));
     assertTrue(element.name().toLowerCase().contains("button"));
-    assertEquals(element.getIosLocator().get(), AppiumBy.xpath("//*[@label='Löschen']"));
+    assertEquals(
+        element.getIosLocator().get(),
+        AppiumBy.accessibilityId("prsc_dtl_toolbar_menu_btn_delete"));
     assertNull(element.getAndroidLocator().get());
   }
 
@@ -62,9 +64,7 @@ class PrescriptionDetailsTest {
     val element = PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON;
     assertTrue(element.getFullName().contains("Delete Prescription button"));
     assertTrue(element.name().toLowerCase().contains("button"));
-    assertEquals(
-        element.getIosLocator().get(),
-        AppiumBy.xpath("//*[@name='Horizontaler Rollbalken, 1 Seite']"));
+    assertEquals(element.getIosLocator().get(), AppiumBy.name("Horizontaler Rollbalken, 1 Seite"));
     assertNull(element.getAndroidLocator().get());
   }
 
@@ -73,9 +73,7 @@ class PrescriptionDetailsTest {
     val element = PrescriptionDetails.LEAVE_DETAILS_BUTTON;
     assertTrue(element.getFullName().contains("Leave Prescription Details"));
     assertTrue(element.name().toLowerCase().contains("button"));
-    assertEquals(
-        element.getIosLocator().get(),
-        AppiumBy.xpath("(//XCUIElementTypeButton[@name='Rezepte'])[1]"));
+    assertEquals(element.getIosLocator().get(), AppiumBy.name("Rezepte"));
     assertNull(element.getAndroidLocator().get());
   }
 

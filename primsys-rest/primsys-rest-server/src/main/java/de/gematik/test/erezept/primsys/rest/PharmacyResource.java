@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import de.gematik.test.erezept.primsys.model.*;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
+import de.gematik.test.erezept.primsys.rest.params.CommunicationFilterParams;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -75,29 +76,11 @@ public class PharmacyResource {
                     404, format("No Pharmacy found with ID {0}", id)));
   }
 
-  @POST
-  @Path("{pharmaId}/reply")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response replyPrescription(
-      @PathParam("pharmaId") String pharmaId,
-      @QueryParam("taskId") String taskId,
-      @QueryParam("kvnr") String kvnr,
-      @DefaultValue("onPremise") @QueryParam("supplyOption") String supplyOption,
-      String messageBody) {
-    val pharmacy = getPharmacy(pharmaId);
-    log.info(
-        format(
-            "POST/pharm/pharmaId/reply -- Pharmacy {0} will reply Task {1} on KVNR {2}",
-            pharmaId, taskId, kvnr));
-    return ReplyUseCase.replyPrescription(pharmacy, taskId, kvnr, supplyOption, messageBody);
-  }
-
   @DELETE
   @Path("{id}/abort")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response abortPrescriptionAsPharma(
+  public Response abortPrescription(
       @PathParam("id") String id,
       @QueryParam("taskId") String taskId,
       @QueryParam("ac") String accessCode,
@@ -112,7 +95,7 @@ public class PharmacyResource {
   @Path("{id}/close")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response closePrescriptionAsPharmaPKV(
+  public Response closePrescription(
       @PathParam("id") String id,
       @QueryParam("taskId") String taskId,
       @QueryParam("secret") String secret,
@@ -178,5 +161,64 @@ public class PharmacyResource {
     val pharmacy = getPharmacy(id);
     log.info(format("get Prescriptions as Pharmacy: with audit KVNR: {1}", id, kvnr));
     return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionByKvnr(kvnr);
+  }
+
+  @POST
+  @Path("{pharmaId}/replyWithSender")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response replyPrescription(
+      @PathParam("pharmaId") String pharmaId,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("kvnr") String kvnr,
+      @DefaultValue("onPremise") @QueryParam("supplyOption") String supplyOption,
+      @QueryParam("sender") String sender,
+      String messageBody) {
+    val pharmacy = getPharmacy(pharmaId);
+    log.info(
+        format(
+            "POST/pharm/pharmaId/reply -- Pharmacy {0} will reply Task {1} on KVNR {2} with Sender"
+                + " {3}",
+            pharmaId, taskId, kvnr, sender));
+    return ReplyUseCase.replyPrescriptionWithSender(
+        pharmacy, taskId, kvnr, supplyOption, messageBody, sender);
+  }
+
+  @POST
+  @Path("{pharmaId}/reply")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response replyPrescriptionWithoutSender(
+      @PathParam("pharmaId") String pharmaId,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("kvnr") String kvnr,
+      @DefaultValue("onPremise") @QueryParam("supplyOption") String supplyOption,
+      String messageBody) {
+    val pharmacy = getPharmacy(pharmaId);
+    log.info(
+        format(
+            "POST/pharm/pharmaId/reply -- Pharmacy {0} will reply Task {1} on KVNR {2}",
+            pharmaId, taskId, kvnr));
+    return ReplyUseCase.replyPrescription(pharmacy, taskId, kvnr, supplyOption, messageBody);
+  }
+
+  @GET
+  @Path("{pharmId}/communications")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response getCommunications(
+      @PathParam("pharmId") String pharmaId, @BeanParam CommunicationFilterParams params) {
+    val pharmacy = getPharmacy(pharmaId);
+    return new GetCommunicationsUseCase(pharmacy).getCommunications(params);
+  }
+
+  @DELETE
+  @Path("{pharmId}/communication/{communicationId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response deleteCommunication(
+      @PathParam("pharmId") String pharmaId, @PathParam("communicationId") String communicationId) {
+    val pharmacy = getPharmacy(pharmaId);
+    return new DeleteCommunicationUseCase(pharmacy).forId(communicationId);
   }
 }

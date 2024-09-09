@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,25 @@
 
 package de.gematik.test.erezept.actors;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationFaker;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.smartcard.Egk;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.Optional;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @Getter
@@ -64,6 +70,11 @@ public class PatientActor extends ErpActor {
   public void setKvnr(KVNR kvnr) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     bd.setKvnr(kvnr);
+  }
+
+  public void changeDmpKennzeichen(DmpKennzeichen dmpKennzeichen) {
+    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
+    bd.setDmpKennzeichen(dmpKennzeichen);
   }
 
   public Optional<PayorType> getPayorType() {

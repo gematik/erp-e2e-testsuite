@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.erezept.fhir.util;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import org.junit.jupiter.api.Test;
 
 class FhirEntryReplacerTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(FhirEntryReplacer.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(FhirEntryReplacer.class));
   }
 }

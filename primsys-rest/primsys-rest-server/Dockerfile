@@ -44,4 +44,4 @@ HEALTHCHECK CMD curl --fail http://localhost:9095/info || exit 1
 EXPOSE 9095
 
 # for -Djdk.tsl.namedGroups system property see https://github.com/bcgit/bc-java/issues/589
-CMD java -Djdk.tls.namedGroups="secp256r1, secp384r1, ffdhe2048, ffdhe3072" -Djava.net.useSystemProxies=false -jar -Derp.primsys.activeEnvironment=${TI_ENV} app.jar /home/primsys/config.yaml
+CMD java -Djdk.tls.namedGroups="secp256r1,secp384r1,ffdhe2048,ffdhe3072" -Djava.net.useSystemProxies=false -Derp.primsys.activeEnvironment=${TI_ENV} -jar app.jar /home/primsys/config.yaml

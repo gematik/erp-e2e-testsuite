@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.crypto.BC;
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.Hba;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
@@ -34,15 +38,20 @@ import de.gematik.test.konnektor.commands.ReadCardCertificateCommand;
 import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
 import de.gematik.test.konnektor.commands.VerifyDocumentCommand;
 import de.gematik.test.konnektor.exceptions.SOAPRequestException;
-import de.gematik.test.smartcard.Algorithm;
 import de.gematik.ws.conn.cardservice.v8.CardInfoType;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import de.gematik.ws.conn.certificateservicecommon.v2.CertRefEnum;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class RemoteKonnektorTest {
 
@@ -51,6 +60,8 @@ class RemoteKonnektorTest {
   @SneakyThrows
   @BeforeAll
   static void setup() {
+    BC.init();
+
     val templatePath =
         Path.of(RemoteKonnektorTest.class.getClassLoader().getResource("config.yaml").getPath());
     cfg =
@@ -59,41 +70,55 @@ class RemoteKonnektorTest {
             .wrappedBy(KonnektorModuleFactory::fromDto);
   }
 
+  private static Stream<Arguments> provideSigningArguments() {
+    val hbas = SmartcardArchive.fromResources().getHbaCards();
+    val algorithms = Arrays.stream(CryptoSystem.values()).toList();
+    val isIncludeRevocationInfo = List.of(true, false);
+    return hbas.stream()
+        .flatMap(
+            hba ->
+                algorithms.stream()
+                    .flatMap(
+                        algo ->
+                            isIncludeRevocationInfo.stream()
+                                .map(iri -> Arguments.of(hba, algo, iri))));
+  }
+
   @Test
-  @SneakyThrows
-  void shouldPerformSimpleRoundtripOnRemoteKonnektor() {
+  void shouldSignDocument() {
     val konnektor = cfg.createKonnektorClient("Soft-Konn");
 
     // get a cardHandle
     val cardHandle =
-        konnektor.execute(GetCardHandleCommand.forIccsn("80276001081699900579")).getPayload();
+        konnektor.execute(GetCardHandleCommand.forIccsn("80276883110000095767")).getPayload();
+
+    // sign an exemplary XML document
+    val signCmd = new SignXMLDocumentCommand(cardHandle, "<xml>TEST</xml>", CryptoSystem.ECC_256);
+    val signRsp = konnektor.execute(signCmd).getPayload();
+    assertNotNull(signRsp);
+    assertTrue(signRsp.length > 0);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideSigningArguments")
+  @SneakyThrows
+  void shouldPerformSimpleRoundtripOnLocalKonnektor(
+      Hba hba, CryptoSystem algorithm, boolean isIncludeRevocationInfo) {
+
+    val konnektor = cfg.createKonnektorClient("Soft-Konn");
+
+    // get a cardHandle
+    val cardHandle = konnektor.execute(GetCardHandleCommand.forIccsn(hba.getIccsn())).getPayload();
 
     // read the Auth certificate from card
-    val cardAuthCertCmd =
-        new ReadCardCertificateCommand(cardHandle, CertRefEnum.C_AUT, Algorithm.RSA_2048);
+    val cardAuthCertCmd = new ReadCardCertificateCommand(cardHandle, CertRefEnum.C_AUT, algorithm);
     val cardAuthCertificate = konnektor.execute(cardAuthCertCmd).getPayload();
     assertNotNull(cardAuthCertificate);
 
-    // read the Sig certificate from card
-    // NOT YET supported on KonSim
-    //    val cardSigCertCmd = new ReadCardCertificateCommand(cardHandle, CertRefEnum.C_SIG);
-    //    val cardSigCertificate = konnektor.execute(cardSigCertCmd);
-    //    assertNotNull(cardSigCertificate);
-
-    // read the Sig certificate from card
-    // NOT YET supported on KonSim
-    //    val cardEncCertCmd = new ReadCardCertificateCommand(cardHandle, CertRefEnum.C_ENC);
-    //    val cardEncCertificate = konnektor.execute(cardEncCertCmd);
-    //    assertNotNull(cardEncCertificate);
-
-    // read the Sig certificate from card
-    // NOT YET supported on KonSim
-    //    val cardQesCertCmd = new ReadCardCertificateCommand(cardHandle, CertRefEnum.C_QES);
-    //    val cardQesCertificate = konnektor.execute(cardQesCertCmd);
-    //    assertNotNull(cardQesCertificate);
-
     // sign an exemplary XML document
-    val signCmd = new SignXMLDocumentCommand(cardHandle, "<xml>TEST</xml>", Algorithm.RSA_2048);
+    val signCmd =
+        new SignXMLDocumentCommand(
+            cardHandle, "<xml>TEST</xml>", algorithm, isIncludeRevocationInfo);
     val signRsp = konnektor.execute(signCmd).getPayload();
     assertNotNull(signRsp);
     assertTrue(signRsp.length > 0);
@@ -101,42 +126,15 @@ class RemoteKonnektorTest {
     // verify the document from previous step
     val verifyCmd = new VerifyDocumentCommand(signRsp);
     val verifyRsp = konnektor.execute(verifyCmd).getPayload();
-    assertTrue(verifyRsp);
-
-    //    val extAuthCmd = new ExternalAuthenticateCommand(cardHandle);
-    //    val token = konnektor.execute(extAuthCmd);
+    assertTrue(verifyRsp, "Signed Response shall be valid");
   }
 
   @Test
-  void shouldPerformSimpleRoundTripWithMockKonnektor() {
-    // instantiate Soft-Konn
+  void shouldThrowExceptionWhenVerificationContentIsInvalid() {
     val konnektor = cfg.createKonnektorClient("Soft-Konn");
-
-    // get a cardHandle
-    val cardHandle =
-        konnektor.execute(GetCardHandleCommand.forIccsn("80276001081699900579")).getPayload();
-
-    // read the Auth certificate from card
-    val cardAuthCertCmd = new ReadCardCertificateCommand(cardHandle, Algorithm.RSA_2048);
-    val cardAuthCertificate = konnektor.execute(cardAuthCertCmd).getPayload();
-    assertNotNull(cardAuthCertificate);
-
-    // sign an exemplary XML document
-    val signCmd = new SignXMLDocumentCommand(cardHandle, "<xml>TEST</xml>", Algorithm.RSA_2048);
-    val signRsp = konnektor.execute(signCmd).getPayload();
-    assertNotNull(signRsp);
-    assertTrue(signRsp.length > 0);
-
-    val verifyCmd = new VerifyDocumentCommand(signRsp);
-    val verifyRsp = konnektor.execute(verifyCmd).getPayload();
-    assertTrue(verifyRsp, "Signed Response shall be valid");
-
     val verifyInvalidCmd = new VerifyDocumentCommand("not valid".getBytes());
-    val verifyInvalidRsp = konnektor.execute(verifyInvalidCmd).getPayload();
-    assertFalse(verifyInvalidRsp, "Invalid Document shall be invalid");
-
-    //    val extAuthCmd = new ExternalAuthenticateCommand(cardHandle);
-    //    val token = konnektor.execute(extAuthCmd);
+    val verifyRsp = konnektor.execute(verifyInvalidCmd).getPayload();
+    assertFalse(verifyRsp, "Signed Response shall be valid");
   }
 
   @Test

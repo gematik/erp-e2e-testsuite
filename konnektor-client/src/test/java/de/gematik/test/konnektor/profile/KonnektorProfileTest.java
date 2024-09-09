@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package de.gematik.test.konnektor.profile;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class KonnektorProfileTest {
+class KonnektorProfileTest {
 
   @Test
-  public void shouldContainKeywordInPaths() {
+  void shouldContainKeywordInPaths() {
     // Well, does not test much but should raise the coverage slightly
     // different Konnektor-Profiles use quite different endpoints for SOAP services
     val inputs = List.of("KonSim", "SECUNET", "RISE", "CGM");

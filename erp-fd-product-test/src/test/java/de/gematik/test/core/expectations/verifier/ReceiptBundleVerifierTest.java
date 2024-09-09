@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import java.util.Base64;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,14 +45,13 @@ class ReceiptBundleVerifierTest extends ParsingTest {
 
   @Test
   void shouldNotInstantiateUtilityClass() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(ReceiptBundleVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ReceiptBundleVerifier.class));
   }
 
   @Test
   void shouldPassOnValidReceipt() {
     val bundle =
-        parser.decode(ErxReceipt.class, ResourceUtils.readFileFromResource(NEW_RECEIPT_VERSION));
+        parser.decode(ErxReceipt.class, ResourceLoader.readFileFromResource(NEW_RECEIPT_VERSION));
     val step = ReceiptBundleVerifier.entryFullUrlIsUuid();
     step.apply(bundle);
   }
@@ -60,7 +59,8 @@ class ReceiptBundleVerifierTest extends ParsingTest {
   @Test
   void shouldFailOnInvalidReceiptEntryFullUrl() {
     val invalidReceipt =
-        parser.decode(ErxReceipt.class, ResourceUtils.readFileFromResource(INVALID_RECEIPT_BUNDLE));
+        parser.decode(
+            ErxReceipt.class, ResourceLoader.readFileFromResource(INVALID_RECEIPT_BUNDLE));
 
     val step = ReceiptBundleVerifier.entryFullUrlIsUuid();
     assertThrows(AssertionError.class, () -> step.apply(invalidReceipt));
@@ -69,7 +69,8 @@ class ReceiptBundleVerifierTest extends ParsingTest {
   @Test
   void shouldFailOnInvalidReceiptEntryCompAuthorReference() {
     val bundle =
-        parser.decode(ErxReceipt.class, ResourceUtils.readFileFromResource(INVALID_RECEIPT_BUNDLE));
+        parser.decode(
+            ErxReceipt.class, ResourceLoader.readFileFromResource(INVALID_RECEIPT_BUNDLE));
     bundle.getAuthor().setReference("123Test");
     val step = ReceiptBundleVerifier.compAuthorRefIsUuid();
     assertThrows(AssertionError.class, () -> step.apply(bundle));
@@ -78,7 +79,8 @@ class ReceiptBundleVerifierTest extends ParsingTest {
   @Test
   void shouldFailOnInvalidReceiptEntrySignatureRef() {
     val bundle =
-        parser.decode(ErxReceipt.class, ResourceUtils.readFileFromResource(INVALID_RECEIPT_BUNDLE));
+        parser.decode(
+            ErxReceipt.class, ResourceLoader.readFileFromResource(INVALID_RECEIPT_BUNDLE));
     bundle.getSignature().getWho().setReference("123Test");
     val step = ReceiptBundleVerifier.signatureRefIsUuid();
     assertThrows(AssertionError.class, () -> step.apply(bundle));
@@ -87,7 +89,8 @@ class ReceiptBundleVerifierTest extends ParsingTest {
   @Test
   void shouldFailOnInvalidReceiptEntryCompSectionRef() {
     val bundle =
-        parser.decode(ErxReceipt.class, ResourceUtils.readFileFromResource(INVALID_RECEIPT_BUNDLE));
+        parser.decode(
+            ErxReceipt.class, ResourceLoader.readFileFromResource(INVALID_RECEIPT_BUNDLE));
 
     bundle.getQesDigestRefInComposSect().getEntryFirstRep().setReference("123Test");
     val step = ReceiptBundleVerifier.compSectionRefIsUuid();
@@ -98,7 +101,7 @@ class ReceiptBundleVerifierTest extends ParsingTest {
   @Test
   void referenceValidationShouldPassOnValidReceipt() {
     val bundle =
-        parser.decode(ErxReceipt.class, ResourceUtils.readFileFromResource(NEW_RECEIPT_VERSION));
+        parser.decode(ErxReceipt.class, ResourceLoader.readFileFromResource(NEW_RECEIPT_VERSION));
 
     val step = ReceiptBundleVerifier.compAuthorRefIsUuid();
     step.apply(bundle);
@@ -113,7 +116,7 @@ class ReceiptBundleVerifierTest extends ParsingTest {
     val bundle =
         parser.decode(
             ErxReceipt.class,
-            ResourceUtils.readFileFromResource(
+            ResourceLoader.readFileFromResource(
                 "fhir/invalid/erp/1.2.0/receiptbundle/org_fd_response_manipulatedreferencesfullurl.xml"));
     val binary = bundle.getQesDigestBinary();
     val code = binary.getContentElement().getValueAsString();
@@ -130,7 +133,7 @@ class ReceiptBundleVerifierTest extends ParsingTest {
     val erxReceipt =
         parser.decode(
             ErxReceipt.class,
-            ResourceUtils.readFileFromResource(
+            ResourceLoader.readFileFromResource(
                 "fhir/valid/erp/1.2.0/receiptbundle/org_fd_response.xml"));
     val step =
         ReceiptBundleVerifier.compareSignatureHashWith(
@@ -143,7 +146,7 @@ class ReceiptBundleVerifierTest extends ParsingTest {
     val erxReceipt =
         parser.decode(
             ErxReceipt.class,
-            ResourceUtils.readFileFromResource(
+            ResourceLoader.readFileFromResource(
                 "fhir/valid/erp/1.2.0/receiptbundle/NeueVersion_0e0f861-0000-0000-0003-000000000000.xml"));
     val step =
         ReceiptBundleVerifier.compareSignatureHashWith(

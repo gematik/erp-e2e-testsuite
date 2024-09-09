@@ -16,6 +16,10 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleHasValidAccessCode;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
+
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
@@ -23,8 +27,11 @@ import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityRunner;
@@ -33,14 +40,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.runner.RunWith;
-
-import java.util.function.Function;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleHasValidAccessCode;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 
 @Slf4j
 @RunWith(SerenityRunner.class)
@@ -87,11 +86,12 @@ class RandomPrescriptionGenerator extends ErpTest {
               doctor.performs(
                   ActivatePrescription.forGiven(creation)
                       .withKbvBundle(
-                          KbvErpBundleBuilder.faker(sina.getKvnr(), prescriptionId)
-                              .patient(sina.getPatientData())
-                              .insurance(sina.getInsuranceCoverage())
-                              .build()));
-
+                          KbvErpBundleFaker.builder()
+                              .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+                              .withPatient(sina.getPatientData())
+                              .withKvnr(sina.getKvnr())
+                              .withPrescriptionId(prescriptionId)
+                              .fake()));
           doctor.attemptsTo(
               Verify.that(activation)
                   .withExpectedType()
@@ -119,7 +119,7 @@ class RandomPrescriptionGenerator extends ErpTest {
 
           // 5. Step: Task/$close dispenses the prescription and closes the task
           val closeInteraction =
-              flughafen.performs(DispensePrescription.acceptedWith(acceptInteraction));
+              flughafen.performs(ClosePrescription.acceptedWith(acceptInteraction));
           flughafen.attemptsTo(
               Verify.that(closeInteraction)
                   .withExpectedType()

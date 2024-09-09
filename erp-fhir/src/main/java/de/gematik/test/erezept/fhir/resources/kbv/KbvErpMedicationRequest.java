@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,7 @@ import java.util.Date;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Period;
-import org.hl7.fhir.r4.model.Ratio;
-import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @ResourceDef(name = "MedicationRequest")
@@ -61,6 +58,10 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
     return this.getAccident().map(AccidentExtension::workplace);
   }
 
+  public int getDispenseQuantity() {
+    return this.getDispenseRequest().getQuantity().getValue().intValue();
+  }
+
   public Optional<Date> getAccidentDate() {
     return this.getAccident().map(AccidentExtension::accidentDay);
   }
@@ -68,16 +69,14 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
   public Optional<AccidentExtension> getAccident() {
     return this.getExtension().stream()
         .filter(
-            ext ->
-                KbvItaErpStructDef.ACCIDENT.match(ext.getUrl())
-                    || KbvItaForStructDef.ACCIDENT.match(ext.getUrl()))
+            ext -> KbvItaErpStructDef.ACCIDENT.match(ext) || KbvItaForStructDef.ACCIDENT.match(ext))
         .findFirst()
         .map(AccidentExtension::fromExtension);
   }
 
   public boolean isBvg() {
     return this.getExtension().stream()
-        .filter(ext -> KbvItaErpStructDef.BVG.match(ext.getUrl()))
+        .filter(KbvItaErpStructDef.BVG::match)
         .map(ext -> ext.getValue().castToBoolean(ext.getValue()).booleanValue())
         .findFirst()
         .orElse(false);
@@ -85,7 +84,7 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
 
   public boolean hasEmergencyServiceFee() {
     return this.getExtension().stream()
-        .filter(ext -> KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.match(ext.getUrl()))
+        .filter(KbvItaErpStructDef.EMERGENCY_SERVICES_FEE::match)
         .map(ext -> ext.getValue().castToBoolean(ext.getValue()).booleanValue())
         .findFirst()
         .orElse(false);
@@ -98,9 +97,7 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
    */
   public boolean isMultiple() {
     return this.getExtension().stream()
-        .filter(
-            ext ->
-                ext.getUrl().contains(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+        .filter(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION::match)
         .map(ext -> ext.getExtensionByUrl("Kennzeichen"))
         .map(
             kennzeichen ->
@@ -134,9 +131,7 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
       return Optional.empty();
     }
     return this.getExtension().stream()
-        .filter(
-            ext ->
-                ext.getUrl().contains(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+        .filter(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION::match)
         .map(ext -> ext.getExtensionByUrl("Nummerierung"))
         .map(ratio -> ratio.getValue().castToRatio(ratio.getValue()))
         .findFirst();
@@ -158,9 +153,7 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
     }
 
     return this.getExtension().stream()
-        .filter(
-            ext ->
-                ext.getUrl().contains(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl()))
+        .filter(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION::match)
         .map(ext -> ext.getExtensionByUrl("Zeitraum"))
         .map(period -> period.getValue().castToPeriod(period.getValue()))
         .findFirst();
@@ -170,8 +163,8 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
     return this.getExtension().stream()
         .filter(
             ext ->
-                KbvItaForStructDef.STATUS_CO_PAYMENT.match(ext.getUrl())
-                    || KbvItaErpStructDef.STATUS_CO_PAYMENT.match(ext.getUrl()))
+                KbvItaForStructDef.STATUS_CO_PAYMENT.match(ext)
+                    || KbvItaErpStructDef.STATUS_CO_PAYMENT.match(ext))
         .map(ext -> ext.getValue().castToCoding(ext.getValue()))
         .map(coding -> StatusCoPayment.fromCode(coding.getCode()))
         .findFirst();
@@ -184,12 +177,21 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
         .orElse(false);
   }
 
+  public boolean isSubstitutionAllowed() {
+    val allowedType = this.getSubstitution().getAllowedBooleanType();
+    return !allowedType.isEmpty() && allowedType.booleanValue();
+  }
+
   public String getNoteTextOr(String alternative) {
     return getNoteText().orElse(alternative);
   }
 
   public String getNoteTextOrEmpty() {
     return getNoteTextOr("");
+  }
+
+  public String getDosageInstructionAsText() {
+    return this.getDosageInstructionFirstRep().getText();
   }
 
   @Override

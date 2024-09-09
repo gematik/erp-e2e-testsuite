@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ public class ErxMedicationDispenseBundleBuilder
     this.medicationDispenses = medicationDispenses;
   }
 
+  @Deprecated(since = "recently")
   public static ErxMedicationDispenseBundleBuilder faker(
       int amount, KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
     val medicationDispenses = new ArrayList<ErxMedicationDispense>();
@@ -52,7 +53,11 @@ public class ErxMedicationDispenseBundleBuilder
         .forEach(
             idx ->
                 medicationDispenses.add(
-                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseFaker.builder()
+                        .withKvnr(kvnr)
+                        .withPerfomer(performerId)
+                        .withPrescriptionId(prescriptionId)
+                        .fake()));
     return of(medicationDispenses);
   }
 

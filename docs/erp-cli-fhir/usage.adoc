@@ -13,7 +13,7 @@ Docker-Container mit link:https://docs.docker.com/engine/reference/commandline/r
 
 [source,shell]
 ----
-docker run --name ${CONTAINER_NAME} -v ${FULL_HOST_PATH}:/mnt/shared -dt gematik1/erp-cli-fhir
+docker run --name ${CONTAINER_NAME} -v ${FULL_HOST_PATH}:/home/gematik/shared -dt gematik1/erp-cli-fhir
 ----
 
 - `${CONTAINER_NAME}` frei wählbarer Name für den Container mit dem dieser später angesprochen werden kann. Empfohlen und in diesem Manual wird der Name {APP}

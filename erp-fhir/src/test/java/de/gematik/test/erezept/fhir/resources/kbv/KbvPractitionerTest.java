@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 class KbvPractitionerTest extends ParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/kbv/1.0.2/bundle/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.0.2/bundle/";
 
   @Test
   void testEncodingLANRPractitionerFromKbvBundle() {
@@ -42,7 +42,7 @@ class KbvPractitionerTest extends ParsingTest {
     val expQualification = QualificationType.DOCTOR;
     val expAdditionalQualification = "Facharzt für Allgemeinmedizin";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val practitioner = kbvBundle.getPractitioner();
 
@@ -62,7 +62,7 @@ class KbvPractitionerTest extends ParsingTest {
     val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
     val fileName = kbvId + ".xml";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val practitioner = kbvBundle.getPractitioner();
 

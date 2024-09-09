@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,8 +66,8 @@ public class GetPrescriptionsWithPNUseCase {
     log.info(
         format(
             "GetPrescriptionsWithPNUseCase().getPrescriptionByKvnr({0}) was called but is not"
-                + " implemented, jet",
+                + " implemented, yet",
             kvnr));
-    return Response.status(400).entity("not jet implemented").build();
+    return Response.status(400).entity("not yet implemented").build();
   }
 }

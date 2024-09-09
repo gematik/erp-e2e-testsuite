@@ -52,7 +52,6 @@ import org.junit.runner.RunWith;
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Task für ein E-Rezept erstellen")
-
 class TaskCreateUsecase extends ErpTest {
 
     @TestcaseId("ERP_TASK_CREATE_01")

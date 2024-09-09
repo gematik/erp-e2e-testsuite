@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 
 package de.gematik.test.erezept.app;
 
-import io.cucumber.junit.CucumberOptions;
-import net.serenitybdd.cucumber.CucumberWithSerenity;
-import org.junit.runner.RunWith;
+import static io.cucumber.core.options.Constants.GLUE_PROPERTY_NAME;
 
-@RunWith(CucumberWithSerenity.class)
-@CucumberOptions(
-    features = "src/test/resources/features",
-    plugin = {"pretty"},
-    glue = {"de.gematik.test.erezept.app.steps", "de.gematik.test.erezept.lei.steps"})
+import org.junit.platform.suite.api.ConfigurationParameter;
+import org.junit.platform.suite.api.IncludeEngines;
+import org.junit.platform.suite.api.SelectClasspathResource;
+import org.junit.platform.suite.api.Suite;
+
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("/features")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value = "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.app.steps")
 public class CompleteTestSuite {}

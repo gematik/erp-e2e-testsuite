@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,8 @@ public interface ICommunicationType<T extends ProfileVersion<?>> {
     return (ICommunicationType<V>) ret;
   }
 
-  /**
-   * @deprecated will be removed because a communication does not necessarily have a fixed
-   *     StructureDefinition but is dependent on the version
-   * @return the StructureDefinition of the concrete Communication Type
-   */
-  @Deprecated(forRemoval = true, since = "0.3.0")
+  String name();
+
   IStructureDefinition<T> getType();
 
   INamingSystem getRecipientNamingSystem(ErpWorkflowVersion version);

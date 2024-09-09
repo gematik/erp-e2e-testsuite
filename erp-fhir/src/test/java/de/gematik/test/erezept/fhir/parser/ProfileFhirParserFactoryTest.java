@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -28,13 +28,12 @@ class ProfileFhirParserFactoryTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(ProfileFhirParserFactory.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ProfileFhirParserFactory.class));
   }
 
   @Test
   void shouldCreateProfiledParsers() {
     val parsers = ProfileFhirParserFactory.getProfiledValidators();
-    assertEquals(2, parsers.size());
+    assertEquals(3, parsers.size());
   }
 }

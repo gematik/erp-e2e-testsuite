@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
+import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -53,6 +54,17 @@ public class ActorContext {
     this.pharmacies = factory.createPharmacyActors();
 
     contextData = new ContextData();
+  }
+
+  public static void init(PrimSysRestFactory factory) {
+    if (instance == null) {
+      instance = new ActorContext(factory);
+    }
+  }
+
+  public static ActorContext getInstance() {
+    return Optional.ofNullable(instance)
+        .orElseThrow(() -> new ConfigurationException("ActorContext is not initialized"));
   }
 
   public Optional<Doctor> getDoctor(String id) {
@@ -96,11 +108,31 @@ public class ActorContext {
   }
 
   public List<PrescriptionDto> getPrescriptions() {
-    return contextData.getPrescriptions();
+    return contextData.getReadyPrescriptions();
+  }
+
+  public List<PrescriptionDto> getPrescriptions(PrescriptionFilterParams params) {
+    return params
+        .getKvnr()
+        .map(contextData::getReadyPrescriptionsByKvnr)
+        .orElse(contextData.getReadyPrescriptions());
+  }
+
+  public Optional<PrescriptionDto> getPrescription(String prescriptionId) {
+    return this.getPrescriptions().stream()
+        .filter(p -> p.getTaskId().equals(prescriptionId))
+        .findFirst();
   }
 
   public List<AcceptedPrescriptionDto> getAcceptedPrescriptions() {
     return contextData.getAcceptedPrescriptions();
+  }
+
+  public List<AcceptedPrescriptionDto> getAcceptedPrescriptions(PrescriptionFilterParams params) {
+    return params
+        .getKvnr()
+        .map(contextData::getAcceptedPrescriptionsByKvnr)
+        .orElse(contextData.getAcceptedPrescriptions());
   }
 
   public Optional<AcceptedPrescriptionDto> getAcceptedPrescription(String prescriptionId) {
@@ -113,6 +145,13 @@ public class ActorContext {
     return contextData.getDispensedMedications();
   }
 
+  public List<DispensedMedicationDto> getDispensedMedications(PrescriptionFilterParams params) {
+    return params
+        .getKvnr()
+        .map(contextData::getDispensedPrescriptionsByKvnr)
+        .orElse(contextData.getDispensedMedications());
+  }
+
   public Optional<DispensedMedicationDto> getDispensedMedication(String prescriptionId) {
     return this.getDispensedMedications().stream()
         .filter(dd -> dd.getPrescriptionId().equals(prescriptionId))
@@ -121,19 +160,5 @@ public class ActorContext {
 
   public void shutdown() {
     // nothing to be done yet
-  }
-
-  public static void init(PrimSysRestFactory factory) {
-    if (instance == null) {
-      instance = new ActorContext(factory);
-    }
-  }
-
-  public static ActorContext getInstance() {
-    if (instance == null) {
-      throw new ConfigurationException("ActorContext is not initialized");
-    }
-
-    return instance;
   }
 }

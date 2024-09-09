@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class ErxCommunicationBundleTest extends ParsingTest {
   void shouldEncodeSingleCommunicationBundle() {
     val fileName = "CommunicationReplyBundle_01.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val communicationBundle = parser.decode(ErxCommunicationBundle.class, content);
     assertNotNull(communicationBundle, "Valid ErxCommunicationBundle must be parseable");
 

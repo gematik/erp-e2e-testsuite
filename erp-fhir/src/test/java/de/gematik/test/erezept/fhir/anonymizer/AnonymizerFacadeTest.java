@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package de.gematik.test.erezept.fhir.anonymizer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 import lombok.val;
@@ -38,7 +38,7 @@ class AnonymizerFacadeTest extends ParsingTest {
   @ParameterizedTest
   @MethodSource
   void shouldAnonymizeCompleteBundle(String path, AnonymizationType type, MaskingStrategy blacker) {
-    val content = ResourceUtils.readFileFromResource(path);
+    val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
 
     val anonymizer = new AnonymizerFacade(type, blacker);
@@ -82,7 +82,7 @@ class AnonymizerFacadeTest extends ParsingTest {
         "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"
       })
   void shouldAnonymizePatient(String path) {
-    val content = ResourceUtils.readFileFromResource(path);
+    val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
 
     val patient =
@@ -116,7 +116,7 @@ class AnonymizerFacadeTest extends ParsingTest {
         "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"
       })
   void shouldAnonymizeWithoutFamilyNameExtensions(String path) {
-    val content = ResourceUtils.readFileFromResource(path);
+    val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
 
     val patient =
@@ -139,7 +139,7 @@ class AnonymizerFacadeTest extends ParsingTest {
         "fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"
       })
   void shouldAnonymizePractitioner(String path) {
-    val content = ResourceUtils.readFileFromResource(path);
+    val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
 
     val practitioner =

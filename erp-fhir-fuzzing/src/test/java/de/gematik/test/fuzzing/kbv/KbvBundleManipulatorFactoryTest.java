@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import static java.text.MessageFormat.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.parser.*;
 import de.gematik.test.erezept.fhir.testutil.*;
 import java.lang.reflect.*;
 import lombok.*;
@@ -61,7 +60,7 @@ class KbvBundleManipulatorFactoryTest extends ParsingTest {
                 m ->
                     (Executable)
                         () -> {
-                          val kbvBundle = KbvErpBundleBuilder.faker().build();
+                          val kbvBundle = KbvErpBundleFaker.builder().fake();
                           assertDoesNotThrow(() -> m.getParameter().accept(kbvBundle));
                           val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle, DEBUG);
 

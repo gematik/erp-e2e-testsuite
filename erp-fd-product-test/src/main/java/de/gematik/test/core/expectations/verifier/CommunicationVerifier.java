@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.Communication;
 
 @Slf4j
 public class CommunicationVerifier {
@@ -50,20 +51,18 @@ public class CommunicationVerifier {
   }
 
   public static VerificationStep<ErxCommunication> emptyReceivedElement() {
-    Predicate<ErxCommunication> predicate =
-        comunication -> comunication.getReceivedElement().isEmpty();
+    Predicate<ErxCommunication> predicate = communication -> !communication.hasReceived();
     val step =
         new VerificationStep.StepBuilder<ErxCommunication>(
-            ErpAfos.A_19521.getRequirement(), "Der Wert in comunication.received ist leer!");
+            ErpAfos.A_19521.getRequirement(), "Der Wert in communication.received ist leer!");
     return step.predicate(predicate).accept();
   }
 
   public static VerificationStep<ErxCommunication> presentReceivedElement() {
-    Predicate<ErxCommunication> predicate =
-        comunication -> !comunication.getReceivedElement().isEmpty();
+    Predicate<ErxCommunication> predicate = Communication::hasReceived;
     val step =
         new VerificationStep.StepBuilder<ErxCommunication>(
-            ErpAfos.A_19521.getRequirement(), "Der Wert in comunication.received ist vorhanden!");
+            ErpAfos.A_19521.getRequirement(), "Der Wert in communication.received ist vorhanden!");
     return step.predicate(predicate).accept();
   }
 }

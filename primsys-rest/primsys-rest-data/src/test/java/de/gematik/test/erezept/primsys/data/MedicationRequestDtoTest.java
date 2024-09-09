@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -33,5 +34,19 @@ class MedicationRequestDtoTest {
   void shouldReadFromJson(File example) {
     val om = new ObjectMapper();
     assertDoesNotThrow(() -> om.readValue(example, MedicationRequestDto.class));
+  }
+
+  @Test
+  void shouldBuildMedicationRequestDto() {
+    val dtoBuilder =
+        MedicationRequestDto.medicationRequest()
+            .dosage("1-0-0-1")
+            .packageQuantity(1)
+            .note("nur nach dem Essen")
+            .substitutionAllowed(true)
+            .bvg(true)
+            .emergencyFee(false)
+            .mvo(new MvoDto());
+    assertDoesNotThrow(dtoBuilder::build);
   }
 }

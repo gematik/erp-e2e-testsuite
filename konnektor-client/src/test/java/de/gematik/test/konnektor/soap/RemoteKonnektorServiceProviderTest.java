@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.konnektor.soap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.erezept.config.dto.konnektor.BasicAuthConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.TLSConfiguration;
@@ -26,13 +26,13 @@ import de.gematik.test.konnektor.profile.ProfileType;
 import java.net.URL;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class RemoteKonnektorServiceProviderTest {
+class RemoteKonnektorServiceProviderTest {
 
   @Test
   @SneakyThrows
-  public void shouldProvideServices() {
+  void shouldProvideServices() {
     val tlsConfig = new TLSConfiguration();
     tlsConfig.setKeyStore("konsim_mandant1_keystore.p12");
     tlsConfig.setKeyStorePassword("00");

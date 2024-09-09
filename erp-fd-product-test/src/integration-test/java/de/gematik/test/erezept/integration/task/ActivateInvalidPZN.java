@@ -31,11 +31,9 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
@@ -123,7 +121,8 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -150,8 +149,9 @@ public class ActivateInvalidPZN extends ErpTest {
 
     patient.changePatientInsuranceType(insuranceType);
     val medication =
-            KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), GemFaker.fakerName(), "freitext")
-                    .build();
+        KbvErpMedicationCompoundingFaker.builder()
+            .withMedicationIngredient(pzn, fakerDrugName(), "freitext")
+            .fake();
 
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
@@ -178,7 +178,8 @@ public class ActivateInvalidPZN extends ErpTest {
       String detailedText) {
 
     patient.changePatientInsuranceType(insuranceType);
-    val medication = KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
     doc.attemptsTo(
@@ -208,8 +209,9 @@ public class ActivateInvalidPZN extends ErpTest {
     patient.changePatientInsuranceType(insuranceType);
     // @ freetext is a maximum length of 20 digits allowed
     val medication =
-            KbvErpMedicationCompoundingBuilder.faker(PZN.from(pzn), "teurer Schleim", "4 mal täglich")
-                    .build();
+        KbvErpMedicationCompoundingFaker.builder()
+            .withMedicationIngredient(pzn, "teurer Schleim", "4 mal täglich")
+            .fake();
 
     val activation = doc.performs(getIssuePrescription(assignmentKind, doc, medication));
 
@@ -231,18 +233,15 @@ public class ActivateInvalidPZN extends ErpTest {
     AccidentExtension accident = null;
     if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
-    val medicationRequest =
-            MedicationRequestFaker.builder(patient.getPatientData())
-                    .withInsurance(patient.getInsuranceCoverage())
-                    .withRequester(doctorActor.getPractitioner())
-                    .withAccident(accident)
-                    .withMedication(medication)
-                    .fake();
+
     val kbvBundleBuilder =
-        KbvErpBundleBuilder.faker(patient.getKvnr())
-            .practitioner(doctorActor.getPractitioner())
-            .medicationRequest(medicationRequest) // what is the medication
-            .medication(medication);
+        KbvErpBundleFaker.builder()
+            .withKvnr(patient.getKvnr())
+            .withPractitioner(doctorActor.getPractitioner())
+            .withMedication(medication)
+            .withInsurance(patient.getInsuranceCoverage(), patient.getPatientData())
+            .withAccident(accident)
+            .toBuilder();
 
     return IssuePrescription.forPatient(patient)
         .ofAssignmentKind(assignmentKind)

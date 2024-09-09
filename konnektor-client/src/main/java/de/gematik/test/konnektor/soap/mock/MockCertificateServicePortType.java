@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ import de.gematik.ws.conn.certificateservice.wsdl.v6.*;
 import de.gematik.ws.conn.certificateservicecommon.v2.*;
 import de.gematik.ws.conn.connectorcommon.v5.*;
 import de.gematik.ws.conn.connectorcontext.v2.*;
+import jakarta.xml.ws.*;
 import java.security.cert.*;
 import java.util.*;
 import javax.xml.datatype.*;
-import javax.xml.ws.*;
 import lombok.*;
 import org.apache.commons.lang3.*;
 

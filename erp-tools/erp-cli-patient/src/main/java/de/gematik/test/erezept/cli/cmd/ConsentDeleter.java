@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.ConsentDeleteCommand;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
-import de.gematik.test.smartcard.Egk;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import picocli.CommandLine;
@@ -46,7 +46,8 @@ public class ConsentDeleter extends BaseRemoteCommand {
       System.out.println(format("Consent could not be deleted: {0}", message));
     } else {
       System.out.println(
-          format("Consent deleted for {0} ({1})", egk.getOwner().getOwnerName(), egk.getKvnr()));
+          format(
+              "Consent deleted for {0} ({1})", egk.getOwnerData().getOwnerName(), egk.getKvnr()));
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.fuzzing.fhirfuzz.playground;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.fuzzing.fhirfuzz.FuzzMain;
 import lombok.val;
 import org.junit.Ignore;
@@ -50,16 +50,12 @@ class MainFuzzTest {
     val pathToBundle = "fhir/valid/kbv/1.0.2/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml";
     // val pathToBundle2 = "fhir/valid/kbv/1.1.0/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml";
     val path3 = "erp-fhir-fuzzing/target/tmp/test-bundle/erp_bundle_missing_id_01.xml";
-    val stringBundle = readFromFile(pathToBundle);
+    val stringBundle = ResourceLoader.readFileFromResource(pathToBundle);
     // val stringBundle2 = readFromFile(pathToBundle2);
     // val xmlBundle = MainFuzz.main(new String[]{stringBundle, confJson});
     val xmlBundle = FuzzMain.main(new String[] {null, confJson});
     // MainFuzz.main(new String[]{null, null});
     assertTrue(xmlBundle.length() > 10);
-  }
-
-  private String readFromFile(String file) {
-    return ResourceUtils.readFileFromResource(file);
   }
 
   // Method to test single Fuzzer ( + Children) intensively

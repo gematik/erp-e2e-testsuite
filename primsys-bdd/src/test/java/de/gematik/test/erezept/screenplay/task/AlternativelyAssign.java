@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,22 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.test.erezept.crypto.encryption.cms.CmsAuthEnvelopedData;
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.crypto.encryption.cms.CmsAuthEnvelopedData;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.operator.UIProvider;
 import de.gematik.test.erezept.pspwsclient.dataobjects.DeliveryOption;
 import de.gematik.test.erezept.pspwsclient.dataobjects.PharmacyPrescriptionInformation;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UsePspClient;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.Algorithm;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.AccessLevel;
@@ -83,7 +88,8 @@ public class AlternativelyAssign implements Task {
     val cmsAuthEnvelopedData = new CmsAuthEnvelopedData();
     val encryptedBody =
         cmsAuthEnvelopedData.encrypt(
-            List.of(apoSmcb.getSmcB().getEncCertificate(Algorithm.RSA_2048).getX509Certificate()),
+            List.of(
+                apoSmcb.getSmcB().getEncCertificate(CryptoSystem.RSA_2048).getX509Certificate()),
             plainBody);
 
     val req = SerenityRest.given();

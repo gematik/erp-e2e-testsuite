@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class DispensedPrescriptionStrategy extends PharmacyPrescriptionStrategy 
 
   @Override
   public void init(ManagePharmacyPrescriptions prescriptions) {
-    this.receipt = deque.chooseFrom(prescriptions.getDispensedPrescriptions());
+    this.receipt = deque.chooseFrom(prescriptions.getClosedPrescriptions());
   }
 
   @Override

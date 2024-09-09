@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ public class AppiumConfiguration implements INamedConfigurationElement {
   private String url;
   private String accessKey;
   private String version;
+  private String provisioningProfilePostfix;
   private int maxWaitTimeout = 5000; // duration until timeout and finally NoSuchElementException
   private int pollingInterval = 50; // polling interval in milli seconds
 }

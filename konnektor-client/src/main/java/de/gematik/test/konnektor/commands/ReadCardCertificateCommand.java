@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@ package de.gematik.test.konnektor.commands;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.konnektor.exceptions.SOAPRequestException;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
-import de.gematik.test.smartcard.Algorithm;
 import de.gematik.ws.conn.certificateservice.v6.CryptType;
 import de.gematik.ws.conn.certificateservice.v6.ObjectFactory;
 import de.gematik.ws.conn.certificateservicecommon.v2.CertRefEnum;
 import de.gematik.ws.conn.certificateservicecommon.v2.X509DataInfoListType;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
+import jakarta.xml.ws.Holder;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import javax.xml.ws.Holder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -48,15 +48,16 @@ public class ReadCardCertificateCommand extends AbstractKonnektorCommand<X509Cer
    *
    * @param cardInfo identifies the card on the Konnektor
    */
-  public ReadCardCertificateCommand(CardInfo cardInfo, Algorithm algorithm) {
+  public ReadCardCertificateCommand(CardInfo cardInfo, CryptoSystem algorithm) {
     this(cardInfo, CertRefEnum.C_AUT, algorithm);
   }
 
-  public ReadCardCertificateCommand(CardInfo cardInfo, CertRefEnum certRef, Algorithm algorithm) {
+  public ReadCardCertificateCommand(
+      CardInfo cardInfo, CertRefEnum certRef, CryptoSystem algorithm) {
     this(cardInfo, certRef, getCryptoType(algorithm));
   }
 
-  private static CryptType getCryptoType(Algorithm algorithm) {
+  private static CryptType getCryptoType(CryptoSystem algorithm) {
     return switch (algorithm) {
       case RSA_2048, RSA_PSS_2048 -> CryptType.RSA;
       default -> CryptType.ECC;

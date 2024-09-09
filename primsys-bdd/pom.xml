@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.8.0-SNAPSHOT</version>
+        <version>0.9.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,6 @@
     <name>E-Rezept E2E-Testsuite</name>
 
     <properties>
-        <tags/>
         <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
         <polarion.ml-id>ERP_EE_*</polarion.ml-id>
     </properties>
@@ -113,12 +112,42 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>crypto-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>fhir-codec-brick</artifactId>
+            <scope>test</scope>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>de.gematik.refv</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-rest-assured</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -127,14 +156,12 @@
             <artifactId>erp-bdd-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>erp-fhir</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
@@ -220,9 +247,10 @@
                         <include>**/${bdd.testsuite}.java</include>
                     </includes>
                     <parallel>suites</parallel>
-                    <forkCount>1</forkCount>
+                    <forkCount>1C</forkCount>
                     <threadCount>1</threadCount>
                     <reuseForks>true</reuseForks>
+                    <argLine>-Xmx10G</argLine>
                     <skip>${skip.inttests}</skip>
                 </configuration>
                 <executions>
@@ -239,8 +267,7 @@
                 <artifactId>serenity-maven-plugin</artifactId>
                 <version>${version.serenity}</version>
                 <configuration>
-                    <tags>${tags}</tags>
-                    <reports>single-page-html</reports>
+                    <reports>single-page-html,json-summary</reports>
                     <systemPropertyVariables>
                         <report.customfields.Testsuite>E2E-TestSuite v${project.version}</report.customfields.Testsuite>
                         <report.customfields.Tester>${user.name}</report.customfields.Tester>
@@ -250,6 +277,11 @@
                     <dependency>
                         <groupId>net.serenity-bdd</groupId>
                         <artifactId>serenity-single-page-report</artifactId>
+                        <version>${version.serenity}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.serenity-bdd</groupId>
+                        <artifactId>serenity-json-summary-report</artifactId>
                         <version>${version.serenity}</version>
                     </dependency>
                 </dependencies>
@@ -278,7 +310,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>0.8.0-SNAPSHOT</version>
+                <version>0.9.0-SNAPSHOT</version>
             </plugin>
         </plugins>
     </build>

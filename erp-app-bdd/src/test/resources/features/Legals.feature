@@ -17,7 +17,7 @@
 
 @PRODUKT:eRp_FdV
 @iosNightly
-@Einstellungen
+@Rechtliches
 Funktionalität: Einstellungen
   Alle Komponenten der Einstellung werden angezeigt und sind sichtbar.
 
@@ -25,14 +25,12 @@ Funktionalität: Einstellungen
     Angenommen die GKV Versicherte Alice öffnet das Onboarding
 
   @TCID:ERP_FDV_GKV_RECHTLICHES_01
-  @Rechtliches
   Szenario:  Verifikation Datenschutzerklärung und Nutzungsbedingungen während des Onboarding
     Wenn die Versicherte das Impressum während des Onboarding überprüfen möchte
     Dann sind die Nutzungsbedingungen und den Datenschutz sichtbar
 
 
   @TCID:ERP_FDV_GKV_RECHTLICHES_02
-  @Rechtliches
   Szenario: Verifikation von Einstellungen - Rechtliches
     Wenn die Versicherte das Impressum nach dem Onboarding überprüfen möchte
     Dann sind die Nutzungsbedingungen, der Datenschutz, das Impressum und die Lizenzen sichtbar

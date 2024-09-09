@@ -17,10 +17,7 @@
 package de.gematik.test.erezept.primsys
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import de.gematik.test.erezept.primsys.rest.BasicRequests
-import de.gematik.test.erezept.primsys.rest.DoctorRequests
-import de.gematik.test.erezept.primsys.rest.PharmacyRequests
-import de.gematik.test.erezept.primsys.rest.PrimSysResponse
+import de.gematik.test.erezept.primsys.rest.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -29,6 +26,7 @@ class IntegrationTest {
     @Test
     @Disabled(value = "only for manual test and demonstration purposes")
     fun shouldRunAgainstLocalPrimSys() {
+//        val clientFactory = PrimSysClientFactory.forRemote("https://erpps-test.dev.gematik.solutions").env("tu").apiKey(System.getenv("ERPIONE_API_KEY")).build()
         val clientFactory = PrimSysClientFactory.forRemote("http://127.0.0.1").port(9095).build()
         println(clientFactory.actorsInfo)
 
@@ -53,7 +51,7 @@ class IntegrationTest {
 
         val getAllResponse = doc.performBlocking(BasicRequests.getReadyPrescriptions())
         val getAll = printResponse("Got all prescriptions: ", getAllResponse)
-        getAll.toList().forEach {
+        getAll.forEach {
             println("\t-> $it")
         }
 
@@ -71,7 +69,8 @@ class IntegrationTest {
               "pickUpCodeDMC": "6a3acd69-a01d-4780-885e-ea970b6aacdb"
             }
         """.trimIndent()
-        val replyResponse = pharm.performBlocking(PharmacyRequests.reply(getDto.prescriptionId, getDto.patient.kvnr, replyBody))
+        val replyResponse =
+            pharm.performBlocking(PharmacyCommunicationRequests.reply(getDto.prescriptionId, getDto.patient.kvnr, replyBody))
         val replyDto = printResponse("Reply", replyResponse)
 
         val dispenseResponse =
@@ -84,7 +83,7 @@ class IntegrationTest {
         println("Done")
     }
 
-    fun <T> printResponse(operation: String, response: PrimSysResponse<T>): T {
+    private fun <T> printResponse(operation: String, response: PrimSysResponse<T>): T {
         println(">> $operation : ${response.statusCode}")
         response.body
             .onLeft { println("${it.type} Error: ${it.message}") }

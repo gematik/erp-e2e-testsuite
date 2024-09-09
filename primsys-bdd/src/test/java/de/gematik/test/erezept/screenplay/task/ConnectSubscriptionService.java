@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class ConnectSubscriptionService implements Task {
         new WebSocketClient(subscriptionServiceUrl, useSubscriptionService.getAuthorization());
     useSubscriptionService.setWebsocket(websocket);
 
-    if (websocket.connectBlocking(10, TimeUnit.SECONDS)) {
+    if (websocket.connectBlocking(30, TimeUnit.SECONDS)) {
       websocket.bind(useSubscriptionService.getSubscriptionId()).await();
       if (!websocket.isBound()) {
         throw new WebSocketException("WebSocket isn't bound to subscription id");

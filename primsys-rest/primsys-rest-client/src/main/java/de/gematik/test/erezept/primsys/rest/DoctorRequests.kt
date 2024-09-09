@@ -22,6 +22,8 @@ import de.gematik.test.erezept.primsys.data.PrescribeRequestDto
 import de.gematik.test.erezept.primsys.data.PrescriptionDto
 import io.ktor.client.request.*
 import io.ktor.http.*
+import java.io.File
+import java.nio.file.Path
 
 class PrescribeRequest(private val body: PrescribeRequestDto, private val asDirectAssignment: Boolean = false) :
     PrimSysBaseDoctorRequest<PrescriptionDto>(object : TypeReference<PrescriptionDto>() {}) {
@@ -36,16 +38,43 @@ class PrescribeRequest(private val body: PrescribeRequestDto, private val asDire
     }
 }
 
+class PrescribeKbvBundleRequest(private val body: String, private val asDirectAssignment: Boolean = false) :
+    PrimSysBaseDoctorRequest<PrescriptionDto>(object : TypeReference<PrescriptionDto>() {}) {
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Post
+        rb.url.appendEncodedPathSegments("xml", "prescribe")
+        rb.url.parameters.append("direct", asDirectAssignment.toString())
+
+        // we are sending an XML file:
+        // so we need to set the content type to XML and remove the default JSON content type
+        rb.headers.remove(HttpHeaders.ContentType)
+        rb.header(HttpHeaders.ContentType, ContentType.Application.Xml)
+        rb.setBody(body)
+    }
+}
 
 
 object DoctorRequests {
 
     @JvmStatic
-    fun prescribe(kvnr: String, asDirectAssignment: Boolean = false) = prescribe(PrescribeRequestDto.forKvnr(kvnr), asDirectAssignment)
+    fun prescribeKbvBundle(file: Path, asDirectAssignment: Boolean = false) = prescribeKbvBundle(file.toFile(), asDirectAssignment)
 
     @JvmStatic
-    fun prescribe(bodyBuilder: PrescribeRequestDto.Builder, asDirectAssignment: Boolean = false) = prescribe(bodyBuilder.build(), asDirectAssignment)
+    fun prescribeKbvBundle(file: File, asDirectAssignment: Boolean = false) = prescribeKbvBundle(file.readText(), asDirectAssignment)
 
     @JvmStatic
-    fun prescribe(body: PrescribeRequestDto, asDirectAssignment: Boolean = false) = PrescribeRequest(body, asDirectAssignment)
+    fun prescribeKbvBundle(kbvBundle: String, asDirectAssignment: Boolean = false) = PrescribeKbvBundleRequest(kbvBundle, asDirectAssignment)
+
+    @JvmStatic
+    fun prescribe(kvnr: String, asDirectAssignment: Boolean = false) =
+        prescribe(PrescribeRequestDto.forKvnr(kvnr), asDirectAssignment)
+
+    @JvmStatic
+    fun prescribe(bodyBuilder: PrescribeRequestDto.Builder, asDirectAssignment: Boolean = false) =
+        prescribe(bodyBuilder.build(), asDirectAssignment)
+
+    @JvmStatic
+    fun prescribe(body: PrescribeRequestDto, asDirectAssignment: Boolean = false) =
+        PrescribeRequest(body, asDirectAssignment)
 }

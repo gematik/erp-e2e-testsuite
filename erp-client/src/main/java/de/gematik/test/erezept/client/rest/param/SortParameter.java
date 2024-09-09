@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,5 +35,15 @@ public class SortParameter implements IQueryParameter {
   @Override
   public String encode() {
     return format("_sort={0}", order.sign(parameter));
+  }
+
+  @Override
+  public String parameter() {
+    return "_sort";
+  }
+
+  @Override
+  public String value() {
+    return order.sign(parameter);
   }
 }

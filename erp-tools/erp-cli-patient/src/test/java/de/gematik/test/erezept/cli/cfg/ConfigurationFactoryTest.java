@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package de.gematik.test.erezept.cli.cfg;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
-import de.gematik.test.smartcard.SmartcardFactory;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -27,13 +28,13 @@ class ConfigurationFactoryTest {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(ConfigurationFactory.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ConfigurationFactory.class));
   }
 
   @Test
   void shouldCreatePatientConfiguration() {
-    val egk = SmartcardFactory.getArchive().getEgkCards().get(0);
+    val egk = SmartcardArchive.fromResources().getEgk(0);
     val config = ConfigurationFactory.createPatientConfigurationFor(egk);
-    assertEquals(egk.getOwner().getGivenName(), config.getName());
+    assertEquals(egk.getOwnerData().getGivenName(), config.getName());
   }
 }

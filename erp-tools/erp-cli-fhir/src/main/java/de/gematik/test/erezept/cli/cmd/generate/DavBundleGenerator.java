@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,6 @@ public class DavBundleGenerator extends BaseResourceGenerator {
   }
 
   private DavAbgabedatenBundle createDavAbgabedaten() {
-    return DavAbgabedatenBuilder.faker().build();
+    return DavAbgabedatenFaker.builder().fake();
   }
 }

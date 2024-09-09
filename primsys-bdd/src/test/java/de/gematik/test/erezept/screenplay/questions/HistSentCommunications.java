@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,10 @@ public class HistSentCommunications implements Question<Boolean> {
           (sent, fetched) -> {
             val dequedExp = deque.chooseFrom(sent);
             val dequeFetched = deque.chooseFrom(fetched);
-            return dequedExp.getCommunicationId().equals(dequeFetched.getUnqualifiedId());
+            return dequedExp
+                .getCommunicationId()
+                .map(id -> id.equals(dequeFetched.getUnqualifiedId()))
+                .orElse(false);
           });
     }
 

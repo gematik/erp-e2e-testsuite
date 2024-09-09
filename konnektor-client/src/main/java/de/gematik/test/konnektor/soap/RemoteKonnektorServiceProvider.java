@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.konnektor.soap;
 
 import static java.text.MessageFormat.format;
 
-import com.sun.xml.ws.client.BindingProviderProperties;
+import com.sun.xml.ws.developer.JAXWSProperties;
 import de.gematik.test.konnektor.profile.KonnektorProfile;
 import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureService;
 import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureServicePortType;
@@ -36,8 +36,9 @@ import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureService;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureServicePortType;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDService;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDServicePortType;
+import jakarta.xml.ws.BindingProvider;
 import java.net.URL;
-import javax.xml.ws.BindingProvider;
+import javax.net.ssl.HostnameVerifier;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -59,6 +60,10 @@ public class RemoteKonnektorServiceProvider extends ServicePortProvider {
   public RemoteKonnektorServiceProvider(@NonNull URL baseUrl, @NonNull KonnektorProfile profile) {
     super(profile);
     this.baseUrl = baseUrl;
+  }
+
+  public static Builder of(URL baseUrl, KonnektorProfile profile) {
+    return new Builder(baseUrl, profile);
   }
 
   public final SignatureServicePortType getSignatureService() {
@@ -142,11 +147,9 @@ public class RemoteKonnektorServiceProvider extends ServicePortProvider {
       // the given truststore usually contains a different domain: e.g. konsim running on localhost
       // is
       // still using RU cert
-      servicePort
-          .getRequestContext()
-          .put(
-              BindingProviderProperties.HOSTNAME_VERIFICATION_PROPERTY,
-              "false"); // NOSONAR already covered by comment above
+      HostnameVerifier hostnameVerifier =
+          (hostname, session) -> true; // NOSONAR already covered by comment above
+      servicePort.getRequestContext().put(JAXWSProperties.HOSTNAME_VERIFIER, hostnameVerifier);
     }
   }
 
@@ -160,10 +163,6 @@ public class RemoteKonnektorServiceProvider extends ServicePortProvider {
   @Override
   public String toString() {
     return format("{0} at {1}", this.profile.getType(), this.getBaseUrl());
-  }
-
-  public static Builder of(URL baseUrl, KonnektorProfile profile) {
-    return new Builder(baseUrl, profile);
   }
 
   public static class Builder {

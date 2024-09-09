@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.erezept;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import java.util.Map;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
 
 class ErpInteractionTest {
@@ -35,7 +35,7 @@ class ErpInteractionTest {
         ErpResponse.forPayload(new ErxTask(), ErxTask.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
     assertDoesNotThrow(interaction::expectation);
@@ -48,7 +48,7 @@ class ErpInteractionTest {
         ErpResponse.forPayload(new ErxTask(), ErxTask.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
     assertDoesNotThrow(interaction::getExpectedResponse);
@@ -61,7 +61,7 @@ class ErpInteractionTest {
         ErpResponse.forPayload(new ErxTask(), ErxTask.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
     assertDoesNotThrow(interaction::asOperationOutcome);
@@ -71,10 +71,10 @@ class ErpInteractionTest {
   @Test
   void shouldThrowOnUnexpected() {
     val response =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
     assertThrows(UnexpectedResponseResourceError.class, interaction::getExpectedResponse);

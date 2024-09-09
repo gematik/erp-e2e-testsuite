@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseBundleTest extends ParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.1.1/";
 
   @Test
   void shouldCastFromMedicationDispense() {
     val fileName = "MedicationDispenseBundle_01.json";
 
-    val content = ResourceUtils.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val vr = parser.validate(content);
 
     if (!vr.isSuccessful()) {

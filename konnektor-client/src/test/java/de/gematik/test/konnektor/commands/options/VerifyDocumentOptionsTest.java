@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.konnektor.commands.options;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class VerifyDocumentOptionsTest {
+class VerifyDocumentOptionsTest {
 
   @Test
-  public void defaultVerifyDocumentOptions() {
+  void defaultVerifyDocumentOptions() {
     val opts = VerifyDocumentOptions.getDefaultOptions();
 
     assertEquals("NONE", opts.getTvMode());

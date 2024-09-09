@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.konnektor.cfg;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardTerminalClientFactory;
 import de.gematik.test.erezept.config.dto.konnektor.*;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
@@ -28,7 +29,6 @@ import de.gematik.test.konnektor.soap.MockKonnektorServiceProvider;
 import de.gematik.test.konnektor.soap.RemoteKonnektorServiceProvider;
 import de.gematik.test.konnektor.soap.TrustProvider;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
-import de.gematik.test.smartcard.SmartcardFactory;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import java.net.URL;
 import java.util.Objects;
@@ -92,7 +92,7 @@ public class KonnektorFactory {
 
   public static Konnektor createMockKonnektor(
       String named, VsdmServiceConfiguration vsdmServiceConfiguration) {
-    val smartcards = SmartcardFactory.getArchive();
+    val smartcards = SmartcardArchive.fromResources();
     log.info(format("Create Local Mock Konnektor {0}", named));
 
     val ctx = getDefaultContextType();

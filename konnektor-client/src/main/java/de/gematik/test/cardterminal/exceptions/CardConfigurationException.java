@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.cardterminal.exceptions;
 
 import static java.text.MessageFormat.*;
 
-import kong.unirest.*;
+import kong.unirest.core.*;
 
 public class CardConfigurationException extends RuntimeException {
 

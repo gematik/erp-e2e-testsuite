@@ -294,7 +294,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
     medicationRequest =
-        MedicationRequestFaker.builder(patient.getPatientData())
+        MedicationRequestFaker.builder()
+            .withPatient(patient.getPatientData())
             .withInsurance(patient.getInsuranceCoverage())
             .withRequester(doc.getPractitioner())
             .withAccident(accident)
@@ -353,18 +354,16 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
     AccidentExtension accident = null;
     if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
-    val medicationRequest =
-        MedicationRequestFaker.builder(patient.getPatientData())
-            .withInsurance(patient.getInsuranceCoverage())
-            .withRequester(doctorActor.getPractitioner())
-            .withAccident(accident)
-            .withMedication(medication)
-            .fake();
+
     val kbvBundleBuilder =
-        KbvErpBundleBuilder.faker(patient.getKvnr())
-            .practitioner(doctorActor.getPractitioner())
-            .medicationRequest(medicationRequest) // what is the medication
-            .medication(medication);
+        KbvErpBundleFaker.builder()
+            .withKvnr(patient.getKvnr())
+            .withPractitioner(doctorActor.getPractitioner())
+            .withMedication(medication)
+            .withInsurance(patient.getInsuranceCoverage(), patient.getPatientData())
+            .withAccident(accident)
+            .toBuilder();
+
     return IssuePrescription.forPatient(patient)
         .ofAssignmentKind(assignmentKind)
         .withResourceManipulator(

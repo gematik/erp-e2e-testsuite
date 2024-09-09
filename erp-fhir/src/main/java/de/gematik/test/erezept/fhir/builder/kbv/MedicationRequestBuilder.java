@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
         .quantityPackages(fakerAmount())
         .isBVG(fakerBool())
         .hasEmergencyServiceFee(fakerBool())
-        .insurance(KbvCoverageBuilder.faker(patient.getInsuranceKind()).build())
+        .insurance(KbvCoverageFaker.builder().withInsuranceType(patient.getInsuranceKind()).fake())
         .requester(PractitionerFaker.builder().fake())
         .medication(KbvErpMedicationPZNFaker.builder().fake())
         .substitution(substitution)
@@ -186,7 +186,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return self();
   }
 
-  public MedicationRequestBuilder intent(@NonNull String code) {
+  public MedicationRequestBuilder intent(String code) {
     var intent = MedicationRequest.MedicationRequestIntent.fromCode(code);
     if (intent == null) {
       log.warn(
@@ -199,13 +199,12 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return intent(intent);
   }
 
-  public MedicationRequestBuilder intent(
-      @NonNull MedicationRequest.MedicationRequestIntent intent) {
+  public MedicationRequestBuilder intent(MedicationRequest.MedicationRequestIntent intent) {
     this.requestIntent = intent;
     return self();
   }
 
-  public MedicationRequestBuilder dosage(@NonNull String text) {
+  public MedicationRequestBuilder dosage(String text) {
     this.dosageInstruction = text;
     return self();
   }
@@ -214,7 +213,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return quantity(QuantityBuilder.asUcumPackage().withValue(amount));
   }
 
-  public MedicationRequestBuilder quantity(@NonNull Quantity quantity) {
+  public MedicationRequestBuilder quantity(Quantity quantity) {
     return quantity(
         new MedicationRequest.MedicationRequestDispenseRequestComponent().setQuantity(quantity));
   }
@@ -251,7 +250,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return self();
   }
 
-  public MedicationRequestBuilder coPaymentStatus(@NonNull StatusCoPayment status) {
+  public MedicationRequestBuilder coPaymentStatus(StatusCoPayment status) {
     this.statusCoPayment = status;
     return self();
   }
@@ -356,8 +355,9 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
   }
 
   private Dosage createFlagedDosage() {
+    val dosageFlag = dosageInstruction != null && !dosageInstruction.isEmpty();
     val d = new Dosage().setText(dosageInstruction);
-    d.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(true));
+    d.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(dosageFlag));
     return d;
   }
 }

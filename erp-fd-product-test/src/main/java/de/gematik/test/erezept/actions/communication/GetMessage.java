@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,15 @@ import net.serenitybdd.screenplay.Actor;
 @RequiredArgsConstructor
 public class GetMessage extends ErpAction<ErxCommunication> {
 
-  private final CommunicationGetByIdCommand communicationGetCommand;
+  private final CommunicationGetByIdCommand communicationGetByIdCommand;
+
+  public static GetMessage byId(ErxCommunication com) {
+    return byId(com.getIdPart());
+  }
+
+  public static GetMessage byId(String id) {
+    return byId(new CommunicationGetByIdCommand(id));
+  }
 
   public static GetMessage byId(CommunicationGetByIdCommand communicationGetCommand) {
     return new GetMessage(communicationGetCommand);
@@ -34,6 +42,6 @@ public class GetMessage extends ErpAction<ErxCommunication> {
 
   @Override
   public ErpInteraction<ErxCommunication> answeredBy(Actor actor) {
-    return performCommandAs(communicationGetCommand, actor);
+    return performCommandAs(communicationGetByIdCommand, actor);
   }
 }

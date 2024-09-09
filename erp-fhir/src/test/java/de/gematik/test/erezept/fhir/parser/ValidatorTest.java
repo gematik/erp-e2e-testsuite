@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.validation.ResultSeverityEnum;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.io.File;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -69,11 +69,12 @@ class ValidatorTest extends ParsingTest {
   @ParameterizedTest
   @MethodSource
   void shouldPassValidResources(File file) {
-    ValidatorUtil.validateFile(parser, file, Assertions::assertTrue, true);
+    ValidatorUtil.validateFile(parser, file, Assertions::assertTrue, false);
   }
 
   static Stream<Arguments> shouldPassValidResources() {
-    return ResourceUtils.getResourceFilesInDirectory("fhir/valid", true).stream()
+    return ResourceLoader.getResourceDirectoryStructure("fhir/valid", true).stream()
+        .filter(File::isFile)
         .map(Arguments::of);
   }
 
@@ -84,7 +85,9 @@ class ValidatorTest extends ParsingTest {
   }
 
   static Stream<Arguments> shouldDetectInvalidResources() {
-    return ResourceUtils.getResourceFilesInDirectory("fhir/invalid", true).stream()
+    return ResourceLoader.getResourceDirectoryStructure("fhir/invalid", true).stream()
+        .filter(File::isFile)
+        .filter(it -> !it.getName().equals("no_profile_value_bundle.xml")) // produces NPE in HAPI
         .map(Arguments::arguments);
   }
 
@@ -97,7 +100,7 @@ class ValidatorTest extends ParsingTest {
     System.setProperty(ValidatorMode.SYS_PROP_TOGGLE, mode.name());
     val pedanticFhir = new FhirParser();
     val mixedBundleResources =
-        ResourceUtils.getResourceFilesInDirectory("fhir/valid/mixed_bundles", true);
-    ValidatorUtil.validateFiles(pedanticFhir, mixedBundleResources, Assertions::assertTrue, true);
+        ResourceLoader.getResourceDirectoryStructure("fhir/valid/mixed_bundles", true);
+    ValidatorUtil.validateFiles(pedanticFhir, mixedBundleResources, Assertions::assertTrue, false);
   }
 }

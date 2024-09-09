@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import de.gematik.test.core.expectations.rawhttpverifier.RawHttpResponseVerifier;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.actions.rawhttpactions.GetOcspListResponse;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import java.util.ArrayList;
 import java.util.List;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestInstance;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -49,7 +49,7 @@ class RawHttpResponseVerifierTest {
   static WireMockExtension wiremockExtension =
       WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig()).build();
 
-  private final ErpAfos unspecificAfo = ErpAfos.A_19514_02;
+  private final ErpAfos unspecificAfo = ErpAfos.A_19514;
   private HttpResponse<?> response;
   private Actor actor;
 
@@ -75,8 +75,7 @@ class RawHttpResponseVerifierTest {
 
   @Test
   void shouldNotInstantiateTaskVerifier() {
-    assertTrue(
-        PrivateConstructorsUtil.throwsInvocationTargetException(RawHttpResponseVerifier.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(RawHttpResponseVerifier.class));
   }
 
   @Test

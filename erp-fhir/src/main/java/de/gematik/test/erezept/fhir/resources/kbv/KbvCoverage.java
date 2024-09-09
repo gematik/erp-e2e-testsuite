@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,10 +71,8 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
     return this.getPayor().stream()
         .filter(
             p ->
-                p.getIdentifier().getSystem().equals(DeBasisNamingSystem.IKNR.getCanonicalUrl())
-                    || p.getIdentifier()
-                        .getSystem()
-                        .equals(DeBasisNamingSystem.IKNR_SID.getCanonicalUrl()))
+                DeBasisNamingSystem.IKNR_SID.match(p.getIdentifier())
+                    || DeBasisNamingSystem.IKNR.match(p.getIdentifier()))
         .map(p -> IKNR.from(p.getIdentifier().getValue()))
         .findFirst()
         .orElseThrow(
@@ -86,7 +84,7 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
   public Optional<IKNR> getAlternativeIknr() {
     return this.getPayor().stream()
         .flatMap(p -> p.getIdentifier().getExtension().stream())
-        .filter(ext -> KbvItaForStructDef.ALTERNATIVE_IK.match(ext.getUrl()))
+        .filter(KbvItaForStructDef.ALTERNATIVE_IK::match)
         .map(ext -> ext.castToIdentifier(ext.getValue()).getValue())
         .map(IKNR::from)
         .findFirst();
@@ -98,25 +96,50 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
 
   public Optional<Wop> getWop() {
     return this.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.GKV_WOP.getCanonicalUrl()))
+        .filter(DeBasisStructDef.GKV_WOP::match)
         .map(ext -> Wop.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst();
   }
 
-  public Optional<VersichertenStatus> getInsurantState() {
+  public Optional<VersichertenStatus> getInsurantStateOptional() {
     return this.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.GKV_VERSICHERTENART.getCanonicalUrl()))
+        .filter(DeBasisStructDef.GKV_VERSICHERTENART::match)
         .map(
             ext ->
                 VersichertenStatus.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst();
   }
 
-  public Optional<PersonGroup> getPersonGroup() {
+  public VersichertenStatus getInsurantState() {
+    return getInsurantStateOptional()
+        .orElseThrow(
+            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_VERSICHERTENART));
+  }
+
+  public Optional<PersonGroup> getPersonGroupOptional() {
     return this.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.GKV_PERSON_GROUP.getCanonicalUrl()))
+        .filter(DeBasisStructDef.GKV_PERSON_GROUP::match)
         .map(ext -> PersonGroup.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst();
+  }
+
+  public Optional<DmpKennzeichen> getDmpKennzeichenOptional() {
+    return this.getExtension().stream()
+        .filter(DeBasisStructDef.GKV_DMP_KENNZEICHEN::match)
+        .map(ext -> DmpKennzeichen.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
+        .findFirst();
+  }
+
+  public DmpKennzeichen getDmpKennzeichen() {
+    return getDmpKennzeichenOptional()
+        .orElseThrow(
+            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_DMP_KENNZEICHEN));
+  }
+
+  public PersonGroup getPersonGroup() {
+    return getPersonGroupOptional()
+        .orElseThrow(
+            () -> new MissingFieldException(this.getClass(), DeBasisStructDef.GKV_PERSON_GROUP));
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.actions;
 import static org.mockito.Mockito.mock;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.erezept.actions.chargeitem.GetChargeItemById;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;

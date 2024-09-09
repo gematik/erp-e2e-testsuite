@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
@@ -27,10 +28,10 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
+import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
@@ -54,7 +55,8 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
     val pharmacy = mock(Pharmacy.class);
     val uc = new ChargeItemUseCase(pharmacy);
 
-    try (val response = uc.postChargeItem("123", (InvoiceData) null)) {
+    val prescriptionId = PrescriptionId.random().getValue();
+    try (val response = uc.postChargeItem(prescriptionId, (InvoiceData) null)) {
       fail("RejectUseCase did not throw the expected Exception");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
@@ -70,19 +72,21 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
 
     val mockResponse =
         ErpResponse.forPayload(
-                ErxChargeItemBuilder.faker(PrescriptionId.random()).build(), ErxChargeItem.class)
+                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake(),
+                ErxChargeItem.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(ChargeItemPostCommand.class))).thenReturn(mockResponse);
 
-    val taskId = "123";
+    val taskId = PrescriptionId.random().getValue();
     val receiptId = "123";
 
     val dispensedData = new DispensedMedicationDto();
     val acceptData = new AcceptedPrescriptionDto();
     acceptData.setInsurance(CoverageDataMapper.randomDto());
     acceptData.setPrescriptionReference("Bundle/123123");
+    acceptData.setForKvnr(KVNR.random().getValue());
 
     dispensedData.setReceipt(receiptId);
     dispensedData.setPrescriptionId(taskId);
@@ -103,34 +107,37 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
     val pharmacy = ctx.getPharmacies().get(1);
     val mockClient = pharmacy.getClient();
 
-    val taskId = "123";
+    val taskId = PrescriptionId.random().getValue();
     val receiptId = "123";
 
     val originalChargeItem =
-        ErxChargeItemBuilder.faker(PrescriptionId.from(taskId))
-            .entered(new Date(), TemporalPrecisionEnum.MILLI)
-            .build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(PrescriptionId.from(taskId))
+            .withEnteredDate(new Date(), TemporalPrecisionEnum.MILLI)
+            .fake();
     val chargeItemBundle = new ErxChargeItemBundle();
     chargeItemBundle.addEntry(new Bundle.BundleEntryComponent().setResource(originalChargeItem));
     val mockGetResponse =
         ErpResponse.forPayload(chargeItemBundle, ErxChargeItemBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val mockPostResponse =
         ErpResponse.forPayload(
-                ErxChargeItemBuilder.faker(PrescriptionId.random()).build(), ErxChargeItem.class)
+                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake(),
+                ErxChargeItem.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val mockPutResponse =
         ErpResponse.forPayload(
-                ErxChargeItemBuilder.faker(PrescriptionId.random()).build(), ErxChargeItem.class)
+                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake(),
+                ErxChargeItem.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(ChargeItemGetByIdCommand.class))).thenReturn(mockGetResponse);
     when(mockClient.request(any(ChargeItemPostCommand.class))).thenReturn(mockPostResponse);
@@ -139,6 +146,7 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
     val dispensedData = new DispensedMedicationDto();
     val acceptData = new AcceptedPrescriptionDto();
 
+    acceptData.setForKvnr(KVNR.random().getValue());
     dispensedData.setReceipt(receiptId);
     dispensedData.setPrescriptionId(taskId);
     dispensedData.setAcceptData(acceptData);

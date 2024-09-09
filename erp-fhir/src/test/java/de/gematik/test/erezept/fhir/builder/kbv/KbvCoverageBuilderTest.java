@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ class KbvCoverageBuilderTest extends ParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFaker01(KbvItaForVersion version) {
     for (var i = 0; i < 2; i++) {
-      val coverage = KbvCoverageBuilder.faker().version(version).build();
+      val coverage = KbvCoverageFaker.builder().withVersion(version).fake();
       val result = ValidatorUtil.encodeAndValidate(parser, coverage);
       assertTrue(result.isSuccessful());
     }
@@ -133,7 +133,8 @@ class KbvCoverageBuilderTest extends ParsingTest {
     insuranceKinds.forEach(
         ik -> {
           for (var i = 0; i < 2; i++) {
-            val coverage = KbvCoverageBuilder.faker(ik).version(version).build();
+            val coverage =
+                KbvCoverageFaker.builder().withInsuranceType(ik).withVersion(version).fake();
             log.info(format("Validating Faker Coverage with ID {0}", coverage.getId()));
             val result = ValidatorUtil.encodeAndValidate(parser, coverage);
             assertTrue(result.isSuccessful());

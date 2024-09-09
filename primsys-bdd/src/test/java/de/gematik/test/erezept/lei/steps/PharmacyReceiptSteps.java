@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class PharmacyReceiptSteps {
   }
 
   @Dann("^hat die Apotheke (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? vorliegen$")
-  @Und("^die Apotheke hat (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? vorliegen$")
+  @Und("^die Apotheke (.+) hat (mindestens|maximal|genau) (\\d+) Quittung(?:en)? vorliegen$")
   public void hasReceipts(String pharmName, String adverb, long amount) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy).attemptsTo(Ensure.that(HasReceipts.of(adverb, amount)).isTrue());

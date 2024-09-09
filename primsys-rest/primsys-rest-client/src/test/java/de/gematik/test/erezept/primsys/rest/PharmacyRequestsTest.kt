@@ -1,3 +1,20 @@
+/*
+ *  Copyright 2024 gematik GmbH
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package de.gematik.test.erezept.primsys.rest
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -15,6 +32,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.util.*
 
@@ -77,6 +95,32 @@ class PharmacyRequestsTest : RestTest() {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("")
+                )
+        )
+    }
+
+    private fun setupPositiveCommunicationSearch(): StubMapping {
+        return stubFor(
+            get(urlPathMatching("/pharm/([a-zA-Z0-9]*)/communications"))
+                .withQueryParam("sender", or(absent(), matching("[A-Z][0-9]{9}")))
+                .withQueryParam("receiver", or(absent(), matching("[A-Z][0-9]{9}")))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("[]")
+                )
+        )
+    }
+
+    private fun setupPositiveCommunicationDelete(): StubMapping {
+        return stubFor(
+            delete(urlPathMatching("/pharm/([a-zA-Z0-9]*)/communication/([a-zA-Z0-9]*)"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(204)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("[]")
                 )
         )
     }
@@ -200,12 +244,71 @@ class PharmacyRequestsTest : RestTest() {
         val pharm = clientFactory.getRandomPharmacyClient()
         assertDoesNotThrow {
             pharm.performBlocking(
-                PharmacyRequests.reply(
+                PharmacyCommunicationRequests.reply(
                     "160.100.000.000.011.10",
                     "X110407073",
                     "just some random body (which is currently not valid!!)"
                 )
             ).asExpectedPayload()
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("shouldSearchCommunications")
+    fun shouldSearchCommunications(sender: String?, receiver: String?) {
+        setupPositiveStubs()
+        val clientFactory = PrimSysClientFactory
+            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+
+        removeAllMappings()
+        setupPositiveCommunicationSearch()
+        val pharm = clientFactory.getRandomPharmacyClient()
+        assertDoesNotThrow {
+            pharm.performBlocking(
+                PharmacyCommunicationRequests.search(sender, receiver)
+            ).asExpectedPayload()
+        }
+    }
+
+    @Test
+    fun shouldSearchCommunicationsWithoutFilters() {
+        setupPositiveStubs()
+        val clientFactory = PrimSysClientFactory
+            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+
+        removeAllMappings()
+        setupPositiveCommunicationSearch()
+        val pharm = clientFactory.getRandomPharmacyClient()
+        assertDoesNotThrow {
+            pharm.performBlocking(
+                PharmacyCommunicationRequests.search()
+            ).asExpectedPayload()
+        }
+    }
+
+    @Test
+    fun shouldDeleteCommunication() {
+        setupPositiveStubs()
+        val clientFactory = PrimSysClientFactory
+            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+
+        removeAllMappings()
+        setupPositiveCommunicationDelete()
+        val pharm = clientFactory.getRandomPharmacyClient()
+        assertDoesNotThrow {
+            pharm.performBlocking(
+                PharmacyCommunicationRequests.delete("123123")
+            ).asExpectedPayload()
+        }
+    }
+
+    companion object TestDataProvider {
+        @JvmStatic
+        fun shouldSearchCommunications() = listOf(
+            arrayOf("X110407073", "X110407073"),
+            arrayOf("X110407073", null),
+            arrayOf(null, "X110407073"),
+            arrayOf<String?>(null, null)
+        )
     }
 }

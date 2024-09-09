@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -342,7 +342,7 @@ public class IssuePrescription implements Task {
     if (patient != null) {
       ret = SafeAbility.getAbility(patient, ProvidePatientBaseData.class).getInsuranceCoverage();
     } else {
-      ret = KbvCoverageBuilder.faker(VersicherungsArtDeBasis.GKV).build();
+      ret = KbvCoverageFaker.builder().withInsuranceType(VersicherungsArtDeBasis.GKV).fake();
     }
     return ret;
   }

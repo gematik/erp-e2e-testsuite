@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispenseMedicationCommand;
+import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
@@ -60,7 +60,7 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
     return erpClientAbility.request(cmd);
   }
 
-  private DispenseMedicationCommand dispensePrescribedMedication(
+  private ClosePrescriptionCommand dispensePrescribedMedication(
       DispenseReceipt receipt, String telematikId) {
     val taskId = receipt.getTaskId();
     val secret = receipt.getSecret();
@@ -76,7 +76,7 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
             .performerId(telematikId)
             .medication(medication)
             .build();
-    return new DispenseMedicationCommand(taskId, secret, medicationDispense);
+    return new ClosePrescriptionCommand(taskId, secret, medicationDispense);
   }
 
   public static ResponseOfReDispenseMedication fromStack(String order) {

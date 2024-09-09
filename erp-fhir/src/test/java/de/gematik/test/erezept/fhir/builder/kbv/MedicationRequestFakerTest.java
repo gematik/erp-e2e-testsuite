@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class MedicationRequestFakerTest extends ParsingTest {
   @Test
   void buildFakerMedicationRequestWithInsurance() {
     val medicationRequest =
-        MedicationRequestFaker.builder().withInsurance(KbvCoverageBuilder.faker().build()).fake();
+        MedicationRequestFaker.builder().withInsurance(KbvCoverageFaker.builder().fake()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
   }
@@ -188,7 +188,7 @@ class MedicationRequestFakerTest extends ParsingTest {
 
   @Test
   void buildFakerMedicationRequestWithNote() {
-    val noteText = "This is test note";
+    val noteText = "This is note";
     val medicationRequest = MedicationRequestFaker.builder().withNote(noteText).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
@@ -197,7 +197,8 @@ class MedicationRequestFakerTest extends ParsingTest {
 
   @Test
   void buildFakerMedicationRequestWithPatient() {
-    val medicationRequest = MedicationRequestFaker.builder(PatientFaker.builder().fake()).fake();
+    val medicationRequest =
+        MedicationRequestFaker.builder().withPatient(PatientFaker.builder().fake()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
   }

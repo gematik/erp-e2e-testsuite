@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,6 @@ class CommunicationGetMessagesTest {
   void shouldGetCommunication() {
     val mockResponse = mockUtil.createErpResponse(null, ErxCommunicationBundle.class, 200);
     when(erpClientMock.request(any(CommunicationGetCommand.class))).thenReturn(mockResponse);
-
     assertDoesNotThrow(
         () -> patientActor.performs(GetMessages.fromServerWith(new CommunicationGetCommand())));
   }

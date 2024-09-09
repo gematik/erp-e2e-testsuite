@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@ package de.gematik.test.erezept.app.task.ios;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.smartcards.exceptions.SmartCardKeyNotFoundException;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.Egk;
-import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -41,11 +43,17 @@ public class SetVirtualEgkOnIOS implements Task {
 
   private final Egk egk;
 
+  public static SetVirtualEgkOnIOS withEgk(Egk egk) {
+    return Instrumented.instanceOf(SetVirtualEgkOnIOS.class).withProperties(egk);
+  }
+
   @SneakyThrows
   @Override
   @Step("{0} setzt die virtuelle eGK #egk")
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
+    val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
+
     app.logEvent(
         format(
             "Set virtual eGK with KVNR {0} ({1}) for {2}",
@@ -67,16 +75,25 @@ public class SetVirtualEgkOnIOS implements Task {
     val cc =
         Base64.getEncoder()
             .encodeToString(
-                egk.getAutCertificate(Algorithm.ECC_256)
+                egk.getAutCertificate(CryptoSystem.ECC_256)
                     .orElseThrow(() -> new SmartCardKeyNotFoundException(egk))
                     .getX509Certificate()
                     .getEncoded());
 
     app.input(pk, Debug.EGK_PRIVATE_KEY);
     app.input(cc, Debug.EGK_CERTIFICATE_CHAIN);
-  }
 
-  public static SetVirtualEgkOnIOS withEgk(Egk egk) {
-    return Instrumented.instanceOf(SetVirtualEgkOnIOS.class).withProperties(egk);
+    if (!userConfig.isHasNfc()) {
+      // Note: scrolling up is necessary to make the TypeSwitch visible
+      app.swipe(SwipeDirection.UP);
+
+      // fake NFC capabilities
+      // if active, the text of TypeSwitch is 1, otherwise 0
+      val isFakingCapabilities = "1".equals(app.getText(Debug.FAKE_DEVICE_CAPABILITIES));
+      if (!isFakingCapabilities) {
+        // tap only the TypeSwitch if not already active
+        app.tap(Debug.FAKE_DEVICE_CAPABILITIES);
+      }
+    }
   }
 }

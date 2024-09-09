@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.gematik.test.erezept.cli.description;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class FhirResourceDescriberTest {
   @Test
   void shouldAcceptDescribedResource() {
     val describer = new FhirResourceDescriber();
-    val kbvBundle = KbvErpBundleBuilder.faker().build();
+    val kbvBundle = KbvErpBundleFaker.builder().fake();
     val description = describer.acceptResource(kbvBundle);
     assertEquals(kbvBundle.getDescription(), description);
   }

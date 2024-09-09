@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import de.gematik.test.erezept.testutil.PrivateConstructorsUtil;
 import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class AcceptUseCaseTest extends TestWithActorContext {
 
   @Test
   void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.throwsInvocationTargetException(AcceptUseCase.class));
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AcceptUseCase.class));
   }
 
   @Test
@@ -59,8 +59,9 @@ class AcceptUseCaseTest extends TestWithActorContext {
     when(acceptBundle.getKbvBundleAsString())
         .thenReturn(
             fhir.encode(
-                KbvErpBundleBuilder.faker().prescriptionId(prescriptionId).build(),
+                KbvErpBundleFaker.builder().withPrescriptionId(prescriptionId).fake(),
                 EncodingType.XML));
+
     when(acceptBundle.getTask()).thenReturn(task);
     when(task.getPrescriptionId()).thenReturn(prescriptionId);
     when(task.getAccessCode()).thenReturn(accessCode);

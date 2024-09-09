@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,6 +186,9 @@ public class DoctorPrescribeSteps {
   @Wenn(
       "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges"
           + " Medikament verschreibt$")
+  @Angenommen(
+      "^(?:der Arzt|die Ärztin) (.+) hat (?:dem|der) Versicherten (.+) ein apothekenpflichtiges"
+          + " Medikament verschrieben$")
   public void whenIssueSingleRandomPharmacyOnlyPrescriptionToActor(
       String docName, String patientName) {
     val theDoctor = OnStage.theActorCalled(docName);

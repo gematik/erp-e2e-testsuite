@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,37 @@
 package de.gematik.test.erezept.client.vau;
 
 import static de.gematik.test.erezept.client.testutils.VauCertificateGenerator.generateX509Certificate;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.crypto.BC;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.vau.protocol.VauVersion;
-import de.gematik.test.erezept.crypto.BC;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPairGenerator;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
-import kong.unirest.*;
+import kong.unirest.core.Headers;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-import org.mockito.MockedStatic;
 
 class VauClientTest {
 
   private static X509Certificate vauCertificate;
-  private MockedStatic<Unirest> unitRestMock;
+  private UnirestInstance unitRestMock;
 
   @BeforeAll
   static void init() throws Exception {
@@ -47,14 +57,22 @@ class VauClientTest {
     vauCertificate = generateX509Certificate(keyPair.getPrivate(), keyPair.getPublic());
   }
 
-  @BeforeEach
-  void setUp() {
-    unitRestMock = mockStatic(Unirest.class, Answers.RETURNS_DEEP_STUBS);
-    when(Unirest.primaryInstance()).thenReturn(new UnirestInstance(new Config()));
+  private VauClient createMockClient(
+      String fdBaseUrl,
+      ClientType clientType,
+      X509Certificate vauCertificate,
+      String xApiKey,
+      String userAgent) {
+    try (val unirestMock = mockStatic(Unirest.class, Answers.RETURNS_DEEP_STUBS)) {
+      unitRestMock = mock(UnirestInstance.class, Answers.RETURNS_DEEP_STUBS);
+      when(Unirest.spawnInstance()).thenReturn(unitRestMock);
+      return new VauClient(fdBaseUrl, clientType, vauCertificate, xApiKey, userAgent);
+    }
   }
 
   private void prepareEndpointVauCertificate(byte[] responseData) {
-    when(Unirest.get("https://erp/VAUCertificate").asBytes().getBody()).thenReturn(responseData);
+    when(unitRestMock.get("https://erp/VAUCertificate").asBytes().getBody())
+        .thenReturn(responseData);
   }
 
   private void prepareResponseVau(byte[] resBody, String... resHeader) {
@@ -64,7 +82,8 @@ class VauClientTest {
   @SuppressWarnings("unchecked")
   private void prepareResponseVau(byte[] resBody, int returnCode, String... resHeader) {
     val httpResponseMock = mock(HttpResponse.class);
-    when(Unirest.post("https://erp/VAU/0")
+    when(unitRestMock
+            .post("https://erp/VAU/0")
             .header("Content-Type", "application/octet-stream")
             .header(eq(VauHeader.X_ERP_USER.getValue()), anyString())
             .body(any(byte[].class))
@@ -88,6 +107,10 @@ class VauClientTest {
   @SneakyThrows
   @Test
   void shouldHandleResponse() {
+    val vau =
+        this.createMockClient(
+            "https://erp", ClientType.FDV, vauCertificate, "testApiKey", "testAgent");
+
     prepareEndpointVauCertificate(vauCertificate.getEncoded());
     prepareResponseVau(
         "Nobody calls me chicken".getBytes(StandardCharsets.UTF_8),
@@ -96,8 +119,6 @@ class VauClientTest {
         "X-Request-Id",
         "testRequestId-123456");
 
-    val vau =
-        new VauClient("https://erp", ClientType.FDV, vauCertificate, "testApiKey", "testAgent");
     vau.initialize();
     val response = vau.send("What's wrong, McFly? Chicken!", "testToken", "/Task");
 
@@ -109,6 +130,10 @@ class VauClientTest {
   @SneakyThrows
   @Test
   void shouldHandleUnencryptedResponse500() {
+    val vau =
+        this.createMockClient(
+            "https://erp", ClientType.PS, vauCertificate, "testApiKey", "testAgent");
+
     prepareEndpointVauCertificate(vauCertificate.getEncoded());
     prepareResponseVau(
         "Nobody calls me chicken".getBytes(StandardCharsets.UTF_8),
@@ -119,9 +144,6 @@ class VauClientTest {
         "octet-stream",
         "X-Request-Id",
         "testRequestId-123456");
-
-    val vau =
-        new VauClient("https://erp", ClientType.PS, vauCertificate, "testApiKey", "testAgent");
     vau.initialize();
     assertThrows(
         VauException.class, () -> vau.send("What's wrong, McFly? Chicken!", "testToken", "/Task"));
@@ -130,11 +152,12 @@ class VauClientTest {
   @SneakyThrows
   @Test
   void shouldNotFailIfUserpseudonymMissing() {
-    prepareEndpointVauCertificate(vauCertificate.getEncoded());
-    prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
-
     try {
-      val vau = new VauClient("https://erp", ClientType.PS, vauCertificate, "", "");
+      val vau = this.createMockClient("https://erp", ClientType.PS, vauCertificate, "", "");
+
+      prepareEndpointVauCertificate(vauCertificate.getEncoded());
+      prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
+
       vau.initialize();
       vau.send("What's wrong, McFly? Chicken!", "", null);
     } catch (VauException e) {
@@ -145,11 +168,12 @@ class VauClientTest {
   @SneakyThrows
   @Test
   void shouldNotFailIfUseragentMissing() {
-    prepareEndpointVauCertificate(vauCertificate.getEncoded());
-    prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
-
     try {
-      val vau = new VauClient("https://erp", ClientType.PS, vauCertificate, null, null);
+      val vau = this.createMockClient("https://erp", ClientType.PS, vauCertificate, null, null);
+
+      prepareEndpointVauCertificate(vauCertificate.getEncoded());
+      prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
+
       vau.initialize();
       vau.send("What's wrong, McFly? Chicken!", "", null);
     } catch (VauException e) {
@@ -160,32 +184,24 @@ class VauClientTest {
   @SneakyThrows
   @Test
   void shouldFailIfBaseUrlMissing() {
-    prepareEndpointVauCertificate(vauCertificate.getEncoded());
     assertThrows(
         NullPointerException.class,
-        () -> new VauClient(null, ClientType.PS, vauCertificate, null, null));
+        () -> this.createMockClient(null, ClientType.PS, vauCertificate, null, null));
   }
 
   @SneakyThrows
   @Test
   void shouldFailIfClientTypeMissing() {
-    prepareEndpointVauCertificate(vauCertificate.getEncoded());
     assertThrows(
         NullPointerException.class,
-        () -> new VauClient("https://erp", null, vauCertificate, null, null));
+        () -> this.createMockClient("https://erp", null, vauCertificate, null, null));
   }
 
   @SneakyThrows
   @Test
   void shouldFailIfVauCertificateMissing() {
-    prepareEndpointVauCertificate(vauCertificate.getEncoded());
     assertThrows(
         NullPointerException.class,
-        () -> new VauClient("https://erp", ClientType.PS, null, null, null));
-  }
-
-  @AfterEach
-  void resetMocks() {
-    unitRestMock.closeOnDemand();
+        () -> this.createMockClient("https://erp", ClientType.PS, null, null, null));
   }
 }

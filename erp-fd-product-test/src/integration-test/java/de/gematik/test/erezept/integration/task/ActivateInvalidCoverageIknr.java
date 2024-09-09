@@ -148,7 +148,8 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
 
   private KbvErpMedicationRequest getMedicationRequest(
       AccidentExtension accident, KbvErpMedication medication) {
-    return MedicationRequestFaker.builder(sina.getPatientData())
+    return MedicationRequestFaker.builder()
+            .withPatient(sina.getPatientData())
             .withInsurance(sina.getInsuranceCoverage())
             .withRequester(doctorActor.getPractitioner())
             .withAccident(accident)
@@ -162,5 +163,6 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
         .practitioner(doctorActor.getPractitioner())
         .medicationRequest(medicationRequest) // what is the medication
         .medication(medication);
+
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,13 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.konnektor.exceptions.SOAPRequestException;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 public abstract class AbstractKonnektorCommand<R> implements KonnektorCommand<R> {
 
   static {
     System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-  }
-
-  @FunctionalInterface
-  public interface SOAPSupplier<T> {
-    T execute()
-        throws Exception; // NOSONAR we're gonna catch'em all and rethrow as SOAPRequestException
-  }
-
-  @FunctionalInterface
-  public interface SOAPAction {
-    void execute()
-        throws Exception; // NOSONAR we're gonna catch'em all and rethrow as SOAPRequestException
   }
 
   /**
@@ -54,8 +43,10 @@ public abstract class AbstractKonnektorCommand<R> implements KonnektorCommand<R>
     try {
       return supplier.execute();
     } catch (Exception e) {
-      log.error(format("{0} failed with {1}", this.getClass().getSimpleName(), e.getMessage()));
-      throw new SOAPRequestException(this.getClass(), e);
+      val errorMessage =
+          format("{0} failed with {1}", this.getClass().getSimpleName(), e.getMessage());
+      log.error(errorMessage, e);
+      throw new SOAPRequestException(this.getClass(), e.getMessage());
     }
   }
 
@@ -70,8 +61,24 @@ public abstract class AbstractKonnektorCommand<R> implements KonnektorCommand<R>
     try {
       action.execute();
     } catch (Exception e) {
-      log.error(format("{0} failed with {1}", this.getClass().getSimpleName(), e.getMessage()));
-      throw new SOAPRequestException(this.getClass(), e);
+      val errorMessage =
+          format("{0} failed with {1}", this.getClass().getSimpleName(), e.getMessage());
+      log.error(errorMessage, e);
+      throw new SOAPRequestException(this.getClass(), e.getMessage());
     }
+  }
+
+  @FunctionalInterface
+  public interface SOAPSupplier<T> {
+    T execute()
+        throws
+            Exception; // NOSONAR we're going to catch them all and rethrow as SOAPRequestException
+  }
+
+  @FunctionalInterface
+  public interface SOAPAction {
+    void execute()
+        throws
+            Exception; // NOSONAR we're going to catch them all and rethrow as SOAPRequestException
   }
 }

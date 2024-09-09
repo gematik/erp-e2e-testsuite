@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.app.task;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.Environment;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
@@ -26,7 +27,6 @@ import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.smartcard.SmartcardArchive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

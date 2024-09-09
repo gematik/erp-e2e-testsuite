@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,12 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
     val performerId = GemFaker.fakerTelematikId();
     val prescriptionId = PrescriptionId.random();
     val bundle =
-        ErxMedicationDispenseBundleBuilder.faker(3, kvnr, performerId, prescriptionId).build();
+        ErxMedicationDispenseBundleFaker.build()
+            .withAmount(3)
+            .withKvnr(kvnr)
+            .withPerformerId(performerId)
+            .withPrescriptionId(prescriptionId)
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
     assertEquals(3, bundle.getEntry().size());
@@ -82,7 +87,11 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseFaker.builder()
+                        .withKvnr(kvnr)
+                        .withPerfomer(performerId)
+                        .withPrescriptionId(prescriptionId)
+                        .fake()));
 
     val bundle = builder.build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
@@ -103,11 +112,14 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId)
-                        .version(erpWorkflowVersion)
-                        .medication(
+                    ErxMedicationDispenseFaker.builder()
+                        .withKvnr(kvnr)
+                        .withPerfomer(performerId)
+                        .withPrescriptionId(prescriptionId)
+                        .withVersion(erpWorkflowVersion)
+                        .withMedication(
                             KbvErpMedicationPZNFaker.builder().withVersion(kbvItaErpVersion).fake())
-                        .build()));
+                        .fake()));
 
     val bundle = builder.build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
@@ -128,11 +140,14 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId)
-                        .version(erpWorkflowVersion)
-                        .medication(
+                    ErxMedicationDispenseFaker.builder()
+                        .withKvnr(kvnr)
+                        .withPerfomer(performerId)
+                        .withPrescriptionId(prescriptionId)
+                        .withVersion(erpWorkflowVersion)
+                        .withMedication(
                             KbvErpMedicationPZNFaker.builder().withVersion(kbvItaErpVersion).fake())
-                        .build()));
+                        .fake()));
 
     val bundle = builder.build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
@@ -152,7 +167,11 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseBuilder.faker(kvnr, performerId, prescriptionId).build()));
+                    ErxMedicationDispenseFaker.builder()
+                        .withKvnr(kvnr)
+                        .withPerfomer(performerId)
+                        .withPrescriptionId(prescriptionId)
+                        .fake()));
 
     val bundle = builder.build();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);

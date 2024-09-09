@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class ErpResponseVerifier {
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIs(int expected) {
-    return returnCodeIs(expected, ErpAfos.A_19514_03);
+    return returnCodeIs(expected, ErpAfos.A_19514);
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIs(
@@ -63,7 +63,7 @@ public class ErpResponseVerifier {
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsNot(int expected) {
-    return returnCodeIsNot(expected, ErpAfos.A_19514_03);
+    return returnCodeIsNot(expected, ErpAfos.A_19514);
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsNot(
@@ -82,7 +82,7 @@ public class ErpResponseVerifier {
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsBetween(
       int lower, int upper) {
-    return returnCodeIsBetween(lower, upper, ErpAfos.A_19514_03);
+    return returnCodeIsBetween(lower, upper, ErpAfos.A_19514);
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsBetween(
@@ -98,12 +98,12 @@ public class ErpResponseVerifier {
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsIn(int... expected) {
-    return returnCodeIsIn(ErpAfos.A_19514_03, expected);
+    return returnCodeIsIn(ErpAfos.A_19514, expected);
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsIn(
       List<Integer> expected) {
-    return returnCodeIsIn(expected, ErpAfos.A_19514_03);
+    return returnCodeIsIn(expected, ErpAfos.A_19514);
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCodeIsIn(

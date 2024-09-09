@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,41 @@
 
 package de.gematik.test.erezept.client.vau;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.client.*;
-import de.gematik.test.erezept.client.vau.protocol.*;
-import java.io.*;
-import java.nio.charset.*;
-import java.security.*;
-import java.security.cert.*;
-import java.security.interfaces.*;
-import java.util.*;
-import javax.annotation.*;
-import javax.crypto.*;
-import javax.net.ssl.*;
-import kong.unirest.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import de.gematik.test.erezept.client.ClientType;
+import de.gematik.test.erezept.client.UnirestRetryWrapper;
+import de.gematik.test.erezept.client.vau.protocol.VauProtocol;
+import de.gematik.test.erezept.client.vau.protocol.VauVersion;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Objects;
+import javax.annotation.Nullable;
+import javax.crypto.BadPaddingException;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 public class VauClient {
 
-  private VauProtocol vauProtocol;
-  private X509Certificate vauCertificate;
-
+  private final VauProtocol vauProtocol;
   private final String fdBaseUrl;
   private final String xApiKey;
   private final String userAgent;
   private final ClientType clientType;
+  private final UnirestInstance unirest;
+  private final UnirestRetryWrapper retryWrapper = new UnirestRetryWrapper();
 
   /**
    * UserPseudonym which will be used for VAU-Sessions. Initially each VAU-Session starts with
@@ -57,10 +65,11 @@ public class VauClient {
       @Nullable String xApiKey,
       @Nullable String userAgent) {
     this.fdBaseUrl = fdBaseUrl;
-    this.vauCertificate = vauCertificate;
+    this.vauProtocol = new VauProtocol(VauVersion.V1, (ECPublicKey) vauCertificate.getPublicKey());
     this.xApiKey = xApiKey;
     this.userAgent = userAgent;
     this.clientType = clientType;
+    this.unirest = Unirest.spawnInstance();
   }
 
   @SneakyThrows
@@ -70,22 +79,24 @@ public class VauClient {
     val sslCtx = SSLContext.getInstance("TLS");
     sslCtx.init(null, new TrustManager[] {vauTrustManager}, new SecureRandom());
 
-    Unirest.primaryInstance()
+    this.unirest
         .config()
         .verifySsl(false)
-        .hostnameVerifier(new VauHostVerifier())
+        .useSystemProperties(true)
+        .retryAfter(true)
+        .connectTimeout(UnirestRetryWrapper.CONNECT_TIMEOUT * 1000)
         .sslContext(sslCtx);
-
-    vauProtocol = new VauProtocol(VauVersion.V1, (ECPublicKey) vauCertificate.getPublicKey());
     return this;
   }
 
   public Response send(
       @NonNull String innerHttpRequest, @NonNull String accessToken, String erpResource) {
-    Objects.requireNonNull(vauProtocol);
+    Objects.requireNonNull(
+        this.unirest, "VauClient is not initialized: missing call to initialize()?");
 
     val req =
-        Unirest.post(getVauRequestUrl())
+        this.unirest
+            .post(getVauRequestUrl())
             // VAU Header
             .header("Content-Type", "application/octet-stream")
             .header(VauHeader.X_ERP_USER.getValue(), this.getErpUserHeaderValue())
@@ -110,18 +121,22 @@ public class VauClient {
         format(
             "Sending VAU-Request to: {0} with Request ID {1}",
             getVauRequestUrl(), Base64.getEncoder().encodeToString(vauProtocol.getRequestId())));
-    val outerResponse = req.asBytes();
-    return createResponse(outerResponse);
+
+    val start = System.currentTimeMillis();
+    try {
+      val outerResponse = this.retryWrapper.requestWithRetries(req);
+      return createResponse(outerResponse);
+    } finally {
+      val duration = System.currentTimeMillis() - start;
+      log.info(format("VAU-Request took {0}ms", duration));
+    }
   }
 
   private Response createResponse(HttpResponse<byte[]> outerResponse) {
     // store the userpseudonym for next request
-    if (outerResponse.getHeaders().containsKey("Userpseudonym")) {
-      vauUserPseudonym = outerResponse.getHeaders().getFirst("Userpseudonym");
-    } else {
-      // reset
-      vauUserPseudonym = "0";
-    }
+    this.vauUserPseudonym =
+        outerResponse.getHeaders().get("Userpseudonym").stream().findFirst().orElse("0");
+
     val responseId = outerResponse.getHeaders().getFirst("X-Request-Id");
     // check if the response is octet-stream (encrypted) before decrypting
     val contentType = outerResponse.getHeaders().getFirst("content-type");

@@ -29,7 +29,7 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID:ERP_EE_MVO_01
-  @AFO-ID:A_22627
+  @AFO-ID:A_22627-01
   @TESTFALL:positiv
   @Workflow:160
   @Versicherung:GKV
@@ -51,7 +51,7 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID:ERP_EE_MVO_02
-  @AFO-ID:A_22627
+  @AFO-ID:A_22627-01
   @TESTFALL:positiv
   @Workflow:200
   @Versicherung:PKV
@@ -205,7 +205,7 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
 
 
   @TCID:ERP_EE_MVO_09
-  @AFO-ID:A_22627
+  @AFO-ID:A_22627-01
   @TESTFALL:positiv
   @Workflow:160
   @Versicherung:GKV
@@ -214,9 +214,9 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
   Alle vier Mehrfachverordnungen werden zusammenhängend (über eine gemeinsame ID verknüpft) auf einmal ausgestellt
 
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
-      | MVO  | MVO-ID   | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
-      | true | 13061707 | 4           | 1         | 0                 | leer             |
-      | true |          | 4           | 2         | 90                | leer             |
-      | true |          | 4           | 3         | 180               | leer             |
-      | true |          | 4           | 4         | 270               | leer             |
+      | MVO  | MVO-ID                               | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
+      | true | 497c760a-0460-4862-93a0-6f8491f83328 | 4           | 1         | 0                 | leer             |
+      | true | 497C760A-0460-4862-93A0-6F8491F83328 | 4           | 2         | 90                | leer             |
+      | true |                                      | 4           | 3         | 180               | leer             |
+      | true |                                      | 4           | 4         | 270               | leer             |
     Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt

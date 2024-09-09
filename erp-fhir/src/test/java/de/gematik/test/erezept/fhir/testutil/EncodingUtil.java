@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import static java.text.MessageFormat.format;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.util.ResourceUtils;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -54,7 +54,7 @@ public class EncodingUtil {
   public static String validateRoundtripEncoding(
       FhirParser parser, String filepath, Class<? extends Resource> clazz) {
     // read and validate the original content from file
-    val originalContent = ResourceUtils.readFileFromResource(filepath);
+    val originalContent = ResourceLoader.readFileFromResource(filepath);
     val originalValidationResult = parser.validate(originalContent);
     assertTrue(originalValidationResult.isSuccessful());
     log.info(

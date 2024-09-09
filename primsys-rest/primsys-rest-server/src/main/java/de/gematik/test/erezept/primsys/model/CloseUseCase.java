@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.primsys.model;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.client.usecases.DispenseMedicationCommand;
+import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -43,7 +43,7 @@ public class CloseUseCase {
 
   public static Response closePrescription(Pharmacy pharmacy, String taskId, String secret) {
     val acceptData = getPrescribedMedicationFromAccept(taskId);
-    return closePrescription(pharmacy, taskId, new Secret(secret), List.of(acceptData));
+    return closePrescription(pharmacy, taskId, new Secret(secret), List.of(acceptData), false);
   }
 
   public static Response closePrescription(
@@ -51,14 +51,15 @@ public class CloseUseCase {
       String taskId,
       String secret,
       List<PznDispensedMedicationDto> dispenseMedications) {
-    return closePrescription(pharmacy, taskId, new Secret(secret), dispenseMedications);
+    return closePrescription(pharmacy, taskId, new Secret(secret), dispenseMedications, true);
   }
 
   private static Response closePrescription(
       Pharmacy pharmacy,
       String prescriptionId,
       Secret secret,
-      List<PznDispensedMedicationDto> medications) {
+      List<PznDispensedMedicationDto> medications,
+      boolean isSubstituted) {
 
     val accepted = getAcceptedPrescription(prescriptionId);
 
@@ -70,12 +71,13 @@ public class CloseUseCase {
                             dispMedication,
                             KVNR.from(accepted.getForKvnr()),
                             PrescriptionId.from(prescriptionId),
-                            pharmacy.getSmcb().getTelematikId())
+                            pharmacy.getSmcb().getTelematikId(),
+                            isSubstituted)
                         .convert())
             .toList();
 
     val dispenseMedicationCommand =
-        new DispenseMedicationCommand(TaskId.from(prescriptionId), secret, medicationDispenses);
+        new ClosePrescriptionCommand(TaskId.from(prescriptionId), secret, medicationDispenses);
     val closeResponse = pharmacy.erpRequest(dispenseMedicationCommand);
     val body = closeResponse.getExpectedResource();
 

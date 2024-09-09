@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class ListEnvironments implements Callable<Integer> {
     System.out.println(format("\tUser-Agent:         {0}", env.getInternet().getUserAgent()));
     System.out.println(
         format("\tAPI-Key:            {0}", maskSecret(env.getInternet().getXapiKey())));
-    System.out.println(format("\tTSL:                {0}", env.getTslBaseUrl()));
+    System.out.println(format("\tTSL:                {0}", env.getInternet().getTslBaseUrl()));
     System.out.println(
         format("\tDiscovery Document: {0}", env.getInternet().getDiscoveryDocumentUrl()));
     System.out.println(format("\tIDP Client ID:      {0}", env.getInternet().getClientId()));
@@ -64,7 +64,7 @@ public class ListEnvironments implements Callable<Integer> {
 
     val first = secret.substring(0, startIdx);
     val masked = new String(new char[maskedLength]).replace("\0", "*");
-    val last = secret.substring(endIdx, secret.length());
+    val last = secret.substring(endIdx);
 
     return format("{0}{1}{2}", first, masked, last);
   }

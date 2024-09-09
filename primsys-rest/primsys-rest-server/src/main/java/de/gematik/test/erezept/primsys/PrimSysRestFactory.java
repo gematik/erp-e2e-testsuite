@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.primsys;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
@@ -25,7 +26,6 @@ import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
-import de.gematik.test.smartcard.SmartcardArchive;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

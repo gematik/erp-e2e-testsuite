@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 
+import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
@@ -35,7 +36,6 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.testutil.FhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -108,7 +108,7 @@ class MovingToPrescriptionTest {
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
     when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.isMultiple()).thenReturn(false);
-    when(kbvBundle.isMultiple()).thenReturn(false);
+    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)

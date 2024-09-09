@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 class GrizzlyServerShutdownHookTest {
 
   @Test
+  @SuppressWarnings("unchecked")
   void shouldThrowInterruptedException() throws ExecutionException, InterruptedException {
     val server = mock(HttpServer.class);
     val shutdownHook = new GrizzlyServerShutdownHook(server);
@@ -43,6 +44,7 @@ class GrizzlyServerShutdownHookTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   void testRun() throws ExecutionException, InterruptedException {
     val server = mock(HttpServer.class);
     val shutdownHook = new GrizzlyServerShutdownHook(server);

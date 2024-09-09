@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,22 @@
 
 package de.gematik.test.cardterminal;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.konnektor.util.CardsUtil;
-import de.gematik.test.smartcard.SmartcardType;
 import de.gematik.ws.conn.cardservice.v8.CardInfoType;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 class CardInfoTest {
 
   @Test
-  public void createCardHandleWithBuilder() {
+  void createCardHandleWithBuilder() {
     val smartCardTypes =
         List.of(SmartcardType.SMC_B, SmartcardType.EGK, SmartcardType.EGK, SmartcardType.SMC_KT);
 
@@ -54,7 +54,7 @@ class CardInfoTest {
   }
 
   @Test
-  public void createCardHandleFromCardInfoType() {
+  void createCardHandleFromCardInfoType() {
     val smartCardTypes = List.of(CardTypeType.EGK, CardTypeType.HBA, CardTypeType.SMC_B);
 
     smartCardTypes.forEach(
@@ -75,7 +75,7 @@ class CardInfoTest {
         });
   }
 
-  @org.junit.jupiter.api.Test
+  @Test
   void testEquals() {
     val card1 =
         CardInfo.fromCardInfoType(

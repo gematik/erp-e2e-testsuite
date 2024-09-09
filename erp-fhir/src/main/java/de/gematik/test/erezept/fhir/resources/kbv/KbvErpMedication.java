@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public List<MedicationCategory> getCatagory() {
     return this.getExtension().stream()
-        .filter(
-            ext -> ext.getUrl().equals(KbvItaErpStructDef.MEDICATION_CATEGORY.getCanonicalUrl()))
+        .filter(KbvItaErpStructDef.MEDICATION_CATEGORY::match)
         .map(Extension::getValue)
         .map(coding -> coding.castToCoding(coding))
         .map(coding -> MedicationCategory.fromCode(coding.getCode()))
@@ -64,17 +63,25 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public Optional<MedicationType> getMedicationType() {
     return this.getCode().getCoding().stream()
-        .filter(coding -> coding.getSystem().equals(MedicationType.CODE_SYSTEM.getCanonicalUrl()))
+        .filter(MedicationType.CODE_SYSTEM::match)
         .map(coding -> MedicationType.fromCode(coding.getCode()))
         .findFirst();
   }
 
   public Optional<Integer> getPackagingAmount() {
     return this.getAmount().getNumerator().getExtension().stream()
-        .filter(ext -> KbvItaErpStructDef.PACKAGING_SIZE.match(ext.getUrl()))
+        .filter(KbvItaErpStructDef.PACKAGING_SIZE::match)
         .map(ext -> ext.getValue().castToString(ext.getValue()).getValue())
         .map(Integer::parseInt) // why is the amount defined as String?
         .findFirst();
+  }
+
+  public int getMedicationAmount() {
+    int ret = 0; // Note: return simply 0 if no amount was given as this field is optional
+    if (this.getAmount().getNumerator().getValue() != null) {
+      ret = this.getAmount().getNumerator().getValue().intValue();
+    }
+    return ret;
   }
 
   public Optional<String> getPackagingUnit() {
@@ -83,7 +90,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public boolean isVaccine() {
     return this.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(KbvItaErpStructDef.MEDICATION_VACCINE.getCanonicalUrl()))
+        .filter(KbvItaErpStructDef.MEDICATION_VACCINE::match)
         .map(Extension::getValue)
         .map(coding -> coding.castToBoolean(coding))
         .map(BooleanType::booleanValue)
@@ -128,7 +135,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public List<String> getPzn() {
     return this.getCode().getCoding().stream()
-        .filter(coding -> coding.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
+        .filter(DeBasisCodeSystem.PZN::match)
         .map(Coding::getCode)
         .toList();
   }
@@ -146,7 +153,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   private Optional<PZN> getPznFromPznMedication() {
     return this.getCode().getCoding().stream()
-        .filter(coding -> coding.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
+        .filter(DeBasisCodeSystem.PZN::match)
         .map(coding -> PZN.from(coding.getCode()))
         .findFirst();
   }
@@ -177,7 +184,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public StandardSize getStandardSize() {
     return this.getExtension().stream()
-        .filter(ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
+        .filter(DeBasisStructDef.NORMGROESSE::match)
         .map(ext -> StandardSize.fromCode(ext.getValue().castToCoding(ext.getValue()).getCode()))
         .findFirst()
         .orElse(StandardSize.KA);

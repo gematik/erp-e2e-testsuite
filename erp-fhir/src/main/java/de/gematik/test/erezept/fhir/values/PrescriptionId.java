@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,10 @@ public class PrescriptionId extends Value<String> {
 
   public boolean check() {
     return checkId(this.getValue());
+  }
+
+  public TaskId toTaskId() {
+    return TaskId.from(this);
   }
 
   public PrescriptionFlowType getFlowType() {

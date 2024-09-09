@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,34 @@
 
 package de.gematik.test.konnektor.commands;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.konnektor.exceptions.SmartcardMissmatchException;
 import de.gematik.test.konnektor.soap.ServicePortProvider;
 import de.gematik.test.konnektor.util.CardsUtil;
-import de.gematik.test.smartcard.SmartcardType;
 import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.eventservice.wsdl.v7.EventServicePortType;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class GetCardInfoCommandTest {
+class GetCardInfoCommandTest {
 
   private ContextType ctx;
   private ServicePortProvider mockProvider;
   private EventServicePortType mockEventService;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     ctx = new ContextType();
     ctx.setClientSystemId("cs1");
     ctx.setMandantId("m1");
@@ -74,7 +76,7 @@ public class GetCardInfoCommandTest {
 
   @Test
   @SneakyThrows
-  public void shouldThrowSmartcardMissmatchExceptionOnUnavailableIccsn() {
+  void shouldThrowSmartcardMissmatchExceptionOnUnavailableIccsn() {
     val status = new Status();
     status.setResult("OK");
     val mockResponse = CardsUtil.createGetCardsResponse(status, 10);

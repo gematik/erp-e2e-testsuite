@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.actions.rawhttpactions;
 
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import kong.unirest.HttpResponse;
+import kong.unirest.core.HttpResponse;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;

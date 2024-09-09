@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,29 @@ package de.gematik.test.cardterminal.cats;
 
 import static java.text.MessageFormat.format;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.test.cardterminal.CardTerminalClient;
 import de.gematik.test.cardterminal.cats.dto.CardConfigurationDto;
 import de.gematik.test.cardterminal.cats.dto.CardStatusDto;
 import de.gematik.test.cardterminal.exceptions.CardConfigurationException;
 import de.gematik.test.cardterminal.exceptions.CardTerminalClientException;
 import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
-import de.gematik.test.smartcard.Smartcard;
 import java.util.concurrent.TimeUnit;
-import kong.unirest.JsonObjectMapper;
-import kong.unirest.ObjectMapper;
-import kong.unirest.Unirest;
-import lombok.*;
+import kong.unirest.core.Unirest;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @RequiredArgsConstructor
 @Slf4j
 public class CatsClient implements CardTerminalClient {
 
-  private static final ObjectMapper OBJECT_MAPPER = new JsonObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new JsonMapper();
   @Getter private final String ctId;
   @NonNull private final String address;
 
@@ -45,20 +49,23 @@ public class CatsClient implements CardTerminalClient {
   }
 
   @Override
+  @SneakyThrows
   public void insertCard(Smartcard card, int slotId) {
     // deactivate card
     request(
         address + "/config/card/insert",
-        OBJECT_MAPPER.writeValue(new CardStatusDto(slotId, false)));
+        OBJECT_MAPPER.writeValueAsString(new CardStatusDto(slotId, false)));
 
     // change card configuration
     request(
         address + "/config/card/configuration",
-        OBJECT_MAPPER.writeValue(new CardConfigurationDto(slotId, toCatsConfigurationPath(card))));
+        OBJECT_MAPPER.writeValueAsString(
+            new CardConfigurationDto(slotId, toCatsConfigurationPath(card))));
 
     // activate card
     request(
-        address + "/config/card/insert", OBJECT_MAPPER.writeValue(new CardStatusDto(slotId, true)));
+        address + "/config/card/insert",
+        OBJECT_MAPPER.writeValueAsString(new CardStatusDto(slotId, true)));
   }
 
   @SneakyThrows
@@ -78,6 +85,10 @@ public class CatsClient implements CardTerminalClient {
     // Workaround to prevent tls client authentication
     Unirest.config().verifySsl(true);
     if (resp.getStatus() != 200) {
+      log.error(
+          format(
+              "Unexpected Response from CATS: status: {0} body {1}",
+              resp.getStatus(), resp.getBody()));
       throw new CardTerminalClientException(address, body, resp);
     }
 
@@ -85,10 +96,11 @@ public class CatsClient implements CardTerminalClient {
   }
 
   private String toCatsConfigurationPath(Smartcard card) {
+    val configTypeName = card.getType().name().toLowerCase().replace("-", "_");
     return format(
         "/opt/cats-configuration/card-simulation/"
             + "CardSimulationConfigurations/configuration_{0}_{1}.xml",
-        card.getType().toConfig(), card.getIccsn());
+        configTypeName, card.getIccsn());
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfDispenseMedicationOperation;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfClosePrescriptionOperation;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfDispensePrescriptionAsBundle;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfReDispenseMedication;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
-import de.gematik.test.erezept.screenplay.task.DispenseMedication;
-import de.gematik.test.erezept.screenplay.task.Negate;
-import de.gematik.test.erezept.screenplay.task.ThatNotAllowedToAsk;
+import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
@@ -43,26 +40,26 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePharmacy)
-        .attemptsTo(DispenseMedication.toPatient(order, thePatient).withPrescribedMedications());
+        .attemptsTo(ClosePrescription.toPatient(order, thePatient).withPrescribedMedications());
   }
 
   @Wenn("^die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept korrekt dispensiert$")
   public void whenDispenseMedication(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
-    when(thePharmacy).attemptsTo(DispenseMedication.fromStack(order).withPrescribedMedications());
+    when(thePharmacy).attemptsTo(ClosePrescription.fromStack(order).withPrescribedMedications());
   }
 
   @Wenn("^die Apotheke das (letzte|erste) akzeptierte E-Rezept korrekt dispensiert$")
   public void whenDispenseMedication(String order) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
-    when(thePharmacy).attemptsTo(DispenseMedication.fromStack(order).withPrescribedMedications());
+    when(thePharmacy).attemptsTo(ClosePrescription.fromStack(order).withPrescribedMedications());
   }
 
   @Dann("^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept korrekt dispensieren$")
   @Und("^die Apotheke (.+) kann das (letzte|erste) akzeptierte E-Rezept korrekt dispensieren$")
   public void thenDispenseMedication(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
-    then(thePharmacy).attemptsTo(DispenseMedication.fromStack(order).withPrescribedMedications());
+    then(thePharmacy).attemptsTo(ClosePrescription.fromStack(order).withPrescribedMedications());
   }
 
   @Wenn(
@@ -74,8 +71,7 @@ public class PharmacyDispenseSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePharmacy)
         .attemptsTo(
-            DispenseMedication.toPatient(order, thePatient)
-                .withAlternativeMedications(medications));
+            ClosePrescription.toPatient(order, thePatient).withAlternativeMedications(medications));
   }
 
   @Wenn(
@@ -87,8 +83,7 @@ public class PharmacyDispenseSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePharmacy)
         .attemptsTo(
-            DispenseMedication.toPatient(order, thePatient)
-                .withAlternativeMedications(medications));
+            ClosePrescription.toPatient(order, thePatient).withAlternativeMedications(medications));
   }
 
   @Dann(
@@ -102,8 +97,7 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(
-                    DispenseMedication.withSecret(order, wrongSecret).withPrescribedMedications())
+            Negate.the(ClosePrescription.withSecret(order, wrongSecret).withPrescribedMedications())
                 .with(UnexpectedResponseResourceError.class));
   }
 
@@ -117,8 +111,7 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(
-                    DispenseMedication.withSecret(order, wrongSecret).withPrescribedMedications())
+            Negate.the(ClosePrescription.withSecret(order, wrongSecret).withPrescribedMedications())
                 .with(UnexpectedResponseResourceError.class));
   }
 
@@ -133,7 +126,7 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(DispenseMedication.toKvnr(order, wrongKvnr).withPrescribedMedications())
+            Negate.the(ClosePrescription.toKvnr(order, wrongKvnr).withPrescribedMedications())
                 .with(UnexpectedResponseResourceError.class));
   }
 
@@ -147,7 +140,7 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(DispenseMedication.toKvnr(order, wrongKvnr).withPrescribedMedications())
+            Negate.the(ClosePrescription.toKvnr(order, wrongKvnr).withPrescribedMedications())
                 .with(UnexpectedResponseResourceError.class));
   }
 
@@ -155,7 +148,7 @@ public class PharmacyDispenseSteps {
   @Und("^die Apotheke kann das (letzte|erste) akzeptierte E-Rezept korrekt dispensieren$")
   public void thenDispenseMedication(String order) {
     val thePharmacy = OnStage.theActorInTheSpotlight();
-    then(thePharmacy).attemptsTo(DispenseMedication.fromStack(order).withPrescribedMedications());
+    then(thePharmacy).attemptsTo(ClosePrescription.fromStack(order).withPrescribedMedications());
   }
 
   @Dann("^kann die Apotheke (.+) noch kein E-Rezept dispensieren$")
@@ -164,7 +157,7 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(DispenseMedication.fromStack(DequeStrategy.LIFO).withPrescribedMedications())
+            Negate.the(ClosePrescription.fromStack(DequeStrategy.LIFO).withPrescribedMedications())
                 .with(MissingPreconditionError.class));
   }
 
@@ -174,7 +167,7 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorInTheSpotlight();
     then(thePharmacy)
         .attemptsTo(
-            Negate.the(DispenseMedication.fromStack(DequeStrategy.LIFO).withPrescribedMedications())
+            Negate.the(ClosePrescription.fromStack(DequeStrategy.LIFO).withPrescribedMedications())
                 .with(MissingPreconditionError.class));
   }
 
@@ -186,7 +179,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationOperation.fromStack(order)
+                    ResponseOfClosePrescriptionOperation.fromStack(order)
                         .forPrescribedMedications())
                 .isEqualTo(410));
   }
@@ -199,7 +192,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationOperation.fromStack(order)
+                    ResponseOfClosePrescriptionOperation.fromStack(order)
                         .forPrescribedMedications())
                 .isEqualTo(410));
   }
@@ -212,7 +205,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationOperation.fromStack(order)
+                    ResponseOfClosePrescriptionOperation.fromStack(order)
                         .forPrescribedMedications())
                 .isEqualTo(403));
   }
@@ -225,7 +218,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationOperation.fromStack(order)
+                    ResponseOfClosePrescriptionOperation.fromStack(order)
                         .forPrescribedMedications())
                 .isEqualTo(403));
   }
@@ -255,5 +248,21 @@ public class PharmacyDispenseSteps {
         .attemptsTo(
             ThatNotAllowedToAsk.the(GetMedicationDispense.asPharmacy().forPrescription(order))
                 .with(UnexpectedResponseResourceError.class));
+  }
+
+  @Und(
+      "^die Apotheke (.+) für das (letzte|erste) akzeptierte E-Rezept von (.+) die"
+          + " Dispensierinformationen zeitnah bereitstellt$")
+  public void andPharmacyProvidesDispensingInformationTimelyManner(
+      String pharmName, String order, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    and(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfDispensePrescriptionAsBundle.fromStack(order)
+                        .forPatient(thePatient)
+                        .build())
+                .isEqualTo(200));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.eventservice.v7.*;
 import de.gematik.ws.conn.eventservice.wsdl.v7.EventServicePortType;
 import de.gematik.ws.conn.eventservice.wsdl.v7.FaultMessage;
+import jakarta.xml.ws.Holder;
 import java.math.BigInteger;
 import java.util.List;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.Holder;
 import lombok.val;
 import org.apache.commons.lang3.NotImplementedException;
 

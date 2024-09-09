@@ -48,7 +48,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
@@ -64,7 +63,6 @@ import org.junit.runner.RunWith;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Verordnungen mit String Fuzzing and SmartFuzzer ")
 @Tag("Fuzzing")
-@WithTag("Fuzzing")
 class ActivateFuzzedKbvBundles extends ErpTest {
 
   private static final Integer iterations = featureConf.getToggle(new FuzzingIterationsToggle());

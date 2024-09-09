@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,18 @@ package de.gematik.test.konnektor.soap.mock;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.crypto.signature.EcdsaSigner;
-import de.gematik.test.erezept.crypto.signature.RsaPssSigner;
-import de.gematik.test.smartcard.Algorithm;
-import de.gematik.test.smartcard.exceptions.SmartCardKeyNotFoundException;
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.crypto.signature.EcdsaSigner;
+import de.gematik.bbriccs.crypto.signature.RsaPssSigner;
+import de.gematik.bbriccs.smartcards.exceptions.SmartCardKeyNotFoundException;
 import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.AuthSignatureServicePortType;
 import de.gematik.ws.conn.authsignatureservice.wsdl.v7_4.FaultMessage;
 import de.gematik.ws.conn.connectorcommon.v5.Status;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.v7_4.BinaryDocumentType;
 import de.gematik.ws.conn.signatureservice.v7_4.ExternalAuthenticate.OptionalInputs;
+import jakarta.xml.ws.Holder;
 import java.security.interfaces.RSAPrivateKey;
-import javax.xml.ws.Holder;
 import lombok.val;
 import oasis.names.tc.dss._1_0.core.schema.Base64Signature;
 import oasis.names.tc.dss._1_0.core.schema.SignatureObject;
@@ -61,7 +61,7 @@ public class MockAuthSignatureServicePortType extends AbstractMockService
                         mockKonnektor.createError(cardHandle)));
 
     val toBeSignedData = binaryString.getBase64Data().getValue();
-    val algorithm = Algorithm.fromSpecificationUrn(optionalInputs.getSignatureType());
+    val algorithm = CryptoSystem.fromSpecificationUrn(optionalInputs.getSignatureType());
 
     val autCert =
         scw.getSmartcard()

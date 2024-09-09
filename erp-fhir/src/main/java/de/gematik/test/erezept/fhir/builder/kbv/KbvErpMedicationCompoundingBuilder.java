@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,12 @@ public class KbvErpMedicationCompoundingBuilder
     return new KbvErpMedicationCompoundingBuilder();
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationCompoundingBuilder faker() {
     return faker(PZN.random(), "Fancy Salbe die auch als Schuhcreme funktioniert", "freeTheText");
   }
 
+  @Deprecated(forRemoval = true)
   public static KbvErpMedicationCompoundingBuilder faker(PZN pzn, String name, String freiText) {
     return new KbvErpMedicationCompoundingBuilder()
         .medicationIngredient(pzn, name, freiText)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,22 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
-import de.gematik.test.erezept.app.abilities.*;
-import de.gematik.test.erezept.app.mobile.*;
-import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.app.abilities.UseConfigurationData;
+import de.gematik.test.erezept.app.abilities.UseTheApp;
+import de.gematik.test.erezept.app.mobile.Environment;
+import de.gematik.test.erezept.app.mobile.elements.DebugSettings;
 import de.gematik.test.erezept.app.task.ChangeTheEnvironment;
 import de.gematik.test.erezept.app.task.CreateNewProfile;
 import de.gematik.test.erezept.app.task.NavigateThroughCardwall;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import de.gematik.test.smartcard.SmartcardArchive;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Task;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,7 +44,7 @@ public class SetUpIosDevice implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
-    val userConfig = SafeAbility.getAbility(actor, UseAppUserConfiguration.class);
+    val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
 
     actor.attemptsTo(NavigateThroughOnboardingOnIOS.entirely());
     actor.attemptsTo(CreateNewProfile.fromSettingsMenu());

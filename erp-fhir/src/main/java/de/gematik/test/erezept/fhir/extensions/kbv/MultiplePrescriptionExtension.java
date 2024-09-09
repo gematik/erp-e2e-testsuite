@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,24 @@
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
 
-import static java.text.MessageFormat.format;
-
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Ratio;
 
 /** Mehrfachverordnung MVO */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,7 +45,7 @@ public class MultiplePrescriptionExtension {
   private Ratio ratio;
   @Nullable private Date start;
   @Nullable private Date end;
-  @Nullable private String id;
+  private MultiplePrescriptionIdExtension id;
 
   public Optional<Date> getStart() {
     return Optional.ofNullable(start);
@@ -80,11 +86,7 @@ public class MultiplePrescriptionExtension {
       innerExtensions.add(periodExt);
 
       if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) >= 0) {
-        val idSystem = "urn:ietf:rfc:3986";
-        val urnIdentifier = format("urn:uuid:{0}", this.id != null ? this.id : UUID.randomUUID());
-        val mvoIdentifier = new Identifier().setSystem(idSystem).setValue(urnIdentifier);
-        val idExt = new Extension("ID", mvoIdentifier);
-        innerExtensions.add(idExt);
+        innerExtensions.add(id.asExtension());
       }
     }
 
@@ -107,14 +109,15 @@ public class MultiplePrescriptionExtension {
   public static class Builder {
     private final Ratio ratio;
     private Date start;
-    @Nullable private String id;
+    @Nullable private MultiplePrescriptionIdExtension id;
 
-    public Builder withRandomId() {
-      return withId(UUID.randomUUID().toString());
+    public Builder withId(MultiplePrescriptionIdExtension id) {
+      this.id = id;
+      return this;
     }
 
     public Builder withId(String id) {
-      this.id = id;
+      this.id = MultiplePrescriptionIdExtension.withId(id);
       return this;
     }
 
@@ -181,11 +184,16 @@ public class MultiplePrescriptionExtension {
 
     public MultiplePrescriptionExtension validThrough(@Nullable Date start, @Nullable Date end) {
       val ret = new MultiplePrescriptionExtension(true);
-      ret.id = id;
+      ret.id = id != null ? id : MultiplePrescriptionIdExtension.randomId();
       ret.ratio = ratio;
       ret.start = start;
       ret.end = end;
       return ret;
+    }
+
+    public Builder withRandomId() {
+      this.id = MultiplePrescriptionIdExtension.randomId();
+      return this;
     }
   }
 }

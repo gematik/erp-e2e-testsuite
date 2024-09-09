@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class ManageChargeItemsTest {
     assertTrue(ability.getChargeItems().getRawList().isEmpty());
 
     val prescriptionId = PrescriptionId.random();
-    val chargeItem = ErxChargeItemBuilder.faker(prescriptionId).build();
+    val chargeItem = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId).fake();
 
     ability.update(chargeItem);
     assertEquals(1, ability.getChargeItems().getRawList().size());
@@ -45,9 +45,15 @@ class ManageChargeItemsTest {
 
     val prescriptionId = PrescriptionId.random();
     val chargeItem1 =
-        ErxChargeItemBuilder.faker(prescriptionId).markingFlag(true, true, true).build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(prescriptionId)
+            .withMarkingFlag(true, true, true)
+            .fake();
     val chargeItem2 =
-        ErxChargeItemBuilder.faker(prescriptionId).markingFlag(false, false, false).build();
+        ErxChargeItemFaker.builder()
+            .withPrescriptionId(prescriptionId)
+            .withMarkingFlag(false, false, false)
+            .fake();
 
     ability.update(chargeItem1);
     assertEquals(1, ability.getChargeItems().getRawList().size());
@@ -67,10 +73,10 @@ class ManageChargeItemsTest {
     assertTrue(ability.getChargeItems().getRawList().isEmpty());
 
     val prescriptionId1 = PrescriptionId.random();
-    val chargeItem1 = ErxChargeItemBuilder.faker(prescriptionId1).build();
+    val chargeItem1 = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId1).fake();
 
     val prescriptionId2 = PrescriptionId.random();
-    val chargeItem2 = ErxChargeItemBuilder.faker(prescriptionId2).build();
+    val chargeItem2 = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId2).fake();
 
     ability.update(chargeItem1);
     ability.update(chargeItem2);

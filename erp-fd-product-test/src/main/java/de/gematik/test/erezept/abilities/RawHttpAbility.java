@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,18 @@
 
 package de.gematik.test.erezept.abilities;
 
-import kong.unirest.UnirestInstance;
+import kong.unirest.core.UnirestInstance;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import net.serenitybdd.screenplay.Ability;
+import net.serenitybdd.screenplay.HasTeardown;
 
 @RequiredArgsConstructor
-public class RawHttpAbility implements Ability {
+public class RawHttpAbility implements Ability, HasTeardown {
   @Delegate private final UnirestInstance client;
+
+  @Override
+  public void tearDown() {
+    client.close();
+  }
 }

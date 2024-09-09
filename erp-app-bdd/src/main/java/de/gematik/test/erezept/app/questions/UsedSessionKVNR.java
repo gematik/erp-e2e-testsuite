@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.app.mobile.elements.Profile;
 import de.gematik.test.erezept.app.mobile.elements.ProfileSelectorElement;
+import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,11 +40,21 @@ public class UsedSessionKVNR implements Question<String> {
   public String answeredBy(Actor actor) {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
 
-    app.tap(BottomNav.SETTINGS_BUTTON);
+    ensureSettingsMenuIsOpened(app);
     app.tap(ProfileSelectorElement.forActor(actor).fromSettingsMenu());
     val userKVNR = app.getText(Profile.USER_KVNR);
     app.tap(Debug.LEAVE_BUTTON);
     return userKVNR;
+  }
+
+  private void ensureSettingsMenuIsOpened(UseTheApp<?> app) {
+    app.tap(BottomNav.SETTINGS_BUTTON);
+
+    // occasionally, clicking the settings button does not open the settings menu
+    if (!app.isPresent(Settings.SETTINGS_HEADER_LINE)) {
+      // perform one single retry to open the settings menu
+      app.tap(BottomNav.SETTINGS_BUTTON);
+    }
   }
 
   public static UsedSessionKVNR fromUserProfile() {

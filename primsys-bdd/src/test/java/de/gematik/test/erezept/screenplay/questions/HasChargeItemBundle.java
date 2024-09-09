@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ public class HasChargeItemBundle implements Question<Boolean> {
 
     val pharmacyStack = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
-    val dispensed = deque.chooseFrom(pharmacyStack.getDispensedPrescriptions());
+    val dispensed = deque.chooseFrom(pharmacyStack.getClosedPrescriptions());
 
     if (!chargeItem.getPrescriptionId().equals(dispensed.getPrescriptionId())) {
       log.warn(
@@ -103,7 +103,7 @@ public class HasChargeItemBundle implements Question<Boolean> {
       return false;
     }
 
-    return chargeItem.getEntererTelematikId().equals(smcb.getTelematikID());
+    return chargeItem.getEntererTelematikId().getValue().equals(smcb.getTelematikID());
   }
 
   public static Builder forLastDispensedDrug() {

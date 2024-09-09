@@ -57,7 +57,7 @@
         <fullUrl value="https://erp.zentral.erp.splitdns.ti-dienste.de/Device/1"/>
         <resource>
             <Device xmlns="http://hl7.org/fhir">
-                <id value="1"/>
+                <!--<id value="1"/>-->
                 <meta>
                     <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Device|1.2"/>
                 </meta>
@@ -81,7 +81,7 @@
         <fullUrl value="https://erp.zentral.erp.splitdns.ti-dienste.de/Binary/PrescriptionDigest-160.000.006.708.177.19"/>
         <resource>
             <Binary xmlns="http://hl7.org/fhir">
-                <id value="PrescriptionDigest-160.000.006.708.177.19"/>
+                <!--<id value="PrescriptionDigest-160.000.006.708.177.19"/>-->
                 <meta>
                     <versionId value="1"/>
                     <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"/>

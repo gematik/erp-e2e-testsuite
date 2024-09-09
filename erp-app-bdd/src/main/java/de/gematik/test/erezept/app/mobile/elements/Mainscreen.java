@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,6 @@ public enum Mainscreen implements PageElement {
       "Delete Prescription",
       () -> By.xpath("/ComposeNode/ComposeNode/VerticalScrollAxisRange/Button"),
       () -> AppiumBy.accessibilityId("erx_btn_show_settings")),
-  LEAVE_DETAILS(
-      "Leave Prescription Details",
-      () -> AppiumBy.accessibilityId("nav_btn_back"),
-      () -> AppiumBy.accessibilityId("nav_btn_back")),
   PRESCRIPTIONS_LIST(
       "List of Prescriptions",
       () ->

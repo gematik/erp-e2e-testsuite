@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,12 @@
 package de.gematik.test.erezept.fhir.resources.kbv;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coverage;
 import org.hl7.fhir.r4.model.Resource;
@@ -39,5 +44,48 @@ class KbvCoverageTest {
     val kbvCoverage = KbvCoverage.fromCoverage(resource);
     val kbvCoverage2 = KbvCoverage.fromCoverage(kbvCoverage);
     assertEquals(kbvCoverage, kbvCoverage2);
+  }
+
+  @Test
+  void shouldThrowOnMissingInsuranceKind() {
+    val coverage = mock(KbvCoverage.class);
+    when(coverage.getInsuranceKindOptional()).thenReturn(Optional.empty());
+    when(coverage.getInsuranceKind()).thenCallRealMethod();
+    assertThrows(MissingFieldException.class, coverage::getInsuranceKind);
+  }
+
+  @Test
+  void shouldThrowOnMissingInsurantState() {
+    val coverage = mock(KbvCoverage.class);
+    when(coverage.getInsurantStateOptional()).thenReturn(Optional.empty());
+    when(coverage.getInsurantState()).thenCallRealMethod();
+    assertThrows(MissingFieldException.class, coverage::getInsurantState);
+  }
+
+  @Test
+  void shouldThrowOnMissingPersonGroup() {
+    val coverage = mock(KbvCoverage.class);
+    when(coverage.getPersonGroupOptional()).thenReturn(Optional.empty());
+    when(coverage.getPersonGroup()).thenCallRealMethod();
+    assertThrows(MissingFieldException.class, coverage::getPersonGroup);
+  }
+
+  @Test
+  void shouldReturnDmpKennzeichen() {
+    val coverage = mock(KbvCoverage.class);
+    when(coverage.getDmpKennzeichenOptional()).thenReturn(Optional.of(DmpKennzeichen.DM1));
+    when(coverage.getDmpKennzeichen()).thenCallRealMethod();
+    assertDoesNotThrow(coverage::getDmpKennzeichen);
+
+    val coverage2 = new KbvCoverage();
+    assertEquals(Optional.empty(), coverage2.getDmpKennzeichenOptional());
+  }
+
+  @Test
+  void shouldThrowOnMissingDmpKennzeichen() {
+    val coverage = mock(KbvCoverage.class);
+    when(coverage.getDmpKennzeichenOptional()).thenReturn(Optional.empty());
+    when(coverage.getDmpKennzeichen()).thenCallRealMethod();
+    assertThrows(MissingFieldException.class, coverage::getDmpKennzeichen);
   }
 }

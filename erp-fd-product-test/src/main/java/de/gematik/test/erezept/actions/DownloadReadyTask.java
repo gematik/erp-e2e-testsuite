@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ package de.gematik.test.erezept.actions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,28 @@ public class DownloadReadyTask extends ErpAction<ErxTaskBundle> {
             "Request Get /Task as pharmacy with exam evidence {0} and kvnr {1} ",
             examEvidence, kvnr));
     val cmd = new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64()).andKvnr(kvnr);
+    return new DownloadReadyTask(cmd);
+  }
+
+  public static DownloadReadyTask asPatient(List<IQueryParameter> queryParameter) {
+    val cmd = new DownloadReadyTask(new TaskGetCommand(queryParameter));
+    log.info(
+        format(
+            "Request Get /Task with Query {0} as as Patient with Sort- or PagingParams ",
+            queryParameter));
+    return cmd;
+  }
+
+  public static DownloadReadyTask withExamEvidenceAnOptionalQueryParams(
+      VsdmExamEvidence examEvidence, KVNR kvnr, List<IQueryParameter> queryParameter) {
+    log.info(
+        format(
+            "Request Get /Task as pharmacy with exam evidence {0} and kvnr {1} and QueryParam {2} ",
+            examEvidence, kvnr, queryParameter));
+    val cmd =
+        new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64())
+            .andKvnr(kvnr)
+            .andAdditionalQuery(queryParameter);
     return new DownloadReadyTask(cmd);
   }
 

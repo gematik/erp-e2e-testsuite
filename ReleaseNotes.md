@@ -1,14 +1,50 @@
 # Release Notes ERP E2E Testsuite
 
-## Release 0.7.0
+## Release 0.8.0
 
+Module:
+
+* erp-client:
+  - GetOcspRequestParamBuilder to use in GetOCSPRequest
+  - C_11530: add generic BundlePagingCommand to get previous or next bundleSet based on specific bundle
+  - add QueryParam extracting Method to IQueryParameters
+  - extends SearchQueryBuilder in IQueryParameter
+  - add QueryParams builder in IQueryParameters for whenHandedOver, whenPrepared, fromPerformer, withOffset, -Count,
+    -Sort
+  - C_11574: split $dispense and $close operation to do both separately.
+  - C_11574: add DispenseOperation and CloseOperation to handle Dispense and Close operations
+* erp-fd-product-test:
+  - add action GetOCSPRequest to call Certificate from FD for C_11598
+  - add action GetTslList to download filter it.
+  - add StoreChargeItem with minimal Builder in Pr-Test for C_11617
+  - C_11530: add generic DownloadBundle Question
+  - C_11530: add GenericBundleVerifier to use on SearchSetBundles for basic BundleStructures
+  - C_11530: extends TaskBundleVerifier to handle SearchSetBundles and compare their entries and relations
+  - C_11530: add MedicationRequestVerifier to handle MedicationRequests and compare their entries and relations
+  - extends CommunicationBundleVerifier to handle SearchSetBundles and compare their entries and relations
+  - Extension of the key table "Darreichungsform" to include "Injektions- und Infusionsdispersion (IID)" and "Lösung zur intravesikalen Anwendung (LIV)"
+  - Implenmented TestSzenario to validate the availability of IID and LIV
+  - Add toggle to activate Validation for IID and LIV
+* erp-fhir:
+  - add FHIR E-Rezept Workflow Version 1.3 (de.gematik.erezept-workflow.r4)
+* primsys-rest:
+  - Communication search endpoint for pharmacies
+  - Communication replyWithSender Endepoint &sender=<value>
+
+* konnektor-client:
+  - upgrade from `javax.ws` to `jakarta.ws`
+* openapi: 
+  - update ErpTestDriver OpenAPI specification to version 1.0.1
+## Release 0.7.0
 
 Implemented Features:
 
-- PrimSysRest - Add a new Endpoint (pharm{id}/withEvidence) to call a list of prescriptions that fits to the given evidence
+- PrimSysRest - Add a new Endpoint (pharm{id}/withEvidence) to call a list of prescriptions that fits to the given
+  evidence
 - Add verification steps, to check if Receipts has "fullUrl as urn:uuid", references in composition as "urn:uuid"
 - C_11669 - Extends test cases for the feature “Egk in der Pharmacy” with PN3
-- C_11595 - Add test case to verify that only e-prescriptions with workflow 160 are retrieved with the feature "eGK in pharmacy"
+- C_11595 - Add test case to verify that only e-prescriptions with workflow 160 are retrieved with the feature "eGK in
+  pharmacy"
 - Implemented _anonymization_ feature for KBV-Bundles in `erp-cli-fhir`
 - Implenmented TestSzenario to validate QES-HASH from activated Prescription and Receipt-Binary
 - C_11582: Add toggle to activate Validation for ANR-Validation in Error-Configuration

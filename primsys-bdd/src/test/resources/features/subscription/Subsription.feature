@@ -46,6 +46,7 @@ Funktionalität: Subscription Service für Apotheken
   @TESTFALL:positiv
   @AFO-ID:A_22367-01
   @AFO-ID:A_22364
+  @Funktionalität:InfoReq
   @Hauptdarsteller:Apotheke
   Szenario: Benachrichtigung beim Eingang einer neuen Anfrage
   Eine Apotheke wird durch den Subscription Service informiert, wenn ein Versicherter für ein E-Rezept mit dem FdV eine Anfrage an diese Apotheke schickt

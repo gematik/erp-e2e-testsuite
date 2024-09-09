@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.cardterminal;
 
-import de.gematik.test.smartcard.Smartcard;
+import de.gematik.bbriccs.smartcards.Smartcard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

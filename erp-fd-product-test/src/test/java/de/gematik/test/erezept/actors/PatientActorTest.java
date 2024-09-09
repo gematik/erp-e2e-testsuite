@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -89,6 +90,19 @@ class PatientActorTest extends ParsingTest {
     val kvnr = "X123456789";
     patient.setKvnr(kvnr);
     assertEquals(kvnr, patient.getPatientData().getKvnr().getValue());
+  }
+
+  @Test
+  void shouldChangeDmpKennzeichen() {
+    val patient = new PatientActor("Sina Hüllmann");
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
+
+    // initialised as Not_Set
+    assertEquals(DmpKennzeichen.NOT_SET, patient.getInsuranceCoverage().getDmpKennzeichen());
+
+    // now change to DmpKennzeichen.DM1
+    patient.changeDmpKennzeichen(DmpKennzeichen.DM1);
+    assertEquals(DmpKennzeichen.DM1, patient.getInsuranceCoverage().getDmpKennzeichen());
   }
 
   @ParameterizedTest(name = "Create Coverage with PayorType {0}")

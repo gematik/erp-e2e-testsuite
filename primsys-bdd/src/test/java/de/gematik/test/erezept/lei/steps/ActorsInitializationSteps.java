@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@ package de.gematik.test.erezept.lei.steps;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.PrimSysBddFactory;
 import de.gematik.test.erezept.apimeasure.DumpingStopwatch;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.screenplay.task.ConnectSubscriptionService;
-import de.gematik.test.smartcard.SmartcardArchive;
-import de.gematik.test.smartcard.SmartcardFactory;
 import io.cucumber.java.After;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
@@ -50,7 +49,7 @@ public class ActorsInitializationSteps {
 
   @Before
   public void setUp() {
-    smartcards = SmartcardFactory.getArchive();
+    smartcards = SmartcardArchive.fromResources();
     config =
         ConfigurationReader.forPrimSysConfiguration()
             .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, smartcards));

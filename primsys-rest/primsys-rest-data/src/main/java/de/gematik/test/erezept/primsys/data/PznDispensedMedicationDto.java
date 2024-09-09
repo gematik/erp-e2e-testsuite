@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,35 @@
 
 package de.gematik.test.erezept.primsys.data;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
-import lombok.*;
+import java.util.LinkedList;
+import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PznDispensedMedicationDto extends PznMedicationDto {
 
   private PznMedicationBatchDto batch;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+  private Date whenHandedOver;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+  private Date whenPrepared;
+
+  private List<String> dosageInstructions = new LinkedList<>();
+  private List<String> notes = new LinkedList<>();
 
   public static Builder dispensed(PznMedicationDto medication) {
     return new Builder(medication);
@@ -37,7 +56,8 @@ public class PznDispensedMedicationDto extends PznMedicationDto {
 
     public PznDispensedMedicationDto withBatchInfo(String lotNumber, Date expiryDate) {
       val batch = new PznMedicationBatchDto(lotNumber, expiryDate);
-      val dto = new PznDispensedMedicationDto(batch);
+      val dto = new PznDispensedMedicationDto();
+      dto.setBatch(batch);
       dto.setCategory(medication.getCategory());
       dto.setVaccine(medication.isVaccine());
       dto.setStandardSize(medication.getStandardSize());
@@ -46,6 +66,10 @@ public class PznDispensedMedicationDto extends PznMedicationDto {
       dto.setAmountUnit(medication.getAmountUnit());
       dto.setPzn(medication.getPzn());
       dto.setName(medication.getName());
+      dto.setWhenHandedOver(new Date());
+      dto.setWhenPrepared(new Date());
+      dto.setDosageInstructions(new LinkedList<>());
+      dto.setNotes(new LinkedList<>());
 
       return dto;
     }

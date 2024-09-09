@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ public class ChargeItemUseCase {
     dto.setId(chargeItem.getId());
     dto.setPrescriptionId(chargeItem.getPrescriptionId().getValue());
     chargeItem.getAccessCode().ifPresent(ac -> dto.setAccessCode(ac.getValue()));
-    dto.setEntererTelematikId(chargeItem.getEntererTelematikId());
+    dto.setEntererTelematikId(chargeItem.getEntererTelematikId().getValue());
     dto.setSubjectKvnr(chargeItem.getSubjectKvnr().getValue());
     dto.setEntered(chargeItem.getEnteredDate());
 

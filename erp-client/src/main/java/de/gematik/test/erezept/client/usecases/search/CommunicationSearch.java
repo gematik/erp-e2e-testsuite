@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.rest.param.SortParameter;
 import de.gematik.test.erezept.client.usecases.CommunicationGetCommand;
-import java.util.ArrayList;
-import lombok.val;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CommunicationSearch {
 
@@ -30,29 +30,28 @@ public class CommunicationSearch {
     throw new AssertionError();
   }
 
+  public static Builder searchFor() {
+    return new Builder();
+  }
+
   public static CommunicationGetCommand getNewCommunications() {
-    val searchParams = new ArrayList<IQueryParameter>();
-    searchParams.add(new QueryParameter("received", "NULL"));
-    return new CommunicationGetCommand(searchParams);
+    return searchFor().nonReceived().unsorted();
   }
 
   public static CommunicationGetCommand getNewCommunications(SortOrder order) {
-    val searchParams = new ArrayList<IQueryParameter>();
-    searchParams.add(new QueryParameter("received", "NULL"));
-    searchParams.add(new SortParameter("sent", order));
-    return new CommunicationGetCommand(searchParams);
+    return searchFor().nonReceived().sortedBySendDate(order);
   }
 
   public static CommunicationGetCommand getRecipientCommunications(String id) {
-    val searchParams = new ArrayList<IQueryParameter>();
-    searchParams.add(new QueryParameter("recipient", id));
-    return new CommunicationGetCommand(searchParams);
+    return searchFor().recipient(id).unsorted();
+  }
+
+  public static CommunicationGetCommand withAdditionalQuery(List<IQueryParameter> queryParameter) {
+    return searchFor().specificQuery(queryParameter).unsorted();
   }
 
   public static CommunicationGetCommand getSenderCommunications(String id) {
-    val searchParams = new ArrayList<IQueryParameter>();
-    searchParams.add(new QueryParameter("sender", id));
-    return new CommunicationGetCommand(searchParams);
+    return searchFor().sender(id).unsorted();
   }
 
   public static CommunicationGetCommand getLatestCommunications() {
@@ -64,8 +63,39 @@ public class CommunicationSearch {
   }
 
   public static CommunicationGetCommand getAllCommunications(SortOrder order) {
-    val searchParams = new ArrayList<IQueryParameter>();
-    searchParams.add(new SortParameter("sent", order));
-    return new CommunicationGetCommand(searchParams);
+    return searchFor().sortedBySendDate(order);
+  }
+
+  public static class Builder {
+    List<IQueryParameter> searchParams = new LinkedList<>();
+
+    public Builder specificQuery(List<IQueryParameter> queryParameter) {
+      searchParams.addAll(queryParameter);
+      return this;
+    }
+
+    public Builder nonReceived() {
+      searchParams.add(new QueryParameter("received", "NULL"));
+      return this;
+    }
+
+    public Builder recipient(String id) {
+      searchParams.add(new QueryParameter("recipient", id));
+      return this;
+    }
+
+    public Builder sender(String id) {
+      searchParams.add(new QueryParameter("sender", id));
+      return this;
+    }
+
+    public CommunicationGetCommand unsorted() {
+      return new CommunicationGetCommand(searchParams);
+    }
+
+    public CommunicationGetCommand sortedBySendDate(SortOrder order) {
+      searchParams.add(new SortParameter("sent", order));
+      return unsorted();
+    }
   }
 }

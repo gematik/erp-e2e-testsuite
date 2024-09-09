@@ -52,3 +52,29 @@ Funktionalität: E-Rezepte als Direktzuweisung
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensiert
     Dann hat die Apotheke genau eine Quittung vorliegen
     # TODO: check prescription archive as Alice
+
+  @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_03
+  @Funktionalität:Löschen
+  @Versicherung:GKV
+  Szenario: Anzeigen und  löschen von direkt zugewiesenen E-Rezepten für GKV-Versicherte
+  Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung.
+  Dieses E-Rezept soll im FdV angezeigt werden.
+  Die GKV Versicherte soll das E-Rezept nicht löschen können.
+    Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
+    Wenn die Ärztin Dr. Schraßer der Versicherten Alice ein Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist
+    Und die Versicherte Alice ihre E-Rezepte abruft
+    Dann kann die Versicherte Alice ihr letztes E-Rezept in der App nicht löschen
+    Und der Versicherten wird das letzte E-Rezept in der App angezeigt
+
+  @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_04
+  @Funktionalität:Löschen
+  @Versicherung:PKV
+  Szenario: Anzeigen und  löschen von direkt zugewiesenen E-Rezepten für PKV-Versicherte
+  Der Arzt verschreibt der PKV-Versicherten ein Medikament als Direktzuweisung.
+  Dieses E-Rezept soll im FdV angezeigt werden.
+  Die PKV Versicherte soll das E-Rezept nicht löschen können.
+    Angenommen die PKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
+    Wenn die Ärztin Dr. Schraßer der Versicherten Alice ein Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist
+    Und die Versicherte Alice ihre E-Rezepte abruft
+    Dann kann die Versicherte Alice ihr letztes E-Rezept in der App nicht löschen
+    Und der Versicherten wird das letzte E-Rezept in der App angezeigt
