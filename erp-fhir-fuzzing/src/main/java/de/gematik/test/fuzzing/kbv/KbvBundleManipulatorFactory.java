@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 
@@ -862,5 +863,17 @@ public class KbvBundleManipulatorFactory {
     val ext = resource.getExtensionByUrl(url.getCanonicalUrl());
     val coding = ext.getValue().castToCoding(ext.getValue());
     coding.setCode(code);
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getKbvBundleEntryManipulators() {
+    return Stream.of(ResourceType.MedicationRequest, ResourceType.Medication)
+        .map(
+            rt -> {
+              String name = String.format("KbvBundle without %s Resource", rt.name());
+              FuzzingMutator<KbvErpBundle> mutator =
+                  b -> b.getEntry().removeIf(e -> e.getResource().getResourceType().equals(rt));
+              return NamedEnvelope.of(name, mutator);
+            })
+        .toList();
   }
 }

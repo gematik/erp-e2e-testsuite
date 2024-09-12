@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.auditevents;
@@ -73,7 +72,8 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_01")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der next und prev Link ")
+      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der next"
+          + " und prev Link ")
   void shouldGetAuditEvent() {
     val auditEventQueryParam =
         IQueryParameter.search()
@@ -116,7 +116,8 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_02")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der __offset URL-Parameter")
+      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der"
+          + " __offset URL-Parameter")
   void shouldGetAuditEventWith_offset() {
     val auditEventQueryParam =
         IQueryParameter.search()
@@ -136,7 +137,8 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_03")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der __offset URL-Parameter mit unterschiedlichen Werten")
+      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der"
+          + " __offset URL-Parameter mit unterschiedlichen Werten")
   void shouldGetAuditEventWithDifferent_offset() {
     val firstCall =
         sina.performs(
@@ -165,7 +167,8 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_04")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der _offset und _count URL-Parameter in Kombination")
+      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der"
+          + " _offset und _count URL-Parameter in Kombination")
   void shouldGetAuditEventWithDifferent_offsetAnd_count() {
     val firstCall =
         sina.performs(
@@ -215,7 +218,8 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_06")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell die Default Parameter (_count=50, __offset=0)")
+      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell die"
+          + " Default Parameter (_count=50, __offset=0)")
   void shouldGetAuditEventWith_count() {
     val firstAuditEventBundleInteraction =
         sina.performs(
@@ -268,9 +272,11 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von AuditEventBundles als Patient mit URL-Parameter {1}, erwartet im RelationLink {3} als Wert für {2} = {4}")
+          "[{index}] -> Abrufen von AuditEventBundles als Patient mit URL-Parameter {1}, erwartet"
+              + " im RelationLink {3} als Wert für {2} = {4}")
   @DisplayName(
-      "Es muss sichergestellt werden, dass in den Link-Relation die Clientseitig verwendeten Filter und Suchkriterien verwendet werden")
+      "Es muss sichergestellt werden, dass in den Link-Relation die Clientseitig verwendeten Filter"
+          + " und Suchkriterien verwendet werden")
   @MethodSource("auditEventQueryComposer")
   void backendShouldUseClientsParams(
       List<IQueryParameter> queryParam,

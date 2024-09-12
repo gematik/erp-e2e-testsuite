@@ -30,7 +30,7 @@ class EncodingTypeTest {
 
   @Test
   void chooseFromXmlString() {
-    val inputs = List.of("Xml", "XML", "some XML", "test.xml");
+    val inputs = List.of("Xml", "XML", "some XML", "9b48f82c-9c11-4a57-aa72-a805f9537a82.xml");
     inputs.forEach(input -> assertEquals(EncodingType.XML, EncodingType.fromString(input)));
   }
 

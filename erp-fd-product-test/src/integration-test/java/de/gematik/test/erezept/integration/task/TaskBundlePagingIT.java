@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -142,7 +141,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @ParameterizedTest(
       name = "[{index}] -> Prüfe, dass bei Paging als {0} der RelationLink self funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der self Link ")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der self"
+          + " Link ")
   @MethodSource("actorComposer")
   void getTaskBundleWhileUsingRelationSelfAsPharmacy(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -184,9 +184,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe, dass Paging bei TaskBundles funktioniert. Speziell, dass für {0} alle fünf RelationLinks vorhanden sind")
+          "[{index}] -> Prüfe, dass Paging bei TaskBundles funktioniert. Speziell, dass für {0}"
+              + " alle fünf RelationLinks vorhanden sind")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell, dass für Abrufende alle fünf RelationLinks vorhanden sind")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell, dass für"
+          + " Abrufende alle fünf RelationLinks vorhanden sind")
   @MethodSource("actorComposer")
   void checkInTaskBundleForRelationLinks(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -211,9 +213,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als Apotheke mit URL-Parameter {1}, erwartet im RelationLink {3} als Wert für {2} = {4}")
+          "[{index}] -> Abrufen von TaskBundles als Apotheke mit URL-Parameter {1}, erwartet im"
+              + " RelationLink {3} als Wert für {2} = {4}")
   @DisplayName(
-      "Es muss sichergestellt werden, dass in den Link-Relation für Apotheken die Clientseitig verwendeten Filter und Suchkriterien wiederverwendet werden")
+      "Es muss sichergestellt werden, dass in den Link-Relation für Apotheken die Clientseitig"
+          + " verwendeten Filter und Suchkriterien wiederverwendet werden")
   @MethodSource("taskBundleQueryComposer")
   void backendShouldUseClientsParamsAsPharmacy(
       List<IQueryParameter> iQueryParameters,
@@ -240,9 +244,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als Versicherte mit URL-Parameter {1}, erwartet im RelationLink {3} als Wert für {2} = {4}")
+          "[{index}] -> Abrufen von TaskBundles als Versicherte mit URL-Parameter {1}, erwartet im"
+              + " RelationLink {3} als Wert für {2} = {4}")
   @DisplayName(
-      "Es muss sichergestellt werden, dass in den Link-Relation für Patienten die Clientseitig verwendeten Filter und Suchkriterien wiederverwendet werden")
+      "Es muss sichergestellt werden, dass in den Link-Relation für Patienten die Clientseitig"
+          + " verwendeten Filter und Suchkriterien wiederverwendet werden")
   @MethodSource("taskBundleQueryComposer")
   void backendShouldUseClientsParamsAsPatient(
       List<IQueryParameter> iQueryParameters,
@@ -264,9 +270,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_05")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als {0} muss der -offset URL-Parameter geprüft werden")
+          "[{index}] -> Abrufen von TaskBundles als {0} muss der -offset URL-Parameter geprüft"
+              + " werden")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der _offset URL-Parameter")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der"
+          + " _offset URL-Parameter")
   @MethodSource("actorComposer")
   void shouldGetTaskBundleWithFixStartIndex(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -292,9 +300,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_06")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset URL-Parameter mit unterschiedlichen Werten für den Startpunkt überprüft werden")
+          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset URL-Parameter mit"
+              + " unterschiedlichen Werten für den Startpunkt überprüft werden")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der _offset URL-Parameter")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der"
+          + " _offset URL-Parameter")
   @MethodSource("actorComposer")
   void shouldGetTaskBundleWithDifferent_offset(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -326,9 +336,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_07")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset und _count URL-Parameter in Kombination überprüft werden")
+          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset und _count URL-Parameter"
+              + " in Kombination überprüft werden")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der _offset und _count URL-Parameter in Kombination")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der"
+          + " _offset und _count URL-Parameter in Kombination")
   @MethodSource("actorComposer")
   void shouldGetTaskBundleWithDifferentOffsetAndCount(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -362,9 +374,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset und _count Default URL-Parameter (_count=50, __offset=0) ")
+          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset und _count Default"
+              + " URL-Parameter (_count=50, __offset=0) ")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der _offset und _count Default URL-Parameter (_count=50, __offset=0)")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der"
+          + " _offset und _count Default URL-Parameter (_count=50, __offset=0)")
   @MethodSource("actorComposer")
   void shouldGetTaskBundleWithDefault_offsetAND_Count(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -397,9 +411,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_09")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe, dass bei Paging als {0} die RelationLink next und previous funktioniert")
+          "[{index}] -> Prüfe, dass bei Paging als {0} die RelationLink next und previous"
+              + " funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Genauer die RelationLink next und previous")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Genauer die"
+          + " RelationLink next und previous")
   @MethodSource("actorComposer")
   void getTaskBundleWhileUsingRelationNextAndPrevious(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -443,7 +459,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @ParameterizedTest
   @ValueSource(ints = {4, 3, 5})
   @DisplayName(
-      "Als Apotheker muss sichergestellt werden, dass der Total-Count um den folgenden Wert erhöht wird: ")
+      "Als Apotheker muss sichergestellt werden, dass der Total-Count um den folgenden Wert erhöht"
+          + " wird: ")
   void shouldHaveTotalCountAsApothecary() {
     ensurePrecondition();
     val examEvidence =
@@ -474,7 +491,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @ParameterizedTest
   @ValueSource(ints = {2, 1, 4})
   @DisplayName(
-      "Für den Patienten muss sichergestellt werden, dass der Total-Count immer entsprechend um den folgenden Wert erhöht wird: ")
+      "Für den Patienten muss sichergestellt werden, dass der Total-Count immer entsprechend um den"
+          + " folgenden Wert erhöht wird: ")
   void shouldHaveCorrectTotalCountAsPatient() {
     ensurePrecondition();
     val firstCall =
@@ -496,7 +514,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_12")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Patienten  funktioniert. Genauer, dass der Filteroperator Equals für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Patienten  funktioniert."
+          + " Genauer, dass der Filteroperator Equals für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateEqualFilterAsPatient() {
     ensurePrecondition();
 
@@ -513,13 +532,13 @@ public class TaskBundlePagingIT extends ErpTest {
             .withExpectedType()
             .and(authoredOnDateIsEqual(LocalDate.now()))
             .isCorrect());
-   
   }
 
   @TestcaseId("ERP_TASK_PAGING_13")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Patienten funktioniert. Genauer, dass der Filteroperator Not-Equals für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Patienten funktioniert."
+          + " Genauer, dass der Filteroperator Not-Equals für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateNotEqualFilterAsPatient() {
     ensurePrecondition();
 
@@ -541,13 +560,13 @@ public class TaskBundlePagingIT extends ErpTest {
                         + LocalDate.now()
                         + " enthalten"))
             .isCorrect());
-   
   }
 
   @TestcaseId("ERP_TASK_PAGING_14")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert für Apotheken. Genauer, dass der Filteroperator ist gleich für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert für Apotheken."
+          + " Genauer, dass der Filteroperator ist gleich für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateEqualFilterAsPharmacy() {
     ensurePrecondition();
     val examEvidence =
@@ -572,7 +591,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_15")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Apotheken funktioniert. Genauer, dass der Filteroperator ungleich für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Apotheken funktioniert."
+          + " Genauer, dass der Filteroperator ungleich für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateWithNotEqualFilterAsPharmacy() {
     ensurePrecondition();
     val examEvidence =
@@ -602,7 +622,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_16")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Patienten funktioniert. Genauer, dass der Filteroperator höheres als für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Patienten funktioniert."
+          + " Genauer, dass der Filteroperator höheres als für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateWithGraterThanFilterAsPatient() {
     ensurePrecondition();
 
@@ -624,13 +645,13 @@ public class TaskBundlePagingIT extends ErpTest {
                         + LocalDate.now()
                         + " enthalten"))
             .isCorrect());
-   
   }
 
   @TestcaseId("ERP_TASK_PAGING_17")
   @Test
   @DisplayName(
-      "Bei TaskBundles muss Paging für Patienten funktionieren, genauer der Filteroperator für Datumsabfragen mit früher als (lt = lowerThan)")
+      "Bei TaskBundles muss Paging für Patienten funktionieren, genauer der Filteroperator für"
+          + " Datumsabfragen mit früher als (lt = lowerThan)")
   void getTaskBundleWhileUsingDateWithLessThanFilterAsPatient() {
     ensurePrecondition();
 
@@ -652,13 +673,13 @@ public class TaskBundlePagingIT extends ErpTest {
                         + LocalDate.now()
                         + " enthalten"))
             .isCorrect());
-   
   }
 
   @TestcaseId("ERP_TASK_PAGING_18")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Apotheken funktioniert. Genauer, dass der Filteroperator höher als für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Apotheken funktioniert."
+          + " Genauer, dass der Filteroperator höher als für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateWithGraterThabFilterAsPharmacy() {
     ensurePrecondition();
     val examEvidence =
@@ -688,7 +709,8 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_19")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Apotheken funktioniert. Genauer, dass der Filteroperator früher als für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei TaskBundles für Apotheken funktioniert."
+          + " Genauer, dass der Filteroperator früher als für Datumsabfragen funktionieren")
   void getTaskBundleWhileUsingDateWithLessThenFilterAsPharmacy() {
     ensurePrecondition();
     val examEvidence =

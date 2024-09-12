@@ -35,16 +35,33 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
-public class ResponseOfDispensePrescriptionAsBundle
+public class ResponseOfDispenseMedicationAsBundle
     extends FhirResponseQuestion<ErxMedicationDispenseBundle> {
 
   private final Actor patient;
   private final DequeStrategy dequeue;
+  private final ErxMedicationDispense medicationDsp;
 
-  public ResponseOfDispensePrescriptionAsBundle(Actor patient, DequeStrategy dequeue) {
+  private final int dispenseIterations;
+
+  private ResponseOfDispenseMedicationAsBundle(
+      Actor patient,
+      DequeStrategy dequeue,
+      ErxMedicationDispense medicationDsp,
+      int dispenseIterations) {
     super("Task/$dispense");
     this.patient = patient;
     this.dequeue = dequeue;
+    this.medicationDsp = medicationDsp;
+    this.dispenseIterations = dispenseIterations;
+  }
+
+  public static Builder fromStackForPatient(DequeStrategy dequeue, Actor patient) {
+    return new Builder(dequeue, patient);
+  }
+
+  public static Builder fromStackForPatient(String dequeue, Actor patient) {
+    return fromStackForPatient(DequeStrategy.fromString(dequeue), patient);
   }
 
   @Override
@@ -54,33 +71,32 @@ public class ResponseOfDispensePrescriptionAsBundle
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val patientDispenseInformation = SafeAbility.getAbility(patient, ReceiveDispensedDrugs.class);
 
-    val acceptedPrescriptions = prescriptionManager.getAcceptedPrescriptions();
-    val acceptBundle = dequeue.chooseFrom(acceptedPrescriptions);
+    val acceptBundle = dequeue.chooseFrom(prescriptionManager.getAcceptedPrescriptions());
     val taskId = acceptBundle.getTaskId();
     val secret = acceptBundle.getSecret();
 
-    val kbvAsString = acceptBundle.getKbvBundleAsString();
-    val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
-    val medicationDispenses = this.dispensePrescribedMedication(kbvBundle, smcb.getTelematikID());
+    ErpResponse<ErxMedicationDispenseBundle> resp = null;
+    ErxMedicationDispense medicationDispense = null;
+    for (int x = 1; x <= dispenseIterations; x++) {
+      if (medicationDsp == null || medicationDsp.isEmpty()) {
+        val kbvAsString = acceptBundle.getKbvBundleAsString();
+        val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
+        medicationDispense = this.dispensePrescribedMedication(kbvBundle, smcb.getTelematikID());
+      } else {
+        medicationDispense = medicationDsp;
+      }
+      val client = SafeAbility.getAbility(actor, UseTheErpClient.class);
+      resp =
+          client.request(
+              new DispensePrescriptionAsBundleCommand(taskId, secret, medicationDispense));
 
-    val client = SafeAbility.getAbility(actor, UseTheErpClient.class);
-    val resp =
-        client.request(
-            new DispensePrescriptionAsBundleCommand(taskId, secret, medicationDispenses));
-    val time = resp.getExpectedResource().getTimestamp();
-    prescriptionManager.getDispensedPrescriptions().append(resp.getExpectedResource());
-    prescriptionManager.getDispenseTimestamps().append(time.toInstant());
-    patientDispenseInformation.append(taskId.toPrescriptionId());
+      if (resp.isOperationOutcome()) return resp;
 
+      val dispensationTime = resp.getExpectedResource().getTimestamp().toInstant();
+      prescriptionManager.getDispensedPrescriptions().append(resp.getExpectedResource());
+      patientDispenseInformation.append(taskId.toPrescriptionId(), dispensationTime);
+    }
     return resp;
-  }
-
-  public static Builder fromStack(DequeStrategy dequeue) {
-    return new Builder(dequeue);
-  }
-
-  public static Builder fromStack(String dequeue) {
-    return fromStack(DequeStrategy.fromString(dequeue));
   }
 
   private ErxMedicationDispense dispensePrescribedMedication(
@@ -99,15 +115,23 @@ public class ResponseOfDispensePrescriptionAsBundle
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
     private final DequeStrategy dequeue;
-    private Actor patient;
+    private final Actor patient;
+    private int dispenseIterations = 1;
+    private ErxMedicationDispense medicationDispense;
 
-    public Builder forPatient(Actor patient) {
-      this.patient = patient;
+    public ResponseOfDispenseMedicationAsBundle build() {
+      return new ResponseOfDispenseMedicationAsBundle(
+          patient, dequeue, medicationDispense, dispenseIterations);
+    }
+
+    public Builder multiple(int dispenseIterations) {
+      this.dispenseIterations = dispenseIterations;
       return this;
     }
 
-    public ResponseOfDispensePrescriptionAsBundle build() {
-      return new ResponseOfDispensePrescriptionAsBundle(patient, dequeue);
+    public Builder withMedicationDispense(ErxMedicationDispense medication) {
+      this.medicationDispense = medication;
+      return this;
     }
   }
 }

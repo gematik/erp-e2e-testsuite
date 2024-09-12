@@ -44,7 +44,6 @@ class ManagePharmacyPrescriptionsTest {
     assertTrue(ability.getAcceptedPrescriptions().isEmpty());
     assertTrue(ability.getAssignedPrescriptions().isEmpty());
     assertTrue(ability.getClosedPrescriptions().isEmpty());
-    assertTrue(ability.getDispenseTimestamps().isEmpty());
     assertTrue(ability.getReceiptsList().isEmpty());
     assertDoesNotThrow(ability::toString);
   }

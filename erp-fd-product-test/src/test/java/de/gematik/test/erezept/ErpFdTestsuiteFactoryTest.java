@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.OCSPAbility;
@@ -32,7 +35,12 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -208,7 +216,7 @@ class ErpFdTestsuiteFactoryTest {
 
   @Test
   void shouldEquipAsApothecary() {
-    val apothecaryName = "Amanda Albrecht";
+    val apothecaryName = "Finn-Louis Nullmayr";
     val config = ErpFdTestsuiteFactory.create();
     val apothecary = new Actor(apothecaryName); // currently no specific class for apothecary
 

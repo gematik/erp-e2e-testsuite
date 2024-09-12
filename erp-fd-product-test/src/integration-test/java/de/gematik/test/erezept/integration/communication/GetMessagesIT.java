@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.communication;
@@ -101,7 +100,8 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Ein Apotheke versucht mittels Id eine Nachricht von einem {2}-Versicherten als {0} und SupplyOption {1} abzurufen, die nicht für sie ist!")
+          "[{index}] -> Ein Apotheke versucht mittels Id eine Nachricht von einem {2}-Versicherten"
+              + " als {0} und SupplyOption {1} abzurufen, die nicht für sie ist!")
   @DisplayName("Es muss geprüft werden, dass nur der Adressierte seine Nachricht abrufen kann")
   @MethodSource("getCommunicationTestComposer")
   void shouldNotGetForeignCommunicationsAsPharmacy(
@@ -117,7 +117,8 @@ public class GetMessagesIT extends ErpTest {
                 .asDispenseRequest(
                     new CommunicationDisReqMessage(
                         supplyOptionsType,
-                        "Nachricht zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?")));
+                        "Nachricht zum testen des ErpFD bezüglich Communication: Ist das Medikament"
+                            + " No.1 heute noch verfügbar, liebe Apo woodlandPharma?")));
     val airportRequest =
         airportApo.performs(
             GetMessage.byId(
@@ -149,7 +150,8 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Ein Apotheke versucht ihre neuen Nachrichten für einen {2}-Versicherten als {0} und Belieferungsoption {1} abzurufen!")
+          "[{index}] -> Ein Apotheke versucht ihre neuen Nachrichten für einen {2}-Versicherten als"
+              + " {0} und Belieferungsoption {1} abzurufen!")
   @DisplayName("Es muss geprüft werden, dass eine Apotheke nur neue Nachrichten abrufen kann")
   @MethodSource("getCommunicationTestComposer")
   void shouldGetCorrectCountOfNewCommunicationsAsPharmacy(
@@ -193,7 +195,8 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_03")
   @ParameterizedTest(
       name =
-          "[{index}] ->  Ein Patient versucht als {2}-Versicherter mittels Id eine Nachricht als {0} und SupplyOption {1} abzurufen, die nicht für ihn ist!")
+          "[{index}] ->  Ein Patient versucht als {2}-Versicherter mittels Id eine Nachricht als"
+              + " {0} und SupplyOption {1} abzurufen, die nicht für ihn ist!")
   @DisplayName(
       "Es muss geprüft werden, dass eine Patient nur seine eigenen Nachrichten abrufen kann")
   @MethodSource("getCommunicationTestComposer")
@@ -240,7 +243,8 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Ein {2}-Patient versucht seine neuen Nachrichten für {0} und Belieferungsoption {1} abzurufen!")
+          "[{index}] -> Ein {2}-Patient versucht seine neuen Nachrichten für {0} und"
+              + " Belieferungsoption {1} abzurufen!")
   @DisplayName("Es muss geprüft werden, dass ein Patient nur neue Nachrichten abrufen kann")
   @MethodSource("getCommunicationTestComposer")
   void shouldGetCorrectCountOfNewCommunicationsAsPatient(
@@ -274,9 +278,11 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_05")
   @ParameterizedTest(
       name =
-          "[{index}] -> Ein {2}-Patient und eine Apotheke versuchen Nachrichten als {0} und Belieferungsoption {1} über Recipient sortiert abzurufen!")
+          "[{index}] -> Ein {2}-Patient und eine Apotheke versuchen Nachrichten als {0} und"
+              + " Belieferungsoption {1} über Recipient sortiert abzurufen!")
   @DisplayName(
-      "Es muss geprüft werden, dass eine Patient bzw. eine Apotheke Nachrichten von einem bestimmten Empfänger abrufen können")
+      "Es muss geprüft werden, dass eine Patient bzw. eine Apotheke Nachrichten von einem"
+          + " bestimmten Empfänger abrufen können")
   @MethodSource("getCommunicationTestComposer")
   void shouldGetCorrectRecipientCommunications(
       PrescriptionAssignmentKind assignmentKind,
@@ -328,9 +334,11 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_06")
   @ParameterizedTest(
       name =
-          "[{index}] -> Ein {2}-Patient und eine Apotheke versuchten Nachrichten für {0} und Belieferungsoption {1} über Sender sortiert abzurufen!")
+          "[{index}] -> Ein {2}-Patient und eine Apotheke versuchten Nachrichten für {0} und"
+              + " Belieferungsoption {1} über Sender sortiert abzurufen!")
   @DisplayName(
-      "Es muss geprüft werden, dass eine Patient, eine Apotheke Nachrichten von einem bestimmten Sender abrufen können")
+      "Es muss geprüft werden, dass eine Patient, eine Apotheke Nachrichten von einem bestimmten"
+          + " Sender abrufen können")
   @MethodSource("getCommunicationTestComposer")
   void shouldGetCorrectSenderCommunications(
       PrescriptionAssignmentKind assignmentKind,
@@ -385,9 +393,11 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_07")
   @ParameterizedTest(
       name =
-          "[{index}] -> Ein {2}-Patient validiert, ob seine Nachrichten für {0} und Belieferungsoption {1} abgerufen wurde!")
+          "[{index}] -> Ein {2}-Patient validiert, ob seine Nachrichten für {0} und"
+              + " Belieferungsoption {1} abgerufen wurde!")
   @DisplayName(
-      "Es muss geprüft werden, ob ein Patient kontrollieren kann, dass seine Nachrichten abgerufen wurden")
+      "Es muss geprüft werden, ob ein Patient kontrollieren kann, dass seine Nachrichten abgerufen"
+          + " wurden")
   @MethodSource("getCommunicationTestComposer")
   void shouldSetSystemTimeByGetCommunication(
       PrescriptionAssignmentKind assignmentKind,
@@ -402,7 +412,8 @@ public class GetMessagesIT extends ErpTest {
                 .asDispenseRequest(
                     new CommunicationDisReqMessage(
                         supplyOptionsType,
-                        "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??")));
+                        "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                            + " patient, how are you? does the medicine takes an effect??")));
     val dispReqId = disRequest.getExpectedResponse().getIdPart();
     val disReq2 = sina.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
     sina.attemptsTo(
@@ -421,7 +432,8 @@ public class GetMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_GET_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Apotheke prüft, ob die Antwort-Nachrichten für den {2}-Versicherten als empfangen angezeigt wird")
+          "[{index}] -> Die Apotheke prüft, ob die Antwort-Nachrichten für den {2}-Versicherten als"
+              + " empfangen angezeigt wird")
   @DisplayName(
       "Es muss geprüft werden, dass beim Abruf einer Communication die System Zeit gesetzt wird")
   @MethodSource("getCommunicationTestComposer")
@@ -441,7 +453,8 @@ public class GetMessagesIT extends ErpTest {
                 .asDispenseRequest(
                     new CommunicationDisReqMessage(
                         supplyOptionsType,
-                        "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??")));
+                        "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                            + " patient, how are you? does the medicine takes an effect??")));
     sina.attemptsTo(
         Verify.that(postDispRequest).withExpectedType().has(emptyReceivedElement()).isCorrect());
 
@@ -472,7 +485,7 @@ public class GetMessagesIT extends ErpTest {
 
     val getReply1 = airportApo.performs(GetMessage.byId(postReply.getExpectedResponse()));
     airportApo.attemptsTo(
-            Verify.that(getReply1).withExpectedType().has(emptyReceivedElement()).isCorrect());
+        Verify.that(getReply1).withExpectedType().has(emptyReceivedElement()).isCorrect());
 
     // make sure sina has fetched the message in between
     val getAllMessages =
@@ -518,7 +531,8 @@ public class GetMessagesIT extends ErpTest {
                   new CommunicationDisReqMessage(
                       supplyOptionsType,
                       format(
-                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?",
+                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist das"
+                              + " Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?",
                           i))));
     }
   }
@@ -537,7 +551,8 @@ public class GetMessagesIT extends ErpTest {
                   new CommunicationReplyMessage(
                       supplyOptionsType,
                       format(
-                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??",
+                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                              + " patient, how are you? does the medicine takes an effect??",
                           i)),
                   sender));
     }

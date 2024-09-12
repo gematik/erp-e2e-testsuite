@@ -16,44 +16,48 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import java.util.*;
-import net.serenitybdd.screenplay.*;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.screenplay.util.ManagedList;
+import java.time.Instant;
+import java.util.List;
+import net.serenitybdd.screenplay.Ability;
 
 public class ReceiveDispensedDrugs implements Ability {
 
-  private final ManagedList<PrescriptionId> dispensedDrugs;
+  private final ManagedList<ReceivedDispensedDrugInformation> dispensedDrugs;
 
   public ReceiveDispensedDrugs() {
     this.dispensedDrugs = new ManagedList<>(() -> "No Drugs were dispensed so far");
   }
 
-  public void append(PrescriptionId forPrescription) {
-    dispensedDrugs.append(forPrescription);
+  public void append(PrescriptionId forPrescription, Instant dispenseDate) {
+    dispensedDrugs.append(new ReceivedDispensedDrugInformation(forPrescription, dispenseDate));
   }
 
-  public PrescriptionId getLastDispensedDrug() {
+  public ReceivedDispensedDrugInformation getLastDispensedDrug() {
     return this.dispensedDrugs.getLast();
   }
 
-  public PrescriptionId consumeLastDispensedDrug() {
+  public ReceivedDispensedDrugInformation consumeLastDispensedDrug() {
     return this.dispensedDrugs.consumeLast();
   }
 
-  public PrescriptionId getFirstDispensedDrug() {
+  public ReceivedDispensedDrugInformation getFirstDispensedDrug() {
     return this.dispensedDrugs.getFirst();
   }
 
-  public PrescriptionId consumeFirstDispensedDrug() {
+  public ReceivedDispensedDrugInformation consumeFirstDispensedDrug() {
     return this.dispensedDrugs.consumeFirst();
   }
 
-  public List<PrescriptionId> getDispensedDrugsList() {
+  public List<ReceivedDispensedDrugInformation> getDispensedDrugsList() {
     return this.dispensedDrugs.getRawList();
   }
 
   public static ReceiveDispensedDrugs forHimself() {
     return new ReceiveDispensedDrugs();
   }
+
+  public record ReceivedDispensedDrugInformation(
+      PrescriptionId prescriptionId, Instant dispenseDate) {}
 }

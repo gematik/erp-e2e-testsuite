@@ -40,6 +40,7 @@ import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.questions.HasChargeItemBundle;
 import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import lombok.val;
@@ -98,7 +99,7 @@ class DrugDispensationTest {
 
     when(useMockClientAbility.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
 
-    dispensedDrugs.append(prescriptionId);
+    dispensedDrugs.append(prescriptionId, Instant.now());
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
     assertTrue(then(patient).asksFor(HasChargeItemBundle.forLastDispensedDrug().asPatient()));
   }
@@ -112,7 +113,7 @@ class DrugDispensationTest {
             .andValidationResult(createEmptyValidationResult());
     when(useMockClientAbility.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
 
-    dispensedDrugs.append(prescriptionId);
+    dispensedDrugs.append(prescriptionId, Instant.now());
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
     assertFalse(then(patient).asksFor(HasChargeItemBundle.forLastDispensedDrug().asPatient()));
   }

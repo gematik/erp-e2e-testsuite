@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -69,12 +68,14 @@ public class ActivateInvalidPatientKvnr extends ErpTest {
             "B123456789",
             "die Prüfziffer 9 statt 2 ist",
             ErpAfos.A_23890,
-            "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten entspricht nicht den Prüfziffer-Validierungsregeln.")
+            "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten"
+                + " entspricht nicht den Prüfziffer-Validierungsregeln.")
         .arguments(
             "A111111111",
             "die Prüfziffer 1 statt 4 ist",
             ErpAfos.A_23890,
-            "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten entspricht nicht den Prüfziffer-Validierungsregeln.")
+            "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer des Patienten"
+                + " entspricht nicht den Prüfziffer-Validierungsregeln.")
         .arguments(
             "a123456789",
             "die Prüfziffer 9 statt 2 ist und mit einem Kleinbuchstabe beginnt",
@@ -112,7 +113,8 @@ public class ActivateInvalidPatientKvnr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_KVNR_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein E-Rezept für einen {1}-Versicherten  als {0} mit invalider KVNR: {2} ein, da {3}. ")
+          "[{index}] -> Verordnender Arzt stellt ein E-Rezept für einen {1}-Versicherten  als {0}"
+              + " mit invalider KVNR: {2} ein, da {3}. ")
   @DisplayName(
       "Es muss geprüft werden, dass die KVNR in der Patient Ressource korrekt validiert wird")
   @MethodSource("baseKVNRComposer")

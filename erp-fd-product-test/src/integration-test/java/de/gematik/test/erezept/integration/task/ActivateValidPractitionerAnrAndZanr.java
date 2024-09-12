@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -92,9 +91,11 @@ public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_VALID_ANR_ZANR_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit ANR / ZANR: {3} für den Kostenträger {0} als Darreichungsform {1} aus. ")
+          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit ANR / ZANR: {3} für den"
+              + " Kostenträger {0} als Darreichungsform {1} aus. ")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert und zulässige Nummern akzeptiert")
+      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert und"
+          + " zulässige Nummern akzeptiert")
   @MethodSource("validAnrComposer")
   void activateValidAnrZanrInPractitioner(
       VersicherungsArtDeBasis insuranceType,

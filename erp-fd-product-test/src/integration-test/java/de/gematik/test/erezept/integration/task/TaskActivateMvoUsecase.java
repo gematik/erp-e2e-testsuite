@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,13 +87,16 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
-        KbvErpBundleFaker.builder().withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(),sina.getPatientData())
+        KbvErpBundleFaker.builder()
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
             .withPractitioner(doctor.getPractitioner())
-            .withMvo(mvo.getParameter()).toBuilder();
+            .withMvo(mvo.getParameter())
+            .toBuilder();
     val activation =
         doctor.performs(
             IssuePrescription.forPatient(sina)
@@ -115,7 +118,8 @@ class TaskActivateMvoUsecase extends ErpTest {
   @ParameterizedTest(
       name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO ({2}) aus")
   @DisplayName(
-      "Mehrfachverordnung mit ungültigem Verhältnis als Verordnender Arzt an eine/n Versicherte/n ausstellen")
+      "Mehrfachverordnung mit ungültigem Verhältnis als Verordnender Arzt an eine/n Versicherte/n"
+          + " ausstellen")
   @MethodSource("invalidRatioMvoPrescriptionTypesProvider")
   void activateMvoPrescriptionWithInvalidRatio(
       VersicherungsArtDeBasis insuranceType,
@@ -125,13 +129,16 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
-        KbvErpBundleFaker.builder().withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(),sina.getPatientData())
+        KbvErpBundleFaker.builder()
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
             .withPractitioner(doctor.getPractitioner())
-            .withMvo(mvo.getParameter()).toBuilder();
+            .withMvo(mvo.getParameter())
+            .toBuilder();
 
     val activation =
         doctor.performs(
@@ -149,7 +156,8 @@ class TaskActivateMvoUsecase extends ErpTest {
   @ParameterizedTest(
       name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO ({2}) aus")
   @DisplayName(
-      "Mehrfachverordnung mit unzulässigen Angaben der Extension als Verordnender Arzt an eine/n Versicherte/n ausstellen")
+      "Mehrfachverordnung mit unzulässigen Angaben der Extension als Verordnender Arzt an eine/n"
+          + " Versicherte/n ausstellen")
   @MethodSource("mvoExtensionManipulator")
   void activateMvoPrescriptionWithManipulatedExtension(
       VersicherungsArtDeBasis insuranceType,
@@ -158,13 +166,16 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
-        KbvErpBundleFaker.builder().withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(),sina.getPatientData())
+        KbvErpBundleFaker.builder()
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
             .withPractitioner(doctor.getPractitioner())
-            .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365)).toBuilder();
+            .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
+            .toBuilder();
 
     val activation =
         doctor.performs(
@@ -182,9 +193,11 @@ class TaskActivateMvoUsecase extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_MVO_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO mit Statuskennzeichen {2} aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO mit"
+              + " Statuskennzeichen {2} aus")
   @DisplayName(
-      "Mehrfachverordnung mit unzulässigem Statuskennzeichen als Verordnender Arzt an eine/n Versicherte/n ausstellen")
+      "Mehrfachverordnung mit unzulässigem Statuskennzeichen als Verordnender Arzt an eine/n"
+          + " Versicherte/n ausstellen")
   @MethodSource("mvoWithInvalidStatuskennzeichen")
   void activateMvoPrescriptionWithInvalidStatuskennzeichen(
       VersicherungsArtDeBasis insuranceType,
@@ -194,13 +207,17 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
-        KbvErpBundleFaker.builder().withMedication(medication).withStatusKennzeichen(statusKennzeichen)
-            .withInsurance(sina.getInsuranceCoverage(),sina.getPatientData())
+        KbvErpBundleFaker.builder()
+            .withMedication(medication)
+            .withStatusKennzeichen(statusKennzeichen)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
             .withPractitioner(doctor.getPractitioner())
-            .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365)).toBuilder();
+            .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
+            .toBuilder();
     val activation =
         doctor.performs(
             IssuePrescription.forPatient(sina)
@@ -215,10 +232,10 @@ class TaskActivateMvoUsecase extends ErpTest {
 
   @TestcaseId("ERP_TASK_ACTIVATE_MVO_05")
   @ParameterizedTest(
-      name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO mit {2} aus")
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} als MVO mit {2} aus")
   @DisplayName(
-      "Mehrfachverordnung mit unzulässiger oder zulässiger MVO-ID als Verordnender Arzt an eine/n Versicherte/n ausstellen")
+      "Mehrfachverordnung mit unzulässiger oder zulässiger MVO-ID als Verordnender Arzt an eine/n"
+          + " Versicherte/n ausstellen")
   @MethodSource("mvoIdExtension")
   void activateMvoPrescriptionWithInvalidIdExtension(
       VersicherungsArtDeBasis insuranceType,
@@ -228,19 +245,32 @@ class TaskActivateMvoUsecase extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
 
-    val medication = KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     val kbvBundleBuilder =
-        KbvErpBundleFaker.builder().withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(),sina.getPatientData())
+        KbvErpBundleFaker.builder()
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
             .withPractitioner(doctor.getPractitioner())
-            .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).withId(idExt.getParameter()).validThrough(0, 365)).toBuilder();
+            .withMvo(
+                MultiplePrescriptionExtension.asMultiple(1, 4)
+                    .withId(idExt.getParameter())
+                    .validThrough(0, 365))
+            .toBuilder();
     val activation =
         doctor.performs(
             IssuePrescription.forPatient(sina)
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
-    val verify = expectSuccess || invalidMvoIdAccept ?  Verify.that(activation).withExpectedType(ErpAfos.A_24901).hasResponseWith(returnCode(200)) : Verify.that(activation).withOperationOutcome(ErpAfos.A_24901).hasResponseWith(returnCode(400));
+    val verify =
+        expectSuccess || invalidMvoIdAccept
+            ? Verify.that(activation)
+                .withExpectedType(ErpAfos.A_24901)
+                .hasResponseWith(returnCode(200))
+            : Verify.that(activation)
+                .withOperationOutcome(ErpAfos.A_24901)
+                .hasResponseWith(returnCode(400));
     doctor.attemptsTo(verify.isCorrect());
   }
 
@@ -321,8 +351,8 @@ class TaskActivateMvoUsecase extends ErpTest {
             .arguments(
                 NamedEnvelope.of(
                     "MOV-ID mit unbekanntem Schema",
-                        MultiplePrescriptionIdExtension.with("abc","def")),
-              false);
+                    MultiplePrescriptionIdExtension.with("abc", "def")),
+                false);
 
     return multiplyWithFlowTypes(composer);
   }
@@ -355,7 +385,7 @@ class TaskActivateMvoUsecase extends ErpTest {
   private static Stream<Arguments> multiplyWithFlowTypes(ArgumentComposer composer) {
     val insuranceArguments = new ArrayList<VersicherungsArtDeBasis>(2);
     insuranceArguments.add(VersicherungsArtDeBasis.GKV);
-      insuranceArguments.add(VersicherungsArtDeBasis.PKV);
+    insuranceArguments.add(VersicherungsArtDeBasis.PKV);
     composer.multiply(
         List.of(
             PrescriptionAssignmentKind.PHARMACY_ONLY,

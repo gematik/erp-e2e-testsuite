@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.consent;
@@ -128,7 +127,8 @@ public class ConsentPostUseCase extends ErpTest {
   @TestcaseId("ERP_CONSENT_POST_02")
   @ParameterizedTest(
       name =
-          "Prüfe, dass ein Consent ohne DateTime akzeptiert wird, aber keine 500 zurück liefert, wenn vorher ein Consent gesetzt war: {0}")
+          "Prüfe, dass ein Consent ohne DateTime akzeptiert wird, aber keine 500 zurück liefert,"
+              + " wenn vorher ein Consent gesetzt war: {0}")
   @ValueSource(booleans = {true, false})
   @DisplayName("Prüfe, Consent ohne DateTime")
   void setConsentWithoutDateTime(boolean ensureConsentIsUnset) {
@@ -151,7 +151,8 @@ public class ConsentPostUseCase extends ErpTest {
   @TestcaseId("ERP_CONSENT_POST_03")
   @Test
   @DisplayName(
-      "Prüfe, dass die KVNR im Authorization-Header mit der in Consent.patient.identifier übereinstimmt")
+      "Prüfe, dass die KVNR im Authorization-Header mit der in Consent.patient.identifier"
+          + " übereinstimmt")
   void setConsentWithAlternativIdentifierKvnr() {
     val rejection = fridolin.performs(RejectConsent.forOneSelf().buildValid());
     fridolin.attemptsTo(Verify.that(rejection).withoutBody().isCorrect());

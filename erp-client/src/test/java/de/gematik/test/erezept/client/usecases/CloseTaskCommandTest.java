@@ -37,7 +37,7 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ClosePrescriptionCommandTest {
+class CloseTaskCommandTest {
 
   private FhirParser parser;
 
@@ -51,7 +51,7 @@ class ClosePrescriptionCommandTest {
     val md = ErxMedicationDispenseFaker.builder().withPerfomer("performerid").fake();
     val taskId = TaskId.from("123456");
     val secret = "7890123";
-    val cmd = new ClosePrescriptionCommand(taskId, new Secret(secret));
+    val cmd = new CloseTaskCommand(taskId, new Secret(secret));
 
     val expected = format("/Task/{0}/$close?secret={1}", taskId, secret);
     val actual = cmd.getRequestLocator();
@@ -63,7 +63,7 @@ class ClosePrescriptionCommandTest {
     val md = ErxMedicationDispenseFaker.builder().fake();
     val taskId = "123456";
     val secret = "7890123";
-    val cmd = new ClosePrescriptionCommand(TaskId.from(taskId), Secret.fromString(secret), md);
+    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret), md);
 
     val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret);
     assertEquals(expectedEndpoint, cmd.getRequestLocator());
@@ -94,7 +94,7 @@ class ClosePrescriptionCommandTest {
 
     val taskId = "123456";
     val secret = "7890123";
-    val cmd = new ClosePrescriptionCommand(TaskId.from(taskId), Secret.fromString(secret), mds);
+    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret), mds);
 
     val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret);
     assertEquals(expectedEndpoint, cmd.getRequestLocator());

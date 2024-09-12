@@ -17,6 +17,7 @@
 
 @PRODUKT:eRp_FD
 @Workflow:160
+@Funktionalität:ZeitnaheBereitstellung
 @Versicherung:GKV
 Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothekenpflichtige Medikamente für GKV-Versicherte
 
@@ -28,7 +29,7 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
     Und die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | Name          | PZN      |
       | Schmerzmittel | 12345678 |
-    # Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
+    Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
 
   @TCID:ERP_EE_ZBD_01
@@ -38,8 +39,8 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
     Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen für das letzte akzeptierte E-Rezept von Sina Hüllmann die Dispensierinformationen zeitnah bereitstellt
     Dann kann die Versicherte Sina Hüllmann 1 Dispensierinformationen für ihr letztes E-Rezept abrufen
-    Und die Versicherte Sina Hüllmann kann im FdV einsehen, dass ihr letztes E-Rezept von der Apotheke Am Flughafen abgegeben wurde
-    Und die Versicherte Sina Hüllmann kann im Protokoll für ihr letztes E-Rezept einsehen, dass es abgegeben wurde
+    Und die Versicherte Sina Hüllmann kann im FdV einsehen, dass ihr letztes E-Rezept von einer Apotheke abgegeben wurde
+    Und die Versicherte Sina Hüllmann kann im Protokoll für ihr letztes E-Rezept einsehen, dass es von der Apotheke Am Flughafen abgegeben wurde
     Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept den Workflow abschliessen
     Dann hat die Apotheke Am Flughafen genau 1 Quittung vorliegen
 
@@ -48,9 +49,8 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
   Szenario: Mehrfache zeitnahe Bereitstellung von Dispensierinformationen für das FdV
     Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen für das letzte akzeptierte E-Rezept von Sina Hüllmann die Dispensierinformationen mehrfach zeitnah bereitstellt
-    Dann kann die Versicherte Sina Hüllmann genau die letzte bereitgestellte Dispensierinformation für ihr letztes E-Rezept abrufen
+    Dann kann die Versicherte Sina Hüllmann genau die letzte bereitgestellte Dispensierinformation der Apotheke Am Flughafen für ihr letztes E-Rezept abrufen
     Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept den Workflow abschliessen
-
 
   @TCID:ERP_EE_ZBD_03
   @TESTFALL:positiv
@@ -58,15 +58,17 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
     Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen für das letzte akzeptierte E-Rezept von Sina Hüllmann die Dispensierinformationen zeitnah bereitstellt
     Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept den Workflow abschliessen
-    Dann kann die Apotheke Am Flughafen die Dispensierinformationen für das letzte E-Rezept nicht mehr ändern
+    Dann kann die Apotheke Am Flughafen die Dispensierinformationen für das letzte E-Rezept von Sina Hüllmann nicht mehr ändern
 
   @TCID:ERP_EE_ZBD_04
   @TESTFALL:positiv
   Szenario: Bereitgestellte Dispensierinformationen beim Abschluss des Workflows überschreiben vorherige bereitgestellte Dispensierinformationen
     Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen für das letzte akzeptierte E-Rezept von Sina Hüllmann die Dispensierinformationen zeitnah bereitstellt
-    Dann kann die Apotheke Am Flughafen das letzte E-Rezept beim Abschluss des Workflows die Dispensierinformationen ändern
-    Dann kann die Versicherte Sina Hüllmann genau die letzte bereitgestellte Dispensierinformation für ihr letztes E-Rezept abrufen
+    Dann kann die Apotheke Am Flughafen das letzte E-Rezept für Sina Hüllmann beim Abschluss des Workflows die Dispensierinformationen ändern in:
+      | Name         | PZN      | Normgröße | Menge | Einheit | Darreichungsform |
+      | IBUFLAM akut | 04100230 | N1        | 10    | Stk     | FTA              |
+    Dann kann die Versicherte Sina Hüllmann genau die letzte bereitgestellte Dispensierinformation der Apotheke Am Flughafen für ihr letztes E-Rezept abrufen
 
   @TCID:ERP_EE_ZBD_05
   @TESTFALL:positiv
@@ -78,10 +80,17 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
   @TCID:ERP_EE_ZBD_06
   @TESTFALL:positiv
   Szenario: Zeitnahe Bereitstellung von Dispensierinformationen werden zurückgezogen, wenn das E-Rezept wieder freigegeben wurde
-    Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst nicht akzeptiert
+    Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen für das letzte akzeptierte E-Rezept von Sina Hüllmann die Dispensierinformationen zeitnah bereitstellt
     Und die Apotheke Am Flughafen das letzte akzeptierte Rezept zurückweist
     Dann kann die Versicherte Sina Hüllmann 0 Dispensierinformationen für ihr letztes E-Rezept abrufen
+
+  @TCID:ERP_EE_ZBD_07
+  @TESTFALL:negativ
+  Szenario: Zeitnahe Bereitstellung von Dispensierinformationen werden Vergessen einzustellen, sodass der Patient keine informationen zur verfügung hat
+    Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
+    Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept den Workflow nicht abschliessen
+
 
 
 

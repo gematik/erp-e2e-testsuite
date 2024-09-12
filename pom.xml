@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -71,7 +71,7 @@
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
         <version.jersey>4.0.0-M1</version.jersey>
         <version.poto>3.0.0-185</version.poto>
-        <version.bricks>0.1.1-SNAPSHOT</version.bricks>
+        <version.bricks>0.1.9</version.bricks>
 
         <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
 
@@ -118,81 +118,81 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>pharmacy-service-provider-ws-client</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>0.9.0-SNAPSHOT</version>
+                <version>0.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -346,6 +346,11 @@
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>crypto-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>ca-supplier-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
 
@@ -702,6 +707,13 @@
                         <!-- make sure every file has the following copyright header.
                           optionally, Spotless can set copyright years by digging
                           through git history (see "license" section below) -->
+                        <includes>
+                            <include>**/src/main/java/**/*.java</include>
+                            <include>**/src/*test/java/**/*.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/generated/**</exclude>
+                        </excludes>
                         <licenseHeader>
                             <file>COPYRIGHT_HEADER</file>
                         </licenseHeader>
@@ -715,6 +727,18 @@
                             <engine>google-java-format</engine>
                         </removeUnusedImports>
                     </java>
+                    <kotlin>
+                        <includes>
+                            <include>**/src/main/java/**/*.kt</include>
+                            <include>**/src/*test/java/**/*.kt</include>
+
+                            <include>**/src/main/kotlin/**/*.kt</include>
+                            <include>**/src/*test/kotlin/**/*.kt</include>
+                        </includes>
+                        <licenseHeader>
+                            <file>COPYRIGHT_HEADER</file>
+                        </licenseHeader>
+                    </kotlin>
                 </configuration>
             </plugin>
         </plugins>

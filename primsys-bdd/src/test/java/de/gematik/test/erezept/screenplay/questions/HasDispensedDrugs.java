@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs.ReceivedDispensedDrugInformation;
 import de.gematik.test.erezept.screenplay.strategy.AmountAdverb;
 import de.gematik.test.erezept.screenplay.strategy.AmountStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -29,9 +29,9 @@ import net.serenitybdd.screenplay.Question;
 
 public class HasDispensedDrugs implements Question<Boolean> {
 
-  private final Predicate<List<PrescriptionId>> strategy;
+  private final Predicate<List<ReceivedDispensedDrugInformation>> strategy;
 
-  private HasDispensedDrugs(Predicate<List<PrescriptionId>> strategy) {
+  private HasDispensedDrugs(Predicate<List<ReceivedDispensedDrugInformation>> strategy) {
     this.strategy = strategy;
   }
 

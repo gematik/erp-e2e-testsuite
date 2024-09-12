@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
@@ -57,10 +57,11 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
     val receipt = deque.chooseFrom(prescriptionManager.getReceiptsList());
 
     val cmd = dispensePrescribedMedication(receipt, smcb.getTelematikID());
-    return erpClientAbility.request(cmd);
+    val resp = erpClientAbility.request(cmd);
+    return resp;
   }
 
-  private ClosePrescriptionCommand dispensePrescribedMedication(
+  private CloseTaskCommand dispensePrescribedMedication(
       DispenseReceipt receipt, String telematikId) {
     val taskId = receipt.getTaskId();
     val secret = receipt.getSecret();
@@ -76,7 +77,7 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
             .performerId(telematikId)
             .medication(medication)
             .build();
-    return new ClosePrescriptionCommand(taskId, secret, medicationDispense);
+    return new CloseTaskCommand(taskId, secret, medicationDispense);
   }
 
   public static ResponseOfReDispenseMedication fromStack(String order) {

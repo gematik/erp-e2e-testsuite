@@ -19,6 +19,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.time.Instant;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -26,22 +27,22 @@ class ReceiveDispensedDrugsTest {
 
   @Test
   void shouldAddAndGetReceivedDrugs() {
-    val abiltiy = ReceiveDispensedDrugs.forHimself();
+    val ability = ReceiveDispensedDrugs.forHimself();
     val firstId = PrescriptionId.random();
     val secondId = PrescriptionId.random();
-    abiltiy.append(firstId);
-    abiltiy.append(secondId);
+    ability.append(firstId, Instant.now());
+    ability.append(secondId, Instant.now());
 
-    assertEquals(2, abiltiy.getDispensedDrugsList().size());
+    assertEquals(2, ability.getDispensedDrugsList().size());
 
     // get
-    assertEquals(firstId, abiltiy.getFirstDispensedDrug());
-    assertEquals(secondId, abiltiy.getLastDispensedDrug());
+    assertEquals(firstId, ability.getFirstDispensedDrug().prescriptionId());
+    assertEquals(secondId, ability.getLastDispensedDrug().prescriptionId());
 
     // consume
-    assertEquals(firstId, abiltiy.consumeFirstDispensedDrug());
-    assertEquals(1, abiltiy.getDispensedDrugsList().size());
-    assertEquals(secondId, abiltiy.consumeLastDispensedDrug());
-    assertEquals(0, abiltiy.getDispensedDrugsList().size());
+    assertEquals(firstId, ability.consumeFirstDispensedDrug().prescriptionId());
+    assertEquals(1, ability.getDispensedDrugsList().size());
+    assertEquals(secondId, ability.consumeLastDispensedDrug().prescriptionId());
+    assertEquals(0, ability.getDispensedDrugsList().size());
   }
 }

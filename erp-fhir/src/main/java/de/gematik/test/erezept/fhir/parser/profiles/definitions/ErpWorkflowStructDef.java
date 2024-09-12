@@ -69,7 +69,9 @@ public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVers
   EXPIRY_DATE("https://gematik.de/fhir/StructureDefinition/ExpiryDate"),
   EXPIRY_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate"),
   ACCEPT_DATE("https://gematik.de/fhir/StructureDefinition/AcceptDate"),
-  ACCEPT_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate");
+  ACCEPT_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate"),
+  LAST_MEDICATION_DISPENSE(
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_LastMedicationDispense");
 
   private final String canonicalUrl;
 }

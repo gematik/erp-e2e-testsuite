@@ -16,7 +16,11 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.date.DateConverter;
@@ -28,6 +32,8 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
@@ -38,6 +44,7 @@ class ErxTaskTest extends ParsingTest {
   private static final String BASE_PATH = "fhir/valid/erp/";
   private static final String BASE_PATH_1_1_1 = BASE_PATH + "1.1.1/";
   private static final String BASE_PATH_1_2_0 = BASE_PATH + "1.2.0/task/";
+  private static final String BASE_PATH_1_3_0 = BASE_PATH + "1.3.0/task/";
 
   @Test
   void shouldEncodeSingleTask111() {
@@ -74,6 +81,8 @@ class ErxTaskTest extends ParsingTest {
 
     val expectedIntent = Task.TaskIntent.ORDER;
     assertEquals(expectedIntent, task.getIntent());
+
+    assertFalse(task.hasLastMedicationDispenseDate());
 
     // just for coverage, should never fail
     assertNotNull(task.toString());
@@ -205,6 +214,22 @@ class ErxTaskTest extends ParsingTest {
               assertTrue(task.hasAccessCode());
               assertEquals(expectedSecret, task.getSecret().orElseThrow());
             });
+  }
+
+  @Test
+  void shouldHaveLastMedicationDispenseInstan() throws ParseException {
+    val fileName = "9b48f82c-9c11-4a57-aa72-a805f9537a82.xml";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_3_0 + fileName);
+    val task = parser.decode(ErxTask.class, content);
+    assertNotNull(task, "Valid ErxTask must be parseable");
+
+    assertTrue(task.hasLastMedicationDispenseDate());
+    val lmd = task.getLastMedicationDispenseDate().orElseThrow();
+
+    val formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    val expectation = formatter.parse("2022-05-20T13:28:17+02:00").toInstant();
+    assertEquals(expectation, lmd);
   }
 
   @Test

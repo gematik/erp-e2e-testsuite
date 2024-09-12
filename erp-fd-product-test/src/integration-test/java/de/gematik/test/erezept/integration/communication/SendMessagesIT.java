@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.communication;
@@ -95,9 +94,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content als {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content als"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die CommunicationReply der Apotheke genauer die Stringlänge Hint akzeptiert")
+      "Es muss geprüft werden, dass der Fachdienst die CommunicationReply der Apotheke genauer die"
+          + " Stringlänge Hint akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithCorrectStringLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -120,9 +121,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Patientin schickt eine Communication mit validem (500 Zeichen langem) Json-Content mit {0} und SupplyOption {1} an die Stadtapotheke !")
+          "[{index}] -> Die Patientin schickt eine Communication mit validem (500 Zeichen langem)"
+              + " Json-Content mit {0} und SupplyOption {1} an die Stadtapotheke !")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die CommunicationDispenseRequest des Patienten genauer die Stringlänge Hint <= 500 akzeptiert")
+      "Es muss geprüft werden, dass der Fachdienst die CommunicationDispenseRequest des Patienten"
+          + " genauer die Stringlänge Hint <= 500 akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectStringLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -145,9 +148,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die Version == 1 akzeptiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die Version == 1 akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectVersion(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -169,9 +174,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die SupplyOption akzeptiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " SupplyOption akzeptiert")
   @MethodSource("communicationTestComposerForSupplyOption")
   void shouldValidatePharmaciesCommunicationWithCorrectSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -192,9 +199,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_05")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die SupplyOption akzeptiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die SupplyOption akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -215,9 +224,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_06")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die PickUpCodeDCM Länge validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " PickUpCodeDCM Länge validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithCorrectPickUpCodeDCM(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -251,9 +262,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_07")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer Länge des Namens < 100 akzepiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " Länge des Namens < 100 akzepiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectNameLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -279,9 +292,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_8")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die pickUpCodeHR Länge == 8 akzepiert, wenn eine SupplyOption onPremise gesetzt ist")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " pickUpCodeHR Länge == 8 akzepiert, wenn eine SupplyOption onPremise gesetzt ist")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithCorrectPickUpCodHR(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -308,9 +323,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_9")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die URL akzeptiert ")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die URL"
+          + " akzeptiert ")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWitCorrectUrlLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -335,9 +352,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_10")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer eine Telefonnummer akzeptiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " eine Telefonnummer akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectPhoneLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -358,9 +377,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_11")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die EscapeQuotes akzeptiert ")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " EscapeQuotes akzeptiert ")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWitEscapeQuotes(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -385,9 +406,11 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_10")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten mit EscapeQuotes akzeptiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten mit"
+          + " EscapeQuotes akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithEscapeQuotes(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {

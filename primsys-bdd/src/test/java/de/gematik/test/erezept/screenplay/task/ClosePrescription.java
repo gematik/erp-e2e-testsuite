@@ -76,6 +76,9 @@ public class ClosePrescription implements Task {
         ResponseOfClosePrescriptionOperation.fromStack(dequeStrategy));
   }
 
+  private static boolean storeAcceptationInformation = false;
+  private static Actor patient;
+
   @Override
   public <T extends Actor> void performAs(final T actor) {
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
@@ -99,16 +102,24 @@ public class ClosePrescription implements Task {
           .ifPresent(
               patient -> {
                 val prescriptionId = receipt.getPrescriptionId();
+                val dispensationDate = receipt.getTimestamp().toInstant();
                 log.info(
                     format(
                         "Handout dispensed medication for prescription {0} to {1}",
                         prescriptionId, patient.getName()));
                 val drugReceive = SafeAbility.getAbility(patient, ReceiveDispensedDrugs.class);
-                drugReceive.append(prescriptionId);
+                drugReceive.append(prescriptionId, dispensationDate);
               });
 
-      // only if the dispensation was successful teardown the strategy
-      strategy.teardown();
+      if (patient != null) {
+        val medDsp =
+            patient.asksFor(GetMedicationDispense.asPatient().forPrescription(DequeStrategy.LIFO));
+        prescriptionManager.getDispensedPrescriptions().append(medDsp);
+      }
+      if (!storeAcceptationInformation) {
+        // only if the dispensation was successful teardown the strategy
+        strategy.teardown();
+      }
     } catch (UnexpectedResponseResourceError urre) {
       val strategy = fhirResponseQuestion.getExecutedStrategy();
       log.warn(
@@ -118,6 +129,16 @@ public class ClosePrescription implements Task {
       // re-throw for potential decorators
       throw urre;
     }
+  }
+
+  public ClosePrescription andStoreAcceptInformationForLaterStep() {
+    storeAcceptationInformation = true;
+    return this;
+  }
+
+  public ClosePrescription forThePatient(Actor thePatient) {
+    patient = thePatient;
+    return this;
   }
 
   public static class DispenseMedicationsBuilder {

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class ClosePrescriptionCommand extends BaseCommand<ErxReceipt> {
+public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
 
   private final List<ErxMedicationDispense> medicationDispenses;
 
@@ -39,7 +39,7 @@ public class ClosePrescriptionCommand extends BaseCommand<ErxReceipt> {
    * @param taskId
    * @param secret
    */
-  public ClosePrescriptionCommand(TaskId taskId, Secret secret) {
+  public CloseTaskCommand(TaskId taskId, Secret secret) {
     this(taskId, secret, List.of());
   }
 
@@ -52,12 +52,11 @@ public class ClosePrescriptionCommand extends BaseCommand<ErxReceipt> {
    * @param secret as Secret
    * @param medicationDispense as ErxMedicationDispense
    */
-  public ClosePrescriptionCommand(
-      TaskId taskId, Secret secret, ErxMedicationDispense medicationDispense) {
+  public CloseTaskCommand(TaskId taskId, Secret secret, ErxMedicationDispense medicationDispense) {
     this(taskId, secret, List.of(medicationDispense));
   }
 
-  public ClosePrescriptionCommand(
+  public CloseTaskCommand(
       TaskId taskId, Secret secret, List<ErxMedicationDispense> medicationDispenses) {
     super(ErxReceipt.class, HttpRequestMethod.POST, "Task", taskId.getValue());
     this.medicationDispenses = medicationDispenses;

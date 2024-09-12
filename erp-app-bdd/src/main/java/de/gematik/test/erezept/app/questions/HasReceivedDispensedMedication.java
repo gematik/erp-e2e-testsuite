@@ -54,7 +54,8 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
     val app = SafeAbility.getAbility(actor, UseIOSApp.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val receivedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
-    val prescriptionId = deque.chooseFrom(receivedDrugs.getDispensedDrugsList());
+    val dispensationInformation = deque.chooseFrom(receivedDrugs.getDispensedDrugsList());
+    val prescriptionId = dispensationInformation.prescriptionId();
 
     // first refresh the screen
     app.tap(Mainscreen.REFRESH_BUTTON);

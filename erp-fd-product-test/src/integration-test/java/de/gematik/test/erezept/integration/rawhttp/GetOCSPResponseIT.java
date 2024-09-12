@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.rawhttp;
@@ -69,7 +68,8 @@ public class GetOCSPResponseIT extends ErpTest {
   @TestcaseId("ERP_GET_OCSP_RESPONSE_02")
   @Test
   @DisplayName(
-      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn ein falscher IssuerCn Query Parameter übergeben wird")
+      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn ein falscher"
+          + " IssuerCn Query Parameter übergeben wird")
   void verifyOcspResponseWithWrongQueryIssuerCn() {
     this.config.equipForOCSP(guenther);
     val resp =
@@ -84,7 +84,8 @@ public class GetOCSPResponseIT extends ErpTest {
   @TestcaseId("ERP_GET_OCSP_RESPONSE_03")
   @Test
   @DisplayName(
-      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn falsche Zertifikats-Seriennummer im Query Parameter übergeben werden")
+      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn falsche"
+          + " Zertifikats-Seriennummer im Query Parameter übergeben werden")
   void verifyOcspResponseWithWrongQueryCertSerial() {
     this.config.equipForOCSP(guenther);
     val resp =
@@ -99,7 +100,8 @@ public class GetOCSPResponseIT extends ErpTest {
   @TestcaseId("ERP_GET_OCSP_RESPONSE_04")
   @Test
   @DisplayName(
-      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn keine Query Parameter übergeben werden")
+      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn keine Query"
+          + " Parameter übergeben werden")
   void verifyOcspResponseWithNoQuery() {
     this.config.equipForOCSP(guenther);
     val resp = guenther.performs(GetOCSPRequest.with(passConcreteParams("", "")));
@@ -113,7 +115,8 @@ public class GetOCSPResponseIT extends ErpTest {
   @TestcaseId("ERP_GET_OCSP_RESPONSE_05")
   @Test
   @DisplayName(
-      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn falsche Query Parameter übergeben werden")
+      "Negativ Test, Überprüft, ob der Fachdienst ein OCSP_RESPONSE zurückliefert wenn falsche"
+          + " Query Parameter übergeben werden")
   void verifyOcspResponseWithWrongQuery() {
     this.config.equipForOCSP(guenther);
     val resp =
@@ -124,5 +127,4 @@ public class GetOCSPResponseIT extends ErpTest {
             .and(responseContainsDescription("Query parameter serial-nr is not a number"))
             .isCorrect());
   }
-
 }

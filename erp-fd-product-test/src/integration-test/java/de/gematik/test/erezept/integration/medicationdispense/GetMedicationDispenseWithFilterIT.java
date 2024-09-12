@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.medicationdispense;
@@ -50,7 +49,6 @@ import org.junit.runner.RunWith;
 @Tag("MedicationDispense")
 public class GetMedicationDispenseWithFilterIT extends ErpTest {
 
-
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
 
@@ -68,7 +66,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_01")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals HandedOver filtern kann")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals"
+          + " HandedOver filtern kann")
   public void shouldDownloadMedicDispenseWithFilterHandedOver() {
     val task =
         doctor
@@ -95,7 +94,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_02")
   @Test
   @DisplayName(
-      "Prüfe, dass ein Patient beim Abruf seiner MedicationDispense als SearchSet den Filter whenhandedover nutzen kann. In diesem Fall kombiniert mit before (LowerThan - lt) ")
+      "Prüfe, dass ein Patient beim Abruf seiner MedicationDispense als SearchSet den Filter"
+          + " whenhandedover nutzen kann. In diesem Fall kombiniert mit before (LowerThan - lt) ")
   public void shouldDownloadMedicDispenseWithFilterBeforeAndHandedOver() {
     val task =
         doctor
@@ -116,7 +116,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_03")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach HandedOver Filtern kann")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach"
+          + " HandedOver Filtern kann")
   public void shouldDownloadMedicDispenseWithFilterGraterThanAndHandedOver() {
     val task =
         doctor
@@ -137,7 +138,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_04")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense als DefaultFilter equalsHandedOver benutzt wird")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense als"
+          + " DefaultFilter equalsHandedOver benutzt wird")
   public void shouldDownloadMedicDispenseWithDefaultFilterHandedOver() {
     val task =
         doctor
@@ -157,7 +159,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_05")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals WhenPrepared filtern kann")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals"
+          + " WhenPrepared filtern kann")
   public void shouldDownloadMedicDispenseWithFilterPrepared() {
     val task =
         doctor
@@ -182,7 +185,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_06")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach before WhenPrepared filtern kann")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach before"
+          + " WhenPrepared filtern kann")
   public void shouldDownloadMedicDispenseWithFilterBeforePrepared() {
     val task =
         doctor
@@ -207,7 +211,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_07")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals PerformerId filtern kann")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals"
+          + " PerformerId filtern kann")
   public void shouldDownloadMedicDispenseWithFilterPerformer() {
     val task =
         doctor
@@ -228,7 +233,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_08")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispenseBundles als Wert für totalCount Null bekommt")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispenseBundles als"
+          + " Wert für totalCount Null bekommt")
   public void shouldDownloadMedicDispenseWithCountZero() {
     val task =
         doctor
@@ -246,7 +252,8 @@ public class GetMedicationDispenseWithFilterIT extends ErpTest {
   @TestcaseId("ERP_MEDICATION_DISPENSE_09")
   @Test
   @DisplayName(
-      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispenseBundles KEINE RelationLinks angeboten werden")
+      "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispenseBundles KEINE"
+          + " RelationLinks angeboten werden")
   public void shouldDownloadMedicDispenseWithoutRelationLinks() {
     val task =
         doctor

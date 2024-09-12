@@ -41,6 +41,7 @@ public class JWTPayload {
   private String aud;
   private String azp;
   private String scope;
+
   @JsonIgnore private String organizationIK;
 
   @JsonProperty("auth_time")

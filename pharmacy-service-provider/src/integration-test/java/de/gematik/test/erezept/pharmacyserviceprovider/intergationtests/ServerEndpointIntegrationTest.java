@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,17 +53,16 @@ class ServerEndpointIntegrationTest {
     body = array;
   }
 
-
   // DeliveryEndpoint
   @Test
   void testDeliveryOnlyAllCorrect() {
     val resp =
-            Unirest.post(SERVER_URL + "/delivery_only/{ti_id}?req={transactionID}")
-                    .routeParam(Map.of("ti_id", "testTeleID", "transactionID", "transactionTestID"))
-                    .header("X-Authorization", SERVER_AUTH)
-                    .header("Content-Type", "application/pkcs7-mime")
-                    .body(body)
-                    .asString();
+        Unirest.post(SERVER_URL + "/delivery_only/{ti_id}?req={transactionID}")
+            .routeParam(Map.of("ti_id", "testTeleID", "transactionID", "transactionTestID"))
+            .header("X-Authorization", SERVER_AUTH)
+            .header("Content-Type", "application/pkcs7-mime")
+            .body(body)
+            .asString();
     assertEquals(200, resp.getStatus());
     assertEquals("no fitted receiver connected @ specific TelematikId: testTeleID", resp.getBody());
   }
@@ -71,53 +70,53 @@ class ServerEndpointIntegrationTest {
   @SneakyThrows
   @ParameterizedTest
   @CsvSource({
-          "'/delivery_only?req={transactionID}', 404 ",
-          "'/pspmock/liefern/?req={transactionID}', 404",
-          "'/pick_up?req={transactionID}', 404",
-          "'/local_delivery?req={transactionID}', 404",
+    "'/delivery_only?req={transactionID}', 404 ",
+    "'/pspmock/liefern/?req={transactionID}', 404",
+    "'/pick_up?req={transactionID}', 404",
+    "'/local_delivery?req={transactionID}', 404",
   })
   void shouldAnswer404Or200NoTeleID(String send, int expect) {
     val resp =
-            Unirest.post(SERVER_URL + send)
-                    .header("X-Authorization", SERVER_AUTH)
-                    .routeParam(Map.of("transactionID", "transactionTestID"))
-                    .body(body)
-                    .asString();
+        Unirest.post(SERVER_URL + send)
+            .header("X-Authorization", SERVER_AUTH)
+            .routeParam(Map.of("transactionID", "transactionTestID"))
+            .body(body)
+            .asString();
     assertEquals(expect, resp.getStatus());
   }
 
   @SneakyThrows
   @ParameterizedTest
   @CsvSource({
-          "'/delivery_only', 404 ",
-          "'/pspmock/pick_up', 404",
-          "'/pick_up', 404",
-          "'/local_delivery', 404",
+    "'/delivery_only', 404 ",
+    "'/pspmock/pick_up', 404",
+    "'/pick_up', 404",
+    "'/local_delivery', 404",
   })
   void shouldAnswer404NoIds(String send, int expect) {
     val resp =
-            Unirest.post(SERVER_URL + send)
-                    .header("X-Authorization", SERVER_AUTH)
-                    .body(body)
-                    .asString();
+        Unirest.post(SERVER_URL + send)
+            .header("X-Authorization", SERVER_AUTH)
+            .body(body)
+            .asString();
     assertEquals(expect, resp.getStatus());
   }
 
   @SneakyThrows
   @ParameterizedTest
   @CsvSource({
-          "'/delivery_only', 404 ",
-          "'/pspmock/pick_up', 404",
-          "'/pick_up', 404",
-          "'/local_delivery', 404",
+    "'/delivery_only', 404 ",
+    "'/pspmock/pick_up', 404",
+    "'/pick_up', 404",
+    "'/local_delivery', 404",
   })
   void testNotOnlyBody(String route, int respCode) {
     val resp =
-            Unirest.post(SERVER_URL + route)
-                    .header("X-Authorization", SERVER_AUTH)
-                    .header("Content-Type", "application/pkcs7-mime")
-                    .body(body)
-                    .asString();
+        Unirest.post(SERVER_URL + route)
+            .header("X-Authorization", SERVER_AUTH)
+            .header("Content-Type", "application/pkcs7-mime")
+            .body(body)
+            .asString();
     assertEquals(respCode, resp.getStatus());
   }
 
@@ -159,7 +158,8 @@ class ServerEndpointIntegrationTest {
             .asString();
     assertEquals(404, resp.getStatus());
     assertEquals(
-        "de.gematik.test.erezept.pspwsclient.dataobjects.InvalidDeliveryOptionException: no kind of deliver option matches",
+        "de.gematik.test.erezept.pspwsclient.dataobjects.InvalidDeliveryOptionException: no kind of"
+            + " deliver option matches",
         resp.getBody());
   }
 
@@ -428,28 +428,22 @@ class ServerEndpointIntegrationTest {
   @Test
   void testInfoEnpointTrue() {
     val response =
-            Unirest.get(SERVER_URL + "/info").header("X-Authorization", SERVER_AUTH).asString();
+        Unirest.get(SERVER_URL + "/info").header("X-Authorization", SERVER_AUTH).asString();
     assertEquals(200, response.getStatus());
     assertEquals("actual Version: " + VERSIONNUMBER, response.getBody());
   }
 
-
-
   @SneakyThrows
   @ParameterizedTest
   @CsvSource({
-          "'/delivery_only/testApo123', 404 , 'blob == null or empty'",
-          "'/pspmock/pick_up/testApo123', 404, 'blob == null or empty'",
-          "'/pick_up/testApo123', 404, 'blob == null or empty'",
-          "'/local_delivery/testApo123', 404, 'blob == null or empty'",
+    "'/delivery_only/testApo123', 404 , 'blob == null or empty'",
+    "'/pspmock/pick_up/testApo123', 404, 'blob == null or empty'",
+    "'/pick_up/testApo123', 404, 'blob == null or empty'",
+    "'/local_delivery/testApo123', 404, 'blob == null or empty'",
   })
   void shouldAnswer404NoIdsNoBlob(String send, int expect, String expectedString) {
-    val resp =
-            Unirest.post(SERVER_URL + send)
-                    .header("X-Authorization", SERVER_AUTH)
-                    .asString();
+    val resp = Unirest.post(SERVER_URL + send).header("X-Authorization", SERVER_AUTH).asString();
     assertEquals(expect, resp.getStatus());
     assertEquals(expectedString, resp.getBody());
   }
-
 }

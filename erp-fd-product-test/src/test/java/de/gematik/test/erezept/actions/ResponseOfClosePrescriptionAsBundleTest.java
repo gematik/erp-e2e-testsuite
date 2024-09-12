@@ -55,7 +55,7 @@ class ResponseOfClosePrescriptionAsBundleTest {
             (Answer<ErpResponse<ErxReceipt>>)
                 invovation -> {
                   val args = invovation.getArguments();
-                  val cmd = (ClosePrescriptionCommand) args[0];
+                  val cmd = (CloseTaskCommand) args[0];
                   assertTrue(cmd.getRequestBody().isPresent());
                   val medDisp = (ErxMedicationDispense) cmd.getRequestBody().orElseThrow();
                   assertEquals(manipulatedPerformerId, medDisp.getPerformerIdFirstRep());
@@ -68,7 +68,7 @@ class ResponseOfClosePrescriptionAsBundleTest {
                       .andValidationResult(createEmptyValidationResult());
                 })
         .when(useErpClient)
-        .request(any(ClosePrescriptionCommand.class));
+        .request(any(CloseTaskCommand.class));
 
     val mockAcceptBundle = mock(ErxAcceptBundle.class);
     val mockResponse = (ErpResponse<ErxAcceptBundle>) mock(ErpResponse.class);

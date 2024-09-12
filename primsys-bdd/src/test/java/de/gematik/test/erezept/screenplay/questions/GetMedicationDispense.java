@@ -52,7 +52,8 @@ public class GetMedicationDispense implements Question<ErxMedicationDispenseBund
           format(
               "{0} {1} looks for the {2} of the {3} received medications for refetching",
               role, actor.getName(), deque, dispensed.getDispensedDrugsList().size()));
-      prescriptionId = deque.chooseFrom(dispensed.getDispensedDrugsList());
+      val dispensationInformation = deque.chooseFrom(dispensed.getDispensedDrugsList());
+      prescriptionId = dispensationInformation.prescriptionId();
     } else if (ActorRole.PHARMACY.equals(role)) {
       val receipts = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
       log.info(

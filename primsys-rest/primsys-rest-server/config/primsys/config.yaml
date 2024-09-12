@@ -22,7 +22,7 @@ actors:
 
     - name: Gündüla Gunther
       smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
-      hbaIccsn: 80276001081699900578 #Arzt Gunther
+      hbaIccsn: 80276883110000161759 #Arzt Gunther
       qualificationType: Zahnarzt
       konnektor: Soft-Konn
       validateResponse: false
@@ -59,10 +59,6 @@ actors:
       validateResponse: false
 
   apothecaries:
-    - name: Amanda Albrecht
-      hbaIccsn: 80276001081699900579
-      konnektor: Soft-Konn
-
     - name: Finn-Louis Nullmayr
       hbaIccsn: 80276883110000121166
       algorithm: E256

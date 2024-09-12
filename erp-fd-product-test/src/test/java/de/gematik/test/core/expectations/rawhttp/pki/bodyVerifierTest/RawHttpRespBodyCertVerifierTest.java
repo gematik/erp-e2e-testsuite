@@ -16,18 +16,21 @@
 
 package de.gematik.test.core.expectations.rawhttp.pki.bodyVerifierTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.bbriccs.utils.UtilsKt;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpRespBodyCertVerifier;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import java.util.List;
+import java.security.cert.X509Certificate;
+import java.util.Set;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +41,7 @@ import org.junit.jupiter.api.Test;
 class RawHttpRespBodyCertVerifierTest extends ParsingTest {
 
   private static final String CERT_BODY_PATH = "certexamples/86028_ExampleData.json";
-
+  private static X509Certificate kompCA;
   private PKICertificatesDTOEnvelop body;
 
   @SneakyThrows
@@ -48,6 +51,10 @@ class RawHttpRespBodyCertVerifierTest extends ParsingTest {
     val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH);
     val obMapper = new ObjectMapper();
     body = obMapper.readValue(respBody, PKICertificatesDTOEnvelop.class);
+
+    kompCA =
+        UtilsKt.toCertificate(
+            ResourceLoader.getFileFromResourceAsStream("certexamples/GEM.KOMP-CA28_TEST-ONLY.der"));
   }
 
   @Test
@@ -60,7 +67,7 @@ class RawHttpRespBodyCertVerifierTest extends ParsingTest {
   @TestcaseId("ut_httpResponseCertVerifier_01")
   @DisplayName("Positive Unit Test for an RawHttpBodyCertVerify to check for add_roots")
   void verifierShouldWork() {
-    val step = RawHttpRespBodyCertVerifier.bodyContainsAddRoots();
+    val step = RawHttpRespBodyCertVerifier.bodyContainsAddRoots(Set.of(kompCA));
     step.apply(body);
   }
 
@@ -68,7 +75,7 @@ class RawHttpRespBodyCertVerifierTest extends ParsingTest {
   @TestcaseId("ut_httpResponseCertVerifier_02")
   @DisplayName("Positive Unit Test for an RawHttpBodyCertVerify to check for ca_certs")
   void verifierShouldWorkWithOtherString() {
-    val step = RawHttpRespBodyCertVerifier.bodyContainsCaCerts();
+    val step = RawHttpRespBodyCertVerifier.bodyContainsCaCerts(Set.of(kompCA));
     step.apply(body);
   }
 
@@ -77,7 +84,7 @@ class RawHttpRespBodyCertVerifierTest extends ParsingTest {
   @DisplayName("negative Unit Test should throw Exception caused by missing entries")
   void verifierShouldThrowWhileEmptyLists() {
     val body2 = new PKICertificatesDTOEnvelop();
-    val step = RawHttpRespBodyCertVerifier.bodyContainsAddRoots();
+    val step = RawHttpRespBodyCertVerifier.bodyContainsAddRoots(Set.of(kompCA));
     assertThrows(AssertionError.class, () -> step.apply(body2));
   }
 
@@ -86,8 +93,8 @@ class RawHttpRespBodyCertVerifierTest extends ParsingTest {
   @DisplayName("negative Unit Test should throw Exception caused by missing add_roots")
   void verifierShouldThrowMissingAddRoots() {
     val body2 = new PKICertificatesDTOEnvelop();
-    body2.setCaCerts(List.of("123"));
-    val step = RawHttpRespBodyCertVerifier.bodyContainsAddRoots();
+    body2.setAddRoots(Set.of(kompCA));
+    val step = RawHttpRespBodyCertVerifier.bodyContainsAddRoots(Set.of());
     assertThrows(AssertionError.class, () -> step.apply(body2));
   }
 
@@ -96,8 +103,8 @@ class RawHttpRespBodyCertVerifierTest extends ParsingTest {
   @DisplayName("negative Unit Test should throw Exception caused by missing ca_certs")
   void verifierShouldThrow() {
     val body2 = new PKICertificatesDTOEnvelop();
-    body2.setAddRoots(List.of("123"));
-    val step = RawHttpRespBodyCertVerifier.bodyContainsCaCerts();
+    body2.setCaCerts(Set.of(kompCA));
+    val step = RawHttpRespBodyCertVerifier.bodyContainsCaCerts(Set.of());
     assertThrows(AssertionError.class, () -> step.apply(body2));
   }
 }

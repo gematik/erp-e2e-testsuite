@@ -22,8 +22,8 @@ import eu.europa.esig.trustedlist.jaxb.tsl.TrustStatusListType;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -47,18 +47,18 @@ public class TslListWrapper {
     return this.tslInformationProvider;
   }
 
-  public List<X509Certificate> getFilteredForFDSicAndEncX509Certificates() {
+  public Set<X509Certificate> getFilteredForFDSicAndEncX509Certificates() {
     val extOidFdEnc = new TslExtension("1.2.276.0.76.4.202", "oid_fd_enc");
     val extOidFdSig = new TslExtension("1.2.276.0.76.4.203", "oid_fd_sig");
     return getFilteredCaList(extOidFdEnc, extOidFdSig);
   }
 
-  public List<X509Certificate> getFilteredCaList(
+  public Set<X509Certificate> getFilteredCaList(
       TslExtension extOidFdEnc, TslExtension extOidFdSig) {
     return getFilteredCaList(this.getProvider(), extOidFdEnc, extOidFdSig);
   }
 
-  private List<X509Certificate> getFilteredCaList(
+  private Set<X509Certificate> getFilteredCaList(
       TslInformationProvider tslIP, TslExtension extOidFdEnc, TslExtension extOidFdSig) {
 
     val tspServiceList = tslIP.getTspServices();
@@ -73,7 +73,7 @@ public class TslListWrapper {
                       && (extensions.contains(extOidFdEnc) || extensions.contains(extOidFdSig));
                 })
             .toList();
-    List<X509Certificate> caCertList = new LinkedList<>();
+    val caCertList = new HashSet<X509Certificate>();
     erpTspServices.forEach(
         it ->
             it.getTspServiceType()
