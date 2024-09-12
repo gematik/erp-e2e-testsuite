@@ -69,8 +69,8 @@ public class ResponseOfGetChargeItemBundle extends FhirResponseQuestion<ErxCharg
 
   private ChargeItemGetByIdCommand getPatientCommand(Actor actor) {
     val receivedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
-    val dispensed = deque.chooseFrom(receivedDrugs.getDispensedDrugsList());
-    return new ChargeItemGetByIdCommand(dispensed);
+    val dispensationInformation = deque.chooseFrom(receivedDrugs.getDispensedDrugsList());
+    return new ChargeItemGetByIdCommand(dispensationInformation.prescriptionId());
   }
 
   private ChargeItemGetByIdCommand getPharmacyCommand(Actor actor) {

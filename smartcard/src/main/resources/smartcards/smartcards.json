@@ -450,14 +450,16 @@
     ]
   },
   {
-    "iccsn": "80276001081699900578",
+    "iccsn": "80276883110000161759",
     "type": "HBA",
-    "ownerName": "Dr. med. Gündüla Gunther ARZT TEST-ONLY",
+    "ownerName": "Sébastian Freiherr DômbrowskiTEST-ONLY",
     "stores": [
-      "hba/80276001081699900578/c.hp.qes-erp-arztGunther.p12",
-      "hba/80276001081699900578/c.hp.aut-erp-ecc-arztGunther.p12",
-      "hba/80276001081699900578/c.hp.aut-erp-arztGunther.p12",
-      "hba/80276001081699900578/c.hp.qes-erp-ecc-arztGunther.p12"
+      "hba/80276883110000161759/80276883110000161759-C_HP_AUT_E256.p12",
+      "hba/80276883110000161759/80276883110000161759-C_HP_AUT_R2048.p12",
+      "hba/80276883110000161759/80276883110000161759-C_HP_ENC_E256.p12",
+      "hba/80276883110000161759/80276883110000161759-C_HP_ENC_R2048.p12",
+      "hba/80276883110000161759/80276883110000161759-C_HP_QES_E256.p12",
+      "hba/80276883110000161759/80276883110000161759-C_HP_QES_R2048.p12"
     ]
   },
   {
@@ -472,17 +474,6 @@
       "hba/80276883110000095767/80276883110000095767-C_HP_ENC_E256.p12",
       "hba/80276883110000095767/80276883110000095767-C_HP_QES_R2048.p12",
       "hba/80276883110000095767/80276883110000095767-C_HP_QES_PSS_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276001081699900579",
-    "type": "HBA",
-    "ownerName": "Dr. Amanda Albrecht APO TEST-ONLY",
-    "stores": [
-      "hba/80276001081699900579/c.hp.aut-erp-apoAlbrecht.p12",
-      "hba/80276001081699900579/c.hp.qes-erp-ecc-apoAlbrecht.p12",
-      "hba/80276001081699900579/c.hp.qes-erp-apoAlbrecht.p12",
-      "hba/80276001081699900579/c.hp.aut-erp-ecc-apoAlbrecht.p12"
     ]
   },
   {

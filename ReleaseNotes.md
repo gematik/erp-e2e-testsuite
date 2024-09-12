@@ -1,6 +1,6 @@
 # Release Notes ERP E2E Testsuite
 
-## Release 0.8.0
+## Release 0.8.1
 
 Module:
 
@@ -12,7 +12,8 @@ Module:
   - add QueryParams builder in IQueryParameters for whenHandedOver, whenPrepared, fromPerformer, withOffset, -Count,
     -Sort
   - C_11574: split $dispense and $close operation to do both separately.
-  - C_11574: add DispenseOperation and CloseOperation to handle Dispense and Close operations
+  - C_11574: add DispenseOperation and CloseOperation to handle Dispense and Close operations separate
+  - C_11574: add new dispense operation without sending a Secret for special Testcases
 * erp-fd-product-test:
   - add action GetOCSPRequest to call Certificate from FD for C_11598
   - add action GetTslList to download filter it.
@@ -25,16 +26,23 @@ Module:
   - Extension of the key table "Darreichungsform" to include "Injektions- und Infusionsdispersion (IID)" and "Lösung zur intravesikalen Anwendung (LIV)"
   - Implenmented TestSzenario to validate the availability of IID and LIV
   - Add toggle to activate Validation for IID and LIV
+  - Implemented TestScenario to test if the KbvBundle without MedicationRequest resource and using MedicationCategory different than 00 the FHIR response is equal to 400.
+* erp-fhir-fuzzing:
+  - Add Manipulator to handle different entries in the KbvBundle.
 * erp-fhir:
   - add FHIR E-Rezept Workflow Version 1.3 (de.gematik.erezept-workflow.r4)
 * primsys-rest:
   - Communication search endpoint for pharmacies
-  - Communication replyWithSender Endepoint &sender=<value>
+  - Communication replyWithSender Endpoint &sender=<value>
 
 * konnektor-client:
   - upgrade from `javax.ws` to `jakarta.ws`
 * openapi: 
   - update ErpTestDriver OpenAPI specification to version 1.0.1
+
+* primsys-bbd:
+  - Add new FeatureFile for "Zeitnahe Bereitstellung" with Tasks and questions
+
 ## Release 0.7.0
 
 Implemented Features:

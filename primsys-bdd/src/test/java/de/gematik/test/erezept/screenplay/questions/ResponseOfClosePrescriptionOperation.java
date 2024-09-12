@@ -19,7 +19,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
@@ -116,7 +116,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     executedStrategy = strategyBuilder.initialize(prescriptionManager);
 
-    ClosePrescriptionCommand executedCommand;
+    CloseTaskCommand executedCommand;
     if (replacementMedications.isEmpty()) {
       if (alreadyDispensedFlag) {
         executedCommand = this.closeAlreadyDispensed(executedStrategy);
@@ -139,10 +139,11 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
         format(
             "Actor {0} is asking for the response of {1}",
             actor.getName(), executedCommand.getRequestLocator()));
-    return erpClientAbility.request(executedCommand);
+    val resp = erpClientAbility.request(executedCommand);
+    return resp;
   }
 
-  private ClosePrescriptionCommand dispensePrescribedMedication(
+  private CloseTaskCommand dispensePrescribedMedication(
       PrescriptionToDispenseStrategy strategy, KbvErpMedication medication, String telematikId) {
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
@@ -164,22 +165,22 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
             .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
             .wasSubstituted(false)
             .build();
-    return new ClosePrescriptionCommand(taskId, secret, medicationDispense);
+    return new CloseTaskCommand(taskId, secret, medicationDispense);
   }
 
-  private ClosePrescriptionCommand closeAlreadyDispensed(PrescriptionToDispenseStrategy strategy) {
+  private CloseTaskCommand closeAlreadyDispensed(PrescriptionToDispenseStrategy strategy) {
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
-    return new ClosePrescriptionCommand(taskId, secret);
+    return new CloseTaskCommand(taskId, secret);
   }
 
-  private ClosePrescriptionCommand dispenseAlternativeMedications(
+  private CloseTaskCommand dispenseAlternativeMedications(
       PrescriptionToDispenseStrategy strategy, String performerId) {
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
 
     val medicationDispenses = getAlternativeMedicationDispenses(strategy, performerId);
-    return new ClosePrescriptionCommand(taskId, secret, medicationDispenses);
+    return new CloseTaskCommand(taskId, secret, medicationDispenses);
   }
 
   private List<ErxMedicationDispense> getAlternativeMedicationDispenses(

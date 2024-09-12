@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,8 @@ class ActivateAccidentPrescription extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_ACCIDENT_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Unfallkennzeichen {2} aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Unfallkennzeichen {2}"
+              + " aus")
   @DisplayName("E-Rezept mit validem Unfallkennzeichen ausstellen")
   @MethodSource("validAccidentTypes")
   void activatePrescriptionWithValidAccidentExtension(

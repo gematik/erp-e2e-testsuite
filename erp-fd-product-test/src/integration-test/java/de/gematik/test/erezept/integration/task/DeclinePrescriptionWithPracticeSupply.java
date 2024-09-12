@@ -1,18 +1,17 @@
 /*
- *  Copyright 2024 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -55,17 +54,17 @@ import org.junit.runner.RunWith;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept mit PracticeSupply ausstellen")
 class DeclinePrescriptionWithPracticeSupply extends ErpTest {
-    @Actor(name = "Adelheid Ulmenwald")
-    private DoctorActor doctor;
+  @Actor(name = "Adelheid Ulmenwald")
+  private DoctorActor doctor;
 
-    @Actor(name = "Sina Hüllmann")
-    private PatientActor sina;
+  @Actor(name = "Sina Hüllmann")
+  private PatientActor sina;
 
-    @TestcaseId("ERP_TASK_INVALID_PRESCRIPTION_01")
-    @DisplayName("invalides E-Rezept mit PracticeSupply und MedicationRequest ausstellen")
-    @Test
-    void activateInvalidPrescriptionWithPracticeSupplyAndMedicationRequest() {
-        sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
+  @TestcaseId("ERP_TASK_INVALID_PRESCRIPTION_01")
+  @DisplayName("invalides E-Rezept mit PracticeSupply und MedicationRequest ausstellen")
+  @Test
+  void activateInvalidPrescriptionWithPracticeSupplyAndMedicationRequest() {
+    sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
     val coverage = KbvCoverageFaker.builder().fake();
@@ -97,12 +96,11 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
             .isCorrect());
   }
 
-
-    @TestcaseId("ERP_TASK_VALID_PRESCRIPTION_WITH_SUPPLY_REQUEST_02")
-    @DisplayName("valides E-Rezept mit PracticeSupply wird vom FD abgelehnt")
-    @Test
-    void activateValidPrescriptionWithPracticeSupply() {
-        sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
+  @TestcaseId("ERP_TASK_VALID_PRESCRIPTION_WITH_SUPPLY_REQUEST_02")
+  @DisplayName("valides E-Rezept mit PracticeSupply wird vom FD abgelehnt")
+  @Test
+  void activateValidPrescriptionWithPracticeSupply() {
+    sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
     val kbvBundleBuilder =
@@ -113,36 +111,40 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
             MedicalOrganizationFaker.builder().fake(),
             supplyRequest);
 
-        val issuePrescription = IssuePrescription.forPatient(sina)
-                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY);
+    val issuePrescription =
+        IssuePrescription.forPatient(sina)
+            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY);
 
-        val activation = doctor.performs(issuePrescription.withKbvBundleFrom(kbvBundleBuilder));
+    val activation = doctor.performs(issuePrescription.withKbvBundleFrom(kbvBundleBuilder));
 
-        doctor.attemptsTo(
-                Verify.that(activation)
-                        .withIndefiniteType()
-                        .hasResponseWith(returnCodeIs(400, KbvProfileRules.SUPPLY_REQUEST_AND_MEDICATION_REQUEST))
-                        .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withIndefiniteType()
+            .hasResponseWith(
+                returnCodeIs(400, KbvProfileRules.SUPPLY_REQUEST_AND_MEDICATION_REQUEST))
+            .isCorrect());
+  }
 
-    private SupplyRequest getSupplyRequest(KbvErpMedication medication) {
-        return SupplyRequestBuilder.withCoverage(sina.getInsuranceCoverage())
-                .medication(medication)
-                .requester(doctor.getPractitioner())
-                .build();
-    }
+  private SupplyRequest getSupplyRequest(KbvErpMedication medication) {
+    return SupplyRequestBuilder.withCoverage(sina.getInsuranceCoverage())
+        .medication(medication)
+        .requester(doctor.getPractitioner())
+        .build();
+  }
 
-    private KbvErpBundleBuilder generateKbvBundle(String prescriptionId, KbvCoverage coverage, Medication medication, MedicalOrganization organization, SupplyRequest supplyRequest) {
-        return KbvErpBundleBuilder.forPrescription(prescriptionId)
-                .practitioner(doctor.getPractitioner())
-                .custodian(organization)
-                .patient(sina.getPatientData())
-                .insurance(coverage)
-                .statusKennzeichen("00") // 00/NONE is default
-                .supplyRequest(supplyRequest)
-                .medication(medication);
-    }
-
-
-
+  private KbvErpBundleBuilder generateKbvBundle(
+      String prescriptionId,
+      KbvCoverage coverage,
+      Medication medication,
+      MedicalOrganization organization,
+      SupplyRequest supplyRequest) {
+    return KbvErpBundleBuilder.forPrescription(prescriptionId)
+        .practitioner(doctor.getPractitioner())
+        .custodian(organization)
+        .patient(sina.getPatientData())
+        .insurance(coverage)
+        .statusKennzeichen("00") // 00/NONE is default
+        .supplyRequest(supplyRequest)
+        .medication(medication);
+  }
 }

@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -87,7 +86,8 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_COVERAGE_IKNR_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein E-Rezept mit invalider Prüfnummer: {2} für den Kostenträger {0} aus, da {3} ist!")
+          "[{index}] -> Verordnender Arzt stellt ein E-Rezept mit invalider Prüfnummer: {2} für den"
+              + " Kostenträger {0} aus, da {3} ist!")
   @DisplayName("Es muss geprüft werden, dass der Fachdienst die IKNR  korrekt validiert")
   @MethodSource("baseIKNRComposer")
   void activatePrescriptionWithInvalidIknr(
@@ -97,12 +97,14 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
       String reason) {
     RequirementsSet requirementsSet = ErpAfos.A_23888;
     String detailedText =
-        "Ungültiges Institutionskennzeichen (IKNR): Das übergebene Institutionskennzeichen im Versicherungsstatus entspricht nicht den Prüfziffer-Validierungsregeln.";
+        "Ungültiges Institutionskennzeichen (IKNR): Das übergebene Institutionskennzeichen im"
+            + " Versicherungsstatus entspricht nicht den Prüfziffer-Validierungsregeln.";
     AccidentExtension accident = null;
     Consumer<KbvErpBundle> kbvErpBundleConsumer;
     if (versicherungsArtDeBasis.equals(VersicherungsArtDeBasis.BG)) {
       detailedText =
-          "Ungültiges Institutionskennzeichen (IKNR): Das übergebene Institutionskennzeichen des Kostenträgers entspricht nicht den Prüfziffer-Validierungsregeln.";
+          "Ungültiges Institutionskennzeichen (IKNR): Das übergebene Institutionskennzeichen des"
+              + " Kostenträgers entspricht nicht den Prüfziffer-Validierungsregeln.";
       requirementsSet = ErpAfos.A_24030;
       sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
       accident = AccidentExtension.accidentAtWork().atWorkplace();
@@ -149,12 +151,12 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
   private KbvErpMedicationRequest getMedicationRequest(
       AccidentExtension accident, KbvErpMedication medication) {
     return MedicationRequestFaker.builder()
-            .withPatient(sina.getPatientData())
-            .withInsurance(sina.getInsuranceCoverage())
-            .withRequester(doctorActor.getPractitioner())
-            .withAccident(accident)
-            .withMedication(medication)
-            .fake();
+        .withPatient(sina.getPatientData())
+        .withInsurance(sina.getInsuranceCoverage())
+        .withRequester(doctorActor.getPractitioner())
+        .withAccident(accident)
+        .withMedication(medication)
+        .fake();
   }
 
   private KbvErpBundleBuilder getBundleBuilder(
@@ -163,6 +165,5 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
         .practitioner(doctorActor.getPractitioner())
         .medicationRequest(medicationRequest) // what is the medication
         .medication(medication);
-
   }
 }

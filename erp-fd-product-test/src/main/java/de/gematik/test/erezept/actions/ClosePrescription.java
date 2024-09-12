@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.actions;
 
 import de.gematik.test.erezept.ErpInteraction;
-import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
@@ -76,7 +76,7 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
             .medication(medication);
     if (preparedDate != null) medicationDispense.whenPrepared(preparedDate);
     if (handedOver != null) medicationDispense.whenHandedOver(handedOver);
-    val cmd = new ClosePrescriptionCommand(taskId, secret, medicationDispense.build());
+    val cmd = new CloseTaskCommand(taskId, secret, medicationDispense.build());
     return this.performCommandAs(cmd, actor);
   }
 

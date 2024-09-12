@@ -127,4 +127,11 @@ public class PharmacyAcceptSteps {
             Negate.the(AcceptPrescription.fromStack(DequeStrategy.FIFO))
                 .with(MissingPreconditionError.class));
   }
+
+  @Wenn(
+      "^die Apotheke(.+) das (letzte|erste) (?:zugewiesene|abgerufene) E-Rezept beim Fachdienst"
+          + " nicht akzeptiert$")
+  public void whenThePharmacyDoesNotAcceptThePrescription(String pharmName, String order) {
+    // leerer step, da kein behavior vorliegt
+  }
 }

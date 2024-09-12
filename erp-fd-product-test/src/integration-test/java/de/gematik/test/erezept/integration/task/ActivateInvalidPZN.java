@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -65,23 +64,29 @@ public class ActivateInvalidPZN extends ErpTest {
         .arguments(
             "11111114",
             "da die letzte Ziffer (Prüfziffer) eine 6 statt einer 4 beträgt",
-            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den vorgeschriebenen Prüfziffer-Validierungsregeln.")
+            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den"
+                + " vorgeschriebenen Prüfziffer-Validierungsregeln.")
         .arguments(
             "99999999",
             "da die letzte Ziffer (Prüfziffer) eine 9 statt einer 6 beträgt",
-            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den vorgeschriebenen Prüfziffer-Validierungsregeln.")
+            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den"
+                + " vorgeschriebenen Prüfziffer-Validierungsregeln.")
         .arguments(
             "24888481",
-            "da die letzte Ziffer (Prüfziffer) eine 10 sein würde (durch die 1 dargestellt), was verboten ist",
-            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den vorgeschriebenen Prüfziffer-Validierungsregeln.")
+            "da die letzte Ziffer (Prüfziffer) eine 10 sein würde (durch die 1 dargestellt), was"
+                + " verboten ist",
+            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den"
+                + " vorgeschriebenen Prüfziffer-Validierungsregeln.")
         .arguments(
             "A2345678",
             "da das erste Zeichen ein Buchstabe ist",
-            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den vorgeschriebenen Prüfziffer-Validierungsregeln.")
+            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den"
+                + " vorgeschriebenen Prüfziffer-Validierungsregeln.")
         .arguments(
             "1234Y678",
             "da ein Buchstabe enthalten ist",
-            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den vorgeschriebenen Prüfziffer-Validierungsregeln.")
+            "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den"
+                + " vorgeschriebenen Prüfziffer-Validierungsregeln.")
         .multiply(
             0,
             List.of(
@@ -109,9 +114,12 @@ public class ActivateInvalidPZN extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_PZN_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN: {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer Medication_PZN Ressourceaus, {3}.")
+          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN:"
+              + " {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer"
+              + " Medication_PZN Ressourceaus, {3}.")
   @DisplayName(
-      "Es muss geprüft werden, dass die PZN in der Medication_PZN Ressource korrekt validiert wird (ErpAfos.A_23892)")
+      "Es muss geprüft werden, dass die PZN in der Medication_PZN Ressource korrekt validiert wird"
+          + " (ErpAfos.A_23892)")
   @MethodSource("basePZNTestcaseComposer")
   void activateInvalidPznInMedicationPZN(
       VersicherungsArtDeBasis insuranceType,
@@ -136,9 +144,12 @@ public class ActivateInvalidPZN extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_PZN_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN: {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer Medication_Compounding Ressource aus, {3}.")
+          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN:"
+              + " {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer"
+              + " Medication_Compounding Ressource aus, {3}.")
   @DisplayName(
-      "Es muss geprüft werden, dass die PZN in der MedicationCompounding Ressource korrekt validiert wird (ErpAfos.A_24034)")
+      "Es muss geprüft werden, dass die PZN in der MedicationCompounding Ressource korrekt"
+          + " validiert wird (ErpAfos.A_24034)")
   @MethodSource("basePZNTestcaseComposer")
   void activateInvalidPznInMedicationCompounding(
       VersicherungsArtDeBasis insuranceType,
@@ -166,9 +177,12 @@ public class ActivateInvalidPZN extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_PZN_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN: {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer Medication_PZN Ressourceaus, {3}.")
+          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN:"
+              + " {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer"
+              + " Medication_PZN Ressourceaus, {3}.")
   @DisplayName(
-      "Es muss geprüft werden, dass die PZN in der Medication_PZN Ressource korrekt validiert wird (FHIR-Validation_Error)")
+      "Es muss geprüft werden, dass die PZN in der Medication_PZN Ressource korrekt validiert wird"
+          + " (FHIR-Validation_Error)")
   @MethodSource("basePZNTestcaseComposerAsFhirValidationError")
   void activateInvalidPznInMedicationPznAsFhirValidationError(
       VersicherungsArtDeBasis insuranceType,
@@ -195,9 +209,12 @@ public class ActivateInvalidPZN extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_PZN_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN: {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer Medication_Compounding Ressource aus, {3}.")
+          "[{index}] -> Verordnender Arzt Gündüla Gunther stellt ein E-Rezept mit invalider PZN:"
+              + " {2} für den Kostenträger {0} als Darreichungsform {1} innerhalb einer"
+              + " Medication_Compounding Ressource aus, {3}.")
   @DisplayName(
-      "Es muss geprüft werden, dass die PZN in der MedicationCompounding Ressource korrekt validiert wird (FHIR-Validation_Error)")
+      "Es muss geprüft werden, dass die PZN in der MedicationCompounding Ressource korrekt"
+          + " validiert wird (FHIR-Validation_Error)")
   @MethodSource("basePZNTestcaseComposerAsFhirValidationError")
   void activateInvalidPznInMedicationCompoundingAsFhirValidationError(
       VersicherungsArtDeBasis insuranceType,

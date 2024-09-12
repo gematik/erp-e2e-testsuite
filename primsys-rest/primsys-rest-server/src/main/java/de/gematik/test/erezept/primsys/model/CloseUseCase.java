@@ -18,7 +18,7 @@ package de.gematik.test.erezept.primsys.model;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -77,7 +77,7 @@ public class CloseUseCase {
             .toList();
 
     val dispenseMedicationCommand =
-        new ClosePrescriptionCommand(TaskId.from(prescriptionId), secret, medicationDispenses);
+        new CloseTaskCommand(TaskId.from(prescriptionId), secret, medicationDispenses);
     val closeResponse = pharmacy.erpRequest(dispenseMedicationCommand);
     val body = closeResponse.getExpectedResource();
 

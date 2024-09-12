@@ -20,10 +20,7 @@ import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfClosePrescriptionOperation;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfDispensePrescriptionAsBundle;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfReDispenseMedication;
+import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.datatable.DataTable;
@@ -32,6 +29,7 @@ import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class PharmacyDispenseSteps {
 
@@ -260,9 +258,62 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispensePrescriptionAsBundle.fromStack(order)
-                        .forPatient(thePatient)
+                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
                         .build())
                 .isEqualTo(200));
+  }
+
+  @Und(
+      "^die Apotheke (.+) für das (letzte|erste) akzeptierte E-Rezept von (.+) die"
+          + " Dispensierinformationen mehrfach zeitnah bereitstellt$")
+  public void andPharmacyDispensingMultipleInformationTimelyManner(
+      String pharmName, String order, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    and(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                        .multiple(2)
+                        .build())
+                .isEqualTo(200));
+  }
+
+  @Dann(
+      "^kann die Apotheke (.+) die Dispensierinformationen für das (erste|letzte) E-Rezept von (.+)"
+          + " nicht mehr ändern$")
+  public void thenThePharmacyCouldNotChangeDispenseInformation(
+      String pharmName, String order, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    then(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                        .build())
+                .isEqualTo(403));
+    and(then(thePharmacy))
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfClosePrescriptionOperation.fromStack(order)
+                        .forPrescribedMedications())
+                .isEqualTo(403));
+  }
+
+  @Dann(
+      "^kann die Apotheke (.+) für das (letzte|erste) E-Rezept von (.+) keine"
+          + " Dispensierinformationen zeitnah bereitstellen$")
+  public void thenThePharmacyIsNotAbleSendDispenseInformation(
+      String pharmName, String order, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePharmacy)
+        .attemptsTo(
+            Ensure.that(
+                    ResponseOfDispenseMedicationWithoutAcceptance.forPatient(thePatient)
+                        .withReturnCode(403)
+                        .forPrescription(DequeStrategy.fromString(order)))
+                .isTrue());
   }
 }

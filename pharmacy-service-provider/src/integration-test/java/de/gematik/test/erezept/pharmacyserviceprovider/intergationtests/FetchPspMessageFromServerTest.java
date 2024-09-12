@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,28 +61,26 @@ class FetchPspMessageFromServerTest {
     body = array;
   }
 
-
   @SneakyThrows
   @AfterAll
   static void closeConnection() {
-      clientEndPoint.clearQueueOnServer();
-      clientEndPoint.clearQueue();
-      clientEndPoint.close();
+    clientEndPoint.clearQueueOnServer();
+    clientEndPoint.clearQueue();
+    clientEndPoint.close();
   }
-
 
   @SneakyThrows
   private void sendMessages() {
     Unirest.post(SERVER_URL + "/delivery_only/{ti_id}?req={transactionID}")
-            .routeParam(Map.of("ti_id", TELEMATIK_ID, "transactionID", "11"))
-            .header("X-Authorization", SERVER_AUTH)
-            .header("Content-Type", "application/pkcs7-mime")
-            .body(body)
-            .asString();
+        .routeParam(Map.of("ti_id", TELEMATIK_ID, "transactionID", "11"))
+        .header("X-Authorization", SERVER_AUTH)
+        .header("Content-Type", "application/pkcs7-mime")
+        .body(body)
+        .asString();
     Thread.currentThread().join(WAIT_MILLIS_BEFORE_SEND);
     Unirest.post(SERVER_URL + "/local_delivery/{ti_id}?req={transactionID}")
-            .routeParam(Map.of("ti_id", "2", "transactionID", "22"))
-            .header("X-Authorization", SERVER_AUTH)
+        .routeParam(Map.of("ti_id", "2", "transactionID", "22"))
+        .header("X-Authorization", SERVER_AUTH)
         .header("Content-Type", "application/pkcs7-mime")
         .body(body)
         .asString();
@@ -126,14 +124,14 @@ class FetchPspMessageFromServerTest {
         .asString();
   }
 
-
   @SneakyThrows
   @Test
   void fetchRecipesFormServer() {
     sendMessages();
     Thread.currentThread().join(WAIT_MILLIS_TO_START_STOP_SERVER);
     if (URL_WSS_GRIZZLY.toLowerCase().startsWith("wss")) {
-      clientEndPoint = new PharmaServiceProviderWSClient(URL_WSS_GRIZZLY, TELEMATIK_ID, SERVER_AUTH);
+      clientEndPoint =
+          new PharmaServiceProviderWSClient(URL_WSS_GRIZZLY, TELEMATIK_ID, SERVER_AUTH);
     } else {
       clientEndPoint = new PharmaServiceProviderWSClient(URL_WSS_GRIZZLY, TELEMATIK_ID);
     }
@@ -143,6 +141,4 @@ class FetchPspMessageFromServerTest {
     int newQueueLength = clientEndPoint.getQueueLength();
     assertEquals(3, newQueueLength);
   }
-
-
 }

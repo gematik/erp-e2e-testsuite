@@ -52,10 +52,11 @@ class KbvBundleManipulatorFactoryTest extends ParsingTest {
   void shouldFailAgainstHapi(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val manipulators = KbvBundleManipulatorFactory.getAllKbvBundleManipulators();
+    manipulators.addAll(KbvBundleManipulatorFactory.getKbvBundleEntryManipulators());
 
     val executables =
         manipulators.stream()
-            // .filter(m -> m.getName().contains("MedicationCategory-manipulator"))
+            // .filter(m -> m.getName().contains("KbvBundle without"))
             .map(
                 m ->
                     (Executable)

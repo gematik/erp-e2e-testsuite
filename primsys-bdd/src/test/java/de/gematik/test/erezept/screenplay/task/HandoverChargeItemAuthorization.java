@@ -50,8 +50,8 @@ public class HandoverChargeItemAuthorization implements Task {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val authorizationStack = SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class);
 
-    val dispensedPrescriptionId = deque.chooseFrom(dispensedDrugsStack.getDispensedDrugsList());
-    val cmd = new ChargeItemGetByIdCommand(dispensedPrescriptionId);
+    val dispensationInformation = deque.chooseFrom(dispensedDrugsStack.getDispensedDrugsList());
+    val cmd = new ChargeItemGetByIdCommand(dispensationInformation.prescriptionId());
     val chargeItemBundle = erpClient.request(cmd).getExpectedResource();
     val chargeItem = chargeItemBundle.getChargeItem();
     val cica =

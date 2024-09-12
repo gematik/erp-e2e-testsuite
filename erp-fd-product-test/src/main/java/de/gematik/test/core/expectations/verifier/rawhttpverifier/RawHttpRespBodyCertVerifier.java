@@ -21,7 +21,8 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
-import java.util.List;
+import java.security.cert.X509Certificate;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.val;
@@ -33,17 +34,25 @@ public class RawHttpRespBodyCertVerifier {
     throw new AssertionError("do not instantiate!");
   }
 
-  public static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsAddRoots() {
-    return bodyContainsCert(PKICertificatesDTOEnvelop::getAddRoots, " add_roots");
+  public static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsAddRoots(
+      Set<X509Certificate> expected) {
+    return bodyContainsCert(PKICertificatesDTOEnvelop::getAddRoots, expected, " add_roots");
   }
 
-  public static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsCaCerts() {
-    return bodyContainsCert(PKICertificatesDTOEnvelop::getCaCerts, "ca_cert");
+  public static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsCaCerts(
+      Set<X509Certificate> expected) {
+    return bodyContainsCert(PKICertificatesDTOEnvelop::getCaCerts, expected, "ca_cert");
   }
 
   private static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsCert(
-      Function<PKICertificatesDTOEnvelop, List<String>> certFunction, String objectUnderTest) {
-    Predicate<PKICertificatesDTOEnvelop> predicate = body -> !certFunction.apply(body).isEmpty();
+      Function<PKICertificatesDTOEnvelop, Set<X509Certificate>> certFunction,
+      Set<X509Certificate> expected,
+      String objectUnderTest) {
+    Predicate<PKICertificatesDTOEnvelop> predicate =
+        body ->
+            certFunction.apply(body).containsAll(expected)
+                && expected.containsAll(certFunction.apply(body));
+
     val step =
         new VerificationStep.StepBuilder<PKICertificatesDTOEnvelop>(
             ErpAfos.A_24466.getRequirement(),

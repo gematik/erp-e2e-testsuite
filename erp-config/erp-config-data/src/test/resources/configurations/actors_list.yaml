@@ -24,10 +24,6 @@ actors:
       konnektor: Soft-Konn
 
   apothecaries:
-    - name: Amanda Albrecht
-      hbaIccsn: 80276001081699900579
-      konnektor: Soft-Konn
-
     - name: Finn-Louis Nullmayr
       hbaIccsn: 80276883110000121166
       algorithm: E256

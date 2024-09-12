@@ -41,8 +41,8 @@ public class ChangeChargeItemMarkingFlags implements Task {
     val dispensedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val chargeItemsAbility = SafeAbility.getAbility(actor, ManageChargeItems.class);
-    val prescriptionId = deque.chooseFrom(dispensedDrugs.getDispensedDrugsList());
-    val cmd = new ChargeItemPatchCommand(prescriptionId, markingFlag);
+    val dispensationInformation = deque.chooseFrom(dispensedDrugs.getDispensedDrugsList());
+    val cmd = new ChargeItemPatchCommand(dispensationInformation.prescriptionId(), markingFlag);
     val response = erpClient.request(cmd);
     val chargeItem = response.getExpectedResource();
     chargeItemsAbility.update(chargeItem);

@@ -1,18 +1,17 @@
 /*
- *  Copyright 2024 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -65,7 +64,8 @@ class ActivateWithResponsablePractitioner extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_RESPONSIBLE_DOC_01")
   @ParameterizedTest(
       name =
-          "[{index}] verordnender Arzt in Weiterbildung stellt für einen {0} Patienten ein E-Rezept mit PayorType {1} und einem verantwortlichen Arzt der Profession {2} aus.")
+          "[{index}] verordnender Arzt in Weiterbildung stellt für einen {0} Patienten ein E-Rezept"
+              + " mit PayorType {1} und einem verantwortlichen Arzt der Profession {2} aus.")
   @DisplayName(
       "E-Rezept als verordnender Arzt in Weiterbildung mit verantwortlichen Arzt ausstellen")
   @MethodSource("responsibleDoctor")
@@ -90,7 +90,8 @@ class ActivateWithResponsablePractitioner extends ErpTest {
   }
 
   private static Stream<Arguments> responsibleDoctor() {
-    // Note 05.12.23: Skip PayorType.SKT because currently not possible to build a valid prescription with SKT
+    // Note 05.12.23: Skip PayorType.SKT because currently not possible to build a valid
+    // prescription with SKT
     val payorTypes = new LinkedList<>(List.of(PayorType.UK));
     payorTypes.add(null); // required to have no payor type!
     return ArgumentComposer.composeWith()

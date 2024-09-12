@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.communication;
@@ -61,7 +60,8 @@ public class SendInvalidMessagesIT extends ErpTest {
   public static final int MAX_STRING_LENGTH_100 = 100;
   public static final int MAX_STRING_LENGTH_128 = 128;
   private static final String INVALID_JSON_PAYLOAD =
-      "Invalid payload: does not conform to expected JSON schema: validation of JSON document failed";
+      "Invalid payload: does not conform to expected JSON schema: validation of JSON document"
+          + " failed";
 
   @Actor(name = "Leonie Hütter")
   private PatientActor patient;
@@ -108,9 +108,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content als {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content als"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die CommunicationReply der Apotheke genauer die Stringlänge Hint (max 500) korrekt validiert")
+      "Es muss geprüft werden, dass der Fachdienst die CommunicationReply der Apotheke genauer die"
+          + " Stringlänge Hint (max 500) korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithToLongString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -135,9 +137,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Patientin schickt eine Communication mit invalidem (501 Zeichen langem) Json-Content mit {0} und SupplyOption {1} an die Stadtapotheke !")
+          "[{index}] -> Die Patientin schickt eine Communication mit invalidem (501 Zeichen langem)"
+              + " Json-Content mit {0} und SupplyOption {1} an die Stadtapotheke !")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst CommunicationDispenseRequest des Patienten genauer die Stringlänge Hint (max 500) korrekt validiert")
+      "Es muss geprüft werden, dass der Fachdienst CommunicationDispenseRequest des Patienten"
+          + " genauer die Stringlänge Hint (max 500) korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithToLongString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -162,9 +166,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die Version > 1 korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die Version"
+          + " > 1 korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithIncorrectVersion(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -195,9 +201,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die Version > 1 korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die Version > 1 korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectVersion(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -227,9 +235,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_05_A")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption 'zuwerfen' an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption 'zuwerfen' an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die SupplyOption korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " SupplyOption korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithIncorrectSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -256,9 +266,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_05_B")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst die CommunicationReply der Apotheke und genauer die SupplyOption korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst die CommunicationReply der Apotheke und genauer die"
+          + " SupplyOption korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithIncorrectSupplyOptionEqualsNoSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -285,9 +297,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_06_A")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption 'zuwerfen' an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption 'zuwerfen' an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die SupplyOption korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die SupplyOption korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -313,9 +327,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_06_B")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die SupplyOption korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die SupplyOption korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectSupplyOptionAsNull(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -340,9 +356,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_07")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die PickUpCodeDCM Länge validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " PickUpCodeDCM Länge validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithToIncorrectPickUpCodeDCM(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -373,9 +391,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDisenseRequest des Patienten und genauer Länge des Namens korrekt validiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationDisenseRequest des Patienten und genauer"
+          + " Länge des Namens korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectNameLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -405,9 +425,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_09")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die Version als String ablehnt")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die Version"
+          + " als String ablehnt")
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithToIncorrectVersionAsString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -444,9 +466,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_10")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die Version als String ablehnt")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die Version als String ablehnt")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectVersionAsString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -482,9 +506,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_11")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die pickUpCodeHR Länge validiert und eine SupplyOption onPremise gesetzt ist")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die"
+          + " pickUpCodeHR Länge validiert und eine SupplyOption onPremise gesetzt ist")
   @MethodSource("communicationTestComposerForSupplyOption")
   void shouldValidatePharmaciesCommunicationWithToIncorrectPickUpCodHR(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -514,9 +540,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_12")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die URL Länge validiert ")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply der Apotheke und genauer die URL"
+          + " Länge validiert ")
   @MethodSource("communicationTestComposerForSupplyOption")
   void shouldValidatePharmaciesCommunicationWithIncorrectUrlLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -546,9 +574,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_13")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Die Stadtapotheke schickt eine Communication mit invalidem Json-Content mit"
+              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer die Phone länge")
+      "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten und genauer"
+          + " die Phone länge")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectPhoneLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
@@ -577,9 +607,11 @@ public class SendInvalidMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_14")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Patient:in schickt eine Communication mit für ein fremdes Rezept an die Stadtapotheke !")
+          "[{index}] -> Die Patient:in schickt eine Communication mit für ein fremdes Rezept an die"
+              + " Stadtapotheke !")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst CommunicationDispenseRequest des Patienten genauer die HeaderParameter korrekt validiert")
+      "Es muss geprüft werden, dass der Fachdienst CommunicationDispenseRequest des Patienten"
+          + " genauer die HeaderParameter korrekt validiert")
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithHeadderParams(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {

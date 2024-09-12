@@ -23,8 +23,11 @@ import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
-import de.gematik.test.erezept.screenplay.util.*;
-import java.time.Instant;
+import de.gematik.test.erezept.screenplay.util.ChargeItemChangeAuthorization;
+import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
+import de.gematik.test.erezept.screenplay.util.DmcPrescription;
+import de.gematik.test.erezept.screenplay.util.ManagedList;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -61,9 +64,6 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
   /** Stores dispensed Prescriptions (Quittungen/ErxReceipt) which has been dispensed at the FD */
   @Getter private final ManagedList<ErxMedicationDispenseBundle> dispensedPrescriptions;
 
-  /** Stores dispensed Prescriptions (Quittungen/ErxReceipt) which has been dispensed at the FD */
-  @Getter private final ManagedList<Instant> dispenseTimestamps;
-
   /**
    * Stores the AccessCodes/PrescriptionIDs for ChargeItems which the pharmacy was authorized to
    * change
@@ -74,7 +74,6 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
     assignedPrescriptions = new ManagedList<>(() -> "No Prescriptions were assigned so far");
     acceptedPrescriptions = new ManagedList<>(() -> "No Prescriptions were accepted so far");
     closedPrescriptions = new ManagedList<>(() -> "No Prescriptions were closed so far");
-    dispenseTimestamps = new ManagedList<>(() -> "No PrescriptionTimestamps were deposed so far");
     dispensedPrescriptions = new ManagedList<>(() -> "No Prescriptions were dispensed so far");
     chargeItemChangeAuthorizations =
         new ManagedList<>(() -> "No Authorizations for changing ChargeItems were given so far");

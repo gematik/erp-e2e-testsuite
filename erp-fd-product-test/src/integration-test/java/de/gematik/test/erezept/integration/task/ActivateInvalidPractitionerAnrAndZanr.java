@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -80,7 +79,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       featureConf.getToggle(new AnrValidationConfigurationIsErrorToggle());
 
   public static final String WARNING_RESPONSE_HEADER =
-      "252 erp-server \"Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den Prüfziffer-Validierungsregeln.\"";
+      "252 erp-server \"Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht"
+          + " nicht den Prüfziffer-Validierungsregeln.\"";
 
   @Actor(name = "Leonie Hütter")
   private PatientActor patient;
@@ -155,9 +155,12 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR_ZANR_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit invalider ANR: {3} für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
+          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit invalider ANR: {3} für den"
+              + " Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner entsprechen A_24032 validiert und mit Error-Configuration und OperationOutcome antwortet oder entsprechend A_24033 einen Warning Header zurück gibt")
+      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner entsprechen A_24032"
+          + " validiert und mit Error-Configuration und OperationOutcome antwortet oder"
+          + " entsprechend A_24033 einen Warning Header zurück gibt")
   @MethodSource("afoInvalidANRComposer")
   void activateInvalidAnrZanrInPractitioner(
       VersicherungsArtDeBasis insuranceType,
@@ -184,7 +187,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
               .hasResponseWith(returnCode(400, requirementsSet))
               .and(
                   operationOutcomeContainsInDetailText(
-                      "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den Prüfziffer-Validierungsregeln.",
+                      "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht"
+                          + " nicht den Prüfziffer-Validierungsregeln.",
                       requirementsSet))
               .isCorrect());
 
@@ -203,7 +207,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR_ZANR_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit invalider ANR: {3} für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
+          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit invalider ANR: {3} für den"
+              + " Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
   @DisplayName(
       "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner FHIR-Konform validiert")
   @MethodSource("fhirInvalidANRComposer")
@@ -215,7 +220,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       String reason) {
     RequirementsSet requirementsSet = FhirRequirements.FHIR_VALIDATION_ERROR;
     String detailedText =
-        "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den Prüfziffer-FHIR-Profilen.";
+        "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den"
+            + " Prüfziffer-FHIR-Profilen.";
     val doc = this.getDoctorNamed(doctors.getName());
     patient.changePatientInsuranceType(insuranceType);
 
@@ -237,9 +243,11 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_INVALID_ANR_ZANR_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit ANR / ZANR: {3} + xy für den Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
+          "[{index}] -> Verordnender Arzt {2} stellt ein E-Rezept mit ANR / ZANR: {3} + xy für den"
+              + " Kostenträger {0} als Darreichungsform {1} aus, da {4}!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR 555555 + xy in Practitioner als Ausnahme berücksichtigt")
+      "Es muss geprüft werden, dass der Fachdienst die ANR 555555 + xy in Practitioner als Ausnahme"
+          + " berücksichtigt")
   @MethodSource("exceptionAnrComposer")
   void activateValidAnrZanrInPractitioner(
       VersicherungsArtDeBasis insuranceType,
@@ -274,9 +282,11 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_VALID_ANR_ZANR_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt Adelheid Ulmenwald stellt ein E-Rezept mit invalider ANR für den Kostenträger {0} als Darreichungsform {1} aus, da {2}!")
+          "[{index}] -> Verordnender Arzt Adelheid Ulmenwald stellt ein E-Rezept mit invalider ANR"
+              + " für den Kostenträger {0} als Darreichungsform {1} aus, da {2}!")
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert und die Ausnahme keine ANR durchleitet, da ASV berücksichtigt wird")
+      "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner korrekt validiert und"
+          + " die Ausnahme keine ANR durchleitet, da ASV berücksichtigt wird")
   @MethodSource("exceptionNoAnrComposer")
   void activatePractitionerWithoutANR(
       VersicherungsArtDeBasis insuranceType,

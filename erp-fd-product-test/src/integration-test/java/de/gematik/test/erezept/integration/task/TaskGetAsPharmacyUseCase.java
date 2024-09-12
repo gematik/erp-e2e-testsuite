@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,8 +96,8 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
         new VerificationStep.StepBuilder<ErxTaskBundle>(
             ErpAfos.A_23452.getRequirement(),
             format(
-                "Das ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf nur E-Rezepte "
-                    + "des Patienten mit der KVNR aus dem Prüfungsnachweis enthalten."));
+                "Das ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf nur"
+                    + " E-Rezepte des Patienten mit der KVNR aus dem Prüfungsnachweis enthalten."));
     return step.predicate(verify).accept();
   }
 
@@ -183,7 +183,7 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
             .withExpectedType()
             .hasResponseWith(returnCode(200))
             .and(TaskBundleVerifier.doesContainsErxTasksWithoutQES(ErpAfos.A_23452))
-                .and(TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_23452))
+            .and(TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_23452))
             .isCorrect());
     verifyAuditEvent(ErxAuditEvent.Representation.PHARMACY_GET_TASK_SUCCESSFUL);
   }
@@ -214,8 +214,11 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_04")
   @ParameterizedTest(
-      name = "[{index}] -> Egk in der Apotheke - Prüfungsnachweis {0} ohne Prüfziffer und ohne QueryParameter KVNR")
-  @DisplayName("Egk in der Apotheke - Prüfungsnachweis {0} ohne Prüfziffer und ohne QueryParameter KVNR")
+      name =
+          "[{index}] -> Egk in der Apotheke - Prüfungsnachweis {0} ohne Prüfziffer und ohne"
+              + " QueryParameter KVNR")
+  @DisplayName(
+      "Egk in der Apotheke - Prüfungsnachweis {0} ohne Prüfziffer und ohne QueryParameter KVNR")
   @EnumSource(
       value = VsdmExamEvidenceResult.class,
       names = {"ERROR_EGK"},
@@ -260,7 +263,8 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
   }
 
   @TestcaseId("ERP_TASK_GET_PHARMACY_06")
-  @ParameterizedTest(name = "[{index}] ->Egk in der Apotheke - AcceptPN3 und QueryParameter KVNR {0}")
+  @ParameterizedTest(
+      name = "[{index}] ->Egk in der Apotheke - AcceptPN3 und QueryParameter KVNR {0}")
   @DisplayName("Egk in der Apotheke - AcceptPN3 und QueryParameter KVNR {0}")
   @ValueSource(booleans = {true, false})
   void acceptPN3(boolean withKvnr) {
@@ -279,7 +283,7 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
               .withExpectedType()
               .hasResponseWith(returnCode(202))
               .and(TaskBundleVerifier.doesContainsErxTasksWithoutQES(ErpAfos.A_25209))
-                  .and(TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_25209))
+              .and(TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_25209))
               .isCorrect());
     } else {
       pharmacy.attemptsTo(
@@ -289,11 +293,11 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
               .isCorrect());
     }
 
-    if(withKvnr){
+    if (withKvnr) {
       verifyAuditEvent(
-              pn3Activate
-                      ? ErxAuditEvent.Representation.PHARMACY_GET_TASK_SUCCESSFUL_PN3
-                      : ErxAuditEvent.Representation.PHARMACY_GET_TASK_UNSUCCESSFUL_PN3);
+          pn3Activate
+              ? ErxAuditEvent.Representation.PHARMACY_GET_TASK_SUCCESSFUL_PN3
+              : ErxAuditEvent.Representation.PHARMACY_GET_TASK_UNSUCCESSFUL_PN3);
     }
   }
 
@@ -317,7 +321,8 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
   @TestcaseId("ERP_TASK_GET_PHARMACY_08")
   @Test
   @DisplayName(
-      "Abrufen von Rezepten als Apotheker ohne vorheriges ACCEPT, daher kein Secret und nur ein AccessCode")
+      "Abrufen von Rezepten als Apotheker ohne vorheriges ACCEPT, daher kein Secret und nur ein"
+          + " AccessCode")
   void withTaskIdAndAccessCode() {
     val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
     val activation = doctor.performs(IssuePrescription.forPatient(patient).withRandomKbvBundle());
@@ -357,9 +362,11 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
   @TestcaseId("ERP_TASK_GET_PHARMACY_10")
   @ParameterizedTest(
       name =
-          "[{index}] ->Egk in der Apotheke - Keine Verwendung der KVNR bei Prüfungsnachweis {0} aus Query Parameter")
+          "[{index}] ->Egk in der Apotheke - Keine Verwendung der KVNR bei Prüfungsnachweis {0} aus"
+              + " Query Parameter")
   @DisplayName(
-      "Egk in der Apotheke - Keine Verwendung der KVNR bei Prüfungsnachweis {0} aus Query Parameter")
+      "Egk in der Apotheke - Keine Verwendung der KVNR bei Prüfungsnachweis {0} aus Query"
+          + " Parameter")
   @EnumSource(
       value = VsdmExamEvidenceResult.class,
       names = {"UPDATES_SUCCESSFUL", "NO_UPDATES"},
@@ -447,12 +454,13 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
     INVALID_CHECKSUM_SIZE(ErpAfos.A_23454, "Invalid size of Prüfziffer"),
     PROOF_OF_PRESENCE_INVALID_TIMESTAMP(
         ErpAfos.A_23451,
-        "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Zeitliche Gültigkeit des"
-            + " Anwesenheitsnachweis überschritten)."),
+        "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Zeitliche Gültigkeit"
+            + " des Anwesenheitsnachweis überschritten)."),
     FAILED_PARSING_PNW(ErpAfos.A_23454, "Failed parsing PNW XML."),
     WITHOUT_CHECKSUM(
         ErpAfos.A_23455,
-        "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Prüfziffer fehlt im VSDM Prüfungsnachweis oder ungültiges Ergebnis im Prüfungsnachweis).");
+        "Anwesenheitsnachweis konnte nicht erfolgreich durchgeführt werden (Prüfziffer fehlt im"
+            + " VSDM Prüfungsnachweis oder ungültiges Ergebnis im Prüfungsnachweis).");
     private final RequirementsSet req;
     private final String text;
   }

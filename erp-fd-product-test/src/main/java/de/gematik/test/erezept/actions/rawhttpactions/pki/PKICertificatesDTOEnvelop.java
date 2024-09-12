@@ -17,17 +17,38 @@
 package de.gematik.test.erezept.actions.rawhttpactions.pki;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
+import java.util.Set;
 import lombok.Data;
+import lombok.SneakyThrows;
+import lombok.val;
 
 @Data
 public class PKICertificatesDTOEnvelop {
   @JsonProperty("ca_certs")
-  private List<String> caCerts = List.of();
+  @JsonDeserialize(contentUsing = X509CertificateDeserializer.class)
+  private Set<X509Certificate> caCerts = Set.of();
 
   @JsonProperty("add_roots")
-  private List<String> addRoots = List.of();
+  @JsonDeserialize(contentUsing = X509CertificateDeserializer.class)
+  private Set<X509Certificate> addRoots = Set.of();
 
-  @JsonProperty("ee_certs")
-  private List<String> eeCerts = List.of();
+  private static class X509CertificateDeserializer extends JsonDeserializer<X509Certificate> {
+    @SneakyThrows
+    @Override
+    public X509Certificate deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException {
+      val decoded = Base64.getDecoder().decode(p.getText());
+      val factory = CertificateFactory.getInstance("X.509");
+      return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(decoded));
+    }
+  }
 }

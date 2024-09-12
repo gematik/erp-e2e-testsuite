@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,39 +54,39 @@ import org.junit.runner.RunWith;
 @DisplayName("Task für ein E-Rezept erstellen")
 class TaskCreateUsecase extends ErpTest {
 
-    @TestcaseId("ERP_TASK_CREATE_01")
-    @ParameterizedTest(name = "[{index}] -> Verordnender Arzt erstellt Task mit WorkFlow {0}")
-    @DisplayName("Erstelle einen E-Rezept Task als Verordnender Arzt")
-    @EnumSource(value = PrescriptionFlowType.class)
-    void createTask(PrescriptionFlowType flowType) {
-        val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
-        val creation = doctor.performs(TaskCreate.withFlowType(flowType));
-        doctor.attemptsTo(
-                Verify.that(creation)
-                        .withExpectedType(ErpAfos.A_19018)
-                        .hasResponseWith(returnCode(201))
-                        .and(hasWorkflowType(flowType))
-                        .and(isInDraftStatus())
-                        .and(hasValidPrescriptionId())
-                        .isCorrect());
-    }
+  @TestcaseId("ERP_TASK_CREATE_01")
+  @ParameterizedTest(name = "[{index}] -> Verordnender Arzt erstellt Task mit WorkFlow {0}")
+  @DisplayName("Erstelle einen E-Rezept Task als Verordnender Arzt")
+  @EnumSource(value = PrescriptionFlowType.class)
+  void createTask(PrescriptionFlowType flowType) {
+    val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
+    val creation = doctor.performs(TaskCreate.withFlowType(flowType));
+    doctor.attemptsTo(
+        Verify.that(creation)
+            .withExpectedType(ErpAfos.A_19018)
+            .hasResponseWith(returnCode(201))
+            .and(hasWorkflowType(flowType))
+            .and(isInDraftStatus())
+            .and(hasValidPrescriptionId())
+            .isCorrect());
+  }
 
-    @TestcaseId("ERP_TASK_CREATE_02")
-    @ParameterizedTest(name = "[{index}] -> {0} erstellt Task mit WorkFlow {1}")
-    @DisplayName("Nur ein Verordnender Arzt darf E-Rezepte aktivieren")
-    @MethodSource("taskCreateProvider")
-    void createTaskAsImproperActor(
-            NamedEnvelope<Function<ActorStage, ErpActor>> actorGetter, PrescriptionFlowType flowType) {
-        val actor = actorGetter.getParameter().apply(this.stage);
-        val creation = actor.performs(TaskCreate.withFlowType(flowType));
-        actor.attemptsTo(
-                Verify.that(creation)
-                        .withOperationOutcome(ErpAfos.A_19018)
-                        .responseWith(returnCodeIsIn(403, 410))
-                        .isCorrect());
-    }
+  @TestcaseId("ERP_TASK_CREATE_02")
+  @ParameterizedTest(name = "[{index}] -> {0} erstellt Task mit WorkFlow {1}")
+  @DisplayName("Nur ein Verordnender Arzt darf E-Rezepte aktivieren")
+  @MethodSource("taskCreateProvider")
+  void createTaskAsImproperActor(
+      NamedEnvelope<Function<ActorStage, ErpActor>> actorGetter, PrescriptionFlowType flowType) {
+    val actor = actorGetter.getParameter().apply(this.stage);
+    val creation = actor.performs(TaskCreate.withFlowType(flowType));
+    actor.attemptsTo(
+        Verify.that(creation)
+            .withOperationOutcome(ErpAfos.A_19018)
+            .responseWith(returnCodeIsIn(403, 410))
+            .isCorrect());
+  }
 
-    static Stream<Arguments> taskCreateProvider() {
+  static Stream<Arguments> taskCreateProvider() {
     return ArgumentComposer.composeWith()
         .arguments(
             NamedEnvelope.of(

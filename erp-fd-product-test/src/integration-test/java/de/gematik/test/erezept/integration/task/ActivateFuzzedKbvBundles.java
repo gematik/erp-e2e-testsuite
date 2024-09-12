@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class ActivateFuzzedKbvBundles extends ErpTest {
   private static final Integer iterations = featureConf.getToggle(new FuzzingIterationsToggle());
   private static final Double percentageIncr = featureConf.getToggle(new FuzzingIncrementsToggle());
   private static final Function<Integer, Double> percentageSupplier =
-          input -> ((input + 1) * percentageIncr);
+      input -> ((input + 1) * percentageIncr);
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -77,130 +77,130 @@ class ActivateFuzzedKbvBundles extends ErpTest {
   private PatientActor sina;
 
   public static Stream<Arguments> fuzzingContextProvider() {
-      return IntStream.range(0, iterations).mapToObj(x -> {
-        float adaptedPercent = (float) (x + 1) / iterations;
-        val config = FuzzConfig.getRandom();
-        config.setPercentOfAll(config.getPercentOfAll() * adaptedPercent);
-        config.setPercentOfEach(config.getPercentOfEach() * adaptedPercent);
-        config.setName(config.getName() + "_iter_" + x);
-        config.setUsedPercentOfMutators(config.getUsedPercentOfMutators() * adaptedPercent);
-        log.info(config.toString());
-        return Arguments.arguments(config);
-      });
+    return IntStream.range(0, iterations)
+        .mapToObj(
+            x -> {
+              float adaptedPercent = (float) (x + 1) / iterations;
+              val config = FuzzConfig.getRandom();
+              config.setPercentOfAll(config.getPercentOfAll() * adaptedPercent);
+              config.setPercentOfEach(config.getPercentOfEach() * adaptedPercent);
+              config.setName(config.getName() + "_iter_" + x);
+              config.setUsedPercentOfMutators(config.getUsedPercentOfMutators() * adaptedPercent);
+              log.info(config.toString());
+              return Arguments.arguments(config);
+            });
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_01")
   @ParameterizedTest(
-          name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
   @DisplayName("Mit String Fuzzing invalidierte Verordnungen")
   @MethodSource("kbvBundleStringFuzzer")
   void activatePrescriptionWithStringFuzzing(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_02")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Composition-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundleCompositionStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_02")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Composition-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundleCompositionStringFuzzer")
   void activatePrescriptionWithStringFuzzingComposition(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_03")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Patient-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundlePatientStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_03")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Patient-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundlePatientStringFuzzer")
   void activatePrescriptionWithStringFuzzingPatient(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_04")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Medication-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundleMedicationStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_04")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Medication-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundleMedicationStringFuzzer")
   void activatePrescriptionWithStringFuzzingMedication(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_05")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName(
-            "Mit String Fuzzing invalidierte MedicationRequest-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundleMedicationRequestStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_05")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName(
+      "Mit String Fuzzing invalidierte MedicationRequest-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundleMedicationRequestStringFuzzer")
   void activatePrescriptionWithStringFuzzingMedicationRequest(
-          NamedEnvelope<StringMutator> fuzzingStep) {
+      NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_06")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Practitioner-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundlePractitionerStringFuzzer")
-  void activatePrescriptionWithStringFuzzingPractitioner(
-          NamedEnvelope<StringMutator> fuzzingStep) {
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_06")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Practitioner-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundlePractitionerStringFuzzer")
+  void activatePrescriptionWithStringFuzzingPractitioner(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_07")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Organization-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundleOrganizationStringFuzzer")
-  void activatePrescriptionWithStringFuzzingOrganization(
-          NamedEnvelope<StringMutator> fuzzingStep) {
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_07")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Organization-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundleOrganizationStringFuzzer")
+  void activatePrescriptionWithStringFuzzingOrganization(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_08")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Coverage-Resource innerhalb der Verordnungen")
-    @MethodSource("kbvBundleCoverageStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_08")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Coverage-Resource innerhalb der Verordnungen")
+  @MethodSource("kbvBundleCoverageStringFuzzer")
   void activatePrescriptionWithStringFuzzingCoverage(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_09")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierte Meta-Informationen innerhalb der Verordnungen")
-    @MethodSource("kbvBundleMetaStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_09")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierte Meta-Informationen innerhalb der Verordnungen")
+  @MethodSource("kbvBundleMetaStringFuzzer")
   void activatePrescriptionWithStringFuzzingMeta(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_10")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierter Identifier innerhalb der Verordnungen")
-    @MethodSource("kbvBundleIdentifierStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_10")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierter Identifier innerhalb der Verordnungen")
+  @MethodSource("kbvBundleIdentifierStringFuzzer")
   void activatePrescriptionWithStringFuzzingIdentifier(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_11")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit String Fuzzing invalidierter Codings innerhalb der Verordnungen")
-    @MethodSource("kbvBundleCodingStringFuzzer")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_11")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit String Fuzzing invalidierter Codings innerhalb der Verordnungen")
+  @MethodSource("kbvBundleCodingStringFuzzer")
   void activatePrescriptionWithStringFuzzingCodings(NamedEnvelope<StringMutator> fuzzingStep) {
     executeTest(b -> b.withStringFuzzing(fuzzingStep.getParameter()));
   }
 
-    @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_12")
-    @ParameterizedTest(
-            name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
-    @DisplayName("Mit ByteArray Fuzzing der signierten Verordnung Verordnungen")
-    @MethodSource("kbvBundleByteArrayFuzzer")
-    void activatePrescriptionWithStringFuzzingSignedBundle(
-            NamedEnvelope<ByteArrayMutator> fuzzingStep) {
-      executeTest(b -> b.withByteArrayFuzzing(fuzzingStep.getParameter()));
-    }
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_12")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("Mit ByteArray Fuzzing der signierten Verordnung Verordnungen")
+  @MethodSource("kbvBundleByteArrayFuzzer")
+  void activatePrescriptionWithStringFuzzingSignedBundle(
+      NamedEnvelope<ByteArrayMutator> fuzzingStep) {
+    executeTest(b -> b.withByteArrayFuzzing(fuzzingStep.getParameter()));
+  }
 
   @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_13")
   @DisplayName("FhirFuzz hat mit Random gefuzzten Werten versucht Rezepte einzustellen")
@@ -223,13 +223,17 @@ class ActivateFuzzedKbvBundles extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withSmartFuzzer(fhirFuzzer)
                 .withRandomKbvBundle());
-    val fuzzLog = fuzzerContext.getOperationLogs().stream().map(Object::toString).collect(Collectors.joining("\n"));
+    val fuzzLog =
+        fuzzerContext.getOperationLogs().stream()
+            .map(Object::toString)
+            .collect(Collectors.joining("\n"));
     log.info("FuzzLogWithSmartFuzzer:\n" + fuzzLog);
 
     doctor.attemptsTo(
-            Verify.that(activation).withIndefiniteType()
-                    .hasResponseWith(returnCodeIsBetween(400, 499, FhirRequirements.FHIR_XML_PARSING))
-                    .isCorrect());
+        Verify.that(activation)
+            .withIndefiniteType()
+            .hasResponseWith(returnCodeIsBetween(400, 499, FhirRequirements.FHIR_XML_PARSING))
+            .isCorrect());
   }
 
   private void executeTest(Consumer<IssuePrescription.Builder> mutator) {
@@ -239,10 +243,10 @@ class ActivateFuzzedKbvBundles extends ErpTest {
     val activation = doctor.performs(issueManipulatedPrescription.withRandomKbvBundle());
 
     doctor.attemptsTo(
-            Verify.that(activation)
-                    .withIndefiniteType()
-                    .hasResponseWith(returnCodeIsBetween(203, 499, FhirRequirements.FHIR_XML_PARSING))
-                    .isCorrect());
+        Verify.that(activation)
+            .withIndefiniteType()
+            .hasResponseWith(returnCodeIsBetween(203, 499, FhirRequirements.FHIR_XML_PARSING))
+            .isCorrect());
   }
 
   static Stream<Arguments> kbvBundleStringFuzzer() {
@@ -324,6 +328,4 @@ class ActivateFuzzedKbvBundles extends ErpTest {
 
     return mutators.create();
   }
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,17 @@ package de.gematik.test.erezept.pharmacyserviceprovider.intergationtests;
 
 public class IntegrationSetupTest {
 
+  static final String TARGET_URL_KEY = "psp.target.url";
+  static final String TARGET_DEFAULT_URL = "http://localhost:9095";
+  static final String TARGET_AUTH_KEY = "psp.target.auth";
 
-    static final String TARGET_URL_KEY = "psp.target.url";
-    static final String TARGET_DEFAULT_URL = "http://localhost:9095";
-    static final String TARGET_AUTH_KEY = "psp.target.auth";
+  static String serverUrl;
+  static String wssUrl;
+  static String serverAuth;
 
-    static String serverUrl;
-    static String wssUrl;
-    static String serverAuth;
-
-    static void fetchTargets() {
-        serverUrl = System.getProperty(TARGET_URL_KEY, TARGET_DEFAULT_URL);
-        wssUrl = serverUrl.replace("http", "ws");
-        serverAuth = System.getProperty(TARGET_AUTH_KEY, "000");
-    }
+  static void fetchTargets() {
+    serverUrl = System.getProperty(TARGET_URL_KEY, TARGET_DEFAULT_URL);
+    wssUrl = serverUrl.replace("http", "ws");
+    serverAuth = System.getProperty(TARGET_AUTH_KEY, "000");
+  }
 }

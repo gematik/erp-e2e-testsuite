@@ -40,8 +40,8 @@ public class ResponseOfDeleteChargeItem extends FhirResponseQuestion<Resource> {
     val dispensedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
-    val prescriptionId = deque.chooseFrom(dispensedDrugs.getDispensedDrugsList());
-    val cmd = new ChargeItemDeleteCommand(prescriptionId);
+    val dispensationInformation = deque.chooseFrom(dispensedDrugs.getDispensedDrugsList());
+    val cmd = new ChargeItemDeleteCommand(dispensationInformation.prescriptionId());
     return erpClient.request(cmd);
   }
 

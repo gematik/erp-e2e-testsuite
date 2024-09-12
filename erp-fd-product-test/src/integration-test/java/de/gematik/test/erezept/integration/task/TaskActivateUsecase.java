@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@ import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.ErpDarreichungsformOctoberActive;
 import java.time.Instant;
@@ -118,7 +118,8 @@ class TaskActivateUsecase extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Darreichungsform {2} aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Darreichungsform {2}"
+              + " aus")
   @DisplayName("E-Rezept als Verordnender Arzt an eine/n Versicherte/n ausstellen")
   @MethodSource("prescriptionTypesProviderDarreichungsformen")
   void activatePrescriptionWithDarreichungsformen(
@@ -206,13 +207,15 @@ class TaskActivateUsecase extends ErpTest {
             VersicherungsArtDeBasis.PKV,
             PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
             PrescriptionFlowType.FLOW_TYPE_209)
+        .multiplyAppend(MedicationCategory.class)
         .create();
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Ausstellungsdatum {2} aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Ausstellungsdatum {2}"
+              + " aus")
   @DisplayName("Ausstellungsdatum und Signaturzeitpunkt müssen taggleich sein")
   @MethodSource("prescriptionTypesProviderInvalidAuthoredOn")
   void activatePrescriptionWithInvalidAuthoredOn(
@@ -242,9 +245,11 @@ class TaskActivateUsecase extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit zeitlicher Präzision {2} aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit zeitlicher Präzision"
+              + " {2} aus")
   @DisplayName(
-      "E-Rezept mit einem Ausstellungsdatum, dürfen keinen Zeitstempel enthalten und sind begrenzt auf 10 Zeichen im Format JJJJ-MM-TT")
+      "E-Rezept mit einem Ausstellungsdatum, dürfen keinen Zeitstempel enthalten und sind begrenzt"
+          + " auf 10 Zeichen im Format JJJJ-MM-TT")
   @MethodSource("prescriptionTypesProviderInvalidTemporalPrecision")
   void activatePrescriptionWithInvalidAuthoredOnFormat(
       VersicherungsArtDeBasis insuranceType,
@@ -378,9 +383,11 @@ class TaskActivateUsecase extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_06")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein E-Rezept für einen Versicherten mit dem Versicherungsart-Identifier {0} aus")
+          "[{index}] -> Verordnender Arzt stellt ein E-Rezept für einen Versicherten mit dem"
+              + " Versicherungsart-Identifier {0} aus")
   @DisplayName(
-      "Verordnender Arzt stellt ein E-Rezept für einen Versicherten mit ungültigem Versicherungsart-Identifier aus")
+      "Verordnender Arzt stellt ein E-Rezept für einen Versicherten mit ungültigem"
+          + " Versicherungsart-Identifier aus")
   @EnumSource(
       value = IdentifierTypeDe.class,
       names = {"GKV", "PKV"},
@@ -405,7 +412,8 @@ class TaskActivateUsecase extends ErpTest {
             .hasResponseWith(returnCode(400))
             .and(
                 operationOutcomeContainsInDiagnostics(
-                    "In der Ressource vom Typ Patient ist keine GKV-VersichertenID vorhanden, diese ist aber eine Pflichtangabe beim Kostentraeger des Typs",
+                    "In der Ressource vom Typ Patient ist keine GKV-VersichertenID vorhanden, diese"
+                        + " ist aber eine Pflichtangabe beim Kostentraeger des Typs",
                     ErpAfos.A_23936))
             .isCorrect());
   }
@@ -443,9 +451,11 @@ class TaskActivateUsecase extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit dem DmpKennzeichen Version 1.06 aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit dem DmpKennzeichen"
+              + " Version 1.06 aus")
   @DisplayName(
-      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n mit DmpKennzeichen Version 1.06 ausstellen")
+      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n mit DmpKennzeichen Version 1.06"
+          + " ausstellen")
   @MethodSource("prescriptionTypesProviderDmpKennzeichen")
   void activatePrescriptionWithNewDmpKennzeichen(
       VersicherungsArtDeBasis insuranceType,
@@ -511,5 +521,52 @@ class TaskActivateUsecase extends ErpTest {
             .withPractitioner(doctor.getPractitioner())
             .toBuilder();
     return kbvBundleBuilder;
+  }
+
+  @TestcaseId("ERP_TASK_ACTIVATE_08")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein E-Rezept mit Arzneimittelkategorie {3} aus")
+  @DisplayName(
+      "E-Rezept als Verordnender Arzt mit Arzneimittelkategorie = 00, 01 oder 02 im Bundle")
+  @MethodSource("prescriptionTypesProvider")
+  void activatePrescriptionWithMedicationExtension(
+      VersicherungsArtDeBasis insuranceType,
+      PrescriptionAssignmentKind assignmentKind,
+      PrescriptionFlowType expectedFlowType,
+      MedicationCategory medicationCategory) {
+
+    sina.changePatientInsuranceType(insuranceType);
+
+    val medication = KbvErpMedicationPZNFaker.builder().withCategory(medicationCategory).fake();
+
+    val kbvBundleBuilder =
+        KbvErpBundleFaker.builder()
+            .withKvnr(sina.getKvnr())
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withPractitioner(doctor.getPractitioner())
+            .toBuilder();
+
+    val activation =
+        doctor.performs(
+            IssuePrescription.forPatient(sina)
+                .ofAssignmentKind(assignmentKind)
+                .withKbvBundleFrom(kbvBundleBuilder));
+
+    if (MedicationCategory.C_00.equals(medicationCategory)) {
+      doctor.attemptsTo(
+          Verify.that(activation)
+              .withExpectedType(KbvProfileRules.SUPPLY_REQUEST_AND_MEDICATION_REQUEST)
+              .hasResponseWith(returnCode(200))
+              .and(hasWorkflowType(expectedFlowType))
+              .and(hasCorrectExpiryDate())
+              .isCorrect());
+    } else {
+      doctor.attemptsTo(
+          Verify.that(activation)
+              .withOperationOutcome()
+              .hasResponseWith(returnCode(400, FhirRequirements.FHIR_PROFILES))
+              .isCorrect());
+    }
   }
 }

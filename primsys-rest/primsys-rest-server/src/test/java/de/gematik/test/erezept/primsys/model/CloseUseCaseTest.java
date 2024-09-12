@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ClosePrescriptionCommand;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -62,7 +62,7 @@ class CloseUseCaseTest extends TestWithActorContext {
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
-    when(mockClient.request(any(ClosePrescriptionCommand.class))).thenReturn(mockResponse);
+    when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
     val accessCode = AccessCode.random().getValue();
@@ -106,7 +106,7 @@ class CloseUseCaseTest extends TestWithActorContext {
             .withStatusCode(204)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
-    when(mockClient.request(any(ClosePrescriptionCommand.class))).thenReturn(mockResponse);
+    when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
     val accessCode = AccessCode.random().getValue();

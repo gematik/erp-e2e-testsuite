@@ -45,6 +45,7 @@ import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,7 +99,7 @@ class HasReceivedDispensedMedicationTest {
     val dispensedMedications = actor.abilityTo(ReceiveDispensedDrugs.class);
 
     val prescriptionId = PrescriptionId.random();
-    dispensedMedications.append(prescriptionId);
+    dispensedMedications.append(prescriptionId, Instant.now());
 
     val kvnr = KVNR.random();
     val kbvBundle = mock(KbvErpBundle.class);
@@ -161,7 +162,7 @@ class HasReceivedDispensedMedicationTest {
     val dispensedMedications = actor.abilityTo(ReceiveDispensedDrugs.class);
 
     val prescriptionId = PrescriptionId.random();
-    dispensedMedications.append(prescriptionId);
+    dispensedMedications.append(prescriptionId, Instant.now());
 
     val kvnr = KVNR.random();
     val kbvBundle = mock(KbvErpBundle.class);
@@ -223,7 +224,7 @@ class HasReceivedDispensedMedicationTest {
     val erpClient = actor.abilityTo(UseTheErpClient.class);
     val app = actor.abilityTo(UseIOSApp.class);
     val dispensedMedications = actor.abilityTo(ReceiveDispensedDrugs.class);
-    dispensedMedications.append(PrescriptionId.random());
+    dispensedMedications.append(PrescriptionId.random(), Instant.now());
     val getTaskResponse =
         ErpResponse.forPayload(
                 FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
@@ -249,7 +250,7 @@ class HasReceivedDispensedMedicationTest {
     val dispensedMedications = actor.abilityTo(ReceiveDispensedDrugs.class);
 
     val prescriptionId = PrescriptionId.random();
-    dispensedMedications.append(prescriptionId);
+    dispensedMedications.append(prescriptionId, Instant.now());
 
     val kbvBundle = mock(KbvErpBundle.class);
 

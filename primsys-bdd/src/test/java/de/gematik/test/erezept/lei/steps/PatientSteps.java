@@ -17,7 +17,6 @@
 package de.gematik.test.erezept.lei.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static net.serenitybdd.screenplay.ensure.Ensure.*;
 
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.task.*;
@@ -187,18 +186,25 @@ public class PatientSteps {
 
   @Und(
       "^(?:der|die) Versicherte (.+) kann im FdV einsehen, dass ihr (erstes|letztes) E-Rezept "
-          + "von der Apotheke (.+) abgegeben wurde$")
-  public void thePatientChecksDispenseInformationInFdV(
-      String patientName, String order, String pharmacyName) {
+          + "von einer Apotheke abgegeben wurde$")
+  public void thePatientChecksDispenseInformationInFdV(String patientName, String order) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    and(thePatient).attemptsTo(CheckDispenseStatusAsPatient.fromStack(order));
+  }
+
+  @Dann(
+      "^kann (?:der|die) Versicherte (.+) genau die (erste|letzte) bereitgestellte"
+          + " Dispensierinformation der Apotheke (.+) für ihr (erstes|letztes) E-Rezept abrufen$")
+  public void thenThePatientMayDownloadDspInformation(
+      String patientName, String dspOrder, String pharmacyName, String presOrder) {
     val thePharmacy = OnStage.theActorCalled(pharmacyName);
     val thePatient = OnStage.theActorCalled(patientName);
-    and(thePatient)
+    then(thePatient)
         .attemptsTo(
             Ensure.that(
-                    CheckDispenseStatusAsPatient.forThePatient()
-                        .andPrescription(order)
-                        .byPharmacy(thePharmacy)
-                        .build())
+                    MedicationDispenseContainsMedication.withMedicationDispense(dspOrder)
+                        .andPrescription(presOrder)
+                        .ofPharmacy(thePharmacy))
                 .isTrue());
   }
 }

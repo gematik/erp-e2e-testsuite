@@ -27,6 +27,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSys
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -178,6 +179,17 @@ public class ErxTask extends Task {
                     this.getClass(),
                     ErpWorkflowStructDef.ACCEPT_DATE_12,
                     ErpWorkflowStructDef.ACCEPT_DATE));
+  }
+
+  public Optional<Instant> getLastMedicationDispenseDate() {
+    return this.getExtension().stream()
+        .filter(ErpWorkflowStructDef.LAST_MEDICATION_DISPENSE::match)
+        .map(ext -> ext.getValue().castToInstant(ext.getValue()).getValue().toInstant())
+        .findFirst();
+  }
+
+  public boolean hasLastMedicationDispenseDate() {
+    return this.getLastMedicationDispenseDate().isPresent();
   }
 
   @Override

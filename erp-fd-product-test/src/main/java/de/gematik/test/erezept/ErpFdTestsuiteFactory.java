@@ -184,8 +184,8 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
             yield "/ECC-RSA_TSL-ref.xml";
         };
     client.config().defaultBaseUrl(envConfig.getTslBaseUrl());
-    val ocspAbility = new TSLAbility(client, r);
-    actor.can(ocspAbility);
+    val tslAbility = new TSLAbility(client, r);
+    actor.can(tslAbility);
   }
 
   public <A extends Actor> void equipAsApothecary(A actor) {

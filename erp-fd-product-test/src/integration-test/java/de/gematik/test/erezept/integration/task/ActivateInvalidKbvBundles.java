@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,7 +212,8 @@ class ActivateInvalidKbvBundles extends ErpTest {
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit optionaler {2} aus")
   @DisplayName(
-      "Es dürfen in der Composition nur Extensions verwendet werden, welche explizit nach kbv.ita.erp 1.0.2 gefordert werden")
+      "Es dürfen in der Composition nur Extensions verwendet werden, welche explizit nach"
+          + " kbv.ita.erp 1.0.2 gefordert werden")
   @MethodSource("optionalCompositionExtensions")
   void activatePrescriptionWithOptionalCompositionExtensions(
       VersicherungsArtDeBasis insuranceType,
@@ -228,7 +229,8 @@ class ActivateInvalidKbvBundles extends ErpTest {
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit optionaler {2} aus")
   @DisplayName(
-      "Es dürfen in der Medication nur Extensions verwendet werden, welche explizit nach kbv.ita.erp 1.0.2 gefordert werden")
+      "Es dürfen in der Medication nur Extensions verwendet werden, welche explizit nach"
+          + " kbv.ita.erp 1.0.2 gefordert werden")
   @MethodSource("optionalMedicationExtensions")
   void activatePrescriptionWithOptionalMedicationExtensions(
       VersicherungsArtDeBasis insuranceType,
@@ -244,7 +246,8 @@ class ActivateInvalidKbvBundles extends ErpTest {
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit optionaler {2} aus")
   @DisplayName(
-      "Es dürfen in der MedicationRequest nur Extensions verwendet werden, welche explizit nach kbv.ita.erp 1.0.2 gefordert werden")
+      "Es dürfen in der MedicationRequest nur Extensions verwendet werden, welche explizit nach"
+          + " kbv.ita.erp 1.0.2 gefordert werden")
   @MethodSource("optionalMedicationRequestExtensions")
   void activatePrescriptionWithOptionalMedicationRequestExtensions(
       VersicherungsArtDeBasis insuranceType,
@@ -260,7 +263,8 @@ class ActivateInvalidKbvBundles extends ErpTest {
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit optionaler {2} aus")
   @DisplayName(
-      "Es dürfen in der Coverage nur Extensions verwendet werden, welche explizit nach kbv.ita.erp 1.0.2 gefordert werden")
+      "Es dürfen in der Coverage nur Extensions verwendet werden, welche explizit nach kbv.ita.erp"
+          + " 1.0.2 gefordert werden")
   @MethodSource("optionalCoverageExtensions")
   void activatePrescriptionWithOptionalCoverageExtensions(
       VersicherungsArtDeBasis insuranceType,
@@ -276,7 +280,8 @@ class ActivateInvalidKbvBundles extends ErpTest {
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit optionaler {2} aus")
   @DisplayName(
-      "Es dürfen in der Patient nur Extensions verwendet werden, welche explizit nach kbv.ita.erp 1.0.2 gefordert werden")
+      "Es dürfen in der Patient nur Extensions verwendet werden, welche explizit nach kbv.ita.erp"
+          + " 1.0.2 gefordert werden")
   @MethodSource("optionalPatientExtensions")
   void activatePrescriptionWithOptionalPatientExtensions(
       VersicherungsArtDeBasis insuranceType,
@@ -453,5 +458,24 @@ class ActivateInvalidKbvBundles extends ErpTest {
               .hasResponseWith(returnCode(400, ErpAfos.A_22927))
               .isCorrect());
     }
+  }
+
+  @TestcaseId("ERP_TASK_ACTIVATE_INVALID_14")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept mit ''{1}'' aus")
+  @DisplayName("E-Rezept als Verordnender Arzt ohne MedicationRequest")
+  @MethodSource("removeMedicationDispenseManipulator")
+  void activatePrescriptionWithoutMedicationRequest(
+      PrescriptionAssignmentKind assignmentKind,
+      NamedEnvelope<Consumer<KbvErpBundle>> kbvBundleManipulator) {
+
+    // this "trick" is required because the serenity report cannot handle that many parameters
+    activateInvalidPrescription(assignmentKind, kbvBundleManipulator);
+  }
+
+  static Stream<Arguments> removeMedicationDispenseManipulator() {
+    val manipulators = ArgumentComposer.composeWith();
+    KbvBundleManipulatorFactory.getKbvBundleEntryManipulators().forEach(manipulators::arguments);
+    return manipulators.multiply(PrescriptionAssignmentKind.class).create();
   }
 }

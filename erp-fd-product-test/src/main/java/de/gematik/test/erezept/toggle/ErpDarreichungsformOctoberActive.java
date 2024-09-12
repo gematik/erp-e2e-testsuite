@@ -18,6 +18,6 @@ package de.gematik.test.erezept.toggle;
 
 public class ErpDarreichungsformOctoberActive extends BooleanToggle {
   public ErpDarreichungsformOctoberActive() {
-    super("erp.prodtest.fhir.ERP_DARREICHUNGSFORM_10_1_ACTIVE.active", false);
+    super("erp.prodtest.fhir.ERP_DARREICHUNGSFORM_10_1_ACTIVE", false);
   }
 }

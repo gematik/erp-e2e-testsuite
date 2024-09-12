@@ -1,18 +1,17 @@
 /*
- *  Copyright 2023 gematik GmbH
+ * Copyright 2024 gematik GmbH
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package de.gematik.test.erezept.integration.communication;
@@ -71,8 +70,10 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
 
   @Actor(name = "Sina Hüllmann")
   private static PatientActor patient;
+
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
+
   @Actor(name = "Am Flughafen")
   private PharmacyActor flughafenApo;
 
@@ -127,13 +128,14 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
         .create();
   }
 
-
   @TestcaseId("ERP_COMMUNICATION_PAGING_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe bei Communications, dass das Paging als {0} der RelationLink self funktioniert")
+          "[{index}] -> Prüfe bei Communications, dass das Paging als {0} der RelationLink self"
+              + " funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei Communications funktioniert. Speziell der self Link ")
+      "Es muss sichergestellt werden, dass Paging bei Communications funktioniert. Speziell der"
+          + " self Link ")
   @MethodSource("actorComposer")
   void getSelfLinkInCommunications(String actorType, Function<ErpTest, ErpActor> actorProvider) {
     val actor = actorProvider.apply(this);
@@ -158,9 +160,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe bei Communications, dass das Paging als {0} alle 5 Relation-Links zur verfügung stehen")
+          "[{index}] -> Prüfe bei Communications, dass das Paging als {0} alle 5 Relation-Links zur"
+              + " verfügung stehen")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei Communications funktioniert. Speziell, dass für Abrufende alle fünf RelationLinks vorhanden sind ")
+      "Es muss sichergestellt werden, dass Paging bei Communications funktioniert. Speziell, dass"
+          + " für Abrufende alle fünf RelationLinks vorhanden sind ")
   @MethodSource("actorComposer")
   void checkInCommunicationBundleForRelationLinksAsActor(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -187,9 +191,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_Communication_PAGING_03")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von Communications als Apotheke mit URL-Parameter {1}, erwartet im RelationLink {3} als Wert für {2} = {4}")
+          "[{index}] -> Abrufen von Communications als Apotheke mit URL-Parameter {1}, erwartet im"
+              + " RelationLink {3} als Wert für {2} = {4}")
   @DisplayName(
-      "Es muss sichergestellt werden, dass in den Link-Relation für Apotheken die Clientseitig verwendeten Filter und Suchkriterien wiederverwendet werden")
+      "Es muss sichergestellt werden, dass in den Link-Relation für Apotheken die Clientseitig"
+          + " verwendeten Filter und Suchkriterien wiederverwendet werden")
   @MethodSource("communicationBundleQueryComposer")
   void backendShouldUseClientsParamsAsPharmacy(
       List<IQueryParameter> iQueryParameters,
@@ -210,9 +216,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_04")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von Communications als Patient mit URL-Parameter {1}, erwartet im RelationLink {3} als Wert für {2} = {4}")
+          "[{index}] -> Abrufen von Communications als Patient mit URL-Parameter {1}, erwartet im"
+              + " RelationLink {3} als Wert für {2} = {4}")
   @DisplayName(
-      "Es muss sichergestellt werden, dass in den Link-Relation für Patienten die Clientseitig verwendeten Filter und Suchkriterien wiederverwendet werden")
+      "Es muss sichergestellt werden, dass in den Link-Relation für Patienten die Clientseitig"
+          + " verwendeten Filter und Suchkriterien wiederverwendet werden")
   @MethodSource("communicationBundleQueryComposer")
   void backendShouldUseClientsParamsAsPatient(
       List<IQueryParameter> iQueryParameters,
@@ -233,9 +241,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_05")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset URL-Parameter geprüft werden")
+          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset URL-Parameter"
+              + " geprüft werden")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell der __offset URL-Parameter")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell"
+          + " der __offset URL-Parameter")
   @MethodSource("actorComposer")
   void shouldGetCommunicationBundlesWithFixStartIndex(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -261,9 +271,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_06")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset URL-Parameter mit unterschiedlichen Werten für den Startpunkt überprüft werden")
+          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset URL-Parameter"
+              + " mit unterschiedlichen Werten für den Startpunkt überprüft werden")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell der __offset URL-Parameter")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell"
+          + " der __offset URL-Parameter")
   @MethodSource("actorComposer")
   void shouldGetCommunicationsWithDifferentOffset(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -297,9 +309,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_07")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset und _count URL-Parameter in Kombination überprüft werden")
+          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset und _count"
+              + " URL-Parameter in Kombination überprüft werden")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell der __offset und _count URL-Parameter in Kombination")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell"
+          + " der __offset und _count URL-Parameter in Kombination")
   @MethodSource("actorComposer")
   void shouldGetCommunicationBundlesWithDifferentOffsetAndCount(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -336,9 +350,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset und _count Default URL-Parameter (_count=50, __offset=0) ")
+          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset und _count"
+              + " Default URL-Parameter (_count=50, __offset=0) ")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell der __offset und _count Default URL-Parameter (_count=50, __offset=0)")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell"
+          + " der __offset und _count Default URL-Parameter (_count=50, __offset=0)")
   @MethodSource("actorComposer")
   void shouldGetCommunicationBundlesWithDefaultOffsetAndCount(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -373,9 +389,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_09")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe, dass bei Paging von CommunicationBundles als {0} die RelationLink next und previous funktioniert")
+          "[{index}] -> Prüfe, dass bei Paging von CommunicationBundles als {0} die RelationLink"
+              + " next und previous funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Genauer die RelationLink next und previous")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Genauer"
+          + " die RelationLink next und previous")
   @MethodSource("actorComposer")
   void getCommunicationBundlesWhileUsingRelationNextAndPrevious(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -419,9 +437,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_10")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {1} muss überprüft werden, ob der Total Count im CommunicationBundle um {0} erhöht wird")
+          "[{index}] -> Als {1} muss überprüft werden, ob der Total Count im CommunicationBundle um"
+              + " {0} erhöht wird")
   @DisplayName(
-      "Es muss sichergestellt werden, dass der Total-Count immer entsprechend um den folgenden Wert erhöht wird: ")
+      "Es muss sichergestellt werden, dass der Total-Count immer entsprechend um den folgenden Wert"
+          + " erhöht wird: ")
   @MethodSource("actorComposerWithCount")
   void shouldadaptTotalCount(
       int count, String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -458,9 +478,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_11")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob  Equals für Datumsabfragen im CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob  Equals für Datumsabfragen im"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundl funktioniert. Genauer, dass der Filteroperator Equals Sent für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundl funktioniert. Genauer,"
+          + " dass der Filteroperator Equals Sent für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleWhileUsingDateEqualSendFilter(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -485,9 +507,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_12")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob  Equals für Datumsabfragen im CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob  Equals für Datumsabfragen im"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator before Sent für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator before Sent für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleWhileUsingDateLowerThanSentFilter(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -512,9 +536,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_13")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob  Equals für Datumsabfragen im CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob  Equals für Datumsabfragen im"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator after Sent für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator after Sent für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleWhileUsingDateGraterThanSentFilter(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -539,9 +565,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_14")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob  Equals Received für Datumsabfragen im CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob  Equals Received für Datumsabfragen im"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator Equals Received für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator Equals Received für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleWhileUsingDateEqualReceivedFilter(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -566,9 +594,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_15")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob  Equals Received für Datumsabfragen im CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob  Equals Received für Datumsabfragen im"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator before Received für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator before Received für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleWhileUsingDateLowerThanReceivedFilter(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -598,9 +628,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_16")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob after Received für Datumsabfragen im CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob after Received für Datumsabfragen im"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator after Received für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator after Received für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleWhileUsingDateGraterThanReceivedFilter(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -630,9 +662,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_17")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für recipient in Get CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für recipient in Get"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator Recipient für Datumsabfragen funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator Recipient für Datumsabfragen funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleFilteredByRecipient(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -661,9 +695,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_18")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob der Defaultwert sent in Get CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob der Defaultwert sent in Get"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Defaultwert sent funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Defaultwert sent funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleFilteredByDefault(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -681,9 +717,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_19")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für sender in Get CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für sender in Get"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator Sender funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator Sender funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleFilteredBySender(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -713,9 +751,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_20")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für recipient in Get CommunicationBundle funktioniert")
+          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für recipient in Get"
+              + " CommunicationBundle funktioniert")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer, dass der Filteroperator Identifier funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
+          + " dass der Filteroperator Identifier funktionieren")
   @MethodSource("actorComposer")
   void getCommunicationBundleFilteredByIdentifier(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -753,7 +793,8 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
                   new CommunicationDisReqMessage(
                       SupplyOptionsType.ON_PREMISE,
                       format(
-                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?",
+                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist das"
+                              + " Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?",
                           i))));
     }
   }
@@ -767,7 +808,8 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
                   new CommunicationReplyMessage(
                       SupplyOptionsType.ON_PREMISE,
                       format(
-                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??",
+                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                              + " patient, how are you? does the medicine takes an effect??",
                           i)),
                   flughafenApo));
     }
