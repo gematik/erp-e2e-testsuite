@@ -59,7 +59,7 @@ import org.junit.runner.RunWith;
 @DisplayName("Provide Prescription with Consent Test")
 @Tag("ProvideEmlPrescription")
 @Tag("EpaEml")
-public class PrescriptionProvideWithConsentIT extends ErpTest {
+public class ProvidePrescriptionWithConsentIT extends ErpTest {
 
   public static Stream<Arguments> workflowAndMedicationComposer() {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
