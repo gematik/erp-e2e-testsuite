@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
 import lombok.val;
 import org.junit.jupiter.api.Test;

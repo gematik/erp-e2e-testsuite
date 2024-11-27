@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.OCSPAbility;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.abilities.TSLAbility;
+import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
@@ -84,6 +84,16 @@ class ErpFdTestsuiteFactoryTest {
       assertNotNull(doctor.abilityTo(ProvideDoctorBaseData.class));
       assertNotNull(doctor.getDescription());
     }
+  }
+
+  @Test
+  void shouldEquipActorWithEpaMockClient() {
+    val actorName = "Fridolin Straßer";
+    val actor = new PatientActor(actorName);
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertDoesNotThrow(() -> config.equipWithEpaMockClient(actor));
+    assertNotNull(actor.abilityTo(UseTheEpaMockClient.class));
   }
 
   @Test

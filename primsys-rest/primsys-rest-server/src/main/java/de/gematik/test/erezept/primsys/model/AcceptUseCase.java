@@ -23,7 +23,7 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
-import de.gematik.test.erezept.primsys.mapping.PznMedicationDataMapper;
+import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
 import jakarta.ws.rs.core.Response;
 import lombok.val;
 
@@ -52,7 +52,7 @@ public class AcceptUseCase {
             .coveredBy(
                 CoverageDataMapper.from(kbvBundle.getCoverage(), kbvBundle.getPatient()).getDto())
             .prescriptionReference(kbvBundle.getReference().getReference())
-            .andMedication(PznMedicationDataMapper.from(kbvBundle.getMedication()).getDto());
+            .andMedication(KbvPznMedicationDataMapper.from(kbvBundle.getMedication()).getDto());
 
     ActorContext.getInstance().addAcceptedPrescription(acceptData);
     return Response.status(acceptResponse.getStatusCode()).entity(acceptData).build();

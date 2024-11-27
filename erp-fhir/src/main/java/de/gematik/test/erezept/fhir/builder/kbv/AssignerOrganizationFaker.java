@@ -16,11 +16,14 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPhone;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
 import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;

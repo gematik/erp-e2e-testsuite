@@ -64,6 +64,18 @@ class GenericBundleVerifierTest extends ParsingTest {
 
   @Test
   void shouldThrowWileDetectingCountOfContainedElements() {
+    val step = minimumCountOfEntriesOf(70);
+    assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldDetectMin50EventsCorrect() {
+    val step = minimumCountOfEntriesOf(50);
+    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldThrowWileDetectingMinimalCountOfContainedElements() {
     val step = containsEntriesOfCount(30);
     assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }

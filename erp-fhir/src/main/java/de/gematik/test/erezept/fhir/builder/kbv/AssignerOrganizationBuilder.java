@@ -16,21 +16,31 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-import static java.text.MessageFormat.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPhone;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.references.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.builder.AbstractOrganizationBuilder;
+import de.gematik.test.erezept.fhir.builder.AddressBuilder;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
+import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.valuesets.Country;
+import java.util.UUID;
+import lombok.NonNull;
+import lombok.val;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Reference;
 
 /**
  * This builder will build an Organization which represents an institution that is capable of

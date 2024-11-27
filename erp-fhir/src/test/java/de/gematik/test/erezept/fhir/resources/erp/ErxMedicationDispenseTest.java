@@ -43,6 +43,7 @@ class ErxMedicationDispenseTest extends ParsingTest {
     val medicationDispense = parser.decode(ErxMedicationDispense.class, content);
     assertNotNull(medicationDispense, "Valid MedicationDispense must be parseable");
     assertEquals(new PrescriptionId("12345678"), medicationDispense.getPrescriptionId());
+    assertFalse(medicationDispense.isDiGA());
 
     val medication = medicationDispense.getErpMedicationFirstRep();
     assertNotNull(medication, "MedicationDispense must contain at leas one Medication");

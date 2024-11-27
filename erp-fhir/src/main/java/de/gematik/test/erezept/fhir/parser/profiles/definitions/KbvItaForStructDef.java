@@ -25,6 +25,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum KbvItaForStructDef implements IStructureDefinition<KbvItaForVersion> {
   PRACTITIONER("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner"),
+  PRACTITIONER_ROLE("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_PractitionerRole"),
   ORGANIZATION("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Organization"),
   COVERAGE("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage"),
   PATIENT("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient"),

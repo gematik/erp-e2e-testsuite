@@ -80,7 +80,7 @@ public class PagingArgumentComposer {
             "_count=30&__offset=5",
             QUERY_KEY_COUNT,
             "prev",
-            "5")
+            "30")
         .arguments(
             IQueryParameter.search().withCount(30).withOffset(5).createParameter(),
             "_count=30&__offset=5",
@@ -128,28 +128,8 @@ public class PagingArgumentComposer {
             RELATION_LINK_FIRST,
             "0")
         .arguments(
-            IQueryParameter.search()
-                .sortedBy("expiry-date", SortOrder.DESCENDING)
-                .createParameter(),
-            "_sort=-expiry-date",
-            QUERY_KEY_SORT,
-            "next",
-            "-expiry-date")
-        .arguments(
-            IQueryParameter.search().sortedBy("accept-date", SortOrder.ASCENDING).createParameter(),
-            "_sort=accept-date",
-            QUERY_KEY_SORT,
-            "self",
-            "accept-date")
-        .arguments(
-            IQueryParameter.search().sortedBy("modified", SortOrder.ASCENDING).createParameter(),
-            "_sort=modified",
-            QUERY_KEY_SORT,
-            "self",
-            "modified")
-        .arguments(
             IQueryParameter.search().withCount(5).withOffset(8).createParameter(),
-            "_count=8&__offset=5",
+            "_count=5&__offset=8",
             QUERY_KEY_COUNT,
             "prev",
             "5");
@@ -193,24 +173,6 @@ public class PagingArgumentComposer {
             QUERY_KEY_OFFSET,
             RELATION_LINK_FIRST,
             "0")
-        .arguments(
-            IQueryParameter.search().sortedBy("received", SortOrder.DESCENDING).createParameter(),
-            "_sort=-received",
-            QUERY_KEY_SORT,
-            "next",
-            "-received")
-        .arguments(
-            IQueryParameter.search().sortedBy("recipient", SortOrder.ASCENDING).createParameter(),
-            "_sort=recipient",
-            QUERY_KEY_SORT,
-            "self",
-            "recipient")
-        .arguments(
-            IQueryParameter.search().sortedBy("identifier", SortOrder.ASCENDING).createParameter(),
-            "_sort=identifier",
-            QUERY_KEY_SORT,
-            "self",
-            "identifier")
         .arguments(
             IQueryParameter.search().withCount(5).withOffset(8).createParameter(),
             "_count=8&__offset=5",

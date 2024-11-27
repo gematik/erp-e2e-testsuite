@@ -47,7 +47,18 @@ curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST h
 ----
 
 === Akzeptiertes E-Rezept dispensieren
-Um ein bereits akzeptiertes E-Rezept als Apotheke zu dispensieren, bietet {name-primsys} den Endpunkt `/close` an. Dieser Endpunkt nimmt *optional* einen Body entgegen.
+Um ein bereits akzeptiertes E-Rezept als Apotheke zu dispensieren, bietet {name-primsys} den Endpunkt `/dispense` an. Dieser Endpunkt nimmt *optional* einen Body entgegen. Wird ein Body mitgegeben, dann wird ein alternatives Medikament (oder auch mehrere) dispensiert ansonsten wird das ursprünglich verschriebene Medikament aus der Verordnung dispensiert.
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" -X POST https://erpps-test.dev.gematik.solutions/pharm/84b5f179e0451d03ea8c8948f52687b8/dispense?taskId=<TASK-ID>&ac=<ACCESS-CODE>&secret=<SECRET> -d '[{"pzn": "17260627", "batch": {"lotNumber": 123123 }}]' | jq
+----
+
+[IMPORTANT]
+Die `dispense`-Operation hinterlegt lediglich die Dispensierinformationen für das E-Rezept auf dem Fachdienst. Das E-Rezept selbst wird dadurch nicht geschlossen und verbleibt weiterhin im Status `in-progress` bis ein `close`-Aufruf erfolgt.
+
+=== Akzeptiertes E-Rezept abschließen
+Um ein bereits akzeptiertes E-Rezept als Apotheke zu schließen, bietet {name-primsys} den Endpunkt `/close` an. Dieser Endpunkt nimmt *optional* einen Body entgegen.
 
 Wird *kein* Body mitgegeben, dann wird das ursprünglich verschriebene Medikament dispensiert:
 
@@ -141,3 +152,30 @@ Um *dispensierte* E-Rezepte abzurufen, die über {name-primsys} dispensiert wurd
 ----
 curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/prescription/dispensed | jq
 ----
+
+=== Faker-REST-API
+Der {name-primsys} bietet auch eine REST-API an, die es ermöglicht, Testdaten zu generieren. Diese API ist unter `/faker` erreichbar. Die Faker-API nimmt dabei stets ein JSON-Objekt entgegen, generiert daraus die korrespondierende FHIR-Struktur in XML und liefert diese als Antwort zurück.
+
+Um z.B. einen gewöhnlichen Verordnungsdatensatz (KBV-Bundle) zu generieren, kann folgender cURL-Aufruf verwendet werden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/faker/doc/6a7f66bc2bb0f4cd76deaa260abbb484/kbvbundle -d ''
+
+# alternativ ohne die Adressierung eines bestimmten Arztes
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/faker/kbvbundle -d ''
+----
+
+[NOTE]
+Der Body des Requests (`-d ''`) kann hier im Gegensatz zu dem Endpunkt `prescribe` auch komplett leer sein weil hier kein echtes E-Rezept erzeugt wird.
+
+Um z.B. einen EVDGA Verordnungsdatensatz (EVDGA-Bundle) zu generieren, kann folgender cURL-Aufruf verwendet werden:
+
+[source,shell]
+----
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/faker/doc/6a7f66bc2bb0f4cd76deaa260abbb484/evdgabundle -d ''
+
+# alternativ ohne die Adressierung eines bestimmten Arztes
+curl -H "apikey: $ERPIONE_API_KEY" -H "Content-Type: application/json" https://erpps-test.dev.gematik.solutions/faker/evdgabundle -d '{"patient": {"kvnr": "X110455134"}, "healthAppRequest": {"pzn": "19205615", "name": "Vantis KHK und Herzinfarkt 001", "ser": false}}'
+----
+

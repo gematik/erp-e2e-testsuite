@@ -30,6 +30,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.rest.HttpBRequest;
+import de.gematik.bbriccs.rest.HttpBResponse;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.bbriccs.smartcards.SmartcardCertificate;
 import de.gematik.idp.client.IdpClient;
@@ -42,7 +44,6 @@ import de.gematik.test.erezept.client.rest.ErpResponseFactory;
 import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
-import de.gematik.test.erezept.client.vau.Response;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
@@ -115,9 +116,9 @@ class ErpClientTest {
     when(mockToken.getAccessToken()).thenReturn(mockJsonWebToken);
     when(mockJsonWebToken.getRawString()).thenReturn("idptoken123");
 
-    val mockResponse = mock(Response.class);
-    when(mockVau.send(anyString(), any(), any())).thenReturn(mockResponse);
-    when(mockResponse.getBody()).thenReturn("mock body");
+    val mockResponse = mock(HttpBResponse.class);
+    when(mockVau.send(any(HttpBRequest.class), any(), any())).thenReturn(mockResponse);
+    when(mockResponse.bodyAsString()).thenReturn("mock body");
 
     val mockErpResponse = mock(ErpResponse.class);
     val mockResponseFactory = mock(ErpResponseFactory.class);
@@ -154,9 +155,9 @@ class ErpClientTest {
 
     when(mockJsonWebToken.getRawString()).thenReturn("idptoken123");
 
-    val mockResponse = mock(Response.class);
-    when(mockVau.send(anyString(), any(), any())).thenReturn(mockResponse);
-    when(mockResponse.getBody()).thenReturn("mock body");
+    val mockResponse = mock(HttpBResponse.class);
+    when(mockVau.send(any(HttpBRequest.class), any(), any())).thenReturn(mockResponse);
+    when(mockResponse.bodyAsString()).thenReturn("mock body");
 
     val mockErpResponse = mock(ErpResponse.class);
     val mockResponseFactory = mock(ErpResponseFactory.class);

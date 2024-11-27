@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 
+@Deprecated
 @Slf4j
 public class DoctorPrescribeKvnrSteps {
 
@@ -43,7 +44,7 @@ public class DoctorPrescribeKvnrSteps {
         .attemptsTo(
             IssuePrescription.forKvnr(kvnr)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   /**
@@ -193,7 +194,7 @@ public class DoctorPrescribeKvnrSteps {
         .attemptsTo(
             IssuePrescription.forKvnr(kvnr)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
     log.trace(format("Doctor {0} issued Prescription", docName));
   }
 

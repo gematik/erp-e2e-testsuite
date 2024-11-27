@@ -16,30 +16,95 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerEMail;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPhone;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
 
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.values.BSNR;
+import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.values.KSN;
+import de.gematik.test.erezept.fhir.values.KZVA;
+import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
 
 public class MedicalOrganizationFaker {
+
   private final Map<String, Consumer<MedicalOrganizationBuilder>> builderConsumers =
       new HashMap<>();
 
-  private MedicalOrganizationFaker() {
+  public enum OrganizationFakerType {
+    GENERAL,
+    DENTAL,
+    HOSPITAL,
+    HOSPITAL_KSN;
+  }
+
+  private MedicalOrganizationFaker(OrganizationFakerType type) {
     builderConsumers.put("phone", b -> b.phone(fakerPhone()));
     builderConsumers.put("address", b -> b.address(fakerCity(), fakerZipCode(), fakerStreetName()));
     builderConsumers.put("name", b -> b.name(fakerName()));
     builderConsumers.put("email", b -> b.email(fakerEMail()));
-    builderConsumers.put("bsnr", b -> b.bsnr(fakerBsnr()));
+
+    switch (type) {
+      case DENTAL:
+        this.withKzva(KZVA.random());
+        break;
+      case HOSPITAL:
+        this.withIknr(IKNR.random());
+        break;
+      case HOSPITAL_KSN:
+        this.withKsn(KSN.random());
+        break;
+      case GENERAL:
+      default:
+        this.withBsnr(BSNR.random());
+        break;
+    }
+  }
+
+  public static MedicalOrganizationFaker forPractitioner(KbvPractitioner practitioner) {
+    if (practitioner.getQualificationType() == QualificationType.DENTIST) {
+      return dentalPractice();
+    } else {
+      // Note: older KbvItaForVersion does not accept KSN. HOSPITAL_KSN can be removed from
+      // exclusion once KbvItaForVersion.V1_0_3 is removed
+      return builder(
+          fakerValueSet(
+              OrganizationFakerType.class,
+              List.of(OrganizationFakerType.DENTAL, OrganizationFakerType.HOSPITAL_KSN)));
+    }
   }
 
   public static MedicalOrganizationFaker builder() {
-    return new MedicalOrganizationFaker();
+    return builder(fakerValueSet(OrganizationFakerType.class));
+  }
+
+  public static MedicalOrganizationFaker builder(OrganizationFakerType type) {
+    return new MedicalOrganizationFaker(type);
+  }
+
+  public static MedicalOrganizationFaker dentalPractice() {
+    return builder(OrganizationFakerType.DENTAL);
+  }
+
+  public static MedicalOrganizationFaker medicalPractice() {
+    return builder(OrganizationFakerType.GENERAL);
+  }
+
+  public static MedicalOrganizationFaker hospital() {
+    return builder(OrganizationFakerType.HOSPITAL);
   }
 
   public MedicalOrganizationFaker withVersion(KbvItaForVersion version) {
@@ -63,11 +128,30 @@ public class MedicalOrganizationFaker {
   }
 
   public MedicalOrganizationFaker withBsnr(BSNR bsnr) {
-    return withBsnr(bsnr.getValue());
+    cleanupIdentifiers();
+    builderConsumers.put(OrganizationFakerType.GENERAL.name(), b -> b.bsnr(bsnr));
+    return this;
   }
 
   public MedicalOrganizationFaker withBsnr(String bsnr) {
-    builderConsumers.computeIfPresent("bsnr", (key, defaultValue) -> b -> b.bsnr(bsnr));
+    return withBsnr(BSNR.from(bsnr));
+  }
+
+  public MedicalOrganizationFaker withIknr(IKNR iknr) {
+    cleanupIdentifiers();
+    builderConsumers.put(OrganizationFakerType.HOSPITAL.name(), b -> b.iknr(iknr));
+    return this;
+  }
+
+  public MedicalOrganizationFaker withKsn(KSN ksn) {
+    cleanupIdentifiers();
+    builderConsumers.put(OrganizationFakerType.HOSPITAL_KSN.name(), b -> b.ksn(ksn));
+    return this;
+  }
+
+  public MedicalOrganizationFaker withKzva(KZVA kzva) {
+    cleanupIdentifiers();
+    builderConsumers.put(OrganizationFakerType.DENTAL.name(), b -> b.kzva(kzva));
     return this;
   }
 
@@ -85,5 +169,9 @@ public class MedicalOrganizationFaker {
     val builder = MedicalOrganizationBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
+  }
+
+  private void cleanupIdentifiers() {
+    Arrays.stream(OrganizationFakerType.values()).forEach(ot -> builderConsumers.remove(ot.name()));
   }
 }

@@ -18,12 +18,11 @@ package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import java.util.List;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ResourceType;
 
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
-public class ErxChargeItemSet extends Bundle {
+public class ErxChargeItemSet extends ErxBundle {
 
   public List<ErxChargeItem> getChargeItems() {
     return this.getEntry().stream()

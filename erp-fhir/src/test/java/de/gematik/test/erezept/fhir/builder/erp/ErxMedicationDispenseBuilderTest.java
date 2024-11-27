@@ -68,16 +68,14 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
             .wasSubstituted(true)
             .build();
 
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
+    assertTrue(result.isSuccessful());
+
     assertNotNull(medicationDispense.getId());
-    assertEquals(1, medicationDispense.getErpMedication().size());
     assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(new PrescriptionId(prescriptionId), medicationDispense.getPrescriptionId());
-    assertEquals(
-        lotNumber, medicationDispense.getErpMedicationFirstRep().getBatch().getLotNumber());
     assertTrue(medicationDispense.getDosageInstruction().isEmpty());
     assertTrue(medicationDispense.getNote().isEmpty());
-    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense, true);
-    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
@@ -112,11 +110,8 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
             .build();
 
     assertNotNull(medicationDispense.getId());
-    assertEquals(1, medicationDispense.getErpMedication().size());
     assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(new PrescriptionId(prescriptionId), medicationDispense.getPrescriptionId());
-    assertEquals(
-        lotNumber, medicationDispense.getErpMedicationFirstRep().getBatch().getLotNumber());
     assertEquals(2, medicationDispense.getDosageInstruction().size());
     assertEquals("nur nach dem Essen", medicationDispense.getDosageInstructionText().get(0));
     assertEquals("nicht vor dem Schlafen", medicationDispense.getDosageInstructionText().get(1));
@@ -138,21 +133,21 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.random();
+
     val medicationDispense =
         ErxMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withPerfomer(performerId)
+            .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
+    assertTrue(result.isSuccessful());
 
     assertNotNull(medicationDispense.getId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
     assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
-    assertNotNull(medicationDispense.getErpMedicationFirstRep().getBatch());
-
-    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
-    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest(
@@ -168,17 +163,17 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val medicationDispense =
         ErxMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withPerfomer(performerId)
+            .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
+    assertTrue(result.isSuccessful());
 
     assertNotNull(medicationDispense.getId());
     assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
-
-    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
-    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest(
@@ -195,19 +190,25 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val medicationDispense =
         ErxMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withPerfomer(performerId)
+            .withPerformer(performerId)
             .withPzn(pzn)
             .withPrescriptionId(prescriptionId)
             .fake();
 
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
+    assertTrue(result.isSuccessful());
+
     assertNotNull(medicationDispense.getId());
     assertEquals(kvnr, medicationDispense.getSubjectId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
-    assertEquals(pzn, medicationDispense.getErpMedicationFirstRep().getPznFirstRep());
+
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
 
-    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
-    assertTrue(result.isSuccessful());
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4_0) < 0) {
+      assertEquals(pzn, medicationDispense.getErpMedicationFirstRep().getPznFirstRep());
+    } else {
+      assertTrue(medicationDispense.getErpMedication().isEmpty());
+    }
   }
 
   @Test
@@ -219,7 +220,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val medicationDispense =
         ErxMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withPerfomer(performerId)
+            .withPerformer(performerId)
             .withPzn(pzn)
             .withPrescriptionId(prescriptionId)
             .fake();
@@ -239,7 +240,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val medicationDispense =
         ErxMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withPerfomer(performerId)
+            .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .withPzn(pzn)
             .fake();
@@ -260,7 +261,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val medicationDispense =
         ErxMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withPerfomer(performerId)
+            .withPerformer(performerId)
             .withPzn(pzn)
             .withPrescriptionId(prescriptionId)
             .fake();

@@ -50,6 +50,12 @@ public class PatientFaker {
     return new PatientFaker();
   }
 
+  public PatientFaker withInsuranceType(VersicherungsArtDeBasis insuranceType) {
+    builderConsumers.computeIfPresent(
+        "kvnr", (key, defaultValue) -> b -> b.kvnr(KVNR.random(), insuranceType));
+    return this;
+  }
+
   public PatientFaker withKvnrAndInsuranceType(KVNR kvnr, VersicherungsArtDeBasis insuranceType) {
     builderConsumers.computeIfPresent(
         "kvnr", (key, defaultValue) -> b -> b.kvnr(kvnr, insuranceType));

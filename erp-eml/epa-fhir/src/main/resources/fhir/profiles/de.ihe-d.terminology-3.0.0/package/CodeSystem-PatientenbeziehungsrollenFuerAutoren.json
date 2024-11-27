@@ -1,0 +1,41 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/PatientenbeziehungsrollenFuerAutoren",
+  "version": "2021-06-25T13:21:07",
+  "name": "PatientenbeziehungsrollenFuerAutoren",
+  "id": "PatientenbeziehungsrollenFuerAutoren",
+  "title": "Patientenbeziehungsrollen Fuer Autoren",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "101",
+      "display": "Hausarzt",
+      "definition": "der Hausarzt (Primärversorger) des Patienten"
+    },
+    {
+      "code": "102",
+      "display": "Patient",
+      "definition": "der Patient selbst"
+    },
+    {
+      "code": "103",
+      "display": "Arbeitgebervertreter",
+      "definition": "ein Vertreter des Arbeitgebers des Patienten"
+    },
+    {
+      "code": "104",
+      "display": "Primärbetreuer (langfristig)",
+      "definition": "Die Person, die den Patienten normalerweise primär betreut. Beispiele: Langzeitpflege, Stammapotheke"
+    },
+    {
+      "code": "105",
+      "display": "Kostenträgerverteter",
+      "definition": "ein Vertreter des Kostenträgers"
+    }
+  ],
+  "count": 5
+}

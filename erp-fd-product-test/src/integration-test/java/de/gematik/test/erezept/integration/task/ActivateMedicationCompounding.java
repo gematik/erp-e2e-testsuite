@@ -113,7 +113,7 @@ public class ActivateMedicationCompounding extends ErpTest {
             .patient(patient.getPatientData())
             .assigner(assigner)
             .practitioner(doc.getPractitioner())
-            .custodian(organisation)
+            .medicalOrganization(organisation)
             .medicationRequest(medicationRequest)
             .insurance(insurance)
             .medication(medication);

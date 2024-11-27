@@ -1,0 +1,72 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "cancel-prescription-erp-OP",
+  "url": "https://gematik.de/fhir/epa-medication/OperationDefinition/cancel-prescription-erp-OP",
+  "title": "$cancel-prescription-erp Operation",
+  "description": "The $cancel-prescription-erp operation is used by the E-Rezept-Fachdienst to cancel an already issued electronic prescription. This function is applied when a prescription is no longer needed for various reasons, such as changes in medication or errors in the initial issuance. After cancellation by the E-Rezept-Fachdienst, this information is transmitted to the ePA Medication Service, where the prescription is calculations. It can then no longer be used for dispensing medication. This process ensures accuracy and safety in the management of medications.",
+  "version": "1.0.3",
+  "status": "active",
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "name": "Cancel Prescription eRP",
+  "kind": "operation",
+  "code": "cancel-prescription-erp",
+  "system": true,
+  "type": false,
+  "instance": false,
+  "inputProfile": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-cancel-prescription-erp-input-parameters",
+  "outputProfile": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-rx-prescription-erp-output-parameters",
+  "parameter": [
+    {
+      "name": "rxPrescription",
+      "use": "in",
+      "min": 1,
+      "max": "*",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "type": "Identifier",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "authoredOn",
+          "type": "date",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    },
+    {
+      "name": "rxPrescription",
+      "use": "out",
+      "min": 1,
+      "max": "*",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "type": "Identifier",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "authoredOn",
+          "type": "date",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "operationOutcome",
+          "type": "OperationOutcome",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    }
+  ]
+}

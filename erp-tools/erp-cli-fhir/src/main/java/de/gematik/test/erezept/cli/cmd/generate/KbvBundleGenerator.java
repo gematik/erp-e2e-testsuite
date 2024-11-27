@@ -20,8 +20,8 @@ import static java.text.MessageFormat.*;
 
 import de.gematik.test.erezept.cli.cmd.generate.param.*;
 import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.fuzzing.kbv.*;
@@ -87,7 +87,7 @@ public class KbvBundleGenerator extends BaseResourceGenerator {
     val kbvBundleBuilder =
         KbvErpBundleBuilder.forPrescription(prescriptionId)
             .practitioner(practitioner)
-            .custodian(medicalOrganization)
+            .medicalOrganization(medicalOrganization)
             .patient(patient)
             .insurance(insurance)
             .assigner(patientParam.getAssignerOrganization()) // will be used only for PKV patients

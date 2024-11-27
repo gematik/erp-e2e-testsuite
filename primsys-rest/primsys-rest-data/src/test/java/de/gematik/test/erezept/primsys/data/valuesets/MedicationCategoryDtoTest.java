@@ -16,10 +16,15 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class MedicationCategoryDtoTest {
 
@@ -39,5 +44,14 @@ class MedicationCategoryDtoTest {
   void shouldDecodeFromDisplay() {
     val mcd = MedicationCategoryDto.fromCode("Thalidomid");
     assertEquals(MedicationCategoryDto.C_02, mcd);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"03", "0", "sonstiges", "misc"})
+  @NullSource
+  @EmptySource
+  void shouldNotThrowOnUnknown(String code) {
+    val mcd = assertDoesNotThrow(() -> MedicationCategoryDto.fromCode(code));
+    assertEquals(MedicationCategoryDto.C_03, mcd);
   }
 }

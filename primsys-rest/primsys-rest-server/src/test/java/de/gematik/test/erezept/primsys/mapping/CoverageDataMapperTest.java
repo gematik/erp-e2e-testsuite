@@ -20,11 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.primsys.data.CoverageDto;
 import de.gematik.test.erezept.primsys.data.valuesets.PayorTypeDto;
 import lombok.val;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 class CoverageDataMapperTest {
@@ -47,5 +50,22 @@ class CoverageDataMapperTest {
     when(beneficiary.getInsuranceKind()).thenReturn(VersicherungsArtDeBasis.GKV);
     val coverageDataMapper = CoverageDataMapper.from(dto, beneficiary);
     assertNotNull(coverageDataMapper);
+  }
+
+  @RepeatedTest(5)
+  void shouldNotMissAnyFields() {
+    val patient = PatientFaker.builder().fake();
+    val coverage = KbvCoverageFaker.builder().fake();
+    val mapper = CoverageDataMapper.from(coverage, patient);
+    val dto = mapper.getDto();
+
+    val mapper2 = CoverageDataMapper.from(dto, patient);
+    val coverage2 = mapper2.convert();
+
+    assertEquals(coverage.getIknr(), coverage2.getIknr());
+    assertEquals(coverage.getInsuranceKind(), coverage2.getInsuranceKind());
+    assertEquals(coverage.getName(), coverage2.getName());
+    assertEquals(coverage.getPayorType(), coverage2.getPayorType());
+    assertEquals(coverage.getPersonGroup(), coverage2.getPersonGroup());
   }
 }

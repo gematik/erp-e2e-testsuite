@@ -1,0 +1,289 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "HealthcareServiceDirectory",
+  "url": "https://gematik.de/fhir/directory/StructureDefinition/HealthcareServiceDirectory",
+  "version": "0.11.12",
+  "name": "HealthcareServiceDirectory",
+  "title": "HealthcareService in gematik Directory",
+  "status": "active",
+  "publisher": "gematik GmbH",
+  "description": "Defines the data structure for medical, regulatory and technical\norganisations specific for german Healthcare and Telematics Infrastructure.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "HealthcareService",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/HealthcareService",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "HealthcareService.id",
+        "path": "HealthcareService.id",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.meta.tag",
+        "path": "HealthcareService.meta.tag",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.meta.tag:Origin",
+        "path": "HealthcareService.meta.tag",
+        "sliceName": "Origin",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/OriginVS"
+        }
+      },
+      {
+        "id": "HealthcareService.meta.tag:Origin.system",
+        "path": "HealthcareService.meta.tag.system",
+        "min": 1,
+        "patternUri": "https://gematik.de/fhir/directory/CodeSystem/Origin"
+      },
+      {
+        "id": "HealthcareService.identifier",
+        "path": "HealthcareService.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "open"
+        },
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.identifier:TelematikID",
+        "path": "HealthcareService.identifier",
+        "sliceName": "TelematikID",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-telematik-id"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.providedBy",
+        "path": "HealthcareService.providedBy",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.category",
+        "path": "HealthcareService.category",
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://ihe-d.de/ValueSets/IHEXDShealthcareFacilityTypeCodePatientRelatedHealthcare"
+        }
+      },
+      {
+        "id": "HealthcareService.type",
+        "path": "HealthcareService.type",
+        "mustSupport": true,
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/HealthcareServiceTypeVS"
+        }
+      },
+      {
+        "id": "HealthcareService.specialty",
+        "path": "HealthcareService.specialty",
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/HealthcareSpecialtyTypeVS"
+        }
+      },
+      {
+        "id": "HealthcareService.location",
+        "path": "HealthcareService.location",
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.name",
+        "path": "HealthcareService.name",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.telecom",
+        "path": "HealthcareService.telecom",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.telecom.system",
+        "path": "HealthcareService.telecom.system",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.telecom.value",
+        "path": "HealthcareService.telecom.value",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.telecom.use",
+        "path": "HealthcareService.telecom.use",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.coverageArea",
+        "path": "HealthcareService.coverageArea",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.coverageArea.extension",
+        "path": "HealthcareService.coverageArea.extension",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.coverageArea.extension:serviceCoverageArea",
+        "path": "HealthcareService.coverageArea.extension",
+        "sliceName": "serviceCoverageArea",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/directory/StructureDefinition/ServiceCoverageArea"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.characteristic",
+        "path": "HealthcareService.characteristic",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "short": "Physical Features & Technical Services",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.characteristic:technicalCharacteristic",
+        "path": "HealthcareService.characteristic",
+        "sliceName": "technicalCharacteristic",
+        "short": "Technical Services",
+        "min": 0,
+        "max": "*",
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/healthcareservice-technical-characteristic-vs"
+        }
+      },
+      {
+        "id": "HealthcareService.characteristic:physicalFeatures",
+        "path": "HealthcareService.characteristic",
+        "sliceName": "physicalFeatures",
+        "short": "Physical Features",
+        "min": 0,
+        "max": "*",
+        "patternCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://gematik.de/fhir/directory/CodeSystem/physicalFeatures"
+            }
+          ]
+        },
+        "mustSupport": true,
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/PhysicalFeaturesHealthCareServiceVS"
+        }
+      },
+      {
+        "id": "HealthcareService.characteristic:physicalFeatures.extension:additionalNote",
+        "path": "HealthcareService.characteristic.extension",
+        "sliceName": "additionalNote",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/directory/StructureDefinition/PhysicalFeaturesAdditionalNoteEX"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.communication",
+        "path": "HealthcareService.communication",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.appointmentRequired",
+        "path": "HealthcareService.appointmentRequired",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.availableTime",
+        "path": "HealthcareService.availableTime",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.availableTime.extension:specialOpeningTimes",
+        "path": "HealthcareService.availableTime.extension",
+        "sliceName": "specialOpeningTimes",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/directory/StructureDefinition/SpecialOpeningTimesEX"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.notAvailable",
+        "path": "HealthcareService.notAvailable",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.availabilityExceptions",
+        "path": "HealthcareService.availabilityExceptions",
+        "mustSupport": true
+      },
+      {
+        "id": "HealthcareService.endpoint",
+        "path": "HealthcareService.endpoint",
+        "mustSupport": true
+      }
+    ]
+  }
+}

@@ -16,18 +16,19 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.valuesets.IValueSet;
+import java.util.List;
+import java.util.UUID;
+import lombok.val;
 
 public class AbstractResourceBuilder<B extends AbstractResourceBuilder<B>> {
 
   private String resourceId;
 
-  public B setResourceId(@NonNull String resourceId) {
+  public B setResourceId(String resourceId) {
     this.resourceId = resourceId;
     return self();
   }
@@ -69,8 +70,7 @@ public class AbstractResourceBuilder<B extends AbstractResourceBuilder<B>> {
   protected final <T> void checkRequiredList(List<T> list, int min, String errorMsg) {
     checkRequired(list, errorMsg);
     if (min <= 0) {
-      throw new IllegalArgumentException(
-          format("Minimum amount must be >= 1 but was given {0}", min));
+      throw new BuilderException(format("Minimum amount must be >= 1 but was given {0}", min));
     }
 
     if (list.size() < min) {

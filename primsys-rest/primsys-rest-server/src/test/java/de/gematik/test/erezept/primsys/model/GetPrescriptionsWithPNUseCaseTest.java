@@ -99,11 +99,12 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
 
   @Test
   void getPrescriptionByKvnr() {
-    val kvnr = KVNR.random().toString();
+    val kvnr = KVNR.random().getValue();
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(0);
     val response = new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionByKvnr(kvnr);
     assertEquals(400, response.getStatus());
-    assertEquals("not yet implemented", response.getEntity().toString());
+    assertInstanceOf(ErrorDto.class, response.getEntity());
+    assertEquals("not yet implemented", ((ErrorDto) response.getEntity()).getMessage());
   }
 }

@@ -1,0 +1,27 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "EPAMedicationTypePharmaceuticalProductVS",
+  "id": "epa-medication-type-pharmaceutical-product-vs",
+  "title": "EPA Medication Type ValueSet for a EPA Pharmaceutical Product",
+  "description": "ValueSet of valid concepts for a EPA Pharmaceutical Product, a component of a 'Kombipackung'",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-type-pharmaceutical-product-vs",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/900000000000207008/version/20240201",
+        "concept": [
+          {
+            "code": "373873005",
+            "display": "Pharmaceutical / biologic product (product)"
+          }
+        ]
+      }
+    ]
+  }
+}

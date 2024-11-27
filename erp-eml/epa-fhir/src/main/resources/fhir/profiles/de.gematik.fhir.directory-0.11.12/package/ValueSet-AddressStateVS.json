@@ -1,0 +1,17 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "AddressStateVS",
+  "id": "AddressStateVS",
+  "description": "ValueSet for `Address.state`",
+  "version": "0.11.12",
+  "url": "https://gematik.de/fhir/directory/ValueSet/AddressStateVS",
+  "publisher": "gematik GmbH",
+  "compose": {
+    "include": [
+      {
+        "system": "https://gematik.de/fhir/directory/CodeSystem/Region"
+      }
+    ]
+  }
+}

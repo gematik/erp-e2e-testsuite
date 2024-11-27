@@ -45,6 +45,7 @@ public enum ErpAfos implements RequirementsSet {
   A_19521("A_19521", "E-Rezept-Fachdienst - Nachrichten als abgerufen markieren"),
   A_19522("A_19522-01", " E-Rezept-Fachdienst - Nachrichtenabruf Suchparameter"),
   A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
+  A_20513("A_20513", "E-Rezept-Fachdienst - nicht mehr benötigte Einlösekommunikation"),
   A_21782("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
   A_22110("A_22110", "Task akzeptieren - Flowtype 200/209 - Einwilligung ermitteln"),
   A_22136_01("A_22136_01", "Abrechnungsinformation bereitstellen – FHIR-Validierung ChargeItem"),
@@ -132,6 +133,10 @@ public enum ErpAfos implements RequirementsSet {
       "A_24178",
       "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"
           + " in-progress"),
+  A_24434(
+      "A_24434",
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren198\n"
+          + "FHIR-Objekten - Betroffene Endpunkte"),
   A_24436(
       "A_24436",
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filter- und"
@@ -174,6 +179,7 @@ public enum ErpAfos implements RequirementsSet {
       "A_25515",
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filteroperatoren"
           + " für Datumsabfragen"),
+  A_25962("A_25962", "E-Rezept-Fachdienst - ePA - Medication Service - Versichertenprotokoll"),
   ;
   @Getter private final Requirement requirement;
 

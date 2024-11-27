@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -29,6 +31,7 @@ import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
+import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -71,8 +74,24 @@ public class ActorContext {
     return this.doctors.stream().filter(doc -> doc.getIdentifier().equals(id)).findFirst();
   }
 
+  public Doctor getDoctorOrThrowNotFound(String id) {
+    return this.getDoctor(id)
+        .orElseThrow(
+            () ->
+                ErrorResponseBuilder.createInternalErrorException(
+                    404, format("No Doctor found with ID {0}", id)));
+  }
+
   public Optional<Pharmacy> getPharmacy(String id) {
     return this.pharmacies.stream().filter(pharm -> pharm.getIdentifier().equals(id)).findFirst();
+  }
+
+  public Pharmacy getPharmacyOrThrowNotFound(String id) {
+    return this.getPharmacy(id)
+        .orElseThrow(
+            () ->
+                ErrorResponseBuilder.createInternalErrorException(
+                    404, format("No Doctor found with ID {0}", id)));
   }
 
   public List<BaseActor> getActors() {

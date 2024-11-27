@@ -1,0 +1,155 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "epa-op-cancel-dispensation-erp-input-parameters",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-cancel-dispensation-erp-input-parameters",
+  "version": "1.0.3",
+  "name": "EPAOpCancelDispensationERPInputParameters",
+  "title": "EPA Operation CancelDispensation ERP Input-Parameters",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "EPA Operation CancelDispensation ERP Input-Parameters",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation",
+        "path": "Parameters.parameter",
+        "sliceName": "rxDispensation",
+        "min": 1,
+        "max": "*"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.name",
+        "path": "Parameters.parameter.name",
+        "fixedString": "rxDispensation",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part",
+        "path": "Parameters.parameter.part",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 2,
+        "max": "2",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:prescriptionId",
+        "path": "Parameters.parameter.part",
+        "sliceName": "prescriptionId",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:prescriptionId.name",
+        "path": "Parameters.parameter.part.name",
+        "fixedString": "prescriptionId",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:prescriptionId.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-erp-prescription-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:prescriptionId.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:prescriptionId.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:authoredOn",
+        "path": "Parameters.parameter.part",
+        "sliceName": "authoredOn",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:authoredOn.name",
+        "path": "Parameters.parameter.part.name",
+        "fixedString": "authoredOn",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:authoredOn.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "date"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:authoredOn.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:authoredOn.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      }
+    ]
+  }
+}

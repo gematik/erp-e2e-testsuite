@@ -22,7 +22,7 @@ services:
     hostname: primsys-tu
     environment:
       - TI_ENV=TU
-      - ERP_FHIR_PROFILE=1.2.0
+      - ERP_FHIR_PROFILE=1.3.0
     env_file:
       - .env
 
@@ -31,6 +31,6 @@ services:
     restart: unless-stopped
     environment:
       - TI_ENV=RU-DEV
-      - ERP_FHIR_PROFILE=1.3.0
+      - ERP_FHIR_PROFILE=1.4.0
     env_file:
       - .env

@@ -18,7 +18,7 @@ package de.gematik.test.erezept.actions.rawhttpactions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateFactory;

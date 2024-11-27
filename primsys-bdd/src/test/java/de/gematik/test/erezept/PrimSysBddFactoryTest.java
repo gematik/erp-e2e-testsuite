@@ -31,6 +31,7 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.exceptions.WebSocketException;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.pspwsclient.PSPClient;
 import de.gematik.test.erezept.pspwsclient.config.PSPClientFactory;
@@ -214,6 +215,6 @@ class PrimSysBddFactoryTest {
     // manipulate the psp address to provoke the exception
     factory.getDto().getPspClientConfig().setUrl("http://localhost:1234");
 
-    assertThrows(AssertionError.class, () -> factory.equipPharmacyWithPspClient(pharmacy));
+    assertThrows(WebSocketException.class, () -> factory.equipPharmacyWithPspClient(pharmacy));
   }
 }

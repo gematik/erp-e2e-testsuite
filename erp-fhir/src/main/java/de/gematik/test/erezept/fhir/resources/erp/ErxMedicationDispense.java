@@ -19,31 +19,26 @@ package de.gematik.test.erezept.fhir.resources.erp;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Dosage;
+import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
 @ResourceDef(name = "MedicationDispense")
 @SuppressWarnings({"java:S110"})
-public class ErxMedicationDispense extends MedicationDispense {
+public class ErxMedicationDispense extends ErxMedicationDispenseBase {
 
+  // TODO: should be called getKbvMedications
   public List<KbvErpMedication> getErpMedication() {
     return this.getContained().stream()
         .filter(c -> c.getResourceType().equals(ResourceType.Medication))
         .map(KbvErpMedication::fromMedication)
         .toList();
-  }
-
-  public PrescriptionId getPrescriptionId() {
-    return new PrescriptionId(this.getIdentifierFirstRep().getValue());
   }
 
   public KbvErpMedication getErpMedicationFirstRep() {
@@ -53,31 +48,6 @@ public class ErxMedicationDispense extends MedicationDispense {
             () ->
                 new MissingFieldException(
                     KbvErpMedication.class, KbvItaErpStructDef.MEDICATION_PZN));
-  }
-
-  public KVNR getSubjectId() {
-    return KVNR.from(this.getSubject().getIdentifier().getValue());
-  }
-
-  public List<String> getPerformerIds() {
-    return this.getPerformer().stream()
-        .map(MedicationDispensePerformerComponent::getActor)
-        .map(Reference::getIdentifier)
-        .map(Identifier::getValue)
-        .toList();
-  }
-
-  public String getPerformerIdFirstRep() {
-    return this.getPerformerIds().stream()
-        .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    ErxMedicationDispense.class, ErpWorkflowNamingSystem.TELEMATIK_ID));
-  }
-
-  public ZonedDateTime getZonedWhenHandedOver() {
-    return ZonedDateTime.ofInstant(this.getWhenHandedOver().toInstant(), ZoneId.systemDefault());
   }
 
   public List<String> getDosageInstructionText() {
@@ -93,8 +63,9 @@ public class ErxMedicationDispense extends MedicationDispense {
 
   /**
    * This constructor translates a Task into a ErxTask. For example if you receive an
-   * ErxPrescriptionBundle HAPI interprets the containing Task as plain HAPI-Task and not as a
-   * ErxTask. This constructor allows mapping to ErxTask
+   * ErxPrescriptionBundle HAPI interprets the containing MedicationDispense as plain
+   * HAPI-MedicationDispense and not as a ErxMedicationDispense. This constructor allows mapping to
+   * ErxMedicationDispense.
    *
    * @param adaptee
    */

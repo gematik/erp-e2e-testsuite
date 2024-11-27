@@ -30,9 +30,11 @@ public enum DeBasisNamingSystem implements INamingSystem {
   KVID("http://fhir.de/NamingSystem/gkv/kvid-10"),
   KVID_GKV("http://fhir.de/sid/gkv/kvid-10"),
   KVID_PKV("http://fhir.de/sid/pkv/kvid-10"), // NOTE will be resolved/merged with KVID later
+  STANDORTNUMMER("http://fhir.de/sid/dkgev/standortnummer"),
   ZAHNARZTNUMMER("http://fhir.de/NamingSystem/kzbv/zahnarztnummer"),
   TEAMNUMMER("http://fhir.de/NamingSystem/asv/teamnummer"),
-  KZVA_ABRECHNUNGSNUMMER("http://fhir.de/NamingSystem/kzbv/kzvabrechnungsnummer");
+  KZVA_ABRECHNUNGSNUMMER("http://fhir.de/NamingSystem/kzbv/kzvabrechnungsnummer"),
+  KZVA_ABRECHNUNGSNUMMER_SID("http://fhir.de/sid/kzbv/kzvabrechnungsnummer");
 
   private final String canonicalUrl;
 

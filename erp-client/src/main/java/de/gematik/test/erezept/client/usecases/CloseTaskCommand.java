@@ -16,11 +16,12 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.resources.erp.GemCloseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
@@ -29,15 +30,16 @@ import org.hl7.fhir.r4.model.Resource;
 
 public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
 
-  private final List<ErxMedicationDispense> medicationDispenses;
+  private List<ErxMedicationDispense> medicationDispenses;
+  private GemCloseOperationParameters closeParameters;
 
   /**
    * The Constructor is intended to close a Prescription without transmitting a MedicationDispense
    * it requires that a MedicationDispense has been submitted before, for example by using the
    * DispensePrescriptionAsBundleCommand
    *
-   * @param taskId
-   * @param secret
+   * @param taskId of the task to be closed
+   * @param secret of the task to be closed
    */
   public CloseTaskCommand(TaskId taskId, Secret secret) {
     this(taskId, secret, List.of());
@@ -48,9 +50,9 @@ public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
    * MedicationDispense the MedicationDispense will be sent as MedicationDispenseBundle with a
    * single entry DispensePrescriptionAsBundleCommand
    *
-   * @param taskId as TaskId
-   * @param secret as Secret
-   * @param medicationDispense as ErxMedicationDispense
+   * @param taskId of the task to be closed
+   * @param secret of the task to be closed
+   * @param medicationDispense to be used while closing the task
    */
   public CloseTaskCommand(TaskId taskId, Secret secret, ErxMedicationDispense medicationDispense) {
     this(taskId, secret, List.of(medicationDispense));
@@ -60,6 +62,14 @@ public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
       TaskId taskId, Secret secret, List<ErxMedicationDispense> medicationDispenses) {
     super(ErxReceipt.class, HttpRequestMethod.POST, "Task", taskId.getValue());
     this.medicationDispenses = medicationDispenses;
+
+    queryParameters.add(new QueryParameter("secret", secret.getValue()));
+  }
+
+  public CloseTaskCommand(
+      TaskId taskId, Secret secret, GemCloseOperationParameters closeParameters) {
+    super(ErxReceipt.class, HttpRequestMethod.POST, "Task", taskId.getValue());
+    this.closeParameters = closeParameters;
 
     queryParameters.add(new QueryParameter("secret", secret.getValue()));
   }
@@ -84,6 +94,11 @@ public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
   @Override
   public Optional<Resource> getRequestBody() {
     Optional<Resource> ret;
+
+    // for newer profiles the closeParameters are used and preferred here
+    if (closeParameters != null) {
+      return Optional.of(closeParameters);
+    }
 
     if (medicationDispenses.size() == 1) {
       ret = Optional.of(medicationDispenses.get(0));

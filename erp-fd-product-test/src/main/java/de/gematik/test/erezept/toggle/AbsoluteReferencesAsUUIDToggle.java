@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.toggle;
 
+import de.gematik.bbriccs.toggle.BooleanToggle;
+
 public class AbsoluteReferencesAsUUIDToggle extends BooleanToggle {
   public AbsoluteReferencesAsUUIDToggle() {
     super("erp.prodtest.fhir.absolutereferences.active", false);

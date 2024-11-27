@@ -26,11 +26,13 @@ import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpBasisVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.DavKbvCsVsVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.DeBasisVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.EpaMedicationVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.Hl7Version;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvBasisVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
 import java.nio.file.Path;
@@ -148,6 +150,10 @@ public class ListProfiles implements Callable<Integer> {
             yield getDefaultVersion(KbvItaForVersion.class, customProfile);
           case KBV_ITA_ERP:
             yield getDefaultVersion(KbvItaErpVersion.class, customProfile);
+          case KBV_ITV_EVDGA:
+            yield getDefaultVersion(KbvItvEvdgaVersion.class, customProfile);
+          case GEM_EPA_MEDICATION:
+            yield getDefaultVersion(EpaMedicationVersion.class, customProfile);
           case GEM_ERP_WORKFLOW:
             yield getDefaultVersion(ErpWorkflowVersion.class, customProfile);
           case GEM_PATIENTENRECHNUNG:

@@ -75,7 +75,10 @@ public class ValidationSupport implements IValidationSupport {
   private void initProfile(
       final String profilePath, final IParser xmlParser, final IParser jsonParser) {
     log.trace(format("Load Profile File {0}", profilePath));
-    val inputStream = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(profilePath));
+    val inputStream =
+        Objects.requireNonNull(
+            ClassLoader.getSystemResourceAsStream(profilePath),
+            format("Resource {0} not found", profilePath));
 
     val encodingType = EncodingType.fromString(profilePath);
     val fittingParser = encodingType.chooseAppropriateParser(xmlParser, jsonParser);

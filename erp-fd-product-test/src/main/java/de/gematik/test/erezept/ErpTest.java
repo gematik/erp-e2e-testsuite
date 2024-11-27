@@ -16,14 +16,18 @@
 
 package de.gematik.test.erezept;
 
+import de.gematik.bbriccs.toggle.FeatureConfiguration;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.exceptions.NotAnActorException;
 import de.gematik.test.core.extensions.ErpTestExtension;
-import de.gematik.test.erezept.actors.*;
+import de.gematik.test.erezept.actors.ActorStage;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.ErpActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
 import de.gematik.test.erezept.toggle.CucumberFeatureParser;
 import de.gematik.test.erezept.toggle.CucumberFeatureToggle;
-import de.gematik.test.erezept.toggle.FeatureConfiguration;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import lombok.SneakyThrows;

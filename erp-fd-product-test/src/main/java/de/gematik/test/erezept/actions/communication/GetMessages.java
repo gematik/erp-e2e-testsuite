@@ -16,14 +16,18 @@
 
 package de.gematik.test.erezept.actions.communication;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.client.usecases.CommunicationGetCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunicationBundle;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor
+@Slf4j
 public class GetMessages extends ErpAction<ErxCommunicationBundle> {
 
   private final CommunicationGetCommand communicationGetCommand;
@@ -34,6 +38,10 @@ public class GetMessages extends ErpAction<ErxCommunicationBundle> {
 
   @Override
   public ErpInteraction<ErxCommunicationBundle> answeredBy(Actor actor) {
+    log.info(
+        format(
+            "Tried to call communications from Backend as Bundle for: {0} with: {1}",
+            actor.getName(), communicationGetCommand.getRequestLocator()));
     return performCommandAs(communicationGetCommand, actor);
   }
 }

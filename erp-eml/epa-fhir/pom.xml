@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>de.gematik.test.erezept</groupId>
+    <artifactId>erp-eml</artifactId>
+    <version>0.9.1</version>
+  </parent>
+
+  <artifactId>epa-fhir</artifactId>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+      <dependency>
+          <groupId>de.gematik.bbriccs</groupId>
+          <artifactId>fhir-codec-brick</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>de.gematik.bbriccs</groupId>
+          <artifactId>fhir-de-basisprofil-r4-brick</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>de.gematik.test.erezept</groupId>
+          <artifactId>erp-fhir</artifactId>
+      </dependency>
+
+  </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/logback.xml</exclude>
+                        <exclude>**/logback-test.xml</exclude>
+                        <exclude>**/junit-platform.properties</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-remote-resources-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>bundle</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <includes>
+                <include>**/fhir/**</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -22,7 +22,6 @@ import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.BaseActor;
 import jakarta.ws.rs.core.Response;
-import java.util.Map;
 import lombok.val;
 
 public class AbortUseCase {
@@ -42,14 +41,6 @@ public class AbortUseCase {
     val abortResponse = actor.erpRequest(abortCommand);
 
     ActorContext.getInstance().removeAcceptedPrescription(taskId);
-    return Response.ok(
-            Map.of(
-                "task-status",
-                "cancelled",
-                "task-id",
-                taskId,
-                "fd-status-code",
-                abortResponse.getStatusCode()))
-        .build();
+    return Response.status(abortResponse.getStatusCode()).build();
   }
 }

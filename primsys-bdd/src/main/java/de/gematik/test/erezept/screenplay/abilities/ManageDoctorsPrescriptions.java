@@ -16,16 +16,18 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
-import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
-import de.gematik.test.erezept.screenplay.util.*;
-import lombok.*;
+import de.gematik.test.erezept.screenplay.util.ManagedList;
+import lombok.Getter;
 import lombok.experimental.Delegate;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Ability;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.HasTeardown;
+import net.serenitybdd.screenplay.RefersToActor;
 import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
@@ -56,11 +58,14 @@ public class ManageDoctorsPrescriptions implements Ability, HasTeardown, RefersT
 
   @Override
   public void tearDown() {
-    log.info(format("TearDown ManageDoctorsPrescriptions Ability for {0}", this.actor.getName()));
-    val erpClient = this.actor.abilityTo(UseTheErpClient.class);
+    log.info("TearDown ManageDoctorsPrescriptions Ability for {}", this.actor.getName());
+    val erpClientAbility = this.actor.abilityTo(UseTheErpClient.class);
 
-    // null-check required because in App-Testsuite an actor does not necessarily have an ErpClient
-    if (erpClient != null) {
+    // null-check required because having this ability does not necessarily mean that ErpClient is
+    // also available
+    if (erpClientAbility != null) {
+      // use the erpClient directly to avoid reporting of the teardowns
+      val erpClient = erpClientAbility.getClient();
       this.prescriptions
           .getRawList()
           .forEach(
@@ -72,12 +77,13 @@ public class ManageDoctorsPrescriptions implements Ability, HasTeardown, RefersT
                     .map(OperationOutcomeWrapper::extractFrom)
                     .ifPresent(
                         errorMessage ->
-                            log.warn(
-                                format(
-                                    "Received OperationOutcome with HTTP Statuscode {0} while"
-                                        + " trying to abort Prescription {1}: \n"
-                                        + "{2}",
-                                    response.getStatusCode(), task.getTaskId(), errorMessage)));
+                            log.info(
+                                "Received OperationOutcome with HTTP Statuscode {} while trying to"
+                                    + " abort Prescription {}: \n"
+                                    + "{}",
+                                response.getStatusCode(),
+                                task.getTaskId(),
+                                errorMessage));
               });
     }
   }

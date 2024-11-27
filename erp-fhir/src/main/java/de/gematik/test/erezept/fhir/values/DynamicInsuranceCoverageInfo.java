@@ -52,6 +52,11 @@ public class DynamicInsuranceCoverageInfo implements InsuranceCoverageInfo {
     return random(GemFaker.fakerValueSet(Wop.class));
   }
 
+  public static InsuranceCoverageInfo random(VersicherungsArtDeBasis insuranceType) {
+    return new DynamicInsuranceCoverageInfo(
+        GemFaker.insuranceName(), IKNR.random().getValue(), insuranceType);
+  }
+
   public static InsuranceCoverageInfo random(Wop wop) {
     return new DynamicInsuranceCoverageInfo(
         GemFaker.insuranceName(wop),

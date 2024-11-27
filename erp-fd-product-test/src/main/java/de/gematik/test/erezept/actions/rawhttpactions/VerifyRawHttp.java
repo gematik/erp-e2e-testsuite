@@ -29,8 +29,8 @@ public class VerifyRawHttp<T> implements Performable {
 
   private final HttpResponseExpectation<T> expectation;
 
-  public static <R> Builder<R> that(HttpResponse<R> interaction, Class<R> pyloadType) {
-    return new Builder<>(HttpResponseExpectation.expectFor(interaction, pyloadType));
+  public static <R> Builder<R> that(HttpResponse<R> interaction, Class<R> payloadType) {
+    return new Builder<>(HttpResponseExpectation.expectFor(interaction, payloadType));
   }
 
   @Override

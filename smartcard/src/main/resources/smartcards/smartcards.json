@@ -290,6 +290,131 @@
     "stores": []
   },
   {
+    "iccsn": "80276883110000154825",
+    "note": "EML - Alice IBM",
+    "identifier": "X110571801",
+    "type": "EGK",
+    "ownerName": "Martin Daniel Freiherr Nullmayr",
+    "stores": [
+      "egk/80276883110000154825/80276883110000154825-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154826",
+    "note": "EML - Bernd IBM",
+    "identifier": "X110562170",
+    "type": "EGK",
+    "ownerName": "Justin-Alexander E. L. H. G. Wendler-Schonhäuser",
+    "stores": [
+      "egk/80276883110000154826/80276883110000154826-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154831",
+    "note": "EML - Charlie IBM",
+    "identifier": "X110558398",
+    "type": "EGK",
+    "ownerName": "Amelie Edith Abigail M.-E. Gräfin Damaschke",
+    "stores": [
+      "egk/80276883110000154831/80276883110000154831-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154830",
+    "note": "EML - Alice Rise",
+    "identifier": "X110595713",
+    "type": "EGK",
+    "ownerName": "Sigurd Robin Torben-Tom Graf Schröder",
+    "stores": [
+      "egk/80276883110000154830/80276883110000154830-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154835",
+    "note": "EML - Bernd Rise",
+    "identifier": "X110524396",
+    "type": "EGK",
+    "ownerName": "Ernst-August Johann D.-P. R. Freiherr Özdemir",
+    "stores": [
+      "egk/80276883110000154835/80276883110000154835-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154836",
+    "note": "EML - Charlie Rise",
+    "identifier": "X110521453",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Lena Marie-Ella T. Gräfin Düsterbehn",
+    "stores": [
+      "egk/80276883110000154836/80276883110000154836-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000115469",
+    "note": "EML - Ru-Dev IBM",
+    "identifier": "X110487636",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Dörthe Tanja S. L. Gräfin Ørsted",
+    "stores": [
+      "egk/80276883110000115469/X110487636_C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163961",
+    "note": "IKNR 109500969; valid until Wed Mar 21 23:59:59 UTC 2029",
+    "identifier": "X110609524",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Gunther Michael HütterTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163961/80276883110000163961-C_CH_AUT_E256.p12",
+      "egk/80276883110000163961/80276883110000163961-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163962",
+    "note": "IKNR: 109500969; valid until Wed Mar 21 23:59:59 UTC 2029",
+    "identifier": "X110670787",
+    "type": "EGK",
+    "ownerName": "Gabriele Marian F. H. E. Freifrau MaiÞerTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163962/80276883110000163962-C_CH_AUT_E256.p12",
+      "egk/80276883110000163962/80276883110000163962-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163963",
+    "note": "IKNR: 109500969; valid until Wed Mar 21 23:59:59 UTC 2029",
+    "identifier": "X110614233",
+    "type": "EGK",
+    "ownerName": "Veronika Gräfin AngermännTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163963/80276883110000163963-C_CH_AUT_E256.p12",
+      "egk/80276883110000163963/80276883110000163963-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163964",
+    "note": "IKNR: 109500969; valid until Wed Mar 21 23:59:59 UTC 2029",
+    "identifier": "X110603293",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Daniel Arnold L. Graf von ØzTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163964/80276883110000163964-C_CH_AUT_E256.p12",
+      "egk/80276883110000163964/80276883110000163964-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163965",
+    "note": "IKNR: 109500969; valid until Wed Mar 21 23:59:59 UTC 2029",
+    "identifier": "X110645443",
+    "type": "EGK",
+    "ownerName": "Maude Melissa Tanja Steffi Gräfin SchraßerTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163965/80276883110000163965-C_CH_AUT_E256.p12",
+      "egk/80276883110000163965/80276883110000163965-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
     "iccsn": "833621999741611",
     "type": "SMC_B",
     "ownerName": "Arztpraxis Dr. Niedermeyer TEST-ONLY",

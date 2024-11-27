@@ -68,7 +68,8 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
           "[{index}] -> Build KBV MedicationRequest with Accident in versions KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationRequestAndSkipEmptyDosageInstruction(KbvItaErpVersion version) {
-    val medicationRequest = MedicationRequestBuilder.faker().version(version).dosage("").build();
+    val medicationRequest =
+        MedicationRequestFaker.builder().withVersion(version).withDosageInstruction("").fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());

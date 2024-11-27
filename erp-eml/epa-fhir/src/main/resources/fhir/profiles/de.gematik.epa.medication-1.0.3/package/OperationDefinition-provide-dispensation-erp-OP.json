@@ -1,0 +1,93 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "provide-dispensation-erp-OP",
+  "url": "https://gematik.de/fhir/epa-medication/OperationDefinition/provide-dispensation-erp-OP",
+  "title": "$provide-dispensation-erp Operation",
+  "description": "The $provide-dispensation-erp operation in the ePA Medication Service is used to record information about the dispensing of medications based on an electronic prescription in the patient's record. This operation comes into play when a patient receives their medication from a pharmacy. It documents that the medication has been dispensed as per the prescription, including details like the quantity, date of dispensing, and pharmacy information. This helps maintain a comprehensive overview of the patient's medication history.",
+  "version": "1.0.3",
+  "status": "active",
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "name": "Provide Dispensation eRP",
+  "kind": "operation",
+  "code": "provide-dispensation-erp",
+  "system": true,
+  "type": false,
+  "instance": false,
+  "inputProfile": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-dispensation-erp-input-parameters",
+  "outputProfile": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-rx-dispensation-erp-output-parameters",
+  "parameter": [
+    {
+      "name": "rxDispensation",
+      "use": "in",
+      "min": 1,
+      "max": "*",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "type": "Identifier",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "authoredOn",
+          "type": "date",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "medicationDispense",
+          "type": "MedicationDispense",
+          "use": "in",
+          "min": 1,
+          "max": "*"
+        },
+        {
+          "name": "medication",
+          "type": "Medication",
+          "use": "in",
+          "min": 1,
+          "max": "*"
+        },
+        {
+          "name": "organization",
+          "type": "Organization",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    },
+    {
+      "name": "rxDispensation",
+      "use": "out",
+      "min": 1,
+      "max": "*",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "type": "Identifier",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "authoredOn",
+          "type": "date",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "operationOutcome",
+          "type": "OperationOutcome",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    }
+  ]
+}

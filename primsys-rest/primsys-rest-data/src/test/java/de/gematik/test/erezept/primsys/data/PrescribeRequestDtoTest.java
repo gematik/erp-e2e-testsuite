@@ -26,7 +26,6 @@ class PrescribeRequestDtoTest {
 
   @Test
   void shouldReturnPrescribeRequestDtoBuilder() {
-
     val builder = PrescribeRequestDto.forKvnr("X110407071");
     assertNotNull(builder);
   }

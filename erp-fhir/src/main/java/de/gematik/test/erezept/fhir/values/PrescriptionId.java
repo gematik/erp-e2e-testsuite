@@ -18,8 +18,8 @@ package de.gematik.test.erezept.fhir.values;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;

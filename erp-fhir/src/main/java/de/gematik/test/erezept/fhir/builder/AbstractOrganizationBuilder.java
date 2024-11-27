@@ -19,9 +19,13 @@ package de.gematik.test.erezept.fhir.builder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.NonNull;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Organization;
 
 public abstract class AbstractOrganizationBuilder<T extends AbstractOrganizationBuilder<T>>
     extends AbstractResourceBuilder<T> {
@@ -30,25 +34,25 @@ public abstract class AbstractOrganizationBuilder<T extends AbstractOrganization
   protected String name;
   protected Address address;
 
-  public T name(@NonNull String name) {
+  public T name(String name) {
     this.name = name;
     return self();
   }
 
-  public T address(@NonNull Address address) {
+  public T address(Address address) {
     this.address = address;
     return self();
   }
 
-  public T phone(@NonNull String phoneNumber) {
+  public T phone(String phoneNumber) {
     return this.contact(ContactPoint.ContactPointSystem.PHONE, phoneNumber);
   }
 
-  public T email(@NonNull String email) {
+  public T email(String email) {
     return this.contact(ContactPoint.ContactPointSystem.EMAIL, email);
   }
 
-  public T contact(ContactPoint.ContactPointSystem system, @NonNull String value) {
+  public T contact(ContactPoint.ContactPointSystem system, String value) {
     this.contactPoints.add(new ContactPoint().setSystem(system).setValue(value));
     return self();
   }

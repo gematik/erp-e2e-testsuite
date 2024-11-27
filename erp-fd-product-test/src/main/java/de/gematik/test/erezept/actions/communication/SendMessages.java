@@ -104,6 +104,7 @@ public class SendMessages extends ErpAction<ErxCommunication> {
           ErxCommunicationBuilder.builder()
               .recipient(telematikId.getValue())
               .basedOnTask(erxTask.getTaskId(), erxTask.getAccessCode())
+              .flowType(erxTask.getFlowType())
               .buildDispReq(message);
       return withCommunication(communication, fuzzingMutators);
     }

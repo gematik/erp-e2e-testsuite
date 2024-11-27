@@ -16,16 +16,19 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static java.text.MessageFormat.*;
-
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
-import de.gematik.test.erezept.exceptions.*;
 import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
-import de.gematik.test.erezept.screenplay.util.*;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import de.gematik.test.erezept.screenplay.util.DmcPrescription;
+import de.gematik.test.erezept.screenplay.util.DmcStack;
+import de.gematik.test.erezept.screenplay.util.ManagedList;
+import java.util.List;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Ability;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.HasTeardown;
+import net.serenitybdd.screenplay.RefersToActor;
 import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
@@ -62,9 +65,8 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActo
 
   public void appendDmc(DmcPrescription dmc) {
     log.info(
-        format(
-            "Patient has received a 'paper-based' Prescription on a Data Matrix Code for Task {0}",
-            dmc.getTaskId()));
+        "Patient has received a 'paper-based' Prescription on a Data Matrix Code for Task {}",
+        dmc.getTaskId());
     this.dmcs.append(dmc);
   }
 
@@ -95,11 +97,14 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActo
 
   @Override
   public void tearDown() {
-    log.info(format("TearDown ManageDataMatrixCodes Ability for {0}", this.actor.getName()));
-    val erpClient = this.actor.abilityTo(UseTheErpClient.class);
+    log.info("TearDown ManageDataMatrixCodes Ability for {}", this.actor.getName());
+    val erpClientAbility = this.actor.abilityTo(UseTheErpClient.class);
 
-    // null-check required because in App-Testsuite an actor does not necessarily have an ErpClient
-    if (erpClient != null) {
+    // null-check required because having this ability does not necessarily mean that ErpClient is
+    // also available
+    if (erpClientAbility != null) {
+      // use the erpClient directly to avoid reporting of the teardowns
+      val erpClient = erpClientAbility.getClient();
       this.getDmcList()
           .forEach(
               dmc -> {
@@ -109,12 +114,13 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActo
                     .map(OperationOutcomeWrapper::extractFrom)
                     .ifPresent(
                         errorMessage ->
-                            log.warn(
-                                format(
-                                    "Received OperationOutcome with HTTP Statuscode {0} while"
-                                        + " trying to abort Prescription {1}: \n"
-                                        + "{2}",
-                                    response.getStatusCode(), dmc.getTaskId(), errorMessage)));
+                            log.info(
+                                "Received OperationOutcome with HTTP Statuscode {} while trying to"
+                                    + " abort Prescription {}: \n"
+                                    + "{}",
+                                response.getStatusCode(),
+                                dmc.getTaskId(),
+                                errorMessage));
               });
     }
   }

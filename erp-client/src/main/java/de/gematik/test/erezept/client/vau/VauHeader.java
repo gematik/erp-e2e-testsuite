@@ -16,18 +16,23 @@
 
 package de.gematik.test.erezept.client.vau;
 
+import de.gematik.bbriccs.rest.HttpHeaderKey;
+import de.gematik.bbriccs.rest.headers.HttpHeader;
 import lombok.Getter;
 
-public enum VauHeader {
-  X_AUTHORIZATION("X-Authorization"),
-  X_API_KEY("X-api-key"),
+@Getter
+public enum VauHeader implements HttpHeaderKey {
   X_ERP_RESOURCE("X-erp-resource"),
-  X_ERP_USER_AGENT("User-Agent"),
   X_ERP_USER("X-erp-user");
 
-  @Getter private final String value;
+  private final String key;
 
-  VauHeader(final String value) {
-    this.value = value;
+  VauHeader(final String key) {
+    this.key = key;
+  }
+
+  @Override
+  public HttpHeader createHeader(String value) {
+    return new HttpHeader(this.key, value);
   }
 }

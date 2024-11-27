@@ -1,0 +1,100 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "provide-prescription-erp-OP",
+  "url": "https://gematik.de/fhir/epa-medication/OperationDefinition/provide-prescription-erp-OP",
+  "title": "$provide-prescription-erp Operation",
+  "description": "The $provide-prescription-erp operation in the ePA MedicationService is used to add electronic prescriptions to a patient's record. These prescriptions are already made by the E-Rezept-Fachdienst. This operation does not create new patient prescriptions; it just puts the ones made by the E-Rezept-Fachdienst into the patient's ePA, making sure they are stored safely and can be easily accessed.",
+  "version": "1.0.3",
+  "status": "active",
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "name": "Provide Prescription eRP",
+  "kind": "operation",
+  "code": "provide-prescription-erp",
+  "system": true,
+  "type": false,
+  "instance": false,
+  "inputProfile": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-prescription-erp-input-parameters",
+  "outputProfile": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-rx-prescription-erp-output-parameters",
+  "parameter": [
+    {
+      "name": "rxPrescription",
+      "use": "in",
+      "min": 1,
+      "max": "*",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "type": "Identifier",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "authoredOn",
+          "type": "date",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "medicationRequest",
+          "type": "MedicationRequest",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "medication",
+          "type": "Medication",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "organization",
+          "type": "Organization",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "practitioner",
+          "type": "Practitioner",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    },
+    {
+      "name": "rxPrescription",
+      "use": "out",
+      "min": 1,
+      "max": "*",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "type": "Identifier",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "authoredOn",
+          "type": "date",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "operationOutcome",
+          "type": "OperationOutcome",
+          "use": "out",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    }
+  ]
+}

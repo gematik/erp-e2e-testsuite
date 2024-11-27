@@ -16,8 +16,6 @@
 
 package de.gematik.test.erezept.primsys;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.primsys.exceptions.PrimSysErrorPageGenerator;
@@ -69,7 +67,7 @@ public class Main {
     if (args.length > 0) {
       // if a parameter is given, handle this one as the path to the config file
       val configFile = Path.of(args[0]).toAbsolutePath();
-      log.info(format("Initialize REST Service with Config from {0}", configFile));
+      log.info("Initialize REST Service with Config from {}", configFile);
       factory =
           ConfigurationReader.forPrimSysConfiguration()
               .configFile(configFile)

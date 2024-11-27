@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import lombok.val;
 import org.hl7.fhir.r4.model.Configuration;
@@ -33,6 +32,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class ProfileExtractorTest {
 
+  private final ProfileExtractor profileExtractor = new ProfileExtractor();
   private boolean doesAcceptInvalidEnums;
 
   @BeforeEach
@@ -59,7 +59,7 @@ class ProfileExtractorTest {
       })
   void shouldNotFailOnNoProfilesInSearchsets(String filePath) {
     val content = ResourceLoader.readFileFromResource(filePath);
-    val p = ProfileExtractor.extractProfile(content);
+    val p = profileExtractor.extractProfile(content);
     assertTrue(p.isEmpty());
   }
 
@@ -71,7 +71,7 @@ class ProfileExtractorTest {
       })
   void shouldFindProfileFromCollectionChildren(String filePath) {
     val content = ResourceLoader.readFileFromResource(filePath);
-    val p = ProfileExtractor.extractProfile(content);
+    val p = profileExtractor.extractProfile(content);
     assertTrue(p.isPresent());
   }
 
@@ -84,7 +84,7 @@ class ProfileExtractorTest {
     kbvBundleResources.forEach(
         file -> {
           val content = ResourceLoader.readString(file);
-          val profile = ProfileExtractor.extractProfile(content);
+          val profile = profileExtractor.extractProfile(content);
           assertEquals(expectedProfile, profile.orElseThrow());
         });
   }
@@ -94,7 +94,7 @@ class ProfileExtractorTest {
     val basePath = "fhir/valid/erp/1.1.1/";
     val fileName = "Task.json";
     val content = ResourceLoader.readFileFromResource(basePath + fileName);
-    val profile = ProfileExtractor.extractProfile(content);
+    val profile = profileExtractor.extractProfile(content);
 
     val expectedProfile = "https://gematik.de/fhir/StructureDefinition/ErxTask|1.1.1";
     assertTrue(profile.isPresent());
@@ -104,7 +104,7 @@ class ProfileExtractorTest {
   @ParameterizedTest
   @ValueSource(strings = {"<xml>", "alternative_json", ""})
   void shouldNotCrashOnCheckingSearchBundles(String content) {
-    assertFalse(ProfileExtractor.isUnprofiledSearchSet(content));
+    assertFalse(profileExtractor.isUnprofiledSearchSet(content));
   }
 
   @ParameterizedTest
@@ -117,7 +117,7 @@ class ProfileExtractorTest {
     val base = "fhir/valid";
     val resource = format("{0}/{1}", base, resourcePath);
     val content = ResourceLoader.readFileFromResource(resource);
-    assertTrue(ProfileExtractor.isUnprofiledSearchSet(content));
+    assertTrue(profileExtractor.isUnprofiledSearchSet(content));
   }
 
   @ParameterizedTest
@@ -132,11 +132,6 @@ class ProfileExtractorTest {
     val base = "fhir/valid";
     val resource = format("{0}/{1}", base, resourcePath);
     val content = ResourceLoader.readFileFromResource(resource);
-    assertFalse(ProfileExtractor.isUnprofiledSearchSet(content));
-  }
-
-  @Test
-  void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(ProfileExtractor.class));
+    assertFalse(profileExtractor.isUnprofiledSearchSet(content));
   }
 }

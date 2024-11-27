@@ -341,7 +341,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
             .medication(medication)
             .medicationRequest(medicationRequest)
             .assigner(assignerOrganization)
-            .custodian(medicalOrganization);
+            .medicalOrganization(medicalOrganization);
 
     val issuePrescription =
         IssuePrescription.forPatient(patient)

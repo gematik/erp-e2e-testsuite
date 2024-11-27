@@ -29,9 +29,11 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import java.net.URL;
 import java.time.Duration;
+import java.util.function.Supplier;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.remote.http.ClientConfig;
 
 @Slf4j
@@ -90,12 +92,31 @@ public class AppiumDriverFactory {
               .connectionTimeout(Duration.ofMinutes(3))
               .readTimeout(Duration.ofMinutes(10))
               .withRetries();
-      val driver = new IOSDriver(clientConfig, caps);
+      val driver = connectDriver(() -> new IOSDriver(clientConfig, caps));
       log.info("Driver connected for XCUITest");
       return (UseTheApp<T>) new UseIOSApp(driver, appiumConfig);
     } else {
       log.error(format("Given Platform {0} not yet supported", platform));
       throw new UnsupportedPlatformException(platform);
     }
+  }
+
+  private static <D> D connectDriver(Supplier<D> driverSupplier) {
+    val maxRetries = Integer.parseInt(System.getProperty("appFailRetry", "1"));
+    var currentTry = 0;
+    Exception lastException;
+    do {
+      try {
+        return driverSupplier.get();
+      } catch (Exception e) {
+        lastException = e;
+        currentTry++;
+        log.warn(
+            "{} / {} Failed to connect driver with {}", currentTry, maxRetries, e.getMessage());
+      }
+    } while (currentTry < maxRetries);
+
+    throw new SessionNotCreatedException(
+        format("Failed to create driver session after {0} attempts", maxRetries), lastException);
   }
 }

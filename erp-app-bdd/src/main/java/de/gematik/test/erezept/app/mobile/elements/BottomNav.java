@@ -25,7 +25,12 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum BottomNav implements PageElement {
-  PRESCRIPTION_BUTTON("Prescriptions Menu Button", () -> null, () -> AppiumBy.name("Rezepte")),
+  PRESCRIPTION_BUTTON(
+      "Prescriptions Menu Button",
+      () -> null,
+      () ->
+          AppiumBy.iOSNsPredicateString(
+              "type == \"XCUIElementTypeButton\" AND label == \"Rezepte\"")),
 
   PHARMACY_SEARCH_BUTTON(
       "Pharmacy Search Menu Button", () -> null, () -> AppiumBy.name("Apothekensuche")),

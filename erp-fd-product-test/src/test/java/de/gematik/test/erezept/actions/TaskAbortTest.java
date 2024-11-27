@@ -25,8 +25,8 @@ import static org.mockito.Mockito.*;
 import de.gematik.test.erezept.actors.*;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import java.util.*;
 import lombok.*;
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.*;
 
 class TaskAbortTest {
   @Test
-  void shouldPerformCorrectCommand() {
+  void shouldPerformCorrectCommandAsPatient() {
     val useErpClient = mock(UseTheErpClient.class);
     val patient = new PatientActor("Sina");
     patient.can(useErpClient);
@@ -50,5 +50,59 @@ class TaskAbortTest {
     when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(() -> patient.performs(TaskAbort.asPatient(erxTask)));
+  }
+
+  @Test
+  void shouldPerformCorrectCommandAsLeistungserbringer() {
+    val useErpClient = mock(UseTheErpClient.class);
+    val doctor = new DoctorActor("Gündüla Gunther");
+    doctor.can(useErpClient);
+
+    val erxTask = new ErxTask();
+    erxTask.setId("123");
+
+    Identifier accessCodeIdentifier =
+        new Identifier()
+            .setSystem("https://gematik.de/fhir/NamingSystem/AccessCode")
+            .setValue("456");
+    erxTask.addIdentifier(accessCodeIdentifier);
+
+    val mockResponse =
+        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(createEmptyValidationResult());
+    when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
+
+    assertDoesNotThrow(() -> doctor.performs(TaskAbort.asLeistungserbringer(erxTask)));
+  }
+
+  @Test
+  void shouldPerformCorrectCommandAsPharmacy() {
+    val useErpClient = mock(UseTheErpClient.class);
+    val pharmacy = new PharmacyActor("Stadtapotheke");
+    pharmacy.can(useErpClient);
+
+    val erxTask = new ErxTask();
+    erxTask.setId("456");
+
+    Identifier secretIdentifier = new Identifier();
+    secretIdentifier.setSystem(ErpWorkflowNamingSystem.SECRET.getCanonicalUrl());
+    secretIdentifier.setValue("some-secret");
+
+    erxTask.addIdentifier(secretIdentifier);
+
+    val mockResponse =
+        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
+            .withStatusCode(404)
+            .withHeaders(Map.of())
+            .andValidationResult(createEmptyValidationResult());
+
+    when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
+
+    val acceptBundle = new ErxAcceptBundle();
+    acceptBundle.addEntry(new Bundle.BundleEntryComponent().setResource(erxTask));
+
+    assertDoesNotThrow(() -> pharmacy.performs(TaskAbort.asPharmacy(acceptBundle)));
   }
 }

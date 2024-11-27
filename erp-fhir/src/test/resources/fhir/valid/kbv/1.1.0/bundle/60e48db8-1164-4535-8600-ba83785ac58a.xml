@@ -135,7 +135,7 @@
     <fullUrl value="http://pvs.praxis.local/fhir/Medication/bdb52b32-96ef-4616-8368-c60148b090b1" />
     <resource>
       <Medication xmlns="http://hl7.org/fhir">
-        <id value="2420612c-a1c8-4b08-be02-2ee831e0f82a" />
+        <id value="bdb52b32-96ef-4616-8368-c60148b090b1" />
         <meta>
           <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.1.0" />
         </meta>

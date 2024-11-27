@@ -16,11 +16,11 @@
             <pattern>${date_format} [%thread] %highlight(%-5level) %logger{6} - %msg%n</pattern>
         </encoder>
     </appender>
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="REST" class="ch.qos.logback.core.FileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>trace</level>
         </filter>
-        <file>target/site/testsuite.log</file>
+        <file>target/site/rest.log</file>
         <append>false</append>
         <encoder>
             <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
@@ -37,25 +37,31 @@
             <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <logger name="ch.qos.logback" level="WARN" additivity="false">
+        <appender-ref ref="FHIR"/>
+        <append>false</append>
+    </logger>
     <logger name="ca.uhn.fhir" level="INFO" additivity="false">
         <appender-ref ref="FHIR"/>
         <append>false</append>
     </logger>
-    <logger name="de.gematik.test.erezept.fhir.parser.profiles" level="TRACE" additivity="false">
+    <logger name="org.hl7.fhir" level="WARN" additivity="false">
         <appender-ref ref="FHIR"/>
+        <append>false</append>
     </logger>
-    <logger name="de.gematik.test.erezept.fhir.parser" level="TRACE">
+    <logger name="de.gematik.test.erezept.fhir.parser" level="INFO" additivity="false">
         <appender-ref ref="FHIR"/>
     </logger>
 
-
-    <logger name="de.gematik" level="TRACE" additivity="false">
-        <appender-ref ref="FILE"/>
+    <logger name="de.gematik.test.erezept.client" level="TRACE" additivity="false">
+        <appender-ref ref="REST"/>
+    </logger>
+    <logger name="de.gematik" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
     </root>
 </configuration>

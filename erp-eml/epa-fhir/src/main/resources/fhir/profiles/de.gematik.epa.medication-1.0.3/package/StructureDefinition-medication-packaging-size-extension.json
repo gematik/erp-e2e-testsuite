@@ -1,0 +1,77 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "medication-packaging-size-extension",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension",
+  "version": "1.0.3",
+  "name": "MedicationPackagingSizeExtension",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "Specification of the package size according to divided quantity (e.g., 100, 2x25), only appears in conjunction with \"unit\" (e.g., 100 Stück).",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "definition": "Specification of the package size according to divided quantity (e.g., 100, 2x25), only appears in conjunction with \"unit\" (e.g., 100 Stück)."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1,
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.value[x]:valueString",
+        "path": "Extension.value[x]",
+        "sliceName": "valueString",
+        "short": "Package size according to divided quantity",
+        "definition": "Specification of the package size according to divided quantity (e.g., 100, 2x25), only appears in conjunction with \"unit\" (e.g., 100 Stück).",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "maxLength": 7
+      }
+    ]
+  }
+}

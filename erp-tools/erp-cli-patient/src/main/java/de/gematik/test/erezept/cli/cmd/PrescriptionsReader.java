@@ -64,9 +64,10 @@ public class PrescriptionsReader extends BaseRemoteCommand {
   @Override
   public void performFor(Egk egk, ErpClient erpClient) {
     log.info(
-        format(
-            "Show prescriptions for {0} ({1}) from {2}",
-            egk.getOwnerData().getOwnerName(), egk.getKvnr(), this.getEnvironmentName()));
+        "Show prescriptions for {} ({}) from {}",
+        egk.getOwnerData().getOwnerName(),
+        egk.getKvnr(),
+        this.getEnvironmentName());
 
     val cmd =
         TaskSearch.builder()
@@ -137,13 +138,8 @@ public class PrescriptionsReader extends BaseRemoteCommand {
             kbvBundle.getFlowType().getDisplay(),
             DATE_FORMATTER.format(task.getAuthoredOn()),
             DATE_FORMATTER.format(task.getLastModified())));
-    printSubLine(
-        format(
-            "{0} {1} (PZN: {2})",
-            medication.getMedicationName(),
-            medication.getStandardSize().getCode(),
-            medication.getPznFirstRep()));
-    medication.getMedicationType().ifPresent(type -> printSubLine(format("Type: {0}", type)));
+
+    printSubLine(medication.getDescription());
     medication.getIngredientText().ifPresent(text -> printSubLine(format("Ingredient: {0}", text)));
     medication
         .getIngredientStrengthString()
@@ -159,31 +155,12 @@ public class PrescriptionsReader extends BaseRemoteCommand {
         format("{0} / {1}", practitioner.getDescription(), practitionerOrg.getDescription()));
 
     if (prescription.getTask().getStatus() == Task.TaskStatus.COMPLETED) {
-      printMedicationDispense(erpClient, task);
+      val medDispCmd = new MedicationDispenseSearchByIdCommand(task.getPrescriptionId());
+      val medDispBundle = erpClient.request(medDispCmd).getExpectedResource();
+      resourcePrinter.printMedicationDispenses(medDispBundle.getMedicationDispenses());
     }
 
     System.out.println("-------------");
-  }
-
-  private void printMedicationDispense(ErpClient erpClient, ErxTask task) {
-    val cmd = new MedicationDispenseSearchByIdCommand(task.getPrescriptionId());
-    val response = erpClient.request(cmd).getExpectedResource();
-
-    System.out.println("\nMedicationDispense:");
-    response
-        .getMedicationDispenses()
-        .forEach(
-            md -> {
-              System.out.println(
-                  format(
-                      "Abgabe durch: {0} am {1}",
-                      md.getPerformerIdFirstRep(), md.getZonedWhenHandedOver()));
-              md.getErpMedication()
-                  .forEach(
-                      med -> {
-                        System.out.println(format("\tMedikament: {0}", med.getMedicationName()));
-                      });
-            });
   }
 
   private void printSubLine(String line) {

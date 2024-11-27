@@ -1,0 +1,51 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/NichtPatientBezogeneGesundheitsversorgung",
+  "version": "2018-07-13T16:21:25",
+  "name": "NichtPatientBezogeneGesundheitsversorgung",
+  "id": "NichtPatientBezogeneGesundheitsversorgung",
+  "title": "Nicht Patient Bezogene Gesundheitsversorgung",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "BIL",
+      "display": "Bildungseinrichtung",
+      "definition": "Kindergarten, Schulen, Hochschulen und andere erzieherische Einrichtungen für Kinder oder Erwachsene"
+    },
+    {
+      "code": "FOR",
+      "display": "Forschungseinrichtung",
+      "definition": "Einrichtung der medizinischen Forschung außerhalb von Arztpraxis oder Krankenhaus."
+    },
+    {
+      "code": "GEN",
+      "display": "Gen-Analysedienste",
+      "definition": "Organisationen die Dienste für Vaterschafts-/Mutterschaftstest anbieten, für Abstammungtests, Riskoanalysen, etc."
+    },
+    {
+      "code": "MDK",
+      "display": "Medizinischer Dienst der Krankenversicherung",
+      "definition": "Alle medizinischen Dienste die sozialmedizinische Begutachtungen nach § 275 SGB V für die Krankenversicherungen oder Pflegebegutachtungen nach § 18 bzw. §§ 114ff SGB XI für die Pflegeversicherungen durchführen."
+    },
+    {
+      "code": "PAT",
+      "display": "Patient außerhalb der Betreuung",
+      "definition": "Dieser Wert kann zur Kennzeichnung der Herkunft von Dokumenten verwendet werden, die der Patient selbstständig erstellt und eingestellt hat, zum Beispiel über ein Patientenportal oder eine Smartphone-App. Daten die vom Patienten über eine solche Lösung stellvertretend für einen Heilberufler eingestellt werden (z.B. gescannter Arztbrief, DICOM-DVD) sollten nicht diesen Wert verwenden, sondern den für den Heilberufler vorgesehenen Wert."
+    },
+    {
+      "code": "SPE",
+      "display": "Spendedienste",
+      "definition": "Blutspendedienst, Knochenmarkspendedienst, Samenbank, Nabelschnur-Blutbank, Bio-Banken, etc."
+    },
+    {
+      "code": "VER",
+      "display": "Versicherungsträger",
+      "definition": "Träger der gesetzlichen Krankenversicherung (d.h. Krankenkasse) oder der privaten Krankenversicherung."
+    }
+  ],
+  "count": 7
+}

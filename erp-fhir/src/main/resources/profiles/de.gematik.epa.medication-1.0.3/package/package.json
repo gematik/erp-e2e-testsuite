@@ -1,0 +1,15 @@
+{
+  "name": "de.gematik.epa.medication",
+  "version": "1.0.3",
+  "author": "gematik",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "description": "Die Medication-Service-Spezifikation für das ePA Release 3.0",
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1",
+    "de.basisprofil.r4": "1.5.0",
+    "de.gematik.fhir.directory": "0.11.12"
+  },
+  "jurisdiction": "urn:iso:std:iso:3166#DE"
+}

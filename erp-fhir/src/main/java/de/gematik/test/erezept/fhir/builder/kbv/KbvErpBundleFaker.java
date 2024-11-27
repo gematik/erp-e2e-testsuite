@@ -16,14 +16,20 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -37,7 +43,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Quantity;
 
 public class KbvErpBundleFaker {
@@ -73,7 +78,8 @@ public class KbvErpBundleFaker {
 
     builderConsumers.put("patient", b -> b.patient(patient));
     builderConsumers.put(
-        "medOrganization", b -> b.custodian(MedicalOrganizationFaker.builder().fake()));
+        "medOrganization",
+        b -> b.medicalOrganization(MedicalOrganizationFaker.medicalPractice().fake()));
     builderConsumers.put("assignerOrganization", b -> b.assigner(assignerOrganization));
     builderConsumers.put("practitioner", b -> b.practitioner(practitioner));
     builderConsumers.put("medication", b -> b.medication(kbvErpMedication));
@@ -205,7 +211,7 @@ public class KbvErpBundleFaker {
 
   public KbvErpBundleFaker withCustodian(MedicalOrganization organization) {
     builderConsumers.computeIfPresent(
-        "medOrganization", (key, defaultValue) -> b -> b.custodian(organization));
+        "medOrganization", (key, defaultValue) -> b -> b.medicalOrganization(organization));
     return this;
   }
 
@@ -215,7 +221,7 @@ public class KbvErpBundleFaker {
     return this;
   }
 
-  public KbvErpBundleFaker withPractitioner(Practitioner practitioner) {
+  public KbvErpBundleFaker withPractitioner(KbvPractitioner practitioner) {
     medicationRequestFaker.withRequester(practitioner);
     builderConsumers.computeIfPresent(
         "practitioner", (key, defaultValue) -> b -> b.practitioner(practitioner));
@@ -253,7 +259,7 @@ public class KbvErpBundleFaker {
     return this.withMedication(medication);
   }
 
-  public KbvErpBundleFaker withAttester(Practitioner attester) {
+  public KbvErpBundleFaker withAttester(KbvPractitioner attester) {
     builderConsumers.put("attester", b -> b.attester(attester));
     return this;
   }

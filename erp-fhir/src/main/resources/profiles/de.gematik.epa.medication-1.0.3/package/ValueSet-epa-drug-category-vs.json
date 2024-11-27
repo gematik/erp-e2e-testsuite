@@ -1,0 +1,20 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "EPADrugCategoryVS",
+  "id": "epa-drug-category-vs",
+  "title": "EPA Drug Category ValueSet",
+  "description": "The ValueSet for drug category.",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/ValueSet/epa-drug-category-vs",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "compose": {
+    "include": [
+      {
+        "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs"
+      }
+    ]
+  }
+}

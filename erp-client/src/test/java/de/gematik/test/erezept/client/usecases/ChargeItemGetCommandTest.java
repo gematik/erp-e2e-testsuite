@@ -18,6 +18,7 @@ package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -27,5 +28,11 @@ class ChargeItemGetCommandTest {
   void shouldNotHaveAnyBody() {
     val cmd = new ChargeItemGetCommand();
     assertTrue(cmd.getRequestBody().isEmpty());
+  }
+
+  @Test
+  void shouldHaveQueryParam() {
+    val cmd = new ChargeItemGetCommand(IQueryParameter.search().withCount(3).createParameter());
+    assertTrue(cmd.getRequestLocator().contains("count=3"));
   }
 }

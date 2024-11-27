@@ -38,7 +38,7 @@ class PagingArgumentComposerTest {
   void shouldBuildCorrectQueryComposerSmallValuesCheckFirstArgument() {
     val qCBV = queryComposerSmallValues().create().toList();
     assertFalse(Arrays.stream(qCBV.get(0).get()).toList().isEmpty());
-    assertEquals(10, qCBV.size());
+    assertEquals(7, qCBV.size());
     assertEquals(5, Arrays.stream(qCBV.get(1).get()).toList().size());
   }
 
@@ -46,7 +46,7 @@ class PagingArgumentComposerTest {
   void shouldBuildCorrectQueryComposerSmallValuesForCommunicationCheckFirstArgument() {
     val qCBV = queryComposerSmallValuesForCommunication().create().toList();
     assertFalse(Arrays.stream(qCBV.get(0).get()).toList().isEmpty());
-    assertEquals(10, qCBV.size());
+    assertEquals(7, qCBV.size());
     assertEquals(5, Arrays.stream(qCBV.get(1).get()).toList().size());
   }
 }

@@ -1,0 +1,27 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "EPAMedicationTypeProductVS",
+  "id": "epa-medication-type-product-vs",
+  "title": "EPA Medication Type ValueSet for PZN-Medication",
+  "description": "ValueSet of valid concepts for a PZN EPAMedication Product",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-type-product-vs",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/900000000000207008/version/20240201",
+        "concept": [
+          {
+            "code": "781405001",
+            "display": "Medicinal product package (product)"
+          }
+        ]
+      }
+    ]
+  }
+}

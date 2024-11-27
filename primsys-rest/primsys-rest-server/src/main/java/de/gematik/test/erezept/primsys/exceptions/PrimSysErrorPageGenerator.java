@@ -16,8 +16,6 @@
 
 package de.gematik.test.erezept.primsys.exceptions;
 
-import static java.text.MessageFormat.format;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import lombok.SneakyThrows;
@@ -28,6 +26,7 @@ import org.glassfish.grizzly.http.server.Request;
 
 @Slf4j
 public class PrimSysErrorPageGenerator implements ErrorPageGenerator {
+
   @SneakyThrows
   @Override
   public String generate(
@@ -38,9 +37,10 @@ public class PrimSysErrorPageGenerator implements ErrorPageGenerator {
       final Throwable exception) {
 
     log.error(
-        format(
-            "Error while processing request: {0} - {1} {2}\n",
-            request.getContextPath(), status, reasonPhrase),
+        "Error while processing request: {} - {} {}\n",
+        request.getContextPath(),
+        status,
+        reasonPhrase,
         exception);
 
     // trick Grizzly to response with JSON

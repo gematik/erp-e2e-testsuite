@@ -16,8 +16,6 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -41,6 +39,7 @@ import de.gematik.test.erezept.screenplay.strategy.PrescriptionToDispenseStrateg
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.datatable.DataTable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -136,11 +135,10 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     }
 
     log.info(
-        format(
-            "Actor {0} is asking for the response of {1}",
-            actor.getName(), executedCommand.getRequestLocator()));
-    val resp = erpClientAbility.request(executedCommand);
-    return resp;
+        "Actor {} is asking for the response of {}",
+        actor.getName(),
+        executedCommand.getRequestLocator());
+    return erpClientAbility.request(executedCommand);
   }
 
   private CloseTaskCommand dispensePrescribedMedication(
@@ -152,9 +150,8 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
 
     if (medication.getVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
       log.info(
-          format(
-              "Creating a MedicationDispense containing an old Medication with version {0}",
-              medication.getVersion().getVersion()));
+          "Creating a MedicationDispense containing an old Medication with version {}",
+          medication.getVersion().getVersion());
     }
 
     val medicationDispense =
@@ -163,6 +160,8 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
             .performerId(telematikId)
             .medication(medication)
             .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
             .wasSubstituted(false)
             .build();
     return new CloseTaskCommand(taskId, secret, medicationDispense);
@@ -217,9 +216,8 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
 
           if (medication.getVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
             log.info(
-                format(
-                    "Creating a MedicationDispense containing an old Medication with version {0}",
-                    medication.getVersion().getVersion()));
+                "Creating a MedicationDispense containing an old Medication with version {}",
+                medication.getVersion().getVersion());
           }
 
           val medicationDispense =
@@ -228,6 +226,8 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
                   .performerId(performerId)
                   .medication(medication)
                   .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+                  .whenPrepared(new Date())
+                  .whenHandedOver(new Date())
                   .wasSubstituted(true)
                   .build();
 

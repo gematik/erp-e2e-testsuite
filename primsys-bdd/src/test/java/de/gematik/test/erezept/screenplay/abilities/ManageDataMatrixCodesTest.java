@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -101,8 +102,9 @@ class ManageDataMatrixCodesTest {
     val dmc = DmcPrescription.ownerDmc(TaskId.from(PrescriptionId.random()), AccessCode.random());
     ability.getDmcList().add(dmc);
 
-    val erpClient = mock(UseTheErpClient.class);
-    actor.can(erpClient);
+    val erpClient = mock(ErpClient.class);
+    val erpClientAbility = UseTheErpClient.with(erpClient);
+    actor.can(erpClientAbility);
 
     val mockResponse =
         ErpResponse.forPayload(createOperationOutcome(), Resource.class)

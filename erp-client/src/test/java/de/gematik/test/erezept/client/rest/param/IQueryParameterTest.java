@@ -45,6 +45,22 @@ class IQueryParameterTest {
   }
 
   @Test
+  void shouldFindAllQueriesAfterPnw() {
+    val result =
+        queryListFromUrl(
+            "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Task"
+                + "?pnw=H4sIAAAAAAAA%2fy1N0WqDMAB89ytC3meitrCNJIU2cUhJ2lVtwZchGq1djWURdf362W33cHB33B1ZTe0VDPrLNp2h0HMxBNoUXdmYmsI0CZ%2beIbB9bsr82hlN4be2cMUcsldgw%2bXHURziaKd%2bm4%2fuvGYshee%2bv70iNFq31m3eN59uqVGVo8GWLbqZEQ2PJ%2baAGSSJmY%2f9BX4JsIe95SIgaLb%2bMsE8gsS%2f2GfsxMUk%2bbuvkiKQXATyUvi7RNwVV8f0Hm6qCw%2fCNK7xeMA6Wq%2bz6ITO2y5aZtX0tpWUoHnEmVkx5wcIoWC%2b%2fAAAAA%3d%3d"
+                + "&_sort=-expiry-date&_count=50&__offset=50");
+    assertEquals(
+        "-expiry-date",
+        result.stream()
+            .filter(qp -> qp.parameter().equals("_sort"))
+            .findFirst()
+            .orElseThrow()
+            .value());
+  }
+
+  @Test
   void shouldFindNoQuery() {
     val result = queryListFromUrl("https://erp-dev.zentral.erp.splitdns.ti-dienste.de");
     assertEquals(0, result.size());

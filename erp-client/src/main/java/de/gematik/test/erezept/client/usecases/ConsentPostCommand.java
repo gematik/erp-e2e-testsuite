@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.ErxConsentBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.values.KVNR;

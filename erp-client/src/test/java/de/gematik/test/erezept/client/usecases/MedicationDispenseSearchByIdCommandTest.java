@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

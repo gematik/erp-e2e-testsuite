@@ -27,6 +27,7 @@ import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.*;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
+import jakarta.ws.rs.WebApplicationException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -115,10 +116,38 @@ class ActorContextTest extends TestWithActorContext {
 
   @Test
   void shouldBeEmptyOnUnknownDoctorId() {
-    val prescriptionId = PrescriptionId.random().getValue();
     val ctx = ActorContext.getInstance();
-    val optDoc = ctx.getDoctor(prescriptionId);
+    val optDoc = ctx.getDoctor("123123123");
     assertTrue(optDoc.isEmpty());
+  }
+
+  @Test
+  void shouldGetKnownDoctor() {
+    val ctx = ActorContext.getInstance();
+    val doctor = ctx.getDoctors().get(0);
+    val doctor2 = assertDoesNotThrow(() -> ctx.getDoctorOrThrowNotFound(doctor.getIdentifier()));
+    assertEquals(doctor, doctor2);
+  }
+
+  @Test
+  void shouldThrow404OnUnknownDoctor() {
+    val ctx = ActorContext.getInstance();
+    assertThrows(WebApplicationException.class, () -> ctx.getDoctorOrThrowNotFound("123123"));
+  }
+
+  @Test
+  void shouldGetKnownPharmacy() {
+    val ctx = ActorContext.getInstance();
+    val pharmacy = ctx.getPharmacies().get(0);
+    val pharmacy2 =
+        assertDoesNotThrow(() -> ctx.getPharmacyOrThrowNotFound(pharmacy.getIdentifier()));
+    assertEquals(pharmacy, pharmacy2);
+  }
+
+  @Test
+  void shouldThrow404OnUnknownPharmacy() {
+    val ctx = ActorContext.getInstance();
+    assertThrows(WebApplicationException.class, () -> ctx.getPharmacyOrThrowNotFound("123123"));
   }
 
   @Test

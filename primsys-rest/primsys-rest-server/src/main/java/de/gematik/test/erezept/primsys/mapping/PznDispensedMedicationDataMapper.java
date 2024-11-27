@@ -19,6 +19,7 @@ package de.gematik.test.erezept.primsys.mapping;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
@@ -59,8 +60,7 @@ public class PznDispensedMedicationDataMapper
 
   public static PznDispensedMedicationDataMapper random() {
     val dto = randomDto();
-    return new PznDispensedMedicationDataMapper(
-        dto, KVNR.random(), PrescriptionId.random(), GemFaker.fakerTelematikId(), true);
+    return from(dto, KVNR.random(), PrescriptionId.random(), GemFaker.fakerTelematikId(), true);
   }
 
   public static PznDispensedMedicationDto randomDto() {
@@ -70,7 +70,7 @@ public class PznDispensedMedicationDataMapper
   @Override
   protected void complete() {
     // reuse the PznMedicationDataMapper here!
-    PznMedicationDataMapper.from(dto);
+    KbvPznMedicationDataMapper.from(dto);
     ensure(dto::getBatch, dto::setBatch, PznMedicationBatchDto::new);
     ensure(dto::getWhenHandedOver, dto::setWhenHandedOver, Date::new);
     ensure(dto::getWhenPrepared, dto::setWhenPrepared, Date::new);
@@ -86,7 +86,32 @@ public class PznDispensedMedicationDataMapper
         ErxMedicationDispenseBuilder.forKvnr(forKvnr)
             .performerId(performerTelematikId)
             .prescriptionId(forPrescription)
-            .medication(PznMedicationDataMapper.from(dto).convert())
+            .medication(KbvPznMedicationDataMapper.from(dto).convert())
+            .status("completed")
+            .whenPrepared(dto.getWhenPrepared())
+            .whenHandedOver(dto.getWhenHandedOver())
+            .batch(dto.getBatch().getLotNumber(), dto.getBatch().getExpiryDate())
+            .wasSubstituted(isSubstituted);
+
+    dto.getDosageInstructions().forEach(mdb::dosageInstruction);
+    dto.getNotes().forEach(mdb::note);
+
+    return mdb.build();
+  }
+
+  /**
+   * Note: this method is required to build ErxMedicationDispenses for FHIR profiles from 1.4.0
+   * upwards
+   *
+   * @param medication to be referenced
+   * @return the MedicationDispense
+   */
+  public ErxMedicationDispense convert(GemErpMedication medication) {
+    val mdb =
+        ErxMedicationDispenseBuilder.forKvnr(forKvnr)
+            .performerId(performerTelematikId)
+            .prescriptionId(forPrescription)
+            .medication(medication)
             .status("completed")
             .whenPrepared(dto.getWhenPrepared())
             .whenHandedOver(dto.getWhenHandedOver())

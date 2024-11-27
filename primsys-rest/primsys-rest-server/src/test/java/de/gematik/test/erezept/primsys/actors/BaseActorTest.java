@@ -16,13 +16,18 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
+import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.model.ActorContext;
@@ -30,6 +35,7 @@ import jakarta.ws.rs.WebApplicationException;
 import java.security.MessageDigest;
 import java.util.Map;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
 
 class BaseActorTest extends TestWithActorContext {
@@ -75,5 +81,13 @@ class BaseActorTest extends TestWithActorContext {
       cfg.setName("Pharmacy");
       assertThrows(RuntimeException.class, () -> new Pharmacy(cfg, null, null, null));
     }
+  }
+
+  @Test
+  void shouldForwardToEncode() {
+    val ctx = ActorContext.getInstance();
+    val pharmacy = ctx.getPharmacies().get(1);
+    val content = assertDoesNotThrow(() -> pharmacy.encode(new Bundle(), EncodingType.XML));
+    assertNotNull(content);
   }
 }

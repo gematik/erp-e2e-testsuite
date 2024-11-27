@@ -11,7 +11,7 @@
       "fullUrl": "https://prescriptionserver.telematik/ChargeItem/abc825bc-bc30-45f8-b109-1b343fff5c45",
       "resource": {
         "resourceType": "ChargeItem",
-        "id": "App-ChargeItem-abc825bc-bc30-45f8-b109-1b343fff5c45",
+        "id": "abc825bc-bc30-45f8-b109-1b343fff5c45",
         "meta": {
           "profile": [
             "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_ChargeItem|1.0"
@@ -1065,7 +1065,7 @@
                 {
                   "entry": [
                     {
-                      "reference": "Binary/PrescriptionDigest-200.086.824.605.539.20"
+                      "reference": "urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"
                     }
                   ]
                 }
@@ -1104,10 +1104,10 @@
             }
           },
           {
-            "fullUrl": "https://erp.zentral.erp.splitdns.ti-dienste.de/Binary/PrescriptionDigest-200.086.824.605.539.20",
+            "fullUrl": "urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9",
             "resource": {
               "resourceType": "Binary",
-              "id": "PrescriptionDigest-200.086.824.605.539.20",
+              "id": "b35d3602-acab-47ab-b58a-dd53e817e6c9",
               "meta": {
                 "profile": [
                   "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"

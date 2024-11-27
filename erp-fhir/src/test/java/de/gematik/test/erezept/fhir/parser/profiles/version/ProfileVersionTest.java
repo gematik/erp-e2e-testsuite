@@ -19,6 +19,7 @@ package de.gematik.test.erezept.fhir.parser.profiles.version;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -29,10 +30,15 @@ import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ProfileVersionTest {
 
@@ -141,6 +147,30 @@ class ProfileVersionTest {
 
     assertThrows(
         RuntimeException.class, () -> ProfileVersion.getDefaultVersion(TestingVersion.class, m));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldAlwaysProvideADefaultVersion(Supplier<ProfileVersion<?>> defaultVersionSupplier) {
+    val version = assertDoesNotThrow(defaultVersionSupplier::get);
+    assertNotNull(version.getVersion());
+    assertFalse(version.getVersion().isEmpty());
+  }
+
+  static Stream<Arguments> shouldAlwaysProvideADefaultVersion() {
+    return Stream.of(
+            (Supplier<ProfileVersion<?>>) AbdaErpBasisVersion::getDefaultVersion,
+            AbdaErpPkvVersion::getDefaultVersion,
+            DavKbvCsVsVersion::getDefaultVersion,
+            DeBasisVersion::getDefaultVersion,
+            EpaMedicationVersion::getDefaultVersion,
+            ErpWorkflowVersion::getDefaultVersion,
+            Hl7Version::getDefaultVersion,
+            KbvBasisVersion::getDefaultVersion,
+            KbvItaErpVersion::getDefaultVersion,
+            KbvItaForVersion::getDefaultVersion,
+            KbvItvEvdgaVersion::getDefaultVersion)
+        .map(Arguments::of);
   }
 
   @Getter

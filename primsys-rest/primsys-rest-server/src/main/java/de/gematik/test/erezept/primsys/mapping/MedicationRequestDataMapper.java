@@ -57,12 +57,11 @@ public class MedicationRequestDataMapper
     val builder =
         MedicationRequestDto.medicationRequest()
             .dosage(medicationRequest.getDosageInstructionFirstRep().getText())
-            .packageQuantity(
-                medicationRequest.getDispenseRequest().getQuantity().getValue().intValue())
-            .note(medicationRequest.getNoteText().orElse(""))
+            .packageQuantity(medicationRequest.getDispenseQuantity())
             .substitutionAllowed(medicationRequest.allowSubstitution())
             .bvg(medicationRequest.isBvg())
             .emergencyFee(medicationRequest.hasEmergencyServiceFee());
+    medicationRequest.getNoteText().ifPresent(builder::note);
     if (medicationRequest.isMultiple()) {
       val mvo = new MvoDto();
       medicationRequest.getMvoStart().ifPresent(mvo::setStartDate);

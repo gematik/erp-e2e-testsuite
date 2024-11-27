@@ -20,11 +20,13 @@ import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.rest.RestClient;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.OCSPAbility;
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.abilities.TSLAbility;
+import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
@@ -43,6 +45,7 @@ import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
+import de.gematik.test.erezept.eml.EpaMockClient;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
@@ -93,7 +96,28 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(useTheKonnektor)
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor))
-        .can(ProvideDoctorBaseData.fromConfiguration(cfg));
+        .can(ProvideDoctorBaseData.fromConfiguration(cfg, hba.getTelematikId()));
+  }
+
+  public <A extends Actor> void equipWithEpaMockClient(A actor) {
+    val name = actor.getName();
+    log.info(format("Equip Actor {0} with EpaMockClient", name));
+
+    val epaMockClientConfig = getActiveEnvironment().getEpaMockClient();
+    val epaMockUrl = epaMockClientConfig.getEpaMockUrl();
+    val epaMockApiKey = epaMockClientConfig.getEpaMockApiKey();
+    val logRetrieveInterval = epaMockClientConfig.getLogRetrieveInterval();
+    val maxWait = epaMockClientConfig.getMaxWait();
+
+    givenThat(actor)
+        .can(
+            UseTheEpaMockClient.with(
+                EpaMockClient.withRestClient(
+                    RestClient.forUrl(epaMockUrl)
+                        .usingAuthorizationKey(epaMockApiKey)
+                        .withoutTlsVerification(),
+                    logRetrieveInterval,
+                    maxWait)));
   }
 
   public <A extends Actor> void equipAsPharmacy(A actor) {

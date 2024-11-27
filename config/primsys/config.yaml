@@ -85,19 +85,19 @@ actors:
 
   patients:
     - name: Fridolin Straßer
-      egkIccsn: 80276883110000113311
+      egkIccsn: 80276883110000163961
 
     - name: Hanna Bäcker
-      egkIccsn: 80276883110000108142
+      egkIccsn: 80276883110000163962
 
     - name: Sina Hüllmann
-      egkIccsn: 80276883110000113298
+      egkIccsn: 80276883110000163963
 
     - name: Leonie Hütter
-      egkIccsn: 80276883110000113312
+      egkIccsn: 80276883110000163964
 
     - name: Günther Angermänn
-      egkIccsn: 80276883110000113323
+      egkIccsn: 80276883110000163965
 
     - name: Aenna Gondern # Kassenidentität ohne validen privaten Schlüssel
       egkIccsn: 80276881040001935352
@@ -144,6 +144,11 @@ environments:
       fdBaseUrl: https://erp-test.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+    epaMockClient:
+      epaMockUrl: https://epa-as-mock.test.gematik.solutions:443
+      epaMockApiKey: DUMMY VALUE
+      logRetrieveInterval: 10000
+      maxWait: 60000
 
   - name: RU
     ti:
@@ -158,6 +163,11 @@ environments:
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+    epaMockClient:
+      epaMockUrl: https://epa-as-mock.ref.gematik.solutions:443
+      epaMockApiKey: DUMMY VALUE
+      logRetrieveInterval: 10000
+      maxWait: 60000
 
   - name: RU-DEV
     ti:
@@ -172,9 +182,13 @@ environments:
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+    epaMockClient:
+      epaMockUrl: https://epa-as-mock.ref.gematik.solutions:443
+      epaMockApiKey: DUMMY VALUE
+      logRetrieveInterval: 10000
+      maxWait: 60000
 
   - name: TITUS
-
     ti:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
@@ -187,6 +201,11 @@ environments:
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+    epaMockClient:
+      epaMockUrl: https://epa-as-mock.test.epa4all.de:4433
+      epaMockApiKey: DUMMY VALUE
+      logRetrieveInterval: 10000
+      maxWait: 60000
 
   - name: LOCAL
     ti:
@@ -200,6 +219,11 @@ environments:
       fdBaseUrl: http://127.0.0.1:3000
       xapiKey: refimpldoesnotcheckanyways==
       userAgent: eRp-Testsuite
+    epaMockClient:
+      epaMockUrl: https://epa-as-mock.test.epa4all.de:4433
+      epaMockApiKey: DUMMY VALUE
+      logRetrieveInterval: 10000
+      maxWait: 60000
 
 konnektors:
   - name: KonSim@localhost

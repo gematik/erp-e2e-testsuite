@@ -31,10 +31,7 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier;
 import de.gematik.test.core.expectations.verifier.CommunicationVerifier;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.ClosePrescription;
-import de.gematik.test.erezept.actions.IssuePrescription;
-import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actions.communication.GetMessage;
 import de.gematik.test.erezept.actions.communication.GetMessages;
 import de.gematik.test.erezept.actions.communication.SendMessages;
@@ -507,6 +504,60 @@ public class GetMessagesIT extends ErpTest {
     // cleanup
     airportApo.performs(
         ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
+  }
+
+  @TestcaseId("ERP_COMMUNICATION_GET_09")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Ein {2}-Patient prüft, dass seine Nachrichten für {0} und"
+              + " Belieferungsoption {1} nach dem Abschluss durch die Apotheke nicht mehr abgerufen"
+              + " werden können!")
+  @DisplayName(
+      "Es muss geprüft werden, dass Communications nach einem Close Nicht mehr abrufbar sind")
+  @MethodSource("getCommunicationTestComposer")
+  void shouldForbidGetCommunicationWhenClosed(
+      PrescriptionAssignmentKind assignmentKind,
+      SupplyOptionsType supplyOptionsType,
+      VersicherungsArtDeBasis insuranceType) {
+    sina.changePatientInsuranceType(insuranceType);
+    val task = prescribe(assignmentKind, sina);
+
+    // Patient und Apo können Nachrichten Senden / Empfangen
+    val disRequest =
+        sina.performs(
+            SendMessages.to(airportApo)
+                .forTask(task)
+                .asDispenseRequest(
+                    new CommunicationDisReqMessage(
+                        supplyOptionsType,
+                        "Hey StammApotheke, mein Imodium ist alle, habt Ihr noch Vorräte vor Ort?"
+                            + " Und wenn nicht einen großen Korken ??")));
+    val dispReqId = disRequest.getExpectedResponse().getIdPart();
+    sina.attemptsTo(Verify.that(disRequest).withExpectedType().isCorrect());
+
+    // Task wird abgeschlossen
+    airportApo.performs(
+        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
+    val taskById =
+        airportApo.performs(
+            GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
+
+    // Nachrichten sollen nicht mehr zur Verfügung stehen
+    val dispReqAtApoAfterClose =
+        airportApo.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
+    sina.attemptsTo(
+        Verify.that(dispReqAtApoAfterClose)
+            .withOperationOutcome(ErpAfos.A_20513)
+            .hasResponseWith(returnCode(404))
+            .isCorrect());
+
+    val disReq2AfterClose =
+        sina.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
+    airportApo.attemptsTo(
+        Verify.that(disReq2AfterClose)
+            .withOperationOutcome(ErpAfos.A_20513)
+            .hasResponseWith(returnCode(404))
+            .isCorrect());
   }
 
   private ErxTask prescribe(PrescriptionAssignmentKind assignmentKind, PatientActor actor) {

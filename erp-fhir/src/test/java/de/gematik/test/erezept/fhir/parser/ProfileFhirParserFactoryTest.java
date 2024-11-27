@@ -34,6 +34,6 @@ class ProfileFhirParserFactoryTest {
   @Test
   void shouldCreateProfiledParsers() {
     val parsers = ProfileFhirParserFactory.getProfiledValidators();
-    assertEquals(3, parsers.size());
+    assertEquals(4, parsers.size());
   }
 }

@@ -18,7 +18,7 @@ package de.gematik.test.erezept.client.usecases;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;

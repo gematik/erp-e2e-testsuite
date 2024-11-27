@@ -1,0 +1,23 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "EPAMSOperationOutcomeVS",
+  "id": "epa-ms-operation-outcome-vs",
+  "title": "EPA Medication Service OperationOutcome VS",
+  "description": "Include all VS of EPAMSOperationOutcomeCS and Operation Outcome codes used by FHIR",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/ValueSet/epa-ms-operation-outcome-vs",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/operation-outcome"
+      },
+      {
+        "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-ms-operation-outcome-codes-cs"
+      }
+    ]
+  }
+}

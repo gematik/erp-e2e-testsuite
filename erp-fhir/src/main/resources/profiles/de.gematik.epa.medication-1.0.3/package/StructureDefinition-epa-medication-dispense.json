@@ -1,0 +1,174 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "epa-medication-dispense",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-dispense",
+  "version": "1.0.3",
+  "name": "EPAMedicationDispense",
+  "title": "EPA MedicationDispense",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "Defines the medication dispense resource for the Medication Service in the ePA system.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "MedicationDispense",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/MedicationDispense",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "MedicationDispense.meta",
+        "path": "MedicationDispense.meta",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.meta.versionId",
+        "path": "MedicationDispense.meta.versionId",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.meta.lastUpdated",
+        "path": "MedicationDispense.meta.lastUpdated",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.extension:rxPrescriptionProcessIdentifier",
+        "path": "MedicationDispense.extension",
+        "sliceName": "rxPrescriptionProcessIdentifier",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-prescription-process-identifier-extension"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationDispense.identifier",
+        "path": "MedicationDispense.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "$this"
+            }
+          ],
+          "rules": "open",
+          "ordered": false
+        }
+      },
+      {
+        "id": "MedicationDispense.identifier:RxOriginatorProcessIdentifier",
+        "path": "MedicationDispense.identifier",
+        "sliceName": "RxOriginatorProcessIdentifier",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-originator-process-identifier"
+            ]
+          }
+        ],
+        "patternIdentifier": {
+          "system": "https://gematik.de/fhir/epa-medication/sid/rx-originator-process-identifier"
+        }
+      },
+      {
+        "id": "MedicationDispense.status",
+        "path": "MedicationDispense.status",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-dispense-vs"
+        }
+      },
+      {
+        "id": "MedicationDispense.medication[x]",
+        "path": "MedicationDispense.medication[x]",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Medication"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.subject",
+        "path": "MedicationDispense.subject",
+        "min": 1,
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.subject.identifier",
+        "path": "MedicationDispense.subject.identifier",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.performer",
+        "path": "MedicationDispense.performer",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.performer.actor",
+        "path": "MedicationDispense.performer.actor",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Organization"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationDispense.authorizingPrescription.reference",
+        "path": "MedicationDispense.authorizingPrescription.reference",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.whenHandedOver",
+        "path": "MedicationDispense.whenHandedOver",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.dosageInstruction",
+        "path": "MedicationDispense.dosageInstruction",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.substitution",
+        "path": "MedicationDispense.substitution",
+        "mustSupport": true
+      }
+    ]
+  }
+}

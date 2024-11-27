@@ -48,7 +48,7 @@ public class ListPatients implements Callable<Integer> {
   private boolean printCertificate = false;
 
   @Override
-  public Integer call() throws Exception {
+  public Integer call() {
     val sca = SmartcardArchive.fromResources();
 
     val smartcards =

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.primsys.data;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.primsys.data.valuesets.StandardSizeDto;
 import de.gematik.test.erezept.primsys.data.valuesets.SupplyFormDto;
@@ -25,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,7 +39,7 @@ class PznDispensedMedicationDtoTest {
       "de.gematik.test.erezept.util.ExampleFileProvider#getDispensedPznMedicationExamples")
   void shouldReadFromJson(File example) {
     val om = new ObjectMapper();
-    Assertions.assertDoesNotThrow(() -> om.readValue(example, PznDispensedMedicationDto.class));
+    assertDoesNotThrow(() -> om.readValue(example, PznDispensedMedicationDto.class));
   }
 
   @Test
@@ -52,7 +53,7 @@ class PznDispensedMedicationDtoTest {
         PznDispensedMedicationDto.dispensed(medication).withBatchInfo("123123", new Date());
 
     val om = new ObjectMapper();
-    Assertions.assertDoesNotThrow(() -> om.writeValueAsString(dispensed));
+    assertDoesNotThrow(() -> om.writeValueAsString(dispensed));
   }
 
   @Test
@@ -77,6 +78,6 @@ class PznDispensedMedicationDtoTest {
         PznDispensedMedicationDto.dispensed(medication2).withBatchInfo("123123", new Date());
     body.add(dispensed2);
     val om = new ObjectMapper();
-    Assertions.assertDoesNotThrow(() -> om.writeValueAsString(body));
+    assertDoesNotThrow(() -> om.writeValueAsString(body));
   }
 }

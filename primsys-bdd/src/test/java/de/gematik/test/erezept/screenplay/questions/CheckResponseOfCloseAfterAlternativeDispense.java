@@ -51,21 +51,19 @@ public class CheckResponseOfCloseAfterAlternativeDispense implements Question<Bo
     val checkResults = new LinkedList<Boolean>();
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
 
-    val firstDispenseBundle = order.chooseFrom(prescriptionManager.getDispensedPrescriptions());
+    val dispensedPrescription = order.chooseFrom(prescriptionManager.getDispensedPrescriptions());
+    val dispensedMedicationId =
+        dispensedPrescription.getMedicationDispenses().get(0).getErpMedicationFirstRep().getId();
 
     val patientsMedicationDispense =
         patient.asksFor(GetMedicationDispense.asPatient().forPrescription(order));
 
+    // TODO: rather then checking the ID of the contained medication, check the prescriptionId!
     checkResults.add(
         patientsMedicationDispense.getMedicationDispenses().stream()
-            .allMatch(
-                medicationDis ->
-                    medicationDis.getErpMedicationFirstRep().getId()
-                        != firstDispenseBundle
-                            .getMedicationDispenses()
-                            .get(0)
-                            .getErpMedicationFirstRep()
-                            .getId()));
+            .noneMatch(md -> dispensedMedicationId.equals(md.getErpMedicationFirstRep().getId())));
+
+    // TODO: recap if we need those checks here at all
     val telematikId = actor.abilityTo(UseSMCB.class).getTelematikID();
     checkResults.add(
         patientsMedicationDispense.getMedicationDispenses().stream()

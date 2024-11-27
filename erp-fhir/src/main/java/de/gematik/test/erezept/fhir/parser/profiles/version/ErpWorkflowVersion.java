@@ -27,7 +27,8 @@ import lombok.RequiredArgsConstructor;
 public enum ErpWorkflowVersion implements ProfileVersion<ErpWorkflowVersion> {
   V1_1_1("1.1.1", LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2023, Month.JULY, 31)),
   V1_2_0("1.2.0", LocalDate.of(2023, Month.AUGUST, 1), LocalDate.of(2024, Month.OCTOBER, 31)),
-  V1_3_0("1.3.0", LocalDate.of(2024, Month.NOVEMBER, 1), LocalDate.of(2070, Month.JANUARY, 1));
+  V1_3_0("1.3.0", LocalDate.of(2024, Month.NOVEMBER, 1), LocalDate.of(2025, Month.MARCH, 31)),
+  V1_4_0("1.4.0", LocalDate.of(2025, Month.APRIL, 1), LocalDate.of(2070, Month.JANUARY, 1));
 
   private final String version;
   private final LocalDate validFromDate;

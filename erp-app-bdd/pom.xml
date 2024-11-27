@@ -6,7 +6,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.9.0</version>
+        <version>0.9.1</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
@@ -18,7 +18,7 @@
         <maven.compiler.source>${version.java}</maven.compiler.source>
 
         <tags/>
-        <appFailRerun>0</appFailRerun>
+        <failsafeFailRerun>0</failsafeFailRerun>
         <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
     </properties>
 
@@ -227,7 +227,7 @@
                     <forkCount>1</forkCount>
                     <threadCount>1</threadCount>
                     <reuseForks>true</reuseForks>
-                    <rerunFailingTestsCount>${appFailRerun}</rerunFailingTestsCount>
+                    <rerunFailingTestsCount>${failsafeFailRerun}</rerunFailingTestsCount>
                     <skip>${skip.inttests}</skip>
                 </configuration>
                 <executions>

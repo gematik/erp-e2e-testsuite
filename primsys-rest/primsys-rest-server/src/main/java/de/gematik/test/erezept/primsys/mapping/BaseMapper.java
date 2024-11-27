@@ -20,6 +20,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.Getter;
+import lombok.val;
 
 @Getter
 public abstract class BaseMapper<D> {
@@ -69,6 +70,13 @@ public abstract class BaseMapper<D> {
       BooleanSupplier checker, Consumer<T> setter, Supplier<T> defaultSupplier) {
     if (checker.getAsBoolean()) {
       setter.accept(defaultSupplier.get());
+    }
+  }
+
+  protected final <T> void setIfPresent(Supplier<T> getter, Consumer<T> setter) {
+    val value = getter.get();
+    if (!isNullOrEmpty(value)) {
+      setter.accept(value);
     }
   }
 }

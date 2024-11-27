@@ -32,6 +32,10 @@ public class ExampleFileProvider {
     return readResourceFiles("examples/coverages");
   }
 
+  public static Stream<File> getEvdgaRequestExamples() {
+    return readResourceFiles("examples/evdgabundlerequest");
+  }
+
   public static Stream<File> getPznMedicationExamples() {
     return readResourceFiles("examples/medications/pzn");
   }
@@ -46,6 +50,10 @@ public class ExampleFileProvider {
 
   public static Stream<File> getMedicationRequestExamples() {
     return readResourceFiles("examples/medicationrequests");
+  }
+
+  public static Stream<File> getHealthAppRequestExamples() {
+    return readResourceFiles("examples/healthapprequests");
   }
 
   public static Stream<File> getAcceptedExamples() {

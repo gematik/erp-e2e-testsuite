@@ -44,6 +44,7 @@ import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -54,6 +55,7 @@ import org.junit.runner.RunWith;
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication Tests")
+@Tag("Communication")
 public class SendInvalidMessagesIT extends ErpTest {
 
   public static final int MAX_STRING_LENGTH_500 = 500;

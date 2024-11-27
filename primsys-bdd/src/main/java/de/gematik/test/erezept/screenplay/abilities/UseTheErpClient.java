@@ -29,6 +29,7 @@ import de.gematik.test.erezept.jwt.JWTDecoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Delegate;
 import lombok.val;
@@ -38,6 +39,7 @@ import org.hl7.fhir.r4.model.Resource;
 
 public class UseTheErpClient implements Ability {
 
+  @Getter
   @Delegate(excludes = DelegateExclude.class)
   private final ErpClient client;
 

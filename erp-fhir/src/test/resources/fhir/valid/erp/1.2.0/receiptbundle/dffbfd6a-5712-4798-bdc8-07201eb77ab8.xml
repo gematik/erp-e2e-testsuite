@@ -47,7 +47,7 @@
                 </event>
                 <section>
                     <entry>
-                        <reference value="Binary/PrescriptionDigest-160.123.456.789.123.58"/>
+                        <reference value="urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
                     </entry>
                 </section>
             </Composition>
@@ -79,10 +79,10 @@
     </entry>
     <entry>
         <fullUrl
-                value="https://erp.zentral.erp.splitdns.ti-dienste.de/Task/160.000.080.761.527.39/PrescriptionDigest-160.123.456.789.123.58"/>
+                value="urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
         <resource>
             <Binary>
-                <id value="PrescriptionDigest-160.123.456.789.123.58"/>
+                <id value="b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
                 <meta>
                     <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"/>
                 </meta>

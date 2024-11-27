@@ -19,6 +19,7 @@ package de.gematik.test.erezept.integration.communication;
 import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.*;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.*;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsAll5Links;
 import static java.text.MessageFormat.format;
 import static org.junit.Assert.assertTrue;
 
@@ -52,7 +53,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,7 +68,7 @@ import org.junit.runner.RunWith;
 @Tag("Communication")
 public class GetCommunicationsWithPagingIT extends ErpTest {
 
-  @Actor(name = "Sina Hüllmann")
+  @Actor(name = "Hanna Bäcker")
   private static PatientActor patient;
 
   @Actor(name = "Adelheid Ulmenwald")
@@ -77,11 +77,13 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @Actor(name = "Am Flughafen")
   private PharmacyActor flughafenApo;
 
+  private static final String QUERY_KEY_SORT = "_sort";
+
   private static Stream<Arguments> actorComposer() {
     return ArgumentComposer.composeWith()
         .arguments(
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Sina Hüllmann"))
+            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
         .arguments(
             "Apotheke",
             (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPharmacyNamed("Am Flughafen"))
@@ -91,11 +93,29 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   public static Stream<Arguments> communicationBundleQueryComposer() {
     return PagingArgumentComposer.queryComposerSmallValuesForCommunication()
         .arguments(
-            IQueryParameter.search().withOffset(10).withCount(10).createParameter(),
-            "_count=10&__offset=10",
+            IQueryParameter.search().withOffset(4).withCount(4).createParameter(),
+            "_count=4&__offset=4",
             "_count",
             "last",
-            "10")
+            "4")
+        .arguments(
+            IQueryParameter.search().sortedBy("received", SortOrder.DESCENDING).createParameter(),
+            "_sort=-received",
+            QUERY_KEY_SORT,
+            "next",
+            "-received")
+        .arguments(
+            IQueryParameter.search().sortedBy("recipient", SortOrder.ASCENDING).createParameter(),
+            "_sort=recipient",
+            QUERY_KEY_SORT,
+            "self",
+            "recipient")
+        .arguments(
+            IQueryParameter.search().sortedBy("identifier", SortOrder.ASCENDING).createParameter(),
+            "_sort=identifier",
+            QUERY_KEY_SORT,
+            "self",
+            "identifier")
         .create();
   }
 
@@ -104,34 +124,22 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
         .arguments(
             2,
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Sina Hüllmann"))
+            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
         .arguments(
             1,
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Sina Hüllmann"))
+            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
         .arguments(
             4,
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Sina Hüllmann"))
-        .arguments(
-            4,
-            "Apotheke",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPharmacyNamed("Am Flughafen"))
-        .arguments(
-            3,
-            "Apotheke",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPharmacyNamed("Am Flughafen"))
-        .arguments(
-            5,
-            "Apotheke",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPharmacyNamed("Am Flughafen"))
+            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
         .create();
   }
 
   @TestcaseId("ERP_COMMUNICATION_PAGING_01")
   @ParameterizedTest(
       name =
-          "[{index}] -> Prüfe bei Communications, dass das Paging als {0} der RelationLink self"
+          "[{index}] -> Prüfe bei Communications, dass beim Paging als {0} der RelationLink self"
               + " funktioniert")
   @DisplayName(
       "Es muss sichergestellt werden, dass Paging bei Communications funktioniert. Speziell der"
@@ -319,6 +327,15 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
     val actor = actorProvider.apply(this);
 
+    val task =
+        doctor
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
+            .getExpectedResponse();
+    if (actor.getType().equals(ActorType.PATIENT)) {
+      sendMultipleDispenseRequestsAndCount(task, 10);
+    } else {
+      sendMultipleReplyAndCount(task, 10);
+    }
     val firstCall =
         actor.performs(
             GetMessages.fromServerWith(
@@ -350,11 +367,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_PAGING_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset und _count"
-              + " Default URL-Parameter (_count=50, __offset=0) ")
+          "[{index}] -> Abrufen von CommunicationBundles als {0} muss der __offset und"
+              + " Default URL-Parameter (__offset=0) ")
   @DisplayName(
       "Es muss sichergestellt werden, dass Paging bei CommunicationBundles funktioniert. Speziell"
-          + " der __offset und _count Default URL-Parameter (_count=50, __offset=0)")
+          + " der __offset Default URL-Parameter (__offset=0)")
   @MethodSource("actorComposer")
   void shouldGetCommunicationBundlesWithDefaultOffsetAndCount(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -365,9 +382,6 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
             GetMessages.fromServerWith(
                 CommunicationSearch.withAdditionalQuery(
                     IQueryParameter.search().sortedByDate(SortOrder.ASCENDING).createParameter())));
-
-    actor.attemptsTo(
-        Verify.that(firstCall).withExpectedType().and(containsEntriesOfCount(50)).isCorrect());
 
     val secondBundleInteraction =
         actor.performs(
@@ -380,7 +394,6 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
     actor.attemptsTo(
         Verify.that(secondBundleInteraction)
             .withExpectedType()
-            .and(containsEntriesOfCount(50))
             .and(
                 hasElementAtPosition(firstCall.getExpectedResponse().getCommunications().get(9), 4))
             .isCorrect());
@@ -404,7 +417,10 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
         actor.performs(
             GetMessages.fromServerWith(
                 CommunicationSearch.withAdditionalQuery(
-                    IQueryParameter.search().sortedByDate(SortOrder.ASCENDING).createParameter())));
+                    IQueryParameter.search()
+                        .sortedByDate(SortOrder.ASCENDING)
+                        .withCount(3)
+                        .createParameter())));
 
     assertTrue(
         "given first CommunicationBundle has to have a next-Relation-Link",
@@ -440,10 +456,10 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
           "[{index}] -> Als {1} muss überprüft werden, ob der Total Count im CommunicationBundle um"
               + " {0} erhöht wird")
   @DisplayName(
-      "Es muss sichergestellt werden, dass der Total-Count immer entsprechend um den folgenden Wert"
+      "Es muss sichergestellt werden, dass der Total-Count um den folgenden Wert"
           + " erhöht wird: ")
   @MethodSource("actorComposerWithCount")
-  void shouldadaptTotalCount(
+  void shouldAdaptTotalCount(
       int count, String actorType, Function<ErpTest, ErpActor> actorProvider) {
     val task =
         doctor
@@ -747,40 +763,36 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
             .isCorrect());
   }
 
-  @Disabled
   @TestcaseId("ERP_COMMUNICATION_PAGING_20")
   @ParameterizedTest(
       name =
-          "[{index}] -> Als {0} muss überprüft werden, ob der Filter für recipient in Get"
-              + " CommunicationBundle funktioniert")
+          "[{index}] -> Prüfe bei Communications, dass beim Paging als {0} alle RelationLink"
+              + " verfügbar sind bei Verwendung der RelationLinks")
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei CommunicationBundle funktioniert. Genauer,"
-          + " dass der Filteroperator Identifier funktionieren")
+      "Es muss sichergestellt werden, dass Paging bei Communications funktioniert. Speziell die"
+          + " Bereitstellung aller RelationLinks während ihrer Anwendung")
   @MethodSource("actorComposer")
-  void getCommunicationBundleFilteredByIdentifier(
+  void responseOfUsingRelationLinksHasToHaveAllRelationLinks(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
-    // todo builder anpassen, der ein Identifier setzt und dann hier communication senden und wieder
-    // abfragen
-
     val actor = actorProvider.apply(this);
 
-    val id =
-        actor.getType().equals(ActorType.PATIENT)
-            ? ((PatientActor) actor).getKvnr().asIdentifier()
-            : ((PharmacyActor) actor).getTelematikId().asIdentifier();
     val firstCall =
         actor.performs(
             GetMessages.fromServerWith(
-                CommunicationSearch.withAdditionalQuery(
-                    IQueryParameter.search()
-                        .withCount(5)
-                        .sortedByDate(SortOrder.ASCENDING)
-                        .identifier(id)
-                        .createParameter())));
-    patient.attemptsTo(
-        Verify.that(firstCall)
+                CommunicationSearch.searchFor()
+                    .specificQuery(IQueryParameter.search().withCount(5).createParameter())
+                    .sortedBySendDate(SortOrder.DESCENDING)));
+    assertTrue(
+        "given CommunicationBundle has to have a NEXT-Relation-Link",
+        firstCall.getExpectedResponse().hasNextRelation());
+    val secondCall = actor.performs(DownloadBundle.nextFor(firstCall.getExpectedResponse()));
+
+    val thirdCall = actor.performs(DownloadBundle.nextFor(secondCall.getExpectedResponse()));
+    actor.attemptsTo(
+        Verify.that(thirdCall)
             .withExpectedType()
-            .and(containsOnlyIdentifierWith(id.getValue()))
+            .hasResponseWith(returnCode(200, ErpAfos.A_24443))
+            .and(containsAll5Links())
             .isCorrect());
   }
 

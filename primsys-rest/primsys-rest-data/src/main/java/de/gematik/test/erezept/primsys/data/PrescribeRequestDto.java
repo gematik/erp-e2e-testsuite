@@ -18,7 +18,6 @@ package de.gematik.test.erezept.primsys.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,9 +30,7 @@ import lombok.RequiredArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PrescribeRequestDto {
 
-  @JsonProperty(required = true)
   private PatientDto patient;
-
   private CoverageDto coverage;
   private MedicationRequestDto medicationRequest;
   private PznMedicationDto medication;

@@ -397,7 +397,11 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   @Override
   public void tearDown() {
     log.info("Quit driver");
-    driver.quit();
+    try {
+      driver.quit();
+    } catch (Exception e) {
+      log.error("Error while quitting the driver", e);
+    }
   }
 
   @Override

@@ -42,6 +42,14 @@ public class GenericBundleVerifier {
         .accept();
   }
 
+  public static <T extends Bundle> VerificationStep<T> minimumCountOfEntriesOf(int count) {
+    Predicate<T> predicate = bundle -> bundle.getEntry().size() >= count;
+    return new VerificationStep.StepBuilder<T>(
+            ErpAfos.A_24441, format("Die enthaltene Anzahl an Entries mindestens {0} sein.", count))
+        .predicate(predicate)
+        .accept();
+  }
+
   public static <T extends Bundle> VerificationStep<T> containsTotalCountOf(int totalCount) {
     Predicate<T> predicate = bundle -> bundle.getTotal() == totalCount;
     return new VerificationStep.StepBuilder<T>(
@@ -88,7 +96,7 @@ public class GenericBundleVerifier {
                     .count()
                 == count;
     return new VerificationStep.StepBuilder<T>(
-            ErpAfos.A_24442,
+            ErpAfos.A_24443,
             format(
                 "Es müssen {1} Link-Relation aus der Liste {0} enthaltenen sein.",
                 possibleLinks, count))

@@ -59,7 +59,7 @@ class AbortUseCaseTest extends TestWithActorContext {
     when(mockClient.request(any())).thenReturn(mockResponse);
     try (var response =
         AbortUseCase.abortPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
-      assertEquals(200, response.getStatus());
+      assertEquals(204, response.getStatus());
     }
   }
 

@@ -1,0 +1,41 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "epa-erp-prescription-id",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-erp-prescription-id",
+  "version": "1.0.3",
+  "name": "EPAeRPPrescriptionId",
+  "title": "EPA Identifier Profile for eRP Prescription IDs",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "The prescriptionID is an generated and not changeable sequence of numbers seperated by dots. The first three numbers define the type of the prescription. The next twelve numbers are the generated unique and consecutive sequence of the prescription. The last two digits are the check numbers according to ISO 7064.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Identifier",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Identifier",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Identifier.use",
+        "path": "Identifier.use",
+        "fixedCode": "official"
+      },
+      {
+        "id": "Identifier.system",
+        "path": "Identifier.system",
+        "min": 1,
+        "fixedUri": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+        "mustSupport": true
+      },
+      {
+        "id": "Identifier.value",
+        "path": "Identifier.value",
+        "min": 1,
+        "mustSupport": true
+      }
+    ]
+  }
+}

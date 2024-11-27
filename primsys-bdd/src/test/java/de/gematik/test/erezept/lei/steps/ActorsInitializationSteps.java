@@ -16,7 +16,6 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
@@ -38,21 +37,21 @@ import net.serenitybdd.screenplay.actors.OnStage;
 @Slf4j
 public class ActorsInitializationSteps {
 
-  private SmartcardArchive smartcards;
-  private PrimSysBddFactory config;
+  private static SmartcardArchive smartcards;
+  private static PrimSysBddFactory config;
   private static DumpingStopwatch stopwatch;
 
   @BeforeAll
-  public static void initStopwatch() {
+  public static void init() {
+    smartcards = SmartcardArchive.fromResources();
+    config =
+        ConfigurationReader.forPrimSysConfiguration()
+            .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, smartcards));
     stopwatch = new DumpingStopwatch("e2e_testsuite");
   }
 
   @Before
   public void setUp() {
-    smartcards = SmartcardArchive.fromResources();
-    config =
-        ConfigurationReader.forPrimSysConfiguration()
-            .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, smartcards));
     OnStage.setTheStage(Cast.ofStandardActors());
   }
 
@@ -77,14 +76,14 @@ public class ActorsInitializationSteps {
    */
   @Angenommen("^die Apotheke (.+) hat Zugriff auf ihre SMC-B$")
   public void initPharmacy(String pharmName) {
-    log.trace(format("Initialize Pharmacy {0}", pharmName));
+    log.trace("Initialize Pharmacy {}", pharmName);
     val theActor = OnStage.theActorCalled(pharmName);
     config.equipAsPharmacy(theActor);
   }
 
   @Angenommen("^(?:der Apotheker|die Apothekerin) (.+) hat Zugriff auf (?:seinen|ihren) HBA$")
   public void initApothecary(String apothecaryName) {
-    log.trace(format("Initialize Apothecary {0}", apothecaryName));
+    log.trace("Initialize Apothecary {}", apothecaryName);
     val theActor = OnStage.theActorCalled(apothecaryName);
     config.equipAsApothecary(theActor);
   }
@@ -102,7 +101,7 @@ public class ActorsInitializationSteps {
       "^(?:der Arzt|die Ärztin) (.+) hat Zugriff auf (?:seinen|ihren) HBA und auf die SMC-B der"
           + " Praxis$")
   public void initDoctor(String docName) {
-    log.trace(format("Initialize Doctor {0}", docName));
+    log.trace("Initialize Doctor {}", docName);
     val theActor = OnStage.theActorCalled(docName);
     config.equipAsDoctor(theActor);
   }
@@ -133,7 +132,7 @@ public class ActorsInitializationSteps {
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat Zugriff auf"
           + " (?:seine|ihre) (?:digitale Identität|eGK)$")
   public void initPatient(String insuranceType, String patientName) {
-    log.trace(format("Initialize Patient {0} {1}", insuranceType, patientName));
+    log.trace("Initialize Patient {} {}", insuranceType, patientName);
     val theActor = OnStage.theActorCalled(patientName);
     config.equipAsPatient(theActor, insuranceType);
   }
@@ -142,7 +141,7 @@ public class ActorsInitializationSteps {
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat eine (?:digitale"
           + " Identität|eGK) für die Abholung in der Apotheke$")
   public void initPatientForVsdm(String insuranceType, String patientName) {
-    log.trace(format("Initialize Patient {0} {1} for VSDM", insuranceType, patientName));
+    log.trace("Initialize Patient {} {} for VSDM", insuranceType, patientName);
     val theActor = OnStage.theActorCalled(patientName);
     config.equipAsPatientForVsdm(theActor, insuranceType);
   }

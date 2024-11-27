@@ -16,12 +16,10 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
-
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.PatientBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
@@ -52,8 +50,10 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
 
   @Override
   protected KbvPatient convertInternal() {
+    // anyway, if no check was performed on the KVNR, we will still use a random one
+    val kvnr = hasKvnr() ? getKvnr() : KVNR.random();
     return PatientBuilder.builder()
-        .kvnr(getKvnr(), getInsuranceKind())
+        .kvnr(kvnr, getInsuranceKind())
         .name(dto.getFirstName(), dto.getLastName())
         .birthDate(dto.getBirthDate())
         .address(Country.D, dto.getCity(), dto.getPostal(), dto.getStreet())
@@ -78,6 +78,7 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
   public static PatientDataMapper from(KbvPatient patient) {
     val dto = new PatientDto();
     dto.setKvnr(patient.getKvnr().getValue());
+    dto.setInsuranceType(InsuranceTypeDto.valueOf(patient.getInsuranceKind().getCode()));
 
     val humanName = patient.getNameFirstRep();
     dto.setFirstName(humanName.getGivenAsSingleString());
@@ -98,12 +99,6 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
   }
 
   public static PatientDto randomDto() {
-    return PatientDto.withKvnr(KVNR.random().getValue())
-        .named(fakerFirstName(), fakerLastName())
-        .bornOn(fakerBirthday())
-        .city(fakerCity())
-        .postal(fakerZipCode())
-        .street(fakerStreetName())
-        .build();
+    return from(PatientFaker.builder().fake()).getDto();
   }
 }

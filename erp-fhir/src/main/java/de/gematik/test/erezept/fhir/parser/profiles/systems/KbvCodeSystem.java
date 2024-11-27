@@ -25,6 +25,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum KbvCodeSystem implements ICodeSystem {
+  BASE_IDENTIFIER_TYPE("https://fhir.kbv.de/CodeSystem/KBV_CS_Base_identifier_type"),
   STATUS_CO_PAYMENT("https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_StatusCoPayment"),
   STATUS_CO_PAYMENT_FOR(
       "https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_StatusCoPayment"), // the new one!

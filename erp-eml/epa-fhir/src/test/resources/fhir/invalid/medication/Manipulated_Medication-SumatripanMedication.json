@@ -1,0 +1,59 @@
+{
+  "resourceType": "Medication",
+  "id": "SumatripanMedication",
+  "meta": {
+    "profile": [
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication"
+    ]
+  },
+  "extension": [
+    {
+      "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension",
+      "valueCoding": {
+        "code": "781405001",
+        "system": "http://snomed.info/sct",
+        "display": "Medicinal product package (product)",
+        "version": "http://snomed.info/sct/900000000000207008/version/20240201"
+      }
+    },
+    {
+      "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension",
+      "valueCoding": {
+        "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs",
+        "code": "200"
+      }
+    },
+    {
+      "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension",
+      "valueBoolean": false
+    },
+    {
+      "url": "http://fhir.de/StructureDefinition/normgroesse",
+      "valueCode": "N1"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://fhir.de/CodeSystem/ifa/pzn",
+        "code": "06313728ABCD"
+      }
+    ],
+    "text": "Sumatriptan-1a Pharma 100 mg Tabletten"
+  },
+  "amount": {
+    "numerator": {
+      "extension": [
+        {
+          "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension",
+          "valueString": "20 St."
+        }
+      ],
+      "value": 20,
+      "unit": "St"
+    },
+    "denominator": {
+      "value": 1
+    }
+  }
+}

@@ -17,18 +17,30 @@
 package de.gematik.test.erezept.client.rest;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
-import static java.text.MessageFormat.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.client.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
 import java.time.Duration;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
+import java.util.List;
+import java.util.Map;
+import lombok.val;
+import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.Resource;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ErpResponseFactoryTest {
 
@@ -93,7 +105,8 @@ class ErpResponseFactoryTest {
     val resource = response.getAsBaseResource();
     assertNotNull(
         resource, format("Response must contain a Resource of Type {0}", OperationOutcome.class));
-    assertTrue(resource instanceof OperationOutcome, "Resource is expected to be OperationOutcome");
+    assertInstanceOf(
+        OperationOutcome.class, resource, "Resource is expected to be OperationOutcome");
     assertTrue(response.isOfExpectedType());
 
     // get the concrete OperationOutcome
@@ -116,7 +129,8 @@ class ErpResponseFactoryTest {
     val outputOO = response.getAsBaseResource();
     assertNotNull(
         outputOO, format("Response must contain a Resource of Type {0}", OperationOutcome.class));
-    assertTrue(outputOO instanceof OperationOutcome, "Resource is expected to be OperationOutcome");
+    assertInstanceOf(
+        OperationOutcome.class, outputOO, "Resource is expected to be OperationOutcome");
 
     val concreteResource = response.getExpectedResource();
     assertNotNull(
@@ -221,5 +235,18 @@ class ErpResponseFactoryTest {
     val response =
         rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
     assertFalse(response.isValidPayload());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", " ", "\t", "\n", "\r", "\r\n"})
+  @NullSource
+  void shouldNotFailOnBlankContent(String content) {
+    val validatingResponseFactory = new ErpResponseFactory(fhir, true);
+    val response =
+        assertDoesNotThrow(
+            () ->
+                validatingResponseFactory.createFrom(
+                    STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, content, Resource.class));
+    assertTrue(response.getResourceOptional().isEmpty());
   }
 }

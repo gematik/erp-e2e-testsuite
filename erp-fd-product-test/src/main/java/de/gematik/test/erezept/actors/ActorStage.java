@@ -26,13 +26,12 @@ import net.serenitybdd.core.steps.Instrumented;
 
 public class ActorStage {
 
-  @Getter private final ErpFdTestsuiteFactory config;
+  @Getter private static final ErpFdTestsuiteFactory config = ErpFdTestsuiteFactory.create();
   private final Map<String, DoctorActor> doctors;
   private final Map<String, PatientActor> patients;
   private final Map<String, PharmacyActor> pharmacies;
 
   public ActorStage() {
-    this.config = ErpFdTestsuiteFactory.create();
     this.doctors = new HashMap<>();
     this.patients = new HashMap<>();
     this.pharmacies = new HashMap<>();

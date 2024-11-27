@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>0.9.0</version>
+        <version>0.9.1</version>
     </parent>
 
     <artifactId>erp-config</artifactId>
@@ -23,6 +23,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>feature-toggle-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -38,5 +47,4 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
     </dependencies>
-
 </project>

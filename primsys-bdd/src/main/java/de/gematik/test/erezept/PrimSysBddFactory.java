@@ -30,6 +30,7 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
+import de.gematik.test.erezept.exceptions.WebSocketException;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.pspwsclient.config.PSPClientFactory;
@@ -89,7 +90,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
     // check psp connected successfully
     if (!pspClient.isConnected()) {
-      throw new AssertionError("PSP-Client could not connect to PSP-Server");
+      throw new WebSocketException("PSP-Client could not connect to PSP-Server");
     }
     return pspClient;
   }
@@ -113,7 +114,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
         .describedAs(cfg.getDescription())
         .whoCan(useTheKonnektor)
         .can(UseTheErpClient.with(erpClient).authenticatingWith(useTheKonnektor))
-        .can(ProvideDoctorBaseData.fromConfiguration(cfg))
+        .can(ProvideDoctorBaseData.fromConfiguration(cfg, hba.getTelematikId()))
         .can(ManageDoctorsPrescriptions.sheIssued());
   }
 

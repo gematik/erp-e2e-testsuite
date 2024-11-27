@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.builder;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import java.util.regex.Pattern;

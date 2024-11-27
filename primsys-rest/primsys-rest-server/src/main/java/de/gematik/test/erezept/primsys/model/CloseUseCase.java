@@ -16,98 +16,54 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static java.text.MessageFormat.format;
-
-import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
-import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
-import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
-import de.gematik.test.erezept.primsys.mapping.PznDispensedMedicationDataMapper;
-import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.core.Response;
-import java.util.Date;
 import java.util.List;
 import lombok.val;
 
-public class CloseUseCase {
+public class CloseUseCase extends AbstractDispensingUseCase {
 
-  private CloseUseCase() {
-    throw new AssertionError();
+  public CloseUseCase(Pharmacy pharmacy) {
+    super(pharmacy);
   }
 
-  public static Response closePrescription(Pharmacy pharmacy, String taskId, String secret) {
-    val acceptData = getPrescribedMedicationFromAccept(taskId);
-    return closePrescription(pharmacy, taskId, new Secret(secret), List.of(acceptData), false);
+  public Response closePrescription(String taskId, String secret) {
+    val response =
+        pharmacy.erpRequest(new TaskGetByIdCommand(TaskId.from(taskId), Secret.fromString(secret)));
+    val prescriptionBundle = response.getExpectedResource();
+    val hasMedicationDispense = prescriptionBundle.getTask().hasLastMedicationDispenseDate();
+
+    List<PznDispensedMedicationDto> medications = List.of();
+    if (!hasMedicationDispense) {
+      val acceptData = this.getPrescribedMedicationFromAccept(taskId);
+      medications = List.of(acceptData);
+    }
+    return closePrescription(taskId, new Secret(secret), medications, false);
   }
 
-  public static Response closePrescription(
-      Pharmacy pharmacy,
-      String taskId,
-      String secret,
-      List<PznDispensedMedicationDto> dispenseMedications) {
-    return closePrescription(pharmacy, taskId, new Secret(secret), dispenseMedications, true);
+  public Response closePrescription(
+      String taskId, String secret, List<PznDispensedMedicationDto> dispenseMedications) {
+    return closePrescription(taskId, new Secret(secret), dispenseMedications, true);
   }
 
-  private static Response closePrescription(
-      Pharmacy pharmacy,
+  private Response closePrescription(
       String prescriptionId,
       Secret secret,
       List<PznDispensedMedicationDto> medications,
       boolean isSubstituted) {
 
-    val accepted = getAcceptedPrescription(prescriptionId);
+    val accepted = this.getAcceptedPrescription(prescriptionId);
 
-    val medicationDispenses =
-        medications.stream()
-            .map(
-                dispMedication ->
-                    PznDispensedMedicationDataMapper.from(
-                            dispMedication,
-                            KVNR.from(accepted.getForKvnr()),
-                            PrescriptionId.from(prescriptionId),
-                            pharmacy.getSmcb().getTelematikId(),
-                            isSubstituted)
-                        .convert())
-            .toList();
-
-    val dispenseMedicationCommand =
-        new CloseTaskCommand(TaskId.from(prescriptionId), secret, medicationDispenses);
-    val closeResponse = pharmacy.erpRequest(dispenseMedicationCommand);
+    val closeCommand = this.createCloseCommand(prescriptionId, secret, medications, isSubstituted);
+    val closeResponse = pharmacy.erpRequest(closeCommand);
     val body = closeResponse.getExpectedResource();
 
-    val dispensedData = new DispensedMedicationDto();
-    dispensedData.setPrescriptionId(prescriptionId);
-    dispensedData.setSecret(secret.getValue());
-    dispensedData.setAcceptData(accepted);
-    dispensedData.setReceipt(body.getId());
-    dispensedData.setDispensedDate(new Date());
-    dispensedData.setMedications(medications);
-
-    ActorContext.getInstance().addDispensedMedications(dispensedData);
+    val dispensedData =
+        this.storeDispensedMedication(prescriptionId, secret, accepted, body.getId(), medications);
     return Response.status(closeResponse.getStatusCode()).entity(dispensedData).build();
-  }
-
-  private static PznDispensedMedicationDto getPrescribedMedicationFromAccept(
-      String prescriptionId) {
-    val accepted = getAcceptedPrescription(prescriptionId);
-    return PznDispensedMedicationDto.dispensed(accepted.getMedication())
-        .withBatchInfo(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate());
-  }
-
-  public static AcceptedPrescriptionDto getAcceptedPrescription(String prescriptionId) {
-    return ActorContext.getInstance()
-        .getAcceptedPrescription(prescriptionId)
-        .orElseThrow(
-            () ->
-                ErrorResponseBuilder.createInternalErrorException(
-                    404,
-                    format(
-                        "no prescription with PrescriptionId {0} was accepted", prescriptionId)));
   }
 }

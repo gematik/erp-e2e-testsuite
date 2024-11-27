@@ -48,7 +48,7 @@ public class DoctorPrescribeSteps {
         .attemptsTo(
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   @Angenommen(
@@ -62,7 +62,7 @@ public class DoctorPrescribeSteps {
         .attemptsTo(
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   @Angenommen(
@@ -104,7 +104,7 @@ public class DoctorPrescribeSteps {
         .attemptsTo(
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   @Wenn(
@@ -118,7 +118,7 @@ public class DoctorPrescribeSteps {
         .attemptsTo(
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   @Wenn(
@@ -166,7 +166,52 @@ public class DoctorPrescribeSteps {
         .attemptsTo(
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende"
+          + " apothekenpflichtige Freitext Verordnung(?:en)? verschreibt:$")
+  public void whenIssuePharmacyOnlyFreeTextPrescriptionToActor(
+      String docName, String patientName, DataTable freitextVerordnung) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .forFreitextVerordnung(freitextVerordnung.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende"
+          + " apothekenpflichtige Rezeptur Verordnung(?:en)? verschreibt:$")
+  public void whenIssuePharmacyOnlyCompoundingPrescriptionToActor(
+      String docName, String patientName, DataTable rezepturVerordnung) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .forRezepturVerordnung(rezepturVerordnung.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende"
+          + " apothekenpflichtige Wirkstoff Verordnung(?:en)? verschreibt:$")
+  public void whenIssuePharmacyOnlyIngredientPrescriptionToActor(
+      String docName, String patientName, DataTable wirkstoffVerordnung) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .forWirkstoffVerordnung(wirkstoffVerordnung.asMaps()));
   }
 
   @Wenn(
@@ -180,7 +225,7 @@ public class DoctorPrescribeSteps {
         .attemptsTo(
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   @Wenn(
@@ -234,7 +279,7 @@ public class DoctorPrescribeSteps {
             Negate.the(
                     IssuePrescription.forPatient(thePatient)
                         .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                        .from(medications.asMaps()))
+                        .forPznPrescription(medications.asMaps()))
                 .with(UnexpectedResponseResourceError.class));
   }
 
@@ -274,7 +319,7 @@ public class DoctorPrescribeSteps {
             Negate.the(
                     IssuePrescription.forPatient(thePatient)
                         .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                        .from(medications.asMaps()))
+                        .forPznPrescription(medications.asMaps()))
                 .with(UnexpectedResponseResourceError.class));
   }
 
@@ -290,7 +335,7 @@ public class DoctorPrescribeSteps {
             Negate.the(
                     IssuePrescription.forPatient(thePatient)
                         .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                        .from(medications.asMaps()))
+                        .forPznPrescription(medications.asMaps()))
                 .with(UnexpectedResponseResourceError.class));
   }
 }

@@ -16,16 +16,17 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static java.text.MessageFormat.*;
-
-import ca.uhn.fhir.parser.*;
-import ca.uhn.fhir.validation.*;
-import de.gematik.test.erezept.fhir.parser.*;
+import ca.uhn.fhir.parser.DataFormatException;
+import ca.uhn.fhir.validation.ValidationResult;
+import com.google.common.base.Strings;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.time.Duration;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 public class ErpResponseFactory {
@@ -53,10 +54,14 @@ public class ErpResponseFactory {
 
     if (status >= 500) {
       // log unhandled errors from backend for better analysis
-      log.error(format("Server Error {0}: {1}", status, content));
+      log.error("Server Error {}: {}", status, content);
     }
 
-    Resource resource = (content.length() > 0) ? decode(content, expect) : null;
+    val resource =
+        Optional.ofNullable(content)
+            .filter(c -> !Strings.isNullOrEmpty(content) && !content.isBlank())
+            .map(c -> decode(c, expect))
+            .orElse(null);
     return ErpResponse.forPayload(resource, expect)
         .withStatusCode(status)
         .withDuration(duration)
@@ -76,9 +81,9 @@ public class ErpResponseFactory {
       // 2. IllegalArgumentException is thrown if an empty response is expected, but we still get a
       // resource (probably an OperationOutcome)
       log.info(
-          format(
-              "Given content of length {0} could not be decoded as {1}, try without expectation",
-              content.length(), expect.getSimpleName()));
+          "Given content of length {} could not be decoded as {}, try without expectation",
+          content.length(),
+          expect.getSimpleName());
       ret = parser.decode(content);
     }
     return ret;
@@ -86,13 +91,13 @@ public class ErpResponseFactory {
 
   private ValidationResult validateContent(String content) {
     ValidationResult vr;
-    if (!validateResponse || content.isEmpty() || content.isBlank()) {
+    if (!validateResponse || Strings.isNullOrEmpty(content) || content.isBlank()) {
       // simply create an empty validation results which will always be successful
       vr = new ValidationResult(this.parser.getCtx(), List.of());
     } else {
       vr = this.parser.validate(content);
       if (!vr.isSuccessful()) {
-        log.error(format("FHIR Content is invalid\n{0}", content));
+        log.error("FHIR Content is invalid\n{}", content);
       }
     }
 

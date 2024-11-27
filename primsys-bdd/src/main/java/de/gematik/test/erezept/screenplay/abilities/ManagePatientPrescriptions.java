@@ -22,10 +22,11 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import net.serenitybdd.screenplay.*;
 
+@Getter
 @Slf4j
 public class ManagePatientPrescriptions implements Ability {
 
-  @Getter private final ManagedList<ErxPrescriptionBundle> fullDetailedPrescriptions;
+  private final ManagedList<ErxPrescriptionBundle> fullDetailedPrescriptions;
 
   private ManagePatientPrescriptions() {
     fullDetailedPrescriptions =

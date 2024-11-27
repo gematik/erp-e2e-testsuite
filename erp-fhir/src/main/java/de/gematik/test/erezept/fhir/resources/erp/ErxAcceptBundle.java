@@ -60,9 +60,9 @@ public class ErxAcceptBundle extends Bundle {
 
   public String getKbvBundleId() {
     return this.getEntry().stream()
-        .map(BundleEntryComponent::getResource)
-        .filter(resource -> resource.getResourceType().equals(ResourceType.Binary))
-        .map(resource -> IdentifierUtil.getUnqualifiedId(resource.getId()))
+        //        .map(BundleEntryComponent::getResource)
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Binary))
+        .map(entry -> IdentifierUtil.getUnqualifiedId(entry.getFullUrlElement()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(ErxAcceptBundle.class, ResourceType.Binary));
   }

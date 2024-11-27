@@ -22,7 +22,7 @@ import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;

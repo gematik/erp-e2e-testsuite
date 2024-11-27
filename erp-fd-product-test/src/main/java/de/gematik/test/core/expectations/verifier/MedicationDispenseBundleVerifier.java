@@ -20,9 +20,11 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.val;
@@ -49,6 +51,39 @@ public class MedicationDispenseBundleVerifier {
                 .allMatch(localDatePredicate);
     return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
             ErpAfos.A_25515, description)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> verifyCountOfContainedMedication(
+      int count) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> bundle.getMedicationDispenses().size() == count;
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            ErpAfos.A_19248,
+            format("Die Anzahl der enthaltenen MedicationDispense muss {0} sein", count))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> verifyContainedMedicationDispensePZNs(
+      List<ErxMedicationDispense> medicationDispenses) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> {
+          val expectedPzn =
+              medicationDispenses.stream()
+                  .map(mD -> mD.getErpMedicationFirstRep().getPzn())
+                  .toList();
+          val givenPzns =
+              bundle.getMedicationDispenses().stream()
+                  .map(mD -> mD.getErpMedicationFirstRep().getPzn())
+                  .toList();
+          return new HashSet<>(givenPzns).containsAll(expectedPzn)
+              && new HashSet<>(expectedPzn).containsAll(givenPzns);
+        };
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            ErpAfos.A_19248,
+            "Die enthaltenen MedicationDispense müssen die gleichen sein wie die übergebenen")
         .predicate(predicate)
         .accept();
   }

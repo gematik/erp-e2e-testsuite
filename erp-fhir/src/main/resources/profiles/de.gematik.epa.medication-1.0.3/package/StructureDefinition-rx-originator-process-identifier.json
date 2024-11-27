@@ -1,0 +1,35 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "rx-originator-process-identifier",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-originator-process-identifier",
+  "version": "1.0.3",
+  "name": "RxOriginatorProcessIdentifier",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "The RxOriginatorProcessIdentifier, generated within the Medication Service, links the prescriptionID from the E-Rezept-Fachdienst with the original input FHIR resource ID, facilitating accurate tracking and utilization of medication data in operational processes within digital healthcare systems.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Identifier",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Identifier",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Identifier.system",
+        "path": "Identifier.system",
+        "min": 1,
+        "patternUri": "https://gematik.de/fhir/epa-medication/sid/rx-originator-process-identifier",
+        "mustSupport": true
+      },
+      {
+        "id": "Identifier.value",
+        "path": "Identifier.value",
+        "min": 1,
+        "mustSupport": true
+      }
+    ]
+  }
+}

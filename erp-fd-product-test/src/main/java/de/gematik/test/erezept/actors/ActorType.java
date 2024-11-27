@@ -19,7 +19,8 @@ package de.gematik.test.erezept.actors;
 public enum ActorType {
   PATIENT("Versicherte/r"),
   DOCTOR("Arzt/Ärztin"),
-  PHARMACY("Apotheke");
+  PHARMACY("Apotheke"),
+  ;
 
   private final String readable;
 

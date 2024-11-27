@@ -16,7 +16,9 @@
 
 package de.gematik.test.erezept.primsys.rest.response;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
@@ -34,6 +36,7 @@ class InfoResponseBuilderTest extends TestWithActorContext {
   }
 
   @Test
+  @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "")
   void shouldGenerateDefaultInfoResource() {
     val ctx = ActorContext.getInstance();
     val info = InfoResponseBuilder.getInfo(ctx);
@@ -46,7 +49,7 @@ class InfoResponseBuilderTest extends TestWithActorContext {
   }
 
   @Test
-  @SetSystemProperty(key = "erp.fhir.profile", value = "1.2.0")
+  @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "1.2.0")
   void shouldChangeProfileViaSystemProperty() {
     val ctx = ActorContext.getInstance();
     val info = InfoResponseBuilder.getInfo(ctx);

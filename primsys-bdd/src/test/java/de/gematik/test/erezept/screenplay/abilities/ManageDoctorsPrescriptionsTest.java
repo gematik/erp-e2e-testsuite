@@ -18,7 +18,8 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
@@ -51,7 +53,7 @@ class ManageDoctorsPrescriptionsTest {
   void shouldTeardown() {
     OnStage.setTheStage(new Cast() {});
 
-    val actor = OnStage.theActor("Alice");
+    val actor = OnStage.theActor("Dr. Schraßer");
     val ability = spy(ManageDoctorsPrescriptions.sheIssued());
     actor.can(ability);
 
@@ -60,8 +62,9 @@ class ManageDoctorsPrescriptionsTest {
     when(erxTask.getAccessCode()).thenReturn(AccessCode.random());
     ability.getPrescriptions().append(erxTask);
 
-    val erpClient = mock(UseTheErpClient.class);
-    actor.can(erpClient);
+    val erpClient = mock(ErpClient.class);
+    val erpClientAbility = UseTheErpClient.with(erpClient);
+    actor.can(erpClientAbility);
 
     val mockResponse =
         ErpResponse.forPayload(createOperationOutcome(), Resource.class)
@@ -71,6 +74,22 @@ class ManageDoctorsPrescriptionsTest {
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     OnStage.drawTheCurtain();
+
+    verify(ability, times(1)).tearDown();
+  }
+
+  @Test
+  void shouldNotFailOnTeardownWithoutErpClient() {
+    OnStage.setTheStage(new Cast() {});
+
+    val actor = OnStage.theActor("Adelheid Ulmenwald");
+    val ability = spy(ManageDoctorsPrescriptions.sheIssued());
+    actor.can(ability);
+
+    val erxTask = mock(ErxTask.class);
+    ability.append(erxTask);
+
+    assertDoesNotThrow(OnStage::drawTheCurtain);
 
     verify(ability, times(1)).tearDown();
   }

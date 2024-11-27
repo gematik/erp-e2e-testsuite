@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;

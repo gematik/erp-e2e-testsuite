@@ -29,7 +29,7 @@ import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.UUID;
-import lombok.NonNull;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
@@ -52,7 +52,9 @@ public class ProvideDoctorBaseData implements Ability {
   private final String street;
   @Setter private boolean isAsv = false;
 
-  private ProvideDoctorBaseData(DoctorConfiguration cfg) {
+  @Getter private final String hbaTelematikId;
+
+  private ProvideDoctorBaseData(DoctorConfiguration cfg, String telematikID) {
     this.practitionerId = UUID.randomUUID().toString();
     this.medicationOrganizationId = UUID.randomUUID().toString();
 
@@ -76,6 +78,7 @@ public class ProvideDoctorBaseData implements Ability {
     this.city = GemFaker.fakerCity();
     this.postal = GemFaker.fakerZipCode();
     this.street = GemFaker.fakerStreetName();
+    this.hbaTelematikId = telematikID;
   }
 
   public KbvPractitioner getPractitioner() {
@@ -127,7 +130,7 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   public static ProvideDoctorBaseData fromConfiguration(
-      @NonNull final DoctorConfiguration doctorConfiguration) {
-    return new ProvideDoctorBaseData(doctorConfiguration);
+      DoctorConfiguration doctorConfiguration, String hbaTelematikId) {
+    return new ProvideDoctorBaseData(doctorConfiguration, hbaTelematikId);
   }
 }

@@ -31,6 +31,7 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
@@ -161,9 +162,11 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
 
   private KbvErpBundleBuilder getBundleBuilder(
       KbvErpMedication medication, KbvErpMedicationRequest medicationRequest) {
-    return KbvErpBundleBuilder.faker(sina.getKvnr())
-        .practitioner(doctorActor.getPractitioner())
-        .medicationRequest(medicationRequest) // what is the medication
-        .medication(medication);
+    return KbvErpBundleFaker.builder()
+        .withKvnr(sina.getKvnr())
+        .withPractitioner(doctorActor.getPractitioner())
+        .withMedication(medication)
+        .toBuilder()
+        .medicationRequest(medicationRequest);
   }
 }

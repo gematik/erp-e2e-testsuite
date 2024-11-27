@@ -21,23 +21,20 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import java.util.Objects;
-import lombok.Getter;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
 /** <a href="https://de.wikipedia.org/wiki/Betriebsst%C3%A4ttennummer">Betriebsstättennummer</a> */
-public class BSNR {
+public class BSNR extends Value<String> {
 
-  private static final KbvNamingSystem NAMING_SYSTEM = KbvNamingSystem.BASE_BSNR;
   private static final Hl7CodeSystem CODE_SYSTEM = Hl7CodeSystem.HL7_V2_0203;
-  private static final String CODE = "BSNR";
-
-  @Getter private final String value;
+  private static final String CODE = IdentifierTypeDe.BSNR.getCode();
 
   public BSNR(String value) {
-    this.value = value;
+    super(KbvNamingSystem.BASE_BSNR, value);
   }
 
   public static BSNR random() {
@@ -49,18 +46,9 @@ public class BSNR {
   }
 
   public Identifier asIdentifier() {
-    val id = new Identifier();
+    val id = super.asIdentifier();
     id.getType().addCoding(new Coding().setCode(CODE).setSystem(CODE_SYSTEM.getCanonicalUrl()));
-    id.setSystem(NAMING_SYSTEM.getCanonicalUrl()).setValue(value);
     return id;
-  }
-
-  public static KbvNamingSystem getNamingSystem() {
-    return NAMING_SYSTEM;
-  }
-
-  public static String getNamingSystemUrl() {
-    return NAMING_SYSTEM.getCanonicalUrl();
   }
 
   public static Hl7CodeSystem getCodeSystem() {
@@ -90,6 +78,6 @@ public class BSNR {
 
   @Override
   public String toString() {
-    return format("BSNR: {0}", this.value);
+    return format("BSNR: {0}", this.getValue());
   }
 }

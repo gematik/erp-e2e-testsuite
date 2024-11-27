@@ -22,11 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -230,6 +232,39 @@ class MedicationDispenseBundleVerifierTest extends ParsingTest {
   void shouldThrowWhileVerifyWhenHandedOverIsAfter2() {
     val testDate = LocalDate.of(2024, Month.JULY, 31);
     val step = verifyWhenHandedOverIsAfter(testDate);
+    assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldDetectCorrectCountOfContainedMedicationDispenses() {
+    val step = verifyCountOfContainedMedication(5);
+    assertDoesNotThrow(() -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldThrowWhileDetectingCorrectCountOfContainedMedicationDispenses() {
+    val step = verifyCountOfContainedMedication(3);
+    assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldDetectCorrectContainedMedicationDispenses() {
+    val step = verifyContainedMedicationDispensePZNs(validMedDisp.getMedicationDispenses());
+    assertDoesNotThrow(() -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldThrowWhileDetectingCorrectContainedMedicationDispenses() {
+    val partOfMedDisp = validMedDisp.getMedicationDispenses().subList(0, 4);
+    val step = verifyContainedMedicationDispensePZNs(partOfMedDisp);
+    assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldThrowWhileDetectingAMissingContainedMedicationDispenses() {
+    val medDispList = List.of(ErxMedicationDispenseFaker.builder().withPzn("123456789").fake());
+
+    val step = verifyContainedMedicationDispensePZNs(medDispList);
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 }

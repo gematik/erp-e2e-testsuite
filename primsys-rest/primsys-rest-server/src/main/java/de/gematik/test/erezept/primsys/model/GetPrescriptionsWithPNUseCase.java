@@ -16,9 +16,8 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static java.lang.String.format;
-
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
+import de.gematik.test.erezept.fhir.values.Value;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.ShallowPrescriptionDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
@@ -52,10 +51,7 @@ public class GetPrescriptionsWithPNUseCase {
               dto.setPrescriptionId(erxTask.getPrescriptionId().getValue());
               dto.setTaskId(erxTask.getTaskId().getValue());
               dto.setAccessCode(erxTask.getAccessCode().getValue());
-              dto.setKvnr(
-                  erxTask.getForKvnr().isPresent()
-                      ? erxTask.getForKvnr().get().getValue()
-                      : "entry is empty");
+              dto.setKvnr(erxTask.getForKvnr().map(Value::getValue).orElse("entry is empty"));
 
               prescriptionsAsDto.add(dto);
             });
@@ -63,11 +59,10 @@ public class GetPrescriptionsWithPNUseCase {
   }
 
   public Response getPrescriptionByKvnr(String kvnr) {
-    log.info(
-        format(
-            "GetPrescriptionsWithPNUseCase().getPrescriptionByKvnr({0}) was called but is not"
-                + " implemented, yet",
-            kvnr));
-    return Response.status(400).entity("not yet implemented").build();
+    log.warn(
+        "GetPrescriptionsWithPNUseCase.getPrescriptionByKvnr({}) was called but is not implemented,"
+            + " yet",
+        kvnr);
+    return ErrorResponseBuilder.createInternalError(400, "not yet implemented");
   }
 }

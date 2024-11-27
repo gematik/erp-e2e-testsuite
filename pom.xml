@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -17,6 +17,7 @@
         <module>erp-client</module>
         <module>erp-fhir</module>
         <module>erp-fhir-fuzzing</module>
+        <module>erp-eml</module>
         <module>konnektor-client</module>
         <module>erp-bdd-common</module>
         <module>primsys-bdd</module>
@@ -48,12 +49,12 @@
         <version.surefire-report>3.0.0-M2</version.surefire-report>
         <version.maven-javadoc-plugin>3.5.0</version.maven-javadoc-plugin>
         <version.maven-owasp-plugin>8.2.1</version.maven-owasp-plugin>
-        <version.hapi-fhir>7.2.1</version.hapi-fhir>
+        <version.hapi-fhir>7.2.3</version.hapi-fhir>
         <version.serenity>4.1.20</version.serenity>
         <version.appium>9.2.2</version.appium>
         <version.idp-client>28.0.2</version.idp-client>
         <version.spotless>2.41.1</version.spotless>
-        <version.fasterxml.jackson>2.17.1</version.fasterxml.jackson>
+        <version.fasterxml.jackson>2.18.1</version.fasterxml.jackson>
         <version.junit>5.10.2</version.junit>
         <version.assertj>3.24.2</version.assertj>
         <version.archunit>1.0.1</version.archunit>
@@ -71,7 +72,7 @@
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
         <version.jersey>4.0.0-M1</version.jersey>
         <version.poto>3.0.0-185</version.poto>
-        <version.bricks>0.1.9</version.bricks>
+        <version.bricks>0.1.10</version.bricks>
 
         <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
 
@@ -118,81 +119,81 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>pharmacy-service-provider-ws-client</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>0.9.0</version>
+                <version>0.9.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -244,6 +245,11 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
                 <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+                <version>${version.fasterxml.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <artifactId>jackson-jakarta-rs-xml-provider</artifactId>
                 <version>${version.fasterxml.jackson}</version>
             </dependency>
 
@@ -319,7 +325,17 @@
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-builder-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>fhir-codec-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-de-basisprofil-r4-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
             <dependency>
@@ -327,6 +343,11 @@
                 <artifactId>fhir-codec-brick</artifactId>
                 <version>${version.bricks}</version>
                 <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>feature-toggle-brick</artifactId>
+                <version>${version.bricks}</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
@@ -346,6 +367,21 @@
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>crypto-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>rest-client-api-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>rest-client-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>raw-http-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
             <dependency>

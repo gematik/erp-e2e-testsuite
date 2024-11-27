@@ -27,6 +27,10 @@
     {
       "code": "e16A",
       "display": "elektronische Arzneimittelverordnung"
+    },
+    {
+      "code": "e16D",
+      "display": "elektronische Verordnung digitaler Gesundheitsanwendungen"
     }
   ],
   "identifier": [
