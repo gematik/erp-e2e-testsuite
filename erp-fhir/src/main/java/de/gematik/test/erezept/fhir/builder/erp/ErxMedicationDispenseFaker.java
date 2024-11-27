@@ -16,91 +16,50 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 import lombok.val;
 import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.MedicationDispense;
 
-public class ErxMedicationDispenseFaker {
-  private KVNR kvnr = KVNR.random();
-  private final Map<String, Consumer<ErxMedicationDispenseBuilder>> builderConsumers =
-      new HashMap<>();
+public class ErxMedicationDispenseFaker
+    extends ErxMedicationDispenseBaseFaker<
+        ErxMedicationDispense, ErxMedicationDispenseFaker, ErxMedicationDispenseBuilder> {
+
   private static final String KEY_MEDICATION = "medication"; // key used for builderConsumers map
 
   private ErxMedicationDispenseFaker() {
-    builderConsumers.put("performer", b -> b.performerId(fakerTelematikId()));
-    builderConsumers.put("prescriptionId", b -> b.prescriptionId(fakerPrescriptionId()));
-    builderConsumers.put(
-        KEY_MEDICATION, b -> b.medication(KbvErpMedicationPZNFaker.builder().fake()));
+    super();
     builderConsumers.put("batch", b -> b.batch(fakerLotNumber(), fakerFutureExpirationDate()));
+
+    if (fakerBool()
+        && ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
+      withMedication(GemErpMedicationFaker.builder().fake());
+    } else {
+      withMedication(KbvErpMedicationPZNFaker.builder().fake());
+    }
   }
 
   public static ErxMedicationDispenseFaker builder() {
     return new ErxMedicationDispenseFaker();
   }
 
-  public ErxMedicationDispenseFaker withKvnr(KVNR kvnr) {
-    this.kvnr = kvnr;
-    return this;
-  }
-
-  public ErxMedicationDispenseFaker withVersion(ErpWorkflowVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
-  }
-
   public ErxMedicationDispenseFaker withPzn(String pzn) {
     val newMedication =
         KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
-    builderConsumers.computeIfPresent(
-        KEY_MEDICATION, (key, defaultValue) -> b -> b.medication(newMedication));
+    builderConsumers.put(KEY_MEDICATION, b -> b.medication(newMedication));
     return this;
-  }
-
-  public ErxMedicationDispenseFaker withPerfomer(String perfomerId) {
-    builderConsumers.computeIfPresent(
-        "performer", (key, defaultValue) -> b -> b.performerId(perfomerId));
-    return this;
-  }
-
-  public ErxMedicationDispenseFaker withPrescriptionId(PrescriptionId prescriptionId) {
-    builderConsumers.computeIfPresent(
-        "prescriptionId", (key, defaultValue) -> b -> b.prescriptionId(prescriptionId));
-    return this;
-  }
-
-  public ErxMedicationDispenseFaker withPrescriptionId(String prescriptionId) {
-    return this.withPrescriptionId(new PrescriptionId(prescriptionId));
-  }
-
-  public ErxMedicationDispenseFaker withStatus(MedicationDispense.MedicationDispenseStatus status) {
-    builderConsumers.put("status", b -> b.status(status));
-    return this;
-  }
-
-  public ErxMedicationDispenseFaker withStatus(String status) {
-    return this.withStatus(MedicationDispense.MedicationDispenseStatus.fromCode(status));
   }
 
   public ErxMedicationDispenseFaker withMedication(KbvErpMedication medication) {
-    builderConsumers.computeIfPresent(
-        KEY_MEDICATION, (key, defaultValue) -> b -> b.medication(medication));
-    return this;
-  }
-
-  public ErxMedicationDispenseFaker withHandedOverDate(Date whenHandedOver) {
-    builderConsumers.put("handedOverDate", b -> b.whenHandedOver(whenHandedOver));
+    builderConsumers.put(KEY_MEDICATION, b -> b.medication(medication));
     return this;
   }
 
@@ -110,7 +69,7 @@ public class ErxMedicationDispenseFaker {
   }
 
   public ErxMedicationDispenseFaker withBatch(Medication.MedicationBatchComponent batch) {
-    builderConsumers.computeIfPresent("batch", (key, defaultValue) -> b -> b.batch(batch));
+    builderConsumers.put("batch", b -> b.batch(batch));
     return this;
   }
 
@@ -119,10 +78,6 @@ public class ErxMedicationDispenseFaker {
     newBatch.setLotNumber(lotNumber);
     newBatch.setExpirationDate(expirationDate);
     return this.withBatch(newBatch);
-  }
-
-  public ErxMedicationDispense fake() {
-    return this.toBuilder().build();
   }
 
   public ErxMedicationDispenseBuilder toBuilder() {

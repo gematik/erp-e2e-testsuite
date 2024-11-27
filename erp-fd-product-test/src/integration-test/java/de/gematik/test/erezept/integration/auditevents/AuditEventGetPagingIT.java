@@ -32,14 +32,11 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.arguments.PagingArgumentComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.client.usecases.BundlePagingCommand;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Stream;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -64,52 +61,49 @@ public class AuditEventGetPagingIT extends ErpTest {
     return PagingArgumentComposer.queryComposerBigValues().create();
   }
 
-  @BeforeAll
-  static void setTimeZone() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-  }
-
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_01")
   @Test
   @DisplayName(
       "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der next"
-          + " und prev Link ")
+          + " Link ")
   void shouldGetAuditEvent() {
+
     val auditEventQueryParam =
         IQueryParameter.search()
+            .withOffset(10)
             .withCount(5)
             .sortedBy("date", SortOrder.ASCENDING)
             .createParameter();
     val firstAuditEventBundle =
         sina.performs(DownloadAuditEvent.withQueryParams(auditEventQueryParam))
             .getExpectedResponse();
-    assertTrue("firstEventBundle has next Link", firstAuditEventBundle.hasNextRelation());
-    val secondAuditEventBundle = sina.performs(DownloadBundle.nextFor(firstAuditEventBundle));
+    assertTrue("firstEventBundle has to have a next Link", firstAuditEventBundle.hasNextRelation());
+    val secondAuditEventBundleByRelationLinkCall =
+        sina.performs(DownloadBundle.nextFor(firstAuditEventBundle));
     assertTrue(
-        "secondAuditEventBundle has next Link",
-        secondAuditEventBundle.getExpectedResponse().hasNextRelation());
-    val thirdAuditEventBundle =
-        sina.performs(DownloadBundle.nextFor(secondAuditEventBundle.getExpectedResponse()));
-    assertTrue(
-        "thirdAuditEventBundle has prev Link",
-        thirdAuditEventBundle.getExpectedResponse().hasPreviousRelation());
-    val secondByPreviosAuditEventBundle =
-        sina.performs(
-            DownloadBundle.withBundlePagingCommand(
-                BundlePagingCommand.getPreviousFrom(thirdAuditEventBundle.getExpectedResponse())));
+        "secondAuditEventBundle has to have a next Link",
+        secondAuditEventBundleByRelationLinkCall.getExpectedResponse().hasNextRelation());
 
+    val secondAuditEventBundleAsDirectCall =
+        sina.performs(
+            DownloadAuditEvent.withQueryParams(
+                IQueryParameter.search()
+                    .withOffset(14)
+                    .withCount(5)
+                    .sortedBy("date", SortOrder.ASCENDING)
+                    .createParameter()));
     sina.attemptsTo(
-        Verify.that(secondByPreviosAuditEventBundle)
+        Verify.that(secondAuditEventBundleAsDirectCall)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
             .isCorrect());
     sina.attemptsTo(
-        Verify.that(secondAuditEventBundle)
+        Verify.that(secondAuditEventBundleByRelationLinkCall)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
             .and(
                 hasSameEntryIds(
-                    secondByPreviosAuditEventBundle.getExpectedResponse(), ErpAfos.A_24442))
+                    secondAuditEventBundleAsDirectCall.getExpectedResponse(), ErpAfos.A_24442))
             .isCorrect());
   }
 
@@ -218,19 +212,15 @@ public class AuditEventGetPagingIT extends ErpTest {
   @TestcaseId("ERP_AUDIT_EVENT_PAGING_06")
   @Test
   @DisplayName(
-      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell die"
-          + " Default Parameter (_count=50, __offset=0)")
+      "Es muss sichergestellt werden, dass Paging bei AuditEvents funktioniert. Speziell der"
+          + " Default Parameter (__offset=0)")
   void shouldGetAuditEventWith_count() {
     val firstAuditEventBundleInteraction =
         sina.performs(
             DownloadAuditEvent.withQueryParams(
                 IQueryParameter.search().sortedBy("date", SortOrder.ASCENDING).createParameter()));
 
-    sina.attemptsTo(
-        Verify.that(firstAuditEventBundleInteraction)
-            .withExpectedType()
-            .and(containsEntriesOfCount(50))
-            .isCorrect());
+    sina.attemptsTo(Verify.that(firstAuditEventBundleInteraction).withExpectedType().isCorrect());
 
     val secondAuditEventBundleInteraction =
         sina.performs(

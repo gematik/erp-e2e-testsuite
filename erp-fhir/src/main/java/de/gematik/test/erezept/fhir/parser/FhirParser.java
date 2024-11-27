@@ -32,17 +32,18 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 public class FhirParser {
 
   @Getter private final FhirContext ctx;
+  private final ProfileExtractor profileExtractor;
   private final List<FhirProfiledValidator> validators;
   private final FhirProfiledValidator defaultProfileValidator;
   private final ValidatorMode genericValidatorMode = ValidatorMode.getDefault();
@@ -52,6 +53,7 @@ public class FhirParser {
 
   public FhirParser() {
     this.ctx = ProfileFhirParserFactory.createDecoderContext();
+    this.profileExtractor = new ProfileExtractor();
     this.validators = ProfileFhirParserFactory.getProfiledValidators();
     this.defaultProfileValidator = this.validators.get(0);
     this.genericValidator = ProfileFhirParserFactory.createGenericFhirValidator(this.ctx);
@@ -64,16 +66,18 @@ public class FhirParser {
    * @return successful ValidationResult if content represents a valid FHIR-Resource and a
    *     unsuccessful ValidationResult otherwise
    */
-  public ValidationResult validate(@NonNull final String content) {
-    if (ProfileExtractor.isUnprofiledSearchSet(content)) {
+  public ValidationResult validate(String content) {
+    if (this.profileExtractor.isUnprofiledSearchSet(content)) {
+      log.trace("Validate FHIR unprofiled SearchsetBundle with length {}", content.length());
       return validateSearchsetBundle(content);
     } else {
-      val p = chooseProfileValidator(() -> ProfileExtractor.extractProfile(content));
+      log.trace("Validate FHIR Resource with length {}", content.length());
+      val p = chooseProfileValidator(() -> this.profileExtractor.extractProfile(content));
       return p.validate(content);
     }
   }
 
-  private ValidationResult validateSearchsetBundle(final String bundle) {
+  private ValidationResult validateSearchsetBundle(String bundle) {
     // 1. validate the whole bundle without any profiles
     var vrBundle = this.genericValidator.validateWithResult(bundle);
     vrBundle = genericValidatorMode.adjustResult(vrBundle);
@@ -84,46 +88,46 @@ public class FhirParser {
         EncodingType.guessFromContent(bundle).choose(this::getXmlParser, this::getJsonParser);
     parser.parseResource(Bundle.class, bundle).getEntry().stream()
         .map(Bundle.BundleEntryComponent::getResource)
-        .map(parser::encodeToString)
         .forEach(
             r -> {
-              val vr = this.validate(r);
+              val validator = chooseProfileValidator(r);
+              val vr = validator.validate(r);
               validationMessages.addAll(vr.getMessages());
             });
     return new ValidationResult(this.getCtx(), validationMessages);
   }
 
-  public boolean isValid(@NonNull final String content) {
+  public boolean isValid(String content) {
     return validate(content).isSuccessful();
   }
 
-  public <T extends Resource> T decode(Class<T> expectedClass, @NonNull final String content) {
+  public <T extends Resource> T decode(Class<T> expectedClass, String content) {
     val encoding = EncodingType.guessFromContent(content);
     return this.decode(expectedClass, content, encoding);
   }
 
   public synchronized <T extends Resource> T decode(
-      Class<T> expectedClass, @NonNull final String content, EncodingType encoding) {
+      Class<T> expectedClass, String content, EncodingType encoding) {
     val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
     return parser.parseResource(expectedClass, fixBeforeDecode(content));
   }
 
-  public Resource decode(@NonNull final String content) {
+  public Resource decode(String content) {
     val encoding = EncodingType.guessFromContent(content);
     return this.decode(content, encoding);
   }
 
-  public Resource decode(@NonNull final String content, EncodingType encoding) {
+  public Resource decode(String content, EncodingType encoding) {
     // simply put null as expected class and let HAPI do the mapping
     return this.decode(null, content, encoding);
   }
 
-  public String encode(@NonNull IBaseResource resource, EncodingType encoding) {
+  public String encode(IBaseResource resource, EncodingType encoding) {
     return encode(resource, encoding, false);
   }
 
   public synchronized String encode(
-      @NonNull IBaseResource resource, EncodingType encoding, boolean prettyPrint) {
+      IBaseResource resource, EncodingType encoding, boolean prettyPrint) {
     val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
     parser.setPrettyPrint(prettyPrint);
     val encoded = parser.encodeResourceToString(resource);
@@ -132,16 +136,21 @@ public class FhirParser {
 
   private IParser getXmlParser() {
     if (this.xmlParser == null) {
-      this.xmlParser = ctx.newXmlParser();
+      this.xmlParser = ctx.newXmlParser().setOverrideResourceIdWithBundleEntryFullUrl(false);
     }
     return this.xmlParser;
   }
 
   private IParser getJsonParser() {
     if (this.jsonParser == null) {
-      this.jsonParser = ctx.newJsonParser();
+      this.jsonParser = ctx.newJsonParser().setOverrideResourceIdWithBundleEntryFullUrl(false);
     }
     return this.jsonParser;
+  }
+
+  private FhirProfiledValidator chooseProfileValidator(Resource resource) {
+    val profile = resource.getMeta().getProfile().stream().map(PrimitiveType::getValue).findFirst();
+    return chooseProfileValidator(() -> profile);
   }
 
   private FhirProfiledValidator chooseProfileValidator(Supplier<Optional<String>> profileSupplier) {
@@ -187,7 +196,7 @@ public class FhirParser {
    * @param encoded is the encoded resource
    * @return the fixed encoded String
    */
-  private String fixEncoded(IBaseResource resource, final String encoded) {
+  private String fixEncoded(IBaseResource resource, String encoded) {
     String ret = encoded;
     if (resource.getClass().equals(ErxCommunication.class)) {
       ret = encoded.replace("/Task/", "Task/");
@@ -203,7 +212,7 @@ public class FhirParser {
    * @return the fixed encoded String
    */
   private String fixBeforeDecode(String content) {
-    if (ProfileExtractor.isUnprofiledSearchSet(content)) {
+    if (this.profileExtractor.isUnprofiledSearchSet(content)) {
       return content.replace("\"Task/", "\"/Task/");
     } else {
       // no need to change anything if it's not a searchset collection

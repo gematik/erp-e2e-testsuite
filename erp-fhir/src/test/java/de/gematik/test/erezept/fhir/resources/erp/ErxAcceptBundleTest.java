@@ -68,7 +68,7 @@ class ErxAcceptBundleTest extends ParsingTest {
     val erxTask = acceptBundle.getTask();
     assertEquals(expectedTaskId, erxTask.getTaskId().getValue());
 
-    val expectedKbvBundleId = "urn:uuid:a03efedd-0100-0000-0001-000000000000";
+    val expectedKbvBundleId = "a03efedd-0100-0000-0001-000000000000";
     assertEquals(expectedKbvBundleId, acceptBundle.getKbvBundleId());
 
     val kbvString = acceptBundle.getKbvBundleAsString();

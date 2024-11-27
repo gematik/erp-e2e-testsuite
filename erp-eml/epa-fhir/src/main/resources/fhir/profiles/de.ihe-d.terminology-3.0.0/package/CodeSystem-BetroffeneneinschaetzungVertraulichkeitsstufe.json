@@ -1,0 +1,31 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/BetroffeneneinschaetzungVertraulichkeitsstufe",
+  "version": "2021-07-06T21:17:27",
+  "name": "BetroffeneneinschaetzungVertraulichkeitsstufe",
+  "id": "BetroffeneneinschaetzungVertraulichkeitsstufe",
+  "title": "Betroffeneneinschaetzung Vertraulichkeitsstufe",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "PV",
+      "display": "gesperrt",
+      "definition": "Aus Sicht der Betroffenen sind die Daten so sensibel, dass sie für praktisch niemanden außer ihr selbst sichtbar sein sollten."
+    },
+    {
+      "code": "PR",
+      "display": "erhöhte Vertraulichkeit",
+      "definition": "Aus Sicht der Betroffenen sind die Daten sensibel genug, dass für sie besondere Zugriffsregelungen gelten sollen, die den Kreis der Zugriffsberechtigten signifikant einschränken."
+    },
+    {
+      "code": "PN",
+      "display": "übliche Vertraulichkeit",
+      "definition": "Aus Sicht der Betroffenen sind die Daten nicht sensibler als andere Gesundheitsdaten und können daher nach den gleichen Regeln benutzt werden"
+    }
+  ],
+  "count": 3
+}

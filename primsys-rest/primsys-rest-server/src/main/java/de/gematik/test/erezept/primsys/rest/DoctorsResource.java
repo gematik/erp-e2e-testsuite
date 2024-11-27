@@ -16,15 +16,18 @@
 
 package de.gematik.test.erezept.primsys.rest;
 
-import static java.text.MessageFormat.format;
-
-import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
 import de.gematik.test.erezept.primsys.model.AbortUseCase;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.erezept.primsys.model.PrescribeUseCase;
-import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -37,51 +40,46 @@ public class DoctorsResource {
   static ActorContext actors = ActorContext.getInstance();
 
   @POST
-  @Path("{id}/prescribe")
+  @Path("{doctorId}/prescribe")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response issuePrescription(
-      @PathParam("id") String id,
+      @PathParam("doctorId") String doctorId,
       @DefaultValue("false") @QueryParam("direct") boolean isDirectAssignment,
       PrescribeRequestDto body) {
-    log.info("POST/doc/{id}/prescribe with PrescribeRequest as json for Doctor with ID " + id);
-    val doc = getDoctor(id);
+    log.info(
+        "POST/doc/{id}/prescribe with PrescribeRequest as json for Doctor with ID {}", doctorId);
+    val doc = actors.getDoctorOrThrowNotFound(doctorId);
     return PrescribeUseCase.issuePrescription(doc, body, isDirectAssignment);
   }
 
   @POST
-  @Path("{id}/xml/prescribe")
+  @Path("{doctorId}/xml/prescribe")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_XML)
   public Response issuePrescription(
-      @PathParam("id") String id,
+      @PathParam("doctorId") String doctorId,
       @DefaultValue("false") @QueryParam("direct") boolean isDirectAssignment,
       String kbvBundle) {
-    log.info("POST doc/{id}/xml/prescribe with kbvBundle as XML /doc for Doctor with ID " + id);
-    val doc = getDoctor(id);
-    return PrescribeUseCase.issuePrescription(doc, kbvBundle, isDirectAssignment);
+    val doctor = actors.getDoctorOrThrowNotFound(doctorId);
+    log.info(
+        "Doctor {} will issue a prescription from KBV-Bundle as direct assignment={}",
+        doctor.getName(),
+        isDirectAssignment);
+    return PrescribeUseCase.issuePrescription(doctor, kbvBundle, isDirectAssignment);
   }
 
   @DELETE
-  @Path("{id}/abort")
+  @Path("{doctorId}/abort")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response abortPrescriptionAsDoc(
-      @PathParam("id") String id,
+      @PathParam("doctorId") String doctorId,
       @QueryParam("taskId") String taskId,
       @QueryParam("ac") String accessCode,
       @QueryParam("secret") String secret) {
-    log.info("DELETE/doc/{id}/abort for Doctor with ID " + id);
-    val doc = getDoctor(id);
-    return AbortUseCase.abortPrescription(doc, taskId, accessCode, secret);
-  }
-
-  private Doctor getDoctor(String id) {
-    return actors
-        .getDoctor(id)
-        .orElseThrow(
-            () ->
-                ErrorResponseBuilder.createInternalErrorException(
-                    404, format("No Doctor found with ID {0}", id)));
+    val doctor = actors.getDoctorOrThrowNotFound(doctorId);
+    log.info("Doctor {} will abort Task {}", doctor.getName(), taskId);
+    return AbortUseCase.abortPrescription(doctor, taskId, accessCode, secret);
   }
 }

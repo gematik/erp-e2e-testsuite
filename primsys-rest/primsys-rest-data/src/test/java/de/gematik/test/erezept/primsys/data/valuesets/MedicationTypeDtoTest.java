@@ -16,11 +16,14 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class MedicationTypeDtoTest {
   @Test
@@ -31,13 +34,11 @@ class MedicationTypeDtoTest {
     assertEquals(MedicationTypeDto.INGREDIENT, result2);
   }
 
-  @Test
-  void shouldThrowOnInvalidCode() {
-    assertThrows(InvalidCodeValueException.class, () -> MedicationTypeDto.fromCode("invalidCode"));
-  }
-
-  @Test
-  void shouldThrowOnNullCode() {
-    assertThrows(NullPointerException.class, () -> MedicationTypeDto.fromCode(null));
+  @ParameterizedTest
+  @ValueSource(strings = {"invalidCode", ""})
+  @NullSource
+  void shouldMapToUndefinedOnUnknownCode(String code) {
+    val type = assertDoesNotThrow(() -> MedicationTypeDto.fromCode(code));
+    assertEquals(MedicationTypeDto.UNDEFINED, type);
   }
 }

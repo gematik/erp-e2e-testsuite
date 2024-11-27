@@ -33,7 +33,7 @@ class ProvideDoctorBaseDataTest {
     cfgDto.setName("Bernd Claudius");
     cfgDto.setQualificationType("Arzt");
 
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto, "UselessTestId");
 
     assertEquals("Bernd", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Claudius", doc.getPractitioner().getNameFirstRep().getFamily());
@@ -51,7 +51,7 @@ class ProvideDoctorBaseDataTest {
     cfgDto.setName("Bernd Claudius");
     cfgDto.setQualificationType("Zahnarzt");
 
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto, "UselessTestId");
 
     assertEquals("Bernd", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Claudius", doc.getPractitioner().getNameFirstRep().getFamily());
@@ -69,7 +69,7 @@ class ProvideDoctorBaseDataTest {
     cfgDto.setName("");
     cfgDto.setQualificationType("Zahnarzt");
 
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto, "UselessTestId");
 
     assertNotEquals("", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertNotEquals("", doc.getPractitioner().getNameFirstRep().getFamily());
@@ -84,7 +84,7 @@ class ProvideDoctorBaseDataTest {
     val cfgDto = new DoctorConfiguration();
     cfgDto.setName("Bernd Claudius");
     cfgDto.setQualificationType("Arzt");
-    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto);
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto, "UselessTestId");
     doc.setAsv(true);
     val pract = doc.getPractitioner();
     assertEquals(3, pract.getQualification().size());

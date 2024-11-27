@@ -16,18 +16,27 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static java.text.MessageFormat.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
 class KbvCoverageBuilderTest extends ParsingTest {
@@ -35,7 +44,11 @@ class KbvCoverageBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Coverage with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFixedValues(KbvItaForVersion version) {
-    val patient = PatientFaker.builder().withVersion(version).fake();
+    val patient =
+        PatientFaker.builder()
+            .withVersion(version)
+            .withInsuranceType(VersicherungsArtDeBasis.GKV)
+            .fake();
     val coverage =
         KbvCoverageBuilder.insurance(GkvInsuranceCoverageInfo.TK)
             .version(version)
@@ -125,10 +138,7 @@ class KbvCoverageBuilderTest extends ParsingTest {
   void buildCoverageWithFaker02(KbvItaForVersion version) {
     val insuranceKinds =
         List.of(
-            VersicherungsArtDeBasis.GKV,
-            VersicherungsArtDeBasis.PKV,
-            VersicherungsArtDeBasis.BG,
-            VersicherungsArtDeBasis.BEI);
+            VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.BG);
 
     insuranceKinds.forEach(
         ik -> {

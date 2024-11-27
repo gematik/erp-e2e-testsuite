@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;

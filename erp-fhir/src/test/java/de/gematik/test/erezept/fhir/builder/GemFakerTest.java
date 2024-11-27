@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.FakerException;
 import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.values.DoctorProfession;

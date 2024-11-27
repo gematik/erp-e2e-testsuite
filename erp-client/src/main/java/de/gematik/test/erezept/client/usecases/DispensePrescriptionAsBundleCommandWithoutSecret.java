@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;

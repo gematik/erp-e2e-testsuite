@@ -1,9 +1,44 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.9.1
+
+Module:
+
+* erp-eml:
+  - new Epa-Resources available, for Example EpaMedication, EpaMedicationDispense, EpaMedicationRequest,
+    EpaOrganisation, EpaPractitioner, ErpPrescriptionId, RxPrescriptionId, EpaOpCancelDispensation,
+    EpaOpCancelPrescription, EpaOpProvideDispensation, EpaOpProvideDispensation
+  - add Verifier for Eml-MedicationDispense
+  - EpaFhir Version 1.0.3
+* erp-fd-product-test:
+  - new Testcase for epa-op-provide-prescription-erp-input-parameters with
+    6 validators for epa-op-provide-prescription-erp-input-parameters
+  - new Testcase for epa-op-provide-dispensation-erp-input-parameters with
+    5 validators for epa-op-provide-prescription-erp-input-parameters
+  - Add two verifiers for epa-op-cancel-prescription-erp-input-parameters
+  - Add two verifiers for epa-op-cancel-dispensation-erp-input-parameters
+  - new Testcases for epa-op-cancel-prescription-erp-input-parameters
+* primsys-rest:
+  - Faker REST-API for FHIR-Resources
+* Remote FdV
+  - Add status in-progress and cancelled to the prescription scheme
+  - Add lastMedicationDispense (date-time) to the prescription scheme
+* erp-e2e
+  - refactored IssuePrescription to build different medicationTypes in E2E Testsuite
+   
 ## Release 0.8.1
 
 Module:
 
+* erp-eml:
+  - Add new Module named epa-eml to test and validate Epa-Fhir content
+  - this Module contains an EpaFhirFactory Class, in which the B²ric²s validator is accessible and configurable with
+    src/main/resources/fhir/configuration.yaml
+  - also the first profiles and Examples are stored
+  - Implement epa-mock-client for ePa-Mock
+  - Implement polling logic in the ePa mock client for the downloadRequestByKvnr and downloadRequestByPrescriptionId
+    functions.
+  - Implement epa-mock-client for ePa-Mock
 * erp-client:
   - GetOcspRequestParamBuilder to use in GetOCSPRequest
   - C_11530: add generic BundlePagingCommand to get previous or next bundleSet based on specific bundle
@@ -23,25 +58,27 @@ Module:
   - C_11530: extends TaskBundleVerifier to handle SearchSetBundles and compare their entries and relations
   - C_11530: add MedicationRequestVerifier to handle MedicationRequests and compare their entries and relations
   - extends CommunicationBundleVerifier to handle SearchSetBundles and compare their entries and relations
-  - Extension of the key table "Darreichungsform" to include "Injektions- und Infusionsdispersion (IID)" and "Lösung zur intravesikalen Anwendung (LIV)"
+  - Extension of the key table "Darreichungsform" to include "Injektions- und Infusionsdispersion (IID)" and "Lösung
+    zur intravesikalen Anwendung (LIV)"
   - Implenmented TestSzenario to validate the availability of IID and LIV
   - Add toggle to activate Validation for IID and LIV
-  - Implemented TestScenario to test if the KbvBundle without MedicationRequest resource and using MedicationCategory different than 00 the FHIR response is equal to 400.
+  - Implemented TestScenario to test if the KbvBundle without MedicationRequest resource and using MedicationCategory
+    different than 00 the FHIR response is equal to 400.
 * erp-fhir-fuzzing:
   - Add Manipulator to handle different entries in the KbvBundle.
 * erp-fhir:
-  - add FHIR E-Rezept Workflow Version 1.3 (de.gematik.erezept-workflow.r4)
+    - add FHIR E-Rezept Workflow Version 1.3 (de.gematik.erezept-workflow.r4)
 * primsys-rest:
-  - Communication search endpoint for pharmacies
-  - Communication replyWithSender Endpoint &sender=<value>
+    - Communication search endpoint for pharmacies
+    - Communication replyWithSender Endpoint &sender=<value>
 
 * konnektor-client:
-  - upgrade from `javax.ws` to `jakarta.ws`
-* openapi: 
-  - update ErpTestDriver OpenAPI specification to version 1.0.1
+    - upgrade from `javax.ws` to `jakarta.ws`
+* openapi:
+    - update ErpTestDriver OpenAPI specification to version 1.0.1
 
 * primsys-bbd:
-  - Add new FeatureFile for "Zeitnahe Bereitstellung" with Tasks and questions
+    - Add new FeatureFile for "Zeitnahe Bereitstellung" with Tasks and Questions
 
 ## Release 0.7.0
 
@@ -58,11 +95,13 @@ Implemented Features:
 - C_11582: Add toggle to activate Validation for ANR-Validation in Error-Configuration
 - Add Manipulators in KbvBundleManipulatorFactory.class for MedicationCategory, MedicationType, StandardSize and
   Darreichungsform
-- Add actions for RejectConsent, ReadConsent, DeposeConsent, extends their Builder classes and Constructors, add Verifier
+- Add actions for RejectConsent, ReadConsent, DeposeConsent, extends their Builder classes and Constructors, add
+  Verifier
   for Consent
-- CR0071: Extension of the key table "Darreichungsform" to include "Lyophilizate for the preparation of a solution for infusion"
+- CR0071: Extension of the key table "Darreichungsform" to include "Lyophilizate for the preparation of a solution for
+  infusion"
 - Add action "GetMessage" (as Communications)
-- Add actions to call the endpoints OCSPList and CertList from Backend 
+- Add actions to call the endpoints OCSPList and CertList from Backend
 
 ## Release 0.6.0
 
@@ -75,27 +114,32 @@ Implemented Features:
 ## Release 0.5.0
 
 Implemented Features:
-- `primsys-rest-client` for `primsys-rest-server` with common DTOs from `primsys-rest-data` 
+
+- `primsys-rest-client` for `primsys-rest-server` with common DTOs from `primsys-rest-data`
 - Renewal of the certificates for Dr. Schraßer because the QES certificates have expired
 - Change the default signature and encryption algorithm from RSA to ECC
 - Implement configuration for `STRICT`  and `PEDANTIC` FHIR-Validation
-- C_11467: Add test cases to verify that the E-Rezept Fachdienst does not return an AccessCode if the pharmacist changes the ChargeItem
-- C_11399: Add test cases to verify that the AccessCode is not contained in the ChangeItem if it has been changed by the pharmacist
+- C_11467: Add test cases to verify that the E-Rezept Fachdienst does not return an AccessCode if the pharmacist changes
+  the ChargeItem
+- C_11399: Add test cases to verify that the AccessCode is not contained in the ChangeItem if it has been changed by the
+  pharmacist
 - Upgrade Kbv Fhir Package kbv.ita.erp to 1.1.2
 - C_11498: Add test cases to verify that the E-Rezept Fachdienst does check identifier KVNR for insured persons
 
 ## Release 0.4.0
 
 Implemented Features:
-- Implement test cases for the feature "eGK in the pharmacy" 
+
+- Implement test cases for the feature "eGK in the pharmacy"
 - Improve PKV test cases
 - Further development of test data generation, especially for the prescription data set, based on fuzzing concepts
 - Improved Fhir Validation of Collection and Searchset Bundles which contain resources from different profile versions
-- Implement alternative payor in case of VersicherungsArt BG (Berufsgenossenschaft) 
+- Implement alternative payor in case of VersicherungsArt BG (Berufsgenossenschaft)
 
 ## Release 0.3.0
 
 Implemented features:
+
 - Fhir Profile Support for KBV, DAV, GKV, PKV and gematik for the generation of test data and
   validation of fhir resources from July 1, 2023
   - An overview of the Fhir profile versions can be found

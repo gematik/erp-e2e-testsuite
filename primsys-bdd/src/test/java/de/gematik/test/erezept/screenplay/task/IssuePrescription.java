@@ -21,27 +21,25 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PZN;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.fhirdump.FhirDumper;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.strategy.prescription.*;
+import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
+import de.gematik.test.erezept.screenplay.util.DmcPrescription;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -50,32 +48,22 @@ import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.Serenity;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
-import org.hl7.fhir.r4.model.Practitioner;
 
 @Slf4j
 public class IssuePrescription implements Task {
 
-  private final Actor patient;
   private final Actor pharmacy;
-  private final List<Map<String, String>> medications;
-  private final PrescriptionAssignmentKind type;
-  private KVNR patientKvnr;
+  private final PrescriptionDataMapper prescriptionDataMapper;
+
+  private final KVNR patientKvnr;
 
   private IssuePrescription(
       @Nullable KVNR kvnr,
-      @Nullable Actor patient,
       @Nullable Actor pharmacy,
-      PrescriptionAssignmentKind type,
-      List<Map<String, String>> medications) {
+      PrescriptionDataMapper prescriptionDataMapper) {
     this.patientKvnr = kvnr;
-    this.medications = medications;
-    this.patient = patient;
     this.pharmacy = pharmacy;
-    this.type = type;
-
-    if (kvnr == null && patient != null) {
-      this.patientKvnr = SafeAbility.getAbility(patient, ProvideEGK.class).getKvnr();
-    }
+    this.prescriptionDataMapper = prescriptionDataMapper;
   }
 
   public static IssuePrescriptionBuilder forKvnr(String kvnr) {
@@ -97,172 +85,36 @@ public class IssuePrescription implements Task {
     // Practitioner base data (Stammdaten)
     val kbvPractitioner = baseDataAbility.getPractitioner();
     val kbvOrganization = baseDataAbility.getMedicalOrganization();
-    val kbvPatient = this.getPatientBaseData();
-    val kbvPatientCoverage = this.getPatientInsuranceCoverage();
 
-    medications.forEach(
-        med -> {
-          // get the flowtype either from med or reason from patient's insurance kind
-          val workflowType = getFlowType(med.get("Workflow"));
-          // create Task in state draft
-          log.info(
-              format(
-                  "Create Task for {0} with WorkflowType {1} ({2})",
-                  type, workflowType.getCode(), workflowType.getDisplay()));
-          val createCmd = new TaskCreateCommand(workflowType);
-          val createResponse = erpClientAbility.request(createCmd);
-          val draftTask = createResponse.getExpectedResource();
-          val prescriptionId = draftTask.getPrescriptionId();
+    val type = prescriptionDataMapper.getType();
+    prescriptionDataMapper
+        .createKbvBundles(kbvPractitioner, kbvOrganization)
+        .forEach(
+            builderFlowtypePair -> {
+              val builder = builderFlowtypePair.getLeft();
+              val flowType = builderFlowtypePair.getRight();
 
-          log.info(
-              format(
-                  "Issue ePrescription with ID {0} for {1}",
-                  prescriptionId.getValue(), patientKvnr));
-          // create a KBV-Bundle
+              log.info(
+                  format(
+                      "Create Task for {0} with WorkflowType {1} ({2})",
+                      type, flowType.getCode(), flowType.getDisplay()));
 
-          val kbvBundle =
-              createKbvBundle(
-                  actor,
-                  kbvPractitioner,
-                  kbvOrganization,
-                  kbvPatient,
-                  kbvPatientCoverage,
-                  prescriptionId,
-                  med);
+              val createCmd = new TaskCreateCommand(flowType);
+              val createResponse = erpClientAbility.request(createCmd);
+              val draftTask = createResponse.getExpectedResource();
+              val prescriptionId = draftTask.getPrescriptionId();
 
-          // activate the Task
-          val activeTask =
-              this.activateTask(erpClientAbility, konnektorAbility, draftTask, kbvBundle);
+              val kbvBundle = builder.prescriptionId(prescriptionId).build();
 
-          // store the issued prescription
-          managePrescriptions.append(activeTask);
+              val activeTask =
+                  this.activateTask(erpClientAbility, konnektorAbility, draftTask, kbvBundle);
 
-          // handover DMC if a concrete actor is available
-          this.handoverDmc(activeTask);
-        });
+              // store the issued prescription
+              managePrescriptions.append(activeTask);
 
-    actor.forget("MVO-ID");
-  }
-
-  /**
-   * Perform the mapping from a single DataTable-Row to fully built KBV-Bundle
-   *
-   * @param prescriptionId is the Prescription-ID of the Task (in state draft)
-   * @param medMap is a single Row-Entry for the DataTable
-   * @return a fully built KBV-Bundle
-   */
-  private KbvErpBundle createKbvBundle(
-      Actor actor,
-      Practitioner practitioner,
-      MedicalOrganization organization,
-      KbvPatient patient,
-      KbvCoverage insurance,
-      PrescriptionId prescriptionId,
-      Map<String, String> medMap) {
-
-    // read the row of the prescription and fill up with faker values if required
-    val statusKennzeichen = medMap.getOrDefault("KBV_Statuskennzeichen", "00");
-    val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
-    val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
-    val substitution =
-        Boolean.parseBoolean(
-            medMap.getOrDefault("Substitution", GemFaker.getFaker().bool().toString()));
-    val category = medMap.getOrDefault("Verordnungskategorie", "00");
-    val isVaccine = Boolean.parseBoolean(medMap.getOrDefault("Impfung", "false"));
-    val size = medMap.getOrDefault("Normgröße", "NB");
-    val darreichungsForm = medMap.getOrDefault("Darreichungsform", "TAB");
-    val darreichungsMenge = medMap.getOrDefault("Darreichungsmenge", "1");
-    val dosage = medMap.getOrDefault("Dosierung", GemFaker.fakerDosage());
-    val amount = medMap.getOrDefault("Menge", "1");
-    val emergencyServiceFee =
-        Boolean.parseBoolean(
-            medMap.getOrDefault("Notdiensgebühr", GemFaker.getFaker().bool().toString()));
-    val paymentStatus =
-        medMap.getOrDefault(
-            "Zahlungsstatus", GemFaker.fakerValueSet(StatusCoPayment.class).getCode());
-
-    MultiplePrescriptionExtension mvo;
-    val isMvo = Boolean.parseBoolean(medMap.getOrDefault("MVO", "false"));
-    if (isMvo) {
-      val denominator = Integer.parseInt(medMap.getOrDefault("Denominator", "4"));
-      val numerator = Integer.parseInt(medMap.getOrDefault("Numerator", "1"));
-
-      val rememberedMvoId =
-          actor.recall("MVO-ID") != null
-              ? actor.recall("MVO-ID").toString()
-              : UUID.randomUUID().toString();
-      val tableMvoId = medMap.get("MVO-ID");
-      val mvoId = tableMvoId != null ? tableMvoId : rememberedMvoId;
-
-      actor.remember("MVO-ID", mvoId);
-      val mvoBuilder =
-          MultiplePrescriptionExtension.asMultiple(numerator, denominator).withId(mvoId);
-
-      val start = medMap.getOrDefault("Gueltigkeitsstart", "leer");
-      if (!start.equalsIgnoreCase("leer")) {
-        mvoBuilder.starting(Integer.parseInt(start));
-      }
-
-      val end = medMap.getOrDefault("Gueltigkeitsende", "leer");
-      if (!end.equalsIgnoreCase("leer")) {
-        mvo = mvoBuilder.validForDays(Integer.parseInt(end), false);
-      } else {
-        mvo = mvoBuilder.withoutEndDate(false);
-      }
-    } else {
-      mvo = MultiplePrescriptionExtension.asNonMultiple();
-    }
-
-    // create the medication
-    val medication =
-        KbvErpMedicationPZNBuilder.builder()
-            .category(MedicationCategory.fromCode(category))
-            .isVaccine(isVaccine)
-            .normgroesse(StandardSize.fromCode(size))
-            .darreichungsform(Darreichungsform.fromCode(darreichungsForm))
-            .amount(Integer.decode(darreichungsMenge))
-            .pzn(pzn, name)
-            .build();
-
-    val medicationRequest =
-        MedicationRequestBuilder.forPatient(patient)
-            .insurance(insurance)
-            .requester(practitioner)
-            .medication(medication)
-            .dosage(dosage)
-            .quantityPackages(Integer.decode(amount))
-            .status("active")
-            .intent("order")
-            .isBVG(false)
-            .mvo(mvo)
-            .hasEmergencyServiceFee(emergencyServiceFee)
-            .substitution(substitution)
-            .coPaymentStatus(StatusCoPayment.fromCode(paymentStatus))
-            .build();
-
-    // create and return the KBV Bundle
-    val kbvBuilder =
-        KbvErpBundleBuilder.forPrescription(prescriptionId)
-            .statusKennzeichen(statusKennzeichen)
-            .practitioner(practitioner)
-            .custodian(organization)
-            .patient(patient)
-            .insurance(insurance)
-            .medicationRequest(medicationRequest) // what is the medication
-            .medication(medication);
-
-    if (insurance.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
-      // assigner organization was only required in KbvItaFor 1.0.3
-      if (KbvItaForVersion.getDefaultVersion().compareTo(KbvItaForVersion.V1_0_3) == 0) {
-        // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
-        // Reference + Name
-        // build a faked one matching the Reference of the patient
-        val fakedAssignerOrganization = AssignerOrganizationFaker.builder().forPatient(patient);
-        kbvBuilder.assigner(fakedAssignerOrganization.fake());
-      }
-    }
-
-    return kbvBuilder.build();
+              // handover DMC if a concrete actor is available
+              this.handoverDmc(activeTask);
+            });
   }
 
   /**
@@ -296,57 +148,6 @@ public class IssuePrescription implements Task {
                         activate.expectedResponseBody(), activateResponse.getAsBaseResource())));
   }
 
-  private KbvPatient getPatientBaseData() {
-    KbvPatient ret;
-    if (patient != null) {
-      val baseData = SafeAbility.getAbility(patient, ProvidePatientBaseData.class);
-      log.info(
-          format(
-              "Issue ePrescription to patient {0} with insurance type {1}",
-              baseData.getFullName(), baseData.getPatientInsuranceType()));
-      ret = baseData.getPatient();
-    } else {
-      ret =
-          PatientFaker.builder()
-              .withKvnrAndInsuranceType(patientKvnr, VersicherungsArtDeBasis.GKV)
-              .fake();
-      log.info(
-          format(
-              "Issue ePrescription to KVNR {0} with insurance type {1}",
-              patientKvnr, ret.getInsuranceKind()));
-    }
-    return ret;
-  }
-
-  /**
-   * The PrescriptionFlowType can be reasoned from the insurance kind (VersicherungsArtDeBasis) and
-   * the PrescriptionAssignementKind. However, if a different WorkflowType is given via the
-   * DataTable as the code, this one will overwrite the reasoned one.
-   *
-   * @param code is the String representation of the WorkflowType
-   * @return a PrescriptionFlowType which was reasoned from Data; if provided via code (code !=
-   *     null) then the PrescriptionFlowType from this code
-   */
-  private PrescriptionFlowType getFlowType(@Nullable String code) {
-    VersicherungsArtDeBasis insuranceKind = VersicherungsArtDeBasis.GKV;
-    if (patient != null) {
-      val baseData = SafeAbility.getAbility(patient, ProvidePatientBaseData.class);
-      insuranceKind = baseData.getCoverageInsuranceType();
-    }
-
-    return FlowTypeUtil.getFlowType(code, insuranceKind, type);
-  }
-
-  private KbvCoverage getPatientInsuranceCoverage() {
-    KbvCoverage ret;
-    if (patient != null) {
-      ret = SafeAbility.getAbility(patient, ProvidePatientBaseData.class).getInsuranceCoverage();
-    } else {
-      ret = KbvCoverageFaker.builder().withInsuranceType(VersicherungsArtDeBasis.GKV).fake();
-    }
-    return ret;
-  }
-
   /**
    * If this Task was created with a concrete Patient and not only with a KVNR, the activated Task
    * will be transformed to a DmcPrescription (Data Matrix Code) and handed over to this patient
@@ -359,7 +160,7 @@ public class IssuePrescription implements Task {
   private void handoverDmc(ErxTask activatedTask) {
     val dmc = DmcPrescription.ownerDmc(activatedTask.getTaskId(), activatedTask.getAccessCode());
     writeDmcToReport(dmc);
-
+    val patient = this.prescriptionDataMapper.getPatient();
     // if we have the not only the KVRN but also the actor, give him also a DMC Prescription
     if (patient != null) {
       log.info(format("Doctor hands over DMC for {0} to {1}", dmc.getTaskId(), patient.getName()));
@@ -367,7 +168,7 @@ public class IssuePrescription implements Task {
     } else {
       log.info(format("No concrete Actor was given to handover the DMC for {0}", dmc.getTaskId()));
     }
-
+    val type = this.prescriptionDataMapper.getType();
     if (pharmacy != null) {
       if (type.equals(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)) {
         SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class)
@@ -428,15 +229,33 @@ public class IssuePrescription implements Task {
       return this;
     }
 
-    public IssuePrescription from(List<Map<String, String>> medications) {
-      return new IssuePrescription(kvnr, patient, pharmacy, type, medications);
+    public IssuePrescription forPznPrescription(List<Map<String, String>> medications) {
+
+      val mapper = new PrescriptionDataMapperPZN(patient, type, medications);
+      return new IssuePrescription(kvnr, pharmacy, mapper);
+    }
+
+    public IssuePrescription forFreitextVerordnung(List<Map<String, String>> freitextVerordnungen) {
+      val mapper = new PrescriptionDataMapperFreitext(patient, type, freitextVerordnungen);
+      return new IssuePrescription(kvnr, pharmacy, mapper);
+    }
+
+    public IssuePrescription forRezepturVerordnung(List<Map<String, String>> rezepturVerordnungen) {
+      val mapper = new PrescriptionDataMapperCompounding(patient, type, rezepturVerordnungen);
+      return new IssuePrescription(kvnr, pharmacy, mapper);
+    }
+
+    public IssuePrescription forWirkstoffVerordnung(
+        List<Map<String, String>> wirkstoffVerordnungen) {
+      val mapper = new PrescriptionDataMapperIngredient(patient, type, wirkstoffVerordnungen);
+      return new IssuePrescription(kvnr, pharmacy, mapper);
     }
 
     public IssuePrescription randomPrescription() {
       // concrete content of does not matter; we just simply need a single entry to issue a single
       // random prescription
       val medications = List.of(Map.of("prescription", "1"));
-      return from(medications);
+      return forPznPrescription(medications);
     }
   }
 }

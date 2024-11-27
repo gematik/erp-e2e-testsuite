@@ -16,21 +16,26 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.references.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.references.kbv.OrganizationReference;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import java.util.Optional;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class AssignerOrganizationBuilderTest extends ParsingTest {
 

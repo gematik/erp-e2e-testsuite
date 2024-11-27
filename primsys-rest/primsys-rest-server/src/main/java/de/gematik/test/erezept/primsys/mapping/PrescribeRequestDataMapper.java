@@ -20,11 +20,13 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.val;
 
@@ -33,16 +35,16 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
 
   private PatientDataMapper patientMapper;
   private CoverageDataMapper coverageMapper;
-  private PznMedicationDataMapper medicationMapper;
+  private KbvPznMedicationDataMapper medicationMapper;
 
   public PrescribeRequestDataMapper(PrescribeRequestDto dto) {
-    super(dto);
+    super(Optional.ofNullable(dto).orElseGet(PrescribeRequestDto::new));
   }
 
   @Override
   protected void complete() {
     ensure(dto::getPatient, dto::setPatient, PatientDto::new);
-    ensure(dto::getMedication, dto::setMedication, PznMedicationDataMapper::randomDto);
+    ensure(dto::getMedication, dto::setMedication, KbvPznMedicationDataMapper::randomDto);
     ensure(
         dto::getMedicationRequest,
         dto::setMedicationRequest,
@@ -64,7 +66,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
             this.coverageMapper, () -> CoverageDataMapper.from(dto.getCoverage(), getPatient()));
     this.medicationMapper =
         this.getOrDefault(
-            this.medicationMapper, () -> PznMedicationDataMapper.from(dto.getMedication()));
+            this.medicationMapper, () -> KbvPznMedicationDataMapper.from(dto.getMedication()));
   }
 
   public KbvPatient getPatient() {
@@ -93,7 +95,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
 
   public KbvErpBundle createKbvBundle(String doctorName) {
     val practitioner = PractitionerFaker.builder().withName(doctorName).fake();
-    val organization = MedicalOrganizationFaker.builder().fake();
+    val organization = MedicalOrganizationFaker.medicalPractice().fake();
     val patient = this.getPatient();
     val coverage = this.getCoverage();
     val medication = this.getMedication();
@@ -107,7 +109,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
     val builder =
         KbvErpBundleBuilder.forPrescription(GemFaker.fakerPrescriptionId())
             .practitioner(practitioner)
-            .custodian(organization)
+            .medicalOrganization(organization)
             .patient(patient)
             .insurance(coverage)
             .medicationRequest(medicationRequest)

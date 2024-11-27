@@ -186,6 +186,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     return ErxCommunicationBuilder.builder()
         .recipient(receiverId)
         .basedOnTask(prescription.getTask().getTaskId(), accessCode)
+        .flowType(prescription.getTask().getFlowType())
         .buildDispReq(message);
   }
 

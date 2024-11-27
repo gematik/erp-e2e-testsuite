@@ -1,0 +1,49 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "EPAMSOperationOutcomeCS",
+  "id": "epa-ms-operation-outcome-codes-cs",
+  "title": "EPA Medication Service OperationOutcome CodeSystem",
+  "description": "EPA Medication Service Operation Outcome CodeSystem",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-ms-operation-outcome-codes-cs",
+  "concept": [
+    {
+      "code": "MEDICATIONSVC_NO_VALID_STRUCTURE",
+      "display": "Invalid Data Structure in Medication Service"
+    },
+    {
+      "code": "MEDICATIONSVC_PRESCRIPTION_NO_EXIST",
+      "display": "Prescription Not Found in Medication Service"
+    },
+    {
+      "code": "MEDICATIONSVC_PRESCRIPTION_DUPLICATE",
+      "display": "Duplicate Prescription Detected in Medication Service"
+    },
+    {
+      "code": "MEDICATIONSVC_PRESCRIPTION_STATUS",
+      "display": "Operation Not Permitted on Current Prescription Status"
+    },
+    {
+      "code": "MEDICATIONSVC_DISPENSATION_NO_EXIST",
+      "display": "Dispensation Not Found in Medication Service"
+    },
+    {
+      "code": "MEDICATIONSVC_DISPENSATION_STATUS",
+      "display": "Operation Not Permitted on Current Dispensation Status"
+    },
+    {
+      "code": "MEDICATIONSVC_OPERATION_SUCCESS",
+      "display": "Operation Successfully Completed in Medication Service"
+    },
+    {
+      "code": "MEDICATIONSVC_PARAMETERS_REFERENCE_NO_EXIST",
+      "display": "Unresolved Reference in Parameters"
+    }
+  ],
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "count": 8
+}

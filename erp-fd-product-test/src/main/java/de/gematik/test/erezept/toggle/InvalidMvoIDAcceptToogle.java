@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.toggle;
 
+import de.gematik.bbriccs.toggle.BooleanToggle;
+
 public class InvalidMvoIDAcceptToogle extends BooleanToggle {
 
   // ERP FD toggle SERVICE_TASK_ACTIVATE_MVOID_VALIDATION_MODE

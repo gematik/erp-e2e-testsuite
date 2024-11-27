@@ -18,10 +18,8 @@ package de.gematik.test.erezept.primsys.data.valuesets;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -33,15 +31,16 @@ public enum MedicationTypeDto {
   PZN("PZN"),
   INGREDIENT("Wirkstoff"),
   FREETEXT("Freitext"),
-  COMPOUNDING("Rezeptur");
+  COMPOUNDING("Rezeptur"),
+  UNDEFINED("undefiniert"); // just for collecting temporarily all unknown values
 
   @JsonValue private final String display;
 
   @JsonCreator
-  public static MedicationTypeDto fromCode(@NonNull String code) {
+  public static MedicationTypeDto fromCode(String code) {
     return Arrays.stream(MedicationTypeDto.values())
         .filter(it -> it.display.equalsIgnoreCase(code) || it.name().equalsIgnoreCase(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidCodeValueException(MedicationTypeDto.class, code));
+        .orElse(UNDEFINED);
   }
 }

@@ -26,15 +26,12 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvCoverageFaker {
-  private final boolean useNewDmpK =
-      Boolean.parseBoolean(System.getProperty("erp.prodtest.fhir.useDmpV_1_06.active", "false"));
   private VersicherungsArtDeBasis insurance =
       randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV);
   private final Map<String, Consumer<KbvCoverageBuilder>> builderConsumers = new HashMap<>();
@@ -42,16 +39,7 @@ public class KbvCoverageFaker {
 
   private KbvCoverageFaker() {
     builderConsumers.put("personGroup", b -> b.personGroup(fakerValueSet(PersonGroup.class)));
-    if (!useNewDmpK) {
-      val excluded =
-          Arrays.stream(DmpKennzeichen.class.getEnumConstants())
-              .filter(x -> Integer.parseInt(x.getCode()) >= 12)
-              .toList();
-      builderConsumers.put(
-          DMP, b -> b.dmpKennzeichen(fakerValueSet(DmpKennzeichen.class, excluded)));
-    } else {
-      builderConsumers.put(DMP, b -> b.dmpKennzeichen(fakerValueSet(DmpKennzeichen.class)));
-    }
+    builderConsumers.put(DMP, b -> b.dmpKennzeichen(fakerValueSet(DmpKennzeichen.class)));
     builderConsumers.put("wop", b -> b.wop(fakerValueSet(Wop.class)));
     builderConsumers.put(
         "versichertenStatus", b -> b.versichertenStatus(fakerValueSet(VersichertenStatus.class)));
@@ -67,7 +55,7 @@ public class KbvCoverageFaker {
   }
 
   public KbvCoverageFaker withInsuranceType(VersicherungsArtDeBasis insuranceType) {
-    insurance = insuranceType;
+    this.insurance = insuranceType;
     return this;
   }
 
@@ -120,7 +108,7 @@ public class KbvCoverageFaker {
           case GKV -> insurance(randomElement(GkvInsuranceCoverageInfo.values()));
           case PKV -> insurance(randomElement(PkvInsuranceCoverageInfo.values()));
           case BG -> insurance(randomElement(BGInsuranceCoverageInfo.values()));
-          default -> insurance(DynamicInsuranceCoverageInfo.random());
+          default -> insurance(DynamicInsuranceCoverageInfo.random(insurance));
         };
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;

@@ -16,13 +16,20 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBirthday;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCountry;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFirstName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLastName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import de.gematik.test.erezept.fhir.builder.AddressBuilder;
 import de.gematik.test.erezept.fhir.builder.HumanNameBuilder;
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
@@ -40,8 +47,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.val;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Reference;
 
 @Getter(AccessLevel.PACKAGE)
 public class PatientBuilder extends AbstractResourceBuilder<PatientBuilder> {

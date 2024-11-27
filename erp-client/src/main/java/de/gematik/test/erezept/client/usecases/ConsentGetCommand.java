@@ -16,10 +16,10 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import java.util.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
+import de.gematik.test.erezept.fhir.resources.erp.ErxConsentBundle;
+import java.util.Optional;
+import org.hl7.fhir.r4.model.Resource;
 
 public class ConsentGetCommand extends BaseCommand<ErxConsentBundle> {
 

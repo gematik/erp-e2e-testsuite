@@ -28,7 +28,10 @@ import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseDiGA;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,9 +63,14 @@ public class ProfileFhirParserFactory {
           CustomProfiles.KBV_ITA_FOR,
           List.of(
               new TypeHint<>(KbvItaForStructDef.PRACTITIONER, KbvPractitioner.class),
+              new TypeHint<>(KbvItaForStructDef.PRACTITIONER_ROLE, KbvPractitionerRole.class),
               new TypeHint<>(KbvItaForStructDef.ORGANIZATION, MedicalOrganization.class),
               new TypeHint<>(KbvItaForStructDef.COVERAGE, KbvCoverage.class),
               new TypeHint<>(KbvItaForStructDef.PATIENT, KbvPatient.class)),
+          CustomProfiles.KBV_ITV_EVDGA,
+          List.of(
+              new TypeHint<>(KbvItvEvdgaStructDef.BUNDLE, KbvEvdgaBundle.class),
+              new TypeHint<>(KbvItvEvdgaStructDef.HEALTH_APP_REQUEST, KbvHealthAppRequest.class)),
           CustomProfiles.GEM_PATIENTENRECHNUNG,
           List.of(
               new TypeHint<>(PatientenrechnungStructDef.CHARGE_ITEM, ErxChargeItem.class),
@@ -76,6 +84,12 @@ public class ProfileFhirParserFactory {
               new TypeHint<>(ErpWorkflowStructDef.TASK_12, ErxTask.class),
               new TypeHint<>(ErpWorkflowStructDef.AUDIT_EVENT, ErxAuditEvent.class),
               new TypeHint<>(ErpWorkflowStructDef.CHARGE_ITEM, ErxChargeItem.class),
+              new TypeHint<>(ErpWorkflowStructDef.MEDICATION, GemErpMedication.class),
+              new TypeHint<>(ErpWorkflowStructDef.MEDICATION_DISPENSE, ErxMedicationDispense.class),
+              new TypeHint<>(
+                  ErpWorkflowStructDef.MEDICATION_DISPENSE_12, ErxMedicationDispense.class),
+              new TypeHint<>(
+                  ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA, ErxMedicationDispenseDiGA.class),
               new TypeHint<>(ErpWorkflowStructDef.COM_DISP_REQ, ErxCommunication.class),
               new TypeHint<>(ErpWorkflowStructDef.COM_DISP_REQ_12, ErxCommunication.class),
               new TypeHint<>(ErpWorkflowStructDef.COM_INFO_REQ, ErxCommunication.class),

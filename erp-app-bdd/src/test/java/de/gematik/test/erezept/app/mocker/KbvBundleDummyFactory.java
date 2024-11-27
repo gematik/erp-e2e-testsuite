@@ -66,7 +66,7 @@ public class KbvBundleDummyFactory {
 
     return KbvErpBundleBuilder.forPrescription(prescriptionId.getValue())
         .practitioner(practitioner)
-        .custodian(medicalOrganization)
+        .medicalOrganization(medicalOrganization)
         .assigner(assignerOrganization)
         .patient(patient)
         .insurance(insurance)

@@ -28,7 +28,7 @@ import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import java.util.*;

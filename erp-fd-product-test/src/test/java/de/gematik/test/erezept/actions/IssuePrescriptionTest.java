@@ -40,10 +40,7 @@ import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
 import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
@@ -95,7 +92,7 @@ class IssuePrescriptionTest {
     val smcb = config.getSmcbByICCSN(docConfig.getSmcbIccsn());
     val hba = config.getHbaByICCSN(docConfig.getHbaIccsn());
 
-    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig);
+    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig, "UselessTestId");
 
     val useKonnektor =
         UseTheKonnektor.with(smcb)
@@ -111,7 +108,7 @@ class IssuePrescriptionTest {
     responsibleDoctor = new DoctorActor("Gündüla Gunther");
     responsibleDoctor.can(
         ProvideDoctorBaseData.fromConfiguration(
-            config.getDoctorConfig(responsibleDoctor.getName())));
+            config.getDoctorConfig(responsibleDoctor.getName()), "UselessTestId"));
 
     // init patient
     patient = new PatientActor("Sina Hüllmann");

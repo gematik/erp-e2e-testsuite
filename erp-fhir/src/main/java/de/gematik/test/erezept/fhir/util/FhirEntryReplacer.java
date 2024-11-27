@@ -37,15 +37,16 @@ public class FhirEntryReplacer {
    * @return the entry-resource of its expected type
    * @param <C> the generic type of the entry-resource
    */
+  @SuppressWarnings("unchecked")
   public static <C extends Resource> C cast(
       Class<C> childType, BundleEntryComponent entry, Function<Resource, C> childMapper) {
 
-    C ret = childMapper.apply(entry.getResource());
     if (!entry.getResource().getClass().equals(childType)) {
       // not yet of expected type; convert to the correct type and replace the old instance
+      C ret = childMapper.apply(entry.getResource());
       entry.setResource(ret);
     }
 
-    return ret;
+    return (C) entry.getResource();
   }
 }

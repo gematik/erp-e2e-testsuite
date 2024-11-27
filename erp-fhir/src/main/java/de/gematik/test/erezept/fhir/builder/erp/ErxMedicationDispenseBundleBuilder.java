@@ -55,7 +55,7 @@ public class ErxMedicationDispenseBundleBuilder
                 medicationDispenses.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
     return of(medicationDispenses);
@@ -85,7 +85,8 @@ public class ErxMedicationDispenseBundleBuilder
         new Enumeration<>(new Bundle.BundleTypeEnumFactory(), Bundle.BundleType.COLLECTION);
     val mdBundle = new Bundle(bundleType);
 
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) != 0) {
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) > 0
+        && erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) < 0) {
       mdBundle
           .getMeta()
           .addProfile(

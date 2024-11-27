@@ -122,7 +122,7 @@
               </event>
               <section>
                 <entry>
-                  <reference value="Binary/PrescriptionDigest-160.000.031.325.889.64"/>
+                  <reference value="urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
                 </entry>
               </section>
             </Composition>
@@ -153,10 +153,10 @@
           </resource>
         </entry>
         <entry>
-          <fullUrl value="https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Binary/PrescriptionDigest-160.000.031.325.889.64"/>
+          <fullUrl value="urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
           <resource>
             <Binary xmlns="http://hl7.org/fhir">
-              <id value="PrescriptionDigest-160.000.031.325.889.64"/>
+              <id value="b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
               <meta>
                 <versionId value="1"/>
                 <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"/>

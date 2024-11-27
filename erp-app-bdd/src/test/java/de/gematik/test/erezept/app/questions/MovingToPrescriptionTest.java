@@ -26,6 +26,7 @@ import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
@@ -68,7 +69,9 @@ class MovingToPrescriptionTest {
     userName = GemFaker.fakerName();
     val theAppUser = OnStage.theActorCalled(userName);
     givenThat(theAppUser).can(appAbility);
+    val erpClient = mock(ErpClient.class);
     val erpClientAbility = mock(UseTheErpClient.class);
+    when(erpClientAbility.getClient()).thenReturn(erpClient);
     givenThat(theAppUser).can(erpClientAbility);
     givenThat(theAppUser).can(ManageDataMatrixCodes.sheGetsPrescribed());
 
@@ -78,7 +81,7 @@ class MovingToPrescriptionTest {
             .withStatusCode(404)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
-    when(erpClientAbility.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
+    when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
 
   @AfterEach

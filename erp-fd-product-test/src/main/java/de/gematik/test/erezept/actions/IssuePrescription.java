@@ -90,7 +90,7 @@ public class IssuePrescription extends ErpAction<ErxTask> {
     bundleBuilder
         .prescriptionId(prescriptionId)
         .practitioner(docBaseData.getPractitioner())
-        .custodian(docBaseData.getMedicalOrganization())
+        .medicalOrganization(docBaseData.getMedicalOrganization())
         .patient(patient.getPatientData())
         .insurance(patient.getInsuranceCoverage());
 

@@ -18,13 +18,16 @@ package de.gematik.test.erezept.client.usecases;
 
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.resources.erp.GemCloseOperationParameters;
 import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -48,7 +51,7 @@ class CloseTaskCommandTest {
 
   @Test
   void getRequestLocator() {
-    val md = ErxMedicationDispenseFaker.builder().withPerfomer("performerid").fake();
+    val md = ErxMedicationDispenseFaker.builder().withPerformer("performerid").fake();
     val taskId = TaskId.from("123456");
     val secret = "7890123";
     val cmd = new CloseTaskCommand(taskId, new Secret(secret));
@@ -88,7 +91,7 @@ class CloseTaskCommandTest {
                 mds.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
 
@@ -118,5 +121,27 @@ class CloseTaskCommandTest {
     }
 
     assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldCloseWithoutMedicationDispense() {
+    val taskId = "123456";
+    val secret = "7890123";
+    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret));
+
+    val optBody = cmd.getRequestBody();
+    assertTrue(optBody.isEmpty());
+  }
+
+  @Test
+  void shouldCloseWithParametersStructure() {
+    val taskId = "123456";
+    val secret = "7890123";
+    val closeParameters = GemOperationInputParameterBuilder.forClosingPharmaceuticals().build();
+    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret), closeParameters);
+
+    val optBody = cmd.getRequestBody();
+    assertTrue(optBody.isPresent());
+    assertInstanceOf(GemCloseOperationParameters.class, optBody.get());
   }
 }

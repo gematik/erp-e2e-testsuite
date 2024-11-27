@@ -38,7 +38,6 @@ import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.AbsoluteReferencesAsUUIDToggle;
 import java.util.stream.Stream;
@@ -130,10 +129,6 @@ class TaskCloseUsecase extends ErpTest {
             .isCorrect());
 
     val dispensation = flughafen.performs(ClosePrescription.acceptedWith(acceptation));
-
-    val binary = dispensation.getExpectedResponse().getQesDigestBinary();
-    val konnektor = flughafen.abilityTo(UseTheKonnektor.class);
-    val isValid = konnektor.verifyDocument(binary.getContent()).getPayload();
 
     val verifier =
         Verify.that(dispensation)

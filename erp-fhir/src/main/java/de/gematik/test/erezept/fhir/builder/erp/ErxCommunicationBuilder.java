@@ -33,7 +33,11 @@ import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Reference;
 
 public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCommunicationBuilder> {
 
@@ -158,14 +162,16 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     checkRequiredForRepresentative();
     val type = CommunicationType.REPRESENTATIVE;
     ErxCommunication com;
+
     ErpWorkflowStructDef substitutionAllowedExt;
-    ErpWorkflowStructDef prescriptionType;
-    Coding flowTypeCoding;
+
+    Extension flowTypeExtension;
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       com = build(type, () -> type.getType().asCanonicalType(), message);
       substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED;
-      prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE;
-      flowTypeCoding = flowType.asCoding(true);
+      val flowTypeCoding = flowType.asCoding(true);
+      flowTypeExtension =
+          new Extension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), flowTypeCoding);
     } else {
       com =
           build(
@@ -175,20 +181,16 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
                       erpWorkflowVersion, true),
               message);
       substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED_12;
-      prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12;
-      // hacky but should work fow now!
-      flowTypeCoding =
-          flowType.asCoding(true).setSystem(ErpWorkflowCodeSystem.FLOW_TYPE_12.getCanonicalUrl());
+      flowTypeExtension = flowType.asExtension();
     }
 
     val payload = com.getPayloadFirstRep();
     val substitutionExt =
         new Extension(
             substitutionAllowedExt.getCanonicalUrl(), new BooleanType(substitutionAllowed));
-    val prescriptionTypeExt = new Extension(prescriptionType.getCanonicalUrl(), flowTypeCoding);
 
     payload.addExtension(substitutionExt);
-    payload.addExtension(prescriptionTypeExt);
+    payload.addExtension(flowTypeExtension);
     com.setBasedOn(List.of(new Reference(taskReference)));
     return com;
   }
@@ -209,6 +211,10 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
     }
 
     com.setBasedOn(List.of(new Reference(taskReference)));
+
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
+      com.addExtension(flowType.asExtension());
+    }
     return com;
   }
 
@@ -275,6 +281,11 @@ public class ErxCommunicationBuilder extends AbstractCommunicationBuilder<ErxCom
 
   private void checkRequiredForDispReq() {
     checkRequiredForTaskCommunication();
+
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
+      this.checkRequired(
+          flowType, "A Dispense Request Communication requires a Flow-Type of the Prescription");
+    }
   }
 
   private void checkRequiredForReply() {

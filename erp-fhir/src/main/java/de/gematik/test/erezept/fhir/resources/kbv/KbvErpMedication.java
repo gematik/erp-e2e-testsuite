@@ -192,12 +192,16 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   @Override
   public String getDescription() {
+    val type =
+        this.getMedicationType()
+            .map(mt -> format("(Verordnungstyp {0})", mt.getDisplay()))
+            .orElse("(unbekannter Verordnungstyp)");
+    val pznText =
+        this.getPznOptional().map(pzn -> format("(PZN: {0})", pzn.getValue())).orElse(type);
+
     val medicationName = this.getMedicationName();
-    val pzn = this.getPznFirstRep();
     val size = this.getStandardSize();
-    val category = this.getCategoryFirstRep();
-    return format(
-        "{0} {1} (PZN: {2}) / {3}", medicationName, size.getCode(), pzn, category.getDisplay());
+    return format("{0} {1} {2}", medicationName, size.getCode(), pznText);
   }
 
   public KbvItaErpVersion getVersion() {

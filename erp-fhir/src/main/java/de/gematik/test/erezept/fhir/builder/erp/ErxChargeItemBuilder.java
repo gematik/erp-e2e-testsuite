@@ -215,11 +215,6 @@ public class ErxChargeItemBuilder extends AbstractResourceBuilder<ErxChargeItemB
               ac -> identifiers.add(ac.asIdentifier(ErpWorkflowNamingSystem.ACCESS_CODE_121)));
 
       chargeItem.setIdentifier(identifiers);
-      containedDavBundle
-          .getMeta()
-          .addProfile(
-              ErpWorkflowStructDef.BINARY_12.getVersionedUrl(
-                  ErpWorkflowVersion.getDefaultVersion(), true));
 
       val kvnrIdentifier = kvnr.asIdentifier(DeBasisNamingSystem.KVID_PKV);
       kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);

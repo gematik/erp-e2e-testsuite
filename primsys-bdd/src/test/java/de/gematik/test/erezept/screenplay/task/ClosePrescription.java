@@ -16,20 +16,23 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.*;
-
-import de.gematik.test.erezept.client.exceptions.*;
+import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import io.cucumber.datatable.*;
-import java.util.*;
-import lombok.*;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfClosePrescriptionOperation;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import io.cucumber.datatable.DataTable;
+import java.util.List;
+import java.util.Map;
 import lombok.experimental.Delegate;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import net.serenitybdd.screenplay.Task;
 
 @Slf4j
 public class ClosePrescription implements Task {
@@ -104,9 +107,9 @@ public class ClosePrescription implements Task {
                 val prescriptionId = receipt.getPrescriptionId();
                 val dispensationDate = receipt.getTimestamp().toInstant();
                 log.info(
-                    format(
-                        "Handout dispensed medication for prescription {0} to {1}",
-                        prescriptionId, patient.getName()));
+                    "Handout dispensed medication for prescription {} to {}",
+                    prescriptionId,
+                    patient.getName());
                 val drugReceive = SafeAbility.getAbility(patient, ReceiveDispensedDrugs.class);
                 drugReceive.append(prescriptionId, dispensationDate);
               });
@@ -123,9 +126,9 @@ public class ClosePrescription implements Task {
     } catch (UnexpectedResponseResourceError urre) {
       val strategy = fhirResponseQuestion.getExecutedStrategy();
       log.warn(
-          format(
-              "Dispensing Prescription {0} to {1} failed",
-              strategy.getPrescriptionId(), strategy.getKvnr()));
+          "Dispensing Prescription {} to {} failed",
+          strategy.getPrescriptionId(),
+          strategy.getKvnr());
       // re-throw for potential decorators
       throw urre;
     }

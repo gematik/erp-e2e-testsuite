@@ -51,7 +51,19 @@ public class UseIOSApp extends UseTheApp<IOSDriver> {
   @Override
   protected Optional<WebElement> getOptionalWebElement(PageElement pageElement, String pageSource) {
     val label = pageElement.extractSourceLabel(this.getPlatformType());
-    val found = pageSource.contains(label);
+    var found = pageSource.contains(label);
+
+    var retries = 1;
+    while (!found && retries-- > 0) {
+      // perform one single retry if element was not found
+      // this should prevent missing elements due to slow rendering
+      log.info(
+          "Retry: Element {} was not found in page source by label {}",
+          pageElement.getFullName(),
+          label);
+      found = driver.getPageSource().contains(label);
+    }
+
     if (found) {
       return waitForElement(pageElement, ExpectedConditions::presenceOfElementLocated);
     } else {

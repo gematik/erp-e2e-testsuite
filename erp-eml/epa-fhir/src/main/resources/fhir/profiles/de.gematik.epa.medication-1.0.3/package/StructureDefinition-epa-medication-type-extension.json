@@ -1,0 +1,60 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "epa-medication-type-extension",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension",
+  "version": "1.0.3",
+  "name": "EPAMedicationTypeExtension",
+  "title": "Medication Type",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "Extension for EPAMedication types",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "expression": "Medication",
+      "type": "element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Medication Type",
+        "definition": "Extension for EPAMedication types"
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-type-vs"
+        }
+      }
+    ]
+  }
+}

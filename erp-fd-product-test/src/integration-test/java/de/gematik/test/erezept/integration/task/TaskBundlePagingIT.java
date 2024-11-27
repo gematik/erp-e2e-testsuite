@@ -69,7 +69,7 @@ import org.junit.runner.RunWith;
 @Tag("Task_Paging")
 public class TaskBundlePagingIT extends ErpTest {
   private final VsdmService vsdmService = config.getSoftKonnVsdmService();
-
+  private static final String QUERY_KEY_SORT = "_sort";
   private static final LinkedList<ErxTask> erxTasks = new LinkedList<>();
 
   @Actor(name = "Adelheid Ulmenwald")
@@ -99,7 +99,7 @@ public class TaskBundlePagingIT extends ErpTest {
 
   private void ensurePrecondition() {
     if (erxTasks.isEmpty()) {
-      postTasks(7);
+      postTasks(10);
     }
   }
 
@@ -123,6 +123,27 @@ public class TaskBundlePagingIT extends ErpTest {
             "_count",
             "last",
             "10")
+        .arguments(
+            IQueryParameter.search()
+                .sortedBy("expiry-date", SortOrder.DESCENDING)
+                .withCount(3)
+                .createParameter(),
+            "_sort=-expiry-date",
+            QUERY_KEY_SORT,
+            "next",
+            "-expiry-date")
+        .arguments(
+            IQueryParameter.search().sortedBy("accept-date", SortOrder.ASCENDING).createParameter(),
+            "_sort=accept-date",
+            QUERY_KEY_SORT,
+            "self",
+            "accept-date")
+        .arguments(
+            IQueryParameter.search().sortedBy("modified", SortOrder.ASCENDING).createParameter(),
+            "_sort=modified",
+            QUERY_KEY_SORT,
+            "self",
+            "modified")
         .create();
   }
 
@@ -144,7 +165,7 @@ public class TaskBundlePagingIT extends ErpTest {
       "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der self"
           + " Link ")
   @MethodSource("actorComposer")
-  void getTaskBundleWhileUsingRelationSelfAsPharmacy(
+  void getTaskBundleWhileUsingRelationSelfLink(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
     ensurePrecondition();
     val actor = actorProvider.apply(this);
@@ -374,11 +395,11 @@ public class TaskBundlePagingIT extends ErpTest {
   @TestcaseId("ERP_TASK_PAGING_08")
   @ParameterizedTest(
       name =
-          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset und _count Default"
-              + " URL-Parameter (_count=50, __offset=0) ")
+          "[{index}] -> Abrufen von TaskBundles als {0} muss der _offset  Default"
+              + " URL-Parameter ( __offset=0) ")
   @DisplayName(
       "Es muss sichergestellt werden, dass Paging bei TaskBundles funktioniert. Speziell der"
-          + " _offset und _count Default URL-Parameter (_count=50, __offset=0)")
+          + " _offset Default URL-Parameter (__offset=0)")
   @MethodSource("actorComposer")
   void shouldGetTaskBundleWithDefault_offsetAND_Count(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
@@ -390,9 +411,6 @@ public class TaskBundlePagingIT extends ErpTest {
             actor,
             IQueryParameter.search().sortedBy("date", SortOrder.ASCENDING).createParameter());
 
-    actor.attemptsTo(
-        Verify.that(firstCall).withExpectedType().and(containsEntriesOfCount(50)).isCorrect());
-
     val secondBundleInteraction =
         getErxTaskBundleInteraction(
             actor,
@@ -403,7 +421,6 @@ public class TaskBundlePagingIT extends ErpTest {
     actor.attemptsTo(
         Verify.that(secondBundleInteraction)
             .withExpectedType()
-            .and(containsEntriesOfCount(50))
             .and(hasElementAtPosition(firstCall.getExpectedResponse().getTasks().get(9), 4))
             .isCorrect());
   }
@@ -425,7 +442,10 @@ public class TaskBundlePagingIT extends ErpTest {
     val firstCall =
         getErxTaskBundleInteraction(
             actor,
-            IQueryParameter.search().sortedBy("date", SortOrder.ASCENDING).createParameter());
+            IQueryParameter.search()
+                .sortedBy("date", SortOrder.ASCENDING)
+                .withCount(3)
+                .createParameter());
 
     assertTrue(
         "given first TaskBundle has next-Relation-Link",

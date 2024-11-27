@@ -16,8 +16,13 @@
 
 package de.gematik.test.erezept.client.vau;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.rest.HttpBRequest;
+import de.gematik.bbriccs.rest.HttpBResponse;
+import de.gematik.bbriccs.rest.HttpVersion;
+import de.gematik.bbriccs.rest.RawHttpCodec;
+import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
+import de.gematik.bbriccs.rest.headers.HttpHeader;
+import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.UnirestRetryWrapper;
 import de.gematik.test.erezept.client.vau.protocol.VauProtocol;
@@ -27,8 +32,8 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.crypto.BadPaddingException;
 import javax.net.ssl.SSLContext;
@@ -36,7 +41,6 @@ import javax.net.ssl.TrustManager;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestInstance;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -44,6 +48,7 @@ import lombok.val;
 @Slf4j
 public class VauClient {
 
+  private final RawHttpCodec httpCodec = RawHttpCodec.defaultCodec();
   private final VauProtocol vauProtocol;
   private final String fdBaseUrl;
   private final String xApiKey;
@@ -59,9 +64,9 @@ public class VauClient {
   private String vauUserPseudonym = "0";
 
   public VauClient(
-      @NonNull String fdBaseUrl,
-      @NonNull ClientType clientType,
-      @NonNull X509Certificate vauCertificate,
+      String fdBaseUrl,
+      ClientType clientType,
+      X509Certificate vauCertificate,
       @Nullable String xApiKey,
       @Nullable String userAgent) {
     this.fdBaseUrl = fdBaseUrl;
@@ -89,50 +94,46 @@ public class VauClient {
     return this;
   }
 
-  public Response send(
-      @NonNull String innerHttpRequest, @NonNull String accessToken, String erpResource) {
+  public HttpBResponse send(HttpBRequest innerHttpRequest, String accessToken, String erpResource) {
     Objects.requireNonNull(
         this.unirest, "VauClient is not initialized: missing call to initialize()?");
 
-    val req =
-        this.unirest
-            .post(getVauRequestUrl())
-            // VAU Header
-            .header("Content-Type", "application/octet-stream")
-            .header(VauHeader.X_ERP_USER.getValue(), this.getErpUserHeaderValue())
-            .body(
-                vauProtocol.encryptRawVauRequest(
-                    accessToken, innerHttpRequest.getBytes(StandardCharsets.UTF_8)));
-    if (erpResource != null) {
-      req.header(VauHeader.X_ERP_RESOURCE.getValue(), erpResource.replaceFirst("/", ""));
-    } else {
-      log.warn("parameter resource isn't set");
-    }
-    if (userAgent != null) {
-      req.header(VauHeader.X_ERP_USER_AGENT.getValue(), userAgent);
-      log.info(format("Set Header Parameter 'User-Agent' to: {0}", userAgent));
-    }
-    if (clientType == ClientType.FDV) {
-      req.header(VauHeader.X_API_KEY.getValue(), xApiKey);
-      log.info(format("Set Header Parameter 'X-api-key' to: {0}", xApiKey));
-    }
-
+    val encodedRequest = httpCodec.encode(innerHttpRequest);
+    val reqBody =
+        vauProtocol.encryptRawVauRequest(
+            accessToken, encodedRequest.getBytes(StandardCharsets.UTF_8));
     log.info(
-        format(
-            "Sending VAU-Request to: {0} with Request ID {1}",
-            getVauRequestUrl(), Base64.getEncoder().encodeToString(vauProtocol.getRequestId())));
+        "Sending VAU-Request as {} to: {} with Request ID {}",
+        clientType.toString(),
+        getVauRequestUrl(),
+        Base64.getEncoder().encodeToString(vauProtocol.getRequestId()));
+    log.trace("\n------- inner VAU-Request -------\n{}\n-------", encodedRequest);
+
+    val req = this.unirest.post(getVauRequestUrl()).body(reqBody);
+
+    // additional/conditional outer VAU-Request Headers
+    StandardHttpHeaderKey.CONTENT_TYPE.apply("application/octet-stream", req::header);
+    StandardHttpHeaderKey.USER_AGENT.apply(this.userAgent, req::header);
+    // erpResource is optional? check if that is still true
+    Optional.ofNullable(erpResource)
+        .map(rh -> rh.replaceFirst("/", ""))
+        .ifPresent(rh -> VauHeader.X_ERP_RESOURCE.apply(rh, req::header));
+    VauHeader.X_ERP_USER.apply(this.getErpUserHeaderValue(), req::header);
+    // API-Key is optional because only required/used by FdVs
+    Optional.ofNullable(xApiKey)
+        .ifPresent(ak -> AuthHttpHeaderKey.X_API_KEY.apply(ak, req::header));
 
     val start = System.currentTimeMillis();
     try {
       val outerResponse = this.retryWrapper.requestWithRetries(req);
-      return createResponse(outerResponse);
+      return decodeResponse(outerResponse);
     } finally {
       val duration = System.currentTimeMillis() - start;
-      log.info(format("VAU-Request took {0}ms", duration));
+      log.info("VAU-Request took {}ms", duration);
     }
   }
 
-  private Response createResponse(HttpResponse<byte[]> outerResponse) {
+  private HttpBResponse decodeResponse(HttpResponse<byte[]> outerResponse) {
     // store the userpseudonym for next request
     this.vauUserPseudonym =
         outerResponse.getHeaders().get("Userpseudonym").stream().findFirst().orElse("0");
@@ -141,39 +142,42 @@ public class VauClient {
     // check if the response is octet-stream (encrypted) before decrypting
     val contentType = outerResponse.getHeaders().getFirst("content-type");
     val isOctetStream = Objects.requireNonNull(contentType).contains("octet-stream");
+    val xRequestId = Base64.getEncoder().encodeToString(vauProtocol.getRequestId());
 
     log.info(
-        format(
-            "Received VAU-Response with Status Code {0} for Request ID {1} (X-Request-Id {2}) with"
-                + " VAU Userpseudonym: {3}",
-            outerResponse.getStatus(),
-            Base64.getEncoder().encodeToString(vauProtocol.getRequestId()),
-            responseId,
-            vauUserPseudonym));
+        "Received VAU-Response with Status Code {} for Request ID {} (X-Request-Id {}) with"
+            + " VAU Userpseudonym: {}",
+        outerResponse.getStatus(),
+        xRequestId,
+        responseId,
+        vauUserPseudonym);
 
     if (isOctetStream) {
       try {
         val decrypted = vauProtocol.decryptRawVauResponse(outerResponse.getBody());
-        return InnerHttp.decode(decrypted);
+        log.trace(
+            "\n------- inner VAU-Response -------\n{}\n-------",
+            new String(decrypted, StandardCharsets.UTF_8));
+        return httpCodec.decodeResponse(decrypted);
       } catch (BadPaddingException e) {
         val innerHttp = outerResponse.getBody();
         val b64Body = Base64.getEncoder().encodeToString(innerHttp);
         log.error(
-            format(
-                "Error while decoding VAU inner-HTTP of length {0}\n{1}",
-                innerHttp.length, b64Body));
+            "Error while decoding VAU inner-HTTP of length {}\n{}", innerHttp.length, b64Body);
         throw new VauException("Error while decoding VAU", e);
       }
     } else {
       // response seems to be unencrypted, return simply the plain response
-      val header = new HashMap<String, String>();
-      // problematic if a header key has multiple values
-      outerResponse.getHeaders().all().forEach(x -> header.put(x.getName(), x.getValue()));
-      return new Response(
-          InnerHttp.HTTP_V,
-          outerResponse.getStatus(),
-          header,
-          new String(outerResponse.getBody(), StandardCharsets.UTF_8));
+      val headers =
+          outerResponse.getHeaders().all().stream()
+              .map(h -> new HttpHeader(h.getName(), h.getValue()))
+              .toList();
+      val response =
+          new HttpBResponse(
+              HttpVersion.HTTP_1_1, outerResponse.getStatus(), headers, outerResponse.getBody());
+      log.trace(
+          "\n------- missing inner VAU-Response -------\n{}\n-------", httpCodec.encode(response));
+      return response;
     }
   }
 

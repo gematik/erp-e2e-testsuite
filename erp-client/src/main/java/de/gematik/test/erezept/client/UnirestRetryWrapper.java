@@ -63,8 +63,8 @@ public class UnirestRetryWrapper {
           // and re-throw on all other exceptions
           throw new VauException(
               format(
-                  "Error while sending request to VAU on attempt {0}/{1}",
-                  attempt, MAX_CONNECT_ATTEMPTS),
+                  "Error while sending request to VAU on attempt {0}/{1} with {2}",
+                  attempt, MAX_CONNECT_ATTEMPTS, ure.getClass().getSimpleName()),
               ure);
         }
       }

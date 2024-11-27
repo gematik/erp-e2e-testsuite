@@ -1,0 +1,84 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-PAR-Accept-Operation-Output",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_AcceptOperation_Output",
+  "version": "1.4",
+  "name": "GEM_ERP_PR_PAR_AcceptOperation_Output",
+  "title": "GEM ERP PR AcceptOperation Output",
+  "status": "active",
+  "date": "2024-07-15",
+  "description": "This profile defines the parameters for accepting a medication from AVS to the E-Rezept-Fachdienst. This can be used for the $accept-operation.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_AcceptOperation_Output|1.4"
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Parameters.parameter:return",
+        "path": "Parameters.parameter",
+        "sliceName": "return",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Parameters.parameter:return.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "return",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:return.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:return.resource",
+        "path": "Parameters.parameter.resource",
+        "min": 1,
+        "type": [
+          {
+            "code": "Bundle",
+            "profile": [
+              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle_OP_Accept"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:return.part",
+        "path": "Parameters.parameter.part",
+        "max": "0"
+      }
+    ]
+  }
+}

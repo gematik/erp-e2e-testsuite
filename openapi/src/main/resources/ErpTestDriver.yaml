@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: "Test drive interface for e-Prescription FdV Module"
   description: "REST interface to automate the test of a e-Prescription FdV Module implementation."
-  version: 1.0.1
+  version: 1.1.0
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -650,11 +650,15 @@ components:
           $ref: '#/components/schemas/ExpiryDate'
         authoredOn:
           $ref: '#/components/schemas/AuthoredOn'
+        lastMedicationDispense:
+          $ref: '#/components/schemas/LastMedicationDispense'
         status:
           type: string
           enum:
             - ready
+            - in-progress
             - close
+            - cancelled
         patient:
           $ref: '#/components/schemas/Patient'
         practitioner:
@@ -699,6 +703,10 @@ components:
       type: string
       format: date-time
       example: "2020-03-02T08:25:05+00:00"
+    LastMedicationDispense:
+      type: string
+      format: date-time
+      example: "2024-11-25T14:30:00+00:00"
     # Medication
     Medication:
       type: object

@@ -16,7 +16,6 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
@@ -46,7 +45,15 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Dosage;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.MedicationRequest;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Reference;
 
 @Slf4j
 public class MedicationRequestBuilder extends AbstractResourceBuilder<MedicationRequestBuilder> {
@@ -76,46 +83,10 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
 
   private String note;
 
-  public static MedicationRequestBuilder forPatient(@NonNull KbvPatient patient) {
+  public static MedicationRequestBuilder forPatient(KbvPatient patient) {
     val mrb = new MedicationRequestBuilder();
     mrb.subjectReference = new SubjectReference(patient.getId()).asReference();
     return mrb;
-  }
-
-  @Deprecated(forRemoval = true)
-  public static MedicationRequestBuilder faker() {
-    return faker(PatientFaker.builder().fake());
-  }
-
-  @Deprecated(forRemoval = true)
-  public static MedicationRequestBuilder faker(@NonNull KbvPatient patient) {
-    return faker(patient, fakerBool());
-  }
-
-  @Deprecated(forRemoval = true)
-  public static MedicationRequestBuilder faker(@NonNull KbvPatient patient, Date authoredOn) {
-    return faker(patient, authoredOn, fakerBool());
-  }
-
-  @Deprecated(forRemoval = true)
-  public static MedicationRequestBuilder faker(@NonNull KbvPatient patient, boolean substitution) {
-    return faker(patient, new Date(), substitution);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static MedicationRequestBuilder faker(
-      @NonNull KbvPatient patient, Date authoredOn, boolean substitution) {
-    return forPatient(patient)
-        .dosage(fakerDosage())
-        .quantityPackages(fakerAmount())
-        .isBVG(fakerBool())
-        .hasEmergencyServiceFee(fakerBool())
-        .insurance(KbvCoverageFaker.builder().withInsuranceType(patient.getInsuranceKind()).fake())
-        .requester(PractitionerFaker.builder().fake())
-        .medication(KbvErpMedicationPZNFaker.builder().fake())
-        .substitution(substitution)
-        .authoredOn(authoredOn)
-        .coPaymentStatus(fakerValueSet(StatusCoPayment.class));
   }
 
   /**
@@ -151,23 +122,23 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return authoredOn(date);
   }
 
-  public MedicationRequestBuilder medication(@NonNull KbvErpMedication medication) {
+  public MedicationRequestBuilder medication(KbvErpMedication medication) {
     this.medicationType = medication.getMedicationType().orElse(null);
     this.medicationReference = new MedicationReference(medication.getId()).asReference();
     return self();
   }
 
-  public MedicationRequestBuilder requester(@NonNull Practitioner practitioner) {
+  public MedicationRequestBuilder requester(Practitioner practitioner) {
     this.requesterReference = new RequesterReference(practitioner.getId()).asReference();
     return self();
   }
 
-  public MedicationRequestBuilder insurance(@NonNull KbvCoverage coverage) {
+  public MedicationRequestBuilder insurance(KbvCoverage coverage) {
     this.insuranceReference = new CoverageReference(coverage.getId()).asReference();
     return self();
   }
 
-  public MedicationRequestBuilder status(@NonNull String code) {
+  public MedicationRequestBuilder status(String code) {
     var status = MedicationRequest.MedicationRequestStatus.fromCode(code);
     if (status == null) {
       log.warn(
@@ -180,8 +151,7 @@ public class MedicationRequestBuilder extends AbstractResourceBuilder<Medication
     return status(status);
   }
 
-  public MedicationRequestBuilder status(
-      @NonNull MedicationRequest.MedicationRequestStatus status) {
+  public MedicationRequestBuilder status(MedicationRequest.MedicationRequestStatus status) {
     this.requestStatus = status;
     return self();
   }

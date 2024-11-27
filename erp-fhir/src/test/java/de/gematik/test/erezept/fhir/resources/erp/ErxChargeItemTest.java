@@ -16,7 +16,11 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,20 +30,27 @@ import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
+import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.util.*;
-import de.gematik.test.erezept.fhir.values.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
-import org.junitpioneer.jupiter.*;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.util.List;
+import java.util.UUID;
+import lombok.val;
+import org.hl7.fhir.r4.model.ChargeItem;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
 class ErxChargeItemTest extends ParsingTest {
 
@@ -124,8 +135,12 @@ class ErxChargeItemTest extends ParsingTest {
     assertThrows(MissingFieldException.class, chargeItem::getPrescriptionId);
   }
 
-  @Test
-  void shouldChangeContainedData() {
+  @ParameterizedTest
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void shouldChangeContainedData(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val prescriptionId = PrescriptionId.random();
     val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
     val kbvBundle = KbvErpBundleFaker.builder().fake();
@@ -153,8 +168,8 @@ class ErxChargeItemTest extends ParsingTest {
         chargeItem.withChangedContainedBinaryData(abgabeRefenrece, changedResource.getBytes());
     assertEquals(changedResource, new String(changedChargeItem.getContainedBinaryData()));
 
-    val encodedChargeItem = parser.encode(changedChargeItem, EncodingType.XML);
-    assertTrue(parser.isValid(encodedChargeItem));
+    val vr = ValidatorUtil.encodeAndValidate(parser, changedChargeItem);
+    assertTrue(vr.isSuccessful());
   }
 
   @Test

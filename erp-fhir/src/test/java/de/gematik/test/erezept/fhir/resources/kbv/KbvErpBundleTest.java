@@ -46,9 +46,11 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.SupplyRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -564,15 +566,43 @@ class KbvErpBundleTest extends ParsingTest {
   }
 
   @Test
-  void testGetMedicationRequests() {
+  void shouldGetMedicationRequests() {
     val bundle = KbvErpBundleFaker.builder().fake();
     assertDoesNotThrow(bundle::getMedicationRequests);
   }
 
   @Test
-  void testGetFirstMedicationRequest() {
+  void shouldGetFirstMedicationRequest() {
     val bundle = KbvErpBundleFaker.builder().fake();
     assertDoesNotThrow(bundle::getFirstMedicationRequest);
+  }
+
+  @Test
+  void shouldHandleMissingMedicationRequest() {
+    val expectedID = "dae573db-54e3-4cb8-880d-0a46bea8aea1";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_0 + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+
+    kbvBundle
+        .getEntry()
+        .removeIf(
+            entry -> entry.getResource().getResourceType().equals(ResourceType.MedicationRequest));
+    assertTrue(kbvBundle.getMedicationRequestOptional().isEmpty());
+    assertThrows(MissingFieldException.class, kbvBundle::getMedicationRequest);
+  }
+
+  @Test
+  void shouldFetchSupplyRequest() {
+    val expectedID = "dae573db-54e3-4cb8-880d-0a46bea8aea1";
+    val fileName = expectedID + ".xml";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_0 + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+
+    kbvBundle.getEntry().add(new BundleEntryComponent().setResource(new SupplyRequest()));
+    assertTrue(kbvBundle.getSupplyRequest().isPresent());
   }
 
   @RequiredArgsConstructor

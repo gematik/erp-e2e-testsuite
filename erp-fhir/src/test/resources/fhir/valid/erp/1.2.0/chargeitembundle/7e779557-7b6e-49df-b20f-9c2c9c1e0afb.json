@@ -992,12 +992,6 @@
         "type": "document",
         "timestamp": "2024-07-02T14:51:43.177+00:00",
         "resourceType": "Bundle",
-        "link": [
-          {
-            "relation": "self",
-            "url": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Task/200.000.003.320.338.84/$close/"
-          }
-        ],
         "identifier": {
           "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
           "value": "200.000.003.320.338.84"
@@ -1051,7 +1045,7 @@
                 {
                   "entry": [
                     {
-                      "reference": "Binary/PrescriptionDigest-200.000.003.320.338.84"
+                      "reference": "urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"
                     }
                   ]
                 }
@@ -1090,10 +1084,10 @@
             }
           },
           {
-            "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Binary/PrescriptionDigest-200.000.003.320.338.84",
+            "fullUrl": "urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9",
             "resource": {
               "resourceType": "Binary",
-              "id": "PrescriptionDigest-200.000.003.320.338.84",
+              "id": "b35d3602-acab-47ab-b58a-dd53e817e6c9",
               "meta": {
                 "profile": [
                   "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"

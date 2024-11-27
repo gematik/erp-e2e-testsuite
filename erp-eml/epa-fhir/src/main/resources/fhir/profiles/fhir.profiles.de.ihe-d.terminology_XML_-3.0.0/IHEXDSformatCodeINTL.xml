@@ -1,0 +1,227 @@
+<ValueSet xmlns="http://hl7.org/fhir">
+    <id value="1.2.276.0.76.11.71--20210706212636"/>
+    <meta>
+        <profile value="http://hl7.org/fhir/StructureDefinition/shareablevalueset"/>
+        <!--<profile value="http://hl7.org/fhir/4.0/StructureDefinition/ValueSet"/>-->
+    </meta>
+    <extension url="http://hl7.org/fhir/StructureDefinition/resource-effectivePeriod">
+        <valuePeriod>
+            <start value="2021-07-06T21:26:36+01:00"/>
+        </valuePeriod>
+    </extension>
+    <url value="http://ihe-d.de/ValueSets/IHEXDSformatCodeINTL"/>
+    <identifier>
+        <use value="official"/>
+        <system value="urn:ietf:rfc:3986"/>
+        <value value="urn:oid:1.2.276.0.76.11.71"/>
+    </identifier>
+    <version value="2021-07-06T21:26:36"/>
+    <name value="IHEXDSformatCodeINTL"/>
+    <title value="IHEXDS formatCode (Intl)"/>
+    <status value="active"/>
+    <experimental value="false"/>
+    <publisher value="IHE Deutschland e.V."/>
+    <description
+            value="**IHE Format Codes**&#13;&#10;This value set lists the format codes used by the IHE Profiles specified in the PCC Technical Framework, and also lists, for reference purposes the same values for other selected IHE Profiles from other committees."/>
+    <immutable value="false"/>
+    <compose>
+        <include>
+            <system value="urn:dicom:uid"/>
+            <concept>
+                <code value="1.2.840.10008.5.1.4.1.1.88.59"/>
+                <display value="DICOM Manifest (DICOM KOS SOP Class UID)"/>
+            </concept>
+        </include>
+        <include>
+            <system value="http://ihe.net/fhir/ihe.formatcode.fhir/CodeSystem/formatcode"/>
+            <concept>
+                <code value="urn:ihe:pcc:xds-ms:2007"/>
+                <display value="Medical Summaries (XDS-MS)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:xphr:2007"/>
+                <display value="Exchange of Personal Health Records (XPHR)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:edr:2007"/>
+                <display value="Emergency Department Referral (EDR)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:aps:2007"/>
+                <display value="Antepartum Summary (APS)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:edes:2007"/>
+                <display value="Emergency Department Encounter Summary (EDES)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:aphp:2008"/>
+                <display value="Antepartum History and Physical (APHP)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:apl:2008"/>
+                <display value="Antepartum Laboratory (APL)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:ape:2008"/>
+                <display value="Antepartum Education (APE)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:ic:2009"/>
+                <display value="Immunization Content (IC)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:cm:2008"/>
+                <display value="Care Management (CM)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:tn:2007"/>
+                <display value="??? (urn:ihe:pcc:tn:2007)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:nn:2007"/>
+                <display value="??? (urn:ihe:pcc:nn:2007)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:ctn:2007"/>
+                <display value="??? (urn:ihe:pcc:ctn:2007)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:edpn:2007"/>
+                <display value="??? (urn:ihe:pcc:edpn:2007)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:hp:2008"/>
+                <display value="??? (urn:ihe:pcc:hp:2008)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:ldhp:2009"/>
+                <display value="??? (urn:ihe:pcc:ldhp:2009)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:lds:2009"/>
+                <display value="??? (urn:ihe:pcc:lds:2009)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:mds:2009"/>
+                <display value="??? (urn:ihe:pcc:mds:2009)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:nds:2010"/>
+                <display value="??? (urn:ihe:pcc:nds:2010)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:ppvs:2010"/>
+                <display value="??? (urn:ihe:pcc:ppvs:2010)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:trs:2011"/>
+                <display value="??? (urn:ihe:pcc:trs:2011)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:ets:2011"/>
+                <display value="??? (urn:ihe:pcc:ets:2011)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pcc:its:2011"/>
+                <display value="??? (urn:ihe:pcc:its:2011)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:xds-sd:pdf:2008"/>
+                <display value="Scanned Documents (PDF)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:xds-sd:text:2008"/>
+                <display value="Scanned Documents (text)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:bppc:2007"/>
+                <display value="Basic Patient Privacy Consents"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:bppc-sd:2007"/>
+                <display value="Basic Patient Privacy Consents with Scanned Document"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:appc:2016:consent"/>
+                <display value="APPC Privacy Consent Document"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:xdw:2011:workflowDoc"/>
+                <display value="XDW Workflow Document"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:dsg:detached:2014"/>
+                <display value="DSG Detached Document"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:dsg:enveloping:2014"/>
+                <display value="DSG Enveloping Document"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:lab:xd-lab:2008"/>
+                <display value="CDA Laboratory Report"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:rad:TEXT"/>
+                <display value="XDS-I CDA Wrapped Text Report (XDS-I)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:rad:PDF"/>
+                <display value="XDS-I PDF (XDS-I)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:rad:CDA:ImagingReportStructuredHeadings:2013"/>
+                <display value="XDS-I Imaging Report with Structured Headings (XDS-I)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:card:CRC:2012"/>
+                <display value="Cardiology&#xA0;??? (CRC)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:card:EPRC-IE:2014"/>
+                <display value="Cardiology&#xA0;??? (EPRC-IE)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:card:imaging:2011"/>
+                <display value="Cardiac Imaging Report"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:dent:TEXT"/>
+                <display value="Dental CDA Wrapped Text Report (DENT)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:dent:PDF"/>
+                <display value="Dental PDF (DENT)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:dent:CDA:ImagingReportStructuredHeadings:2013"/>
+                <display value="Dental Imaging Report with Structured Headings (DENT)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:palm:apsr:2016"/>
+                <display value="Anatomic Pathology Structured Report (APSR)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pharm:pre:2010"/>
+                <display value="Pharmacy&#xA0;??? (urn:ihe:pharm:pre:2010)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pharm:padv:2010"/>
+                <display value="Pharmacy&#xA0;??? (urn:ihe:pharm:padv:2010)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pharm:dis:2010"/>
+                <display value="Pharmacy&#xA0;??? (urn:ihe:pharm:dis:2010)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:pharm:pml:2013"/>
+                <display value="Pharmacy&#xA0;??? (urn:ihe:pharm:pml:2013)"/>
+            </concept>
+            <concept>
+                <code value="urn:ihe:iti:xds:2017:mimeTypeSufficient"/>
+                <display value="Format aus MIME Type ableitbar"/>
+            </concept>
+        </include>
+    </compose>
+</ValueSet>

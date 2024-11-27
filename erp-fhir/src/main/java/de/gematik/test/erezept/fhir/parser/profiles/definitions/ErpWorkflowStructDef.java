@@ -43,14 +43,16 @@ public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVers
   BINARY_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary"),
   TASK("https://gematik.de/fhir/StructureDefinition/ErxTask"),
   TASK_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task"),
+  MEDICATION("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication"),
   MEDICATION_DISPENSE("https://gematik.de/fhir/StructureDefinition/ErxMedicationDispense"),
   MEDICATION_DISPENSE_12(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense"),
+  MEDICATION_DISPENSE_DIGA(
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA"),
   CLOSE_OPERATION_BUNDLE(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_CloseOperationInputBundle"),
   RECEIPT("https://gematik.de/fhir/StructureDefinition/ErxReceipt"),
   GEM_ERP_PR_BUNDLE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle"),
-
   CONSENT("https://gematik.de/fhir/StructureDefinition/ErxConsent"),
   MARKING_FLAG("https://gematik.de/fhir/StructureDefinition/MarkingFlag"),
   CHARGE_ITEM("https://gematik.de/fhir/StructureDefinition/ErxChargeItem"),
@@ -71,7 +73,15 @@ public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVers
   ACCEPT_DATE("https://gematik.de/fhir/StructureDefinition/AcceptDate"),
   ACCEPT_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate"),
   LAST_MEDICATION_DISPENSE(
-      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_LastMedicationDispense");
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_LastMedicationDispense"),
+  REDEEM_CODE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode"),
+  DEEP_LINK("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink"),
+
+  CLOSE_OPERATION_INPUT_PARAM(
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CloseOperation_Input"),
+  DISPENSE_OPERATION_INPUT_PARAM(
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_DispenseOperation_Input"),
+  ;
 
   private final String canonicalUrl;
 }

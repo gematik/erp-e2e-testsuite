@@ -44,6 +44,7 @@ import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.BeforeAll;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
@@ -57,23 +58,26 @@ import net.serenitybdd.screenplay.actors.OnStage;
 
 public class AppInitializationSteps {
 
-  private SmartcardArchive smartcards;
-  private ErpAppConfiguration config;
+  private static SmartcardArchive smartcards;
+  private static ErpAppConfiguration config;
+  private static PrimSysBddFactory primsysConfig;
 
-  private PrimSysBddFactory primsysConfig;
   private String scenarioName;
-
   /* the actor who is responsible for reporting the test result to the MDC */
   private Actor testReporter;
 
-  @Before
-  public void setUp(Scenario scenario) {
-    scenarioName = scenario.getName();
+  @BeforeAll
+  public static void init() {
     smartcards = SmartcardArchive.fromResources();
     config = ConfigurationReader.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
     primsysConfig =
         ConfigurationReader.forPrimSysConfiguration()
             .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, smartcards));
+  }
+
+  @Before
+  public void setUp(Scenario scenario) {
+    scenarioName = scenario.getName();
     OnStage.setTheStage(Cast.ofStandardActors());
   }
 

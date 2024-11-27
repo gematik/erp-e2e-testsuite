@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.client;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.rest.HttpBRequest;
+import de.gematik.bbriccs.rest.HttpVersion;
+import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.idp.client.IdpClient;
 import de.gematik.idp.client.IdpClientRuntimeException;
@@ -28,19 +29,19 @@ import de.gematik.test.erezept.client.rest.ErpResponseFactory;
 import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.rest.ValidationResultHelper;
 import de.gematik.test.erezept.client.usecases.ICommand;
-import de.gematik.test.erezept.client.vau.InnerHttp;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -150,15 +151,12 @@ public class ErpClient {
     return ret;
   }
 
-  // TODO: does not belong here, right? // NOSONAR still needs to be refactored
   public String encode(Resource resource, EncodingType encoding) {
     return this.encode(resource, encoding, false);
   }
 
   public String encode(Resource resource, EncodingType encoding, boolean prettyPrint) {
-    val encoded = fhir.encode(resource, encoding, prettyPrint);
-    log.trace("Encoded Resource:\n" + encoded);
-    return encoded;
+    return fhir.encode(resource, encoding, prettyPrint);
   }
 
   @SneakyThrows
@@ -180,33 +178,41 @@ public class ErpClient {
     val start = Instant.now();
     val response = vauClient.send(innerHttpRequest, accessToken, command.getFhirResource());
     val duration = Duration.between(start, Instant.now());
-    log.info(format("Request against {0} took {1} msec", baseFdUrl, duration.toMillis()));
+    log.info("Request against {} took {} msec", baseFdUrl, duration.toMillis());
 
+    val responseHeaders =
+        response.headers().stream().collect(Collectors.toMap(HttpHeader::key, HttpHeader::value));
     return responseFactory.createFrom(
-        response.getStatusCode(),
+        response.statusCode(),
         duration,
-        response.getHeader(),
+        responseHeaders,
         accessToken,
-        response.getBody(),
+        response.bodyAsString(),
         command.expectedResponseBody());
   }
 
   private void validateRequestFhirContent(String content, boolean shouldValidate) {
     if (shouldValidate && content != null && !content.isEmpty()) {
-      log.info(format("Validate FHIR Content with length {0}", content.length()));
       val vr = fhir.validate(content);
       ValidationResultHelper.throwOnInvalidValidationResult(vr);
     }
   }
 
-  private <R extends Resource> String createInnerHttpRequest(
-      @NonNull ICommand<R> command, @NonNull String accessToken, String body) {
-    val headers = command.getHeaderParameters();
-    headers.put("Accept-Charset", acceptCharset);
-    headers.put("Authorization", "Bearer " + accessToken);
-    headers.put("Accept", acceptMime.asString());
-    headers.put("Content-Type", sendMime.asString());
+  private <R extends Resource> HttpBRequest createInnerHttpRequest(
+      ICommand<R> command, String accessToken, String body) {
+    val headersMap = command.getHeaderParameters();
+    headersMap.put("Accept-Charset", acceptCharset);
+    headersMap.put("Authorization", "Bearer " + accessToken);
+    headersMap.put("Accept", acceptMime.asString());
+    headersMap.put("Content-Type", sendMime.asString());
+    headersMap.put("Content-Length", String.valueOf(body.getBytes(StandardCharsets.UTF_8).length));
 
-    return InnerHttp.encode(command.getMethod(), command.getRequestLocator(), headers, body);
+    val headers =
+        headersMap.entrySet().stream()
+            .map(es -> new HttpHeader(es.getKey(), es.getValue()))
+            .collect(Collectors.toList()); // VAU-client will add its own headers as well
+
+    return new HttpBRequest(
+        HttpVersion.HTTP_1_1, command.getMethod(), command.getRequestLocator(), headers, body);
   }
 }

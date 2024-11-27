@@ -27,19 +27,27 @@ import org.junit.jupiter.params.provider.*;
 public class VersionArgumentProvider {
 
   public static Stream<Arguments> erpFhirProfileVersions() {
-    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
+    // TODO: get rid of the support for building 1.1.1 profiles
+    //    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
+    return Stream.of(Arguments.of("1.2.0"), Arguments.of("1.3.0"), Arguments.of("1.4.0"));
   }
 
   public static Stream<Arguments> erpWorkflowVersions() {
-    return Arrays.stream(ErpWorkflowVersion.values()).map(Arguments::of);
+    return Arrays.stream(ErpWorkflowVersion.values())
+        .filter(v -> !v.equals(ErpWorkflowVersion.V1_1_1))
+        .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaErpVersions() {
-    return Arrays.stream(KbvItaErpVersion.values()).map(Arguments::of);
+    return Arrays.stream(KbvItaErpVersion.values())
+        //        .filter(v -> !v.equals(KbvItaErpVersion.V1_0_2))
+        .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaForVersions() {
-    return Arrays.stream(KbvItaForVersion.values()).map(Arguments::of);
+    return Arrays.stream(KbvItaForVersion.values())
+        //        .filter(v -> !v.equals(KbvItaForVersion.V1_0_3))
+        .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvBundleVersions() {

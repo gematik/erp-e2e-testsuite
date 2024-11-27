@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;

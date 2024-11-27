@@ -16,8 +16,11 @@
 
 package de.gematik.test.erezept.toggle;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import de.gematik.bbriccs.toggle.BooleanToggle;
 import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,7 +39,7 @@ class BooleanToggleTest {
   @ParameterizedTest
   @MethodSource("booleanToggleInstances")
   <T extends BooleanToggle> void shouldHaveDefaultValue(T instance) {
-    assertDoesNotThrow(() -> instance.getDefaultValue());
+    assertDoesNotThrow(instance::getDefaultValue);
   }
 
   @ParameterizedTest
@@ -55,7 +58,6 @@ class BooleanToggleTest {
         Arguments.of(new AbsoluteReferencesAsUUIDToggle()),
         Arguments.of(new AnrValidationConfigurationIsErrorToggle()),
         Arguments.of(new EgkPharmacyAcceptPN3Toggle()),
-        Arguments.of(new ErpDarreichungsformOctoberActive()),
         Arguments.of(new FhirCloseSlicingToggle()));
   }
 }

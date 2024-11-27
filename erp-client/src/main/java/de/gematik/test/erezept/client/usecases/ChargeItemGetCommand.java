@@ -16,8 +16,10 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemSet;
+import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -25,6 +27,11 @@ public class ChargeItemGetCommand extends BaseCommand<ErxChargeItemSet> {
 
   public ChargeItemGetCommand() {
     super(ErxChargeItemSet.class, HttpRequestMethod.GET, "ChargeItem");
+  }
+
+  public ChargeItemGetCommand(List<IQueryParameter> searchParameters) {
+    super(ErxChargeItemSet.class, HttpRequestMethod.GET, "ChargeItem");
+    queryParameters.addAll(searchParameters);
   }
 
   @Override

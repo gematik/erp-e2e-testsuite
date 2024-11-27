@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.toggle;
 
+import de.gematik.bbriccs.toggle.BooleanToggle;
+
 public class EgkPharmacyAcceptPN3Toggle extends BooleanToggle {
 
   public EgkPharmacyAcceptPN3Toggle() {

@@ -1,0 +1,131 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/FallkontextBeiDokumentenerstellung",
+  "version": "2021-07-06T21:19:41",
+  "name": "FallkontextBeiDokumentenerstellung",
+  "id": "FallkontextBeiDokumentenerstellung",
+  "title": "Fallkontext Bei Dokumentenerstellung",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "E100",
+      "display": "ambulanter Kontakt",
+      "definition": "Ambulanter Kontakt in beliebiger Einrichtung mit Teilnahme an der ambulanten Versorgung"
+    },
+    {
+      "code": "E110",
+      "display": "ambulante OP",
+      "definition": "Ambulant durchgeführte OP in beliebiger Einrichtung mit ambulant operativer Versorgung"
+    },
+    {
+      "code": "E200",
+      "display": "stationärer Aufenthalt",
+      "definition": "Voll-, teil- oder nachstationäre Behandlung in einer Einrichtung mit Teilnahme an der stationären Versorgung"
+    },
+    {
+      "code": "E210",
+      "display": "stationäre Aufnahme",
+      "definition": "Aufnahme zur voll-, teil- oder nachstationären Behandlung in eine Einrichtung mit Teilnahme an der stationären Versorgung"
+    },
+    {
+      "code": "E211",
+      "display": "Aufnahme vollstationär",
+      "definition": "Aufnahme in vollstationäre Krankenhausbehandlung; einschließlich vollstationäre Behandlung mit vorausgegangener vorstationärer Behandlung"
+    },
+    {
+      "code": "E212",
+      "display": "Aufnahme/Wiederaufnahme teilstationär",
+      "definition": "Aufnahme/Wiederaufnahme in teilstationäre Krankenhausbehandlung: Kontakt im Rahmen einer teilstationären Behandlung; einschließlich Tagesklinik"
+    },
+    {
+      "code": "E213",
+      "display": "Aufnahme Entbindung stationär",
+      "definition": "Aufnahme zur stationären Entbindung"
+    },
+    {
+      "code": "E214",
+      "display": "Aufnahme eines Neugeborenen",
+      "definition": "Aufnahme eines Neugeborenen bei stationärer Entbindung"
+    },
+    {
+      "code": "E215",
+      "display": "Aufnahme des Spenders zur Organentnahme",
+      "definition": "Stationäre Aufnahme zur Organentnahme"
+    },
+    {
+      "code": "E230",
+      "display": "stationäre Entlassung",
+      "definition": "Entlassung nach voll-, teil- oder nachstationärer Behandlung aus einer Einrichtung mit Teilnahme an der stationären Versorgung"
+    },
+    {
+      "code": "E231",
+      "display": "stationäre Entlassung nach Hause",
+      "definition": "Entlassung aus stationärem Aufenthalt nach Hause: Routineentlassung (Behandlung regulär beendet); Behandlung gegen ärztlichen Rat beendet; Behandlung aus sonstigen Gründen beendet. Einschließlich Entlassung mit geplanter ambulanter Weiterbehandlung. Einschließlich Entlassung in organisierte häusliche Pflege"
+    },
+    {
+      "code": "E232",
+      "display": "stationäre Entlassung in eine Rehabilitationseinrichtung",
+      "definition": "Entlassung aus stationärem Aufenthalt in eine Rehabilitationseinrichtung"
+    },
+    {
+      "code": "E233",
+      "display": "stationäre Entlassung in eine Pflegeeinrichtung/Hospiz",
+      "definition": "Entlassung aus stationärem Aufenthalt in eine Pflegeeinrichtung oder ein Hospiz"
+    },
+    {
+      "code": "E234",
+      "display": "Entlassung zur nachstationären Behandlung",
+      "definition": "Entlassung aus stationärem Aufenthalt, nachstationäre Behandlung vorgesehen: Behandlung regulär oder gegen ärztlichen Rat beendet mit geplanter nachstationärer Behandlung"
+    },
+    {
+      "code": "E235",
+      "display": "Patient während stationärem Aufenthalt verstorben",
+      "definition": "Patient während stationärem Aufenthalt verstorben"
+    },
+    {
+      "code": "E250",
+      "display": "stationäre Verlegung",
+      "definition": "Verlegung im Verlauf oder bei Abschluss eines stationären Aufenthaltes"
+    },
+    {
+      "code": "E251",
+      "display": "Verlegung innerhalb eines Krankenhauses",
+      "definition": "Verlegung innerhalb einer stationären Einrichtung (\"interne stationäre Verlegung\")"
+    },
+    {
+      "code": "E252",
+      "display": "Verlegung in ein anderes Krankenhaus",
+      "definition": "Verlegung in ein anderes Krankenhaus (\"externe stationäre Verlegung\")"
+    },
+    {
+      "code": "E253",
+      "display": "externe Verlegung in Psychiatrie",
+      "definition": "Verlegung zur psychiatrischen Behandlung in eine andere Einrichtung"
+    },
+    {
+      "code": "E270",
+      "display": "kurzzeitige Unterbrechung einer stationären Behandlung",
+      "definition": "Entlassung mit geplanter nachfolgender stationärer Wiederaufnahme in derselben Einrichtung, z.B. Unterbrechung gegen ärztlichen Rat"
+    },
+    {
+      "code": "E280",
+      "display": "Konsil",
+      "definition": "Konsiliarische Mitbehandlung im Verlauf eines stationären Aufenthaltes oder im ambulanten Kontext, ohne Verlegung"
+    },
+    {
+      "code": "E300",
+      "display": "Behandlung im häuslichen Umfeld",
+      "definition": "Behandlung/ Monitoring im häuslichen Umfeld"
+    },
+    {
+      "code": "E400",
+      "display": "Virtual Encounter",
+      "definition": "Behandlung/ Monitoring über virtuellen Patientenkontakt z.B. telemedizinischer Patientenkontakt"
+    }
+  ],
+  "count": 23
+}

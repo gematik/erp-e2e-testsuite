@@ -1,0 +1,82 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "indicator-bvg-extension",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/indicator-bvg-extension",
+  "version": "1.0.3",
+  "name": "IndicatorBVGExtension",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "Indicator of whether this regulation is made in reference to the 'Bundesentschädigungsgesetz' or the 'Bundesversorgungsgesetz'.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "definition": "Indicator of whether this regulation is made in reference to the 'Bundesentschädigungsgesetz' or the 'Bundesversorgungsgesetz'."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/epa-medication/StructureDefinition/indicator-bvg-extension"
+      },
+      {
+        "id": "Extension.value[x]",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status",
+            "valueCode": "normative"
+          }
+        ],
+        "path": "Extension.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Extension.value[x]:valueBoolean",
+        "path": "Extension.value[x]",
+        "sliceName": "valueBoolean",
+        "short": "BVG",
+        "definition": "Indicator of whether this regulation applies to claimants under the 'Bundesentschädigungsgesetz' (BEG) or to claimants under the 'Bundesversorgungsgesetz' (BVG).\n\r\n\r\nfalse - not BVG (default value)\n\r\ntrue - BVG",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      }
+    ]
+  }
+}

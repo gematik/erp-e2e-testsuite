@@ -16,13 +16,14 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import java.util.List;
+import lombok.val;
+import org.hl7.fhir.r4.model.Address;
+import org.junit.jupiter.api.Test;
 
 class AddressBuilderTest {
 

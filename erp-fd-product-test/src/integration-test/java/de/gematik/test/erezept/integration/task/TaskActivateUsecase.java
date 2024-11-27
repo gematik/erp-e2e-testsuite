@@ -20,7 +20,6 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDiagnostics;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectAcceptDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectExpiryDate;
@@ -48,9 +47,7 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.ErpDarreichungsformOctoberActive;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -75,11 +72,6 @@ import org.junit.runner.RunWith;
 @DisplayName("E-Rezept ausstellen")
 @Tag("UseCase:Activate")
 class TaskActivateUsecase extends ErpTest {
-
-  private static final Boolean darreichungsformOctoberActive =
-      featureConf.getToggle(new ErpDarreichungsformOctoberActive());
-  private static final Boolean EXPECT_NEW_DMPKENNZEICHEN_IS_ACTIVE =
-      Boolean.parseBoolean(System.getProperty("erp.prodtest.fhir.useDmpV_1_06.active", "false"));
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -150,26 +142,15 @@ class TaskActivateUsecase extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
 
-    if (!df.getValidFrom().isAfter(LocalDate.now()) || darreichungsformOctoberActive) {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DARREICHUNGSFORMEN)
-              .hasResponseWith(returnCode(200))
-              .and(hasWorkflowType(expectedFlowType))
-              .and(isInReadyStatus())
-              .and(hasCorrectExpiryDate())
-              .and(hasCorrectAcceptDate(expectedFlowType))
-              .isCorrect());
-    } else {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome()
-              .responseWith(returnCodeIs(400))
-              .has(
-                  operationOutcomeHasDetailsText(
-                      "FHIR-Validation error", FhirRequirements.FHIR_VALIDATION_ERROR))
-              .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DARREICHUNGSFORMEN)
+            .hasResponseWith(returnCode(200))
+            .and(hasWorkflowType(expectedFlowType))
+            .and(isInReadyStatus())
+            .and(hasCorrectExpiryDate())
+            .and(hasCorrectAcceptDate(expectedFlowType))
+            .isCorrect());
   }
 
   static Stream<Arguments> prescriptionTypesProviderInvalidAuthoredOn() {
@@ -483,26 +464,15 @@ class TaskActivateUsecase extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
 
-    if (EXPECT_NEW_DMPKENNZEICHEN_IS_ACTIVE) {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DMPKENNZEICHEN)
-              .hasResponseWith(returnCode(200))
-              .and(hasWorkflowType(expectedFlowType))
-              .and(isInReadyStatus())
-              .and(hasCorrectExpiryDate())
-              .and(hasCorrectAcceptDate(expectedFlowType))
-              .isCorrect());
-    } else {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome()
-              .responseWith(returnCodeIs(400))
-              .has(
-                  operationOutcomeHasDetailsText(
-                      "FHIR-Validation error", FhirRequirements.FHIR_VALIDATION_ERROR))
-              .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DMPKENNZEICHEN)
+            .hasResponseWith(returnCode(200))
+            .and(hasWorkflowType(expectedFlowType))
+            .and(isInReadyStatus())
+            .and(hasCorrectExpiryDate())
+            .and(hasCorrectAcceptDate(expectedFlowType))
+            .isCorrect());
   }
 
   private KbvErpBundleBuilder getKbvErpBundleBuilder(PrescriptionId prescriptionId) {

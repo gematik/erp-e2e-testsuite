@@ -1,5 +1,5 @@
 #
-# Copyright 2023 gematik GmbH
+# Copyright 2024 gematik GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -194,7 +194,6 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es einen Konflikt gibt
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
-
 
 
   @TCID:ERP_EE_WF160_11

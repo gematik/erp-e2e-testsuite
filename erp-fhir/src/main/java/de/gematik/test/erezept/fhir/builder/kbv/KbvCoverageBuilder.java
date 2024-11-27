@@ -16,19 +16,30 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.references.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.IValueSet;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
+import java.util.LinkedList;
+import java.util.List;
+import lombok.val;
+import org.hl7.fhir.r4.model.Coverage;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Reference;
 
 public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuilder> {
 
@@ -41,7 +52,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   private Wop wop = Wop.DUMMY;
   private VersichertenStatus versichertenStatus = VersichertenStatus.MEMBERS;
   private static final Coverage.CoverageStatus coverageStatus = Coverage.CoverageStatus.ACTIVE;
-  private IValueSet versicherungsArt = VersicherungsArtDeBasis.GKV;
+  private IValueSet versicherungsArt;
 
   private Reference beneficiary;
   private IKNR iknr;
@@ -49,8 +60,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
 
   public static KbvCoverageBuilder insurance(InsuranceCoverageInfo coverage) {
     val builder = insurance(coverage.getIknr(), coverage.getName());
-    builder.versicherungsArt = coverage.getInsuranceType();
-    return builder;
+    return builder.versicherungsArt(coverage.getInsuranceType());
   }
 
   public static KbvCoverageBuilder insurance(String iknr, String insuranceName) {
@@ -62,31 +72,6 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
     insurance.iknr = iknr;
     insurance.insuranceName = insuranceName;
     return insurance;
-  }
-
-  @Deprecated(since = "recently")
-  public static KbvCoverageBuilder faker() {
-    return faker(randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV));
-  }
-
-  @Deprecated(since = "recently")
-  public static KbvCoverageBuilder faker(VersicherungsArtDeBasis insuranceType) {
-    val builder =
-        switch (insuranceType) {
-          case GKV -> insurance(randomElement(GkvInsuranceCoverageInfo.values()));
-          case PKV -> insurance(randomElement(PkvInsuranceCoverageInfo.values()));
-          case BG -> insurance(randomElement(BGInsuranceCoverageInfo.values()));
-          default -> insurance(DynamicInsuranceCoverageInfo.random());
-        };
-
-    builder
-        .personGroup(fakerValueSet(PersonGroup.class))
-        .beneficiary(
-            PatientFaker.builder().withKvnrAndInsuranceType(KVNR.random(), insuranceType).fake())
-        .dmpKennzeichen(fakerValueSet(DmpKennzeichen.class))
-        .wop(fakerValueSet(Wop.class))
-        .versichertenStatus(fakerValueSet(VersichertenStatus.class));
-    return builder;
   }
 
   /**
@@ -142,7 +127,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   }
 
   public KbvCoverageBuilder beneficiary(KbvPatient patient) {
-    this.versicherungsArt = patient.getInsuranceKind();
+    if (this.versicherungsArt == null) versicherungsArt(patient.getInsuranceKind());
     return beneficiary(new SubjectReference(patient.getId()));
   }
 

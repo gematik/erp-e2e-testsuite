@@ -21,6 +21,7 @@ import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOpe
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
@@ -44,6 +45,7 @@ class ManagePharmacyPrescriptionsTest {
     assertTrue(ability.getAcceptedPrescriptions().isEmpty());
     assertTrue(ability.getAssignedPrescriptions().isEmpty());
     assertTrue(ability.getClosedPrescriptions().isEmpty());
+    assertTrue(ability.getChargeItemChangeAuthorizations().isEmpty());
     assertTrue(ability.getReceiptsList().isEmpty());
     assertDoesNotThrow(ability::toString);
   }
@@ -52,7 +54,7 @@ class ManagePharmacyPrescriptionsTest {
   void shouldTeardown() {
     OnStage.setTheStage(new Cast() {});
 
-    val actor = OnStage.theActor("Alice");
+    val actor = OnStage.theActor("Am Waldesrand");
     val ability = spy(ManagePharmacyPrescriptions.itWorksWith());
     actor.can(ability);
 
@@ -65,8 +67,12 @@ class ManagePharmacyPrescriptionsTest {
 
     ability.appendAcceptedPrescription(acceptBundle);
 
-    val erpClient = mock(UseTheErpClient.class);
-    actor.can(erpClient);
+    // simply for coverage...
+    assertEquals(acceptBundle, ability.getLastAcceptedPrescription());
+
+    val erpClient = mock(ErpClient.class);
+    val erpClientAbility = UseTheErpClient.with(erpClient);
+    actor.can(erpClientAbility);
 
     val mockResponse =
         ErpResponse.forPayload(createOperationOutcome(), Resource.class)
@@ -76,6 +82,22 @@ class ManagePharmacyPrescriptionsTest {
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
     OnStage.drawTheCurtain();
+
+    verify(ability, times(1)).tearDown();
+  }
+
+  @Test
+  void shouldNotFailOnTeardownWithoutErpClient() {
+    OnStage.setTheStage(new Cast() {});
+
+    val actor = OnStage.theActor("Stadtapotheke");
+    val ability = spy(ManagePharmacyPrescriptions.itWorksWith());
+    actor.can(ability);
+
+    val acceptBundle = mock(ErxAcceptBundle.class);
+    ability.appendAcceptedPrescription(acceptBundle);
+
+    assertDoesNotThrow(OnStage::drawTheCurtain);
 
     verify(ability, times(1)).tearDown();
   }

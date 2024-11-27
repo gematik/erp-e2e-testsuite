@@ -16,12 +16,13 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.rest.param.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.values.*;
-import java.util.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.QueryParameter;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.util.Optional;
+import org.hl7.fhir.r4.model.Resource;
 
 public class ChargeItemGetByIdCommand extends BaseCommand<ErxChargeItemBundle> {
 

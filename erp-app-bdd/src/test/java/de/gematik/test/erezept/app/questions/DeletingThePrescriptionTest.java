@@ -26,6 +26,7 @@ import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
@@ -50,15 +51,21 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 
 class DeletingThePrescriptionTest {
+
   private String userName;
   private KbvErpBundle kbvBundle;
 
   @BeforeEach
   void setUp() {
+    val jwt =
+        "eyJhbGciOiJCUDI1NlIxIiwidHlwIjoiYXQrSldUIiwia2lkIjoicHVrX2lkcF9zaWcifQ.eyJzdWIiOiJJWERkLTNyUVpLS0ZYVWR4R0dqNFBERG9WNk0wUThaai1xdzF2cjF1XzU4IiwicHJvZmVzc2lvbk9JRCI6IjEuMi4yNzYuMC43Ni40LjQ5Iiwib3JnYW5pemF0aW9uTmFtZSI6ImdlbWF0aWsgTXVzdGVya2Fzc2UxR0tWTk9ULVZBTElEIiwiaWROdW1tZXIiOiJYMTEwNTAyNDE0IiwiYW1yIjpbIm1mYSIsInNjIiwicGluIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTUwMTEvYXV0aC9yZWFsbXMvaWRwLy53ZWxsLWtub3duL29wZW5pZC1jb25maWd1cmF0aW9uIiwiZ2l2ZW5fbmFtZSI6IlJvYmluIEdyYWYiLCJjbGllbnRfaWQiOiJlcnAtdGVzdHN1aXRlLWZkIiwiYWNyIjoiZ2VtYXRpay1laGVhbHRoLWxvYS1oaWdoIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDozMDAwLyIsImF6cCI6ImVycC10ZXN0c3VpdGUtZmQiLCJzY29wZSI6Im9wZW5pZCBlLXJlemVwdCIsImF1dGhfdGltZSI6MTY0MzgwNDczMywiZXhwIjoxNjQzODA1MDMzLCJmYW1pbHlfbmFtZSI6IlbDs3Jtd2lua2VsIiwiaWF0IjoxNjQzODA0NjEzLCJqdGkiOiI2Yjg3NmU0MWNmMGViNGJkIn0.MV5cDnL3JBZ4b6xr9SqiYDmZ7qtZFEWBd1vCrHzVniZeDhkyuSYc7xhf577h2S21CzNgrMp0M6JALNW9Qjnw_g";
+
     OnStage.setTheStage(new Cast() {});
     userName = GemFaker.fakerName();
     val theAppUser = OnStage.theActorCalled(userName);
+    val erpClient = mock(ErpClient.class);
     val erpClientAbility = mock(UseTheErpClient.class);
+    when(erpClientAbility.getClient()).thenReturn(erpClient);
     givenThat(theAppUser).can(erpClientAbility);
     val mdmc = ManageDataMatrixCodes.sheGetsPrescribed();
     givenThat(theAppUser).can(mdmc);
@@ -73,6 +80,7 @@ class DeletingThePrescriptionTest {
     val mockResponse =
         ErpResponse.forPayload(mockPrescriptionBundle, ErxPrescriptionBundle.class)
             .withStatusCode(200)
+            .usedJwt(jwt)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(erpClientAbility.request(any(TaskGetByIdCommand.class))).thenReturn(mockResponse);
@@ -81,9 +89,10 @@ class DeletingThePrescriptionTest {
     val tearDownResponse =
         ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
             .withStatusCode(404)
+            .usedJwt(jwt)
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
-    when(erpClientAbility.request(any(TaskAbortCommand.class))).thenReturn(tearDownResponse);
+    when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(tearDownResponse);
   }
 
   @AfterEach

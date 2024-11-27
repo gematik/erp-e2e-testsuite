@@ -121,12 +121,12 @@ class HasReceivedDispensedMedicationTest {
             List.of(
                 ErxMedicationDispenseFaker.builder()
                     .withKvnr(kvnr)
-                    .withPerfomer("123")
+                    .withPerformer("123")
                     .withPrescriptionId(prescriptionId)
                     .fake(),
                 ErxMedicationDispenseFaker.builder()
                     .withKvnr(kvnr)
-                    .withPerfomer("123")
+                    .withPerformer("123")
                     .withPrescriptionId(prescriptionId)
                     .fake()));
 
@@ -184,12 +184,12 @@ class HasReceivedDispensedMedicationTest {
             List.of(
                 ErxMedicationDispenseFaker.builder()
                     .withKvnr(kvnr)
-                    .withPerfomer("123")
+                    .withPerformer("123")
                     .withPrescriptionId(prescriptionId)
                     .fake(),
                 ErxMedicationDispenseFaker.builder()
                     .withKvnr(kvnr)
-                    .withPerfomer("123")
+                    .withPerformer("123")
                     .withPrescriptionId(prescriptionId)
                     .fake()));
 

@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.toggle;
 
+import de.gematik.bbriccs.toggle.BooleanToggle;
+
 public class FhirCloseSlicingToggle extends BooleanToggle {
 
   public FhirCloseSlicingToggle() {

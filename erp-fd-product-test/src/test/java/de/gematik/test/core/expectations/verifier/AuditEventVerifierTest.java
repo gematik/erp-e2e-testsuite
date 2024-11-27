@@ -29,6 +29,7 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
@@ -102,6 +103,24 @@ class AuditEventVerifierTest extends ParsingTest {
   void shouldThrowWhileCompareAuditEventAtPositionCorrect() {
     val auditEventNo2 = firstErxAuditEventBundle.getAuditEvents().get(2);
     val step = hasAuditEventAtPosition(auditEventNo2, 3);
+    assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldVerifyContainedText() {
+    val step =
+        bundleContainsLogFor(
+            PrescriptionId.from("160.000.023.898.864.45"),
+            "Sina Karla Gräfin Hüllmann downloaded a prescription");
+    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyContainedText() {
+    val step =
+        bundleContainsLogFor(
+            PrescriptionId.from("160.000.023.898.863.48"),
+            "Sina Karla Gräfin TestMänn downloaded a prescription");
     assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }
 }

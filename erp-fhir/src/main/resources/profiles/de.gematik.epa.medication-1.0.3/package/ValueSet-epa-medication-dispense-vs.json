@@ -1,0 +1,31 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "EPAMedicationDispenseVS",
+  "id": "epa-medication-dispense-vs",
+  "title": "EPA Medication Dispense ValueSet",
+  "description": "EPA Medication Dispense ValueSet",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-dispense-vs",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/medicationdispense-status",
+        "concept": [
+          {
+            "code": "completed"
+          },
+          {
+            "code": "declined"
+          },
+          {
+            "code": "cancelled"
+          }
+        ]
+      }
+    ]
+  }
+}

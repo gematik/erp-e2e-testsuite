@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.9.0</version>
+        <version>0.9.1</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
@@ -71,7 +71,6 @@
             <groupId>de.gematik.bbriccs</groupId>
             <artifactId>fhir-hapi-fuzzing-brick</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
@@ -95,10 +94,24 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>de.gematik.bbriccs</groupId>
-            <artifactId>resource-loader-brick</artifactId>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>epa-fhir</artifactId>
+            <version>0.9.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>epa-fhir</artifactId>
+            <type>test-jar</type>
+            <version>0.9.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>epa-mock-client</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-core</artifactId>
@@ -165,6 +178,10 @@
                         <resourceBundle>
                             de.gematik.test.erezept:smartcard:${project.parent.version}
                         </resourceBundle>
+                        <resourceBundle>
+                            <!--TODO following plugin won´t be required up to bricks 0.2.0-->
+                            de.gematik.test.erezept:epa-fhir:${project.parent.version}
+                        </resourceBundle>
                     </resourceBundles>
                 </configuration>
                 <executions>
@@ -213,6 +230,7 @@
                     <includes>
                         <!-- integration test against SUT everything in de.gematik.test.erezept -->
                         <include>%regex[.*/erezept/integration/.*.class]</include>
+                         <include>%regex[.*/eml/integration/.*.class]</include>
                         <include>%regex[.*/erezept/performance/.*.class]</include>
                     </includes>
                     <systemPropertyVariables>

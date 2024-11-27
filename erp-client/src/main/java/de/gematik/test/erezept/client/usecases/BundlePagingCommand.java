@@ -18,7 +18,7 @@ package de.gematik.test.erezept.client.usecases;
 
 import static de.gematik.test.erezept.client.rest.param.IQueryParameter.queryListFromUrl;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import java.util.List;
 import java.util.Optional;

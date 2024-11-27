@@ -19,8 +19,8 @@ package de.gematik.test.erezept.fhir.extensions.kbv;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;

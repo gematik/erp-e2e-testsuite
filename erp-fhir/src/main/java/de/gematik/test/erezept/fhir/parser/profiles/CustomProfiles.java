@@ -23,11 +23,13 @@ import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpBasisVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.DavKbvCsVsVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.DeBasisVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.EpaMedicationVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.Hl7Version;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvBasisVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
 import java.util.Arrays;
@@ -42,6 +44,11 @@ public enum CustomProfiles {
   KBV_BASIS("kbv.basis", "https://fhir.kbv.de/", KbvBasisVersion.class),
   KBV_ITA_FOR("kbv.ita.for", "https://fhir.kbv.de/", KbvItaForVersion.class),
   KBV_ITA_ERP("kbv.ita.erp", "https://fhir.kbv.de/", KbvItaErpVersion.class),
+  KBV_ITV_EVDGA("kbv.itv.evdga", "https://fhir.kbv.de/", KbvItvEvdgaVersion.class),
+  GEM_EPA_MEDICATION(
+      "de.gematik.epa.medication",
+      List.of("https://gematik.de/fhir/epa-medication", "https://gematik.de/fhir/epa"),
+      EpaMedicationVersion.class),
   GEM_ERP_WORKFLOW(
       "de.gematik.erezept-workflow",
       List.of(

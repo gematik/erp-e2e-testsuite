@@ -16,9 +16,17 @@
 
 package de.gematik.test.erezept.client.cfg;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.reset;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -26,9 +34,10 @@ import static org.mockito.Mockito.mockStatic;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
+import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
 import de.gematik.test.erezept.client.testutils.VauCertificateGenerator;
 import de.gematik.test.erezept.client.vau.VauException;
-import de.gematik.test.erezept.client.vau.VauHeader;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
@@ -43,7 +52,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @Slf4j
 @WireMockTest(httpPort = 8081)
@@ -142,7 +151,7 @@ class ErpClientFactoryTest {
     verify(
         1,
         getRequestedFor(urlPathEqualTo("/VAUCertificate"))
-            .withoutHeader(VauHeader.X_API_KEY.getValue()));
+            .withoutHeader(AuthHttpHeaderKey.X_API_KEY.getKey()));
   }
 
   @ParameterizedTest
@@ -164,7 +173,7 @@ class ErpClientFactoryTest {
     verify(
         0,
         getRequestedFor(urlPathEqualTo("/VAUCertificate"))
-            .withHeader(VauHeader.X_ERP_USER_AGENT.getValue(), equalTo(originalAgent)));
+            .withHeader(StandardHttpHeaderKey.USER_AGENT.getKey(), equalTo(originalAgent)));
   }
 
   @Test

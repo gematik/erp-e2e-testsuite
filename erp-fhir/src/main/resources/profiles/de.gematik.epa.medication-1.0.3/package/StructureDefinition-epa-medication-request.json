@@ -1,0 +1,398 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "epa-medication-request",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-request",
+  "version": "1.0.3",
+  "name": "EPAMedicationRequest",
+  "title": "EPA MedicationRequest",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "Defines the medication request resource for the Medication Service in the ePA system.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "MedicationRequest",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "MedicationRequest.meta",
+        "path": "MedicationRequest.meta",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.meta.versionId",
+        "path": "MedicationRequest.meta.versionId",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.meta.lastUpdated",
+        "path": "MedicationRequest.meta.lastUpdated",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription",
+        "path": "MedicationRequest.extension",
+        "sliceName": "multiplePrescription",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/multiple-prescription-extension"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:indicator",
+        "path": "MedicationRequest.extension.extension",
+        "sliceName": "indicator"
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:indicator.value[x]:valueBoolean",
+        "path": "MedicationRequest.extension.extension.value[x]",
+        "sliceName": "valueBoolean",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:counter",
+        "path": "MedicationRequest.extension.extension",
+        "sliceName": "counter"
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:counter.value[x]:valueRatio",
+        "path": "MedicationRequest.extension.extension.value[x]",
+        "sliceName": "valueRatio",
+        "type": [
+          {
+            "code": "Ratio"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:counter.value[x]:valueRatio.numerator",
+        "path": "MedicationRequest.extension.extension.value[x].numerator",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:counter.value[x]:valueRatio.numerator.value",
+        "path": "MedicationRequest.extension.extension.value[x].numerator.value",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:counter.value[x]:valueRatio.denominator",
+        "path": "MedicationRequest.extension.extension.value[x].denominator",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:counter.value[x]:valueRatio.denominator.value",
+        "path": "MedicationRequest.extension.extension.value[x].denominator.value",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:period",
+        "path": "MedicationRequest.extension.extension",
+        "sliceName": "period"
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:period.value[x]:valuePeriod",
+        "path": "MedicationRequest.extension.extension.value[x]",
+        "sliceName": "valuePeriod",
+        "type": [
+          {
+            "code": "Period"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:period.value[x]:valuePeriod.start",
+        "path": "MedicationRequest.extension.extension.value[x].start",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:period.value[x]:valuePeriod.end",
+        "path": "MedicationRequest.extension.extension.value[x].end",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:id",
+        "path": "MedicationRequest.extension.extension",
+        "sliceName": "id"
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:id.value[x]:valueIdentifier",
+        "path": "MedicationRequest.extension.extension.value[x]",
+        "sliceName": "valueIdentifier",
+        "type": [
+          {
+            "code": "Identifier"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:id.value[x]:valueIdentifier.system",
+        "path": "MedicationRequest.extension.extension.value[x].system",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:multiplePrescription.extension:id.value[x]:valueIdentifier.value",
+        "path": "MedicationRequest.extension.extension.value[x].value",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:isBvg",
+        "path": "MedicationRequest.extension",
+        "sliceName": "isBvg",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/indicator-bvg-extension"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:isBvg.value[x]",
+        "path": "MedicationRequest.extension.value[x]",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.extension:isBvg.value[x]:valueBoolean",
+        "path": "MedicationRequest.extension.value[x]",
+        "sliceName": "valueBoolean",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.identifier",
+        "path": "MedicationRequest.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "$this"
+            }
+          ],
+          "rules": "open",
+          "description": "ePrescription identifier and overall transaction identifier",
+          "ordered": false
+        }
+      },
+      {
+        "id": "MedicationRequest.identifier:RxPrescriptionProcessIdentifier",
+        "path": "MedicationRequest.identifier",
+        "sliceName": "RxPrescriptionProcessIdentifier",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-prescription-process-identifier"
+            ]
+          }
+        ],
+        "patternIdentifier": {
+          "system": "https://gematik.de/fhir/epa-medication/sid/rx-prescription-process-identifier"
+        }
+      },
+      {
+        "id": "MedicationRequest.identifier:RxOriginatorProcessIdentifier",
+        "path": "MedicationRequest.identifier",
+        "sliceName": "RxOriginatorProcessIdentifier",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-originator-process-identifier"
+            ]
+          }
+        ],
+        "patternIdentifier": {
+          "system": "https://gematik.de/fhir/epa-medication/sid/rx-originator-process-identifier"
+        }
+      },
+      {
+        "id": "MedicationRequest.status",
+        "path": "MedicationRequest.status",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-request-vs"
+        }
+      },
+      {
+        "id": "MedicationRequest.intent",
+        "path": "MedicationRequest.intent",
+        "short": "filler-order",
+        "definition": "When data is synchronized with the E-Rezept-Fachdienst, the 'filler-order' code should be used here.",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.medication[x]",
+        "path": "MedicationRequest.medication[x]",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Medication"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.subject",
+        "path": "MedicationRequest.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.subject.identifier",
+        "path": "MedicationRequest.subject.identifier",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.authoredOn",
+        "path": "MedicationRequest.authoredOn",
+        "short": "Issue Date",
+        "definition": "Issue Date of the Prescription",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.requester",
+        "path": "MedicationRequest.requester",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/PractitionerRole"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.note",
+        "path": "MedicationRequest.note",
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.note.text",
+        "path": "MedicationRequest.note.text",
+        "short": "Dispensing Note",
+        "definition": "Instructions to the pharmacy that go beyond the dosage information",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dosageInstruction",
+        "path": "MedicationRequest.dosageInstruction",
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dosageInstruction.text",
+        "path": "MedicationRequest.dosageInstruction.text",
+        "short": "Dosage Instructions",
+        "definition": "Dosage Instructions of a Prescription",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dosageInstruction.patientInstruction",
+        "path": "MedicationRequest.dosageInstruction.patientInstruction",
+        "short": "Instructions for Use",
+        "definition": "Instructions for Use",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dispenseRequest",
+        "path": "MedicationRequest.dispenseRequest",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dispenseRequest.quantity",
+        "path": "MedicationRequest.dispenseRequest.quantity",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dispenseRequest.quantity.value",
+        "path": "MedicationRequest.dispenseRequest.quantity.value",
+        "short": "Number of Prescribed Packages",
+        "definition": "Number of Prescribed Packages",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dispenseRequest.quantity.system",
+        "path": "MedicationRequest.dispenseRequest.quantity.system",
+        "min": 1,
+        "patternUri": "http://unitsofmeasure.org",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.dispenseRequest.quantity.code",
+        "path": "MedicationRequest.dispenseRequest.quantity.code",
+        "min": 1,
+        "patternCode": "{Package}",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.substitution",
+        "path": "MedicationRequest.substitution",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationRequest.substitution.allowed[x]",
+        "path": "MedicationRequest.substitution.allowed[x]",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

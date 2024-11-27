@@ -95,8 +95,9 @@ public class RedeemPrescription implements Task {
               "Bitte im Morsecode klingeln: -.-.",
               "004916094858168");
 
-      communicationBuilder.basedOnTask(
-          prescription.getTask().getTaskId(), prescription.getTask().getAccessCode());
+      communicationBuilder
+          .basedOnTask(prescription.getTask().getTaskId(), prescription.getTask().getAccessCode())
+          .flowType(prescription.getTask().getFlowType());
       communication = communicationBuilder.buildDispReq(message);
     }
 

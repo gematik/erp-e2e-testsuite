@@ -47,15 +47,22 @@ import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.AppiumFluentWait;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.serverevents.CustomEvent;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.Status;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -63,6 +70,7 @@ import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -428,30 +436,6 @@ class UseTheAppTest {
     verify(driver, atMost(10)).findElement(locator);
   }
 
-  // TODO: should no longer be needed
-  //  @Test
-  //  void checkIfTapWithTooltipAndDrawerIsWorkingForIOS() {
-  //    val driver = mock(IOSDriver.class);
-  //    val useIOSApp = new UseIOSApp(driver, appiumConfig);
-  //
-  //    val loginButton = WebElementMockFactory.getDisplayableMockElement(true, true);
-  //    val bottomDrawerDecline = WebElementMockFactory.getDisplayableMockElement(true, true);
-  //    val tooltip = WebElementMockFactory.getDisplayableMockElement(true, true);
-  //
-  //    when(driver.findElement(Mainscreen.LOGIN_BUTTON.forPlatform(PlatformType.IOS)))
-  //        .thenReturn(loginButton);
-  //    when(driver.findElement(Utility.DECLINE_LOGIN.forPlatform(PlatformType.IOS)))
-  //        .thenReturn(bottomDrawerDecline);
-  //    when(driver.getPageSource())
-  //        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())
-  //        .thenReturn("");
-  //    when(driver.findElement(Utility.TOOLTIPS.forPlatform(PlatformType.IOS)))
-  //        .thenReturn(tooltip)
-  //        .thenReturn(null); // show tooltips only one time
-  //
-  //    useIOSApp.tap(Mainscreen.LOGIN_BUTTON);
-  //  }
-
   @Test
   void shouldScrollUntilFound() {
     val driver = mock(IOSDriver.class);
@@ -460,7 +444,12 @@ class UseTheAppTest {
     val loginButton = WebElementMockFactory.getDisplayableMockElement(true, true);
     when(driver.findElement(Mainscreen.LOGIN_BUTTON.forPlatform(PlatformType.IOS)))
         .thenReturn(loginButton);
-    when(driver.getPageSource()).thenReturn("").thenReturn("").thenReturn("erx_btn_login");
+    when(driver.getPageSource())
+        .thenReturn("")
+        .thenReturn("")
+        .thenReturn("")
+        .thenReturn("")
+        .thenReturn("erx_btn_login");
 
     useIOSApp.scrollIntoView(ScrollDirection.DOWN, Mainscreen.LOGIN_BUTTON);
     verify(useIOSApp, times(3)).getOptionalWebElement(Mainscreen.LOGIN_BUTTON);
@@ -542,5 +531,34 @@ class UseTheAppTest {
 
     val tappingPoint = new Point(0, 0);
     assertThrows(AssertionError.class, () -> app.tap(times, tappingPoint));
+  }
+
+  static Stream<Arguments> shouldCatchErrorsOnTeardown() {
+    return Stream.of(
+        Arguments.of(new SessionNotCreatedException("TEST")), Arguments.of(new RuntimeException()));
+  }
+
+  @Test
+  void shouldLogEventWithPrefix() {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+
+    app.logEvent("Unit Test");
+
+    val argument = ArgumentCaptor.forClass(CustomEvent.class);
+    verify(driver, times(1)).logEvent(argument.capture());
+    assertEquals("Unit Test", argument.getValue().getEventName());
+    assertEquals("gematik", argument.getValue().getVendor());
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @NullSource
+  void shouldCatchErrorsOnTeardown(Exception toBeThrown) {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+
+    Optional.ofNullable(toBeThrown).ifPresent(it -> doThrow(it).when(driver).quit());
+    assertDoesNotThrow(app::tearDown);
   }
 }

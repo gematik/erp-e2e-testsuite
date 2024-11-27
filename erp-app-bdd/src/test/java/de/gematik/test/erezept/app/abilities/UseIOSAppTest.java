@@ -80,6 +80,25 @@ class UseIOSAppTest {
   }
 
   @Test
+  void shouldPerformRetryOnOptionalElements() {
+    val driver = mock(IOSDriver.class);
+    val webElement = mock(WebElement.class);
+    when(driver.findElement(Onboarding.NEXT_BUTTON.forPlatform(PlatformType.IOS)))
+        .thenReturn(webElement);
+    when(driver.getPageSource())
+        .thenReturn("")
+        .thenReturn(Onboarding.NEXT_BUTTON.extractSourceLabel(PlatformType.IOS));
+
+    val driverAbility = new UseIOSApp(driver, new AppiumConfiguration());
+    val isPresent = driverAbility.isPresent(Onboarding.NEXT_BUTTON);
+
+    assertTrue(isPresent);
+
+    // should have been checking the page source twice
+    verify(driver, times(2)).getPageSource();
+  }
+
+  @Test
   void shouldTapOnElementAfterTooltips() {
     val driver = mock(IOSDriver.class);
     val tooltips = mock(WebElement.class);

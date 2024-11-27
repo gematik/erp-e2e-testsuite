@@ -20,20 +20,22 @@ import static de.gematik.test.erezept.client.testutils.VauCertificateGenerator.g
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.BC;
+import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.vau.protocol.VauVersion;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import javax.net.ssl.SSLContext;
 import kong.unirest.core.Headers;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
@@ -82,12 +84,7 @@ class VauClientTest {
   @SuppressWarnings("unchecked")
   private void prepareResponseVau(byte[] resBody, int returnCode, String... resHeader) {
     val httpResponseMock = mock(HttpResponse.class);
-    when(unitRestMock
-            .post("https://erp/VAU/0")
-            .header("Content-Type", "application/octet-stream")
-            .header(eq(VauHeader.X_ERP_USER.getValue()), anyString())
-            .body(any(byte[].class))
-            .asBytes())
+    when(unitRestMock.post("https://erp/VAU/0").body(any(byte[].class)).asBytes())
         .thenReturn(httpResponseMock);
 
     // mock response status code
@@ -120,11 +117,12 @@ class VauClientTest {
         "testRequestId-123456");
 
     vau.initialize();
-    val response = vau.send("What's wrong, McFly? Chicken!", "testToken", "/Task");
+    val innerRequest = mock(HttpBRequest.class);
+    val response = vau.send(innerRequest, "testToken", "/Task");
 
-    assertEquals(200, response.getStatusCode());
-    assertEquals("Nobody calls me chicken", response.getBody());
-    assertEquals("testRequestId-123456", response.getHeader().get("X-Request-Id"));
+    assertEquals(200, response.statusCode());
+    assertEquals("Nobody calls me chicken", response.bodyAsString());
+    assertEquals("testRequestId-123456", response.headerValue("X-Request-Id"));
   }
 
   @SneakyThrows
@@ -145,8 +143,8 @@ class VauClientTest {
         "X-Request-Id",
         "testRequestId-123456");
     vau.initialize();
-    assertThrows(
-        VauException.class, () -> vau.send("What's wrong, McFly? Chicken!", "testToken", "/Task"));
+    val innerRequest = mock(HttpBRequest.class);
+    assertThrows(VauException.class, () -> vau.send(innerRequest, "testToken", "/Task"));
   }
 
   @SneakyThrows
@@ -159,7 +157,8 @@ class VauClientTest {
       prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
 
       vau.initialize();
-      vau.send("What's wrong, McFly? Chicken!", "", null);
+      val innerRequest = mock(HttpBRequest.class);
+      vau.send(innerRequest, "", null);
     } catch (VauException e) {
       fail();
     }
@@ -175,26 +174,11 @@ class VauClientTest {
       prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
 
       vau.initialize();
-      vau.send("What's wrong, McFly? Chicken!", "", null);
+      val innerRequest = mock(HttpBRequest.class);
+      vau.send(innerRequest, "", null);
     } catch (VauException e) {
       fail();
     }
-  }
-
-  @SneakyThrows
-  @Test
-  void shouldFailIfBaseUrlMissing() {
-    assertThrows(
-        NullPointerException.class,
-        () -> this.createMockClient(null, ClientType.PS, vauCertificate, null, null));
-  }
-
-  @SneakyThrows
-  @Test
-  void shouldFailIfClientTypeMissing() {
-    assertThrows(
-        NullPointerException.class,
-        () -> this.createMockClient("https://erp", null, vauCertificate, null, null));
   }
 
   @SneakyThrows
@@ -203,5 +187,18 @@ class VauClientTest {
     assertThrows(
         NullPointerException.class,
         () -> this.createMockClient("https://erp", ClientType.PS, null, null, null));
+  }
+
+  @Test
+  void shouldThrowOnMissingTlsContext() {
+    val vauClient =
+        new VauClient("https://erp", ClientType.PS, vauCertificate, "testApiKey", "testAgent");
+
+    try (val mockSslContext = mockStatic(SSLContext.class)) {
+      mockSslContext
+          .when(() -> SSLContext.getInstance(anyString()))
+          .thenThrow(new NoSuchAlgorithmException());
+      assertThrows(NoSuchAlgorithmException.class, vauClient::initialize);
+    }
   }
 }

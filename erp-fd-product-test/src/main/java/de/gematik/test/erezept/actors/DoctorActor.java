@@ -37,6 +37,11 @@ public class DoctorActor extends ErpActor {
     return baseData.getPractitioner();
   }
 
+  public String getHbaTelematikId() {
+    val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
+    return baseData.getHbaTelematikId();
+  }
+
   public MedicalOrganization getMedicalOrganization() {
     val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
     return baseData.getMedicalOrganization();

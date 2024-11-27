@@ -17,7 +17,9 @@
 package de.gematik.test.erezept.primsys;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jakarta.rs.xml.JacksonXMLProvider;
 import de.gematik.test.erezept.primsys.exceptions.GenericExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.IdpClientExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.JacksonExceptionMapper;
@@ -81,10 +83,16 @@ public class PrimSysApplication extends ResourceConfig {
 
   public PrimSysApplication() {
     packages("de.gematik.test.erezept.primsys.rest");
-    val mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    val provider = new JacksonJsonProvider(mapper);
-    register(provider);
+    val jsonMapper = new ObjectMapper();
+    jsonMapper.registerModule(new JavaTimeModule());
+    val jsonProvider = new JacksonJsonProvider(jsonMapper);
+    register(jsonProvider);
+
+    val xmlMapper = new XmlMapper();
+    xmlMapper.registerModule(new JavaTimeModule());
+    val xmlProvider = new JacksonXMLProvider(xmlMapper);
+    register(xmlProvider);
+
     register(new CORSFilter());
     register(JacksonExceptionMapper.class);
     register(NotFoundExceptionMapper.class);

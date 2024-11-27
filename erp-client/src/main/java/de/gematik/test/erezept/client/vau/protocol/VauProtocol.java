@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
+import java.util.Random;
 import javax.crypto.BadPaddingException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -30,12 +31,14 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 public class VauProtocol {
+  private final Random rnd;
   @Getter private final VauVersion vauVersion;
   private final ECPublicKey publicKey;
   private final SecretKey decryptionKey;
   @Getter private byte[] requestId;
 
   public VauProtocol(VauVersion vauVersion, ECPublicKey publicKey) {
+    this.rnd = new SecureRandom();
     this.vauVersion = vauVersion;
     this.publicKey = publicKey;
     this.decryptionKey = genDecryptKey(vauVersion.getKeySize());
@@ -48,9 +51,9 @@ public class VauProtocol {
     return keyGenerator.generateKey();
   }
 
-  private static byte[] genRequestId(int size) {
+  private byte[] genRequestId(int size) {
     val requestId = new byte[size];
-    new SecureRandom().nextBytes(requestId);
+    this.rnd.nextBytes(requestId);
     return requestId;
   }
 

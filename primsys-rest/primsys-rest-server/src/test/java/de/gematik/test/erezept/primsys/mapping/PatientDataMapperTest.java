@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
 import lombok.val;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 class PatientDataMapperTest {
@@ -27,11 +30,27 @@ class PatientDataMapperTest {
   void shouldCreateRandomDto() {
     val dto = PatientDataMapper.randomDto();
     assertNotNull(dto.getKvnr());
+    assertNotNull(dto.getInsuranceType());
     assertNotNull(dto.getFirstName());
     assertNotNull(dto.getLastName());
     assertNotNull(dto.getBirthDate());
     assertNotNull(dto.getCity());
     assertNotNull(dto.getPostal());
     assertNotNull(dto.getStreet());
+  }
+
+  @RepeatedTest(5)
+  void shouldNotMissAnyFields() {
+    val patient = PatientFaker.builder().fake();
+    val mapper = PatientDataMapper.from(patient);
+    val dto = mapper.getDto();
+
+    val mapper2 = PatientDataMapper.from(dto);
+    val patient2 = mapper2.convert();
+
+    assertEquals(patient.getKvnr(), patient2.getKvnr());
+    assertEquals(patient.getInsuranceKind(), patient2.getInsuranceKind());
+    assertEquals(patient.getFullname(), patient2.getFullname());
+    assertEquals(patient.getBirthDate(), patient2.getBirthDate());
   }
 }

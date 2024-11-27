@@ -1,0 +1,35 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "EPAMedicationTypeVS",
+  "id": "epa-medication-type-vs",
+  "title": "EPA Medication Type ValueSet",
+  "description": "ValueSet of valid concepts for EPAMedication",
+  "version": "1.0.3",
+  "url": "https://gematik.de/fhir/epa-medication/ValueSet/epa-medication-type-vs",
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-08-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/900000000000207008/version/20240201",
+        "concept": [
+          {
+            "code": "781405001",
+            "display": "Medicinal product package (product)"
+          },
+          {
+            "code": "1208954007",
+            "display": "Extemporaneous preparation (product)"
+          },
+          {
+            "code": "373873005",
+            "display": "Pharmaceutical / biologic product (product)"
+          }
+        ]
+      }
+    ]
+  }
+}

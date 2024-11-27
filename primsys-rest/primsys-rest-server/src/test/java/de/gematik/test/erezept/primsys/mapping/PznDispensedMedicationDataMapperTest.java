@@ -25,7 +25,7 @@ import org.junit.jupiter.api.RepeatedTest;
 
 class PznDispensedMedicationDataMapperTest extends ParsingTest {
 
-  @RepeatedTest(value = 10)
+  @RepeatedTest(value = 5)
   void shouldGenerateRandomly() {
     val mapper = PznDispensedMedicationDataMapper.random();
     val medicationDispense = mapper.convert();

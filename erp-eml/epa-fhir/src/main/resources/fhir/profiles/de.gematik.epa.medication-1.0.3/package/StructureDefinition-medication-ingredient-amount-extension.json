@@ -1,0 +1,77 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "medication-ingredient-amount-extension",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-amount-extension",
+  "version": "1.0.3",
+  "name": "MedicationIngredientAmountExtensions",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "Free-text amount of the ingredient for classical Latin notations such as \"ad 100.0\" or \"quantum satis,\" including the unit.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "definition": "Free-text amount of the ingredient for classical Latin notations such as \"ad 100.0\" or \"quantum satis,\" including the unit."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-amount-extension"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1,
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.value[x]:valueString",
+        "path": "Extension.value[x]",
+        "sliceName": "valueString",
+        "short": "Free-text amount of an ingredient in a formulation.",
+        "definition": "Free-text amount of the ingredient for classical Latin notations such as \"ad 100.0\" or \"quantum satis,\" including the unit.",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "maxLength": 20
+      }
+    ]
+  }
+}

@@ -36,7 +36,7 @@ class DoctorActorTest {
     val config = ErpFdTestsuiteFactory.create();
     val doctor = new DoctorActor(name);
     val docConfig = config.getDoctorConfig(doctor.getName());
-    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig);
+    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig, "UselessTestId");
     doctor.can(provideBaseData);
     return doctor;
   }
@@ -56,5 +56,11 @@ class DoctorActorTest {
     doctor.changeQualificationType(type);
     val bd = SafeAbility.getAbility(doctor, ProvideDoctorBaseData.class);
     assertEquals(type, bd.getPractitioner().getQualificationType());
+  }
+
+  @Test
+  void shouldResponseHbaTelematikId() {
+    val doctor = createDoc("Adelheid Ulmenwald");
+    assertNotNull(doctor.getHbaTelematikId());
   }
 }

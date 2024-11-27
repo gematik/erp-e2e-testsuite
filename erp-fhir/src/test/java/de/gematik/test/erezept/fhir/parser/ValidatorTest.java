@@ -19,7 +19,8 @@ package de.gematik.test.erezept.fhir.parser;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -69,12 +70,15 @@ class ValidatorTest extends ParsingTest {
   @ParameterizedTest
   @MethodSource
   void shouldPassValidResources(File file) {
-    ValidatorUtil.validateFile(parser, file, Assertions::assertTrue, false);
+    ValidatorUtil.validateFile(parser, file, Assertions::assertTrue, true);
   }
 
   static Stream<Arguments> shouldPassValidResources() {
     return ResourceLoader.getResourceDirectoryStructure("fhir/valid", true).stream()
         .filter(File::isFile)
+        .filter(
+            file ->
+                !file.getAbsolutePath().contains("erp/1.1.1")) // TODO: remove the old erp examples
         .map(Arguments::of);
   }
 

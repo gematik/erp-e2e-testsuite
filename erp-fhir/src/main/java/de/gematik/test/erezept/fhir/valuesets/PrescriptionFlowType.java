@@ -19,12 +19,14 @@ package de.gematik.test.erezept.fhir.valuesets;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
+import org.hl7.fhir.r4.model.Extension;
 
 /**
  * <br>
@@ -38,6 +40,7 @@ import lombok.val;
 @Getter
 public enum PrescriptionFlowType implements IValueSet {
   FLOW_TYPE_160("160", "Muster 16 (Apothekenpflichtige Arzneimittel)"),
+  FLOW_TYPE_162("162", "Muster 16 (Digitale Gesundheitsanwendungen)"),
   FLOW_TYPE_169("169", "Muster 16 (Direkte Zuweisung)"),
   FLOW_TYPE_200("200", "PKV (Apothekenpflichtige Arzneimittel)"),
   FLOW_TYPE_209("209", "PKV (Direkte Zuweisung)");
@@ -76,6 +79,12 @@ public enum PrescriptionFlowType implements IValueSet {
 
   public ErpWorkflowCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
+  }
+
+  public Extension asExtension() {
+    val system = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12.getCanonicalUrl();
+    val coding = this.asCoding(ErpWorkflowCodeSystem.FLOW_TYPE_12, true);
+    return new Extension(system, coding);
   }
 
   @Override

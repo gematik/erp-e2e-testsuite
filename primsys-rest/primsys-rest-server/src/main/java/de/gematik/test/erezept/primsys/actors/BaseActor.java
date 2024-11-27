@@ -29,6 +29,7 @@ import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
@@ -96,8 +97,10 @@ public abstract class BaseActor {
     try {
       return this.getClient().getFhir().decode(expectedClass, content);
     } catch (DataFormatException dfe) {
+      val profileExtractor = new ProfileExtractor();
       val profile =
-          ProfileExtractor.extractProfile(content)
+          profileExtractor
+              .extractProfile(content)
               .map(p -> format("with profile {0}", p))
               .orElse("without profile");
       throw ErrorResponseBuilder.createInternalErrorException(
@@ -106,6 +109,10 @@ public abstract class BaseActor {
               "Unable to decode the given FHIR-Content {0} as {1}",
               profile, expectedClass.getSimpleName()));
     }
+  }
+
+  public String encode(Resource resource, EncodingType encoding) {
+    return this.getClient().encode(resource, encoding);
   }
 
   public ActorDto getActorSummary() {

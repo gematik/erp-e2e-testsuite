@@ -17,10 +17,15 @@
 package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
@@ -48,12 +53,26 @@ class DispensePrescriptionAsBundleCommandTest {
         new DispensePrescriptionAsBundleCommand(
             TaskId.from("testId"), Secret.fromString("testSecret"), medDisp);
     assertTrue(command.getRequestBody().isPresent());
-    assertEquals(
-        testString,
-        (((Bundle.BundleEntryComponent)
-                    ((java.util.ArrayList<?>) ((Bundle) command.getRequestBody().get()).getEntry())
-                        .get(0))
-                .getResource())
-            .getId());
+    val body = assertInstanceOf(Bundle.class, command.getRequestBody().get());
+    assertEquals(1, body.getEntry().size());
+    assertEquals(testString, body.getEntryFirstRep().getResource().getId());
+  }
+
+  @Test
+  void shouldDispenseWithParametersStructure() {
+    val taskId = "123456";
+    val secret = "7890123";
+    val dispenseParameters =
+        GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
+            .with(
+                ErxMedicationDispenseFaker.builder().fake(), GemErpMedicationFaker.builder().fake())
+            .build();
+    val cmd =
+        new DispensePrescriptionAsBundleCommand(
+            TaskId.from(taskId), Secret.fromString(secret), dispenseParameters);
+
+    val optBody = cmd.getRequestBody();
+    assertTrue(optBody.isPresent());
+    assertInstanceOf(GemDispenseOperationParameters.class, optBody.get());
   }
 }

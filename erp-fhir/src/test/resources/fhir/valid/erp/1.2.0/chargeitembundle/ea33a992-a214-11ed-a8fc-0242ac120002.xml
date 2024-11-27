@@ -10,7 +10,7 @@
       value="https://prescriptionserver.telematik/ChargeItem/abc825bc-bc30-45f8-b109-1b343fff5c45"/>
     <resource>
       <ChargeItem>
-        <id value="App-ChargeItem-abc825bc-bc30-45f8-b109-1b343fff5c45"/>
+        <id value="abc825bc-bc30-45f8-b109-1b343fff5c45"/>
         <meta>
           <profile
             value="https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_ChargeItem|1.0"/>
@@ -852,7 +852,7 @@
               </event>
               <section>
                 <entry>
-                  <reference value="Binary/PrescriptionDigest-200.086.824.605.539.20"/>
+                  <reference value="urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
                 </entry>
               </section>
             </Composition>
@@ -885,10 +885,10 @@
         </entry>
         <entry>
           <fullUrl
-            value="https://erp.zentral.erp.splitdns.ti-dienste.de/Binary/PrescriptionDigest-200.086.824.605.539.20"/>
+            value="urn:uuid:b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
           <resource>
             <Binary>
-              <id value="PrescriptionDigest-200.086.824.605.539.20"/>
+              <id value="b35d3602-acab-47ab-b58a-dd53e817e6c9"/>
               <meta>
                 <profile
                   value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.2"/>

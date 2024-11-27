@@ -18,7 +18,6 @@ package de.gematik.test.erezept.primsys.data.valuesets;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public enum MedicationCategoryDto {
   C_00("00", "Arzneimittel"),
   C_01("01", "BtM"),
   C_02("02", "Thalidomid"),
-  ;
+  C_03("03", "Sonstiges");
 
   private final String code;
   @JsonValue private final String display;
@@ -47,6 +46,6 @@ public enum MedicationCategoryDto {
                     || it.getDisplay().equalsIgnoreCase(code)
                     || it.name().equalsIgnoreCase(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidCodeValueException(MedicationCategoryDto.class, code));
+        .orElse(C_03);
   }
 }

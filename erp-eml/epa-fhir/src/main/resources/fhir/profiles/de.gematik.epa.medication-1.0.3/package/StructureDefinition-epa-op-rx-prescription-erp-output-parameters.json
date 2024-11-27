@@ -1,0 +1,196 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "epa-op-rx-prescription-erp-output-parameters",
+  "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-rx-prescription-erp-output-parameters",
+  "version": "1.0.3",
+  "name": "EPAOpRxPrescriptionERPOutputParameters",
+  "title": "EPA Operation RxPrescription ERP Output-Parameters",
+  "status": "active",
+  "experimental": false,
+  "date": "2024-08-21",
+  "publisher": "gematik GmbH",
+  "description": "EPA Operation RxPrescription ERP Output-Parameters",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription",
+        "path": "Parameters.parameter",
+        "sliceName": "rxPrescription",
+        "min": 1,
+        "max": "*"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.name",
+        "path": "Parameters.parameter.name",
+        "fixedString": "rxPrescription",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part",
+        "path": "Parameters.parameter.part",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 3,
+        "max": "3",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:prescriptionId",
+        "path": "Parameters.parameter.part",
+        "sliceName": "prescriptionId",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:prescriptionId.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "prescriptionId",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:prescriptionId.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-erp-prescription-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:prescriptionId.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:prescriptionId.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:authoredOn",
+        "path": "Parameters.parameter.part",
+        "sliceName": "authoredOn",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:authoredOn.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "authoredOn",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:authoredOn.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "date"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:authoredOn.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:authoredOn.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:operationOutcome",
+        "path": "Parameters.parameter.part",
+        "sliceName": "operationOutcome",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:operationOutcome.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "operationOutcome",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:operationOutcome.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:operationOutcome.resource",
+        "path": "Parameters.parameter.part.resource",
+        "min": 1,
+        "type": [
+          {
+            "code": "OperationOutcome",
+            "profile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-ms-operation-outcome"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxPrescription.part:operationOutcome.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      }
+    ]
+  }
+}

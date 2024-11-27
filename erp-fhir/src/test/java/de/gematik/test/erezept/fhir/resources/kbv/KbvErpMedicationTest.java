@@ -74,6 +74,7 @@ class KbvErpMedicationTest {
     PZN pzn = PZN.random();
     val medComp =
         KbvErpMedicationCompoundingFaker.builder().withMedicationIngredient(pzn, "", "").fake();
+    assertTrue(medComp.getPznOptional().isPresent());
     assertEquals(pzn.getValue(), medComp.getPznOptional().get().getValue());
   }
 
@@ -82,6 +83,7 @@ class KbvErpMedicationTest {
     String pzn = PZN.random().getValue();
     val medComp =
         KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, "Useless Medicine").fake();
+    assertTrue(medComp.getPznOptional().isPresent());
     assertEquals(pzn, medComp.getPznOptional().get().getValue());
   }
 

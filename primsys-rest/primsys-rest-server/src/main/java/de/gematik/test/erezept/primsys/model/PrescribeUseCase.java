@@ -16,18 +16,21 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
-import de.gematik.test.erezept.primsys.mapping.*;
+import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
+import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
+import de.gematik.test.erezept.primsys.mapping.MedicationRequestDataMapper;
+import de.gematik.test.erezept.primsys.mapping.PatientDataMapper;
+import de.gematik.test.erezept.primsys.mapping.PrescribeRequestDataMapper;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -77,9 +80,10 @@ public class PrescribeUseCase {
     val flowType = PrescriptionFlowType.fromInsuranceKind(insuranceKind, isDirectAssignment);
     val create = new TaskCreateCommand(flowType);
     log.info(
-        format(
-            "Doctor {0} creates new ''{1}'' Task wit FlowType {2}",
-            doctor.getName(), flowType.toString(), flowType.getCode()));
+        "Doctor {} creates new '{}' Task wit FlowType {}",
+        doctor.getName(),
+        flowType.toString(),
+        flowType.getCode());
     val createResponse = doctor.erpRequest(create);
     val draftTask = createResponse.getExpectedResource();
 
@@ -100,21 +104,22 @@ public class PrescribeUseCase {
       mr.updateMvoDates();
     }
 
-    val kbvXml = doctor.getClient().encode(kbvBundle, EncodingType.XML);
+    val kbvXml = doctor.encode(kbvBundle, EncodingType.XML);
+    log.info("Doctor {} sign Prescription: {}", doctor.getName(), kbvXml);
     val signedKbv = doctor.signDocument(kbvXml);
 
-    log.info(format("Activate Task (authoredOn {0}", kbvBundle.getAuthoredOn()));
+    log.info("Activate Task (authoredOn {}", kbvBundle.getAuthoredOn());
     val accessCode = draftTask.getOptionalAccessCode().orElseThrow();
     val activate = new TaskActivateCommand(draftTask.getTaskId(), accessCode, signedKbv);
     val activateResponse = doctor.erpRequest(activate);
-    log.info(format("FD answered on $activate with: {0}", activateResponse.getResourceType()));
+    log.info("FD answered on $activate with: {}", activateResponse.getResourceType());
 
     val activatedTask = activateResponse.getExpectedResource();
 
     val kvnr = kbvBundle.getPatient().getKvnr();
     val patientMapper = PatientDataMapper.from(kbvBundle.getPatient());
     val coverageMapper = CoverageDataMapper.from(kbvBundle.getCoverage(), kbvBundle.getPatient());
-    val medicationMapper = PznMedicationDataMapper.from(kbvBundle.getMedication());
+    val medicationMapper = KbvPznMedicationDataMapper.from(kbvBundle.getMedication());
     val medicationRequestMapper =
         MedicationRequestDataMapper.from(kbvBundle.getMedicationRequest())
             .requestedBy(kbvBundle.getPractitioner())
@@ -124,8 +129,10 @@ public class PrescribeUseCase {
     val doctorData = doctor.getDoctorInformation(kbvBundle);
 
     log.info(
-        format(
-            "Doctor {0} issues Prescription {1} to {2}", doctor.getName(), prescriptionId, kvnr));
+        "Doctor {} issues Prescription {} to {}",
+        doctor.getName(),
+        prescriptionId.getValue(),
+        kvnr.getValue());
     val prescriptionData =
         PrescriptionDto.builder()
             .practitioner(doctorData)

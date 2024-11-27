@@ -16,7 +16,9 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
@@ -30,9 +32,9 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junitpioneer.jupiter.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
 
@@ -50,19 +52,19 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
     System.setProperty(
         "erp.fhir.medicationdispense.default",
         "true"); // required to build old medication dispenses!
-    val kvnr = KVNR.random();
-    val performerId = GemFaker.fakerTelematikId();
-    val prescriptionId = PrescriptionId.random();
+    val kvnr = KVNR.from("X110488614");
+    val performerId = "3-SMC-B-Testkarte-883110000116873";
+    val prescriptionId = PrescriptionId.from("160.000.006.741.854.62");
     val bundle =
         ErxMedicationDispenseBundleFaker.build()
-            .withAmount(3)
+            .withAmount(2)
             .withKvnr(kvnr)
             .withPerformerId(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
-    assertEquals(3, bundle.getEntry().size());
+    assertEquals(2, bundle.getEntry().size());
   }
 
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
@@ -75,6 +77,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
       })
   void buildEmptyWithAddedFakedDispenses(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
+    // TODO: should not be required any longer; remove as soon old profiles are removed
     System.setProperty(
         "erp.fhir.medicationdispense.default",
         "true"); // required to build old medication dispenses!
@@ -89,7 +92,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                 builder.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
 
@@ -114,7 +117,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                 builder.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .withVersion(erpWorkflowVersion)
                         .withMedication(
@@ -142,7 +145,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                 builder.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .withVersion(erpWorkflowVersion)
                         .withMedication(
@@ -169,7 +172,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
                 builder.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
 

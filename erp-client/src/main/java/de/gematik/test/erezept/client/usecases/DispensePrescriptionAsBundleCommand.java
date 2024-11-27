@@ -16,11 +16,12 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
@@ -28,7 +29,8 @@ import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 public class DispensePrescriptionAsBundleCommand extends BaseCommand<ErxMedicationDispenseBundle> {
-  private final List<ErxMedicationDispense> medicationDispenses;
+  private List<ErxMedicationDispense> medicationDispenses;
+  private GemDispenseOperationParameters dispenseParameters;
 
   public DispensePrescriptionAsBundleCommand(
       TaskId taskId, Secret secret, ErxMedicationDispense medicationDispense) {
@@ -42,6 +44,14 @@ public class DispensePrescriptionAsBundleCommand extends BaseCommand<ErxMedicati
     queryParameters.add(new QueryParameter("secret", secret.getValue()));
   }
 
+  // TODO: needs to be checked if get here still a ErxMedicationDispenseBundle as response
+  public DispensePrescriptionAsBundleCommand(
+      TaskId taskId, Secret secret, GemDispenseOperationParameters dispenseParameters) {
+    super(ErxMedicationDispenseBundle.class, HttpRequestMethod.POST, "Task", taskId.getValue());
+    this.dispenseParameters = dispenseParameters;
+    queryParameters.add(new QueryParameter("secret", secret.getValue()));
+  }
+
   @Override
   public String getRequestLocator() {
     return this.getResourcePath() + "/$dispense" + this.encodeQueryParameters();
@@ -49,6 +59,10 @@ public class DispensePrescriptionAsBundleCommand extends BaseCommand<ErxMedicati
 
   @Override
   public Optional<Resource> getRequestBody() {
+    // for newer profiles the closeParameters are used and preferred here
+    if (dispenseParameters != null) {
+      return Optional.of(dispenseParameters);
+    }
     return Optional.of(ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build());
   }
 }

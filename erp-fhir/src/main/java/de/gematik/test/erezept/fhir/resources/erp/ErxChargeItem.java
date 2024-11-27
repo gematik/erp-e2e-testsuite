@@ -149,10 +149,6 @@ public class ErxChargeItem extends ChargeItem {
   private Binary getContainedBinary() {
     return this.getContained().stream()
         .filter(resource -> resource.getResourceType().equals(ResourceType.Binary))
-        .filter(
-            resource ->
-                ErpWorkflowStructDef.BINARY.match(resource.getMeta())
-                    || ErpWorkflowStructDef.BINARY_12.match(resource.getMeta()))
         .map(Binary.class::cast)
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), "Contained Binary Resource"));
@@ -177,11 +173,12 @@ public class ErxChargeItem extends ChargeItem {
         new Binary().setContentType("application/pkcs7-mime").setContent(signedData);
     containedData.setId(reference.getReference(false));
 
-    containedData
-        .getMeta()
-        .addProfile(
-            ErpWorkflowStructDef.BINARY_12.getVersionedUrl(
-                ErpWorkflowVersion.getDefaultVersion(), true));
+    val erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) < 0) {
+      containedData
+          .getMeta()
+          .addProfile(ErpWorkflowStructDef.BINARY_12.getVersionedUrl(erpWorkflowVersion, true));
+    }
 
     val ret = ErxChargeItem.fromChargeItem(this);
     ret.removeContainedResources();

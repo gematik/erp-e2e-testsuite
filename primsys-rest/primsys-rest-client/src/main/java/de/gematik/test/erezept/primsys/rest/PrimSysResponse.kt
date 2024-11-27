@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.primsys.rest
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import de.gematik.test.erezept.primsys.PrimSysRestException
 import de.gematik.test.erezept.primsys.data.error.ErrorDto
 import io.ktor.http.*
@@ -30,11 +31,17 @@ class PrimSysResponse<T>(val statusCode: Int, val headers: Headers, val body: Ei
      * **Attention: ** if the body contains an [ErrorDto] this method will throw a [PrimSysRestException]
      */
     fun asExpectedPayload(): T {
-        return this.body.getOrNull() ?: throw PrimSysRestException(statusCode, "unexpected response body")
+        return this.body.getOrElse {
+            val message = "unexpected response: [${it.type}] ${it.message}"
+            throw PrimSysRestException(statusCode, message)
+        }
     }
 
     fun asError(): ErrorDto {
-        return this.body.leftOrNull() ?: throw PrimSysRestException(statusCode, "expected error in body but no error found")
+        this.body.onRight {
+            throw PrimSysRestException(statusCode, "expected error body but found: $it")
+        }
+        return this.body.leftOrNull()!!
     }
 
     fun successful(): Boolean = this.body.isRight()

@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.toggle;
 
+import de.gematik.bbriccs.toggle.FeatureToggle;
 import java.util.function.Function;
 
 public class FuzzingIncrementsToggle implements FeatureToggle<Double> {

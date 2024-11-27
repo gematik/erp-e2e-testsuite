@@ -22,16 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
 import java.io.File;
 import java.util.Date;
-import lombok.SneakyThrows;
 import lombok.val;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class PatientDtoTest {
 
-  @SneakyThrows
   @ParameterizedTest(name = "Read example patient from {0}")
   @MethodSource("de.gematik.test.erezept.util.ExampleFileProvider#getPatientExamples")
   void shouldReadFromJson(File example) {
@@ -73,6 +70,6 @@ class PatientDtoTest {
             .address("10117", "Berlin", "Friedrichstraße 136")
             .build();
     val om = new ObjectMapper();
-    Assertions.assertDoesNotThrow(() -> om.writeValueAsString(dto));
+    assertDoesNotThrow(() -> om.writeValueAsString(dto));
   }
 }

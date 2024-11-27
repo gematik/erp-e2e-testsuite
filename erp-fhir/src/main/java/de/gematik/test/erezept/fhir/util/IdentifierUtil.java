@@ -27,16 +27,21 @@ public class IdentifierUtil {
 
   /**
    * While Resource.getId() returns a qualified ID (Resource/[ID]) this method will return only the
-   * plain/unqualified ID
+   * plain/unqualified ID Additionally, this method can extract the ID from fullUrl like
+   * urn:uuid:[ID]
    *
-   * @return the unqualified ID without the prefixed resource type
+   * @return the unqualified ID without the prefixed resource or ID type
    */
   public static String getUnqualifiedId(String qualifiedId) {
-    val idTokens = qualifiedId.split("/");
+    val idTokens = qualifiedId.split("[/:]");
     return idTokens[idTokens.length - 1];
   }
 
   public static String getUnqualifiedId(IdType idType) {
     return getUnqualifiedId(idType.getValue());
+  }
+
+  public static String getUnqualifiedId(UriType uriType) {
+    return getUnqualifiedId(uriType.getValue());
   }
 }

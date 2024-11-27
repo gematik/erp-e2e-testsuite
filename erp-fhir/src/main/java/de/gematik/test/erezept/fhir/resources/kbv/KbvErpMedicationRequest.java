@@ -46,6 +46,10 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
     return Optional.ofNullable(note);
   }
 
+  public int getDispenseQuantity() {
+    return this.getDispenseRequest().getQuantity().getValue().intValue();
+  }
+
   public boolean hasAccidentExtension() {
     return this.getAccident().isPresent();
   }
@@ -56,10 +60,6 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
 
   public Optional<String> getAccidentWorkplace() {
     return this.getAccident().map(AccidentExtension::workplace);
-  }
-
-  public int getDispenseQuantity() {
-    return this.getDispenseRequest().getQuantity().getValue().intValue();
   }
 
   public Optional<Date> getAccidentDate() {

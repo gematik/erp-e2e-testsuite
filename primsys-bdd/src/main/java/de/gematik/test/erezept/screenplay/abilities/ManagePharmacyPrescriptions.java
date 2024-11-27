@@ -16,8 +16,6 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
@@ -27,7 +25,6 @@ import de.gematik.test.erezept.screenplay.util.ChargeItemChangeAuthorization;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -168,37 +165,44 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
 
   @Override
   public void tearDown() {
-    log.info(format("TearDown ManagePharmacyPrescription Ability for {0}", this.actor.getName()));
-    val erpClient = SafeAbility.getAbility(this.actor, UseTheErpClient.class);
-    this.acceptedPrescriptions
-        .getRawList()
-        .forEach(
-            accepted -> {
-              log.info(
-                  format(
-                      "Abort accepted Prescription {0} {1} {2}",
-                      accepted.getTaskId(),
-                      accepted.getTask().getAccessCode(),
-                      accepted.getSecret()));
-              val cmd =
-                  new TaskAbortCommand(
-                      accepted.getTaskId(),
-                      accepted.getTask().getAccessCode(),
-                      accepted.getSecret());
-              val response = erpClient.request(cmd);
+    log.info("TearDown ManagePharmacyPrescription Ability for {}", this.actor.getName());
+    val erpClientAbility = this.actor.abilityTo(UseTheErpClient.class);
 
-              response
-                  .getResourceOptional(OperationOutcome.class)
-                  .map(OperationOutcomeWrapper::extractFrom)
-                  .ifPresent(
-                      errorMessage ->
-                          log.warn(
-                              format(
-                                  "Received OperationOutcome with HTTP Statuscode {0} while trying"
-                                      + " to abort accepted Prescription {1}: \n"
-                                      + "{2}",
-                                  response.getStatusCode(), accepted.getTaskId(), errorMessage)));
-            });
+    // null-check required because having this ability does not necessarily mean that ErpClient is
+    // also available
+    if (erpClientAbility != null) {
+      // use the erpClient directly to avoid reporting of the teardowns
+      val erpClient = erpClientAbility.getClient();
+      this.acceptedPrescriptions
+          .getRawList()
+          .forEach(
+              accepted -> {
+                log.info(
+                    "Abort accepted Prescription {} {} {}",
+                    accepted.getTaskId(),
+                    accepted.getTask().getAccessCode(),
+                    accepted.getSecret());
+                val cmd =
+                    new TaskAbortCommand(
+                        accepted.getTaskId(),
+                        accepted.getTask().getAccessCode(),
+                        accepted.getSecret());
+                val response = erpClient.request(cmd);
+
+                response
+                    .getResourceOptional(OperationOutcome.class)
+                    .map(OperationOutcomeWrapper::extractFrom)
+                    .ifPresent(
+                        errorMessage ->
+                            log.info(
+                                "Received OperationOutcome with HTTP Statuscode {} while trying to"
+                                    + " abort accepted Prescription {}: \n"
+                                    + "{}",
+                                response.getStatusCode(),
+                                accepted.getTaskId(),
+                                errorMessage));
+              });
+    }
   }
 
   @Override

@@ -66,7 +66,7 @@ public class ErxMedicationDispenseBundleFaker {
                 builder.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withPerfomer(performerId)
+                        .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
     return builder;

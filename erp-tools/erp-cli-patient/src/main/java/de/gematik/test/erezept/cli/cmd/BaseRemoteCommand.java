@@ -21,6 +21,7 @@ import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
 import de.gematik.test.erezept.cli.param.EgkParameter;
 import de.gematik.test.erezept.cli.param.EnvironmentParameter;
+import de.gematik.test.erezept.cli.printer.ResourcePrinter;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
@@ -33,6 +34,8 @@ public abstract class BaseRemoteCommand implements Callable<Integer> {
   @CommandLine.Mixin private EgkParameter egkParameter;
 
   @CommandLine.Mixin private EnvironmentParameter environmentParameter;
+
+  protected final ResourcePrinter resourcePrinter = new ResourcePrinter();
 
   @Override
   public final Integer call() {

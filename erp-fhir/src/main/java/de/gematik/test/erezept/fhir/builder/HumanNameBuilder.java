@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
 import java.util.Arrays;
 import java.util.List;

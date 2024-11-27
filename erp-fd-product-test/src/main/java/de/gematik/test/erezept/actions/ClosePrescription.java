@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 
@@ -45,6 +46,7 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
   private final Map<String, Object> manipulator;
 
   @Override
+  @Step("{0} dispensiert ein E-Rezept und schließt den Vorgang mit $close ab")
   public ErpInteraction<ErxReceipt> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 

@@ -52,7 +52,58 @@ public class DoctorDirectAssignmentSteps {
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
                 .to(thePharmacy)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende apothekenpflichtige"
+          + " Freitext Verordnung(?:en)? verschreibt und der Apotheke (.+) direkt zuweist:$")
+  public void whenIssueDirectAssignmentOnlyFreeTextPrescriptionToActor(
+      String docName, String patientName, String pharmacyName, DataTable freitextVerordnung) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    val thePharmacy = OnStage.theActorCalled(pharmacyName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+                .to(thePharmacy)
+                .forFreitextVerordnung(freitextVerordnung.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende apothekenpflichtige"
+          + " Rezeptur Verordnung(?:en)? verschreibt und der Apotheke (.+) direkt zuweist:$")
+  public void whenIssueDirectAssignmentOnlyCompoundingPrescriptionToActor(
+      String docName, String patientName, String pharmacyName, DataTable rezepturVerordnung) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    val thePharmacy = OnStage.theActorCalled(pharmacyName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+                .to(thePharmacy)
+                .forFreitextVerordnung(rezepturVerordnung.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende apothekenpflichtige"
+          + " Wirkstoff Verordnung(?:en)? verschreibt und der Apotheke (.+) direkt zuweist:$")
+  public void whenIssueDirectAssignmentOnlyIngredientPrescriptionToActor(
+      String docName, String patientName, String pharmacyName, DataTable wirkstoffVerordnung) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    val thePharmacy = OnStage.theActorCalled(pharmacyName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+                .to(thePharmacy)
+                .forFreitextVerordnung(wirkstoffVerordnung.asMaps()));
   }
 
   @Wenn(
@@ -69,7 +120,7 @@ public class DoctorDirectAssignmentSteps {
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
                 .to(thePharmacy)
-                .from(medications.asMaps()));
+                .forPznPrescription(medications.asMaps()));
   }
 
   @Wenn(
@@ -121,7 +172,7 @@ public class DoctorDirectAssignmentSteps {
                     IssuePrescription.forPatient(thePatient)
                         .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
                         .to(thePharmacy)
-                        .from(medications.asMaps()))
+                        .forPznPrescription(medications.asMaps()))
                 .with(UnexpectedResponseResourceError.class));
   }
 }

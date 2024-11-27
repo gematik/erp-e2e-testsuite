@@ -18,6 +18,8 @@ package de.gematik.test.erezept.client.cfg;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
+import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
 import de.gematik.idp.client.IdpClient;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
@@ -25,7 +27,6 @@ import de.gematik.test.erezept.client.UnirestRetryWrapper;
 import de.gematik.test.erezept.client.rest.ErpResponseFactory;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.client.vau.VauException;
-import de.gematik.test.erezept.client.vau.VauHeader;
 import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
@@ -149,16 +150,14 @@ public class ErpClientFactory {
 
     val headers = new HashMap<String, String>();
     if (xApiKey != null && !xApiKey.isEmpty()) {
-      headers.put(VauHeader.X_API_KEY.getValue(), xApiKey);
-      log.info(format("Set Header Parameter 'X-api-key' to: {0}", xApiKey));
+      AuthHttpHeaderKey.X_API_KEY.createHeader(xApiKey).apply(headers::put);
     }
 
     if (userAgent != null && !userAgent.isEmpty()) {
-      log.info(format("Set Header Parameter 'User-Agent' to: {0}", userAgent));
-      headers.put(VauHeader.X_ERP_USER_AGENT.getValue(), userAgent);
+      StandardHttpHeaderKey.USER_AGENT.createHeader(userAgent).apply(headers::put);
     }
 
-    log.info(format("Request {0} Certificate from {1}", certificateFactory.getType(), certUrl));
+    log.info("Request {} Certificate from {}", certificateFactory.getType(), certUrl);
     val req = Unirest.get(certUrl).headers(headers);
 
     try {

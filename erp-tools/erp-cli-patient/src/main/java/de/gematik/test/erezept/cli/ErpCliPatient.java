@@ -28,6 +28,7 @@ import picocli.CommandLine.Command;
     subcommands = {
       AuditEventReader.class,
       PrescriptionsManager.class,
+      MedicationDispenseManager.class,
       CommunicationsManager.class,
       ConsentManager.class,
       ChargeItemReader.class,

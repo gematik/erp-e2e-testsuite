@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import de.gematik.test.erezept.client.rest.HttpRequestMethod;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.SubscriptionBuilder;
 import java.util.Arrays;
 import java.util.Optional;

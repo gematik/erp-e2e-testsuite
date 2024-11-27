@@ -23,6 +23,7 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
 import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,6 +36,47 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AuditEventVerifier {
   private final List<Function<String, String>> replacements;
+
+  public static VerificationStep<ErxAuditEventBundle> hasAuditEventAtPosition(
+      ErxAuditEvent auditEvent, int position) {
+    Predicate<ErxAuditEventBundle> predicate =
+        bundle -> bundle.getAuditEvents().get(position).getId().equals(auditEvent.getId());
+    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
+            ErpAfos.A_24441.getRequirement(),
+            format(
+                "Die übergebenen AuditEventBundle muss an position {0} ein AuditEvent mit Id"
+                    + " {1} enthalten",
+                position, auditEvent.getId()))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxAuditEventBundle> bundleContainsLogFor(
+      PrescriptionId prescriptionId, String logContent) {
+
+    Predicate<ErxAuditEventBundle> predicate =
+        auditEventBundle ->
+            auditEventBundle.getAuditEvents().stream()
+                .filter(
+                    ae -> ae.getEntity().get(0).getDescription().equals(prescriptionId.getValue()))
+                .toList()
+                .stream()
+                .anyMatch(ae -> ae.getFirstText().contains(logContent));
+
+    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
+            ErpAfos.A_25962.getRequirement(),
+            format(
+                "Das Audit Event für die Prescription {0} enthält die Information: {1}",
+                prescriptionId.getValue(), logContent))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static @NonNull Builder forPharmacy(PharmacyActor pharmacy) {
+    val builder = new Builder();
+    builder.getReplacements().add(text -> text.replace("{agentName}", pharmacy.getCommonName()));
+    return builder;
+  }
 
   private boolean corresponds(ErxAuditEvent event, Representation representation) {
     return unifyText(event.getFirstText()).equals(unifyText(representation.getText()))
@@ -91,20 +133,6 @@ public class AuditEventVerifier {
         .accept();
   }
 
-  public static VerificationStep<ErxAuditEventBundle> hasAuditEventAtPosition(
-      ErxAuditEvent auditEvent, int position) {
-    Predicate<ErxAuditEventBundle> predicate =
-        bundle -> bundle.getAuditEvents().get(position).getId().equals(auditEvent.getId());
-    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
-            ErpAfos.A_24441.getRequirement(),
-            format(
-                "Die übergebenen AuditEventBundle muss an position {0} ein AuditEvent mit Id"
-                    + " {1} enthalten",
-                position, auditEvent.getId()))
-        .predicate(predicate)
-        .accept();
-  }
-
   @Getter
   public static class Builder {
     private final List<Function<String, String>> replacements = new ArrayList<>();
@@ -117,11 +145,5 @@ public class AuditEventVerifier {
     public AuditEventVerifier build() {
       return new AuditEventVerifier(replacements);
     }
-  }
-
-  public static @NonNull Builder forPharmacy(PharmacyActor pharmacy) {
-    val builder = new Builder();
-    builder.getReplacements().add(text -> text.replace("{agentName}", pharmacy.getCommonName()));
-    return builder;
   }
 }

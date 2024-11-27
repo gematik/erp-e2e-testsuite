@@ -19,7 +19,7 @@ package de.gematik.test.erezept.fhir.builder;
 import static java.text.MessageFormat.format;
 
 import com.github.javafaker.Faker;
-import de.gematik.test.erezept.fhir.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.exceptions.FakerException;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;

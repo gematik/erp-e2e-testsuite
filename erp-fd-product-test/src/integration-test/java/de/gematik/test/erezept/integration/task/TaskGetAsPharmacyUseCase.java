@@ -77,7 +77,7 @@ import org.junit.runner.RunWith;
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept abrufen als Apotheker")
-@Tag("Feature:EGKinApotheke")
+@Tag("EGKinDerApotheke")
 class TaskGetAsPharmacyUseCase extends ErpTest {
   private static final Boolean pn3Activate =
       featureConf.getToggle(new EgkPharmacyAcceptPN3Toggle());

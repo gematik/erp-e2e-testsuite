@@ -140,7 +140,7 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
       SupplyRequest supplyRequest) {
     return KbvErpBundleBuilder.forPrescription(prescriptionId)
         .practitioner(doctor.getPractitioner())
-        .custodian(organization)
+        .medicalOrganization(organization)
         .patient(sina.getPatientData())
         .insurance(coverage)
         .statusKennzeichen("00") // 00/NONE is default

@@ -25,4 +25,5 @@ public class EnvironmentConfiguration implements INamedConfigurationElement {
   private String name;
   private BackendRouteConfiguration ti;
   private BackendRouteConfiguration internet;
+  private EpaMockClientConfiguration epaMockClient;
 }

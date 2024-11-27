@@ -16,19 +16,23 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static java.text.MessageFormat.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static java.text.MessageFormat.format;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.*;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
 class PatientBuilderTest extends ParsingTest {

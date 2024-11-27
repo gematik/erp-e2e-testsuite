@@ -27,6 +27,7 @@ import de.gematik.test.erezept.screenplay.questions.FhirResponseQuestion;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @Slf4j
@@ -45,6 +46,7 @@ public class GetAuditEventBundle extends FhirResponseQuestion<ErxAuditEventBundl
   }
 
   @Override
+  @Step("{0} fragt beim Fachdienst, nach Protokolleinträgen zur Prescription #prescriptionId .")
   public ErpResponse<ErxAuditEventBundle> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(patient, UseTheErpClient.class);
 

@@ -54,17 +54,17 @@ public class ActorsResource {
   }
 
   @GET
-  @Path("{id}")
+  @Path("{actorId}")
   @Produces(MediaType.APPLICATION_JSON)
-  public ActorDto getActor(@PathParam("id") String id) {
-    log.info("GET actor with ID " + id);
+  public ActorDto getActor(@PathParam("actorId") String actorId) {
+    log.info("GET actor with ID {}", actorId);
     return ctx.getActors().stream()
-        .filter(actor -> actor.getIdentifier().equals(id))
+        .filter(actor -> actor.getIdentifier().equals(actorId))
         .map(BaseActor::getActorSummary)
         .findFirst()
         .orElseThrow(
             () ->
                 ErrorResponseBuilder.createInternalErrorException(
-                    404, format("No Actor with ID {0} found", id)));
+                    404, format("No Actor with ID {0} found", actorId)));
   }
 }

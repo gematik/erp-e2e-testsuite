@@ -1,0 +1,205 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-PAR-Dispense-Operation-Output",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_DispenseOperation_Output",
+  "version": "1.4",
+  "name": "GEM_ERP_PR_PAR_DispenseOperation_Output",
+  "title": "GEM ERP PR DispenseOperation Output",
+  "status": "active",
+  "date": "2024-07-15",
+  "description": "This profile defines the parameters for dispensing a medication from AVS to the E-Rezept-Fachdienst. This can be used for the $dispense-operation.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_DispenseOperation_Output|1.4"
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation",
+        "path": "Parameters.parameter",
+        "sliceName": "rxDispensation",
+        "min": 1,
+        "max": "*"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "rxDispensation",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part",
+        "path": "Parameters.parameter.part",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medicationDispense",
+        "path": "Parameters.parameter.part",
+        "sliceName": "medicationDispense",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medicationDispense.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "medicationDispense",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medicationDispense.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medicationDispense.resource",
+        "path": "Parameters.parameter.part.resource",
+        "min": 1,
+        "type": [
+          {
+            "code": "MedicationDispense",
+            "profile": [
+              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medicationDispense.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medication",
+        "path": "Parameters.parameter.part",
+        "sliceName": "medication",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medication.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "medication",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medication.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medication.resource",
+        "path": "Parameters.parameter.part.resource",
+        "min": 1,
+        "type": [
+          {
+            "code": "Medication",
+            "profile": [
+              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:medication.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:operationOutcome",
+        "path": "Parameters.parameter.part",
+        "sliceName": "operationOutcome",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:operationOutcome.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "operationOutcome",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:operationOutcome.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:operationOutcome.resource",
+        "path": "Parameters.parameter.part.resource",
+        "min": 1,
+        "type": [
+          {
+            "code": "OperationOutcome"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:rxDispensation.part:operationOutcome.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      }
+    ]
+  }
+}

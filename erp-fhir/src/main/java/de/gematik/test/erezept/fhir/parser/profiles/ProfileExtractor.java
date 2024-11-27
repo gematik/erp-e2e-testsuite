@@ -20,10 +20,12 @@ import static java.text.MessageFormat.format;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.gematik.test.erezept.fhir.parser.EncodingType;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
@@ -41,11 +43,10 @@ public class ProfileExtractor {
   private static final String ENTRY_LITERAL = "entry";
   private static final String VALUE_LITERAL = "value";
 
-  private ProfileExtractor() {
-    throw new IllegalStateException("Utility class");
-  }
+  private ObjectMapper xmlMapper;
+  private ObjectMapper jsonMapper;
 
-  public static Optional<String> extractProfile(String content) {
+  public Optional<String> extractProfile(String content) {
     val root = encodeContent(content);
     return root.flatMap(r -> extractProfileValue(r, content));
   }
@@ -58,24 +59,21 @@ public class ProfileExtractor {
    * @param content to be encoded
    * @return true if the content is a searchset without an explicit profile and false otherwise
    */
-  public static boolean isUnprofiledSearchSet(String content) {
+  public boolean isUnprofiledSearchSet(String content) {
     return encodeContent(content)
         .filter(root -> extractProfileFromRoot(root).isEmpty())
-        .map(root -> isOfType(root, BundleType.SEARCHSET) || isOfType(root, BundleType.COLLECTION))
+        .map(root -> isOfType(root, BundleType.SEARCHSET, BundleType.COLLECTION))
         .orElse(false);
   }
 
-  private static Optional<JsonNode> encodeContent(String content) {
+  private Optional<JsonNode> encodeContent(String content) {
     val encoding = EncodingType.guessFromContent(content);
-    val mapper = encoding.choose(XmlMapper::new, JsonMapper::new);
+    val mapper = encoding.choose(this::getXmlMapper, this::getJsonMapper);
     try {
       val root = mapper.readTree(content);
       return Optional.of(root);
     } catch (JsonProcessingException jpe) {
-      log.warn(
-          format(
-              "Given content cannot be parsed as JSON/XML: {0}",
-              shortenContentForLogging(content)));
+      log.warn("Given content cannot be parsed as JSON/XML: {}", shortenContentForLogging(content));
       return Optional.empty();
     }
   }
@@ -87,7 +85,7 @@ public class ProfileExtractor {
    * @param root node
    * @return the nearest profile-node from root or empty if no profile-node was found
    */
-  private static Optional<JsonNode> extractProfileNode(JsonNode root) {
+  private Optional<JsonNode> extractProfileNode(JsonNode root) {
     if (isOfType(root, BundleType.COLLECTION)) {
       return extractProfileFromCollection(root);
     } else {
@@ -104,7 +102,7 @@ public class ProfileExtractor {
    * @param content representing the raw resource
    * @return the found profile-string or empty of no profile was found
    */
-  private static Optional<String> extractProfileValue(JsonNode root, String content) {
+  private Optional<String> extractProfileValue(JsonNode root, String content) {
     val profileNode = extractProfileNode(root);
 
     // 1. on array take the first element, otherwise take the value by name
@@ -118,9 +116,8 @@ public class ProfileExtractor {
         .or(
             () -> {
               log.info(
-                  format(
-                      "Given content does not contain a profile: {0}",
-                      shortenContentForLogging(content)));
+                  "Given content does not contain a profile: {}",
+                  shortenContentForLogging(content));
               return Optional.empty();
             });
   }
@@ -133,13 +130,13 @@ public class ProfileExtractor {
    * @return the JsonNode of the first found profile within the whole collection or empty if no
    *     profiles found
    */
-  private static Optional<JsonNode> extractProfileFromCollection(JsonNode root) {
+  private Optional<JsonNode> extractProfileFromCollection(JsonNode root) {
     return extractProfileFromRoot(root)
         .or(
             () ->
                 root.findValues(ENTRY_LITERAL).stream()
                     .map(entry -> entry.findValue(META_LITERAL))
-                    .filter(ProfileExtractor::filterEmptyProfiles)
+                    .filter(this::filterEmptyProfiles)
                     .map(meta -> meta.findValue(PROFILE_LITERAL))
                     .findFirst());
   }
@@ -153,21 +150,20 @@ public class ProfileExtractor {
    * @return the JsonNode of the profile in the root node or empty if the root node does not have a
    *     profile
    */
-  private static Optional<JsonNode> extractProfileFromRoot(JsonNode root) {
-    // find the first meta-tag on the root
+  private Optional<JsonNode> extractProfileFromRoot(JsonNode root) {
     val meta = root.get(META_LITERAL);
     return Optional.ofNullable(meta)
-        .filter(ProfileExtractor::filterEmptyProfiles)
+        .filter(this::filterEmptyProfiles)
         .flatMap(m -> Optional.ofNullable(m.get(PROFILE_LITERAL)));
   }
 
   /**
    * filter all the found meta-tags for such tags which contain a non-empty profile value
    *
-   * @param meta
-   * @return
+   * @param meta node to be filtered
+   * @return true if the profile contains a value and false otherwise
    */
-  private static boolean filterEmptyProfiles(JsonNode meta) {
+  private boolean filterEmptyProfiles(JsonNode meta) {
     var profile = meta.findValue(PROFILE_LITERAL);
     if (profile == null) return false;
     profile = profile.isArray() ? profile.get(0) : profile.get(VALUE_LITERAL);
@@ -175,21 +171,20 @@ public class ProfileExtractor {
     return !profile.asText("").isEmpty();
   }
 
-  private static boolean isOfType(JsonNode root, BundleType type) {
+  private boolean isOfType(JsonNode root, BundleType... types) {
     val extractedType = extractBundleType(root);
-    return extractedType.equals(type);
+    return Arrays.asList(types).contains(extractedType);
   }
 
   /**
    * Extracts the type of bundle resource
    *
    * @param root node
-   * @return the BundleType which might be also NULL-Type from {@link
-   *     org.hl7.fhir.r4.model.Bundle.BundleType}
+   * @return the BundleType which might be also NULL-Type from {@link BundleType}
    */
   @Nonnull
   @SuppressWarnings("java:S2637") // null is properly handled via BundleType.NULL here!
-  private static BundleType extractBundleType(JsonNode root) {
+  private BundleType extractBundleType(JsonNode root) {
     val typeNode = root.get(TYPE_LITERAL);
 
     try {
@@ -214,11 +209,25 @@ public class ProfileExtractor {
    * @return a shortened content string which should provide just enough information without
    *     polluting the log
    */
-  private static String shortenContentForLogging(String content) {
+  private String shortenContentForLogging(String content) {
     if (content.length() <= 200) {
       return content;
     } else {
       return format("{0}...", content.substring(0, 200).strip().replaceAll("\\s{2,}", ""));
     }
+  }
+
+  private ObjectMapper getXmlMapper() {
+    if (this.xmlMapper == null) {
+      this.xmlMapper = new XmlMapper();
+    }
+    return this.xmlMapper;
+  }
+
+  private ObjectMapper getJsonMapper() {
+    if (this.jsonMapper == null) {
+      this.jsonMapper = new JsonMapper();
+    }
+    return this.jsonMapper;
   }
 }
