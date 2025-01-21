@@ -29,6 +29,7 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
     Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
     Und die Apotheke Stadtapotheke hat Zugriff auf ihre SMC-B
+    Und die Apotheke Am Waldesrand hat Zugriff auf ihre SMC-B
 
   @TCID:ERP_EE_WF160_01
   @TESTFALL:positiv
@@ -458,6 +459,6 @@ Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
       | Harnsäure Hemmer | 16588573 |
     Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Stadtapotheke via Data Matrix Code zuweist
-    Dann kann die Apotheke Stadtapotheke das letzte zugewiesene E-Rezept nicht beim Fachdienst abrufen, weil das E-Rezept noch nicht akzeptiert ist
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Waldesrand via Data Matrix Code zuweist
+    Dann kann die Apotheke Am Waldesrand das letzte zugewiesene E-Rezept nicht beim Fachdienst abrufen, weil das E-Rezept noch nicht akzeptiert ist
 

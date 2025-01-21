@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.10.0</version>
+        <version>0.10.1</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
@@ -96,20 +96,20 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-fhir</artifactId>
-            <version>0.10.0</version>
+            <version>0.10.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-fhir</artifactId>
             <type>test-jar</type>
-            <version>0.10.0</version>
+            <version>0.10.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-mock-client</artifactId>
-            <version>0.10.0</version>
+            <version>0.10.1</version>
         </dependency>
 
         <dependency>
@@ -164,6 +164,12 @@
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
             <artifactId>ca-supplier-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stephenc.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>1.0-1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

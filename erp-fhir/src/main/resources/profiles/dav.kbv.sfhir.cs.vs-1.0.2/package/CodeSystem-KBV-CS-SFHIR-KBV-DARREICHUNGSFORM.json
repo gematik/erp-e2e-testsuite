@@ -309,6 +309,10 @@
       "display": "INHALATIONS-PULVER"
     },
     {
+      "code": "IID",
+      "display": "Injektions- und Infusionsdispersion"
+    },
+    {
       "code": "IIE",
       "display": "Injektions- oder Infusionslösung oder Lösung zum Einnehmen"
     },
@@ -469,6 +473,10 @@
       "display": "LIQUIDUM"
     },
     {
+      "code": "LIV",
+      "display": "Lösung zur intravesikalen Anwendung"
+    },
+    {
       "code": "LOE",
       "display": "LOESUNG"
     },
@@ -495,6 +503,10 @@
     {
       "code": "LUT",
       "display": "LUTSCHTABLETTEN"
+    },
+    {
+      "code": "LYE",
+      "display": "LYE - Lyophilisat zum Einnehmen"
     },
     {
       "code": "LYO",
@@ -695,6 +707,10 @@
     {
       "code": "PUD",
       "display": "PUDER"
+    },
+    {
+      "code": "PUE",
+      "display": "Pulver zum Einnehmen"
     },
     {
       "code": "PUL",

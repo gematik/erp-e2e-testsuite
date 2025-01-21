@@ -415,6 +415,16 @@
     ]
   },
   {
+    "iccsn": "80276883110000163965",
+    "note": "EML - Ru-Dev RISE; IKNR: 109500969; valid until Wed Nov 01 23:59:59 UTC 2028",
+    "identifier": "X110594367",
+    "type": "EGK",
+    "ownerName": "Dr. Adelheid A.-H. BlücherTEST-ONLY",
+    "stores": [
+      "egk/80276883110000154828/80276883110000154828-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
     "iccsn": "833621999741611",
     "type": "SMC_B",
     "ownerName": "Arztpraxis Dr. Niedermeyer TEST-ONLY",
@@ -428,6 +438,7 @@
   {
     "iccsn": "80276001011699901102",
     "type": "SMC_B",
+    "note": "valid until: Thu Nov 09 22:59:59 UTC 2028",
     "ownerName": "Arztpraxis Bernd Rosenstrauch TEST-ONLY",
     "stores": [
       "smcb/80276001011699901102/80276001011699901102-C_SMCB_ENC_E256_X509.p12",
@@ -481,6 +492,7 @@
   {
     "iccsn": "80276001011699900861",
     "type": "SMC_B",
+    "note": "valid until Wed Sep 29 21:59:59 UTC 2027",
     "ownerName": "Krankenhausapotheke Am Waldesrand TEST-ONLY",
     "stores": [
       "smcb/80276001011699900861/80276001011699900861-C_SMCB_AUT_R2048_X509/80276001011699900861-C_SMCB_AUT_R2048_X509.p12",
@@ -494,6 +506,7 @@
   {
     "iccsn": "80276883110000117369",
     "type": "SMC_B",
+    "note": "valid until Wed Dec 11 23:59:59 UTC 2024",
     "ownerName": "Praxis Blôch-BauerTEST-ONLY",
     "stores": [
       "smcb/80276883110000117369/80276883110000117369-C_SMCB_AUT_R2048_X509/80276883110000117369-C_SMCB_AUT_R2048_X509.p12",
@@ -537,6 +550,7 @@
   {
     "iccsn": "80276883110000116873",
     "type": "SMC_B",
+    "note": "valid until Wed Dec 11 23:59:59 UTC 2024",
     "ownerName": "Apotheke am FlughafenTEST-ONLY",
     "stores": [
       "smcb/80276883110000116873/80276883110000116873-C_SMCB_AUT_R2048_X509.p12",
@@ -551,6 +565,7 @@
   {
     "iccsn": "80276883110000116872",
     "type": "SMC_B",
+    "note": "valid until Wed Dec 11 23:59:59 UTC 2024",
     "ownerName": "Stadt ApothekeTEST-ONLY",
     "stores": [
       "smcb/80276883110000116872/80276883110000116872-C_SMCB_HCI_ENC_E256/80276883110000116872-C_SMCB_HCI_ENC_E256.p12",
@@ -562,16 +577,23 @@
     ]
   },
   {
-    "iccsn": "80276883110000121166",
-    "type": "HBA",
-    "ownerName": "Finn-Louis NullmayrTEST-ONLY",
+    "iccsn": "80276883110000163972",
+    "note": "Oid: 1.2.276.0.76.4.50, valid until Sun Dec 02 23:59:59 UTC 2029",
+    "type": "SMC_B",
+    "ownerName": "Praxis Peer Graf von MüllerTEST-ONLY",
     "stores": [
-      "hba/80276883110000121166/80276883110000121166-C_HP_QES_R2048.p12",
-      "hba/80276883110000121166/80276883110000129213-C_HP_ENC_R2048.p12",
-      "hba/80276883110000121166/80276883110000121166-C_HP_QES_E256.p12",
-      "hba/80276883110000121166/80276883110000121166-C_HP_AUT_E256.p12",
-      "hba/80276883110000121166/80276883110000121166-C_HP_AUT_R2048.p12",
-      "hba/80276883110000121166/80276883110000121166-C_HP_ENC_R2048.p12"
+      "smcb/80276883110000163972/80276883110000163972-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/80276883110000163972/80276883110000163972-C_SMCB_HCI_OSIG_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163973",
+    "note": "Oid: 1.2.276.0.76.4.54, valid until Mon Dec 03 23:59:59 UTC 2029",
+    "type": "SMC_B",
+    "ownerName": "Arminius ApothekeTEST-ONLY",
+    "stores": [
+      "smcb/80276883110000163973/80276883110000163973-C_SMCB_HCI_AUT_E256.p12",
+      "smcb/80276883110000163973/80276883110000163973-C_SMCB_HCI_OSIG_E256.p12"
     ]
   },
   {
@@ -612,6 +634,18 @@
       "hba/80276001011699901501/80276001011699901501-C_HP_AUT_R2048.p12",
       "hba/80276001011699901501/80276001011699901501-C_HP_ENC_E256.p12",
       "hba/80276001011699901501/80276001011699901501-C_HP_QES_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699901726",
+    "type": "HBA",
+    "note": "TelematikId: 3-1-APO-ZacharineXander01, oid: 1.2.276.0.76.4.32; valid until Tue Nov 14 22:59:59 UTC 2028",
+    "ownerName": "Apotheker/in Zacharine Xander TEST-ONLY",
+    "stores": [
+      "hba/80276001011699901726/80276001011699901726-C_HP_QES_R2048.p12",
+      "hba/80276001011699901726/80276001011699901726-C_HP_QES_E256.p12",
+      "hba/80276001011699901726/80276001011699901726-C_HP_ENC_E256.p12",
+      "hba/80276001011699901726/80276001011699901726-C_HP_AUT_E256.p12"
     ]
   }
 ]

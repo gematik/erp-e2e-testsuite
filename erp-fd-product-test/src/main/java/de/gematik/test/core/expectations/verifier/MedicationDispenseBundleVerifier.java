@@ -22,10 +22,13 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.TelematikID;
+import de.gematik.test.erezept.fhir.values.Value;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.val;
 
@@ -66,26 +69,53 @@ public class MedicationDispenseBundleVerifier {
         .accept();
   }
 
-  public static VerificationStep<ErxMedicationDispenseBundle> verifyContainedMedicationDispensePZNs(
-      List<ErxMedicationDispense> medicationDispenses) {
+  private static VerificationStep<ErxMedicationDispenseBundle> containsAllPZNs(
+      List<String> expectedPZNs, Function<ErxMedicationDispenseBundle, List<String>> pznProvider) {
+
     Predicate<ErxMedicationDispenseBundle> predicate =
         bundle -> {
-          val expectedPzn =
-              medicationDispenses.stream()
-                  .map(mD -> mD.getErpMedicationFirstRep().getPzn())
-                  .toList();
-          val givenPzns =
-              bundle.getMedicationDispenses().stream()
-                  .map(mD -> mD.getErpMedicationFirstRep().getPzn())
-                  .toList();
-          return new HashSet<>(givenPzns).containsAll(expectedPzn)
-              && new HashSet<>(expectedPzn).containsAll(givenPzns);
+          val givenPZNs = pznProvider.apply(bundle);
+          return new HashSet<>(givenPZNs).containsAll(expectedPZNs)
+              && new HashSet<>(expectedPZNs).containsAll(givenPZNs);
         };
+
     return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
             ErpAfos.A_19248,
             "Die enthaltenen MedicationDispense müssen die gleichen sein wie die übergebenen")
         .predicate(predicate)
         .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsAllPZNsForOldProfiles(
+      List<ErxMedicationDispense> medicationDispenses) {
+
+    val expectedPzn =
+        medicationDispenses.stream()
+            .flatMap(mD -> mD.getContainedKbvMedicationFirstRep().getPzn().stream())
+            .toList();
+
+    Function<ErxMedicationDispenseBundle, List<String>> pznProvider =
+        bundle ->
+            bundle.getMedicationDispenses().stream()
+                .flatMap(mD -> mD.getContainedKbvMedicationFirstRep().getPzn().stream())
+                .toList();
+
+    return containsAllPZNs(expectedPzn, pznProvider);
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsAllPZNsForNewProfiles(
+      List<GemErpMedication> medications) {
+
+    val expectedPzn =
+        medications.stream().flatMap(m -> m.getPzn().stream().map(Value::getValue)).toList();
+
+    Function<ErxMedicationDispenseBundle, List<String>> pznProvider =
+        bundle ->
+            bundle.getMedications().stream()
+                .flatMap(m -> m.getPzn().stream().map(Value::getValue))
+                .toList();
+
+    return containsAllPZNs(expectedPzn, pznProvider);
   }
 
   public static VerificationStep<ErxMedicationDispenseBundle> verifyWhenHandedOverIsBefore(

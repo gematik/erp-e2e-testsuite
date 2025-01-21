@@ -17,10 +17,16 @@
 package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.rest.HttpRequestMethod;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
@@ -31,6 +37,15 @@ class DispensePrescriptionAsBundleCommandWithoutSecretTest {
   @Test
   void shouldDispenseAsBundleCorrect() {
     val medDisp = new ErxMedicationDispense();
+    val command =
+        new DispensePrescriptionAsBundleCommandWithoutSecret(TaskId.from("testId"), medDisp);
+    assertEquals("/Task/testId/$dispense", command.getRequestLocator());
+    assertEquals(HttpRequestMethod.POST, command.getMethod());
+  }
+
+  @Test
+  void shouldDispenseAsGemMedicationCorrect() {
+    val medDisp = new GemDispenseOperationParameters();
     val command =
         new DispensePrescriptionAsBundleCommandWithoutSecret(TaskId.from("testId"), medDisp);
     assertEquals("/Task/testId/$dispense", command.getRequestLocator());
@@ -52,5 +67,30 @@ class DispensePrescriptionAsBundleCommandWithoutSecretTest {
                         .get(0))
                 .getResource())
             .getId());
+  }
+
+  @Test
+  void shouldDispenseAsGemMedicationCorrectWithRequestBody() {
+    val medDisp = new GemDispenseOperationParameters();
+    val command =
+        new DispensePrescriptionAsBundleCommandWithoutSecret(TaskId.from("testId"), medDisp);
+    assertNotNull(command.getRequestBody());
+  }
+
+  @Test
+  void shouldDispenseWithParametersStructure() {
+    val taskId = "123456";
+    val dispenseParameters =
+        GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
+            .with(
+                ErxMedicationDispenseFaker.builder().fake(), GemErpMedicationFaker.builder().fake())
+            .build();
+    val cmd =
+        new DispensePrescriptionAsBundleCommandWithoutSecret(
+            TaskId.from(taskId), dispenseParameters);
+
+    val optBody = cmd.getRequestBody();
+    assertTrue(optBody.isPresent());
+    assertInstanceOf(GemDispenseOperationParameters.class, optBody.get());
   }
 }

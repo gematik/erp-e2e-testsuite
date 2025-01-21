@@ -135,8 +135,8 @@ public enum ErpAfos implements RequirementsSet {
           + " in-progress"),
   A_24434(
       "A_24434",
-      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren198\n"
-          + "FHIR-Objekten - Betroffene Endpunkte"),
+      "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Betroffene"
+          + " Endpunkte"),
   A_24436(
       "A_24436",
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filter- und"
@@ -180,6 +180,7 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filteroperatoren"
           + " für Datumsabfragen"),
   A_25962("A_25962", "E-Rezept-Fachdienst - ePA - Medication Service - Versichertenprotokoll"),
+  A_26337("A_26337", "E-Rezept-Fachdienst - Task schließen - Zeitstempel MedicationDispense"),
   ;
   @Getter private final Requirement requirement;
 

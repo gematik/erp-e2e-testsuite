@@ -18,6 +18,7 @@ package de.gematik.test.core.expectations.verifier;
 
 import static java.text.MessageFormat.format;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
@@ -107,6 +108,23 @@ public class PrescriptionBundleVerifier {
         new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
             requirementsSet,
             format("Das E-Rezept muss die Übergebene Medikamentenbezeichnung {0} haben", expected));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxPrescriptionBundle> bundleHasLastMedicationDispenseDate() {
+    Predicate<ErxPrescriptionBundle> predicate =
+        bundle ->
+            bundle
+                .getTask()
+                .getLastMedicationDispenseDateElement()
+                .map(ip -> ip.getPrecision().equals(TemporalPrecisionEnum.SECOND))
+                .orElse(false);
+
+    val step =
+        new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
+            ErpAfos.A_26337.getRequirement(),
+            "Das 'lastMedicationDispense' muss im korrekten Format 'YYYY-MM-DDThh:mm:ss+zz:zz'"
+                + " vorliegen");
     return step.predicate(predicate).accept();
   }
 }

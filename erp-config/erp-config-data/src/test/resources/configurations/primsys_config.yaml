@@ -32,7 +32,7 @@ actors:
 
   apothecaries:
     - name: Finn-Louis Nullmayr
-      hbaIccsn: 80276883110000121166
+      hbaIccsn: 80276001011699901726
       algorithm: E256
       konnektor: Soft-Konn
 

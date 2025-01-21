@@ -58,6 +58,7 @@ class BooleanToggleTest {
         Arguments.of(new AbsoluteReferencesAsUUIDToggle()),
         Arguments.of(new AnrValidationConfigurationIsErrorToggle()),
         Arguments.of(new EgkPharmacyAcceptPN3Toggle()),
-        Arguments.of(new FhirCloseSlicingToggle()));
+        Arguments.of(new FhirCloseSlicingToggle()),
+        Arguments.of(new ErpDarreichungsformAprilActive()));
   }
 }

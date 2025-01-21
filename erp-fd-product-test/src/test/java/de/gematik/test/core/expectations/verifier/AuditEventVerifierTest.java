@@ -17,6 +17,7 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.*;
+import static de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil.createErxAuditEvent;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,12 +31,15 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -89,7 +93,50 @@ class AuditEventVerifierTest extends ParsingTest {
     for (Representation rep : Representation.values()) {
       verifier.contains(rep).apply(testData);
     }
-    verifier.firstElementCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL).apply(testData);
+    verifier
+        .oneOfFirstThreeElementsCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL)
+        .apply(testData);
+  }
+
+  @Test
+  void shouldFailWhileDetectingWithEmptyAuditEventBundle() {
+    val checksum =
+        VsdmExamEvidence.asOnlineTestMode(patient.getEgk())
+            .generate(VsdmExamEvidenceResult.NO_UPDATES)
+            .getChecksum()
+            .orElseThrow();
+
+    val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
+
+    val testData = new ErxAuditEventBundle();
+
+    val action =
+        verifier.oneOfFirstThreeElementsCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL);
+    assertThrows(AssertionError.class, () -> action.apply(testData));
+  }
+
+  @Test
+  void shouldFailWhileDetectingWithWrongAuditEventBundle() {
+    val checksum =
+        VsdmExamEvidence.asOnlineTestMode(patient.getEgk())
+            .generate(VsdmExamEvidenceResult.NO_UPDATES)
+            .getChecksum()
+            .orElseThrow();
+
+    val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
+    val erxAuditEventBundle = new ErxAuditEventBundle();
+    erxAuditEventBundle.addEntry(
+        new Bundle.BundleEntryComponent()
+            .setResource(
+                createErxAuditEvent(
+                    "TestText",
+                    TelematikID.from("telematikId"),
+                    "agentName",
+                    AuditEvent.AuditEventAction.R)));
+
+    val action =
+        verifier.oneOfFirstThreeElementsCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL);
+    assertThrows(AssertionError.class, () -> action.apply(erxAuditEventBundle));
   }
 
   @Test
@@ -122,5 +169,37 @@ class AuditEventVerifierTest extends ParsingTest {
             PrescriptionId.from("160.000.023.898.863.48"),
             "Sina Karla Gräfin TestMänn downloaded a prescription");
     assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldNotContainLogForGivenPrescriptionIdAndLogContent() {
+    val prescriptionId = PrescriptionId.from("160.000.023.898.864.45");
+    val logContent =
+        "Die Löschinformation zum E-Rezept konnte nicht in die Patientenakte übermittelt werden.";
+    val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
+
+    assertDoesNotThrow(
+        () -> step.apply(firstErxAuditEventBundle)); // Should pass without throwing exceptions
+  }
+
+  @Test
+  void shouldNotContainLogForAnotherPrescriptionId() {
+    val prescriptionId = PrescriptionId.from("160.000.023.898.863.48");
+    val logContent =
+        "Die Löschinformation zum E-Rezept konnte nicht in die Patientenakte übermittelt werden.";
+    val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
+
+    assertDoesNotThrow(
+        () -> step.apply(secondErxAuditEventBundle)); // Should pass without throwing exceptions
+  }
+
+  @Test
+  void shouldNotContainLogForInvalidContent() {
+    val prescriptionId = PrescriptionId.from("160.000.023.898.864.45");
+    val logContent = "Some random log content that shouldn't exist in the audit events";
+    val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
+
+    assertDoesNotThrow(
+        () -> step.apply(firstErxAuditEventBundle)); // Should pass without throwing exceptions
   }
 }

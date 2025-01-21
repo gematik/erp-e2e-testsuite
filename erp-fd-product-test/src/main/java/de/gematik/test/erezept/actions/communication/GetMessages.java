@@ -24,6 +24,7 @@ import de.gematik.test.erezept.client.usecases.CommunicationGetCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxCommunicationBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class GetMessages extends ErpAction<ErxCommunicationBundle> {
   }
 
   @Override
+  @Step("{0} ruft Communications als Bundle ab")
   public ErpInteraction<ErxCommunicationBundle> answeredBy(Actor actor) {
     log.info(
         format(

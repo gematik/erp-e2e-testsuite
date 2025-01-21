@@ -260,4 +260,15 @@ class ErxTaskTest extends ParsingTest {
     assertNotNull(erxTask);
     assertEquals(ErxTask.class, erxTask.getClass());
   }
+
+  @Test
+  void shouldReturnEmptyWhenLastMedicationDispenseDateIsAbsent() {
+    val fileName = "Task_01.xml";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val task = parser.decode(ErxTask.class, content);
+    assertNotNull(task, "Valid ErxTask must be parseable");
+
+    assertFalse(task.getLastMedicationDispenseDateElement().isPresent());
+  }
 }

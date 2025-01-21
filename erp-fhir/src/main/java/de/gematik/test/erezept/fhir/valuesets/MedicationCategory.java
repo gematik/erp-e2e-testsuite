@@ -21,13 +21,13 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructD
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 import org.hl7.fhir.r4.model.Extension;
 
 /**
- * <b>Profile:</b> kbv.ita.erp (1.1.0) <br>
- * <b>https://simplifier.net/erezept/kbv-vs-erp-medication-category<br>
- * <b>https://simplifier.net/eRezept/KBV-CS-ERP-Medication-Category/~overview<br>
+ * <b>Profile:</b> kbv.ita.erp<br>
+ * <a
+ * href="https://simplifier.net/erezept/kbv-vs-erp-medication-category">kbv-vs-erp-medication-category</a>
+ * <br>
  * <b>Publisher:</b> Kassenärztliche Bundesvereinigung <br>
  * <b>Published:</b> 2022-09-30 <br>
  */
@@ -36,10 +36,7 @@ public enum MedicationCategory implements IValueSet {
   C_00(
       "00", "Arzneimittel oder in die Arzneimittelversorgung nach § 31 SGB V einbezogenes Produkt"),
   C_01("01", "BtM"),
-  C_02("02", "AMVV § 3a Abs. 1 (Thalidomid o. ä.)"),
-// C_03("03", "Sonstiges"), //vorerst auskommentiert, da in der Medication_PZN nicht erlaubt, wenn
-// diese Category aktiviert ist können zufällig falsche werte in die M._PZN gelangen
-;
+  C_02("02", "AMVV § 3a Abs. 1 (Thalidomid o. ä.)");
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.MEDICATION_CATEGORY;
   public static final String VERSION = "1.0.1";
@@ -69,7 +66,7 @@ public enum MedicationCategory implements IValueSet {
     return new Extension(KbvItaErpStructDef.MEDICATION_CATEGORY.getCanonicalUrl(), this.asCoding());
   }
 
-  public static MedicationCategory fromCode(@NonNull String coding) {
+  public static MedicationCategory fromCode(String coding) {
     return Arrays.stream(MedicationCategory.values())
         .filter(mc -> mc.code.equals(coding))
         .findFirst()

@@ -69,9 +69,7 @@ public class DeleteRedeemablePrescription implements Task {
       app.acceptAlert();
     }
 
-    // move the dmc to the deleted stack
-    deque.removeFrom(dmcAbility.getDmcs());
-    dmcAbility.getDeletedDmcs().append(dmc);
+    dmcAbility.moveToDeleted(dmc);
 
     // Note: wait until the App finished the delete and moved back to the main screen
     app.waitUntilElementIsVisible(Mainscreen.REFRESH_BUTTON);

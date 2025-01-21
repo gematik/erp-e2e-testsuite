@@ -20,6 +20,7 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
@@ -51,6 +52,11 @@ public class DispensePrescription extends ErpAction<ErxMedicationDispenseBundle>
 
     public DispensePrescription withMedDsp(List<ErxMedicationDispense> erxMedicationDispenses) {
       val cmd = new DispensePrescriptionAsBundleCommand(taskId, secret, erxMedicationDispenses);
+      return new DispensePrescription(cmd);
+    }
+
+    public DispensePrescription withParameters(GemDispenseOperationParameters params) {
+      val cmd = new DispensePrescriptionAsBundleCommand(taskId, secret, params);
       return new DispensePrescription(cmd);
     }
   }

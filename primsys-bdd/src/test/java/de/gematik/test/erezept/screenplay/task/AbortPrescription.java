@@ -33,6 +33,7 @@ import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import net.serenitybdd.screenplay.ensure.Ensure;
+import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -71,12 +72,11 @@ public class AbortPrescription implements Task {
 
     val response = actor.asksFor(question);
     checkReturnCode(response);
-    val deleted = question.getDeque().chooseFrom(dmcs);
-    question.getDeque().removeFrom(dmcs);
-    deletedDmcs.append(deleted);
+    val deleted = question.getDeque().chooseFrom(ability.getDmcs());
+    ability.moveToDeleted(deleted);
   }
 
-  private void checkReturnCode(ErpResponse response) {
+  private void checkReturnCode(ErpResponse<Resource> response) {
     // see A_19514-03
     then(Ensure.that(response.getStatusCode()).isEqualTo(204));
   }

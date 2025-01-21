@@ -20,8 +20,10 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import de.gematik.test.erezept.fhir.resources.*;
+import de.gematik.test.erezept.fhir.resources.AbstractOrganization;
+import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
 import de.gematik.test.erezept.fhir.values.BSNR;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
@@ -29,11 +31,15 @@ import org.hl7.fhir.r4.model.Resource;
 @SuppressWarnings({"java:S110"})
 public class MedicalOrganization extends AbstractOrganization implements ErpFhirResource {
 
-  public BSNR getBsnr() {
+  public Optional<BSNR> getBsnrOptional() {
     return this.identifier.stream()
         .filter(KbvNamingSystem.BASE_BSNR::match)
-        .map(identifer -> new BSNR(identifer.getValue()))
-        .findFirst()
+        .map(identifier -> new BSNR(identifier.getValue()))
+        .findFirst();
+  }
+
+  public BSNR getBsnr() {
+    return this.getBsnrOptional()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), KbvNamingSystem.BASE_BSNR));
   }
 

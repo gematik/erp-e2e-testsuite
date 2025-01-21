@@ -101,11 +101,14 @@ class PrescriptionDataMapperTest {
         ProvidePatientBaseData.forPatient(
             KVNR.random(), "Marty McFly", VersicherungsArtDeBasis.GKV));
 
+    val mvoId = "497c760a-0460-4862-93a0-6f8491f83328";
     val medications =
         List.of(
-            Map.of("MVO", "true", "FreiText", "first prescription"),
-            Map.of("MVO", "true", "FreiText", "second prescription"),
-            Map.of("MVO", "true", "FreiText", "third prescription"));
+            Map.of("MVO", "true", "MVO-ID", mvoId, "FreiText", "first prescription"),
+            Map.of("MVO", "true", "MVO-ID", "", "FreiText", "second prescription"),
+            Map.of("MVO", "true", "MVO-ID", "     ", "FreiText", "third prescription"),
+            Map.of("MVO", "true", "MVO-ID", "\t\n", "FreiText", "fourth prescription"),
+            Map.of("MVO", "true", "FreiText", "fifth prescription"));
     val practitioner = PractitionerFaker.builder().fake();
     val medOrganization = MedicalOrganizationFaker.builder().fake();
 
@@ -115,11 +118,17 @@ class PrescriptionDataMapperTest {
     val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization);
 
     assertNotNull(result);
-    assertEquals(3, result.size());
-    result.stream()
-        .map(
-            r -> r.getLeft().prescriptionId(PrescriptionId.random()).build().getMedicationRequest())
-        .forEach(res -> assertTrue(res.isMultiple()));
+    assertEquals(medications.size(), result.size());
+    val bundles =
+        result.stream()
+            .map(r -> r.getLeft().prescriptionId(PrescriptionId.random()).build())
+            .toList();
+    bundles.forEach(b -> assertTrue(b.getMedicationRequest().isMultiple()));
+
+    // check if all generated MVO ids are equal
+    val distinctIds =
+        bundles.stream().map(b -> b.getMedicationRequest().getMvoId()).distinct().count();
+    assertEquals(1, distinctIds);
   }
 
   @Test

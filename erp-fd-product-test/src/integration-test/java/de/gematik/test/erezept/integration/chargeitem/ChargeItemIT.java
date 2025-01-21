@@ -32,7 +32,12 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
+import de.gematik.test.fuzzing.erx.ErxChargeItemManipulatorFactory;
+import java.util.stream.Stream;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -40,8 +45,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
+@DisplayName("Charge Item Integration Tests")
 @Tag("CHARGE_ITEM")
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
@@ -58,6 +67,11 @@ public class ChargeItemIT extends ErpTest {
   @Actor(name = "Am Waldesrand")
   private PharmacyActor waldApo;
 
+  public static Stream<Arguments> ChargeItemBinaryVersions() {
+    return ErxChargeItemManipulatorFactory.binaryVersionManipulator().stream()
+        .map(namedEnvelope -> Arguments.arguments(namedEnvelope.getName(), namedEnvelope));
+  }
+
   @Test
   @TestcaseId("ERP_CHARGE_ITEM_01")
   @DisplayName("Vergleich der PrescriptionID und ChargeItemID auf Gleichheit")
@@ -65,7 +79,7 @@ public class ChargeItemIT extends ErpTest {
 
     // patient preset behavior
     sina.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
-    sina.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent());
+    sina.performs(GrantConsent.forOneSelf().withDefaultConsent());
 
     // Doc behavior
     val task =
@@ -83,6 +97,7 @@ public class ChargeItemIT extends ErpTest {
             .davBundle(davAbgabedatenBundle)
             .withAcceptBundle(acceptation));
 
+    // patients verification
     val chargeItem =
         sina.performs(
             GetChargeItemById.withPrescriptionId(task.getPrescriptionId())
@@ -100,7 +115,7 @@ public class ChargeItemIT extends ErpTest {
   @Test
   @TestcaseId("ERP_CHARGE_ITEM_02")
   @DisplayName(
-      "Versuch einen fremden Task richtigem Secret und korrekter BundleReference mit einem"
+      "Versuch einen fremden Task mit richtigem Secret und korrekter BundleReference mit einem"
           + " ChargeItem zu erweitern")
   void validateChargeItemIdAndFail() {
 
@@ -200,6 +215,62 @@ public class ChargeItemIT extends ErpTest {
             .hasResponseWith(returnCode(200))
             .and(chargeItemIdIsEqualTo(task1.getPrescriptionId()))
             .and(prescriptionIdIsEqualTo(task1.getTaskId()))
+            .isCorrect());
+  }
+
+  @TestcaseId("ERP_CHARGE_ITEM_04")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Einstellen eines ChargeItemBundlesBundles als Apotheke manipulierten Binary"
+              + " Profilversionen: {0}")
+  @DisplayName(
+      "Nachweis, dass ein ChargeItem in Version 1.3 mit Binary verschiedenen Profilversionen"
+          + " eingestellt werden kann")
+  @MethodSource("ChargeItemBinaryVersions")
+  void postChargeItemsWithDifferentBinaryVersions(
+      String description, NamedEnvelope<FuzzingMutator<ErxChargeItem>> chargeItemMutators) {
+
+    // patient preset behavior
+    sina.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+    sina.performs(GrantConsent.forOneSelf().withDefaultConsent());
+
+    // Doc behavior
+    val task =
+        doctor
+            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .getExpectedResponse();
+
+    // pharma behavior
+    val acceptation =
+        flughafenApo.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+    flughafenApo.performs(ClosePrescription.acceptedWith(acceptation));
+    val davAbgabedatenBundle = DavAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
+
+    val pharmaciesChargeItem =
+        flughafenApo.performs(
+            PostChargeItem.forPatient(sina)
+                .davBundle(davAbgabedatenBundle)
+                .withCustomStructureAndVersion(chargeItemMutators)
+                .withAcceptBundle(acceptation));
+
+    flughafenApo.attemptsTo(
+        Verify.that(pharmaciesChargeItem)
+            .withExpectedType()
+            .responseWith(returnCode(201))
+            .isCorrect());
+
+    // patients verification
+    val chargeItem =
+        sina.performs(
+            GetChargeItemById.withPrescriptionId(task.getPrescriptionId())
+                .withAccessCode(task.getAccessCode()));
+
+    sina.attemptsTo(
+        Verify.that(chargeItem)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(chargeItemIdIsEqualTo(task.getPrescriptionId()))
+            .and(prescriptionIdIsEqualTo(task.getTaskId()))
             .isCorrect());
   }
 }

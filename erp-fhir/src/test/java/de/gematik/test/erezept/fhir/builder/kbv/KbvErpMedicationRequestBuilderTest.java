@@ -168,7 +168,7 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
           "[{index}] -> Build KBV MedicationRequest with random Accident in versions"
               + " KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
-  void shouldBuildMedicationRequestWithMvoIdentifier(KbvItaErpVersion version) {
+  void shouldBuildMedicationRequestWithRandomMvoIdentifier(KbvItaErpVersion version) {
     val medicationRequest =
         MedicationRequestFaker.builder()
             .withVersion(version)
@@ -178,6 +178,10 @@ class KbvErpMedicationRequestBuilderTest extends ParsingTest {
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
+    if (version.compareTo(KbvItaErpVersion.V1_0_2) > 0) {
+      // MVO-ID is not allowed in versions 1.0.2 and was introduced in 1.1.0
+      assertTrue(medicationRequest.getMvoId().isPresent());
+    }
   }
 
   @ParameterizedTest(

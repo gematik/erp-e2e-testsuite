@@ -23,6 +23,7 @@ import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import java.util.List;
 import lombok.Getter;
 import picocli.CommandLine;
 
@@ -84,7 +85,11 @@ public class MedicationParameter implements BaseResourceParameter {
   }
 
   public Darreichungsform getSupplyForm() {
-    return this.getOrDefault(supplyForm, () -> GemFaker.fakerValueSet(Darreichungsform.class));
+    return this.getOrDefault(
+        supplyForm,
+        () ->
+            GemFaker.fakerValueSet(
+                Darreichungsform.class, List.of(Darreichungsform.PUE, Darreichungsform.LYE)));
   }
 
   public Integer getQuantity() {

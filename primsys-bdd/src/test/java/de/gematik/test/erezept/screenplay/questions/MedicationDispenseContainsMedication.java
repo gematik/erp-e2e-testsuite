@@ -18,6 +18,8 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -51,29 +53,31 @@ public class MedicationDispenseContainsMedication implements Question<Boolean> {
     val checkResults = new LinkedList<Boolean>();
     val prescriptionManager = SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class);
     val dispenseBundle = medDspOrder.chooseFrom(prescriptionManager.getDispensedPrescriptions());
-
+    val prescriptionId = dispenseBundle.getMedicationDispenses().get(0).getPrescriptionId();
     val response = actor.asksFor(question);
     log.info(
         format(
             "Actor {0} asked for MedicationDispenses and received {1} elements",
             actor.getName(), response.getMedicationDispenses().size()));
-    checkResults.add(response.getMedicationDispenses().size() == 1);
+    checkResults.add(!response.getMedicationDispenses().isEmpty());
 
-    val medDspFromStack = medDspOrder.chooseFrom(dispenseBundle.getMedicationDispenses());
-    val medDspFromFD = response.getMedicationDispenses().get(0);
-    checkResults.add(
-        medDspFromFD
-            .getErpMedicationFirstRep()
-            .getId()
-            .equals(medDspFromStack.getErpMedicationFirstRep().getId()));
+    ErxMedicationDispense medDspFromStack;
+    ErxMedicationDispense medDspFromFD;
+
+    medDspFromStack = medDspOrder.chooseFrom(dispenseBundle.getMedicationDispenses());
+    medDspFromFD = response.getMedicationDispenses().get(0);
+
     checkResults.add(
         medDspFromFD.getPerformerIdFirstRep().equals(medDspFromStack.getPerformerIdFirstRep()));
-    checkResults.add(
-        medDspFromFD
-            .getErpMedicationFirstRep()
-            .getPznFirstRep()
-            .equals(medDspFromStack.getErpMedicationFirstRep().getPznFirstRep()));
 
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+      val erxMedRes = response.unpackDispensePairBy(prescriptionId);
+      checkResults.add(dispenseBundle.getMedicationDispenses().size() == erxMedRes.size());
+
+    } else {
+      val gemMedRes = response.getDispensePairBy(prescriptionId);
+      checkResults.add(dispenseBundle.getMedicationDispenses().size() == gemMedRes.size());
+    }
     return (!checkResults.contains(false));
   }
 

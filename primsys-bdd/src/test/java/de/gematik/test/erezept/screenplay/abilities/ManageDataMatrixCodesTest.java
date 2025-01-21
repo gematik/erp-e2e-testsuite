@@ -18,10 +18,15 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -30,8 +35,10 @@ import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
+import java.util.List;
 import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -51,19 +58,19 @@ class ManageDataMatrixCodesTest {
     manageDmcs.appendDmc(DmcPrescription.ownerDmc(second, AccessCode.random()));
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
-    var dmc = manageDmcs.getFirstDmc();
+    var dmc = DequeStrategy.FIFO.chooseFrom(manageDmcs.getDmcs());
     assertEquals(first, dmc.getTaskId());
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
-    dmc = manageDmcs.getLastDmc();
+    dmc = DequeStrategy.LIFO.chooseFrom(manageDmcs.getDmcs());
     assertEquals(second, dmc.getTaskId());
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
-    dmc = manageDmcs.consumeFirstDmc();
+    dmc = DequeStrategy.FIFO.consume(manageDmcs.getDmcList());
     assertEquals(first, dmc.getTaskId());
     assertEquals(1, manageDmcs.getDmcs().getRawList().size());
 
-    dmc = manageDmcs.consumeLastDmc();
+    dmc = DequeStrategy.LIFO.consume(manageDmcs.getDmcList());
     assertEquals(second, dmc.getTaskId());
     assertEquals(0, manageDmcs.getDmcs().getRawList().size());
   }
@@ -87,8 +94,41 @@ class ManageDataMatrixCodesTest {
     val manageDmcs = ManageDataMatrixCodes.sheGetsPrescribed();
     assertEquals(0, manageDmcs.getDmcs().getRawList().size());
 
-    assertThrows(MissingPreconditionError.class, manageDmcs::getFirstDmc);
-    assertThrows(MissingPreconditionError.class, manageDmcs::getLastDmc);
+    val dmcList = manageDmcs.getDmcList();
+    List.of(DequeStrategy.FIFO, DequeStrategy.LIFO)
+        .forEach(
+            deque -> assertThrows(MissingPreconditionError.class, () -> deque.chooseFrom(dmcList)));
+  }
+
+  @Test
+  void shouldMoveDmcToDeleted() {
+    val manageDmcs = ManageDataMatrixCodes.sheGetsPrescribed();
+    val first = TaskId.from("taskId");
+    val second = TaskId.from("taskId2");
+    manageDmcs.appendDmc(DmcPrescription.ownerDmc(first, AccessCode.random()));
+    manageDmcs.moveToDeleted(DmcPrescription.ownerDmc(second, AccessCode.random()));
+
+    assertEquals(1, manageDmcs.getDmcs().getRawList().size());
+    assertEquals(1, manageDmcs.getDeletedDmcs().getRawList().size());
+  }
+
+  @Test
+  void shouldMaintainAggregatedList() {
+    val manageDmcs = ManageDataMatrixCodes.sheGetsPrescribed();
+    val first = TaskId.from("taskId");
+    val second = TaskId.from("taskId2");
+    manageDmcs.appendDmc(DmcPrescription.ownerDmc(first, AccessCode.random()));
+    manageDmcs.moveToDeleted(DmcPrescription.ownerDmc(second, AccessCode.random()));
+
+    assertEquals(1, manageDmcs.getDmcs().getRawList().size());
+    assertEquals(1, manageDmcs.getDeletedDmcs().getRawList().size());
+    assertEquals(2, manageDmcs.getAggregatedDmcs().size());
+
+    val firstDeq = DequeStrategy.FIFO.chooseFrom(manageDmcs.getAggregatedDmcs());
+    assertEquals(first, firstDeq.getTaskId());
+
+    val secondDeq = DequeStrategy.LIFO.chooseFrom(manageDmcs.getAggregatedDmcs());
+    assertEquals(second, secondDeq.getTaskId());
   }
 
   @Test

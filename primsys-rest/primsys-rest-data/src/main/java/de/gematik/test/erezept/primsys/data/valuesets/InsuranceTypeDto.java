@@ -37,9 +37,7 @@ public enum InsuranceTypeDto {
   SOZ("Sozialamt"),
   GPV("gesetzliche Pflegeversicherung"),
   PPV("private Pflegeversicherung"),
-  BEI("Beihilfe"),
-  SKT("Sonstige Kostenträger"),
-  UK("Unfallkassen");
+  BEI("Beihilfe");
 
   private final String display;
 

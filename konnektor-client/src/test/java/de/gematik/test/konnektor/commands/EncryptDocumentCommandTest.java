@@ -51,7 +51,7 @@ class EncryptDocumentCommandTest {
   @BeforeEach
   void setUp() {
     val smartCardArchive = SmartcardArchive.fromResources();
-    smcb = smartCardArchive.getSmcbByICCSN("80276883110000116873");
+    smcb = smartCardArchive.getSmcbByICCSN("80276001011699901102");
     val templatePath =
         Path.of(this.getClass().getClassLoader().getResource("config.yaml").getPath());
     cfg =

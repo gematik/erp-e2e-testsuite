@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.core.expectations.verifier.VerificationStep;
+import de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
@@ -33,6 +35,8 @@ import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Predicate;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MedicationDispense;
@@ -351,5 +355,31 @@ class EpaOpProvideDispensationVerifierTest {
   void shouldThrowWhileVerifyOrganisationSmcbIdInEmlDispensation() {
     val step = emlOrganisationHasSmcbTelematikId(TelematikID.from("91-2.123.123456789"));
     assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void EmlDoesNotContainAnythingWithEmptyList() {
+    List<EpaOpProvideDispensation> emptyList = List.of();
+
+    VerificationStep<List<EpaOpProvideDispensation>> verificationStep =
+        EpaOpProvideDispensationVerifier.emlDoesNotContainAnything();
+
+    Predicate<List<EpaOpProvideDispensation>> predicate = verificationStep.getPredicate();
+
+    assertTrue(predicate.test(emptyList), "Expected verification step to pass for an empty list");
+  }
+
+  @Test
+  void EmlDoesNotContainAnythingWithNonEmptyList() {
+    List<EpaOpProvideDispensation> nonEmptyList =
+        List.of(new EpaOpProvideDispensation(), new EpaOpProvideDispensation());
+
+    VerificationStep<List<EpaOpProvideDispensation>> verificationStep =
+        EpaOpProvideDispensationVerifier.emlDoesNotContainAnything();
+
+    Predicate<List<EpaOpProvideDispensation>> predicate = verificationStep.getPredicate();
+
+    assertFalse(
+        predicate.test(nonEmptyList), "Expected verification step to fail for a non-empty list");
   }
 }

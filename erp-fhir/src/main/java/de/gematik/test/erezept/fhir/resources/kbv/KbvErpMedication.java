@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.fhir.resources.kbv;
 
+import static de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef.*;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
@@ -42,6 +43,20 @@ import org.hl7.fhir.r4.model.*;
 @ResourceDef(name = "Medication")
 @SuppressWarnings({"java:S110"})
 public class KbvErpMedication extends Medication implements ErpFhirResource {
+
+  public static KbvErpMedication fromMedication(Medication adaptee) {
+    if (adaptee instanceof KbvErpMedication erpMedication) {
+      return erpMedication;
+    } else {
+      val kbvMedication = new KbvErpMedication();
+      adaptee.copyValues(kbvMedication);
+      return kbvMedication;
+    }
+  }
+
+  public static KbvErpMedication fromMedication(Resource adaptee) {
+    return fromMedication((Medication) adaptee);
+  }
 
   public List<MedicationCategory> getCatagory() {
     return this.getExtension().stream()
@@ -77,11 +92,11 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
   }
 
   public int getMedicationAmount() {
-    int ret = 0; // Note: return simply 0 if no amount was given as this field is optional
-    if (this.getAmount().getNumerator().getValue() != null) {
-      ret = this.getAmount().getNumerator().getValue().intValue();
-    }
-    return ret;
+    return this.getAmount().getNumerator().getExtension().stream()
+        .filter(PACKAGING_SIZE::match)
+        .findFirst()
+        .map(ext -> Integer.valueOf(ext.getValue().primitiveValue()))
+        .orElse(0);
   }
 
   public Optional<String> getPackagingUnit() {
@@ -98,13 +113,31 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
         .orElse(false);
   }
 
+  /**
+   * @return the free text of the medication or null if not present
+   * @deprecated fetching the free text of the medication this way may result in a
+   *     NullPointerException because this value is optional. Use {@link #getFreeTextOptional()}
+   *     instead.
+   */
+  @Deprecated(since = "0.10.1", forRemoval = true)
   public String getFreeText() {
     return this.getCode().getText();
+  }
+
+  public Optional<String> getFreeTextOptional() {
+    return Optional.ofNullable(this.getCode().getText());
   }
 
   public Optional<String> getIngredientText() {
     return this.getIngredient().stream()
         .map(mic -> mic.getItemCodeableConcept().getText())
+        .findFirst();
+  }
+
+  public Optional<String> getManufactoringInstrOptional() {
+    return this.getExtension().stream()
+        .filter(ex -> ex.getUrl().contains(COMPOUNDING_INSTRUCTION.getCanonicalUrl()))
+        .map(instr -> instr.getValue().primitiveValue())
         .findFirst();
   }
 
@@ -130,6 +163,19 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
         .map(
             ratio ->
                 format("{0} {1}", ratio.getNumerator().getValue(), ratio.getNumerator().getUnit()))
+        .findFirst();
+  }
+
+  public Optional<Ratio> getIngredientStrengthRatio() {
+    return this.getIngredient().stream()
+        .map(MedicationIngredientComponent::getStrength)
+        .findFirst();
+  }
+
+  public Optional<String> getIngredientTextOptional() {
+    return this.getIngredient().stream()
+        .map(MedicationIngredientComponent::getItemCodeableConcept)
+        .map(CodeableConcept::getText)
         .findFirst();
   }
 
@@ -172,10 +218,28 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
     return this.getCode().getText();
   }
 
+  /**
+   * @return the free text of the medication or null if not present
+   * @deprecated fetching the form.code of the medication this way may result in a
+   *     NullPointerException because this value is optional. Use {@link
+   *     #getDarreichungsformOptional} instead.
+   */
+  @Deprecated(since = "0.10.1", forRemoval = false)
   public List<Darreichungsform> getDarreichungsform() {
     return this.getForm().getCoding().stream()
         .map(coding -> Darreichungsform.fromCode(coding.getCode()))
         .toList();
+  }
+
+  public Optional<List<Darreichungsform>> getDarreichungsformOptional() {
+    return Optional.of(
+        this.getForm().getCoding().stream()
+            .map(coding -> Darreichungsform.fromCode(coding.getCode()))
+            .toList());
+  }
+
+  public Optional<String> getTextInFormOptional() {
+    return Optional.ofNullable(this.getForm().getText());
   }
 
   public Optional<Darreichungsform> getDarreichungsformFirstRep() {
@@ -226,17 +290,10 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
                         KbvItaErpVersion.class.getSimpleName(), this.getClass().getSimpleName())));
   }
 
-  public static KbvErpMedication fromMedication(Medication adaptee) {
-    if (adaptee instanceof KbvErpMedication erpMedication) {
-      return erpMedication;
-    } else {
-      val kbvMedication = new KbvErpMedication();
-      adaptee.copyValues(kbvMedication);
-      return kbvMedication;
-    }
-  }
-
-  public static KbvErpMedication fromMedication(Resource adaptee) {
-    return fromMedication((Medication) adaptee);
+  public Optional<String> getPackagingOptional() {
+    return this.getExtension().stream()
+        .filter(ex -> ex.getUrl().contains(PACKAGING.getCanonicalUrl()))
+        .map(instr -> instr.getValue().primitiveValue())
+        .findFirst();
   }
 }

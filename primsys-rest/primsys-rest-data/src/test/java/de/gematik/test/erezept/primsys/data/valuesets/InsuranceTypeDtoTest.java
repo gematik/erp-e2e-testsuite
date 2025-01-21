@@ -16,9 +16,13 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -35,5 +39,27 @@ class InsuranceTypeDtoTest {
   @Test
   void shouldThrowOnInvalidCode() {
     assertThrows(InvalidCodeValueException.class, () -> InsuranceTypeDto.fromCode("abc"));
+  }
+
+  @Test
+  void shouldHaveAllInsuranceTypes() {
+    Arrays.stream(VersicherungsArtDeBasis.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> InsuranceTypeDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraInsuranceTypes() {
+    Arrays.stream(InsuranceTypeDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> VersicherungsArtDeBasis.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

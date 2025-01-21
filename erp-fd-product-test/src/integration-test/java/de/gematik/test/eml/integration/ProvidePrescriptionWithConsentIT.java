@@ -33,8 +33,11 @@ import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.values.TelematikID;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
@@ -139,12 +142,30 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
 
   private KbvErpMedication getMedication(String medicationType) {
     return switch (medicationType) {
-      case MEDICATION_PZN -> KbvErpMedicationPZNFaker.builder().fake();
-      case MEDICATION_INGREDIENT -> KbvErpMedicationIngredientFaker.builder().fake();
-      case MEDICATION_COMPOUNDING -> KbvErpMedicationCompoundingFaker.builder().fake();
-      case MEDICATION_FREITEXT -> KbvErpMedicationFreeTextBuilder.builder()
-          .freeText("Erp-To-Epa E2E Test")
-          .build();
+      case MEDICATION_PZN -> KbvErpMedicationPZNFaker.builder()
+          .withPznMedication(PZN.random(), "IBU-ratiopharm 400mg akut Schmerztabletten")
+          .withAmount(50, "Tablet")
+          .withStandardSize(StandardSize.N1)
+          .fake();
+      case MEDICATION_INGREDIENT -> KbvErpMedicationIngredientFaker.builder()
+          .withCategory(MedicationCategory.C_00)
+          .withAmount("1", 1, "halt sowas")
+          .withDrugName("Grippostad C® Fruchtgummi")
+          .withStandardSize(StandardSize.N1)
+          .withIngredientComponent(2, 1, "wölkchen")
+          .fake();
+      case MEDICATION_COMPOUNDING -> KbvErpMedicationCompoundingFaker.builder()
+          .withCategory(MedicationCategory.C_00)
+          .withMedicationIngredient(PZN.random(), "Vertigoheel® 20 mg", "freitextPzn")
+          .withAmount(5, 1, "Stk")
+          .withDosageForm("Zäpfchen, viel Spaß")
+          .fake();
+      case MEDICATION_FREITEXT -> KbvErpMedicationFreeTextFaker.builder()
+          .withCategory(MedicationCategory.C_00)
+          .withDosageForm("Zäpfchen, viel Spaß")
+          .withVaccine(false)
+          .withFreeText("Hier ist der mentale Meilenstein des LE")
+          .fake();
       default -> throw new IllegalArgumentException("Unknown medication type: " + medicationType);
     };
   }

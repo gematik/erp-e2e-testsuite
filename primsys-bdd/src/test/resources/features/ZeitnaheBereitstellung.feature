@@ -21,7 +21,6 @@
 @Versicherung:GKV
 Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothekenpflichtige Medikamente für GKV-Versicherte
 
-
   Grundlage:
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK

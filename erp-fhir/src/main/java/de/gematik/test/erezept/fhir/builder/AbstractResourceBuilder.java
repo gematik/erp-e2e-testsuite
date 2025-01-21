@@ -67,6 +67,17 @@ public class AbstractResourceBuilder<B extends AbstractResourceBuilder<B>> {
     }
   }
 
+  protected final <T> void checkRequiredOneOfTwoNotBoth(T obj1, T obj2, String errorMsg) {
+    if (obj1 == null && obj2 == null) {
+      val prefixedErrorMsg = format("Missing required property: {0}", errorMsg);
+      throw new BuilderException(prefixedErrorMsg);
+    }
+    if (obj1 != null && obj2 != null) {
+      val prefixedErrorMsg = format("to much properties, one is Max: {0}", errorMsg);
+      throw new BuilderException(prefixedErrorMsg);
+    }
+  }
+
   protected final <T> void checkRequiredList(List<T> list, int min, String errorMsg) {
     checkRequired(list, errorMsg);
     if (min <= 0) {

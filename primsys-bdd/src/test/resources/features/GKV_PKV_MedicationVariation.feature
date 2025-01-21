@@ -26,7 +26,7 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
     Und die Apotheke Stadtapotheke hat Zugriff auf ihre SMC-B
 
-  @TCID:ERP_EE_WF160_&_200
+    @TCID:ERP_EE_REZEPTVARIANTEN_01
     @TESTFALL:positiv
     @AFO-ID:A_24034
     @Hauptdarsteller:Arzt
@@ -50,10 +50,10 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
       | Rezeptur       | PKV              | Anti Aging Chreme für die Achsel | beidseitig auftragen                                                                                                |          | 5     | false     |
       | Wirkstoff      | PKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 1     | false     |
 
-  @TCID:ERP_EE_WF169_&_209
-    @TESTFALL:positiv
-    @AFO-ID:A_24034
-    @Hauptdarsteller:Arzt
+  @TCID:ERP_EE_REZEPTVARIANTEN_02
+  @TESTFALL:positiv
+  @AFO-ID:A_24034
+  @Hauptdarsteller:Arzt
   Szenariogrundriss: Einstellen des E-Rezeptes Direktzuweisung mit verschiedenen Verordnungstypen und Versicherungsverhältnissen
   Die Apotheke akzeptiert das zugewiesene Rezept in den Variationen Frteitext-, Wirkstoff- und Rezepturverordnung.
 
@@ -61,7 +61,6 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgende apothekenpflichtige <Verordnungstyp> Verordnung verschreibt und der Apotheke Am Flughafen direkt zuweist:
       | Name   | Freitext   | PZN   | Menge   |
       | <Name> | <Freitext> | <PZN> | <Menge> |
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 

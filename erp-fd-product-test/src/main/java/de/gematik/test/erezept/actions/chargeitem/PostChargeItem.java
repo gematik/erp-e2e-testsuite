@@ -31,13 +31,21 @@ import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 import org.hl7.fhir.r4.model.ChargeItem;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostChargeItem extends ErpAction<ErxChargeItem> {
 
@@ -46,12 +54,14 @@ public class PostChargeItem extends ErpAction<ErxChargeItem> {
   private final PrescriptionId prescriptionId;
   private final Secret secret;
   private final String kbvBundleReference;
+  @Nullable private final List<NamedEnvelope<FuzzingMutator<ErxChargeItem>>> manipulator;
 
   public static Builder forPatient(PatientActor patient) {
     return new Builder(patient);
   }
 
   @Override
+  @Step("{0} sendet ein ChargeItem für #patientActor zur PrescriptionId: #prescriptionId ")
   public ErpInteraction<ErxChargeItem> answeredBy(Actor actor) {
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val konnektor = SafeAbility.getAbility(actor, UseTheKonnektor.class);
@@ -67,6 +77,12 @@ public class PostChargeItem extends ErpAction<ErxChargeItem> {
             .abgabedatensatz(davBundle.getReference(), signedDavBundle)
             .build();
 
+    manipulator.forEach(
+        m -> {
+          log.info("manipulate ChargeItem with {}", m.getName());
+          m.getParameter().accept(chargeItem);
+        });
+
     val chargeItemPostCommand = new ChargeItemPostCommand(chargeItem, secret);
     return performCommandAs(chargeItemPostCommand, actor);
   }
@@ -75,6 +91,8 @@ public class PostChargeItem extends ErpAction<ErxChargeItem> {
   public static class Builder {
     private final PatientActor patient;
     private DavAbgabedatenBundle davAbgabedatenBundle;
+    private final List<NamedEnvelope<FuzzingMutator<ErxChargeItem>>> manipulator =
+        new LinkedList<>();
 
     public Builder davBundle(DavAbgabedatenBundle davAbgabedatenBundle) {
       this.davAbgabedatenBundle = davAbgabedatenBundle;
@@ -92,7 +110,13 @@ public class PostChargeItem extends ErpAction<ErxChargeItem> {
         PrescriptionId prescriptionId, Secret secret, String kbvBundleReference) {
       Objects.requireNonNull(davAbgabedatenBundle, "davAbgabedatenBundle -> is missing !!!");
       return new PostChargeItem(
-          patient, davAbgabedatenBundle, prescriptionId, secret, kbvBundleReference);
+          patient, davAbgabedatenBundle, prescriptionId, secret, kbvBundleReference, manipulator);
+    }
+
+    public Builder withCustomStructureAndVersion(
+        NamedEnvelope<FuzzingMutator<ErxChargeItem>> mutatorNamedEnvelope) {
+      this.manipulator.add(mutatorNamedEnvelope);
+      return this;
     }
   }
 }

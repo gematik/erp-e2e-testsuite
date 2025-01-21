@@ -28,6 +28,8 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Predicate;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -82,5 +84,31 @@ class EpaOpCancelPrescriptionVerifierTest {
         EpaOpCancelPrescriptionVerifier.emlAuthoredOnIsEqualTo(incorrectDate);
 
     assertFalse(verificationStep.getPredicate().test(epaOpCancelPrescription));
+  }
+
+  @Test
+  void EmlDoesNotContainAnythingWithEmptyList() {
+    List<EpaOpCancelPrescription> emptyList = List.of();
+
+    VerificationStep<List<EpaOpCancelPrescription>> verificationStep =
+        EpaOpCancelPrescriptionVerifier.emlDoesNotContainAnything();
+
+    Predicate<List<EpaOpCancelPrescription>> predicate = verificationStep.getPredicate();
+
+    assertTrue(predicate.test(emptyList), "Expected verification step to pass for an empty list.");
+  }
+
+  @Test
+  void EmlDoesNotContainAnythingWithNonEmptyList() {
+    List<EpaOpCancelPrescription> nonEmptyList =
+        List.of(new EpaOpCancelPrescription(), new EpaOpCancelPrescription());
+
+    VerificationStep<List<EpaOpCancelPrescription>> verificationStep =
+        EpaOpCancelPrescriptionVerifier.emlDoesNotContainAnything();
+
+    Predicate<List<EpaOpCancelPrescription>> predicate = verificationStep.getPredicate();
+
+    assertFalse(
+        predicate.test(nonEmptyList), "Expected verification step to fail for a non-empty list.");
   }
 }

@@ -16,8 +16,11 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -41,5 +44,27 @@ class InsurantStateDtoTest {
     val value2 = InsurantStateDto.fromCode("Family members");
     assertEquals(InsurantStateDto.FAMILY_MEMBERS, value);
     assertEquals(value, value2);
+  }
+
+  @Test
+  void shouldHaveAllInsuranceStates() {
+    Arrays.stream(VersichertenStatus.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> InsurantStateDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraInsuranceStates() {
+    Arrays.stream(InsurantStateDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> VersichertenStatus.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

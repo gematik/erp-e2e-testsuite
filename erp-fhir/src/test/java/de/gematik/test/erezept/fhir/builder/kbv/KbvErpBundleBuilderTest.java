@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
+import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -826,7 +828,14 @@ class KbvErpBundleBuilderTest extends ParsingTest {
               .fake();
       val insurance =
           KbvCoverageFaker.builder().withBeneficiary(patient).withVersion(kbvForVersion).fake();
-      val medication = KbvErpMedicationPZNFaker.builder().withVersion(kbvErpVersion).fake();
+      val medication =
+          KbvErpMedicationPZNFaker.builder()
+              .withVersion(kbvErpVersion)
+              // for debugging purposes, set one these Darreichungsformen
+              //          .withSupplyForm(GemFaker.randomElement(Darreichungsform.LIV,
+              // Darreichungsform.IID, Darreichungsform.LYO, Darreichungsform.PUE,
+              // Darreichungsform.LYE))
+              .fake();
 
       val kbvBundle =
           KbvErpBundleFaker.builder()
@@ -839,9 +848,8 @@ class KbvErpBundleBuilderTest extends ParsingTest {
               .withMedicationRequestVersion(kbvErpVersion)
               .withMedication(medication)
               .fake();
-      log.info(format("Validating Faker KBV-Bundle with ID {0}", kbvBundle.getPrescriptionId()));
-      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
-      assertTrue(result.isSuccessful());
+      log.info("Validating Faker KBV-Bundle with ID {}", kbvBundle.getPrescriptionId());
+      assertTrue(logIfInvalid(kbvBundle));
     }
   }
 
@@ -867,11 +875,10 @@ class KbvErpBundleBuilderTest extends ParsingTest {
               .withPznAndMedicationName(PZN.from("04773414"), fakerDrugName())
               .fake();
       log.info(
-          format(
-              "Validating Faker KBV-Bundle {0} with ID {1}",
-              kbvBundle.getMetaProfileVersion(), kbvBundle.getPrescriptionId()));
-      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
-      assertTrue(result.isSuccessful());
+          "Validating Faker KBV-Bundle {} with ID {}",
+          kbvBundle.getMetaProfileVersion(),
+          kbvBundle.getPrescriptionId());
+      assertTrue(logIfInvalid(kbvBundle));
     }
   }
 
@@ -897,8 +904,7 @@ class KbvErpBundleBuilderTest extends ParsingTest {
           format(
               "Validating Faker KBV-Bundle {0} with ID {1}",
               kbvBundle.getMetaProfileVersion(), kbvBundle.getPrescriptionId()));
-      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
-      assertTrue(result.isSuccessful());
+      assertTrue(logIfInvalid(kbvBundle));
     }
   }
 
@@ -925,11 +931,22 @@ class KbvErpBundleBuilderTest extends ParsingTest {
               .fake();
 
       log.info(
-          format(
-              "Validating Faker KBV-Bundle {0} with ID {1}",
-              kbvBundle.getMetaProfileVersion(), kbvBundle.getPrescriptionId()));
-      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
-      assertTrue(result.isSuccessful());
+          "Validating Faker KBV-Bundle {} with ID {}",
+          kbvBundle.getMetaProfileVersion(),
+          kbvBundle.getPrescriptionId());
+
+      assertTrue(logIfInvalid(kbvBundle));
+    }
+  }
+
+  private boolean logIfInvalid(Resource resource) {
+    val result = ValidatorUtil.encodeAndValidate(parser, resource);
+    if (result.isSuccessful()) {
+      return true;
+    } else {
+      ValidatorUtil.encodeAndValidate(parser, resource, EncodingType.XML, true, true);
+      result.getMessages().forEach(m -> log.info("Validation result Messages: " + m));
+      return false;
     }
   }
 

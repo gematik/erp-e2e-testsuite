@@ -17,10 +17,10 @@
 package de.gematik.test.erezept.screenplay.task;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
@@ -79,9 +79,12 @@ public class CheckDispenseAuditEvent implements Task {
 
     specificAuditEvents.forEach(
         auditEvent ->
-            assertTrue(
-                auditEvent.getFirstText().toLowerCase().contains(pharmacy.getName().toLowerCase()),
-                format("AuditEvent does not contain the pharmacy name: {0}", pharmacy.getName())));
+            assertEquals(
+                auditEvent.getAgentId(),
+                SafeAbility.getAbility(pharmacy, UseSMCB.class).getTelematikID(),
+                format(
+                    "AuditEvent does not contain the pharmacies TelematikId: {0}",
+                    SafeAbility.getAbility(pharmacy, UseSMCB.class).getTelematikID())));
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

@@ -86,7 +86,7 @@ public class DoctorDirectAssignmentSteps {
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
                 .to(thePharmacy)
-                .forFreitextVerordnung(rezepturVerordnung.asMaps()));
+                .forRezepturVerordnung(rezepturVerordnung.asMaps()));
   }
 
   @Wenn(
@@ -103,7 +103,7 @@ public class DoctorDirectAssignmentSteps {
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
                 .to(thePharmacy)
-                .forFreitextVerordnung(wirkstoffVerordnung.asMaps()));
+                .forWirkstoffVerordnung(wirkstoffVerordnung.asMaps()));
   }
 
   @Wenn(

@@ -20,6 +20,7 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuilder;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,9 @@ import org.hl7.fhir.r4.model.Resource;
 
 public class DispensePrescriptionAsBundleCommandWithoutSecret
     extends BaseCommand<ErxMedicationDispenseBundle> {
-  private final List<ErxMedicationDispense> medicationDispenses;
+  private List<ErxMedicationDispense> medicationDispenses;
+
+  private GemDispenseOperationParameters closeParameters;
 
   public DispensePrescriptionAsBundleCommandWithoutSecret(
       TaskId taskId, ErxMedicationDispense medicationDispense) {
@@ -40,6 +43,12 @@ public class DispensePrescriptionAsBundleCommandWithoutSecret
     this.medicationDispenses = medicationDispenses;
   }
 
+  public DispensePrescriptionAsBundleCommandWithoutSecret(
+      TaskId taskId, GemDispenseOperationParameters closeParameters) {
+    super(ErxMedicationDispenseBundle.class, HttpRequestMethod.POST, "Task", taskId.getValue());
+    this.closeParameters = closeParameters;
+  }
+
   @Override
   public String getRequestLocator() {
     return this.getResourcePath() + "/$dispense" + this.encodeQueryParameters();
@@ -47,6 +56,12 @@ public class DispensePrescriptionAsBundleCommandWithoutSecret
 
   @Override
   public Optional<Resource> getRequestBody() {
+
+    // for newer profiles the closeParameters are used and preferred here
+    if (closeParameters != null) {
+      return Optional.of(closeParameters);
+    }
+
     return Optional.of(ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build());
   }
 }

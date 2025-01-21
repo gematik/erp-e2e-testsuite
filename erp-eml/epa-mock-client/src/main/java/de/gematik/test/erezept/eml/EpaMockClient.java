@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.bbriccs.rest.HttpBResponse;
 import de.gematik.bbriccs.rest.RawHttpCodec;
@@ -47,7 +48,7 @@ public class EpaMockClient {
 
   public static EpaMockClient withRestClient(HttpBClient restClient) {
     long interval = 5000L;
-    long maxWait = 60000L;
+    long maxWait = 360000L;
     return withRestClient(restClient, interval, maxWait);
   }
 
@@ -73,27 +74,43 @@ public class EpaMockClient {
         .toList();
   }
 
-  @SneakyThrows
   public List<ErpEmlLog> pollRequest(EpaMockDownloadRequest request) {
+    return this.pollRequest(request, "");
+  }
+
+  private List<ErpEmlLog> filterByPathPart(List<ErpEmlLog> list, String filter) {
+    if (Strings.isNullOrEmpty(filter)) {
+      return list;
+    } else {
+      return list.stream().filter(log -> log.request().urlPath().contains(filter)).toList();
+    }
+  }
+
+  @SneakyThrows
+  public List<ErpEmlLog> pollRequest(EpaMockDownloadRequest request, String filter) {
     long startTime = System.currentTimeMillis();
     List<ErpEmlLog> list;
     var count = 0;
     do {
       count++;
-      list = this.downloadRequest(request);
+
+      list = filterByPathPart(this.downloadRequest(request), filter);
       if (!list.isEmpty()) {
         break;
       }
       log.info(
-          format(
-              "tried to download from EpaMock with {0} Iterations and a Period of: {1} ",
-              count, (System.currentTimeMillis() - startTime)));
-      Thread.sleep(interval);
+          "tried to download from EpaMock with {} Iterations and a Period of: {} ",
+          count,
+          (System.currentTimeMillis() - startTime));
+      Thread.sleep(interval); // busy wait by intention
     } while (System.currentTimeMillis() - startTime < maxWait);
+    log.info("Duration for download was {} millis", (System.currentTimeMillis() - startTime));
 
     if (list.isEmpty()) {
       throw new PollingTimeoutException(
-          "No request returned after " + maxWait / 1000 + " seconds wait time");
+          format(
+              "No request returned after {0} seconds wait´n for call: {1}",
+              (maxWait / 1000), request.getHttpBRequest().urlPath()));
     }
     return list;
   }

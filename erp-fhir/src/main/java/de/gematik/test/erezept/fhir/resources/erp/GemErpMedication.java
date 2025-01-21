@@ -28,10 +28,12 @@ import de.gematik.test.erezept.fhir.valuesets.epa.EpaDrugCategory;
 import java.math.BigDecimal;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Medication;
+import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @ResourceDef(name = "Medication")
@@ -96,5 +98,19 @@ public class GemErpMedication extends Medication {
     return this.getBatch().getLotNumberElement().isEmpty()
         ? Optional.empty()
         : Optional.of(this.getBatch().getLotNumber());
+  }
+
+  public static GemErpMedication fromMedication(Medication adaptee) {
+    if (adaptee instanceof GemErpMedication erpMedication) {
+      return erpMedication;
+    } else {
+      val erpMedication = new GemErpMedication();
+      adaptee.copyValues(erpMedication);
+      return erpMedication;
+    }
+  }
+
+  public static GemErpMedication fromMedication(Resource adaptee) {
+    return fromMedication((Medication) adaptee);
   }
 }

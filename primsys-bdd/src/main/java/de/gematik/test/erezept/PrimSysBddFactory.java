@@ -114,6 +114,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
         .describedAs(cfg.getDescription())
         .whoCan(useTheKonnektor)
         .can(UseTheErpClient.with(erpClient).authenticatingWith(useTheKonnektor))
+        .can(UseSMCB.itHasAccessTo(smcb))
         .can(ProvideDoctorBaseData.fromConfiguration(cfg, hba.getTelematikId()))
         .can(ManageDoctorsPrescriptions.sheIssued());
   }

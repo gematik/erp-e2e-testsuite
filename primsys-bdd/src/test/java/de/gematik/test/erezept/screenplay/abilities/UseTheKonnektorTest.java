@@ -178,7 +178,7 @@ class UseTheKonnektorTest {
 
   @Test
   void shouldEncryptAndDecrypt() {
-    val smcb = sca.getSmcbByICCSN("80276883110000116873");
+    val smcb = sca.getSmcbByICCSN("80276001011699901102");
     val konnektor = KonnektorFactory.createSoftKon();
     val ability = UseTheKonnektor.with(smcb).on(konnektor);
 

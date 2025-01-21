@@ -1,0 +1,329 @@
+{
+  "meta": {
+    "profile": [
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-prescription-erp-input-parameters|1.0.3"
+    ]
+  },
+  "resourceType": "Parameters",
+  "id": "f2d7d7e9-c961-425b-91e4-b0da48f795c9",
+  "parameter": [
+    {
+      "name": "rxPrescription",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "valueIdentifier": {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "160.000.103.037.858.69"
+          }
+        },
+        {
+          "name": "authoredOn",
+          "valueDate": "2024-11-29"
+        },
+        {
+          "name": "medicationRequest",
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "f4da6196-0401-4857-9078-c4a718d94252",
+            "meta": {
+              "profile": [
+                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-request|1.0.3"
+              ]
+            },
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/multiple-prescription-extension",
+                "extension": [
+                  {
+                    "url": "indicator",
+                    "valueBoolean": false
+                  }
+                ]
+              }
+            ],
+            "status": "active",
+            "intent": "filler-order",
+            "medicationReference": {
+              "reference": "Medication/784dc28a-01f9-4267-bfe2-ca577b2feb5d"
+            },
+            "subject": {
+              "identifier": {
+                "system": "http://fhir.de/sid/gkv/kvid-10",
+                "value": "X110645443"
+              }
+            },
+            "authoredOn": "2024-11-29",
+            "dosageInstruction": [
+              {
+                "patientInstruction": "2-2-2-1-1-3"
+              }
+            ],
+            "dispenseRequest": {
+              "quantity": {
+                "value": 1,
+                "system": "http://unitsofmeasure.org",
+                "code": "{Package}"
+              }
+            },
+            "substitution": {
+              "allowedBoolean": false
+            }
+          }
+        },
+        {
+          "name": "medication",
+          "resource": {
+            "resourceType": "Medication",
+            "id": "784dc28a-01f9-4267-bfe2-ca577b2feb5d",
+            "meta": {
+              "profile": [
+                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication|1.0.3"
+              ]
+            },
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension",
+                "valueCoding": {
+                  "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs",
+                  "code": "00"
+                }
+              },
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension",
+                "valueBoolean": false
+              },
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-manufacturing-instructions-extension",
+                "valueString": "freitext"
+              }
+            ],
+            "form": {
+              "text": "Zäpfchen, viel Spaß"
+            },
+            "amount": {
+              "numerator": {
+                "extension": [
+                  {
+                    "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension",
+                    "valueString": "5"
+                  }
+                ],
+                "unit": "Stk"
+              },
+              "denominator": {
+                "value": 1
+              }
+            },
+            "ingredient": [
+              {
+                "itemCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://fhir.de/CodeSystem/ifa/pzn",
+                      "code": "13374"
+                    }
+                  ],
+                  "text": "Vertigoheel® 20 mg"
+                },
+                "strength": {
+                  "extension": [
+                    {
+                      "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-amount-extension",
+                      "valueString": "freitext"
+                    }
+                  ],
+                  "numerator": {
+                    "_value": {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                          "valueCode": "unknown"
+                        }
+                      ]
+                    },
+                    "_system": {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                          "valueCode": "unknown"
+                        }
+                      ]
+                    },
+                    "_code": {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                          "valueCode": "unknown"
+                        }
+                      ]
+                    }
+                  },
+                  "denominator": {
+                    "value": 1,
+                    "_code": {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                          "valueCode": "unknown"
+                        }
+                      ]
+                    },
+                    "_system": {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                          "valueCode": "unknown"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "organization",
+          "resource": {
+            "resourceType": "Organization",
+            "id": "3e3a7de8-ef3a-4fcf-bda5-eb674dcdd71c",
+            "meta": {
+              "profile": [
+                "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory|0.11.12"
+              ],
+              "tag": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/Origin",
+                  "code": "ldap"
+                }
+              ]
+            },
+            "identifier": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                      "code": "BSNR"
+                    }
+                  ]
+                },
+                "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR",
+                "value": "551025384"
+              },
+              {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-2-ARZTPRAXIS-BerndRosenstrauch01"
+              }
+            ],
+            "name": "Arztpraxis Bernd Rosenstrauch TEST-ONLY",
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "+49-9678-00492229"
+              },
+              {
+                "system": "email",
+                "value": "emily.naumann@heinemann.de"
+              }
+            ],
+            "address": [
+              {
+                "type": "both",
+                "line": [
+                  "Heymannstr. 696"
+                ],
+                "city": "Emilyscheid",
+                "postalCode": "31673",
+                "country": "D"
+              }
+            ],
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID",
+                    "code": "1.2.276.0.76.4.50"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "practitioner",
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "e0800364-72df-4730-8f73-8c529306de33",
+            "meta": {
+              "profile": [
+                "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory|0.11.12"
+              ],
+              "tag": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/Origin",
+                  "code": "ldap"
+                }
+              ]
+            },
+            "identifier": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                      "code": "LANR"
+                    }
+                  ]
+                },
+                "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+                "value": "118657826"
+              },
+              {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-HBA-Testkarte-883110000161759"
+              }
+            ],
+            "name": [
+              {
+                "use": "official",
+                "family": "Gunther",
+                "given": [
+                  "Gündüla"
+                ],
+                "prefix": [
+                  "Dr."
+                ],
+                "text": "AC Dr. Gündüla Gunther"
+              }
+            ],
+            "qualification": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Qualification_Type",
+                      "code": "00"
+                    }
+                  ]
+                }
+              },
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Berufsbezeichnung",
+                      "code": "Berufsbezeichnung"
+                    }
+                  ],
+                  "text": "Super-Facharzt für alles Mögliche"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

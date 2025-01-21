@@ -33,7 +33,9 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class ClosePrescriptionWithoutDispensationTest {
 
@@ -49,8 +51,11 @@ class ClosePrescriptionWithoutDispensationTest {
     pharmacy.can(useErpClient);
   }
 
-  @Test
-  void shouldPerformClosePrescription() {
+  @ParameterizedTest
+  @ValueSource(strings = {"1.3.0", "1.4.0"})
+  @ClearSystemProperty(key = "erp.fhir.profile")
+  void shouldPerformClosePrescription(String version) {
+    System.setProperty("erp.fhir.profile", version);
     val task = new ErxTask();
     task.setId("123456");
     val secret = Secret.fromString("123456789");

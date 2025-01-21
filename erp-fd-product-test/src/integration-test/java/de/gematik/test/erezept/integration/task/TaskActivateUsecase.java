@@ -19,8 +19,7 @@ package de.gematik.test.erezept.integration.task;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDiagnostics;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectAcceptDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectExpiryDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
@@ -47,6 +46,7 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.toggle.ErpDarreichungsformAprilActive;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -72,6 +72,9 @@ import org.junit.runner.RunWith;
 @DisplayName("E-Rezept ausstellen")
 @Tag("UseCase:Activate")
 class TaskActivateUsecase extends ErpTest {
+
+  private static final Boolean EXPECT_DARREICHUNGSFORM_APRIL_IS_ACTIVE =
+      featureConf.getToggle(new ErpDarreichungsformAprilActive());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -142,15 +145,26 @@ class TaskActivateUsecase extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
 
-    doctor.attemptsTo(
-        Verify.that(activation)
-            .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DARREICHUNGSFORMEN)
-            .hasResponseWith(returnCode(200))
-            .and(hasWorkflowType(expectedFlowType))
-            .and(isInReadyStatus())
-            .and(hasCorrectExpiryDate())
-            .and(hasCorrectAcceptDate(expectedFlowType))
-            .isCorrect());
+    if (EXPECT_DARREICHUNGSFORM_APRIL_IS_ACTIVE) {
+      doctor.attemptsTo(
+          Verify.that(activation)
+              .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DARREICHUNGSFORMEN)
+              .hasResponseWith(returnCode(200))
+              .and(hasWorkflowType(expectedFlowType))
+              .and(isInReadyStatus())
+              .and(hasCorrectExpiryDate())
+              .and(hasCorrectAcceptDate(expectedFlowType))
+              .isCorrect());
+    } else {
+      doctor.attemptsTo(
+          Verify.that(activation)
+              .withOperationOutcome()
+              .responseWith(returnCodeIs(400))
+              .has(
+                  operationOutcomeHasDetailsText(
+                      "FHIR-Validation error", FhirRequirements.FHIR_VALIDATION_ERROR))
+              .isCorrect());
+    }
   }
 
   static Stream<Arguments> prescriptionTypesProviderInvalidAuthoredOn() {
@@ -321,12 +335,8 @@ class TaskActivateUsecase extends ErpTest {
   static Stream<Arguments> prescriptionTypesProviderDarreichungsformen() {
     val dfList =
         List.of(
-            Darreichungsform.IJD,
-            Darreichungsform.PLD,
-            Darreichungsform.SUI,
-            Darreichungsform.LYO,
-            Darreichungsform.IID,
-            Darreichungsform.LIV);
+            Darreichungsform.PUE, // From April 2025 Active
+            Darreichungsform.LYE); // From April 2025 Active
     return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dfList).create();
   }
 

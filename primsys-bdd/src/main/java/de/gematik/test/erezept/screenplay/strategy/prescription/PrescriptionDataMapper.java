@@ -18,11 +18,16 @@ package de.gematik.test.erezept.screenplay.strategy.prescription;
 
 import static java.text.MessageFormat.format;
 
+import com.google.common.base.Strings;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -33,19 +38,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PrescriptionDataMapper {
+
   protected final List<Map<String, String>> medications;
   @Getter private final Actor patient;
   @Getter private final PrescriptionAssignmentKind type;
-  @Nullable private String mvoId;
+  private String mvoId = UUID.randomUUID().toString(); // default MVO-ID
 
   protected abstract KbvErpMedication getKbvErpMedication(Map<String, String> medMap);
 
@@ -67,7 +75,9 @@ public abstract class PrescriptionDataMapper {
   }
 
   protected String getOrDefault(String key, String defaultValue, Map<String, String> medMap) {
-    return Optional.ofNullable(medMap.getOrDefault(key, defaultValue)).orElse(defaultValue);
+    return Optional.ofNullable(medMap.getOrDefault(key, defaultValue))
+        .map(String::trim)
+        .orElse(defaultValue);
   }
 
   protected PrescriptionFlowType getFlowType(Map<String, String> medMap) {
@@ -119,9 +129,11 @@ public abstract class PrescriptionDataMapper {
       val denominator = Integer.parseInt(medMap.getOrDefault("Denominator", "4"));
       val numerator = Integer.parseInt(medMap.getOrDefault("Numerator", "1"));
 
-      val rememberedMvoId = Optional.ofNullable(this.mvoId).orElse(UUID.randomUUID().toString());
-
-      this.mvoId = medMap.getOrDefault("MVO-ID", rememberedMvoId);
+      this.mvoId =
+          Optional.ofNullable(medMap.get("MVO-ID"))
+              .map(String::trim) // get rid of empty strings containing only whitespaces
+              .filter(id -> !Strings.isNullOrEmpty(id))
+              .orElse(this.mvoId);
 
       val mvoBuilder =
           MultiplePrescriptionExtension.asMultiple(numerator, denominator).withId(mvoId);

@@ -19,6 +19,10 @@ package de.gematik.test.core.expectations.requirements;
 import lombok.Getter;
 
 public enum EmlAfos implements RequirementsSet {
+  A_25925(
+      "A_25925",
+      "E-Rezept-Fachdienst - Task aktivieren - Daten ePA Medication Service bereitstellen"
+          + " (Verordnungsdatensatz)"),
   A_25930(
       "A_25930",
       "E-Rezept-Fachdienst - E-Rezept löschen - Löschinformation ePA Medication Service"
@@ -31,6 +35,7 @@ public enum EmlAfos implements RequirementsSet {
   A_25948(
       "A_25948", "E-Rezept-Fachdienst - ePA - Mapping - Übernahme von Werten zwischen Profilen"),
   A_25949("A_25949", "E-Rezept-Fachdienst - ePA - Mapping - Handhabung von Extensions"),
+  A_25951("A_25951", "E-Rezept-Fachdienst - ePA - Prüfung des Widerspruchs vor Übermittlung"),
   A_25952(
       "A_25952", "E-Rezept-Fachdienst - ePA - Übermittlung - Bereitstellung von Verordnungsdaten"),
   A_25953(

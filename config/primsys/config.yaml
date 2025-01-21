@@ -15,7 +15,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Dr. Schraßer
-      smcbIccsn: 80276883110000117369 #Praxis Bloch-Bauer
+      smcbIccsn: 80276883110000163972 #Praxis Peer Graf von Müller
       hbaIccsn: 80276883110000095767
       qualificationType: Arzt
       konnektor: Soft-Konn
@@ -29,15 +29,15 @@ actors:
     - name: Kein Arzt
       description: "Akteur mit Apotheker-HBA und Arztpraxis SMC-B der sich als Arzt ausgibt"
       smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
-      hbaIccsn: 80276883110000121166  # Apotheker Nullmayr
+      hbaIccsn: 80276001011699901726
       algorithm: E256
       qualificationType: Arzt
       konnektor: Soft-Konn
 
     - name: Keine Arztpraxis
       description: "Akteur mit Apotheker-HBA und Apotheken SMC-B der sich als Arzt ausgibt"
-      smcbIccsn: 80276883110000116873 # Apotheke Am Flughafen
-      hbaIccsn: 80276883110000121166  # Apotheker Nullmayr
+      smcbIccsn: 80276883110000163973 # Arminius Apotheke
+      hbaIccsn: 80276001011699901726  # Apotheker Nullmayr
       algorithm: E256
       qualificationType: Arzt
       konnektor: Soft-Konn
@@ -45,7 +45,7 @@ actors:
   pharmacies:
     - name: Am Flughafen
       apoVzdName: Apotheke am FlughafenTEST-ONLY
-      smcbIccsn: 80276883110000116873
+      smcbIccsn: 80276883110000163973
       konnektor: Soft-Konn
 
     - name: NordApotheke  # Apotheke mit abgelaufener SMCB
@@ -53,7 +53,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Stadtapotheke
-      smcbIccsn: 80276883110000116872
+      smcbIccsn: 80276883110000163973
       konnektor: Soft-Konn
 
     - name: Keine Apotheke
@@ -79,7 +79,7 @@ actors:
 
   apothecaries:
     - name: Finn-Louis Nullmayr
-      hbaIccsn: 80276883110000121166
+      hbaIccsn: 80276001011699901726
       algorithm: E256
       konnektor: Soft-Konn
 
@@ -112,13 +112,13 @@ actors:
       egkIccsn: 80276881040001935352
 
     - name: Thomas 'Bitmarck' Gottschalk
-      egkIccsn: 80276883501400000011
+      egkIccsn: 80276883501400000011  #Abgelaufen seit 2024.11.09
 
     - name: Martha 'ITS Care' Koch
-      egkIccsn: 80276883169999962222
+      egkIccsn: 80276883169999962222  #Abgelaufen seit 2024.04.26
 
     - name: Maria 'Mobil ISC' Neumann
-      egkIccsn: 80276883309999982341
+      egkIccsn: 80276883309999982341  #Abgelaufen seit 2024.04.20
 
     - name: Sofia 'Kubus' Herrmann
       egkIccsn: 80276881299985314267

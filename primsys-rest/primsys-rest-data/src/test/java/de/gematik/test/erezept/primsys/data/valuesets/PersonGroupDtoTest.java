@@ -16,8 +16,12 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -36,5 +40,27 @@ class PersonGroupDtoTest {
   @Test
   void shouldThrowOnNullCode() {
     assertThrows(NullPointerException.class, () -> PersonGroupDto.fromCode(null));
+  }
+
+  @Test
+  void shouldHaveAllPersonGroups() {
+    Arrays.stream(PersonGroup.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> PersonGroupDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraPersonGroups() {
+    Arrays.stream(PersonGroupDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> PersonGroup.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

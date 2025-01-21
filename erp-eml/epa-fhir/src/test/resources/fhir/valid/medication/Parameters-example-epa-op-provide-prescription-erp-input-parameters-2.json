@@ -92,6 +92,10 @@
               {
                 "url": "http://fhir.de/StructureDefinition/normgroesse",
                 "valueCode": "N3"
+              },
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension",
+                "valueBoolean": false
               }
             ],
             "code": {
@@ -107,7 +111,8 @@
                   "display": "Ibuprofen",
                   "version": "2022"
                 }
-              ]
+              ],
+              "text": "Hier ist der mentale Meilenstein des LE"
             },
             "form": {
               "coding": [

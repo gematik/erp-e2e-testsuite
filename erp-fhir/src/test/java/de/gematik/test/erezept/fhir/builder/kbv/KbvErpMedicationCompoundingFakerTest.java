@@ -31,9 +31,15 @@ class KbvErpMedicationCompoundingFakerTest extends ParsingTest {
   @Test
   void buildFakeKbvErpMedicationCompoundingWithDosageForm() {
     val medication =
-        KbvErpMedicationCompoundingFaker.builder().withDosageForm("Zäpfchen, viel Spaß").fake();
+        KbvErpMedicationCompoundingFaker.builder()
+            .withPackaging("fass")
+            .withDosageForm("Zäpfchen, viel Spaß")
+            .fake();
     val medication2 =
-        KbvErpMedicationCompoundingFaker.builder().withDosageForm(Darreichungsform.AEO).fake();
+        KbvErpMedicationCompoundingFaker.builder()
+            .withProductionInstruction("mischen")
+            .withDosageForm(Darreichungsform.AEO)
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     val result2 = ValidatorUtil.encodeAndValidate(parser, medication2);
     assertTrue(result.isSuccessful());
@@ -42,8 +48,16 @@ class KbvErpMedicationCompoundingFakerTest extends ParsingTest {
 
   @Test
   void buildFakeKbvErpMedicationCompoundingWithAmount() {
-    val medication = KbvErpMedicationCompoundingFaker.builder().withAmount(fakerAmount()).fake();
-    val medication2 = KbvErpMedicationCompoundingFaker.builder().withAmount(5, 1, "Stk").fake();
+    val medication =
+        KbvErpMedicationCompoundingFaker.builder()
+            .withAmount(fakerAmount())
+            .withPackaging("fass")
+            .fake();
+    val medication2 =
+        KbvErpMedicationCompoundingFaker.builder()
+            .withProductionInstruction("mischen")
+            .withAmount(5, 1, "Stk")
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     val result2 = ValidatorUtil.encodeAndValidate(parser, medication2);
     assertTrue(result.isSuccessful());
@@ -52,7 +66,11 @@ class KbvErpMedicationCompoundingFakerTest extends ParsingTest {
 
   @Test
   void buildFakeKbvErpMedicationCompoundingWithVaccine() {
-    val medication = KbvErpMedicationCompoundingFaker.builder().withVaccine(fakerBool()).fake();
+    val medication =
+        KbvErpMedicationCompoundingFaker.builder()
+            .withProductionInstruction("mischen")
+            .withVaccine(fakerBool())
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
@@ -61,6 +79,7 @@ class KbvErpMedicationCompoundingFakerTest extends ParsingTest {
   void buildFakeKbvErpMedicationCompoundingWithProductionInstruction() {
     val medication =
         KbvErpMedicationCompoundingFaker.builder()
+            .withPackaging("fass")
             .withProductionInstruction(ProductionInstruction.asCompounding("freitext"))
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
@@ -71,6 +90,7 @@ class KbvErpMedicationCompoundingFakerTest extends ParsingTest {
   void buildFakeKbvErpMedicationCompoundingWithMedicationIngredient() {
     val medication =
         KbvErpMedicationCompoundingFaker.builder()
+            .withPackaging("Fassabfüllung")
             .withMedicationIngredient(PZN.random().getValue(), fakerDrugName())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);

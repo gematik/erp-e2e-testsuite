@@ -19,14 +19,12 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.screenplay.questions.CheckResponseOfCloseAfterAlternativeDispense;
 import de.gematik.test.erezept.screenplay.task.ClosePrescription;
 import de.gematik.test.erezept.screenplay.task.Negate;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.de.Dann;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class PharmacyCloseSteps {
 
@@ -56,13 +54,6 @@ public class PharmacyCloseSteps {
             ClosePrescription.fromStack(order)
                 .withAlternativeMedications(medications)
                 .forThePatient(thePatient));
-
-    then(thePharmacy)
-        .attemptsTo(
-            Ensure.that(
-                    CheckResponseOfCloseAfterAlternativeDispense.forPrescription(order)
-                        .forThePatient(thePatient))
-                .isTrue());
   }
 
   @Dann(

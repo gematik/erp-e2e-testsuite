@@ -16,8 +16,6 @@
 
 package de.gematik.test.erezept.primsys.exceptions;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
@@ -30,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
 
   public Response toResponse(NotFoundException exception) {
-    log.error(format("No such resource: {0}", exception.getMessage()));
+    log.error("No such resource: {}", exception.getMessage());
     return ErrorResponseBuilder.createInternalErrorException(404, "Not Found").getResponse();
   }
 }

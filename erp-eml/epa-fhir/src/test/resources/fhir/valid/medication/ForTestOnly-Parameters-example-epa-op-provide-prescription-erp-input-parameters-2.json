@@ -90,6 +90,10 @@
                 }
               },
               {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension",
+                "valueBoolean": false
+              },
+              {
                 "url": "http://fhir.de/StructureDefinition/normgroesse",
                 "valueCode": "N3"
               }
@@ -101,7 +105,8 @@
                   "code": "10019621",
                   "display": "IBU-ratiopharm 400mg akut Schmerztabletten"
                 }
-              ]
+              ],
+              "text": "IBU-ratiopharm 400mg akut Schmerztabletten"
             },
             "form": {
               "coding": [
