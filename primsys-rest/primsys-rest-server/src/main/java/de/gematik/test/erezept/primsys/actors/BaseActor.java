@@ -93,6 +93,15 @@ public abstract class BaseActor {
     return response;
   }
 
+  // Note: when throw an error anyway in erpRequest, why not unpacking the response directly?
+  public final <R extends Resource> R erpRequest2(final ICommand<R> command) {
+    val response = this.getClient().request(command);
+    if (response.isOperationOutcome() || response.getStatusCode() > 299) {
+      ErrorResponseBuilder.throwFachdienstError(response);
+    }
+    return response.getExpectedResource();
+  }
+
   public <T extends Resource> T decode(Class<T> expectedClass, final String content) {
     try {
       return this.getClient().getFhir().decode(expectedClass, content);

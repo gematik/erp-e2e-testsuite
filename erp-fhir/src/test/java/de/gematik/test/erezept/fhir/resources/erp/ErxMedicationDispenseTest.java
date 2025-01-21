@@ -52,7 +52,7 @@ class ErxMedicationDispenseTest extends ParsingTest {
     assertFalse(medication.isVaccine());
     assertEquals("06313728", medication.getPznFirstRep());
     assertEquals("Sumatriptan-1a Pharma 100 mg Tabletten", medication.getMedicationName());
-    assertEquals(Darreichungsform.TAB, medication.getDarreichungsformFirstRep().orElseThrow());
+    assertEquals(Darreichungsform.TAB, medication.getDarreichungsform().orElseThrow());
     // TODO: implement tests for further convenience methods on demand
 
     assertEquals("X234567890", medicationDispense.getSubjectId().getValue());

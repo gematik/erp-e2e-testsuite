@@ -137,7 +137,7 @@ class GemErpMedicationBuilderTest extends ParsingTest {
     assertEquals(kbvMedication.getPznOptional(), gemMedication.getPzn());
     assertEquals(kbvMedication.getMedicationName(), gemMedication.getName().orElse(null));
     assertEquals(kbvMedication.getStandardSize(), gemMedication.getStandardSize().orElse(null));
-    assertEquals(kbvMedication.getDarreichungsformFirstRep(), gemMedication.getDarreichungsform());
+    assertEquals(kbvMedication.getDarreichungsform(), gemMedication.getDarreichungsform());
     assertEquals(
         kbvMedication.getMedicationAmount(),
         gemMedication.getAmountNumerator().orElse(Integer.MIN_VALUE));

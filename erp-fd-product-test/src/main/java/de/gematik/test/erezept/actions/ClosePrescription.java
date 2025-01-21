@@ -36,10 +36,8 @@ import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import jakarta.annotation.Nullable;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
@@ -53,7 +51,7 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
   private final ErxAcceptBundle acceptBundle;
   @Nullable private final Date preparedDate;
   @Nullable private final Date handedOver;
-  @Deprecated private final Map<String, Object> buildManipulators;
+
   private final List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>> fhirCloseMutators;
 
   @Override
@@ -63,24 +61,12 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
 
     val taskId = acceptBundle.getTaskId();
     val secret = acceptBundle.getSecret();
+    val prescriptionId = acceptBundle.getTask().getPrescriptionId();
+    val kvnr = acceptBundle.getTask().getForKvnr().orElseThrow();
+    val telematikId = SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID();
+
     val kbvAsString = acceptBundle.getKbvBundleAsString();
     val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
-    val prescriptionId =
-        (PrescriptionId)
-            buildManipulators.getOrDefault(
-                "prescriptionId", acceptBundle.getTask().getPrescriptionId());
-    val kvnr =
-        (KVNR)
-            buildManipulators.getOrDefault(
-                "kvnr",
-                acceptBundle
-                    .getTask()
-                    .getForKvnr()
-                    .orElseThrow()); // why is this an optional at all?
-    val telematikId =
-        (String)
-            buildManipulators.getOrDefault(
-                "telematikId", SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID());
 
     if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
       val medication = kbvBundle.getMedication();
@@ -90,8 +76,12 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
               .performerId(telematikId)
               .medication(medication);
 
-      if (preparedDate != null) medicationDispenseBuilder.whenPrepared(preparedDate);
-      if (handedOver != null) medicationDispenseBuilder.whenHandedOver(handedOver);
+      if (preparedDate != null) {
+        medicationDispenseBuilder.whenPrepared(preparedDate);
+      }
+      if (handedOver != null) {
+        medicationDispenseBuilder.whenHandedOver(handedOver);
+      }
 
       val medicationDispense = medicationDispenseBuilder.build();
       applyMutators(this.fhirCloseMutators, medicationDispense);
@@ -110,8 +100,12 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
               .performerId(telematikId)
               .medication(medication);
 
-      if (preparedDate != null) medicationDispenseBuilder.whenPrepared(preparedDate);
-      if (handedOver != null) medicationDispenseBuilder.whenHandedOver(handedOver);
+      if (preparedDate != null) {
+        medicationDispenseBuilder.whenPrepared(preparedDate);
+      }
+      if (handedOver != null) {
+        medicationDispenseBuilder.whenHandedOver(handedOver);
+      }
 
       val medicationDispense = medicationDispenseBuilder.build();
       applyMutators(this.fhirCloseMutators, medicationDispense);
@@ -146,24 +140,35 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
   }
 
   public static class Builder {
-
-    private final Map<String, Object> alternatives = new HashMap<>();
     private final List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>> fhirCloseMutators =
         new LinkedList<>();
 
     public Builder performer(String telematikId) {
-      alternatives.put("telematikId", telematikId);
-      return this;
+      return this.withResourceManipulator(
+          NamedEnvelope.of(
+              "Custom Telematik-ID: " + telematikId,
+              medicationDispense ->
+                  medicationDispense
+                      .getPerformerFirstRep()
+                      .getActor()
+                      .getIdentifier()
+                      .setValue(telematikId)));
     }
 
     public Builder prescriptionId(PrescriptionId prescriptionId) {
-      alternatives.put("prescriptionId", prescriptionId);
-      return this;
+      return this.withResourceManipulator(
+          NamedEnvelope.of(
+              "Custom PrescriptionId: " + prescriptionId.getValue(),
+              medicationDispense ->
+                  medicationDispense.getIdentifierFirstRep().setValue(prescriptionId.getValue())));
     }
 
     public Builder kvnr(KVNR kvnr) {
-      alternatives.put("kvnr", kvnr);
-      return this;
+      return this.withResourceManipulator(
+          NamedEnvelope.of(
+              "Custom KVNR: " + kvnr.getValue(),
+              medicationDispense ->
+                  medicationDispense.getSubject().setIdentifier(kvnr.asIdentifier())));
     }
 
     public Builder withResourceManipulator(
@@ -192,7 +197,7 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
 
     public ClosePrescription acceptedWith(
         ErxAcceptBundle acceptBundle, Date prepareDate, Date handedOver) {
-      Object[] params = {acceptBundle, prepareDate, handedOver, alternatives, fhirCloseMutators};
+      Object[] params = {acceptBundle, prepareDate, handedOver, fhirCloseMutators};
       return new Instrumented.InstrumentedBuilder<>(ClosePrescription.class, params).newInstance();
     }
   }

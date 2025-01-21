@@ -24,9 +24,13 @@ import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.util.Date;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.ResourceType;
 
@@ -35,6 +39,21 @@ import org.hl7.fhir.r4.model.ResourceType;
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
 public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
+
+  /**
+   * Get the <a href="https://simplifier.net/erezept/kbvprerpcomposition">KBV E-Rezept
+   * Composition</a> from Bundle
+   *
+   * @return the {@link Composition}
+   */
+  public Composition getComposition() {
+    return this.entry.stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(resource -> resource.getClass().equals(Composition.class))
+        .map(Composition.class::cast)
+        .findFirst()
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), "Composition"));
+  }
 
   /**
    * Convenience method for getting the prescription ID of the bundle. Will yield the same result
@@ -47,6 +66,15 @@ public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
       throw new MissingFieldException(KbvErpBundle.class, PrescriptionId.NAMING_SYSTEM);
     }
     return PrescriptionId.from(this.getIdentifier());
+  }
+
+  public void setPrescriptionId(PrescriptionId prescriptionId) {
+    val pidIdentifier =
+        new Identifier()
+            .setSystem(prescriptionId.getSystemAsString())
+            .setValue(prescriptionId.getValue());
+
+    this.setIdentifier(pidIdentifier);
   }
 
   public PrescriptionFlowType getFlowType() {
@@ -96,5 +124,29 @@ public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
                     MedicalOrganization.class, entry, MedicalOrganization::fromOrganization))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), "Medical Organization"));
+  }
+
+  public void setAllDates() {
+    val now = new Date();
+    this.setAllDates(now);
+  }
+
+  public void setAllDates(Date date) {
+    this.setAuthoredOnDate(date);
+    this.setCompositionDate(date);
+    this.setTimestamp(date);
+    this.getMeta().setLastUpdated(date);
+  }
+
+  public abstract void setAuthoredOnDate(Date authoredOn);
+
+  public abstract Date getAuthoredOn();
+
+  public Date getCompositionDate() {
+    return this.getComposition().getDate();
+  }
+
+  public void setCompositionDate(Date date) {
+    this.getComposition().setDate(date);
   }
 }

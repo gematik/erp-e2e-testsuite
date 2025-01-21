@@ -19,7 +19,8 @@ package de.gematik.test.erezept.primsys.rest;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
 import de.gematik.test.erezept.primsys.model.AbortUseCase;
 import de.gematik.test.erezept.primsys.model.ActorContext;
-import de.gematik.test.erezept.primsys.model.PrescribeUseCase;
+import de.gematik.test.erezept.primsys.model.PrescribeDiGa;
+import de.gematik.test.erezept.primsys.model.PrescribePharmaceuticals;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -49,8 +50,8 @@ public class DoctorsResource {
       PrescribeRequestDto body) {
     log.info(
         "POST/doc/{id}/prescribe with PrescribeRequest as json for Doctor with ID {}", doctorId);
-    val doc = actors.getDoctorOrThrowNotFound(doctorId);
-    return PrescribeUseCase.issuePrescription(doc, body, isDirectAssignment);
+    val doctor = actors.getDoctorOrThrowNotFound(doctorId);
+    return PrescribePharmaceuticals.as(doctor).assignDirectly(isDirectAssignment).withDto(body);
   }
 
   @POST
@@ -66,7 +67,20 @@ public class DoctorsResource {
         "Doctor {} will issue a prescription from KBV-Bundle as direct assignment={}",
         doctor.getName(),
         isDirectAssignment);
-    return PrescribeUseCase.issuePrescription(doctor, kbvBundle, isDirectAssignment);
+    return PrescribePharmaceuticals.as(doctor)
+        .assignDirectly(isDirectAssignment)
+        .withKbvBundle(kbvBundle);
+  }
+
+  @POST
+  @Path("{doctorId}/xml/evdga")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_XML)
+  public Response issueDiGAPrescription(
+      @PathParam("doctorId") String doctorId, String evdgaBundle) {
+    val doctor = actors.getDoctorOrThrowNotFound(doctorId);
+    log.info("Doctor {} will issue a DiGA prescription", doctor.getName());
+    return PrescribeDiGa.as(doctor).withEvdga(evdgaBundle);
   }
 
   @DELETE

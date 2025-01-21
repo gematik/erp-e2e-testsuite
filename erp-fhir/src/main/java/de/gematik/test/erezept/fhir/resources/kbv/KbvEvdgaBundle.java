@@ -23,6 +23,7 @@ import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItvEvdgaStructDef;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
 import de.gematik.test.erezept.fhir.values.BaseANR;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
@@ -90,5 +91,15 @@ public class KbvEvdgaBundle extends KbvBaseBundle {
     return format(
         "{0} (Workflow {1}) {2} für {3}",
         workflow.getDisplay(), workflow.getCode(), type, this.getPatient().getDescription());
+  }
+
+  @Override
+  public void setAuthoredOnDate(Date authoredOn) {
+    this.getHealthAppRequest().setAuthoredOn(authoredOn);
+  }
+
+  @Override
+  public Date getAuthoredOn() {
+    return this.getHealthAppRequest().getAuthoredOn();
   }
 }

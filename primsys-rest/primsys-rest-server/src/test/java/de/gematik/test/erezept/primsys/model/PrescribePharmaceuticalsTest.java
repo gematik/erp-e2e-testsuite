@@ -16,12 +16,16 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
-import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
@@ -32,7 +36,11 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import de.gematik.test.erezept.primsys.data.*;
+import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
+import de.gematik.test.erezept.primsys.data.MvoDto;
+import de.gematik.test.erezept.primsys.data.PatientDto;
+import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
+import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.mapping.MvoDataMapper;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
@@ -48,7 +56,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class PrescribeUseCaseTest extends TestWithActorContext {
+class PrescribePharmaceuticalsTest extends TestWithActorContext {
 
   @Test
   void shouldPrescribeWithDto() {
@@ -90,7 +98,8 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     val patient = new PatientDto();
     patient.setKvnr("X123123123");
     prescribeRequest.setPatient(patient);
-    try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asNormalAssignment().withDto(prescribeRequest)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());
@@ -135,13 +144,15 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
 
     val kbvBundle = fhir.encode(KbvErpBundleFaker.builder().fake(), EncodingType.XML);
-    try (val response = PrescribeUseCase.issuePrescription(doctor, kbvBundle)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundle)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());
       assertEquals(accessCode.getValue(), resMap.getAccessCode());
     }
-    try (val response1 = PrescribeUseCase.issuePrescription(doctor, kbvBundle, true)) {
+    try (val response1 =
+        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundle)) {
       val resMap = (PrescriptionDto) response1.getEntity();
       assertTrue(response1.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());
@@ -156,7 +167,8 @@ class PrescribeUseCaseTest extends TestWithActorContext {
 
     val prescribeBody = new PrescribeRequestDto();
 
-    try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeBody)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asNormalAssignment().withDto(prescribeBody)) {
       fail(
           "PrescribeUseCase did not throw the expected Exception and answered with "
               + response.getStatus());
@@ -179,7 +191,8 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     patientDto.setKvnr(null);
     prescribeBody.setPatient(patientDto);
 
-    try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeBody)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asNormalAssignment().withDto(prescribeBody)) {
       fail(
           "PrescribeUseCase did not throw the expected Exception and answered with "
               + response.getStatus());
@@ -213,7 +226,8 @@ class PrescribeUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskCreateCommand.class));
 
-    try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asNormalAssignment().withDto(prescribeRequest)) {
       fail(
           "PrescribeUseCase did not throw the expected Exception and answered with "
               + response.getStatus());
@@ -268,7 +282,8 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     prescribeRequest.setMedicationRequest(MedicationRequestDto.medicationRequest().build());
     val mvoData = MvoDataMapper.randomDto();
     prescribeRequest.getMedicationRequest().setMvo(mvoData);
-    try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asNormalAssignment().withDto(prescribeRequest)) {
       assertTrue(response.hasEntity());
       assertEquals(202, response.getStatus());
       val prescriptionDto = (PrescriptionDto) response.getEntity();
@@ -317,7 +332,8 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     mvoData.setDenominator(11);
     prescribeRequest.getMedicationRequest().setMvo(mvoData);
 
-    try (val response = PrescribeUseCase.issuePrescription(doctor, prescribeRequest)) {
+    try (val response =
+        PrescribePharmaceuticals.as(doctor).asNormalAssignment().withDto(prescribeRequest)) {
       fail(
           "PrescribeUseCase did not throw the expected Exception and answered with "
               + response.getStatus());
@@ -342,9 +358,13 @@ class PrescribeUseCaseTest extends TestWithActorContext {
     Supplier<Response> responseSupplier;
     if (directAssignment != null) {
       responseSupplier =
-          () -> PrescribeUseCase.issuePrescription(doctor, invalidFhir, directAssignment);
+          () ->
+              PrescribePharmaceuticals.as(doctor)
+                  .assignDirectly(directAssignment)
+                  .withKbvBundle(invalidFhir);
     } else {
-      responseSupplier = () -> PrescribeUseCase.issuePrescription(doctor, invalidFhir);
+      responseSupplier =
+          () -> PrescribePharmaceuticals.as(doctor).asNormalAssignment().withKbvBundle(invalidFhir);
     }
     try (val response = responseSupplier.get()) {
       fail(
@@ -359,10 +379,5 @@ class PrescribeUseCaseTest extends TestWithActorContext {
               .getMessage()
               .contains("Unable to decode the given FHIR-Content"));
     }
-  }
-
-  @Test
-  void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(PrescribeUseCase.class));
   }
 }

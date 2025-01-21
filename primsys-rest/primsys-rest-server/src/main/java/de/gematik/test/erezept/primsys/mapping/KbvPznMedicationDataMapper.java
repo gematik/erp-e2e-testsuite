@@ -81,7 +81,7 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
     dto.setVaccine(medication.isVaccine());
     dto.setStandardSize(StandardSizeDto.fromCode(medication.getStandardSize().getCode()));
     medication
-        .getDarreichungsformFirstRep()
+        .getDarreichungsform()
         .ifPresent(df -> dto.setSupplyForm(SupplyFormDto.fromCode(df.getCode())));
     medication.getPackagingAmount().ifPresent(dto::setAmount);
     medication.getPackagingUnit().ifPresent(dto::setAmountUnit);
