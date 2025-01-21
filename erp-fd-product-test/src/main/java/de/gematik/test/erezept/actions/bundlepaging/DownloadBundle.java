@@ -20,6 +20,7 @@ import de.gematik.test.erezept.*;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.client.usecases.*;
 import lombok.extern.slf4j.*;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.*;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -50,6 +51,7 @@ public class DownloadBundle<T extends Bundle> extends ErpAction<T> {
   }
 
   @Override
+  @Step("{0} ruft ein Bundle ab")
   public ErpInteraction<T> answeredBy(Actor actor) {
     return this.performCommandAs(cmd, actor);
   }

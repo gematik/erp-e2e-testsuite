@@ -22,6 +22,7 @@ import de.gematik.test.erezept.client.usecases.ChargeItemGetCommand;
 import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @Slf4j
@@ -35,6 +36,7 @@ public class GetChargeItems extends ErpAction<ErxChargeItemSet> {
   }
 
   @Override
+  @Step("{0} fragt den Fachdienst nach einem ChargeItem")
   public ErpInteraction<ErxChargeItemSet> answeredBy(Actor actor) {
     return this.performCommandAs(chargeItemGetCommand, actor);
   }

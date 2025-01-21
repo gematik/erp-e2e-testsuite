@@ -19,6 +19,7 @@ package de.gematik.test.erezept.fhir.extensions.kbv;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import lombok.Getter;
+import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.StringType;
 
@@ -29,6 +30,7 @@ public class ProductionInstruction {
   private final String display;
 
   private ProductionInstruction(KbvItaErpStructDef strucDef, String display) {
+
     this.display = display;
     this.strucDef = strucDef;
   }
@@ -45,8 +47,17 @@ public class ProductionInstruction {
     }
   }
 
+  /**
+   * maximum length of string in Medication.extension:Verpackung.value[x]:valueString in
+   * https://simplifier.net/packages/kbv.ita.erp/1.0.2 has to have max digits of 60 from
+   * kbv.ita.erp/1.0.3
+   *
+   * @param freitext as String
+   * @return ProductionInstruction
+   */
   public static ProductionInstruction asPackaging(String freitext) {
-    return new ProductionInstruction(KbvItaErpStructDef.PACKAGING, freitext);
+    return new ProductionInstruction(
+        KbvItaErpStructDef.PACKAGING, freitext.substring(0, Integer.min(59, freitext.length())));
   }
 
   public static ProductionInstruction asCompounding(String freitext) {
@@ -55,5 +66,16 @@ public class ProductionInstruction {
 
   public Extension asExtension() {
     return new Extension(strucDef.getCanonicalUrl(), new StringType(display));
+  }
+
+  /**
+   * maximum length of string in Medication.extension:Herstellungsanweisung.value[x]:valueString in
+   * https://simplifier.net/packages/kbv.ita.erp/1.0.2 has to have max digits of 60
+   *
+   * @param maxLength
+   */
+  public Extension asExtension(int maxLength) {
+    val cuttedDisply = display.substring(0, Integer.min(display.length(), maxLength - 1));
+    return new Extension(strucDef.getCanonicalUrl(), new StringType(cuttedDisply));
   }
 }

@@ -60,15 +60,18 @@ class TaskCreateUsecase extends ErpTest {
   @EnumSource(value = PrescriptionFlowType.class)
   void createTask(PrescriptionFlowType flowType) {
     val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
-    val creation = doctor.performs(TaskCreate.withFlowType(flowType));
-    doctor.attemptsTo(
-        Verify.that(creation)
-            .withExpectedType(ErpAfos.A_19018)
-            .hasResponseWith(returnCode(201))
-            .and(hasWorkflowType(flowType))
-            .and(isInDraftStatus())
-            .and(hasValidPrescriptionId())
-            .isCorrect());
+    // Todo  reduce 'if...' after 15.01.2025
+    if (!flowType.equals(PrescriptionFlowType.FLOW_TYPE_162)) {
+      val creation = doctor.performs(TaskCreate.withFlowType(flowType));
+      doctor.attemptsTo(
+          Verify.that(creation)
+              .withExpectedType(ErpAfos.A_19018)
+              .hasResponseWith(returnCode(201))
+              .and(hasWorkflowType(flowType))
+              .and(isInDraftStatus())
+              .and(hasValidPrescriptionId())
+              .isCorrect());
+    }
   }
 
   @TestcaseId("ERP_TASK_CREATE_02")

@@ -59,6 +59,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
+@net.jcip.annotations.NotThreadSafe
 @Slf4j
 @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
@@ -68,8 +69,11 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
   private static final LinkedList<ErxTask> erxTasks = new LinkedList<>();
   private static final LinkedList<ErxChargeItem> chargeItems = new LinkedList<>();
 
-  @Actor(name = "Sina Hüllmann")
+  @Actor(name = "Günther Angermänn")
   private static PatientActor patient;
+
+  @Actor(name = "Hanna Bäcker")
+  private static PatientActor secondPatient;
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -79,8 +83,12 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
 
   @AfterAll
   static void housekeeping() {
+    deleteChargeItems(patient, chargeItems);
+  }
+
+  private static void deleteChargeItems(PatientActor patient, List<ErxChargeItem> chargeItemList) {
     val erpClient = patient.abilityTo(UseTheErpClient.class);
-    for (val chargeItem : chargeItems) {
+    for (val chargeItem : chargeItemList) {
       val erg = erpClient.request(new ChargeItemDeleteCommand(chargeItem.getPrescriptionId()));
       if (erg.isOperationOutcome()) {
         log.info(OperationOutcomeWrapper.extractFrom(erg.getAsOperationOutcome()));
@@ -94,39 +102,47 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
 
   private void ensurePrecondition() {
     if (erxTasks.isEmpty()) {
-      val consent = ErxConsentBuilder.forKvnr(patient.getKvnr()).build();
-      consent.setDateTime(new Date());
-
-      patient.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withConsent(consent));
-
-      postTasksAndChargeItems(20);
+      grandConsentAsPkv(patient);
+      postTasksAndChargeItems(30);
     }
   }
 
   private void postTasksAndChargeItems(int numOfTasks) {
-    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
-
     for (int i = 1; i <= numOfTasks; i++) {
-
-      erxTasks.add(
-          doctor
-              .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
-              .getExpectedResponse());
+      erxTasks.add(setUpTask(patient));
     }
     for (val task : erxTasks) {
-
-      val acceptation =
-          pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
-      pharmacy.performs(ClosePrescription.acceptedWith(acceptation));
-      val davAbgabedatenBundle = DavAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
-      chargeItems.add(
-          pharmacy
-              .performs(
-                  PostChargeItem.forPatient(patient)
-                      .davBundle(davAbgabedatenBundle)
-                      .withAcceptBundle(acceptation))
-              .getExpectedResponse());
+      chargeItems.add(setUpChargeItem(task, patient));
     }
+  }
+
+  private ErxChargeItem setUpChargeItem(ErxTask task, PatientActor patientActor) {
+
+    val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptation));
+    val davAbgabedatenBundle = DavAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
+
+    return pharmacy
+        .performs(
+            PostChargeItem.forPatient(patientActor)
+                .davBundle(davAbgabedatenBundle)
+                .withAcceptBundle(acceptation))
+        .getExpectedResponse();
+  }
+
+  private ErxTask setUpTask(PatientActor patientActor) {
+    return doctor
+        .performs(IssuePrescription.forPatient(patientActor).withRandomKbvBundle())
+        .getExpectedResponse();
+  }
+
+  private void grandConsentAsPkv(PatientActor patientActor) {
+    patientActor.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+    val consent = ErxConsentBuilder.forKvnr(patientActor.getKvnr()).build();
+    consent.setDateTime(new Date());
+    patientActor.performs(GrantConsent.forOneSelf().withDefaultConsent());
+
+    patientActor.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
   }
 
   @TestcaseId("ERP_CHARGE_ITEM_PAGING_01")
@@ -134,17 +150,28 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
   @DisplayName(
       "Es muss überprüft werden, dass mehrere ChargeItems für Versicherte abgerufen werden können")
   void shouldDownloadChargeItems() {
-    ensurePrecondition();
+    // precondition
+    grandConsentAsPkv(secondPatient);
+    LinkedList<ErxTask> localTasks = new LinkedList<>();
+    LinkedList<ErxChargeItem> lokalChargeItems = new LinkedList<>();
+    for (int i = 1; i <= 10; i++) {
+      localTasks.add(setUpTask(secondPatient));
+    }
+    for (val task : localTasks) {
+      lokalChargeItems.add(setUpChargeItem(task, secondPatient));
+    }
 
     val chargeItemSet =
-        patient.performs(
+        secondPatient.performs(
             GetChargeItems.fromServerWith(ChargeItemSearch.getChargeItems(SortOrder.ASCENDING)));
-    patient.attemptsTo(
+    secondPatient.attemptsTo(
         Verify.that(chargeItemSet)
             .withExpectedType()
             .hasResponseWith(returnCode(200, ErpAfos.A_24434))
-            .and(minimumCountOfEntriesOf(Math.min(chargeItems.size(), 25)))
+            .and(minimumCountOfEntriesOf(10))
             .isCorrect());
+    // housekeeping
+    deleteChargeItems(secondPatient, lokalChargeItems);
   }
 
   @TestcaseId("ERP_CHARGE_ITEM_PAGING_02")
@@ -177,7 +204,17 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
       "Es muss überprüft werden, dass mehrere ChargeItems für Versicherte abgerufen werden können"
           + " mit allen 5 RelativeLink")
   void shouldDownloadChargeItemsWithRelationLinks() {
-    ensurePrecondition();
+    grandConsentAsPkv(secondPatient);
+    LinkedList<ErxTask> localTasks = new LinkedList<>();
+    LinkedList<ErxChargeItem> lokalChargeItems = new LinkedList<>();
+
+    for (int i = 1; i <= 10; i++) {
+      localTasks.add(setUpTask(secondPatient));
+    }
+    for (val task : localTasks) {
+      lokalChargeItems.add(setUpChargeItem(task, secondPatient));
+    }
+
     val queries =
         IQueryParameter.search()
             .sortedBy("date", SortOrder.ASCENDING)
@@ -186,14 +223,15 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
             .createParameter();
 
     val chargeItemSet =
-        patient.performs(
+        secondPatient.performs(
             GetChargeItems.fromServerWith(ChargeItemSearch.searchFor().withQuery(queries).build()));
-    patient.attemptsTo(
+    secondPatient.attemptsTo(
         Verify.that(chargeItemSet)
             .withExpectedType()
             .hasResponseWith(returnCode(200, ErpAfos.A_24434))
             .and(containsCountOfGivenLinks(List.of("next", "prev", "self", "first", "last"), 5))
             .isCorrect());
+    deleteChargeItems(secondPatient, lokalChargeItems);
   }
 
   @TestcaseId("ERP_CHARGE_ITEM_PAGING_04")
@@ -342,7 +380,7 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
                             .sortedBy("date", SortOrder.ASCENDING)
                             .createParameter())
                     .build()));
-    val chargeItemSeSecindCall =
+    val chargeItemSeSecondCall =
         patient.performs(
             GetChargeItems.fromServerWith(
                 ChargeItemSearch.searchFor()
@@ -360,7 +398,7 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
             .hasResponseWith(returnCode(200, ErpAfos.A_24434))
             .and(
                 hasElementAtPosition(
-                    chargeItemSeSecindCall.getExpectedResponse().getChargeItems().get(4), 9))
+                    chargeItemSeSecondCall.getExpectedResponse().getChargeItems().get(4), 9))
             .isCorrect());
   }
 
@@ -411,22 +449,34 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
       "Es muss sichergestellt werden, dass Paging bei ChargeItems funktioniert. Genauer die"
           + " RelationLink next und previous")
   void getTaskChargeItemsWhileUsingRelationNextAndPrevious() {
-    ensurePrecondition();
+    // precondition
+    grandConsentAsPkv(secondPatient);
+    LinkedList<ErxTask> localTasks = new LinkedList<>();
+    LinkedList<ErxChargeItem> lokalChargeItems = new LinkedList<>();
+
+    for (int i = 1; i <= 10; i++) {
+      localTasks.add(setUpTask(secondPatient));
+    }
+    for (val task : localTasks) {
+      lokalChargeItems.add(setUpChargeItem(task, secondPatient));
+    }
+
     val firstCall =
-        patient.performs(
+        secondPatient.performs(
             GetChargeItems.fromServerWith(
                 ChargeItemSearch.searchFor()
                     .withQuery(
                         IQueryParameter.search()
-                            .withCount(3)
+                            .withCount(2)
                             .sortedBy("date", SortOrder.ASCENDING)
                             .createParameter())
                     .build()));
     assertTrue(
         "given first TaskBundle has next-Relation-Link",
         firstCall.getExpectedResponse().hasNextRelation());
-    val secondCall = patient.performs(DownloadBundle.nextFor(firstCall.getExpectedResponse()));
-    patient.attemptsTo(
+    val secondCall =
+        secondPatient.performs(DownloadBundle.nextFor(firstCall.getExpectedResponse()));
+    secondPatient.attemptsTo(
         Verify.that(firstCall)
             .withExpectedType()
             .hasResponseWith(returnCode(200, ErpAfos.A_24442))
@@ -435,27 +485,31 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
         "given second TaskBundle has previous-Relation-Link",
         secondCall.getExpectedResponse().hasPreviousRelation());
     val firstFromSecondCall =
-        patient.performs(DownloadBundle.previousFor(secondCall.getExpectedResponse()));
-    patient.attemptsTo(
+        secondPatient.performs(DownloadBundle.previousFor(secondCall.getExpectedResponse()));
+    secondPatient.attemptsTo(
         Verify.that(firstFromSecondCall)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
             .isCorrect());
-    patient.attemptsTo(
+    secondPatient.attemptsTo(
         Verify.that(firstCall)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
             .and(hasSameEntryIds(firstFromSecondCall.getExpectedResponse(), ErpAfos.A_24442))
             .isCorrect());
+    // housekeeping
+    deleteChargeItems(secondPatient, lokalChargeItems);
   }
 
   @TestcaseId("ERP_CHARGE_ITEM_PAGING_11")
   @Test
   @DisplayName(
       "Für den Patienten muss sichergestellt werden, dass der Total-Count immer entsprechend um den"
-          + " folgenden Wert erhöht wird: ")
+          + " folgenden Wert erhöht wird ")
   void shouldHaveCorrectTotalCountAsPatient() {
     ensurePrecondition();
+    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+
     val firstCall =
         patient.performs(
             GetChargeItems.fromServerWith(
@@ -465,8 +519,6 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
                             .sortedBy("date", SortOrder.ASCENDING)
                             .createParameter())
                     .build()));
-
-    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
 
     val newTask =
         doctor

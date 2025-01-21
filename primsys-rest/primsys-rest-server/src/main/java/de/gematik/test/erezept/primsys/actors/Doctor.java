@@ -68,7 +68,7 @@ public class Doctor extends BaseActor {
     d.setDocNumberType(doc.getANRType().name());
     d.setDocNumber(doc.getANR().getValue());
     d.setDocQualificationType(QualificationType.DOCTOR.getDisplay());
-    d.setBsnr(org.getBsnr().getValue());
+    org.getBsnrOptional().ifPresent(bsnr -> d.setBsnr(bsnr.getValue()));
     d.setPhone(org.getPhone());
     d.setEmail(org.getMail());
     d.setCity(org.getCity());

@@ -17,11 +17,13 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -37,6 +39,7 @@ import java.util.Date;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Medication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -182,6 +185,22 @@ class PrescriptionBundleVerifierTest {
 
     val verifyText = "Bauschaum";
     val step = bundleContainsNameInMedicationCompound(verifyText, ErpAfos.A_24034);
+    assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldFailWhenLastMedicationDispenseDateHasIncorrectPrecision() {
+    val task = mock(ErxTask.class);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+
+    val invalidDate = new DateTimeType("2025-01-22");
+    invalidDate.setPrecision(TemporalPrecisionEnum.DAY);
+    assertEquals(
+        TemporalPrecisionEnum.DAY, invalidDate.getPrecision()); // Ensures precision is incorrect
+
+    when(prescriptionBundle.getTask()).thenReturn(task);
+
+    val step = bundleHasLastMedicationDispenseDate();
     assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
   }
 }

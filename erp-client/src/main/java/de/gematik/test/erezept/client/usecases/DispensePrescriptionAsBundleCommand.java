@@ -44,7 +44,6 @@ public class DispensePrescriptionAsBundleCommand extends BaseCommand<ErxMedicati
     queryParameters.add(new QueryParameter("secret", secret.getValue()));
   }
 
-  // TODO: needs to be checked if get here still a ErxMedicationDispenseBundle as response
   public DispensePrescriptionAsBundleCommand(
       TaskId taskId, Secret secret, GemDispenseOperationParameters dispenseParameters) {
     super(ErxMedicationDispenseBundle.class, HttpRequestMethod.POST, "Task", taskId.getValue());

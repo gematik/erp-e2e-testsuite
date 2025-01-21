@@ -33,11 +33,15 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
@@ -78,6 +82,8 @@ public class ProvideDispensationPermitIT extends ErpTest {
   @Actor(name = "Am Waldesrand")
   private PharmacyActor pharmacy;
 
+  private ErxAcceptBundle acceptance;
+
   private final List<IQueryParameter> searchParams =
       IQueryParameter.search()
           .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
@@ -117,12 +123,12 @@ public class ProvideDispensationPermitIT extends ErpTest {
                             .withMedication(getMedication(medicationType))
                             .toBuilder()))
             .getExpectedResponse();
-    val acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
 
-    val dispensation =
-        pharmacy.performs(
-            DispensePrescription.forPrescription(acceptance.getTaskId(), acceptance.getSecret())
-                .withMedDsp(List.of(getMedDisp(task))));
+    acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+
+    val dispenseAction = determineDispenseAction(task, acceptance);
+
+    val dispensation = pharmacy.performs(dispenseAction);
 
     pharmacy.attemptsTo(Verify.that(dispensation).withExpectedType().isCorrect());
     pharmacy.performs(
@@ -156,21 +162,59 @@ public class ProvideDispensationPermitIT extends ErpTest {
     };
   }
 
-  private ErxMedicationDispense getMedDisp(ErxTask task) {
+  private List<ErxMedicationDispense> getMedDisp(ErxTask task) {
     val medication1 =
         KbvErpMedicationPZNFaker.builder()
             .withAmount(666)
             .withPznMedication(PZN.from("17377588"), "Comirnaty von BioNTech/Pfizer")
             .fake();
 
-    return ErxMedicationDispenseBuilder.forKvnr(patient.getKvnr())
-        .dosageInstruction("1-2-3-4")
-        .whenHandedOver(new Date())
-        .wasSubstituted(false)
-        .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
-        .medication(medication1)
-        .performerId(pharmacy.getTelematikId().getValue())
-        .prescriptionId(task.getPrescriptionId())
+    val md =
+        ErxMedicationDispenseBuilder.forKvnr(patient.getKvnr())
+            .dosageInstruction("1-2-3-4")
+            .whenHandedOver(new Date())
+            .wasSubstituted(false)
+            .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
+            .medication(medication1)
+            .performerId(pharmacy.getTelematikId().getValue())
+            .prescriptionId(task.getPrescriptionId())
+            .build();
+
+    return List.of(md);
+  }
+
+  private GemDispenseOperationParameters getDispenseParameters(ErxTask task) {
+    val medication =
+        GemErpMedicationFaker.builder()
+            .withAmount(666)
+            .withPzn(PZN.from("17377588"), "Comirnaty von BioNTech/Pfizer")
+            .fake();
+
+    val md =
+        ErxMedicationDispenseBuilder.forKvnr(patient.getKvnr())
+            .dosageInstruction("1-2-3-4")
+            .whenHandedOver(new Date())
+            .wasSubstituted(false)
+            .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
+            .medication(medication)
+            .performerId(pharmacy.getTelematikId().getValue())
+            .prescriptionId(task.getPrescriptionId())
+            .build();
+
+    return GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
+        .with(md, medication)
         .build();
+  }
+
+  private DispensePrescription determineDispenseAction(ErxTask task, ErxAcceptBundle acceptance) {
+    TaskId taskId = TaskId.from(acceptance.getTaskId().getValue());
+    Secret secret = Secret.fromString(acceptance.getSecret().getValue());
+
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+      return DispensePrescription.forPrescription(taskId, secret).withMedDsp(getMedDisp(task));
+    } else {
+      return DispensePrescription.forPrescription(taskId, secret)
+          .withParameters(getDispenseParameters(task));
+    }
   }
 }

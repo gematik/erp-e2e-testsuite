@@ -38,6 +38,12 @@ public enum EpaStructDef implements ProfileStructureDefinition<EpaVersion> {
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-prescription-erp-input-parameters"),
   EPA_OP_CANCEL_PRESCRIPTION(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-cancel-prescription-erp-input-parameters"),
+  EXT_MEDICATION_ID_VACCINE(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension"),
+  EXT_DRUG_CATEGORY(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension"),
+  EXT_MED_PACKAGING_SIZE(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension"),
   ;
 
   private final String canonicalUrl;

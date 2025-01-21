@@ -21,6 +21,7 @@ import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -45,7 +46,15 @@ public class EpaOpCancelPrescriptionVerifier {
         prescription -> prescription.getEpaAuthoredOn().equals(date);
     return new VerificationStep.StepBuilder<EpaOpCancelPrescription>(
             EmlAfos.A_25931.getRequirement(),
-            "Das AuthoredOn Datum entspricht nicht dem erwarteten Datum")
+            "Das AuthoredOn Datum entspricht dem erwarteten Datum")
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<List<EpaOpCancelPrescription>> emlDoesNotContainAnything() {
+    Predicate<List<EpaOpCancelPrescription>> predicate = List::isEmpty;
+    return new VerificationStep.StepBuilder<List<EpaOpCancelPrescription>>(
+            EmlAfos.A_25951.getRequirement(), "Eml besitzt eine leere Liste")
         .predicate(predicate)
         .accept();
   }

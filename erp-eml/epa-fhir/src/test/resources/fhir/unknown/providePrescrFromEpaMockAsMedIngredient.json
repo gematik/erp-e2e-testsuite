@@ -98,6 +98,20 @@
             "form": {
               "text": "0-0-1-0-3-2"
             },
+            "amount": {
+              "numerator": {
+                "extension": [
+                  {
+                    "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension",
+                    "valueString": "1"
+                  }
+                ],
+                "unit": "halt sowas"
+              },
+              "denominator": {
+                "value": 1
+              }
+            },
             "ingredient": [
               {
                 "itemCodeableConcept": {
@@ -112,7 +126,7 @@
                 "strength": {
                   "numerator": {
                     "value": 2,
-                    "unit": "wölckhen",
+                    "unit": "wölkchen",
                     "_code": {
                       "extension": [
                         {

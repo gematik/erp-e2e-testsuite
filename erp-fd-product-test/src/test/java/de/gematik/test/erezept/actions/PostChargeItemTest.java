@@ -32,6 +32,7 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.resources.erp.*;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.fuzzing.erx.ErxChargeItemManipulatorFactory;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,10 +73,15 @@ class PostChargeItemTest extends ParsingTest {
     val erpResponse =
         mockUtil.createErpResponse(ErxChargeItemFaker.builder().fake(), ErxChargeItem.class, 201);
     when(erpClientMock.request(any(ChargeItemPostCommand.class))).thenReturn(erpResponse);
-    val postChargeItem =
-        PostChargeItem.forPatient(patientActor)
-            .davBundle(davAbgabedatenBundle)
-            .withAcceptBundle(acceptBundle);
-    assertDoesNotThrow(() -> pharmacyActor.performs(postChargeItem));
+    val manipulatorList = ErxChargeItemManipulatorFactory.binaryVersionManipulator();
+    manipulatorList.forEach(
+        m -> {
+          val postChargeItem =
+              PostChargeItem.forPatient(patientActor)
+                  .davBundle(davAbgabedatenBundle)
+                  .withCustomStructureAndVersion(m)
+                  .withAcceptBundle(acceptBundle);
+          assertDoesNotThrow(() -> pharmacyActor.performs(postChargeItem));
+        });
   }
 }

@@ -50,7 +50,7 @@ class DecryptDocumentCommandTest {
   @BeforeEach
   void setUp() {
     val smartCardArchive = SmartcardArchive.fromResources();
-    smcb = smartCardArchive.getSmcbByICCSN("80276883110000116873");
+    smcb = smartCardArchive.getSmcbByICCSN("80276001011699901102");
   }
 
   @SneakyThrows

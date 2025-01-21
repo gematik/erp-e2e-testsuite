@@ -19,6 +19,7 @@ package de.gematik.test.erezept.integration.communication;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
+import static de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators;
 
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
@@ -35,7 +36,6 @@ import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory;
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -437,8 +437,7 @@ public class SendInvalidMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
     final ErxTask prescTask = getTask(assignmentKind);
-    val manipulator =
-        ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators();
+    val manipulator = getCommunicationPayloadManipulators();
     val replyMessage =
         new CommunicationReplyMessage(
             1,
@@ -477,8 +476,7 @@ public class SendInvalidMessagesIT extends ErpTest {
   void shouldValidatePatientCommunicationWithIncorrectVersionAsString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
     val prescTask = getTask(assignmentKind);
-    val manipulator =
-        ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators();
+    val manipulator = getCommunicationPayloadManipulators();
 
     val cDRM2 =
         new CommunicationDisReqMessage(

@@ -21,6 +21,8 @@ import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -70,20 +72,21 @@ public class ManageDataMatrixCodes implements Ability, HasTeardown, RefersToActo
     this.dmcs.append(dmc);
   }
 
-  public DmcPrescription getLastDmc() {
-    return this.dmcs.getLast();
+  public void moveToDeleted(DmcPrescription dmc) {
+    log.info(
+        "Patient has deleted a 'paper-based' Prescription on a Data Matrix Code for Task {}",
+        dmc.getTaskId());
+    this.dmcs.getRawList().remove(dmc);
+    this.deletedDmcs.getRawList().remove(dmc); // make sure the DMC does not appear twice
+    this.deletedDmcs.append(dmc);
   }
 
-  public DmcPrescription consumeLastDmc() {
-    return this.dmcs.consumeLast();
-  }
-
-  public DmcPrescription getFirstDmc() {
-    return this.dmcs.getFirst();
-  }
-
-  public DmcPrescription consumeFirstDmc() {
-    return this.dmcs.consumeFirst();
+  public List<DmcPrescription> getAggregatedDmcs() {
+    val aggregatedDmcs = new HashSet<>(this.dmcs.getRawList());
+    aggregatedDmcs.addAll(this.deletedDmcs.getRawList());
+    return aggregatedDmcs.stream()
+        .sorted(Comparator.comparing(DmcPrescription::getCreated))
+        .toList();
   }
 
   public List<DmcPrescription> getDmcList() {

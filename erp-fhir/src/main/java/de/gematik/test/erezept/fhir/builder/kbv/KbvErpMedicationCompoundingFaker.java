@@ -39,9 +39,8 @@ public class KbvErpMedicationCompoundingFaker {
         "medicationIngredient",
         b -> b.medicationIngredient(PZN.random(), fakerDrugName(), "freitext"));
     builderConsumers.put("amount", b -> b.amount(5, 1, "Stk"));
-    builderConsumers.put(
-        "productionInstruction",
-        b -> b.productionInstruction(ProductionInstruction.asCompounding("freitext")));
+
+    this.withProductionInstruction("freitext");
   }
 
   public static KbvErpMedicationCompoundingFaker builder() {
@@ -56,6 +55,22 @@ public class KbvErpMedicationCompoundingFaker {
 
   public KbvErpMedicationCompoundingFaker withDosageForm(Darreichungsform df) {
     this.withDosageForm(df.getDisplay());
+    return this;
+  }
+
+  /**
+   * packaging will be removed!!!
+   *
+   * @param productionInstruction
+   * @return
+   */
+  public KbvErpMedicationCompoundingFaker withProductionInstruction(String productionInstruction) {
+    return withProductionInstruction(ProductionInstruction.asCompounding(productionInstruction));
+  }
+
+  public KbvErpMedicationCompoundingFaker withProductionInstruction(ProductionInstruction pd) {
+    builderConsumers.put("productionInstruction", b -> b.productionInstruction(pd));
+    builderConsumers.remove("packaging");
     return this;
   }
 
@@ -89,12 +104,6 @@ public class KbvErpMedicationCompoundingFaker {
     return this;
   }
 
-  public KbvErpMedicationCompoundingFaker withProductionInstruction(ProductionInstruction pd) {
-    builderConsumers.computeIfPresent(
-        "productionInstruction", (key, defaultValue) -> b -> b.productionInstruction(pd));
-    return this;
-  }
-
   public KbvErpMedicationCompoundingFaker withMedicationIngredient(
       String pzn, String medicationName) {
     return this.withMedicationIngredient(pzn, medicationName, "freitextInPzn");
@@ -115,6 +124,12 @@ public class KbvErpMedicationCompoundingFaker {
 
   public KbvErpMedicationCompoundingFaker withResourceId(String resourceId) {
     builderConsumers.put("resourceId", b -> b.setResourceId(resourceId));
+    return this;
+  }
+
+  public KbvErpMedicationCompoundingFaker withPackaging(String packaging) {
+    builderConsumers.put("packaging", p -> p.packaging(packaging));
+    builderConsumers.remove("productionInstruction");
     return this;
   }
 

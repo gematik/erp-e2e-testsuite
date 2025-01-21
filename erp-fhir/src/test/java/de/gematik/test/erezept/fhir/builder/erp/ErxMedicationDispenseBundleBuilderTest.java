@@ -41,7 +41,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name = "[{index}] -> Build CommunicationInfoReq with E-Rezept FHIR Profiles {0}")
   @MethodSource(
-      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpFhirProfileVersions")
   @ClearSystemProperty.ClearSystemProperties(
       value = {
         @ClearSystemProperty(key = "erp.fhir.profile"),
@@ -69,7 +69,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
   @MethodSource(
-      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpFhirProfileVersions")
   @ClearSystemProperty.ClearSystemProperties(
       value = {
         @ClearSystemProperty(key = "erp.fhir.profile"),

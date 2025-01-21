@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
@@ -89,12 +88,12 @@ public abstract class TestWithActorContext {
   }
 
   private static Doctor createMockDoctor(DoctorConfiguration cfg) {
-    cfg.setAlgorithm(CryptoSystem.RSA_2048.getName());
+    // cfg.setAlgorithm(CryptoSystem.RSA_2048.getName());
     return new Doctor(cfg, env, softKonn, sca);
   }
 
   private static Pharmacy createMockedPharmacy(PharmacyConfiguration cfg) {
-    cfg.setAlgorithm(CryptoSystem.RSA_2048.getName());
+    // cfg.setAlgorithm(CryptoSystem.ECC_256.getName());
     return new Pharmacy(cfg, env, softKonn, sca);
   }
 

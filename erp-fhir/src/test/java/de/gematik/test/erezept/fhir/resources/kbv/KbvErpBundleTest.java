@@ -562,7 +562,10 @@ class KbvErpBundleTest extends ParsingTest {
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_0 + fileName);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     assertTrue(kbvBundle.getMedication().getPznOptional().isPresent());
-    assertEquals(expectedPZN, kbvBundle.getMedication().getPznOptional().get().getValue());
+    val medication = kbvBundle.getMedication();
+    assertEquals(expectedPZN, medication.getPznOptional().get().getValue());
+    assertEquals("Aluminiumchlorid-Hexahydrat", medication.getIngredientTextOptional().get());
+    assertNotNull(medication.getDarreichungsformOptional().get());
   }
 
   @Test

@@ -18,6 +18,8 @@ package de.gematik.test.erezept.primsys.data.valuesets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -34,5 +36,27 @@ class SupplyFormDtoTest {
   @Test
   void shouldThrowOnNullCode() {
     assertThrows(NullPointerException.class, () -> SupplyFormDto.fromCode(null));
+  }
+
+  @Test
+  void shouldHaveAllDarreichungsformen() {
+    Arrays.stream(Darreichungsform.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> SupplyFormDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraSupplyForms() {
+    Arrays.stream(SupplyFormDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> Darreichungsform.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

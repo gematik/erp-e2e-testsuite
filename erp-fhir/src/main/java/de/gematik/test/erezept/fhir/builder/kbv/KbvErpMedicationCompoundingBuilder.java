@@ -25,6 +25,7 @@ import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
@@ -35,8 +36,8 @@ public class KbvErpMedicationCompoundingBuilder
   private static final BaseMedicationType BASE_MEDICATION_TYPE =
       BaseMedicationType.PHARM_BIO_PRODUCT;
   private static final int MINIMUM_OF_ONE = 1;
-  private String medicineName;
   private final List<Extension> extensions = new LinkedList<>();
+  private String medicineName;
   private String darreichungsform;
   private long amountNumerator;
   private String amountNumeratorUnit;
@@ -44,10 +45,11 @@ public class KbvErpMedicationCompoundingBuilder
   private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
   private MedicationCategory category = MedicationCategory.C_00;
   private boolean isVaccine = false;
-  private ProductionInstruction productionInstruction = ProductionInstruction.random();
+  private ProductionInstruction productionInstruction;
   private PZN pzn;
   private String medicationName;
   private String freiTextInPzn;
+  private String packaging;
 
   public static KbvErpMedicationCompoundingBuilder builder() {
     return new KbvErpMedicationCompoundingBuilder();
@@ -132,6 +134,11 @@ public class KbvErpMedicationCompoundingBuilder
     return self();
   }
 
+  public KbvErpMedicationCompoundingBuilder packaging(String packaging) {
+    this.packaging = packaging;
+    return self();
+  }
+
   public KbvErpMedicationCompoundingBuilder amount(long numerator) {
     return this.amount(numerator, "stk");
   }
@@ -148,6 +155,7 @@ public class KbvErpMedicationCompoundingBuilder
   }
 
   public KbvErpMedication build() {
+
     checkRequired();
     val medicationCompounding = new KbvErpMedication();
     val profile = KbvItaErpStructDef.MEDICATION_COMPOUNDING.asCanonicalType(kbvItaErpVersion);
@@ -155,11 +163,19 @@ public class KbvErpMedicationCompoundingBuilder
     medicationCompounding.setId(this.getResourceId()).setMeta(meta);
     this.defaultAmount();
     val amount = new Ratio();
-    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
+    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
       amount.getNumerator().setValue(amountNumerator);
+
+      // notice ProductionInstruction and packaging is a Pair and one of them should be set
+      Optional.ofNullable(productionInstruction)
+          .map(pi -> pi.asExtension(60))
+          .ifPresent(extensions::add);
+
     } else {
       extensions.add(BASE_MEDICATION_TYPE.asExtension());
-
+      Optional.ofNullable(productionInstruction)
+          .map(ProductionInstruction::asExtension)
+          .ifPresent(extensions::add);
       val numerator = amount.getNumerator();
       numerator
           .addExtension()
@@ -168,12 +184,17 @@ public class KbvErpMedicationCompoundingBuilder
           .setUrl(KbvItaErpStructDef.PACKAGING_SIZE.getCanonicalUrl());
     }
 
+    // maximum length of string in Medication.extension:Verpackung.value[x]:valueString is 60 digits
+    Optional.ofNullable(packaging)
+        .map(p -> ProductionInstruction.asPackaging(p).asExtension())
+        .ifPresent(extensions::add);
+
     amount.getNumerator().setUnit(amountNumeratorUnit);
     amount.getDenominator().setValue(amountDenominator);
 
     extensions.add(category.asExtension());
     extensions.add(KbvItaErpStructDef.MEDICATION_VACCINE.asBooleanExtension(isVaccine));
-    extensions.add(productionInstruction.asExtension());
+
     medicationCompounding.setExtension(extensions);
     medicationCompounding
         .setCode(MedicationType.COMPOUNDING.asCodeableConcept())
@@ -194,10 +215,11 @@ public class KbvErpMedicationCompoundingBuilder
   }
 
   private void checkRequired() {
-    this.checkRequired(
+    this.checkRequiredOneOfTwoNotBoth(
         productionInstruction,
-        "A MedicationCompounding requires a ProductionInstruction in Version:"
-            + " KbvItaErpVersion.V1_1_0");
+        packaging,
+        "A MedicationCompounding requires a ProductionInstruction or a Packaging in Version:"
+            + " KbvItaErpVersion.V1_1_0, but only one of them");
     this.checkRequired(
         freiTextInPzn,
         "A MedicationCompounding requires a Medication.MedicationIngredientComponent mit"

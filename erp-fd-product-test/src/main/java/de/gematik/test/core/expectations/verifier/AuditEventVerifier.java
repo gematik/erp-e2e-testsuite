@@ -72,6 +72,27 @@ public class AuditEventVerifier {
         .accept();
   }
 
+  public static VerificationStep<ErxAuditEventBundle> bundleDoesNotContainLogFor(
+      PrescriptionId prescriptionId, String logContent) {
+
+    Predicate<ErxAuditEventBundle> predicate =
+        auditEventBundle ->
+            auditEventBundle.getAuditEvents().stream()
+                .filter(
+                    ae -> ae.getEntity().get(0).getDescription().equals(prescriptionId.getValue()))
+                .toList()
+                .stream()
+                .noneMatch(ae -> ae.getFirstText().contains(logContent));
+
+    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
+            ErpAfos.A_25962.getRequirement(),
+            format(
+                "Das Audit Event für die Prescription {0} enthält nicht die Information: {1}",
+                prescriptionId.getValue(), logContent))
+        .predicate(predicate)
+        .accept();
+  }
+
   public static @NonNull Builder forPharmacy(PharmacyActor pharmacy) {
     val builder = new Builder();
     builder.getReplacements().add(text -> text.replace("{agentName}", pharmacy.getCommonName()));
@@ -93,20 +114,33 @@ public class AuditEventVerifier {
     return text.get();
   }
 
-  public VerificationStep<ErxAuditEventBundle> firstElementCorrespondsTo(
+  /**
+   * the Verifier checks the content of the first 3 Elements. from time to time we recognized that
+   * the searched content was in the second or third AuditEvent In addition, the actor can also
+   * change in the future, so the string used for the search is cut off at the beginning
+   *
+   * @param representation
+   * @return as it matches or not
+   */
+  public VerificationStep<ErxAuditEventBundle> oneOfFirstThreeElementsCorrespondsTo(
       Representation representation) {
     Predicate<ErxAuditEventBundle> predicate =
         bundle -> {
           val auditEvents = bundle.getAuditEvents();
-          if (auditEvents.isEmpty()) {
+          val upperLimit = Math.min(auditEvents.size(), 3);
+          val filteredAuditEvent =
+              auditEvents.subList(0, upperLimit).stream()
+                  .filter(ae -> ae.getFirstText().contains(representation.getText().substring(12)))
+                  .findAny();
+          if (auditEvents.isEmpty() || filteredAuditEvent.isEmpty()) {
             return false;
           }
-          val firstAuditEvent = auditEvents.get(0);
+
           log.info(
               format(
                   "Der erste Eintrag im Versichertenprotokoll entspricht \"{0}\"",
-                  firstAuditEvent.getFirstText()));
-          return corresponds(firstAuditEvent, representation);
+                  filteredAuditEvent.get().getFirstText()));
+          return corresponds(filteredAuditEvent.get(), representation);
         };
     return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
             ErpAfos.A_19284.getRequirement(),

@@ -264,6 +264,22 @@ public class PharmacyDispenseSteps {
   }
 
   @Und(
+      "^die Apotheke (.+) für das (letzte|erste) akzeptierte E-Rezept von (.+) alternative"
+          + " Dispensierinformationen zeitnah bereitstellt$")
+  public void andPharmacyProvidesDispensingInformationTimelyMannerWithAlternativeMedication(
+      String pharmName, String order, String patientName, DataTable medications) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    and(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                        .withMedicationDispense(medications)
+                        .build())
+                .isEqualTo(200));
+  }
+
+  @Und(
       "^die Apotheke (.+) für das (letzte|erste) akzeptierte E-Rezept von (.+) die"
           + " Dispensierinformationen mehrfach zeitnah bereitstellt$")
   public void andPharmacyDispensingMultipleInformationTimelyManner(

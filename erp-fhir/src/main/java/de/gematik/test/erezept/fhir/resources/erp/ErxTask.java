@@ -188,6 +188,13 @@ public class ErxTask extends Task {
         .findFirst();
   }
 
+  public Optional<InstantType> getLastMedicationDispenseDateElement() {
+    return this.getExtension().stream()
+        .filter(ErpWorkflowStructDef.LAST_MEDICATION_DISPENSE::match)
+        .map(ext -> ext.getValue().castToInstant(ext.getValue()))
+        .findFirst();
+  }
+
   public boolean hasLastMedicationDispenseDate() {
     return this.getLastMedicationDispenseDate().isPresent();
   }

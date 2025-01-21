@@ -18,17 +18,29 @@ package de.gematik.test.erezept.primsys.mapping;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
 class PznDispensedMedicationDataMapperTest extends ParsingTest {
 
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.3.0")
   @RepeatedTest(value = 5)
   void shouldGenerateRandomly() {
     val mapper = PznDispensedMedicationDataMapper.random();
     val medicationDispense = mapper.convert();
+    val vr = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
+    assertTrue(vr.isSuccessful());
+  }
+
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.4.0")
+  @RepeatedTest(value = 5)
+  void shouldGenerateRandomlyProfileVersion_1_4_() {
+    val mapper = PznDispensedMedicationDataMapper.random();
+    val medicationDispense = mapper.convert(GemErpMedicationFaker.builder().fake());
     val vr = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
     assertTrue(vr.isSuccessful());
   }

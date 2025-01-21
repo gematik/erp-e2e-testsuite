@@ -67,4 +67,32 @@ class KbvErpMedicationPZNBuilderTest extends ParsingTest {
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
+
+  @ParameterizedTest(name = "[{index}] -> Build KBV Medication with Faker for KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationWithFakerAndValidValues(KbvItaErpVersion version) {
+    val medicationResourceId = "e41d2c17-7632-486e-b24f-60c6c7a8b8d9";
+    val randomPZN = PZN.random();
+    val medication =
+        KbvErpMedicationPZNBuilder.faker(
+                randomPZN.getValue(), "Test Medikament", MedicationCategory.C_00)
+            .version(version)
+            .setResourceId(medicationResourceId)
+            .build();
+
+    assertNotNull(medication);
+    assertEquals(medicationResourceId, medication.getId());
+    assertNotNull(medication.getCode());
+    assertEquals("Test Medikament", medication.getCode().getText());
+    assertFalse(
+        medication.getForm().getCoding().stream()
+            .anyMatch(
+                coding ->
+                    coding.getCode().equals(Darreichungsform.PUE.getCode())
+                        || coding.getCode().equals(Darreichungsform.LYE.getCode())),
+        "Excluded Darreichungsformen PUE and LYE should not be used before April 2025");
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(result.isSuccessful());
+  }
 }

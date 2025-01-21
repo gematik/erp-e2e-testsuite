@@ -16,8 +16,12 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.test.erezept.fhir.valuesets.Wop;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -36,5 +40,27 @@ class WopDtoTest {
   @Test
   void shouldThrowOnNullCode() {
     assertThrows(NullPointerException.class, () -> WopDto.fromCode(null));
+  }
+
+  @Test
+  void shouldHaveAllWops() {
+    Arrays.stream(Wop.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> WopDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraWops() {
+    Arrays.stream(WopDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> Wop.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

@@ -23,5 +23,5 @@ public class EpaMockClientConfiguration {
   private String epaMockUrl;
   private String epaMockApiKey;
   private long logRetrieveInterval = 10000L;
-  private long maxWait = 60000L;
+  private long maxWait = 360000L;
 }

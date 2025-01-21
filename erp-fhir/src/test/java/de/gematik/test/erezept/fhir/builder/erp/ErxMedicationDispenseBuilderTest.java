@@ -17,17 +17,18 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
 import lombok.val;
@@ -40,8 +41,9 @@ import org.junitpioneer.jupiter.SetSystemProperty;
 class ErxMedicationDispenseBuilderTest extends ParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
-  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
-  void buildMedicationDispenseFixedValues(ErpWorkflowVersion version) {
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpWorkflowVersions")
+  void buildMedicationDispenseFixedValuesForOldVersions(ErpWorkflowVersion version) {
     val pzn = "06313728";
     val kbvItaVersion =
         ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
@@ -80,6 +82,52 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildMedicationDispenseFixedValues(ErpWorkflowVersion version) {
+    val pzn = "06313728";
+    val kbvItaVersion =
+        ParserConfigurations.getInstance().getAppropriateVersion(KbvItaErpVersion.class, version);
+
+    val kvnr = KVNR.from("X234567890");
+    val telematikId = "606358757";
+    val prescriptionId = "160.100.000.000.011.09";
+    val lotNumber = "123456";
+    val medicationDispenseBuilder =
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
+            .version(version)
+            .performerId(telematikId)
+            .prescriptionId(prescriptionId)
+            .status("completed") // default COMPLETED
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
+            .batch(lotNumber, new Date())
+            .wasSubstituted(true);
+
+    if (version.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+      medicationDispenseBuilder.medication(
+          KbvErpMedicationPZNFaker.builder()
+              .withPznMedication(pzn, fakerDrugName())
+              .withVersion(kbvItaVersion)
+              .fake());
+    } else {
+      medicationDispenseBuilder.medication(
+          GemErpMedicationFaker.builder().withPzn(PZN.from(pzn), fakerDrugName()).fake());
+    }
+
+    val medicationDispense = medicationDispenseBuilder.build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
+    assertTrue(result.isSuccessful());
+
+    assertNotNull(medicationDispense.getId());
+    assertEquals(kvnr, medicationDispense.getSubjectId());
+    assertEquals(PrescriptionId.from(prescriptionId), medicationDispense.getPrescriptionId());
+    assertTrue(medicationDispense.getDosageInstruction().isEmpty());
+    assertTrue(medicationDispense.getNote().isEmpty());
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpWorkflowVersions")
   void buildMedicationDispenseWithMultipleDosageInstructions(ErpWorkflowVersion version) {
     val pzn = "06313728";
     val kbvItaVersion =
@@ -126,7 +174,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
   @MethodSource(
-      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpFhirProfileVersions")
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildMedicationDispenseWithFaker01(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
@@ -153,7 +201,7 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   @ParameterizedTest(
       name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
   @MethodSource(
-      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpFhirProfileVersions")
   @ClearSystemProperty(key = "erp.fhir.profile")
   void buildMedicationDispenseWithFaker02(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
@@ -181,6 +229,30 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
   @MethodSource(
       "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
   @ClearSystemProperty(key = "erp.fhir.profile")
+  void throwExceptionWhileBuildMedicationDispenseWithFaker02(String erpFhirProfileVersion) {
+    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
+    val kvnr = KVNR.from("X234567890");
+    val performerId = "01234567890";
+    val prescriptionId = new PrescriptionId("200.100.000.000.011.09");
+    ErxMedicationDispenseBuilder erxMedicationDispensebuilder;
+    val medication = KbvErpMedicationPZNFaker.builder().fake();
+
+    if (erpFhirProfileVersion.compareTo(ErpWorkflowVersion.V1_3_0.getVersion()) <= 0) {
+      val gemMedication = GemErpMedication.fromMedication(medication);
+      erxMedicationDispensebuilder =
+          ErxMedicationDispenseBuilder.forKvnr(KVNR.random()).medication(gemMedication);
+    } else {
+      erxMedicationDispensebuilder =
+          ErxMedicationDispenseBuilder.forKvnr(KVNR.random()).medication(medication);
+    }
+    assertThrows(BuilderException.class, erxMedicationDispensebuilder::build);
+  }
+
+  @ParameterizedTest(
+      name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#oldErpFhirProfileVersions")
+  @ClearSystemProperty(key = "erp.fhir.profile")
   void buildMedicationDispenseWithFaker03(String erpFhirProfileVersion) {
     System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
     val kvnr = KVNR.from("X234567890");
@@ -204,15 +276,16 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
 
     assertEquals(performerId, medicationDispense.getPerformerIdFirstRep());
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4_0) < 0) {
-      assertEquals(pzn, medicationDispense.getErpMedicationFirstRep().getPznFirstRep());
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+      assertEquals(pzn, medicationDispense.getContainedKbvMedicationFirstRep().getPznFirstRep());
     } else {
-      assertTrue(medicationDispense.getErpMedication().isEmpty());
+      assertTrue(medicationDispense.getContainedKbvMedication().isEmpty());
     }
   }
 
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.3.0")
   @Test
-  void shouldBuildMedicationDispense120ByDefault() {
+  void shouldBuildMedicationDispenseWithDefaultVersion() {
     val kvnr = KVNR.from("X234567890");
     val performerId = "01234567890";
     val prescriptionId = new PrescriptionId("160.100.000.000.011.09");
@@ -269,5 +342,22 @@ class ErxMedicationDispenseBuilderTest extends ParsingTest {
     val profile = medicationDispense.getMeta().getProfile().get(0).asStringValue();
     val profileVersion = profile.split("\\|")[1];
     assertTrue(ErpWorkflowVersion.getDefaultVersion().isEqual(profileVersion));
+  }
+
+  @ParameterizedTest
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void shouldThrowOnDispensingWrongMedicationForProfileVersion(ErpWorkflowVersion version) {
+    val medicationDispenseBuilder =
+        ErxMedicationDispenseFaker.builder().withVersion(version).toBuilder();
+
+    if (version.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+      // v1.3.0 and below using GemErpMedication which is only available from v1.4.0
+      medicationDispenseBuilder.medication(GemErpMedicationFaker.builder().fake());
+    } else {
+      // v1.4.0 and above a GemErpMedication must be used instead
+      medicationDispenseBuilder.medication(KbvErpMedicationPZNFaker.builder().fake());
+    }
+
+    assertThrows(BuilderException.class, medicationDispenseBuilder::build);
   }
 }

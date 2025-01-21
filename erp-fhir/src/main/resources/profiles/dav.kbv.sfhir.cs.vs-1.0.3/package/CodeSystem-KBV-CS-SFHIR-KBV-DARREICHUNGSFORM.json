@@ -509,6 +509,10 @@
       "display": "LUTSCHTABLETTEN"
     },
     {
+      "code": "LYE",
+      "display": "LYE - Lyophilisat zum Einnehmen"
+    },
+    {
       "code": "LYO",
       "display": "LYO - Lyophilisat zur Herstellung einer Infusionslösung"
     },
@@ -707,6 +711,10 @@
     {
       "code": "PUD",
       "display": "PUDER"
+    },
+    {
+      "code": "PUE",
+      "display": "Pulver zum Einnehmen"
     },
     {
       "code": "PUL",

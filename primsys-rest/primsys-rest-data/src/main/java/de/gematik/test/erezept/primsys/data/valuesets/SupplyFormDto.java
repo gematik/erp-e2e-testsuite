@@ -19,16 +19,15 @@ package de.gematik.test.erezept.primsys.data.valuesets;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * corresponding to FHIR-ValueSet {@link de.gematik.test.erezept.fhir.valuesets.Darreichungsform}
  */
 @Getter
-@RequiredArgsConstructor
 public enum SupplyFormDto {
   AEO("AEO", "Ätherisches Öl"),
   AMP("AMP", "Ampullen"),
@@ -155,6 +154,7 @@ public enum SupplyFormDto {
   LTA("LTA", "Lacktabletten"),
   LUP("LUP", "Lutschpastillen"),
   LUT("LUT", "Lutschtabletten"),
+  LYE("LYE", "Lyophilisat zum Einnehmen", LocalDate.of(2025, 4, 1)),
   LYO("LYO", "Lyophilisat zur Herstellung einer Infusionslösung"), // ab eRp-FD v1.14.0 verfügbar
   // offizieller start 01.07.24
   MIL("MIL", "Milch"),
@@ -218,6 +218,7 @@ public enum SupplyFormDto {
   PSE("PSE", "Pulver zur Herstellung einer Suspension zum Einnehmen"),
   PST("PST", "Paste"),
   PUD("PUD", "Puder"),
+  PUE("PUE", "Pulver zum Einnehmen", LocalDate.of(2025, 4, 1)),
   PUL("PUL", "Pulver"),
   RED("RED", "Retard-Dragees"),
   REK("REK", "Retard-Kapseln"),
@@ -323,6 +324,17 @@ public enum SupplyFormDto {
 
   private final String code;
   @JsonValue private final String display;
+  private final LocalDate validFrom;
+
+  SupplyFormDto(String code, String display) {
+    this(code, display, LocalDate.of(1970, 1, 1));
+  }
+
+  SupplyFormDto(String code, String display, LocalDate validFrom) {
+    this.code = code;
+    this.display = display;
+    this.validFrom = validFrom;
+  }
 
   @JsonCreator
   public static SupplyFormDto fromCode(@NonNull String code) {

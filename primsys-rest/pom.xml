@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>0.10.0</version>
+        <version>0.10.1</version>
     </parent>
 
     <artifactId>primsys-rest</artifactId>
@@ -14,8 +14,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>primsys-rest-server</module>
         <module>primsys-rest-data</module>
+        <module>primsys-rest-server</module>
         <module>primsys-rest-client</module>
     </modules>
 

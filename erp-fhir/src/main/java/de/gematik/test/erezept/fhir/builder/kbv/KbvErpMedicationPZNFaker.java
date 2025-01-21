@@ -47,8 +47,7 @@ public class KbvErpMedicationPZNFaker {
         b ->
             b.darreichungsform(
                 GemFaker.fakerValueSet(
-                    Darreichungsform.class,
-                    List.of(Darreichungsform.LIV, Darreichungsform.IID, Darreichungsform.LYO))));
+                    Darreichungsform.class, List.of(Darreichungsform.PUE, Darreichungsform.LYE))));
     builderConsumers.put("amount", b -> b.amount(fakerAmount(), "Stk"));
   }
 

@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erp-eml</artifactId>
-    <version>0.10.0</version>
+    <version>0.10.1</version>
   </parent>
 
   <artifactId>epa-fhir</artifactId>
@@ -29,6 +29,10 @@
       <dependency>
           <groupId>de.gematik.test.erezept</groupId>
           <artifactId>erp-fhir</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>de.gematik.bbriccs</groupId>
+          <artifactId>fhir-coding-system-brick</artifactId>
       </dependency>
 
   </dependencies>

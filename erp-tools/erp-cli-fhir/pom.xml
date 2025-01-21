@@ -7,7 +7,7 @@
   <parent>
     <artifactId>erp-tools</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>0.10.0</version>
+    <version>0.10.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

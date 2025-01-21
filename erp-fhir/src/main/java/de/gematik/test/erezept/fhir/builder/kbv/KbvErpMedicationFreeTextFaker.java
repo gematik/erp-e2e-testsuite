@@ -45,8 +45,7 @@ public class KbvErpMedicationFreeTextFaker {
   }
 
   public KbvErpMedicationFreeTextFaker withDosageForm(String df) {
-    builderConsumers.computeIfPresent(
-        "darreichungsform", (key, defaultValue) -> b -> b.darreichung(df));
+    builderConsumers.put("darreichungsform", b -> b.darreichung(df));
     return this;
   }
 

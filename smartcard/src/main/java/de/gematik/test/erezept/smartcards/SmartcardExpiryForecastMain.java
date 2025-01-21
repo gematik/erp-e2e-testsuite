@@ -26,6 +26,7 @@ import de.gematik.bbriccs.smartcards.cfg.SmartcardConfigDto;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -37,11 +38,15 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.bouncycastle.cert.X509CertificateHolder;
 
 public class SmartcardExpiryForecastMain {
 
+  private static final DateFormat dateFormatter =
+      DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+  private static final Date today = new Date();
+
   public static void main(String[] args) throws IOException {
-    val today = new Date();
     val expiryForecast = 2;
     val expirationCalendar = Calendar.getInstance();
     expirationCalendar.setTime(today);
@@ -71,10 +76,11 @@ public class SmartcardExpiryForecastMain {
                                     .ifPresent(
                                         cert -> {
                                           val expiry = cert.getX509Certificate().getNotAfter();
-                                          val warn =
-                                              !cert.getX509CertificateHolder()
-                                                  .isValidOn(expiryWarnDate);
-                                          summary.addCertificate(cryptoSystem, "AUT", expiry, warn);
+                                          val forecast =
+                                              createExpiryColor(
+                                                  cert.getX509CertificateHolder(), expiryWarnDate);
+                                          summary.addCertificate(
+                                              cryptoSystem, "AUT", expiry, forecast);
                                         }));
 
                     if (card instanceof InstituteSmartcard instituteSmartcard) {
@@ -87,10 +93,11 @@ public class SmartcardExpiryForecastMain {
                                     .ifPresent(
                                         cert -> {
                                           val expiry = cert.getX509Certificate().getNotAfter();
-                                          val warn =
-                                              !cert.getX509CertificateHolder()
-                                                  .isValidOn(expiryWarnDate);
-                                          summary.addCertificate(cryptoSystem, "ENC", expiry, warn);
+                                          val forecast =
+                                              createExpiryColor(
+                                                  cert.getX509CertificateHolder(), expiryWarnDate);
+                                          summary.addCertificate(
+                                              cryptoSystem, "ENC", expiry, forecast);
                                         });
                               });
                     }
@@ -104,10 +111,11 @@ public class SmartcardExpiryForecastMain {
                                     .ifPresent(
                                         cert -> {
                                           val expiry = cert.getX509Certificate().getNotAfter();
-                                          val warn =
-                                              !cert.getX509CertificateHolder()
-                                                  .isValidOn(expiryWarnDate);
-                                          summary.addCertificate(cryptoSystem, "QES", expiry, warn);
+                                          val forecast =
+                                              createExpiryColor(
+                                                  cert.getX509CertificateHolder(), expiryWarnDate);
+                                          summary.addCertificate(
+                                              cryptoSystem, "QES", expiry, forecast);
                                         });
                               });
                     }
@@ -115,6 +123,8 @@ public class SmartcardExpiryForecastMain {
 
                   return summary;
                 })
+            .sorted(
+                Comparator.comparing(ss -> ss.totalForecast.ordinal(), Comparator.reverseOrder()))
             .toList();
 
     val hasExpiringCards = summaries.stream().anyMatch(SmartcardSummary::warn);
@@ -124,11 +134,11 @@ public class SmartcardExpiryForecastMain {
 
     sb.append("<h1>Smartcard Summary</h1>");
     sb.append("<p>Collected on ")
-        .append(today)
-        .append("smartcard forecast for ")
+        .append(dateFormatter.format(today))
+        .append(" smartcard forecast for ")
         .append(expiryForecast)
         .append(" Months")
-        .append("</p>");
+        .append("</p><hr />");
 
     summaries.forEach(
         summary -> {
@@ -146,8 +156,6 @@ public class SmartcardExpiryForecastMain {
           sb.append(
               "<table border='1'><tr><th>CryptoSystem</th><th>Usage</th><th>Expiry</th></tr>");
 
-          val dateColor = summary.warn() ? "red" : "green";
-
           summary.certificates.forEach(
               cert -> {
                 sb.append("<tr><td>")
@@ -155,12 +163,12 @@ public class SmartcardExpiryForecastMain {
                     .append("</td><td>")
                     .append(cert.usage)
                     .append("</td><td bgcolor=\"")
-                    .append(dateColor)
+                    .append(cert.forecast.color)
                     .append("\">")
-                    .append(cert.expiry)
+                    .append(dateFormatter.format(cert.expiry))
                     .append("</td></tr>");
               });
-          sb.append("</table>");
+          sb.append("</table><hr />");
         });
 
     sb.append("</body></html>");
@@ -170,6 +178,20 @@ public class SmartcardExpiryForecastMain {
       System.exit(1);
     } else {
       System.exit(0);
+    }
+  }
+
+  private static ExpiryForecast createExpiryColor(
+      X509CertificateHolder certificateHolder, Date forecastDate) {
+    val alreadyExpired = !certificateHolder.isValidOn(today);
+    if (alreadyExpired) {
+      return ExpiryForecast.EXPIRED;
+    }
+    val expiresSoon = !certificateHolder.isValidOn(forecastDate);
+    if (expiresSoon) {
+      return ExpiryForecast.EXPIRES_SOON;
+    } else {
+      return ExpiryForecast.VALID;
     }
   }
 
@@ -190,19 +212,36 @@ public class SmartcardExpiryForecastMain {
     private final String owner;
     private final String note;
     private final List<CertificateSummary> certificates = new LinkedList<>();
-    private boolean warn;
+    private ExpiryForecast totalForecast = ExpiryForecast.VALID;
 
-    public void addCertificate(CryptoSystem cryptoSystem, String usage, Date expiry, boolean warn) {
-      certificates.add(new CertificateSummary(cryptoSystem, usage, expiry));
-      if (!this.warn) {
-        this.warn = warn;
-      }
+    public void addCertificate(
+        CryptoSystem cryptoSystem, String usage, Date expiry, ExpiryForecast forecast) {
+      certificates.add(new CertificateSummary(cryptoSystem, usage, expiry, forecast));
+      this.totalForecast = totalForecast.adjust(forecast);
     }
 
     public boolean warn() {
-      return warn;
+      return !this.totalForecast.equals(ExpiryForecast.VALID);
     }
   }
 
-  private record CertificateSummary(CryptoSystem cryptoSystem, String usage, Date expiry) {}
+  private record CertificateSummary(
+      CryptoSystem cryptoSystem, String usage, Date expiry, ExpiryForecast forecast) {}
+
+  @RequiredArgsConstructor
+  private enum ExpiryForecast {
+    VALID("#00AA00"),
+    EXPIRES_SOON("#FFAA00"),
+    EXPIRED("#CC0000");
+
+    private final String color;
+
+    public ExpiryForecast adjust(ExpiryForecast forecast) {
+      if (forecast.ordinal() > this.ordinal()) {
+        return forecast;
+      } else {
+        return this;
+      }
+    }
+  }
 }

@@ -1,71 +1,87 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.10.0
+
+Module:
+
+* erp-e2e:
+    - MedicationDispense in ErpProfile version 1.4.0 is enabled in E2E scope while using gematik-Medication and
+      ErpDispense in parameter structure
+* erp-fd-product-test:
+  - Adapted the TestSzenario to validate the availability of PUE and LYE
+  - Add toggle to activate Validation for PUE and LYE
+  - GemErpMedicationBuilder got a "from()" Method to map KbvMedications to GemErpMedication in types of: ingredient,
+    freetext and PZN. you´ll need it to transfer Medications from Version 1.3 and below up to 1.4.x
+    ->> mapping of Medication Compounding doesn't work valid at the moment (fix  is work in progress) 
+* erp-fhir:
+    - Extension of the key table "Darreichungsform" to include "PUE - Pulver zum Einnehmen" and "LYE - Lyophilisat zum Einnehmen"
+
 ## Release 0.9.1
 
 Module:
 
 * erp-eml:
-  - new Epa-Resources available, for Example EpaMedication, EpaMedicationDispense, EpaMedicationRequest,
-    EpaOrganisation, EpaPractitioner, ErpPrescriptionId, RxPrescriptionId, EpaOpCancelDispensation,
-    EpaOpCancelPrescription, EpaOpProvideDispensation, EpaOpProvideDispensation
-  - add Verifier for Eml-MedicationDispense
-  - EpaFhir Version 1.0.3
+    - new Epa-Resources available, for Example EpaMedication, EpaMedicationDispense, EpaMedicationRequest,
+      EpaOrganisation, EpaPractitioner, ErpPrescriptionId, RxPrescriptionId, EpaOpCancelDispensation,
+      EpaOpCancelPrescription, EpaOpProvideDispensation, EpaOpProvideDispensation
+    - add Verifier for Eml-MedicationDispense
+    - EpaFhir Version 1.0.3
 * erp-fd-product-test:
-  - new Testcase for epa-op-provide-prescription-erp-input-parameters with
-    6 validators for epa-op-provide-prescription-erp-input-parameters
-  - new Testcase for epa-op-provide-dispensation-erp-input-parameters with
-    5 validators for epa-op-provide-prescription-erp-input-parameters
-  - Add two verifiers for epa-op-cancel-prescription-erp-input-parameters
-  - Add two verifiers for epa-op-cancel-dispensation-erp-input-parameters
-  - new Testcases for epa-op-cancel-prescription-erp-input-parameters
+    - new Testcase for epa-op-provide-prescription-erp-input-parameters with
+      6 validators for epa-op-provide-prescription-erp-input-parameters
+    - new Testcase for epa-op-provide-dispensation-erp-input-parameters with
+      5 validators for epa-op-provide-prescription-erp-input-parameters
+    - Add two verifiers for epa-op-cancel-prescription-erp-input-parameters
+    - Add two verifiers for epa-op-cancel-dispensation-erp-input-parameters
+    - new Testcases for epa-op-cancel-prescription-erp-input-parameters
 * primsys-rest:
-  - Faker REST-API for FHIR-Resources
+    - Faker REST-API for FHIR-Resources
 * Remote FdV
-  - Add status in-progress and cancelled to the prescription scheme
-  - Add lastMedicationDispense (date-time) to the prescription scheme
+    - Add status in-progress and cancelled to the prescription scheme
+    - Add lastMedicationDispense (date-time) to the prescription scheme
 * erp-e2e
-  - refactored IssuePrescription to build different medicationTypes in E2E Testsuite
-   
+    - refactored IssuePrescription to build different medicationTypes in E2E Testsuite
+
 ## Release 0.8.1
 
 Module:
 
 * erp-eml:
-  - Add new Module named epa-eml to test and validate Epa-Fhir content
-  - this Module contains an EpaFhirFactory Class, in which the B²ric²s validator is accessible and configurable with
-    src/main/resources/fhir/configuration.yaml
-  - also the first profiles and Examples are stored
-  - Implement epa-mock-client for ePa-Mock
-  - Implement polling logic in the ePa mock client for the downloadRequestByKvnr and downloadRequestByPrescriptionId
-    functions.
-  - Implement epa-mock-client for ePa-Mock
+    - Add new Module named epa-eml to test and validate Epa-Fhir content
+    - this Module contains an EpaFhirFactory Class, in which the B²ric²s validator is accessible and configurable with
+      src/main/resources/fhir/configuration.yaml
+    - also the first profiles and Examples are stored
+    - Implement epa-mock-client for ePa-Mock
+    - Implement polling logic in the ePa mock client for the downloadRequestByKvnr and downloadRequestByPrescriptionId
+      functions.
+    - Implement epa-mock-client for ePa-Mock
 * erp-client:
-  - GetOcspRequestParamBuilder to use in GetOCSPRequest
-  - C_11530: add generic BundlePagingCommand to get previous or next bundleSet based on specific bundle
-  - add QueryParam extracting Method to IQueryParameters
-  - extends SearchQueryBuilder in IQueryParameter
-  - add QueryParams builder in IQueryParameters for whenHandedOver, whenPrepared, fromPerformer, withOffset, -Count,
-    -Sort
-  - C_11574: split $dispense and $close operation to do both separately.
-  - C_11574: add DispenseOperation and CloseOperation to handle Dispense and Close operations separate
-  - C_11574: add new dispense operation without sending a Secret for special Testcases
+    - GetOcspRequestParamBuilder to use in GetOCSPRequest
+    - C_11530: add generic BundlePagingCommand to get previous or next bundleSet based on specific bundle
+    - add QueryParam extracting Method to IQueryParameters
+    - extends SearchQueryBuilder in IQueryParameter
+    - add QueryParams builder in IQueryParameters for whenHandedOver, whenPrepared, fromPerformer, withOffset, -Count,
+      -Sort
+    - C_11574: split $dispense and $close operation to do both separately.
+    - C_11574: add DispenseOperation and CloseOperation to handle Dispense and Close operations separate
+    - C_11574: add new dispense operation without sending a Secret for special Testcases
 * erp-fd-product-test:
-  - add action GetOCSPRequest to call Certificate from FD for C_11598
-  - add action GetTslList to download filter it.
-  - add StoreChargeItem with minimal Builder in Pr-Test for C_11617
-  - C_11530: add generic DownloadBundle Question
-  - C_11530: add GenericBundleVerifier to use on SearchSetBundles for basic BundleStructures
-  - C_11530: extends TaskBundleVerifier to handle SearchSetBundles and compare their entries and relations
-  - C_11530: add MedicationRequestVerifier to handle MedicationRequests and compare their entries and relations
-  - extends CommunicationBundleVerifier to handle SearchSetBundles and compare their entries and relations
-  - Extension of the key table "Darreichungsform" to include "Injektions- und Infusionsdispersion (IID)" and "Lösung
-    zur intravesikalen Anwendung (LIV)"
-  - Implenmented TestSzenario to validate the availability of IID and LIV
-  - Add toggle to activate Validation for IID and LIV
-  - Implemented TestScenario to test if the KbvBundle without MedicationRequest resource and using MedicationCategory
-    different than 00 the FHIR response is equal to 400.
+    - add action GetOCSPRequest to call Certificate from FD for C_11598
+    - add action GetTslList to download filter it.
+    - add StoreChargeItem with minimal Builder in Pr-Test for C_11617
+    - C_11530: add generic DownloadBundle Question
+    - C_11530: add GenericBundleVerifier to use on SearchSetBundles for basic BundleStructures
+    - C_11530: extends TaskBundleVerifier to handle SearchSetBundles and compare their entries and relations
+    - C_11530: add MedicationRequestVerifier to handle MedicationRequests and compare their entries and relations
+    - extends CommunicationBundleVerifier to handle SearchSetBundles and compare their entries and relations
+    - Extension of the key table "Darreichungsform" to include "Injektions- und Infusionsdispersion (IID)" and "Lösung
+      zur intravesikalen Anwendung (LIV)"
+    - Implenmented TestSzenario to validate the availability of IID and LIV
+    - Add toggle to activate Validation for IID and LIV
+    - Implemented TestScenario to test if the KbvBundle without MedicationRequest resource and using MedicationCategory
+      different than 00 the FHIR response is equal to 400.
 * erp-fhir-fuzzing:
-  - Add Manipulator to handle different entries in the KbvBundle.
+    - Add Manipulator to handle different entries in the KbvBundle.
 * erp-fhir:
     - add FHIR E-Rezept Workflow Version 1.3 (de.gematik.erezept-workflow.r4)
 * primsys-rest:
@@ -142,8 +158,8 @@ Implemented features:
 
 - Fhir Profile Support for KBV, DAV, GKV, PKV and gematik for the generation of test data and
   validation of fhir resources from July 1, 2023
-  - An overview of the Fhir profile versions can be found
-    at https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc#%C3%BCbersicht-timeline
+    - An overview of the Fhir profile versions can be found
+      at https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc#%C3%BCbersicht-timeline
 - Refactoring of the smartcard module
 - Expansion of test cases of the test preparation for the admission tests for the e-prescription
   service

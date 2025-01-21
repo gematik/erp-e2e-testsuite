@@ -45,7 +45,7 @@ class ErxMedicationDispenseTest extends ParsingTest {
     assertEquals(new PrescriptionId("12345678"), medicationDispense.getPrescriptionId());
     assertFalse(medicationDispense.isDiGA());
 
-    val medication = medicationDispense.getErpMedicationFirstRep();
+    val medication = medicationDispense.getContainedKbvMedicationFirstRep();
     assertNotNull(medication, "MedicationDispense must contain at leas one Medication");
 
     assertEquals(MedicationCategory.C_00, medication.getCategoryFirstRep());

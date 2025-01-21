@@ -249,14 +249,14 @@ class MedicationDispenseBundleVerifierTest extends ParsingTest {
 
   @Test
   void shouldDetectCorrectContainedMedicationDispenses() {
-    val step = verifyContainedMedicationDispensePZNs(validMedDisp.getMedicationDispenses());
+    val step = containsAllPZNsForOldProfiles(validMedDisp.getMedicationDispenses());
     assertDoesNotThrow(() -> step.apply(validMedDisp));
   }
 
   @Test
   void shouldThrowWhileDetectingCorrectContainedMedicationDispenses() {
     val partOfMedDisp = validMedDisp.getMedicationDispenses().subList(0, 4);
-    val step = verifyContainedMedicationDispensePZNs(partOfMedDisp);
+    val step = containsAllPZNsForOldProfiles(partOfMedDisp);
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 
@@ -264,7 +264,19 @@ class MedicationDispenseBundleVerifierTest extends ParsingTest {
   void shouldThrowWhileDetectingAMissingContainedMedicationDispenses() {
     val medDispList = List.of(ErxMedicationDispenseFaker.builder().withPzn("123456789").fake());
 
-    val step = verifyContainedMedicationDispensePZNs(medDispList);
+    val step = containsAllPZNsForOldProfiles(medDispList);
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldDetectCorrectContainedMedicationDispensesForNewProfiles() {
+    val simpleMedDispBundle =
+        parser.decode(
+            ErxMedicationDispenseBundle.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-SimpleMedicationDispenseBundle.json"));
+
+    val step = containsAllPZNsForNewProfiles(simpleMedDispBundle.getMedications());
+    assertDoesNotThrow(() -> step.apply(simpleMedDispBundle));
   }
 }

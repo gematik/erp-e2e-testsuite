@@ -170,7 +170,7 @@ public class GetMessagesIT extends ErpTest {
             .isCorrect());
     val task = prescribe(assignmentKind, hanna);
     val counterToSendMessages = 5;
-    val expectation = countOfNewMessages + counterToSendMessages;
+    val expectation = Math.min(50, countOfNewMessages + counterToSendMessages);
     sendMultipleDispenseRequestsAndCount(
         hanna, woodlandPharma, task, supplyOptionsType, counterToSendMessages);
 

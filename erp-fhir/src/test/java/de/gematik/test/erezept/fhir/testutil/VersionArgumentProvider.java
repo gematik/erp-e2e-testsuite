@@ -25,16 +25,35 @@ import lombok.*;
 import org.junit.jupiter.params.provider.*;
 
 public class VersionArgumentProvider {
-
+  /**
+   * caused by a breakingChange from ErpWorkflowVersion.V1_3_0 to ErpWorkflowVersion.V1_4_0 in this
+   * case you´ll get only V1_2_0 & V1_3_0
+   *
+   * @return ErpWorkflowVersion.V1_2_0, ErpWorkflowVersion.V1_3_0
+   */
   public static Stream<Arguments> erpFhirProfileVersions() {
     // TODO: get rid of the support for building 1.1.1 profiles
     //    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
     return Stream.of(Arguments.of("1.2.0"), Arguments.of("1.3.0"), Arguments.of("1.4.0"));
   }
 
+  public static Stream<Arguments> oldErpFhirProfileVersions() {
+    // TODO: get rid of the support for building 1.1.1 profiles   commanded out, until builder for
+    // gemMedication ist seperated ...
+    //    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
+    return Stream.of(Arguments.of("1.2.0"), Arguments.of("1.3.0"));
+  }
+
   public static Stream<Arguments> erpWorkflowVersions() {
     return Arrays.stream(ErpWorkflowVersion.values())
         .filter(v -> !v.equals(ErpWorkflowVersion.V1_1_1))
+        .map(Arguments::of);
+  }
+
+  public static Stream<Arguments> oldErpWorkflowVersions() {
+    return Arrays.stream(ErpWorkflowVersion.values())
+        .filter(v -> !v.equals(ErpWorkflowVersion.V1_1_1))
+        .filter(v -> !v.equals(ErpWorkflowVersion.V1_4_0))
         .map(Arguments::of);
   }
 

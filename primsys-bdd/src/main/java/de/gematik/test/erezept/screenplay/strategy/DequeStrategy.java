@@ -23,7 +23,6 @@ import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
 import java.util.Comparator;
 import java.util.List;
-import lombok.NonNull;
 import lombok.val;
 
 /**
@@ -39,7 +38,7 @@ public enum DequeStrategy {
   LIFO,
   ;
 
-  public <T> T chooseFrom(@NonNull List<T> objects) {
+  public <T> T chooseFrom(List<T> objects) {
     if (objects.isEmpty()) {
       throw new MissingPreconditionError(format("Cannot deque with {0} from empty list", this));
     }
@@ -53,16 +52,26 @@ public enum DequeStrategy {
     return ret;
   }
 
-  public <T> T chooseFrom(@NonNull ManagedList<T> managedList) {
+  public <T> T chooseFrom(ManagedList<T> managedList) {
     return chooseFrom(managedList.getRawList());
   }
 
-  public <T> T chooseFrom(@NonNull List<T> objects, @NonNull Comparator<? super T> comparator) {
+  public <T> T chooseFrom(List<T> objects, Comparator<? super T> comparator) {
     val sorted = objects.stream().sorted(comparator.reversed()).toList();
     return chooseFrom(sorted);
   }
 
-  public <T> void removeFrom(@NonNull ManagedList<T> managedList) {
+  public <T> T consume(ManagedList<T> managedList) {
+    return consume(managedList.getRawList());
+  }
+
+  public <T> T consume(List<T> objects) {
+    val ret = chooseFrom(objects);
+    objects.remove(ret);
+    return ret;
+  }
+
+  public <T> void removeFrom(ManagedList<T> managedList) {
     val item = chooseFrom(managedList);
     managedList.getRawList().remove(item);
   }

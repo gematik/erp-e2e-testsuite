@@ -16,10 +16,19 @@
 
 package de.gematik.test.erezept.fhir.resources.erp;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
 @ResourceDef(name = "Bundle")
@@ -29,7 +38,91 @@ public class ErxMedicationDispenseBundle extends Bundle {
   public List<ErxMedicationDispense> getMedicationDispenses() {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
+        .filter(resource -> resource.getResourceType().equals(ResourceType.MedicationDispense))
+        // TODO: we'll have an easier way with bricks for that
+        .filter(
+            resource -> {
+              val profile = resource.getMeta().getProfile().get(0);
+              return ErpWorkflowStructDef.MEDICATION_DISPENSE_12.match(profile)
+                  || ErpWorkflowStructDef.MEDICATION_DISPENSE.match(profile);
+            })
         .map(ErxMedicationDispense::fromMedicationDispense)
+        .toList();
+  }
+
+  public List<GemErpMedication> getMedications() {
+    return this.getEntry().stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(resource -> resource.getResourceType().equals(ResourceType.Medication))
+        // TODO: we'll have an easier way with bricks for that
+        .filter(
+            resource -> {
+              val profile = resource.getMeta().getProfile().get(0);
+              return ErpWorkflowStructDef.MEDICATION.match(profile);
+            })
+        .map(GemErpMedication::fromMedication)
+        .toList();
+  }
+
+  /**
+   * Get the pair of corresponding MedicationDispense and GemErpMedication by prescriptionId
+   * <b>Attention:</b> this method will only work for FHIR profiles 1.4.0 onwards
+   *
+   * @param prescriptionId of the prescription for which the dispensation was performed
+   * @return a list of pairs of MedicationDispense and GemErpMedication
+   */
+  public List<Pair<ErxMedicationDispense, GemErpMedication>> getDispensePairBy(
+      PrescriptionId prescriptionId) {
+    val mds = this.getMedicationDispenses();
+    val medications = this.getMedications();
+
+    return mds.stream()
+        .filter(md -> md.getPrescriptionId().getValue().equals(prescriptionId.getValue()))
+        .map(
+            md -> {
+              val medicationRef =
+                  md.getMedicationReference().getReference().replace("urn:uuid:", "");
+              val medication =
+                  medications.stream()
+                      .filter(m -> m.getId().contains(medicationRef))
+                      .findFirst()
+                      .orElseThrow(
+                          () ->
+                              new MissingFieldException(
+                                  this.getClass(),
+                                  format(
+                                      "Medication with reference {0} for {1}",
+                                      medicationRef, prescriptionId.getValue())));
+              return Pair.of(md, medication);
+            })
+        .toList();
+  }
+
+  /**
+   * Get the pair of corresponding MedicationDispense and KbvErpMedication (which is contained
+   * within the MedicationDispense) by prescriptionId <b>Attention:</b> this method will only work
+   * up to FHIR profiles 1.3.0
+   *
+   * @param prescriptionId of the prescription for which the dispensation was performed
+   * @return a list of pairs of MedicationDispense and KbvErpMedication
+   */
+  public List<Pair<ErxMedicationDispense, KbvErpMedication>> unpackDispensePairBy(
+      PrescriptionId prescriptionId) {
+    return this.getMedicationDispenses().stream()
+        .filter(md -> md.getPrescriptionId().getValue().equals(prescriptionId.getValue()))
+        .map(
+            md -> {
+              val containedMedication =
+                  md.getContained().stream()
+                      .filter(c -> c.getResourceType().equals(ResourceType.Medication))
+                      .map(KbvErpMedication::fromMedication)
+                      .findFirst()
+                      .orElseThrow(
+                          () ->
+                              new MissingFieldException(
+                                  this.getClass(), "Contained KbvErpMedication"));
+              return Pair.of(md, containedMedication);
+            })
         .toList();
   }
 }

@@ -44,7 +44,7 @@ public class ResourcePrinter {
     ps.println(
         format(
             "Abgabe durch: {0} am {1}", md.getPerformerIdFirstRep(), md.getZonedWhenHandedOver()));
-    md.getErpMedication()
+    md.getContainedKbvMedication()
         .forEach(med -> ps.println(format("\tMedikament: {0}", med.getDescription())));
   }
 }

@@ -26,6 +26,7 @@ import de.gematik.test.erezept.tasks.EnsureConsent;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @AllArgsConstructor
@@ -48,6 +49,7 @@ public class GrantConsent extends ErpAction<ErxConsent> {
   }
 
   @Override
+  @Step("{0} sendet eine Einwilligung zum hinterlegen von Rechnungsinformationen an den Fachdienst")
   public ErpInteraction<ErxConsent> answeredBy(Actor actor) {
     if (ensureConsentIsUnset) EnsureConsent.shouldBeUnset().performAs(actor);
     if (kvnr == null) {

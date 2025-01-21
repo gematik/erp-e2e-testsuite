@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.exceptions.FhirValidationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
+import de.gematik.test.erezept.eml.EpaMockDownloadRequest;
 import de.gematik.test.erezept.eml.ErpEmlLog;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
@@ -57,7 +59,9 @@ class UseTheEpaMockClientTest {
     val bRequest = new HttpBRequest(HttpRequestMethod.GET, "provide-prescription-erp", body);
     val mockErpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
 
-    when(mockClientMock.pollRequest(any())).thenReturn(List.of(mockErpEmlLog));
+    when(mockClientMock.pollRequest(
+            any(EpaMockDownloadRequest.class), eq("provide-prescription-erp")))
+        .thenReturn(List.of(mockErpEmlLog));
 
     val useEpaMockClient = UseTheEpaMockClient.with(mockClientMock);
     val result = useEpaMockClient.downloadProvidePrescriptionBy(prescriptionId);
@@ -77,7 +81,9 @@ class UseTheEpaMockClientTest {
     val bRequest = new HttpBRequest(HttpRequestMethod.GET, "provide-dispensation-erp", body);
     val erpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
 
-    when(mockClientMock.pollRequest(any())).thenReturn(List.of(erpEmlLog));
+    when(mockClientMock.pollRequest(
+            any(EpaMockDownloadRequest.class), eq("provide-dispensation-erp")))
+        .thenReturn(List.of(erpEmlLog));
 
     val useEpaMockClient = UseTheEpaMockClient.with(mockClientMock);
     assertThrows(
@@ -95,7 +101,9 @@ class UseTheEpaMockClientTest {
 
     val bRequest = new HttpBRequest(HttpRequestMethod.GET, "provide-dispensation-erp", body);
     val mockErpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
-    when(mockClientMock.pollRequest(any())).thenReturn(List.of(mockErpEmlLog));
+    when(mockClientMock.pollRequest(
+            any(EpaMockDownloadRequest.class), eq("provide-dispensation-erp")))
+        .thenReturn(List.of(mockErpEmlLog));
     val useEpaMockClient = UseTheEpaMockClient.with(mockClientMock);
 
     val result = useEpaMockClient.downloadProvideDispensationBy(prescriptionId);
@@ -115,7 +123,9 @@ class UseTheEpaMockClientTest {
     val bRequest = new HttpBRequest(HttpRequestMethod.GET, "cancel-prescription-erp", body);
     val mockErpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
 
-    when(mockClientMock.pollRequest(any())).thenReturn(List.of(mockErpEmlLog));
+    when(mockClientMock.pollRequest(
+            any(EpaMockDownloadRequest.class), eq("cancel-prescription-erp")))
+        .thenReturn(List.of(mockErpEmlLog));
 
     val useEpaMockClient = UseTheEpaMockClient.with(mockClientMock);
 

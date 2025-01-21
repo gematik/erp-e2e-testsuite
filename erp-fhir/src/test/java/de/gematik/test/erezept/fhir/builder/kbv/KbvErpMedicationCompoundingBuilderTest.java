@@ -26,6 +26,7 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructD
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -161,6 +162,26 @@ class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
   @Test
   void fakerWithoutRequiredShouldThrowException() {
     val builder5 = KbvErpMedicationCompoundingBuilder.builder().darreichungsform("Zäpfchen");
+    assertThrows(BuilderException.class, builder5::build);
+  }
+
+  @Test
+  void fakerWithoutRequiredShouldThrowException5() {
+    val builder5 =
+        KbvErpMedicationCompoundingBuilder.builder()
+            .darreichungsform("Zäpfchen")
+            .medicationIngredient(PZN.random().getValue(), "testText");
+    assertThrows(BuilderException.class, builder5::build);
+  }
+
+  @Test
+  void fakerWithoutRequiredShouldThrowExceptionWhilePackagingAndProductionInstruction() {
+    val builder5 =
+        KbvErpMedicationCompoundingBuilder.builder()
+            .darreichungsform("Zäpfchen")
+            .medicationIngredient(PZN.random().getValue(), "testText")
+            .productionInstruction(ProductionInstruction.random())
+            .packaging("packung");
     assertThrows(BuilderException.class, builder5::build);
   }
 }

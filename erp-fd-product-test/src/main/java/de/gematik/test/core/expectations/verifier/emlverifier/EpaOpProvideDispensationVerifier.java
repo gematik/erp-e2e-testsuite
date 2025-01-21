@@ -27,6 +27,7 @@ import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
@@ -135,6 +136,14 @@ public class EpaOpProvideDispensationVerifier {
     return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
             EmlAfos.A_25949.getRequirement(),
             format("Die EpaOrganisation muss die TelematikId {0} enthalten", hbaTelematikId))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<List<EpaOpProvideDispensation>> emlDoesNotContainAnything() {
+    Predicate<List<EpaOpProvideDispensation>> predicate = List::isEmpty;
+    return new VerificationStep.StepBuilder<List<EpaOpProvideDispensation>>(
+            EmlAfos.A_25951.getRequirement(), "Eml besitzt eine leere Liste")
         .predicate(predicate)
         .accept();
   }

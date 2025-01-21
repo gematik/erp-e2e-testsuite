@@ -157,6 +157,7 @@ public enum Darreichungsform implements IValueSet {
   LTA("LTA", "Lacktabletten"),
   LUP("LUP", "Lutschpastillen"),
   LUT("LUT", "Lutschtabletten"),
+  LYE("LYE", "Lyophilisat zum Einnehmen", LocalDate.of(2025, 4, 1)),
   LYO("LYO", "Lyophilisat zur Herstellung einer Infusionslösung"), // ab eRp-FD v1.14.0 verfügbar
   MIL("MIL", "Milch"),
   MIS("MIS", "Mischung"),
@@ -219,6 +220,7 @@ public enum Darreichungsform implements IValueSet {
   PSE("PSE", "Pulver zur Herstellung einer Suspension zum Einnehmen"),
   PST("PST", "Paste"),
   PUD("PUD", "Puder"),
+  PUE("PUE", "Pulver zum Einnehmen", LocalDate.of(2025, 4, 1)),
   PUL("PUL", "Pulver"),
   RED("RED", "Retard-Dragees"),
   REK("REK", "Retard-Kapseln"),

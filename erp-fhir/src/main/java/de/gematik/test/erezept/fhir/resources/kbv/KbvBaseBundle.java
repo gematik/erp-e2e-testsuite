@@ -18,16 +18,15 @@ package de.gematik.test.erezept.fhir.resources.kbv;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.resources.ErpFhirResource;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
-import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.ResourceType;
 
@@ -87,27 +86,10 @@ public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
         .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Practitioner));
   }
 
-  /**
-   * Returns the Organization which issued the prescription. This is usually a medical practice
-   * which has a BSNR. In case of an GKV prescription this should be the only organization within
-   * the KbvErpBundle. However, if this is a PKV prescription this KbvErpBundle will hold at least
-   * to different organizations: one which issued the prescription and a second one for organization
-   * which assigned the healthcare insurance number to patient who receives this prescription
-   *
-   * @return the KbvMedicalOrganization
-   */
   public MedicalOrganization getMedicalOrganization() {
     return this.entry.stream()
         .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Organization))
-        .filter(
-            orgEntry ->
-                ((Organization) orgEntry.getResource())
-                    .getIdentifier().stream()
-                        .map(identifier -> identifier.getType().getCodingFirstRep())
-                        .anyMatch(
-                            coding ->
-                                coding.getSystem().equals(BSNR.getCodeSystemUrl())
-                                    && coding.getCode().equals(BSNR.getCode())))
+        .filter(entry -> KbvItaForStructDef.ORGANIZATION.match(entry.getResource().getMeta()))
         .map(
             entry ->
                 FhirEntryReplacer.cast(

@@ -56,7 +56,7 @@ class ExternalAuthenticateCommandTest {
 
   @Test
   void shouldCreateValidSignatureWithECC() {
-    val hba = sca.getHbaByICCSN("80276883110000121166");
+    val hba = sca.getHbaByICCSN("80276001011699901726");
     val cardHandle = mockKonnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
 
     val externalAuthenticateCommand =

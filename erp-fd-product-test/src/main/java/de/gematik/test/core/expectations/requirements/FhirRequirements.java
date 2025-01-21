@@ -30,7 +30,13 @@ public enum FhirRequirements implements RequirementsSet {
   FHIR_XML_PARSING("FHIR_XML_PARSING", "Invalide FHIR Ressourcen dürfen nicht zum Absturz führen"),
 
   FHIR_VALIDATION_ERROR("FHIR-Validation", "die Semantik entspricht nicht der Profilierung"),
+  DATE_TIME_CONSTRAINT(
+      "DATE_TIME_CONSTRAINT",
+      "C_11654 - Die Anforderung A_22073 - E-Rezept-Fachdienst - Task schliessen - Datum"
+          + " MedicationDispense whenHandedOver beschreibt eine Übergangszeit für die Angabe des"
+          + " Formats. Diese Übergangszeit ist nicht mehr relevant."),
   ;
+
   @Getter private final Requirement requirement;
 
   FhirRequirements(String id, String description) {

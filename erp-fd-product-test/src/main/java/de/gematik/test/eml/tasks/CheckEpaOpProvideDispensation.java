@@ -64,7 +64,7 @@ public class CheckEpaOpProvideDispensation implements Task {
         List.of(
             emlDispensationIdIsEqualTo(medicationDispense.getPrescriptionId()),
             emlHandedOverIsEqualTo(medicationDispense.getWhenHandedOver()),
-            emlMedicationMapsTo(medicationDispense.getErpMedicationFirstRep()),
+            emlMedicationMapsTo(medicationDispense.getContainedKbvMedicationFirstRep()),
             emlMedicationDispenseMapsTo(medicationDispense),
             emlOrganisationHasSmcbTelematikId(tidSmcb));
 

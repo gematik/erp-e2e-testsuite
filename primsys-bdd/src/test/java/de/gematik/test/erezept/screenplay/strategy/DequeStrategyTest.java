@@ -73,6 +73,22 @@ class DequeStrategyTest {
   }
 
   @Test
+  void shouldConsumeFromManagedList() {
+    val managed = new ManagedList<>(() -> "empty");
+    managed.append("first");
+    managed.append("second");
+    managed.append("third");
+
+    assertEquals(3, managed.getRawList().size());
+    assertEquals("first", FIFO.consume(managed));
+    assertEquals(2, managed.getRawList().size());
+    assertEquals("third", LIFO.consume(managed));
+    assertEquals(1, managed.getRawList().size());
+    assertEquals("second", LIFO.consume(managed));
+    assertTrue(managed.getRawList().isEmpty());
+  }
+
+  @Test
   void failOnRemoveFromEmptyList() {
     val managed = new ManagedList<>(() -> "empty");
     val strategies = List.of(FIFO, LIFO);

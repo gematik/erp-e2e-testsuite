@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -37,5 +40,27 @@ class StandardSizeDtoTest {
   @Test
   void shouldThrowOnNullCode() {
     assertThrows(NullPointerException.class, () -> StandardSizeDto.fromCode(null));
+  }
+
+  @Test
+  void shouldHaveAllStandardsizes() {
+    Arrays.stream(StandardSize.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> StandardSizeDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraStandardsizes() {
+    Arrays.stream(StandardSizeDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> StandardSize.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

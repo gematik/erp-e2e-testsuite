@@ -28,6 +28,7 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -51,13 +52,31 @@ class DispensePrescriptionTest {
   }
 
   @Test
-  void shouldPerformDispensationCorrect() {
+  void shouldPerformDispensationCorrectWithMedDsp() {
     val taskId = TaskId.from("123456789");
     val secret = Secret.fromString("123456789");
 
     val action =
         DispensePrescription.forPrescription(taskId, secret)
             .withMedDsp(List.of(ErxMedicationDispenseFaker.builder().fake()));
+
+    val resource = new ErxMedicationDispenseBundle();
+    val response =
+        ErpResponse.forPayload(resource, ErxMedicationDispenseBundle.class)
+            .withStatusCode(200)
+            .withHeaders(Map.of())
+            .andValidationResult(createEmptyValidationResult());
+    when(useErpClient.request(any(DispensePrescriptionAsBundleCommand.class))).thenReturn(response);
+    assertDoesNotThrow(() -> pharmacy.performs(action));
+  }
+
+  @Test
+  void shouldPerformDispensationCorrectWithParameters() {
+    val taskId = TaskId.from("123456");
+    val secret = Secret.fromString("123456");
+
+    val params = new GemDispenseOperationParameters();
+    val action = DispensePrescription.forPrescription(taskId, secret).withParameters(params);
 
     val resource = new ErxMedicationDispenseBundle();
     val response =

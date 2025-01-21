@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
 import one.util.streamex.EntryStream;
+import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 public class UseTheEpaMockClient implements Ability {
@@ -55,59 +56,27 @@ public class UseTheEpaMockClient implements Ability {
 
   public List<EpaOpProvidePrescription> downloadProvidePrescriptionBy(
       PrescriptionId prescriptionId) {
-
     val req = new DownloadRequestByPrescriptionId(prescriptionId.getValue());
-    val startDate = System.currentTimeMillis();
-    val request = this.epaMockClient.pollRequest(req);
-
-    val diff = System.currentTimeMillis() - startDate;
-    log.info("Duration of call to EpaMockClient in millis: {}", diff);
-
-    val res = extractAndValidateRequests(request, "provide-prescription-erp");
-    return res.stream()
-        .map(content -> epaFhirCodec.decode(EpaOpProvidePrescription.class, content))
-        .toList();
+    val request = this.epaMockClient.pollRequest(req, "provide-prescription-erp");
+    return extractAndValidateRequests(request, EpaOpProvidePrescription.class);
   }
 
   public List<EpaOpCancelPrescription> downloadCancelPrescriptionBy(PrescriptionId prescriptionId) {
     val req = new DownloadRequestByPrescriptionId(prescriptionId.getValue());
-    val request = this.epaMockClient.pollRequest(req);
-
-    val res = extractAndValidateRequests(request, "cancel-prescription-erp");
-    return res.stream()
-        .map(content -> epaFhirCodec.decode(EpaOpCancelPrescription.class, content))
-        .toList();
+    val request = this.epaMockClient.pollRequest(req, "cancel-prescription-erp");
+    return extractAndValidateRequests(request, EpaOpCancelPrescription.class);
   }
 
   public List<EpaOpProvideDispensation> downloadProvideDispensationBy(
       PrescriptionId prescriptionId) {
     val req = new DownloadRequestByPrescriptionId(prescriptionId.getValue());
-    val startTime = System.currentTimeMillis();
-
-    // important when Prescription has arrived but Dispensation is on his way
-    var count = 5;
-    var request = this.epaMockClient.pollRequest(req);
-    var dispensations = extractAndValidateRequests(request, "provide-dispensation-erp");
-
-    while (dispensations.isEmpty() && count-- > 0) {
-      request = this.epaMockClient.pollRequest(req);
-      dispensations = extractAndValidateRequests(request, "provide-dispensation-erp");
-    }
-
-    val diff = System.currentTimeMillis() - startTime;
-    log.info("Duration of call to EpaMockClient in millis: {}", diff);
-
-    return dispensations.stream()
-        .map(content -> epaFhirCodec.decode(EpaOpProvideDispensation.class, content))
-        .toList();
+    val request = this.epaMockClient.pollRequest(req, "provide-dispensation-erp");
+    return extractAndValidateRequests(request, EpaOpProvideDispensation.class);
   }
 
-  private List<String> extractAndValidateRequests(List<ErpEmlLog> request, String filter) {
-    val re =
-        request.stream()
-            .filter(log -> log.request().urlPath().contains(filter))
-            .map(log -> log.request().bodyAsString())
-            .toList();
+  private <T extends Resource> List<T> extractAndValidateRequests(
+      List<ErpEmlLog> request, Class<T> asClass) {
+    val re = request.stream().map(log -> log.request().bodyAsString()).toList();
     val validationResults =
         re.stream().map(epaFhirCodec::validate).filter(vr -> !vr.isSuccessful()).toList();
     if (!validationResults.isEmpty()) {
@@ -122,7 +91,7 @@ public class UseTheEpaMockClient implements Ability {
               .joining("\n");
       throw new FhirValidationException(errorMessage);
     }
-    return re;
+    return re.stream().map(content -> epaFhirCodec.decode(asClass, content)).toList();
   }
 
   public boolean setProvidePrescriptionApply(KVNR kvnr) {

@@ -17,6 +17,7 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -242,9 +243,14 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
             GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
 
     // Performs cancellation
-    pharmacy.performs(TaskAbort.asLeistungserbringer(task));
+    val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+    val abortRespInteraction = pharmacy.performs(TaskAbort.asPharmacy(acceptation));
+    pharmacy.attemptsTo(
+        Verify.that(abortRespInteraction)
+            .withoutBody()
+            .hasResponseWith(returnCode(204))
+            .isCorrect());
 
-    // performs the resource-content validation
     epaFhirChecker.attemptsTo(
         CheckEpaOpCancelPrescriptionWithTask.forCancelPrescription(
             prescription.getExpectedResponse().getKbvBundle().orElseThrow()));

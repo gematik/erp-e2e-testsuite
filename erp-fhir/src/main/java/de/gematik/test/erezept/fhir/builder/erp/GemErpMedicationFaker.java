@@ -29,6 +29,7 @@ import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import de.gematik.test.erezept.fhir.valuesets.epa.EpaDrugCategory;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
@@ -49,7 +50,12 @@ public class GemErpMedicationFaker {
 
     if (fakerBool()) withStandardSize(fakerValueSet(StandardSize.class));
 
-    if (fakerBool()) withDarreichungsform(fakerValueSet(Darreichungsform.class));
+    // building Kombipackung is not supported yet
+    if (fakerBool())
+      withDarreichungsform(
+          fakerValueSet(
+              Darreichungsform.class,
+              List.of(Darreichungsform.KPG, Darreichungsform.PUE, Darreichungsform.LYE)));
 
     if (fakerBool()) withVaccineFlag(fakerBool());
 

@@ -33,16 +33,32 @@ import org.hl7.fhir.r4.model.ResourceType;
 @SuppressWarnings({"java:S110"})
 public class ErxMedicationDispense extends ErxMedicationDispenseBase {
 
-  // TODO: should be called getKbvMedications
-  public List<KbvErpMedication> getErpMedication() {
+  /**
+   * This method will return all contained Medication resources as KbvErpMedication
+   *
+   * @deprecated since 0.10.1 because from FHIR-Profiles 1.4.0 the MedicationDispense won't contain
+   *     the Medication anymore
+   * @return List of KbvErpMedication contained within this MedicationDispense
+   */
+  @Deprecated(since = "0.10.1", forRemoval = true)
+  public List<KbvErpMedication> getContainedKbvMedication() {
     return this.getContained().stream()
         .filter(c -> c.getResourceType().equals(ResourceType.Medication))
         .map(KbvErpMedication::fromMedication)
         .toList();
   }
 
-  public KbvErpMedication getErpMedicationFirstRep() {
-    return this.getErpMedication().stream()
+  /**
+   * This method will return the first contained Medication resource as KbvErpMedication or throw an
+   * exception if no Medication is contained
+   *
+   * @deprecated since 0.10.1 because from FHIR-Profiles 1.4.0 the MedicationDispense won't contain
+   *     the Medication anymore
+   * @return the first KbvErpMedication contained within this MedicationDispense
+   */
+  @Deprecated(since = "0.10.1", forRemoval = true)
+  public KbvErpMedication getContainedKbvMedicationFirstRep() {
+    return this.getContainedKbvMedication().stream()
         .findFirst()
         .orElseThrow(
             () ->

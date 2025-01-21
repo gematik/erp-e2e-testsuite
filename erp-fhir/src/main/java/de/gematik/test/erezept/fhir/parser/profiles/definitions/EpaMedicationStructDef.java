@@ -24,11 +24,20 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum EpaMedicationStructDef implements IStructureDefinition<EpaMedicationVersion> {
+  MEDICATION_PZN_INGREDIENT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient"),
+  MED_INGREDIENT_DOSAGE_FORM_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-darreichungsform-extension"),
   DURG_CATEGORY_EXT(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension"),
   VACCINE_EXT(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension"),
+  PACKAGING_EXTENSION(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-formulation-packaging-extension"),
   TOTAL_QUANTITY_FORMULATION_EXT(
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension");
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension"),
+  MANUFACTURING_INSTRUCTION(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-manufacturing-instructions-extension"),
+  ;
   private final String canonicalUrl;
 }

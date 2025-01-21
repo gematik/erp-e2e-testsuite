@@ -82,7 +82,9 @@ public class KbvErpMedicationPZNBuilder
         .category(category)
         .isVaccine(false)
         .normgroesse(fakerValueSet(StandardSize.class))
-        .darreichungsform(fakerValueSet(Darreichungsform.class))
+        .darreichungsform(
+            fakerValueSet(
+                Darreichungsform.class, List.of(Darreichungsform.PUE, Darreichungsform.LYE)))
         .amount(fakerAmount(), "Stk")
         .pzn(pzn, name);
   }

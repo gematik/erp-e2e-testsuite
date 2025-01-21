@@ -114,6 +114,14 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
     return this.getMvoPeriod().map(Period::getEnd);
   }
 
+  public Optional<String> getMvoId() {
+    return this.getExtension().stream()
+        .filter(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION::match)
+        .map(ext -> ext.getExtensionByUrl("ID"))
+        .map(ext -> ext.getValue().castToIdentifier(ext.getValue()).getValue())
+        .findFirst();
+  }
+
   public Optional<Integer> getNumerator() {
     return this.getMvoRatio()
         .map(Ratio::getNumerator)

@@ -21,6 +21,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpiratio
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
@@ -165,7 +166,7 @@ public class ErxMedicationDispenseBuilder
     medDisp.setId(this.getResourceId()).setMeta(meta);
 
     // set medication properly by version
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) < 0) {
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
       medDisp.getContained().add(this.baseMedication);
       medDisp.setMedication(new Reference("#" + this.baseMedication.getIdElement().getIdPart()));
     } else {
@@ -195,5 +196,18 @@ public class ErxMedicationDispenseBuilder
 
   private void checkRequired() {
     this.checkRequired(baseMedication, "MedicationDispense requires a Medication");
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+      if (this.baseMedication instanceof GemErpMedication)
+        throw new BuilderException(
+            format(
+                "in {0} is no {1} allowed",
+                erpWorkflowVersion, GemErpMedication.class.getSimpleName()));
+    } else {
+      if (this.baseMedication instanceof KbvErpMedication)
+        throw new BuilderException(
+            format(
+                "in {0} is no {1} allowed",
+                erpWorkflowVersion, KbvErpMedication.class.getSimpleName()));
+    }
   }
 }

@@ -163,7 +163,7 @@ class TaskGetAsPharmacyUseCase extends ErpTest {
         Verify.that(downloadedAuditEvents)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
-            .and(auditEventVerifier.firstElementCorrespondsTo(representation))
+            .and(auditEventVerifier.oneOfFirstThreeElementsCorrespondsTo(representation))
             .isCorrect());
   }
 

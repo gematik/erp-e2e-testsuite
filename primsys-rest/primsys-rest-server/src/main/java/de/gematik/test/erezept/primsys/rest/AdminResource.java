@@ -16,14 +16,26 @@
 
 package de.gematik.test.erezept.primsys.rest;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import static java.text.MessageFormat.format;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.google.common.base.Strings;
 import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.Arrays;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -39,19 +51,13 @@ public class AdminResource {
   @ApiResponse(description = "Administration of the service")
   public Response changeConfig(@QueryParam("key") String key, AdminRequest request) {
     val adminKey = System.getenv().getOrDefault("COMMIT_HASH", "");
-    if (adminKey == null || adminKey.isBlank() || adminKey.isEmpty() || !adminKey.equals(key)) {
+    if (Strings.isNullOrEmpty(key) || !adminKey.equals(key)) {
       return ErrorResponseBuilder.createInternalError(403, "invalid key");
     }
 
     if (request != null) {
       if (request.profile != null) {
-        System.setProperty(ParserConfigurations.SYS_PROP_TOGGLE, request.profile.toString());
-      }
-
-      if (request.defaultMedicationDispense != null) {
-        // see ErxMedicationDispenseBuilder
-        System.setProperty(
-            "erp.fhir.medicationdispense.default", request.defaultMedicationDispense.toString());
+        System.setProperty(ParserConfigurations.SYS_PROP_TOGGLE, request.profile.getVersion());
       }
 
       return Response.accepted(AdminResponse.withMessage("configuration changed")).build();
@@ -62,6 +68,7 @@ public class AdminResource {
 
   @Data
   public static class AdminResponse {
+
     private String message;
 
     public static AdminResponse withMessage(String message) {
@@ -73,23 +80,38 @@ public class AdminResource {
 
   @Data
   public static class AdminRequest {
-    private Profile profile;
-    private Boolean defaultMedicationDispense;
+
+    @JsonDeserialize(using = ProfileVersionDeserializer.class)
+    private ErpWorkflowVersion profile;
   }
 
-  public enum Profile {
-    @JsonProperty("1.1.1")
-    V_1_1_1,
-    @JsonProperty("1.2.0")
-    @JsonAlias("1.2")
-    V_1_2_0,
-    @JsonProperty("1.3.0")
-    @JsonAlias("1.3")
-    V_1_3_0;
+  /**
+   * Custom deserializer for {@link ErpWorkflowVersion} By using a custom deserializer we can re-use
+   * the {@link ErpWorkflowVersion} without bothering about updating new versions here separately
+   *
+   * <p><b>NOTE:</b> this approach works only as long we are using the {@link ErpWorkflowVersion}
+   * also for the whole "ProfileSet"
+   */
+  static class ProfileVersionDeserializer extends StdDeserializer<ErpWorkflowVersion> {
+
+    protected ProfileVersionDeserializer() {
+      super(ErpWorkflowVersion.class);
+    }
 
     @Override
-    public String toString() {
-      return this.name().replace("V_", "").replace("_", ".").toLowerCase();
+    public ErpWorkflowVersion deserialize(JsonParser parser, DeserializationContext ctxt)
+        throws IOException {
+      val value = parser.getText();
+      return Arrays.stream(ErpWorkflowVersion.values())
+          .filter(v -> v.isEqual(value) || v.name().equalsIgnoreCase(value))
+          .findFirst()
+          .orElseThrow(
+              () ->
+                  ErrorResponseBuilder.createInternalErrorException(
+                      400,
+                      format(
+                          "Invalid profile: {0} cannot be mapped to a valid profile version",
+                          value)));
     }
   }
 }

@@ -16,9 +16,13 @@
 
 package de.gematik.test.erezept.primsys.data.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import java.util.Arrays;
 import lombok.val;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -36,5 +40,25 @@ class PayorTypeDtoTest {
   void shouldDecodeFromDisplay(PayorTypeDto template) {
     val decoded = PayorTypeDto.fromCode(template.getDisplay());
     assertEquals(template, decoded);
+  }
+
+  @Test
+  void shouldHaveAllPayorTypes() {
+    Arrays.stream(PayorType.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> PayorTypeDto.fromCode(vs.getCode()));
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraPayorTypes() {
+    Arrays.stream(PayorTypeDto.values())
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> PayorType.fromDisplay(dto.getDisplay()));
+              assertEquals(vs.getDisplay(), dto.getDisplay());
+            });
   }
 }

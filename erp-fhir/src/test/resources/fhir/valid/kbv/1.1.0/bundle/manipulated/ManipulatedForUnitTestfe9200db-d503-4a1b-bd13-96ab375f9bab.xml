@@ -165,7 +165,7 @@
                     <valueBoolean value="false"/>
                 </extension>
                 <extension url="http://fhir.de/StructureDefinition/normgroesse">
-                    <valueCode value="N1"/>
+                    <valueCode value="N3"/>
                 </extension>
                 <code>
                     <coding>
@@ -183,9 +183,9 @@
                 <amount>
                     <numerator>
                         <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_PackagingSize">
-                            <valueString value="4"/>
+                            <valueString value="50"/>
                         </extension>
-                        <unit value="Stk"/>
+                        <unit value="Tablet"/>
                     </numerator>
                     <denominator>
                         <value value="1"/>

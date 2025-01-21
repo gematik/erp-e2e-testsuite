@@ -19,6 +19,8 @@ package de.gematik.test.erezept.primsys.data.valuesets;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import java.util.Arrays;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,5 +55,30 @@ class MedicationCategoryDtoTest {
   void shouldNotThrowOnUnknown(String code) {
     val mcd = assertDoesNotThrow(() -> MedicationCategoryDto.fromCode(code));
     assertEquals(MedicationCategoryDto.C_03, mcd);
+  }
+
+  @Test
+  void shouldHaveAllMedicationCategories() {
+    Arrays.stream(MedicationCategory.values())
+        .forEach(
+            vs -> {
+              val dto = assertDoesNotThrow(() -> MedicationCategoryDto.fromCode(vs.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+            });
+  }
+
+  @Test
+  void shouldNotHaveAnyExtraMedicationCategory() {
+    Arrays.stream(MedicationCategoryDto.values())
+        .filter(
+            dto ->
+                dto
+                    != MedicationCategoryDto
+                        .C_03) // Note: the default currently not available in MedicationCategory
+        .forEach(
+            dto -> {
+              val vs = assertDoesNotThrow(() -> MedicationCategory.fromCode(dto.getCode()));
+              assertEquals(vs.getCode(), dto.getCode());
+            });
   }
 }
