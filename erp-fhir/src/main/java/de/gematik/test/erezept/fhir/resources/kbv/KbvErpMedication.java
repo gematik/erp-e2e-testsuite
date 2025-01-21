@@ -218,32 +218,14 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
     return this.getCode().getText();
   }
 
-  /**
-   * @return the free text of the medication or null if not present
-   * @deprecated fetching the form.code of the medication this way may result in a
-   *     NullPointerException because this value is optional. Use {@link
-   *     #getDarreichungsformOptional} instead.
-   */
-  @Deprecated(since = "0.10.1", forRemoval = false)
-  public List<Darreichungsform> getDarreichungsform() {
+  public Optional<Darreichungsform> getDarreichungsform() {
     return this.getForm().getCoding().stream()
         .map(coding -> Darreichungsform.fromCode(coding.getCode()))
-        .toList();
-  }
-
-  public Optional<List<Darreichungsform>> getDarreichungsformOptional() {
-    return Optional.of(
-        this.getForm().getCoding().stream()
-            .map(coding -> Darreichungsform.fromCode(coding.getCode()))
-            .toList());
+        .findFirst();
   }
 
   public Optional<String> getTextInFormOptional() {
     return Optional.ofNullable(this.getForm().getText());
-  }
-
-  public Optional<Darreichungsform> getDarreichungsformFirstRep() {
-    return this.getDarreichungsform().stream().findFirst();
   }
 
   public StandardSize getStandardSize() {

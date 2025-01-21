@@ -553,7 +553,7 @@ class KbvErpBundleTest extends ParsingTest {
 
   @Test
   @SuppressWarnings({"java:S5961"})
-  void testEncodingCodingSingleValidKbvBundleAsMedicationCompoundingandCheckPZN() {
+  void testEncodingCodingSingleValidKbvBundleAsMedicationCompoundingAndCheckPZN() {
     val expectedID = "a409358a-da34-11eb-8d19-0242ac130003";
     val expectedPZN = "10206346";
 
@@ -564,8 +564,9 @@ class KbvErpBundleTest extends ParsingTest {
     assertTrue(kbvBundle.getMedication().getPznOptional().isPresent());
     val medication = kbvBundle.getMedication();
     assertEquals(expectedPZN, medication.getPznOptional().get().getValue());
-    assertEquals("Aluminiumchlorid-Hexahydrat", medication.getIngredientTextOptional().get());
-    assertNotNull(medication.getDarreichungsformOptional().get());
+    assertEquals(
+        "Aluminiumchlorid-Hexahydrat", medication.getIngredientTextOptional().orElseThrow());
+    assertTrue(medication.getDarreichungsform().isEmpty());
   }
 
   @Test

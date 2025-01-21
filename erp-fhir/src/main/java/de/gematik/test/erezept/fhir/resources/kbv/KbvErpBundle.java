@@ -25,7 +25,6 @@ import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
 import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +33,6 @@ import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -79,44 +76,6 @@ public class KbvErpBundle extends KbvBaseBundle {
     return this.splitToProfileVersion(this.getFullMetaProfile());
   }
 
-  public void setAllDates() {
-    val now = new Date();
-    this.setAllDates(now);
-  }
-
-  public void setAllDates(Date date) {
-    this.setAuthoredOnDate(date);
-    this.setCompositionDate(date);
-    this.setTimestamp(date);
-    this.getMeta().setLastUpdated(date);
-  }
-
-  public void setAuthoredOnDate(Date authoredOn) {
-    this.getMedicationRequest().setAuthoredOn(authoredOn);
-  }
-
-  public Date getAuthoredOn() {
-    return this.getMedicationRequest().getAuthoredOn();
-  }
-
-  public Date getCompositionDate() {
-    return this.getComposition().getDate();
-  }
-
-  public void setCompositionDate(Date date) {
-    this.getComposition().setDate(date);
-  }
-
-  public KbvErpBundle setPrescriptionId(PrescriptionId prescriptionId) {
-    val pidIdentifier =
-        new Identifier()
-            .setSystem(prescriptionId.getSystemAsString())
-            .setValue(prescriptionId.getValue());
-
-    this.setIdentifier(pidIdentifier);
-    return this;
-  }
-
   public List<KbvErpMedicationRequest> getMedicationRequests() {
     return this.entry.stream()
         .filter(
@@ -139,21 +98,6 @@ public class KbvErpBundle extends KbvBaseBundle {
       ret = Optional.empty();
     }
     return ret;
-  }
-
-  /**
-   * Get the <a href="https://simplifier.net/erezept/kbvprerpcomposition">KBV E-Rezept
-   * Composition</a> from Bundle
-   *
-   * @return the {@link Composition}
-   */
-  public Composition getComposition() {
-    return this.entry.stream()
-        .map(BundleEntryComponent::getResource)
-        .filter(resource -> resource.getClass().equals(Composition.class))
-        .map(Composition.class::cast)
-        .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), "Composition"));
   }
 
   /**
@@ -307,5 +251,15 @@ public class KbvErpBundle extends KbvBaseBundle {
     return format(
         "{0} (Workflow {1}) {2} für {3}",
         workflow.getDisplay(), workflow.getCode(), type, this.getPatient().getDescription());
+  }
+
+  @Override
+  public void setAuthoredOnDate(Date authoredOn) {
+    this.getMedicationRequest().setAuthoredOn(authoredOn);
+  }
+
+  @Override
+  public Date getAuthoredOn() {
+    return this.getMedicationRequest().getAuthoredOn();
   }
 }

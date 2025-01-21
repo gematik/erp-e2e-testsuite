@@ -71,7 +71,7 @@ public class GemErpMedicationBuilder
     kbvMedication
         .getPznOptional()
         .ifPresent(pzn -> builder.pzn(pzn, kbvMedication.getMedicationName()));
-    kbvMedication.getDarreichungsformFirstRep().ifPresent(builder::darreichungsform);
+    kbvMedication.getDarreichungsform().ifPresent(builder::darreichungsform);
     kbvMedication
         .getPackagingUnit()
         .ifPresentOrElse(

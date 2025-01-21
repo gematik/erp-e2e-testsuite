@@ -145,7 +145,7 @@ public class PrescriptionsReader extends BaseRemoteCommand {
         .getIngredientStrengthString()
         .ifPresent(text -> printSubLine(format("Ingredient strength: {0}", text)));
     medication
-        .getDarreichungsformFirstRep()
+        .getDarreichungsform()
         .ifPresent(
             darreichungsform ->
                 printSubLine(format("Darreichungsform: {0}", darreichungsform.getDisplay())));

@@ -21,7 +21,7 @@ import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.resources.kbv.KbvBaseBundle;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.primsys.data.actors.DoctorDto;
 import de.gematik.test.konnektor.Konnektor;
@@ -54,7 +54,7 @@ public class Doctor extends BaseActor {
     return konnektor.execute(signCmd).getPayload();
   }
 
-  public DoctorDto getDoctorInformation(KbvErpBundle kbvBundle) {
+  public DoctorDto getDoctorInformation(KbvBaseBundle kbvBundle) {
     val org = kbvBundle.getMedicalOrganization();
     val doc = kbvBundle.getPractitioner();
     val d = new DoctorDto();
