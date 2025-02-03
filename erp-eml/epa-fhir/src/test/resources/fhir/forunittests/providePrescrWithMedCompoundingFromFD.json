@@ -5,7 +5,7 @@
     ]
   },
   "resourceType": "Parameters",
-  "id": "4861f934-89f2-46bf-b3e5-0abb2587708b",
+  "id": "1e7f24bf-eff0-4353-8799-a5741e4c3b2b",
   "parameter": [
     {
       "name": "rxPrescription",
@@ -14,18 +14,18 @@
           "name": "prescriptionId",
           "valueIdentifier": {
             "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
-            "value": "160.000.006.799.595.81"
+            "value": "160.000.106.856.581.85"
           }
         },
         {
           "name": "authoredOn",
-          "valueDate": "2025-01-13"
+          "valueDate": "2025-01-24"
         },
         {
           "name": "medicationRequest",
           "resource": {
             "resourceType": "MedicationRequest",
-            "id": "b70f8a2e-609c-475a-9f32-30b49518c093",
+            "id": "05397853-7d7a-4970-b751-0b6658cc8e67",
             "meta": {
               "profile": [
                 "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-request|1.0.3"
@@ -45,7 +45,7 @@
             "status": "active",
             "intent": "filler-order",
             "medicationReference": {
-              "reference": "Medication/7383fa50-606d-47fd-8fc0-13c5cf587b52"
+              "reference": "Medication/65a4ba7d-cc76-499c-8b9f-08eb658f5aa7"
             },
             "subject": {
               "identifier": {
@@ -53,15 +53,15 @@
                 "value": "X110645443"
               }
             },
-            "authoredOn": "2025-01-13",
+            "authoredOn": "2025-01-24",
             "dosageInstruction": [
               {
-                "patientInstruction": "3-3-1-2-0-1-0"
+                "patientInstruction": "2-3-1-0-2-0"
               }
             ],
             "dispenseRequest": {
               "quantity": {
-                "value": 12,
+                "value": 9,
                 "system": "http://unitsofmeasure.org",
                 "code": "{Package}"
               }
@@ -75,7 +75,7 @@
           "name": "medication",
           "resource": {
             "resourceType": "Medication",
-            "id": "7383fa50-606d-47fd-8fc0-13c5cf587b52",
+            "id": "65a4ba7d-cc76-499c-8b9f-08eb658f5aa7",
             "meta": {
               "profile": [
                 "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication|1.0.3"
@@ -178,7 +178,7 @@
                   }
                 },
                 "itemReference": {
-                  "reference": "#894bef2d-c3f7-4242-aaa0-596753e2dc2b"
+                  "reference": "#4d64ae5c-2175-47c4-8c64-780bbe9c2479"
                 }
               }
             ],
@@ -190,7 +190,7 @@
                   ]
                 },
                 "resourceType": "Medication",
-                "id": "894bef2d-c3f7-4242-aaa0-596753e2dc2b",
+                "id": "4d64ae5c-2175-47c4-8c64-780bbe9c2479",
                 "extension": [
                   {
                     "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension",
@@ -205,7 +205,7 @@
                   "coding": [
                     {
                       "system": "http://fhir.de/CodeSystem/ifa/pzn",
-                      "code": "27889036",
+                      "code": "41063001",
                       "display": "Vertigoheel® 20 mg"
                     }
                   ],
@@ -219,7 +219,7 @@
           "name": "organization",
           "resource": {
             "resourceType": "Organization",
-            "id": "2578c124-97fa-4365-875d-5fea9d47d42b",
+            "id": "c9cd9f5e-376a-4222-bfb7-a7dbb2b6b6d4",
             "meta": {
               "profile": [
                 "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory|0.11.12"
@@ -242,7 +242,7 @@
                   ]
                 },
                 "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR",
-                "value": "026339027"
+                "value": "170672847"
               },
               {
                 "system": "https://gematik.de/fhir/sid/telematik-id",
@@ -253,21 +253,21 @@
             "telecom": [
               {
                 "system": "phone",
-                "value": "(0999) 552566889"
+                "value": "+49-688-1953048"
               },
               {
                 "system": "email",
-                "value": "alex.dylus@tilgner.ch"
+                "value": "brian.klose@kahlmeyer.name"
               }
             ],
             "address": [
               {
                 "type": "both",
                 "line": [
-                  "Werkstättenstr. 066"
+                  "Eulenkamp 16"
                 ],
-                "city": "Lennartstadt",
-                "postalCode": "07908",
+                "city": "Bad Jannek",
+                "postalCode": "87527",
                 "country": "D"
               }
             ],
@@ -287,7 +287,7 @@
           "name": "practitioner",
           "resource": {
             "resourceType": "Practitioner",
-            "id": "38f25a92-e60b-44a1-9b33-41ca80232e80",
+            "id": "6956d9f3-561c-4489-8db1-77fe187fadce",
             "meta": {
               "profile": [
                 "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory|0.11.12"
@@ -310,7 +310,7 @@
                   ]
                 },
                 "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
-                "value": "204026477"
+                "value": "195508890"
               },
               {
                 "system": "https://gematik.de/fhir/sid/telematik-id",

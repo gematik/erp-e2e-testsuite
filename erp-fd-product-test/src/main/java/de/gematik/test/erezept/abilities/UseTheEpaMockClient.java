@@ -80,6 +80,7 @@ public class UseTheEpaMockClient implements Ability {
     val validationResults =
         re.stream().map(epaFhirCodec::validate).filter(vr -> !vr.isSuccessful()).toList();
     if (!validationResults.isEmpty()) {
+      log.info("Response From FD {}", request.get(0).request().bodyAsString());
       val errorMessage =
           EntryStream.of(validationResults)
               .map(

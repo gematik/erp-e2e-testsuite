@@ -19,7 +19,7 @@ package de.gematik.test.erezept.eml.fhir;
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.codec.ResourceTypeHint;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaStructDef;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
 import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaVersion;
 import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirStrucDef;
 import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirVersion;
@@ -42,18 +42,23 @@ public class EpaFhirFactory {
   private static List<ResourceTypeHint<?, ?>> getTypeHints() {
     val list = new LinkedList<ResourceTypeHint<?, ?>>();
     // EpaFhir
-    list.addAll(registerEpaStruc(EpaStructDef.EPA_MEDICATION, EpaMedication.class));
+    list.addAll(registerEpaStruc(EpaMedStructDef.EPA_MEDICATION, EpaMedication.class));
     list.addAll(
-        registerEpaStruc(EpaStructDef.EPA_MEDICATION_DISPENSE, EpaMedicationDispense.class));
-    list.addAll(registerEpaStruc(EpaStructDef.EPA_MEDICATION_REQUEST, EpaMedicationRequest.class));
+        registerEpaStruc(EpaMedStructDef.EPA_MEDICATION_DISPENSE, EpaMedicationDispense.class));
     list.addAll(
-        registerEpaStruc(EpaStructDef.EPA_OP_PROVIDE_PRESCRIPTION, EpaOpProvidePrescription.class));
+        registerEpaStruc(EpaMedStructDef.EPA_MEDICATION_REQUEST, EpaMedicationRequest.class));
     list.addAll(
-        registerEpaStruc(EpaStructDef.EPA_OP_CANCEL_PRESCRIPTION, EpaOpCancelPrescription.class));
+        registerEpaStruc(
+            EpaMedStructDef.EPA_OP_PROVIDE_PRESCRIPTION, EpaOpProvidePrescription.class));
     list.addAll(
-        registerEpaStruc(EpaStructDef.EPA_OP_PROVIDE_DISPENSATION, EpaOpProvideDispensation.class));
+        registerEpaStruc(
+            EpaMedStructDef.EPA_OP_CANCEL_PRESCRIPTION, EpaOpCancelPrescription.class));
     list.addAll(
-        registerEpaStruc(EpaStructDef.EPA_OP_CANCEL_DISPENSATION, EpaOpCancelDispensation.class));
+        registerEpaStruc(
+            EpaMedStructDef.EPA_OP_PROVIDE_DISPENSATION, EpaOpProvideDispensation.class));
+    list.addAll(
+        registerEpaStruc(
+            EpaMedStructDef.EPA_OP_CANCEL_DISPENSATION, EpaOpCancelDispensation.class));
     // GematikFhir
     list.addAll(registerGematikDirStruc(GematikDirStrucDef.PRACTITIONER, EpaPractitioner.class));
     list.addAll(registerGematikDirStruc(GematikDirStrucDef.ORGANIZATION, EpaOrganisation.class));
@@ -61,7 +66,7 @@ public class EpaFhirFactory {
   }
 
   private static <R extends Resource> List<ResourceTypeHint<EpaVersion, R>> registerEpaStruc(
-      EpaStructDef def, Class<R> rClass) {
+      EpaMedStructDef def, Class<R> rClass) {
     val list =
         Arrays.stream(EpaVersion.values())
             .map(v -> ResourceTypeHint.forStructure(def, v, rClass))

@@ -70,5 +70,5 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
       | Rezeptur       | GKV              | Anti Aging Chreme für die Achsel | quantum satis                                                                                                       |          | 5     |
       | Wirkstoff      | GKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 2     |
       | Freitext       | PKV              | PlaceboCondimenti Luffa-Schwämme | Ein Bisschen Davon und noch mehr davon und das  ganze gut durchrühren                                               |          | 3     |
-      | Rezeptur       | PKV              | Anti Aging Chreme für die Achsel | Mixe a und B und dann rühren                                                                                        |          | 5     |
+      | Rezeptur       | PKV              | Anti Aging Achsel-Chreme         | beidseitig auftragen                                                                                                |          | 5     |
       | Wirkstoff      | PKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 1     |

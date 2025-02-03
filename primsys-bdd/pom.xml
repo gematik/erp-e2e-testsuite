@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.11.0</version>
+        <version>0.12.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -268,10 +268,6 @@
                 <version>${version.serenity}</version>
                 <configuration>
                     <reports>single-page-html,json-summary</reports>
-                    <systemPropertyVariables>
-                        <report.customfields.Testsuite>E2E-TestSuite v${project.version}</report.customfields.Testsuite>
-                        <report.customfields.Tester>${user.name}</report.customfields.Tester>
-                    </systemPropertyVariables>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -310,7 +306,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>0.11.0</version>
+                <version>0.12.0</version>
             </plugin>
         </plugins>
     </build>

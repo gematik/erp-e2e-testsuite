@@ -17,19 +17,19 @@
 package de.gematik.test.erezept.eml.fhir.r4;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaStructDef;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
 import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirStrucDef;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import java.util.Date;
 import org.hl7.fhir.r4.model.Parameters;
 
 public class EpaOpProvidePrescription extends Parameters {
 
-  public PrescriptionId getEpaPrescriptionId() {
+  public RxPrescriptionId getEpaPrescriptionId() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(part -> part.getName().equals("prescriptionId"))
         .map(p -> p.getValue().castToIdentifier(p.getValue()))
-        .map(PrescriptionId::from)
+        .map(RxPrescriptionId::from)
         .findFirst()
         .orElseThrow();
   }
@@ -45,7 +45,7 @@ public class EpaOpProvidePrescription extends Parameters {
   public EpaMedication getEpaMedication() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medication"))
-        .filter(entry -> EpaStructDef.EPA_MEDICATION.matches(entry.getResource().getMeta()))
+        .filter(entry -> EpaMedStructDef.EPA_MEDICATION.matches(entry.getResource().getMeta()))
         .map(entry -> (EpaMedication) entry.getResource())
         .findFirst()
         .orElseThrow();
@@ -54,7 +54,8 @@ public class EpaOpProvidePrescription extends Parameters {
   public EpaMedicationRequest getEpaMedicationRequest() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medicationRequest"))
-        .filter(entry -> EpaStructDef.EPA_MEDICATION_REQUEST.matches(entry.getResource().getMeta()))
+        .filter(
+            entry -> EpaMedStructDef.EPA_MEDICATION_REQUEST.matches(entry.getResource().getMeta()))
         .map(entry -> (EpaMedicationRequest) entry.getResource())
         .findFirst()
         .orElseThrow();

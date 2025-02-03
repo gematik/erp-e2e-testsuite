@@ -19,13 +19,16 @@ package de.gematik.test.erezept.eml.fhir.r4;
 import static org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseStatus.COMPLETED;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,14 +36,16 @@ import org.junit.jupiter.api.Test;
 
 class EpaOpProvideDispensationTest {
 
+  private static final String content =
+      ResourceLoader.readFileFromResource(
+          "fhir/valid/medication/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json");
+
   private static EpaOpProvideDispensation epaOpProvideDispensation;
+  private static FhirCodec fhir;
 
   @BeforeAll
   static void setup() {
-    val fhir = EpaFhirFactory.create();
-    val BASE_PATH =
-        "fhir/valid/medication/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH);
+    fhir = EpaFhirFactory.create();
     epaOpProvideDispensation = fhir.decode(EpaOpProvideDispensation.class, content);
   }
 
@@ -65,9 +70,21 @@ class EpaOpProvideDispensationTest {
   }
 
   @Test
+  void ShouldThrowWhileMissingContentWhenHandedOver() {
+    val provDispForManipulation = fhir.decode(EpaOpProvideDispensation.class, content);
+    provDispForManipulation.getParameter().stream()
+        .filter(p -> p.getName().equals("rxDispensation"))
+        .findFirst()
+        .orElseThrow()
+        .setPart(List.of());
+
+    assertThrows(MissingFieldException.class, provDispForManipulation::getEpaWhenHandedOver);
+  }
+
+  @Test
   void getEpaPrescriptionId() {
     assertEquals(
-        PrescriptionId.from("160.153.303.257.459"),
+        RxPrescriptionId.from("160.153.303.257.459"),
         epaOpProvideDispensation.getEpaPrescriptionId());
   }
 

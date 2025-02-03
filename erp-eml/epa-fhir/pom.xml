@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erp-eml</artifactId>
-    <version>0.11.0</version>
+    <version>0.12.0</version>
   </parent>
 
   <artifactId>epa-fhir</artifactId>
@@ -26,13 +26,14 @@
           <groupId>de.gematik.bbriccs</groupId>
           <artifactId>fhir-de-basisprofil-r4-brick</artifactId>
       </dependency>
-      <dependency>
-          <groupId>de.gematik.test.erezept</groupId>
-          <artifactId>erp-fhir</artifactId>
-      </dependency>
+
       <dependency>
           <groupId>de.gematik.bbriccs</groupId>
           <artifactId>fhir-coding-system-brick</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>de.gematik.bbriccs</groupId>
+          <artifactId>fhir-builder-brick</artifactId>
       </dependency>
 
   </dependencies>

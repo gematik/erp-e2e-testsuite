@@ -10,11 +10,13 @@ Module:
 * erp-fd-product-test:
   - Adapted the TestSzenario to validate the availability of PUE and LYE
   - Add toggle to activate Validation for PUE and LYE
-  - GemErpMedicationBuilder got a "from()" Method to map KbvMedications to GemErpMedication in types of: ingredient,
+  - GemErpMedicationBuilder got a "from()" Method to map KbvMedications to GemErpMedication in types of: ingredient, compounding,
     freetext and PZN. you´ll need it to transfer Medications from Version 1.3 and below up to 1.4.x
-    ->> mapping of Medication Compounding doesn't work valid at the moment (fix  is work in progress) 
+  
 * erp-fhir:
-    - Extension of the key table "Darreichungsform" to include "PUE - Pulver zum Einnehmen" and "LYE - Lyophilisat zum Einnehmen"
+  - Extension of the key table "Darreichungsform" to include "PUE - Pulver zum Einnehmen" and "LYE - Lyophilisat zum Einnehmen"
+* smartcard:
+  - Adding test identities for DIGA and Egk to the pharmacy
 
 ## Release 0.9.1
 

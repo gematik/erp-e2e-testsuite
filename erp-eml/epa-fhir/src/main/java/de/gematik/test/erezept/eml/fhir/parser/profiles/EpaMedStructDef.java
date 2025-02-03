@@ -22,9 +22,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum EpaStructDef implements ProfileStructureDefinition<EpaVersion> {
-  RX_PRESCRIPTION_ID(
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-prescription-process-identifier-extension"),
+public enum EpaMedStructDef implements ProfileStructureDefinition<EpaVersion> {
+  DRUG_CATEGORY_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension"),
   EPA_MEDICATION("https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication"),
   EPA_MEDICATION_REQUEST(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-request"),
@@ -38,12 +38,25 @@ public enum EpaStructDef implements ProfileStructureDefinition<EpaVersion> {
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-prescription-erp-input-parameters"),
   EPA_OP_CANCEL_PRESCRIPTION(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-cancel-prescription-erp-input-parameters"),
-  EXT_MEDICATION_ID_VACCINE(
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension"),
-  EXT_DRUG_CATEGORY(
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension"),
+  EPA_MED_TYPE_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension"),
   EXT_MED_PACKAGING_SIZE(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension"),
+  MEDICATION_PZN_INGREDIENT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient"),
+
+  MANUFACTURING_INSTRUCTION(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-manufacturing-instructions-extension"),
+  MED_INGREDIENT_DOSAGE_FORM_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-darreichungsform-extension"),
+  PACKAGING_EXTENSION(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-formulation-packaging-extension"),
+  RX_PRESCRIPTION_ID(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-prescription-process-identifier-extension"),
+  TOTAL_QUANTITY_FORMULATION_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension"),
+  VACCINE_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension"),
   ;
 
   private final String canonicalUrl;

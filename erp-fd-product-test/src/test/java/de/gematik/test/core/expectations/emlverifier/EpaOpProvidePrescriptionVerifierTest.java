@@ -17,9 +17,11 @@
 package de.gematik.test.core.expectations.emlverifier;
 
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.*;
+import static de.gematik.test.erezept.eml.fhir.parser.profiles.UseFulCodeSystems.SNOMED_SCT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
@@ -36,6 +38,7 @@ import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
@@ -55,36 +58,37 @@ class EpaOpProvidePrescriptionVerifierTest {
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithIngredient;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithCompounding;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithFreeText;
+  private static FhirCodec fhir;
 
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("not needed");
-    val fhir = EpaFhirFactory.create();
+    fhir = EpaFhirFactory.create();
     epaOpProvidePrescription =
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/Parameters-example-epa-op-provide-prescription-erp-input-parameters-1.json"));
+                "fhir/forunittests/Parameters-example-epa-op-provide-prescription-erp-input-parameters-1.json"));
     epaOpProvidePrescriptionWithPzn =
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
+                "fhir/forunittests/Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
     epaOpProvidePrescriptionWithFreeText =
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/unknown/providePrescrFromEpaMockAsMedFreeText.json"));
+                "fhir/forunittests/providePrescrFromEpaMockAsMedFreeText.json"));
     epaOpProvidePrescriptionWithCompounding =
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/unknown/providePrescrFromEpaMockAsMedCompounding.json"));
+                "fhir/forunittests/providePrescrWithMedCompoundingFromFD.json"));
     epaOpProvidePrescriptionWithIngredient =
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/unknown/providePrescrFromEpaMockAsMedIngredient.json"));
+                "fhir/forunittests/providePrescrFromEpaMockAsMedIngredient.json"));
   }
 
   private static Stream<Arguments>
@@ -568,13 +572,41 @@ class EpaOpProvidePrescriptionVerifierTest {
     val compoundingMed =
         KbvErpMedicationCompoundingFaker.builder()
             .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
-            .withMedicationIngredient("13374", "Vertigoheel® 20 mg", "freitextPzn")
+            .withMedicationIngredient("41063001", "Vertigoheel® 20 mg", "freitextPzn")
             .withAmount(5, 1, "Stk")
             .withDosageForm("Zäpfchen, viel Spaß")
             .fake();
-    compoundingMed.getIngredientFirstRep().getStrength().setDenominator(new Quantity(1));
     val step = emlMedicationMapsTo(compoundingMed);
     assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithCompounding));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationWithMedicationCompoundingWithSnomed() {
+    val epaMed =
+        fhir.decode(
+            EpaOpProvidePrescription.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/forunittests/providePrescrWithMedCompoundingFromFD.json"));
+    epaMed
+        .getEpaMedication()
+        .getIngredientFirstRep()
+        .setItem(
+            new CodeableConcept()
+                .setCoding(
+                    List.of(
+                        new Coding().setSystem(SNOMED_SCT.getCanonicalUrl()).setCode("123456"))));
+
+    val compoundingMed =
+        KbvErpMedicationCompoundingFaker.builder()
+            .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
+            .withMedicationIngredient("41063001", "Vertigoheel® 20 mg", "freitextPzn")
+            .withAmount(5, 1, "Stk")
+            .withDosageForm("Zäpfchen, viel Spaß")
+            .fake();
+    compoundingMed.getIngredientFirstRep().getItemCodeableConcept().setText("HelloWorld");
+
+    val step = emlMedicationMapsTo(compoundingMed);
+    assertThrows(AssertionError.class, () -> step.apply(epaMed));
   }
 
   @ParameterizedTest

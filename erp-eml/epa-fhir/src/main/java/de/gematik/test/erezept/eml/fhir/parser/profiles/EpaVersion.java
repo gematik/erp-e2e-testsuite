@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.eml.fhir.parser.profiles;
 
 import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -27,4 +28,8 @@ public enum EpaVersion implements ProfileVersion {
   ;
 
   private final String version;
+
+  public static EpaVersion getDefaultVersion() {
+    return VersionUtil.getDefaultVersion(EpaVersion.class, "de.gematik.epa.medication");
+  }
 }

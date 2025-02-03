@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.eml.fhir.r4;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import java.util.Date;
 import org.hl7.fhir.r4.model.Parameters;
 
@@ -31,11 +31,11 @@ public class EpaOpCancelPrescription extends Parameters {
         .orElseThrow();
   }
 
-  public PrescriptionId getEpaPrescriptionId() {
+  public RxPrescriptionId getEpaPrescriptionId() {
     return getRxDispensationParameter().getPart().stream()
         .filter(part -> part.getName().equals("prescriptionId"))
         .map(p -> p.getValue().castToIdentifier(p.getValue()))
-        .map(PrescriptionId::from)
+        .map(RxPrescriptionId::from)
         .findFirst()
         .orElseThrow();
   }

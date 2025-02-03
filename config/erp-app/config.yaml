@@ -2,11 +2,11 @@ shouldLogCapabilityStatement: true
 
 users:
   - name: Alice
-    egkIccsn: 80276883110000115197
-    useVirtualEgk: false
+    egkIccsn: 80276883110000163961
+    useVirtualEgk: true
     device: T-Systems iPhone 14
   - name: Bob
-    egkIccsn: 80276883110000115202
+    egkIccsn: 80276883110000163962
     useVirtualEgk: true # won't have any effects because Bob as co-user will always use virtual eGK
 
 apps:
