@@ -22,7 +22,7 @@ import static java.text.MessageFormat.format;
 import com.google.common.base.Strings;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaStructDef;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Medication;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -308,17 +309,15 @@ public class EpaOpProvidePrescriptionVerifier {
     val givenValues = new HashMap<String, Optional<String>>();
     givenValues.put(
         MEDICATION_EXTENSION_IMPFSTOFF,
-        Optional.ofNullable(
-            compoundingPrescription
-                .getEpaMedication()
-                .getExtensionByUrl(EpaStructDef.EXT_MEDICATION_ID_VACCINE.getCanonicalUrl())
-                .getValue()
-                .primitiveValue()));
+        compoundingPrescription.getEpaMedication().getExtension().stream()
+            .filter(ext -> EpaMedStructDef.VACCINE_EXT.matches(ext.getUrl()))
+            .map(extension -> extension.getValue().primitiveValue())
+            .findFirst());
     givenValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         compoundingPrescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaStructDef.EXT_DRUG_CATEGORY.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -336,21 +335,45 @@ public class EpaOpProvidePrescriptionVerifier {
         MEDICATION_INGREDIENT_STRENGTH_NUMERATOR_VALUE,
         Optional.ofNullable(
             String.valueOf(ingredientComp.getStrength().getNumerator().getValue())));
-    givenValues.put(
-        INGREDIENT_CODE_CON_TEXT,
-        Optional.ofNullable(ingredientComp.getItemCodeableConcept().getText()));
-    givenValues.put(
-        INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
-        ingredientComp.getItemCodeableConcept().getCoding().stream()
-            .map(Coding::getSystem)
-            .filter(system -> system.equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
-            .findFirst());
-    givenValues.put(
-        INGREDIENT_CODE_CON_CODE,
-        ingredientComp.getItemCodeableConcept().getCoding().stream()
-            .filter(co -> co.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
-            .map(Coding::getCode)
-            .findFirst());
+
+    if (ingredientComp.hasItemCodeableConcept()) {
+      givenValues.put(
+          INGREDIENT_CODE_CON_CODE,
+          ingredientComp.getItemCodeableConcept().getCoding().stream()
+              .filter(co -> co.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
+              .map(Coding::getCode)
+              .findFirst());
+      givenValues.put(
+          INGREDIENT_CODE_CON_TEXT,
+          Optional.ofNullable(ingredientComp.getItemCodeableConcept().getText()));
+      givenValues.put(
+          INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
+          ingredientComp.getItemCodeableConcept().getCoding().stream()
+              .map(Coding::getSystem)
+              .filter(system -> system.equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
+              .findFirst());
+
+      // in ErpWorkflowVersion.V1_4_0 ++ the PZN-Object is in a Contained Resource & not in the
+      // Expected Ingredient -> coding
+    }
+    if (compoundingPrescription.getEpaMedication().hasContained()) {
+      val medication =
+          (Medication) compoundingPrescription.getEpaMedication().getContained().get(0);
+      val containedPznCC = medication.getCode();
+      givenValues.put(
+          INGREDIENT_CODE_CON_CODE,
+          containedPznCC.getCoding().stream()
+              .filter(DeBasisCodeSystem.PZN::match)
+              .map(Coding::getCode)
+              .findFirst());
+      givenValues.put(
+          INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
+          containedPznCC.getCoding().stream()
+              .map(Coding::getSystem)
+              .filter(DeBasisCodeSystem.PZN::match)
+              .findFirst());
+      givenValues.put(INGREDIENT_CODE_CON_TEXT, Optional.ofNullable(containedPznCC.getText()));
+    }
     givenValues.put(
         "Form",
         Optional.ofNullable(compoundingPrescription.getEpaMedication().getForm().getText()));
@@ -388,17 +411,15 @@ public class EpaOpProvidePrescriptionVerifier {
     val givenValues = new HashMap<String, Optional<String>>();
     givenValues.put(
         MEDICATION_EXTENSION_IMPFSTOFF,
-        Optional.ofNullable(
-            freeTextPrescription
-                .getEpaMedication()
-                .getExtensionByUrl(EpaStructDef.EXT_MEDICATION_ID_VACCINE.getCanonicalUrl())
-                .getValue()
-                .primitiveValue()));
+        freeTextPrescription.getEpaMedication().getExtension().stream()
+            .filter(ex -> EpaMedStructDef.VACCINE_EXT.matches(ex.getUrl()))
+            .map(ext -> ext.getValue().primitiveValue())
+            .findFirst());
     givenValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         freeTextPrescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaStructDef.EXT_DRUG_CATEGORY.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -438,7 +459,7 @@ public class EpaOpProvidePrescriptionVerifier {
         MEDICATION_EXTENSION_IMPFSTOFF,
         prescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaStructDef.EXT_MEDICATION_ID_VACCINE.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedStructDef.VACCINE_EXT.getCanonicalUrl())
             .stream()
             .map(ex -> ex.getValue().primitiveValue())
             .findFirst());
@@ -446,7 +467,7 @@ public class EpaOpProvidePrescriptionVerifier {
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         prescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaStructDef.EXT_DRUG_CATEGORY.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -511,14 +532,14 @@ public class EpaOpProvidePrescriptionVerifier {
         Optional.ofNullable(
             pznPrescription
                 .getEpaMedication()
-                .getExtensionByUrl(EpaStructDef.EXT_MEDICATION_ID_VACCINE.getCanonicalUrl())
+                .getExtensionByUrl(EpaMedStructDef.VACCINE_EXT.getCanonicalUrl())
                 .getValue()
                 .primitiveValue()));
     givenValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         pznPrescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaStructDef.EXT_DRUG_CATEGORY.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -540,7 +561,7 @@ public class EpaOpProvidePrescriptionVerifier {
     givenValues.put(
         "Medication.amount.numerator.value",
         pznPrescription.getEpaMedication().getAmount().getNumerator().getExtension().stream()
-            .filter(ex -> EpaStructDef.EXT_MED_PACKAGING_SIZE.matches(ex.getUrl()))
+            .filter(ex -> EpaMedStructDef.EXT_MED_PACKAGING_SIZE.matches(ex.getUrl()))
             .map(ext -> ext.getValue().primitiveValue())
             .findFirst());
     givenValues.put(

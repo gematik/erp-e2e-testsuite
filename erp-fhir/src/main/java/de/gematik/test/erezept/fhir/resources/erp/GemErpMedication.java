@@ -17,8 +17,9 @@
 package de.gematik.test.erezept.fhir.resources.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.EpaMedicationStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.values.PZN;
@@ -42,7 +43,7 @@ public class GemErpMedication extends Medication {
 
   public Optional<EpaDrugCategory> getCategory() {
     return this.getExtension().stream()
-        .filter(EpaMedicationStructDef.DURG_CATEGORY_EXT::match)
+        .filter(dC -> EpaMedStructDef.DRUG_CATEGORY_EXT.matches(dC.getUrl()))
         .map(Extension::getValue)
         .map(coding -> coding.castToCoding(coding))
         .map(coding -> EpaDrugCategory.fromCode(coding.getCode()))
@@ -58,7 +59,13 @@ public class GemErpMedication extends Medication {
   }
 
   public Optional<String> getName() {
-    return Optional.ofNullable(this.getCode().getText());
+    return this.getCode().hasText()
+        ? Optional.ofNullable(this.getCode().getText())
+        : this.getContained().stream()
+            .filter(r -> EpaMedStructDef.MEDICATION_PZN_INGREDIENT.matches(r.getMeta()))
+            .map(EpaMedPznIngredient.class::cast)
+            .flatMap(med -> med.getName().stream())
+            .findFirst();
   }
 
   public Optional<Darreichungsform> getDarreichungsform() {
@@ -86,7 +93,7 @@ public class GemErpMedication extends Medication {
 
   public boolean isVaccine() {
     return this.getExtension().stream()
-        .filter(EpaMedicationStructDef.VACCINE_EXT::match)
+        .filter(ex -> EpaMedStructDef.VACCINE_EXT.matches(ex.getUrl()))
         .map(Extension::getValue)
         .map(coding -> coding.castToBoolean(coding))
         .map(BooleanType::booleanValue)

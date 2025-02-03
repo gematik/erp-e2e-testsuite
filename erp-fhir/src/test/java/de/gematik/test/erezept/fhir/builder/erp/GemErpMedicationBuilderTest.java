@@ -16,16 +16,16 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.EpaMedicationStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -256,7 +256,20 @@ class GemErpMedicationBuilderTest extends ParsingTest {
   }
 
   @Test()
-  void shouldBuildFromMedicationCompoundingWithMissingStrenthParams() {
+  void shouldBuildFromMedicationCompoundingWithoutStrength() {
+    val kbvMedicComp = KbvErpMedicationCompoundingFaker.builder().fake();
+    kbvMedicComp.getIngredientFirstRep().setStrength(null);
+    val gemMedication =
+        GemErpMedicationBuilder.from(kbvMedicComp)
+            .version(ErpWorkflowVersion.V1_4_0)
+            .lotNumber("123123")
+            .build();
+    val result = ValidatorUtil.encodeAndValidate(parser, gemMedication, false);
+    assertTrue(result.isSuccessful());
+  }
+
+  @Test()
+  void shouldBuildFromMedicationCompoundingWithMissingStrengthParams() {
     val kbvMedicComp =
         KbvErpMedicationCompoundingFaker.builder().withPackaging("im Karton eben").fake();
     val gemMedication =
@@ -268,11 +281,26 @@ class GemErpMedicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
+  @Test()
+  void shouldBuildFromMedicationCompoundingWithoutPzn() {
+    val kbvMedicComp = KbvErpMedicationCompoundingFaker.builder().fake();
+    kbvMedicComp.getIngredientFirstRep().setItem(null);
+    val gemMedication =
+        GemErpMedicationBuilder.from(kbvMedicComp)
+            .version(ErpWorkflowVersion.V1_4_0)
+            .lotNumber("123123")
+            .build();
+    val result = ValidatorUtil.encodeAndValidate(parser, gemMedication, false);
+    assertFalse(result.isSuccessful());
+  }
+
   @Test
   void shouldBuildFromMedicationCompoundingWithSpecificValuesCorrect() {
+    val pzn = PZN.random().getValue();
+    val medName = "nicorette";
     val kbvMedicComp =
         KbvErpMedicationCompoundingFaker.builder()
-            .withMedicationIngredient(PZN.random().getValue(), "nicorette")
+            .withMedicationIngredient(pzn, medName)
             .withDosageForm(Darreichungsform.ATO)
             .withVaccine(true)
             .withPackaging("im Fass")
@@ -286,23 +314,28 @@ class GemErpMedicationBuilderTest extends ParsingTest {
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
     assertTrue(result.isSuccessful());
-    assertEquals(
-        "nicorette", gemMedication.getIngredientFirstRep().getItemCodeableConcept().getText());
+    assertEquals(medName, gemMedication.getName().get());
     assertTrue(gemMedication.isVaccine());
     assertEquals(
         "im Fass",
         String.valueOf(
             gemMedication.getExtension().stream()
-                .filter(
-                    ex ->
-                        ex.getUrl()
-                            .contains(EpaMedicationStructDef.PACKAGING_EXTENSION.getCanonicalUrl()))
+                .filter(ex -> EpaMedStructDef.PACKAGING_EXTENSION.matches(ex.getUrl()))
                 .findFirst()
                 .get()
                 .getValue()));
     assertEquals(
         String.valueOf(Darreichungsform.ATO.getDisplay()),
         String.valueOf(gemMedication.getIngredient().get(0).getExtensionFirstRep().getValue()));
+    assertEquals(
+        pzn,
+        ((EpaMedPznIngredient) gemMedication.getContained().get(0))
+            .getPzn()
+            .orElseThrow()
+            .getValue());
+    val medReference = gemMedication.getIngredientFirstRep().getItemReference().getReference();
+    assertEquals(gemMedication.getContained().get(0).getId(), medReference);
+    assertFalse(gemMedication.getIngredientFirstRep().hasItemCodeableConcept());
   }
 
   @Test
@@ -391,5 +424,12 @@ class GemErpMedicationBuilderTest extends ParsingTest {
 
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
     assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldNotBuildAnIngredientCompondingMedication() {
+    val builder = GemErpMedicationBuilder.builder();
+    builder.isIngredient().isCompounding().isVaccine(true);
+    assertThrows(BuilderException.class, builder::build);
   }
 }

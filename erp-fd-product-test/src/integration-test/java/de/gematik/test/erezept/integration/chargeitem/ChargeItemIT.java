@@ -67,7 +67,7 @@ public class ChargeItemIT extends ErpTest {
   @Actor(name = "Am Waldesrand")
   private PharmacyActor waldApo;
 
-  public static Stream<Arguments> ChargeItemBinaryVersions() {
+  public static Stream<Arguments> chargeItemBinaryVersions() {
     return ErxChargeItemManipulatorFactory.binaryVersionManipulator().stream()
         .map(namedEnvelope -> Arguments.arguments(namedEnvelope.getName(), namedEnvelope));
   }
@@ -226,7 +226,7 @@ public class ChargeItemIT extends ErpTest {
   @DisplayName(
       "Nachweis, dass ein ChargeItem in Version 1.3 mit Binary verschiedenen Profilversionen"
           + " eingestellt werden kann")
-  @MethodSource("ChargeItemBinaryVersions")
+  @MethodSource("chargeItemBinaryVersions")
   void postChargeItemsWithDifferentBinaryVersions(
       String description, NamedEnvelope<FuzzingMutator<ErxChargeItem>> chargeItemMutators) {
 

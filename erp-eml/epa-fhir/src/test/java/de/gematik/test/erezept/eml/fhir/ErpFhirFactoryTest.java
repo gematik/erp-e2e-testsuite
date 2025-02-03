@@ -34,7 +34,7 @@ class ErpFhirFactoryTest {
   void shouldReadProvidePrescriptionCorrect() {
     val codec = EpaFhirFactory.create();
     val providePrescAsStringFromFd =
-        ResourceLoader.readFileFromResource("fhir/unknown/provPrescFromFD.json");
+        ResourceLoader.readFileFromResource("fhir/forunittests/provPrescFromFD.json");
     val ressource = codec.decode(providePrescAsStringFromFd);
     assertInstanceOf(EpaOpProvidePrescription.class, ressource);
     val provPresc = (EpaOpProvidePrescription) ressource;
@@ -58,7 +58,7 @@ class ErpFhirFactoryTest {
   void validateWithDefaultFhirValidatorShouldWork() {
     val medicationAsString =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/medication/Medication-SumatripanMedication.json");
+            "fhir/forunittests/Medication-SumatripanMedication.json");
 
     val codec = EpaFhirFactory.create();
     val epaMedic = codec.decode(Medication.class, medicationAsString);

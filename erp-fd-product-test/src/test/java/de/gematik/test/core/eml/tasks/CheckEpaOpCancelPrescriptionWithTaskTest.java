@@ -29,11 +29,11 @@ import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
+import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -121,7 +121,7 @@ class CheckEpaOpCancelPrescriptionWithTaskTest extends ParsingTest {
     val mockedPrescription = mock(EpaOpCancelPrescription.class);
 
     when(mockedPrescription.getEpaPrescriptionId())
-        .thenReturn(PrescriptionId.from("160.153.303.257.459"));
+        .thenReturn(RxPrescriptionId.from("160.153.303.257.459"));
     when(mockedPrescription.getEpaAuthoredOn()).thenReturn(testDate_22_01_2025);
     when(useEpaMockClient.downloadCancelPrescriptionBy(any()))
         .thenReturn(List.of(mockedPrescription));

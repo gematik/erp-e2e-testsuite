@@ -93,7 +93,7 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     this.config.equipWithEpaMockClient(epaFhirChecker);
 
     patient.changePatientInsuranceType(insuranceType);
-    // todo
+    // todo activate if PUT is activated
     // patient.attemptsTo(EmlProvidePrescriptionApply.forKvnr(patient.getKvnr()));
 
     val activation =

@@ -15,8 +15,9 @@
       compatibleVersions: "0.11.11"
     - name: "dav.kbv.sfhir.cs.vs"
       version: "1.14"
-  errorFilter: # todo reduce
+  errorFilter: #
     - "^2 Profile für contained Ressource gefunden\\. Mehr als eines wird zur Zeit nicht unterstützt\\. \\(Typ Medication: https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pharmaceutical-product, https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient\\)"
+    - "^2 profiles found for contained resource\\. More than one is not supported at this time\\. \\(Type Medication: https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pharmaceutical-product, https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient\\)"
   ignoreCodeSystems:
     - "http://fhir.de/CodeSystem/ask"
     - "http://fhir.de/CodeSystem/ifa/pzn"

@@ -6,7 +6,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.11.0</version>
+        <version>0.12.0</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
@@ -246,10 +246,6 @@
                 <configuration>
                     <tags>${tags}</tags>
                     <reports>single-page-html,json-summary</reports>
-                    <systemPropertyVariables>
-                        <report.customfields.Testsuite>App-TestSuite v${project.version}</report.customfields.Testsuite>
-                        <report.customfields.Tester>${user.name}</report.customfields.Tester>
-                    </systemPropertyVariables>
                 </configuration>
                 <dependencies>
                     <dependency>

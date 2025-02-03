@@ -16,12 +16,16 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.parser.profiles.definitions.EpaMedicationStructDef.MED_INGREDIENT_DOSAGE_FORM_EXT;
+import static de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef.MED_INGREDIENT_DOSAGE_FORM_EXT;
+import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.EpaMedicationStructDef;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredientBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
@@ -41,8 +45,8 @@ import org.hl7.fhir.r4.model.*;
 public class GemErpMedicationBuilder
     extends ResourceBuilder<GemErpMedication, GemErpMedicationBuilder> {
 
-  private static boolean isMedicationIngredient = false;
-  private static boolean isMedicationCompounding = false;
+  private boolean isMedicationIngredient = false;
+  private boolean isMedicationCompounding = false;
 
   @Nullable String compInstruction;
   @Nullable String formText;
@@ -59,6 +63,7 @@ public class GemErpMedicationBuilder
   private String freeText;
   @Nullable private CodeableConcept ingredCodeableConcept;
   @Nullable private Ratio ingredientStrength;
+
   @Nullable private String packaging;
 
   public static GemErpMedicationBuilder builder() {
@@ -70,8 +75,9 @@ public class GemErpMedicationBuilder
     builder.category(EpaDrugCategory.fromCode(kbvMedication.getCategoryFirstRep().getCode()));
     kbvMedication
         .getPznOptional()
-        .ifPresent(pzn -> builder.pzn(pzn, kbvMedication.getMedicationName()));
-    kbvMedication.getDarreichungsform().ifPresent(builder::darreichungsform);
+        .ifPresent(pzn -> builder.pzn(PZN.from(pzn.getValue()), kbvMedication.getMedicationName()));
+
+    kbvMedication.getDarreichungsform().stream().findFirst().ifPresent(builder::darreichungsform);
     kbvMedication
         .getPackagingUnit()
         .ifPresentOrElse(
@@ -87,7 +93,7 @@ public class GemErpMedicationBuilder
             prof ->
                 prof.getValue()
                     .contains(KbvItaErpStructDef.MEDICATION_INGREDIENT.getCanonicalUrl()))) {
-      isMedicationIngredient = true;
+      builder.isIngredient();
 
       kbvMedication
           .getIngredient()
@@ -100,7 +106,7 @@ public class GemErpMedicationBuilder
             prof ->
                 prof.getValue()
                     .contains(KbvItaErpStructDef.MEDICATION_COMPOUNDING.getCanonicalUrl()))) {
-      isMedicationCompounding = true;
+      builder.isCompounding();
       kbvMedication
           .getIngredient()
           .forEach(ing -> builder.ingredientItemCodeConcept(ing.getItemCodeableConcept()));
@@ -137,6 +143,16 @@ public class GemErpMedicationBuilder
   public GemErpMedicationBuilder packaging(String packaging) {
     this.packaging = packaging;
     return self();
+  }
+
+  public GemErpMedicationBuilder isCompounding() {
+    this.isMedicationCompounding = true;
+    return this;
+  }
+
+  public GemErpMedicationBuilder isIngredient() {
+    this.isMedicationIngredient = true;
+    return this;
   }
 
   private void ingredientStrength(Ratio ratio) {
@@ -203,6 +219,7 @@ public class GemErpMedicationBuilder
 
   @Override
   public GemErpMedication build() {
+    checkRequired();
     // TODO: will be available after final move to bricks builder
     // val medication = this.createResource(GemErpMedication::new, ErpWorkflowStructDef.MEDICATION,
     // version);
@@ -216,17 +233,16 @@ public class GemErpMedicationBuilder
     Optional.ofNullable(this.isVaccine)
         .ifPresent(
             vaccine ->
-                medication.addExtension(
-                    EpaMedicationStructDef.VACCINE_EXT.asBooleanExtension(vaccine)));
+                medication.addExtension(EpaMedStructDef.VACCINE_EXT.asBooleanExtension(vaccine)));
     Optional.ofNullable(this.normgroesse)
         .ifPresent(size -> medication.addExtension(size.asExtension()));
     Optional.ofNullable(this.darreichungsform)
         .ifPresent(form -> medication.setForm(form.asCodeableConcept()));
-
-    Optional.ofNullable(this.pzn)
-        .ifPresent(
-            presentPzn -> medication.setCode(presentPzn.asNamedCodeable(this.medicationName)));
-
+    if (!isMedicationCompounding) {
+      Optional.ofNullable(this.pzn)
+          .ifPresent(
+              presentPzn -> medication.setCode(presentPzn.asNamedCodeable(this.medicationName)));
+    }
     Optional.ofNullable(this.freeText)
         .ifPresent(presentFreeText -> medication.getCode().setText(presentFreeText));
 
@@ -239,34 +255,44 @@ public class GemErpMedicationBuilder
               amountRatio
                   .getNumerator()
                   .addExtension(
-                      EpaMedicationStructDef.TOTAL_QUANTITY_FORMULATION_EXT.getCanonicalUrl(),
+                      EpaMedStructDef.TOTAL_QUANTITY_FORMULATION_EXT.getCanonicalUrl(),
                       new StringType(String.valueOf(numerator)));
               amountRatio.getDenominator().setValue(1);
             });
     Optional.ofNullable(this.batchLotNumber)
         .ifPresent(lotNumber -> medication.getBatch().setLotNumber(lotNumber));
 
-    // forMedicationCompounding
     Optional.ofNullable(this.packaging)
         .ifPresent(
             p ->
                 medication.addExtension(
-                    EpaMedicationStructDef.PACKAGING_EXTENSION.getCanonicalUrl(),
-                    new StringType(p)));
+                    EpaMedStructDef.PACKAGING_EXTENSION.getCanonicalUrl(), new StringType(p)));
     Optional.ofNullable(this.compInstruction)
         .ifPresent(
             compInstr ->
                 medication.addExtension(
-                    EpaMedicationStructDef.MANUFACTURING_INSTRUCTION.getCanonicalUrl(),
+                    EpaMedStructDef.MANUFACTURING_INSTRUCTION.getCanonicalUrl(),
                     new StringType(compInstruction)));
 
     Optional.ofNullable(this.ingredCodeableConcept)
         .ifPresent(ingredientCod -> medication.getIngredientFirstRep().setItem(ingredientCod));
 
-    if (isMedicationIngredient && ingredientStrength != null) {
+    if (isMedicationIngredient) {
       return fillMissingInIngredStrength(ingredientStrength, medication);
     }
-    if (isMedicationCompounding && ingredientStrength != null) {
+    if (isMedicationCompounding) {
+      if (medication.getIngredientFirstRep().getItemCodeableConcept().getCoding().stream()
+          .anyMatch(DeBasisCodeSystem.PZN::match)) {
+
+        val epaPznIngreMed =
+            EpaMedPznIngredientBuilder.builder()
+                .withPzn(medication.getIngredientFirstRep().getItemCodeableConcept())
+                .build();
+
+        medication.getContained().add(epaPznIngreMed);
+        medication.getIngredientFirstRep().setItem(new Reference("#" + epaPznIngreMed.getId()));
+      }
+
       return fillMissingInIngredStrength(ingredientStrength, medication);
     }
     return medication;
@@ -317,5 +343,13 @@ public class GemErpMedicationBuilder
                 .setValue(new StringType(formText)));
 
     return medication;
+  }
+
+  private void checkRequired() {
+    if (isMedicationCompounding && isMedicationIngredient) {
+      val prefixedErrorMsg =
+          format("The medication can only be an Ingredient or Compounding Medication, not both");
+      throw new BuilderException(prefixedErrorMsg);
+    }
   }
 }

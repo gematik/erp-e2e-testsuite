@@ -26,6 +26,30 @@ actors:
       qualificationType: Arzt
       konnektor: Soft-Konn
 
+    - name: Finn Stauffenberg
+      description: "Akteur mit Psychotherapeut-HBA und Psychotherapeutische Praxis SMC-B"
+      smcbIccsn: 80276883110000163952 # Psychotherapeutische Praxis Hillbert Freiherr Cördes
+      hbaIccsn: 80276883110000163949  # Psychotherapeut Finn Stauffenberg
+      algorithm: E256
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Peter Kleinschmidt
+      description: "Akteur mit Psychotherapeut-HBA und Psychotherapeutische Praxis SMC-B"
+      smcbIccsn: 80276883110000163953 # Krankenhaus am Ufer
+      hbaIccsn: 80276883110000163950  # Psychotherapeut Peter Kleinschmidt
+      algorithm: E256
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Julian Böcher
+      description: "Akteur mit Psychotherapeut-HBA und Psychotherapeutische Praxis SMC-B"
+      smcbIccsn: 80276883110000163954 # Betriebsstätte Kostenträger GKV Dr. Heiner Oldenburg
+      hbaIccsn: 80276883110000163951  # Psychotherapeut Julian Böcher
+      algorithm: E256
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
     - name: Kein Arzt
       description: "Akteur mit Apotheker-HBA und Arztpraxis SMC-B der sich als Arzt ausgibt"
       smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
@@ -186,7 +210,7 @@ environments:
       epaMockUrl: https://epa-as-mock.ref.gematik.solutions:443
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
-      maxWait: 60000
+      maxWait: 360000
 
   - name: TITUS
     ti:
@@ -205,7 +229,7 @@ environments:
       epaMockUrl: https://epa-as-mock.test.epa4all.de:4433
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
-      maxWait: 60000
+      maxWait: 360000
 
   - name: LOCAL
     ti:
@@ -223,7 +247,7 @@ environments:
       epaMockUrl: https://epa-as-mock.test.epa4all.de:4433
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
-      maxWait: 60000
+      maxWait: 360000
 
 konnektors:
   - name: KonSim@localhost

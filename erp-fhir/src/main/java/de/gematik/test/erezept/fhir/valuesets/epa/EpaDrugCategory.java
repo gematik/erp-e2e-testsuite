@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.fhir.valuesets.epa;
 
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
 import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.EpaMedicationStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.EpaMedicationCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
@@ -54,8 +54,7 @@ public enum EpaDrugCategory implements IValueSet {
   }
 
   public Extension asExtension() {
-    return new Extension(
-        EpaMedicationStructDef.DURG_CATEGORY_EXT.getCanonicalUrl(), this.asCoding());
+    return new Extension(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl(), this.asCoding());
   }
 
   public static EpaDrugCategory fromCode(String coding) {

@@ -20,18 +20,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import java.util.Optional;
 import lombok.val;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Medication;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class EpaMedicationTest {
 
   private static final String MEDICATION_AS_STRING =
-      ResourceLoader.readFileFromResource(
-          "fhir/valid/medication/Medication-SumatripanMedication.json");
+      ResourceLoader.readFileFromResource("fhir/forunittests/Medication-SumatripanMedication.json");
   private static final String ASK_MEDIC_AS_STRING =
       ResourceLoader.readFileFromResource(
-          "fhir/valid/medication/ASK-Medication-4f9ab221-0eef-4e46-a8a9-38302e0488b1.json");
+          "fhir/forunittests/ASK-Medication-4f9ab221-0eef-4e46-a8a9-38302e0488b1.json");
 
   private static EpaMedication medication;
   private static EpaMedication askMedication;
@@ -65,5 +68,47 @@ class EpaMedicationTest {
   void getPresIdentShouldWork() {
     val id = askMedication.getRxPrescriptionId();
     assertEquals("160.153.303.257.459_20250122", id.orElseThrow().getValue());
+  }
+
+  @Test
+  void isVaccineShouldWorkWithoutVaccineExtension() {
+    val epaMedication = new EpaMedication();
+    assertFalse(epaMedication.isVaccine());
+  }
+
+  @Test
+  void isVaccineShouldFindFalse() {
+    val med = new EpaMedication();
+    med.getExtension().add(EpaMedStructDef.VACCINE_EXT.asBooleanExtension(false));
+    assertFalse(med.isVaccine());
+  }
+
+  @Test
+  void isVaccineShouldFindTrue() {
+    val med = new EpaMedication();
+    med.getExtension().add(EpaMedStructDef.VACCINE_EXT.asBooleanExtension(true));
+    assertTrue(med.isVaccine());
+  }
+
+  @Test
+  void getTextFromCodingDisplay() {
+    assertEquals(Optional.of("Manipulated from PZN..."), askMedication.getName());
+  }
+
+  @Test
+  void getTextFromDisplayCodeText() {
+    val med = new EpaMedication();
+    med.getCode().setText("testCode");
+    assertEquals(Optional.of("testCode"), med.getName());
+  }
+
+  @Test
+  void getTextFromIngredientText() {
+    val med = new EpaMedication();
+    med.getIngredient()
+        .add(
+            new Medication.MedicationIngredientComponent()
+                .setItem(new CodeableConcept().setText("testCode")));
+    assertEquals(Optional.of("testCode"), med.getName());
   }
 }
