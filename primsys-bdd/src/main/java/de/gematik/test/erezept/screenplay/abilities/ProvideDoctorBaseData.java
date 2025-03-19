@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import com.google.common.base.Strings;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerBuilder;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.AsvFachgruppennummer;
 import de.gematik.test.erezept.fhir.values.BaseANR;
-import de.gematik.test.erezept.fhir.valuesets.Country;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.UUID;
 import lombok.Getter;
@@ -60,7 +61,7 @@ public class ProvideDoctorBaseData implements Ability {
 
     val fullName = cfg.getName();
     String[] tokens;
-    if (fullName != null && !fullName.isEmpty()) {
+    if (!Strings.isNullOrEmpty(fullName)) {
       tokens = fullName.split(" "); // split by first and last names
     } else {
       tokens = new String[0];
@@ -89,8 +90,8 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   private KbvPractitioner getAsvPractitioner() {
-    return PractitionerBuilder.builder()
-        .setResourceId(practitionerId)
+    return KbvPractitionerBuilder.builder()
+        .setId(practitionerId)
         .name(firstName, lastName, "Dr.")
         .addQualification(qualificationType)
         .addQualification(asvFachgruppennummer)
@@ -99,8 +100,8 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   private KbvPractitioner getStandardPractitioner() {
-    return PractitionerBuilder.builder()
-        .setResourceId(practitionerId)
+    return KbvPractitionerBuilder.builder()
+        .setId(practitionerId)
         .anr(doctorNumber)
         .name(firstName, lastName, "Dr.")
         .addQualification(qualificationType)
@@ -108,9 +109,9 @@ public class ProvideDoctorBaseData implements Ability {
         .build();
   }
 
-  public MedicalOrganization getMedicalOrganization() {
-    return MedicalOrganizationBuilder.builder()
-        .setResourceId(medicationOrganizationId)
+  public KbvMedicalOrganization getMedicalOrganization() {
+    return KbvMedicalOrganizationBuilder.builder()
+        .setId(medicationOrganizationId)
         .bsnr(bsnr)
         .phone(phone)
         .email(email)

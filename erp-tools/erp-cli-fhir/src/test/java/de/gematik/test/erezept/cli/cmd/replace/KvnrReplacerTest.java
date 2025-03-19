@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 package de.gematik.test.erezept.cli.cmd.replace;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -33,7 +35,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import picocli.CommandLine;
 import picocli.CommandLine.ExitCode;
 
-class KvnrReplacerTest extends ParsingTest {
+class KvnrReplacerTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] Replace KVNR for {2} Patient from {1}")
   @CsvSource({

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,35 +20,28 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junitpioneer.jupiter.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
 @Slf4j
-class DavBundleManipulatorFactoryTest extends ParsingTest {
+class DavBundleManipulatorFactoryTest extends ErpFhirParsingTest {
 
   private static final boolean DEBUG = false;
 
   @Test
   void shouldThrowOnConstructorCall() throws NoSuchMethodException {
-    Constructor<DavBundleManipulatorFactory> constructor =
-        DavBundleManipulatorFactory.class.getDeclaredConstructor();
-    assertTrue(Modifier.isPrivate(constructor.getModifiers()));
-    constructor.setAccessible(true);
-    assertThrows(InvocationTargetException.class, constructor::newInstance);
+    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(DavBundleManipulatorFactory.class));
   }
 
   @ParameterizedTest(
@@ -67,7 +60,7 @@ class DavBundleManipulatorFactoryTest extends ParsingTest {
                 m ->
                     (Executable)
                         () -> {
-                          val davBundle = DavAbgabedatenFaker.builder().fake();
+                          val davBundle = DavPkvAbgabedatenFaker.builder().fake();
                           assertDoesNotThrow(() -> m.getParameter().accept(davBundle));
                           val encoded = parser.encode(davBundle, EncodingType.XML);
                           val result = parser.validate(encoded);
@@ -93,9 +86,8 @@ class DavBundleManipulatorFactoryTest extends ParsingTest {
                             assertFalse(result.isSuccessful(), m.getName());
                           } else {
                             log.warn(
-                                format(
-                                    "''{0}'' manipulation was not detected as invalid by HAPI",
-                                    m.getName()));
+                                "'{}' manipulation was not detected as invalid by HAPI",
+                                m.getName());
                           }
                         });
     assertAll("Should fail on manipulated DavBundle", executables);

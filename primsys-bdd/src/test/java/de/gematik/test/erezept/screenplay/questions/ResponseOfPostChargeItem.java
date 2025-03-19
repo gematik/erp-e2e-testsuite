@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,23 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.strategy.pharmacy.AcceptedPrescriptionStrategy;
 import de.gematik.test.erezept.screenplay.strategy.pharmacy.DispensedPrescriptionStrategy;
 import de.gematik.test.erezept.screenplay.strategy.pharmacy.PharmacyPrescriptionStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.function.Function;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +48,6 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
 
   private ResponseOfPostChargeItem(
       PharmacyPrescriptionStrategy strategy, @Nullable Actor apothecary) {
-    super("POST /ChargeItem");
     this.strategy = strategy;
     this.apothecary = apothecary;
   }
@@ -76,26 +74,19 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     strategy.init(actor);
 
+    // decide who should sign the DAV-Bundle
+    val smartcardType =
+        Optional.ofNullable(this.apothecary)
+            .map(a -> SmartcardType.HBA)
+            .orElse(SmartcardType.SMC_B);
+    val konnektorOwner = Optional.ofNullable(this.apothecary).orElse(actor);
+
     // use a random faked DavBundle for now
-    val davBundle = DavAbgabedatenFaker.builder(strategy.getPrescriptionId()).fake();
-    Function<DavAbgabedatenBundle, byte[]> signer;
-    if (apothecary != null) {
-      // sign as apothecary with HBA
-      val konnektor = SafeAbility.getAbility(apothecary, UseTheKonnektor.class);
-      signer =
-          (b) -> {
-            val encoded = erpClient.encode(b, EncodingType.XML);
-            return konnektor.signDocumentWithHba(encoded).getPayload();
-          };
-    } else {
-      // sign as pharmacy with SMC-B
-      val konnektor = SafeAbility.getAbility(actor, UseTheKonnektor.class);
-      signer =
-          (b) -> {
-            val encoded = erpClient.encode(b, EncodingType.XML);
-            return konnektor.signDocumentWithSmcb(encoded).getPayload();
-          };
-    }
+    val davBundle = DavPkvAbgabedatenFaker.builder(strategy.getPrescriptionId()).fake();
+    val signer =
+        konnektorOwner.asksFor(
+            TheFhirDocumentSigner.withEncoder(b -> erpClient.encode(davBundle, EncodingType.XML))
+                .using(smartcardType));
 
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(strategy.getPrescriptionId())
@@ -104,7 +95,7 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
             .enterer(smcb.getTelematikID())
             .subject(strategy.getReceiverKvnr(), GemFaker.insuranceName())
             .verordnung(strategy.getTaskId().getValue())
-            .abgabedatensatz(davBundle, signer)
+            .abgabedatensatz(davBundle.getReference(), signer.apply(davBundle))
             .build();
 
     val cmd = new ChargeItemPostCommand(chargeItem, strategy.getSecret());
@@ -137,6 +128,7 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
+
     private final PharmacyPrescriptionStrategy strategy;
 
     public ResponseOfPostChargeItem signedByPharmacy() {

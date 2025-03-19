@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,14 @@ import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.GetReceivedCommunication;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -71,13 +75,13 @@ public class AcceptDispenseRequest implements Task {
     val eGK = SafeAbility.getAbility(sender, ProvideEGK.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val response =
-        ErxCommunicationBuilder.builder()
-            .basedOnTaskId(acceptedTask.getTaskId())
-            .recipient(eGK.getKvnr().getValue())
+        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+            .basedOn(acceptedTask.getTaskId())
+            .receiver(eGK.getKvnr().getValue())
             .sender(smcb.getTelematikID())
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(SupplyOptionsType.SHIPMENT)
-            .buildReply(new CommunicationReplyMessage());
+            .build();
     val comResponse = new CommunicationPostCommand(response);
     erpClient.request(comResponse);
   }

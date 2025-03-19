@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import java.util.Calendar;
-import java.util.Date;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class EpaOpCancelDispensationTest {
+class EpaOpCancelDispensationTest extends EpaFhirParsingTest {
   private static final String EPA_OP_CANCEL_DISP_AS_STRING =
       ResourceLoader.readFileFromResource(
           "fhir/valid/medication/Parameters-example-epa-op-cancel-dispensation-erp-input-parameters-1.json");
@@ -35,15 +34,18 @@ class EpaOpCancelDispensationTest {
 
   @BeforeAll
   static void setup() {
-    val fh = EpaFhirFactory.create();
     epaOpCancelDispensation =
-        fh.decode(EpaOpCancelDispensation.class, EPA_OP_CANCEL_DISP_AS_STRING);
+        epaFhir.decode(EpaOpCancelDispensation.class, EPA_OP_CANCEL_DISP_AS_STRING);
   }
 
   @Test
   void shouldGetEpaAuthoredOnDateCorrect() {
-    assertEquals(
-        new Date(2025 - 1900, Calendar.JANUARY, 22), epaOpCancelDispensation.getEpaAuthoredOn());
+    val calendar = Calendar.getInstance();
+    calendar.set(2025, Calendar.JANUARY, 22, 0, 0, 0);
+    calendar.clear(Calendar.MILLISECOND);
+
+    val expected = calendar.getTime();
+    assertEquals(expected, epaOpCancelDispensation.getEpaAuthoredOn());
   }
 
   @Test

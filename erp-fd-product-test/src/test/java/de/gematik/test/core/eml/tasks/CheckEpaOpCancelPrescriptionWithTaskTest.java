@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
 import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -45,7 +45,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class CheckEpaOpCancelPrescriptionWithTaskTest extends ParsingTest {
+class CheckEpaOpCancelPrescriptionWithTaskTest extends ErpFhirParsingTest {
   private static KbvErpBundle kbvErpBundle;
   private static final Date testDate_22_01_2025 =
       DateConverter.getInstance().localDateToDate(LocalDate.of(2025, Month.JANUARY, 22));

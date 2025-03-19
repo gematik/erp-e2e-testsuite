@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class AccidentCauseTypeTest {
 
@@ -28,13 +32,10 @@ class AccidentCauseTypeTest {
     assertEquals(AccidentCauseType.ACCIDENT, AccidentCauseType.fromCode("1"));
   }
 
-  @Test
-  void shouldThrowOnInvalidCode() {
-    assertThrows(InvalidValueSetException.class, () -> AccidentCauseType.fromCode("3"));
-  }
-
-  @Test
-  void shouldThrowOnNullCode() {
-    assertThrows(NullPointerException.class, () -> AccidentCauseType.fromCode(null)); // NOSONAR
+  @ParameterizedTest
+  @ValueSource(strings = {"3"})
+  @NullSource
+  void shouldThrowOnInvalidCode(String code) {
+    assertThrows(InvalidValueSetException.class, () -> AccidentCauseType.fromCode(code));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package de.gematik.test.erezept.primsys.mapping;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
@@ -51,8 +51,9 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
           dto::setSupplyForm,
           () -> fakerValueSet(SupplyFormDto.class, SupplyFormDto.LYO));
       ensure(dto::getPzn, dto::setPzn, () -> PZN.random().getValue());
-      ensure(dto::getAmount, dto::setAmount, () -> fakerAmount(1, 20));
-      ensure(dto::getAmountUnit, dto::setAmountUnit, () -> "Stk");
+      ensure(
+          dto::getPackagingSize, dto::setPackagingSize, () -> String.valueOf(fakerAmount(1, 20)));
+      ensure(dto::getPackagingUnit, dto::setPackagingUnit, () -> "Stk");
     }
   }
 
@@ -62,7 +63,7 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
         .isVaccine(dto.isVaccine())
         .normgroesse(this.getStandardSize())
         .darreichungsform(this.getDarreichungsform())
-        .amount(dto.getAmount(), dto.getAmountUnit())
+        .packagingSize(dto.getPackagingSize(), dto.getPackagingUnit())
         .pzn(dto.getPzn(), dto.getName())
         .category(MedicationCategory.C_00)
         .build();
@@ -83,8 +84,8 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
     medication
         .getDarreichungsform()
         .ifPresent(df -> dto.setSupplyForm(SupplyFormDto.fromCode(df.getCode())));
-    medication.getPackagingAmount().ifPresent(dto::setAmount);
-    medication.getPackagingUnit().ifPresent(dto::setAmountUnit);
+    medication.getPackagingSize().ifPresent(dto::setPackagingSize);
+    medication.getPackagingUnit().ifPresent(dto::setPackagingUnit);
     medication.getPznOptional().ifPresent(pzn -> dto.setPzn(pzn.getValue()));
     dto.setName(medication.getMedicationName());
     dto.setCategory(MedicationCategoryDto.fromCode(medication.getCategoryFirstRep().getCode()));

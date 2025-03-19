@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.app.task;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
@@ -25,7 +26,6 @@ import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.questions.UsedSessionKVNR;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -43,7 +43,7 @@ public class NavigateThroughCardwall implements Task {
 
   private final EnvironmentConfiguration environment;
   private final SmartcardArchive sca;
-  private final VersicherungsArtDeBasis insuranceKind;
+  private final InsuranceTypeDe insuranceKind;
 
   @Override
   @Step("{0} meldet sich mit seiner/ihrer eGK von der #insuranceKind in der E-Rezept App an")
@@ -92,11 +92,11 @@ public class NavigateThroughCardwall implements Task {
     private final EnvironmentConfiguration environment;
 
     public NavigateThroughCardwall byMappingVirtualEgkFrom(SmartcardArchive sca) {
-      return byMappingVirtualEgkFrom(sca, VersicherungsArtDeBasis.GKV);
+      return byMappingVirtualEgkFrom(sca, InsuranceTypeDe.GKV);
     }
 
     public NavigateThroughCardwall byMappingVirtualEgkFrom(
-        SmartcardArchive sca, VersicherungsArtDeBasis insuranceKind) {
+        SmartcardArchive sca, InsuranceTypeDe insuranceKind) {
       return Instrumented.instanceOf(NavigateThroughCardwall.class)
           .withProperties(environment, sca, insuranceKind);
     }

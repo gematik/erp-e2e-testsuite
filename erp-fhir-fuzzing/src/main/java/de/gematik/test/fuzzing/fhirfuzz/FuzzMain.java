@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import static java.text.MessageFormat.format;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzOperationResult;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
@@ -145,7 +145,7 @@ public class FuzzMain {
           jsonOriginalBundle,
           emptyTargetDir,
           format("Run_{0}_orgBundle{1}.json", i, isValidBeforeFuzz));
-      log.info("log.info: " + fuzzLog);
+      log.info("log.info: {}", fuzzLog);
     }
   }
 
@@ -178,7 +178,7 @@ public class FuzzMain {
         val om = new ObjectMapper();
         fuzzConfig = om.readValue(conf, FuzzConfig.class);
       } catch (JsonProcessingException e) {
-        log.info("encode String config failed: {0}", e);
+        log.info("encode String config failed: {}", e.getMessage());
       }
     } else {
       log.info("encode String config failed: config could not be parse");
@@ -192,7 +192,7 @@ public class FuzzMain {
       try {
         bundle = fhirParser.decode(KbvErpBundle.class, bundleString);
       } catch (Exception e) {
-        log.info(format("encode given bundle to KbvErpBundle Failed: {0}", e));
+        log.info("encode given bundle to KbvErpBundle Failed: {}", e.getMessage());
       }
     else {
       bundle = KbvErpBundleFaker.builder().fake();

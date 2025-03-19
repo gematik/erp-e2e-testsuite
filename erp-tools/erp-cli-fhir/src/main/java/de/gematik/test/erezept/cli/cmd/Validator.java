@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,27 @@
 
 package de.gematik.test.erezept.cli.cmd;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import ca.uhn.fhir.validation.*;
-import de.gematik.test.erezept.cli.description.*;
-import de.gematik.test.erezept.cli.indexmap.*;
+import ca.uhn.fhir.validation.ResultSeverityEnum;
+import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.test.erezept.cli.description.FhirResourceDescriber;
+import de.gematik.test.erezept.cli.indexmap.ExampleDetailsMap;
+import de.gematik.test.erezept.cli.indexmap.ExampleEntry;
 import de.gematik.test.erezept.cli.param.InputOutputDirectoryParameter;
-import de.gematik.test.erezept.fhir.parser.*;
-import java.io.*;
-import java.nio.charset.*;
-import java.util.concurrent.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
-import picocli.CommandLine.*;
-import picocli.CommandLine.Help.Ansi.*;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Help.Ansi.Style;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
 
 @Slf4j
 @Command(
@@ -64,7 +70,7 @@ public class Validator implements Callable<Integer> {
 
       try (val fis = new FileInputStream(f)) {
         val content = new String(fis.readAllBytes(), StandardCharsets.UTF_8);
-        log.info(format("Validate {0}", f.getName()));
+        log.info("Validate {}", f.getName());
 
         val resource = fhir.decode(content);
         val description = descriptionCreator.acceptResource(resource);

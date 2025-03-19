@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
-import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
+import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import lombok.val;
@@ -36,43 +36,12 @@ class InfoResponseBuilderTest extends TestWithActorContext {
   }
 
   @Test
-  @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "")
-  void shouldGenerateDefaultInfoResource() {
-    val ctx = ActorContext.getInstance();
-    val info = InfoResponseBuilder.getInfo(ctx);
-    assertTrue(info.getDoctors() > 0);
-    assertTrue(info.getPharmacies() > 0);
-    assertNotNull(info.getBuild());
-    assertNotNull(info.getFhir());
-    assertNotNull(info.getFhir());
-    assertEquals("default", info.getFhir().getConfigured());
-  }
-
-  @Test
-  @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "1.2.0")
+  @SetSystemProperty(key = ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE, value = "1.4.0")
   void shouldChangeProfileViaSystemProperty() {
     val ctx = ActorContext.getInstance();
     val info = InfoResponseBuilder.getInfo(ctx);
     assertNotNull(info.getFhir());
-    assertEquals("1.2.0", info.getFhir().getConfigured());
+    assertEquals("1.4.0", info.getFhir().getConfigured());
     assertNotNull(info.getFhir());
-  }
-
-  @Test
-  @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = "")
-  void shouldGenerateDefaultInfoResponseWhenEmptyVersion() {
-    val ctx = ActorContext.getInstance();
-    val info = InfoResponseBuilder.getInfo(ctx);
-    assertNotNull(info.getFhir());
-    assertEquals("default", info.getFhir().getConfigured());
-  }
-
-  @Test
-  @SetSystemProperty(key = ParserConfigurations.SYS_PROP_TOGGLE, value = " ")
-  void shouldGenerateDefaultInfoResponseWhenBlankVersion() {
-    val ctx = ActorContext.getInstance();
-    val info = InfoResponseBuilder.getInfo(ctx);
-    assertNotNull(info.getFhir());
-    assertEquals("default", info.getFhir().getConfigured());
   }
 }

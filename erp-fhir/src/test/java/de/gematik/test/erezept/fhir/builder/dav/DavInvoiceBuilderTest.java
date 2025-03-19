@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import lombok.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
-class DavInvoiceBuilderTest extends ParsingTest {
+class DavInvoiceBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build DAV DispensedMedication with E-Rezept FHIR Profiles {0}")
@@ -73,9 +73,7 @@ class DavInvoiceBuilderTest extends ParsingTest {
         .forEach(
             pc ->
                 pc.getExtension().stream()
-                    .filter(
-                        ext ->
-                            ext.getUrl().equals(AbdaErpBasisStructDef.MWST_SATZ.getCanonicalUrl()))
+                    .filter(AbdaErpBasisStructDef.MWST_SATZ::matches)
                     .map(
                         ext -> ext.getValue().castToDecimal(ext.getValue()).getValue().floatValue())
                     .forEach(vat -> assertEquals(19.0f, vat, 0.001)));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,26 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
-import java.time.LocalDate;
-import java.time.Month;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum DavKbvCsVsVersion implements ProfileVersion<DavKbvCsVsVersion> {
-  V1_0_2("1.0.2", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2070, Month.DECEMBER, 31)),
-  V1_0_3("1.0.3", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2070, Month.DECEMBER, 31));
+public enum DavKbvCsVsVersion implements ProfileVersion {
+  V1_0_2("1.0.2"),
+  V1_0_3("1.0.3");
 
+  public static final String PROFILE_NAME = "dav.kbv.sfhir.cs.vs";
   private final String version;
-  private final LocalDate validFromDate;
-  private final LocalDate validUntilDate;
-  private final CustomProfiles customProfile = CustomProfiles.DAV_KBV_CS_VS;
+
+  @Override
+  public String getName() {
+    return "";
+  }
 
   public static DavKbvCsVsVersion getDefaultVersion() {
-    return ProfileVersion.getDefaultVersion(DavKbvCsVsVersion.class, CustomProfiles.DAV_KBV_CS_VS);
+    return VersionUtil.getDefaultVersion(DavKbvCsVsVersion.class, PROFILE_NAME);
   }
 }

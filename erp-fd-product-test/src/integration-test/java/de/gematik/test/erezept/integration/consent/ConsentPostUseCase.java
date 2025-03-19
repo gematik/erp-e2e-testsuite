@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,35 @@
 
 package de.gematik.test.erezept.integration.consent;
 
+import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.*;
 import static de.gematik.test.core.expectations.verifier.AcceptBundleVerifier.consentIsPresent;
 import static de.gematik.test.core.expectations.verifier.AcceptBundleVerifier.isInProgressStatus;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
-import static de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis.GKV;
-import static de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis.PKV;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.DIRECT_ASSIGNMENT;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.ConsentBundleVerifier;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
+import de.gematik.test.erezept.actions.GrantConsent;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.ReadConsent;
+import de.gematik.test.erezept.actions.RejectConsent;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.builder.erp.ErxConsentBuilder;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.tasks.EnsureConsent;
 import java.util.stream.Stream;
@@ -90,7 +95,7 @@ public class ConsentPostUseCase extends ErpTest {
   @DisplayName("Prüfe den Consent beim Accept als abgebende Apotheke")
   @MethodSource("prescriptionConsent")
   void checkConsentOnAccept(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       boolean shouldHaveConsent) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,21 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import picocli.*;
+import picocli.CommandLine;
 
-class InsuranceCoverageParameterTest {
+class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldNotRequireAnyOptions() {
@@ -48,7 +51,7 @@ class InsuranceCoverageParameterTest {
     val cmdline = new CommandLine(icp);
     assertDoesNotThrow(() -> cmdline.parseArgs());
 
-    val patient = PatientFaker.builder().fake();
+    val patient = KbvPatientFaker.builder().fake();
     icp.setPatient(patient);
     val coverage = icp.createCoverage();
     // only possible to check if insurance kind is the same as we don't have a getter for patient
@@ -76,7 +79,7 @@ class InsuranceCoverageParameterTest {
     val coverage = icp.createCoverage();
     assertEquals("950585030", coverage.getIknr().getValue());
     assertEquals("PBeaKK Postbeamtenkrankenkasse", coverage.getName());
-    assertEquals(VersicherungsArtDeBasis.PKV, coverage.getInsuranceKind());
+    assertEquals(InsuranceTypeDe.PKV, coverage.getInsuranceKind());
   }
 
   @Test
@@ -100,7 +103,7 @@ class InsuranceCoverageParameterTest {
     val coverage = icp.createCoverage();
     assertNotNull(coverage.getIknr());
     assertEquals("ABC", coverage.getName());
-    assertEquals(VersicherungsArtDeBasis.PKV, coverage.getInsuranceKind());
+    assertEquals(InsuranceTypeDe.PKV, coverage.getInsuranceKind());
   }
 
   @ParameterizedTest(name = "Create random Coverage of Type {0}")
@@ -113,7 +116,7 @@ class InsuranceCoverageParameterTest {
     val coverage = icp.createCoverage();
     assertNotNull(coverage.getIknr().getValue());
     assertNotNull(coverage.getName());
-    assertEquals(VersicherungsArtDeBasis.fromCode(type), coverage.getInsuranceKind());
+    assertEquals(InsuranceTypeDe.fromCode(type), coverage.getInsuranceKind());
   }
 
   @Test
@@ -123,8 +126,8 @@ class InsuranceCoverageParameterTest {
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692"));
 
     val patient =
-        PatientFaker.builder()
-            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.PKV)
+        KbvPatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.PKV)
             .fake();
     icp.setPatient(patient);
     val coverage = icp.createCoverage();

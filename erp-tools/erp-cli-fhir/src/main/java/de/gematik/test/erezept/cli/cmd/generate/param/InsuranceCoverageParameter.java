@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,24 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.DynamicInsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
 import java.util.List;
 import java.util.Optional;
-import lombok.*;
-import picocli.*;
+import lombok.Setter;
+import lombok.val;
+import picocli.CommandLine;
 
 public class InsuranceCoverageParameter implements BaseResourceParameter {
 
@@ -49,10 +56,10 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
   @CommandLine.Option(
       names = {"--coverage-type"},
       paramLabel = "<TYPE>",
-      type = VersicherungsArtDeBasis.class,
+      type = InsuranceTypeDe.class,
       description =
           "The Type of the Insurance from ${COMPLETION-CANDIDATES} for the Coverage-Section")
-  private VersicherungsArtDeBasis versicherungsArt;
+  private InsuranceTypeDe versicherungsArt;
 
   @CommandLine.Option(
       names = {"--group", "--pg"},
@@ -92,7 +99,7 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
     Optional<InsuranceCoverageInfo> ret = Optional.empty();
 
     val typeOption =
-        Optional.ofNullable(versicherungsArt).flatMap(VersicherungsArtDeBasis::getCoverageOptions);
+        Optional.ofNullable(versicherungsArt).flatMap(InsuranceCoverageInfo::coverageOptionsFor);
 
     if (iknr != null && insuranceName == null && typeOption.isEmpty()) {
       // when only IKNR given, try to guess the name from all known
@@ -131,16 +138,13 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
     return getOrDefault(personGroup, () -> GemFaker.fakerValueSet(PersonGroup.class));
   }
 
-  public VersicherungsArtDeBasis getInsuranceType() {
+  public InsuranceTypeDe getInsuranceType() {
     return getOrDefault(
         versicherungsArt,
         () ->
             GemFaker.fakerValueSet(
-                VersicherungsArtDeBasis.class,
-                List.of(
-                    VersicherungsArtDeBasis.PPV,
-                    VersicherungsArtDeBasis.SEL,
-                    VersicherungsArtDeBasis.SOZ)));
+                InsuranceTypeDe.class,
+                List.of(InsuranceTypeDe.PPV, InsuranceTypeDe.SEL, InsuranceTypeDe.SOZ)));
   }
 
   public DmpKennzeichen getDmp() {
@@ -159,7 +163,7 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
     return getOrDefault(
         patient,
         () ->
-            PatientFaker.builder()
+            KbvPatientFaker.builder()
                 .withKvnrAndInsuranceType(KVNR.random(), this.getInsuranceType())
                 .fake());
   }
@@ -175,7 +179,7 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
         .dmpKennzeichen(getDmp())
         .wop(getWop())
         .versichertenStatus(getStatus())
-        .beneficiary(thePatient.getReference())
+        .beneficiary(thePatient)
         .build();
   }
 }

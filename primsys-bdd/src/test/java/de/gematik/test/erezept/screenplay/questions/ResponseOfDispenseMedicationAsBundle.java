@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,32 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
+import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.fhir.valuesets.epa.EpaDrugCategory;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import io.cucumber.datatable.DataTable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,7 +66,6 @@ public class ResponseOfDispenseMedicationAsBundle
       DequeStrategy dequeue,
       List<Map<String, String>> medications,
       int dispenseIterations) {
-    super("Task/$dispense");
     this.patient = patient;
     this.dequeue = dequeue;
     this.medicationDspMapList = medications;
@@ -92,20 +96,18 @@ public class ResponseOfDispenseMedicationAsBundle
 
     for (int x = 1; x <= dispenseIterations; x++) {
       val client = SafeAbility.getAbility(actor, UseTheErpClient.class);
-      if (medicationDspMapList == null || medicationDspMapList.isEmpty()) {
-        val kbvAsString = acceptBundle.getKbvBundleAsString();
+      if (medicationDspMapList.isEmpty()) {
+        val kbvAsString = LocalVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
         val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
 
         if (isOldProfile()) {
           medicationDispense =
               List.of(this.dispensePrescribedMedication(kbvBundle, smcb.getTelematikID()));
-
         } else {
           gemDispenseOperationParameters = convertKbvBundle(kbvBundle, smcb.getTelematikID());
         }
       } else {
         if (isOldProfile()) {
-
           medicationDispense =
               getErxMedDIsp(
                   medicationDspMapList,
@@ -290,7 +292,7 @@ public class ResponseOfDispenseMedicationAsBundle
     private final DequeStrategy dequeue;
     private final Actor patient;
     private int dispenseIterations = 1;
-    private List<Map<String, String>> medications;
+    private List<Map<String, String>> medications = List.of();
 
     public ResponseOfDispenseMedicationAsBundle build() {
       return new ResponseOfDispenseMedicationAsBundle(

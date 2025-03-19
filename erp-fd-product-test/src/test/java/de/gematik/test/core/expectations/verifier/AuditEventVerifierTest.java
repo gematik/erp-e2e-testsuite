@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +26,29 @@ import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent.Representation;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
+import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 @Slf4j
-class AuditEventVerifierTest extends ParsingTest {
+class AuditEventVerifierTest extends ErpFhirParsingTest {
 
   private static final String AUDIT_EVENT_BUNDLE_PATH_FROM_XML =
       "fhir/valid/erp/1.2.0/auditeventbundle/41f94920-14b5-426a-8859-d045270e63a2.xml";
@@ -78,49 +82,44 @@ class AuditEventVerifierTest extends ParsingTest {
         getDecodedFromPath(ErxAuditEventBundle.class, AUDIT_EVENT_BUNDLE_PATH_FROM_JSON);
   }
 
-  @Test
-  void shouldDetectAllRepresentations() {
+  @ParameterizedTest
+  @EnumSource(Representation.class)
+  void shouldDetectAllRepresentations(Representation rep) {
     val checksum =
-        VsdmExamEvidence.asOnlineTestMode(patient.getEgk())
-            .generate(VsdmExamEvidenceResult.NO_UPDATES)
-            .getChecksum()
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patient.getEgk())
+            .build(VsdmExamEvidenceResult.NO_UPDATES)
+            .getCheckDigit()
             .orElseThrow();
 
     val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
     val testData =
         ErxFhirTestResourceUtil.createErxAuditEventBundle(
             pharmacy.getTelematikId(), pharmacy.getCommonName());
-    for (Representation rep : Representation.values()) {
-      verifier.contains(rep).apply(testData);
-    }
-    verifier
-        .oneOfFirstThreeElementsCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL)
-        .apply(testData);
+    verifier.contains(rep, Instant.now()).apply(testData);
   }
 
   @Test
   void shouldFailWhileDetectingWithEmptyAuditEventBundle() {
     val checksum =
-        VsdmExamEvidence.asOnlineTestMode(patient.getEgk())
-            .generate(VsdmExamEvidenceResult.NO_UPDATES)
-            .getChecksum()
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patient.getEgk())
+            .build(VsdmExamEvidenceResult.NO_UPDATES)
+            .getCheckDigit()
             .orElseThrow();
 
     val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
 
     val testData = new ErxAuditEventBundle();
 
-    val action =
-        verifier.oneOfFirstThreeElementsCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL);
+    val action = verifier.contains(Representation.PHARMACY_GET_TASK_SUCCESSFUL, Instant.now());
     assertThrows(AssertionError.class, () -> action.apply(testData));
   }
 
   @Test
   void shouldFailWhileDetectingWithWrongAuditEventBundle() {
     val checksum =
-        VsdmExamEvidence.asOnlineTestMode(patient.getEgk())
-            .generate(VsdmExamEvidenceResult.NO_UPDATES)
-            .getChecksum()
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patient.getEgk())
+            .build(VsdmExamEvidenceResult.NO_UPDATES)
+            .getCheckDigit()
             .orElseThrow();
 
     val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
@@ -134,8 +133,7 @@ class AuditEventVerifierTest extends ParsingTest {
                     "agentName",
                     AuditEvent.AuditEventAction.R)));
 
-    val action =
-        verifier.oneOfFirstThreeElementsCorrespondsTo(Representation.PHARMACY_GET_TASK_SUCCESSFUL);
+    val action = verifier.contains(Representation.PHARMACY_GET_TASK_SUCCESSFUL, Instant.now());
     assertThrows(AssertionError.class, () -> action.apply(erxAuditEventBundle));
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,12 @@ package de.gematik.test.erezept.screenplay.task;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhirdump.FhirDumper;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
@@ -32,7 +31,11 @@ import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.strategy.prescription.*;
+import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapper;
+import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperCompounding;
+import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperFreitext;
+import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperIngredient;
+import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperPZN;
 import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
@@ -52,22 +55,13 @@ import net.serenitybdd.screenplay.Task;
 @Slf4j
 public class IssuePrescription implements Task {
 
-  private final Actor pharmacy;
+  @Nullable private final Actor pharmacy;
   private final PrescriptionDataMapper prescriptionDataMapper;
 
-  private final KVNR patientKvnr;
-
   private IssuePrescription(
-      @Nullable KVNR kvnr,
-      @Nullable Actor pharmacy,
-      PrescriptionDataMapper prescriptionDataMapper) {
-    this.patientKvnr = kvnr;
+      @Nullable Actor pharmacy, PrescriptionDataMapper prescriptionDataMapper) {
     this.pharmacy = pharmacy;
     this.prescriptionDataMapper = prescriptionDataMapper;
-  }
-
-  public static IssuePrescriptionBuilder forKvnr(String kvnr) {
-    return new IssuePrescriptionBuilder(KVNR.from(kvnr));
   }
 
   public static IssuePrescriptionBuilder forPatient(Actor patient) {
@@ -95,9 +89,10 @@ public class IssuePrescription implements Task {
               val flowType = builderFlowtypePair.getRight();
 
               log.info(
-                  format(
-                      "Create Task for {0} with WorkflowType {1} ({2})",
-                      type, flowType.getCode(), flowType.getDisplay()));
+                  "Create Task for {} with WorkflowType {} ({})",
+                  type,
+                  flowType.getCode(),
+                  flowType.getDisplay());
 
               val createCmd = new TaskCreateCommand(flowType);
               val createResponse = erpClientAbility.request(createCmd);
@@ -161,23 +156,20 @@ public class IssuePrescription implements Task {
     val dmc = DmcPrescription.ownerDmc(activatedTask.getTaskId(), activatedTask.getAccessCode());
     writeDmcToReport(dmc);
     val patient = this.prescriptionDataMapper.getPatient();
-    // if we have the not only the KVRN but also the actor, give him also a DMC Prescription
-    if (patient != null) {
-      log.info(format("Doctor hands over DMC for {0} to {1}", dmc.getTaskId(), patient.getName()));
-      SafeAbility.getAbility(patient, ManageDataMatrixCodes.class).appendDmc(dmc);
-    } else {
-      log.info(format("No concrete Actor was given to handover the DMC for {0}", dmc.getTaskId()));
-    }
+    log.info("Doctor hands over DMC for {} to {}", dmc.getTaskId(), patient.getName());
+    SafeAbility.getAbility(patient, ManageDataMatrixCodes.class).appendDmc(dmc);
+
     val type = this.prescriptionDataMapper.getType();
+
     if (pharmacy != null) {
-      if (type.equals(PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)) {
+      if (PrescriptionAssignmentKind.DIRECT_ASSIGNMENT.equals(type)) {
         SafeAbility.getAbility(pharmacy, ManagePharmacyPrescriptions.class)
             .appendAssignedPrescription(dmc);
       } else {
         log.error(
-            format(
-                "The pharmacy {0} was given for direct assignment but assignment is of type {1}",
-                pharmacy.getName(), type));
+            "The pharmacy {} was given for direct assignment but assignment is of type {}",
+            pharmacy.getName(),
+            type);
       }
     }
   }
@@ -205,15 +197,10 @@ public class IssuePrescription implements Task {
   }
 
   public static class IssuePrescriptionBuilder {
-    private KVNR kvnr;
-    private Actor patient;
+    private final Actor patient;
     private Actor pharmacy;
     private PrescriptionAssignmentKind type =
         PrescriptionAssignmentKind.PHARMACY_ONLY; // as default
-
-    private IssuePrescriptionBuilder(KVNR kvnr) {
-      this.kvnr = kvnr;
-    }
 
     private IssuePrescriptionBuilder(Actor patient) {
       this.patient = patient;
@@ -232,30 +219,29 @@ public class IssuePrescription implements Task {
     public IssuePrescription forPznPrescription(List<Map<String, String>> medications) {
 
       val mapper = new PrescriptionDataMapperPZN(patient, type, medications);
-      return new IssuePrescription(kvnr, pharmacy, mapper);
+      return new IssuePrescription(pharmacy, mapper);
     }
 
     public IssuePrescription forFreitextVerordnung(List<Map<String, String>> freitextVerordnungen) {
       val mapper = new PrescriptionDataMapperFreitext(patient, type, freitextVerordnungen);
-      return new IssuePrescription(kvnr, pharmacy, mapper);
+      return new IssuePrescription(pharmacy, mapper);
     }
 
     public IssuePrescription forRezepturVerordnung(List<Map<String, String>> rezepturVerordnungen) {
       val mapper = new PrescriptionDataMapperCompounding(patient, type, rezepturVerordnungen);
-      return new IssuePrescription(kvnr, pharmacy, mapper);
+      return new IssuePrescription(pharmacy, mapper);
     }
 
     public IssuePrescription forWirkstoffVerordnung(
         List<Map<String, String>> wirkstoffVerordnungen) {
       val mapper = new PrescriptionDataMapperIngredient(patient, type, wirkstoffVerordnungen);
-      return new IssuePrescription(kvnr, pharmacy, mapper);
+      return new IssuePrescription(pharmacy, mapper);
     }
 
     public IssuePrescription randomPrescription() {
       // concrete content of does not matter; we just simply need a single entry to issue a single
       // random prescription
-      val medications = List.of(Map.of("prescription", "1"));
-      return forPznPrescription(medications);
+      return forPznPrescription(List.of(Map.of()));
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,20 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.test.erezept.cli.converter.GermanDateConverter;
 import de.gematik.test.erezept.cli.converter.NameConverter;
-import de.gematik.test.erezept.cli.util.*;
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import java.util.*;
-import lombok.*;
-import picocli.*;
+import de.gematik.test.erezept.cli.util.NameWrapper;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
+import de.gematik.test.erezept.fhir.r4.kbv.AssignerOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import java.util.Date;
+import lombok.Getter;
+import lombok.val;
+import picocli.CommandLine;
 import picocli.CommandLine.Mixin;
 
 public class PatientParameter implements BaseResourceParameter {
@@ -55,9 +58,9 @@ public class PatientParameter implements BaseResourceParameter {
     if (assignerOrganization == null) {
       // will be required only for PKV in old KBV-Profiles
       this.assignerOrganization =
-          AssignerOrganizationBuilder.builder()
+          KbvAssignerOrganizationBuilder.builder()
               .name(GemFaker.insuranceName())
-              .iknr(IKNR.random())
+              .iknr(IKNR.randomArgeIknr())
               .phone(GemFaker.fakerPhone())
               .build();
     }
@@ -74,7 +77,7 @@ public class PatientParameter implements BaseResourceParameter {
 
   public KbvPatient createPatient() {
     val name = getFullName();
-    return PatientBuilder.builder()
+    return KbvPatientBuilder.builder()
         .kvnr(kvnrParameter.getKvnr(), kvnrParameter.getInsuranceType())
         .name(name.getFirstName(), name.getLastName())
         .assigner(getAssignerOrganization()) // will be used only for PKV patients

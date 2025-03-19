@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,5 @@ public class PharmacyConfiguration extends PsActorConfiguration {
 
   private String description =
       "Eine 'E-Rezept-ready' Apotheke die E-Rezepte akzeptieren und dispensieren kann";
-  private String smcbIccsn;
-  private String konnektor;
   private String apoVzdName;
 }

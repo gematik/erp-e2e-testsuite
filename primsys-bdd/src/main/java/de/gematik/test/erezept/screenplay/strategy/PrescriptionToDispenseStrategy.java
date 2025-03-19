@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 
 package de.gematik.test.erezept.screenplay.strategy;
 
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -84,7 +89,7 @@ public class PrescriptionToDispenseStrategy {
               .getTask()
               .getForKvnr()
               .orElseThrow(
-                  () -> new MissingFieldException(ErxTask.class, DeBasisNamingSystem.KVID));
+                  () -> new MissingFieldException(ErxTask.class, DeBasisProfilNamingSystem.KVID));
     }
     return this.kvnr;
   }
@@ -113,7 +118,7 @@ public class PrescriptionToDispenseStrategy {
   }
 
   public String getKbvBundleAsString() {
-    return taskToDispense.getKbvBundleAsString();
+    return LocalVerifier.parse(taskToDispense.getSignedKbvBundle()).getDocument();
   }
 
   /**

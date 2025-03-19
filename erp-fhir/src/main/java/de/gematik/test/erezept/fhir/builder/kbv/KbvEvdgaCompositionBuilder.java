@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItvEvdgaStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvEvdgaCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
@@ -36,7 +36,7 @@ public class KbvEvdgaCompositionBuilder
 
   @Override
   protected CanonicalType getProfile() {
-    return KbvItvEvdgaStructDef.COMPOSITION.asCanonicalType(this.version, true);
+    return KbvItvEvdgaStructDef.COMPOSITION.asCanonicalType(this.version);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class KbvEvdgaCompositionBuilder
   }
 
   @Override
-  protected ICodeSystem getSectionCodeSystem() {
+  protected WithCodeSystem getSectionCodeSystem() {
     return KbvEvdgaCodeSystem.SECTION_TYPE;
   }
 }

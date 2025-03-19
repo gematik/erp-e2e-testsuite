@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,16 @@ package de.gematik.test.erezept.cli.param;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.bbriccs.fhir.EncodingType;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import lombok.Getter;

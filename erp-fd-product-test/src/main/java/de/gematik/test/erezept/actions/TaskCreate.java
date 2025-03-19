@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.actions;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.FlowTypeUtil;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import lombok.AllArgsConstructor;
@@ -66,7 +66,7 @@ public class TaskCreate extends ErpAction<ErxTask> {
               .getPayorType()
               .map(
                   pt ->
-                      VersicherungsArtDeBasis
+                      InsuranceTypeDe
                           .GKV) // when payor type given use GKV to distinguish the flowtype
               .orElse(patient.getCoverageInsuranceType());
 

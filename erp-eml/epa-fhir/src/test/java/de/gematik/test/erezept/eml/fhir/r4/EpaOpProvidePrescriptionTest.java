@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,31 +20,27 @@ import static org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus.AC
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class EpaOpProvidePrescriptionTest {
+class EpaOpProvidePrescriptionTest extends EpaFhirParsingTest {
 
   private static EpaOpProvidePrescription epaOpProvidePrescription;
-  private static final FhirCodec fhir = EpaFhirFactory.create();
 
   @BeforeAll
   static void setup() {
-
-    val BASE_PATH =
+    val resourcePath =
         "fhir/forunittests/Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH);
-    epaOpProvidePrescription = fhir.decode(EpaOpProvidePrescription.class, content);
+    val content = ResourceLoader.readFileFromResource(resourcePath);
+    epaOpProvidePrescription = epaFhir.decode(EpaOpProvidePrescription.class, content);
   }
 
   @Test
@@ -56,8 +52,12 @@ class EpaOpProvidePrescriptionTest {
 
   @Test
   void shouldGetEpaAuthoredOn() {
-    assertEquals(
-        new Date(2025 - 1900, Calendar.JANUARY, 22), epaOpProvidePrescription.getEpaAuthoredOn());
+    val calendar = Calendar.getInstance();
+    calendar.set(2025, Calendar.JANUARY, 22, 0, 0, 0);
+    calendar.clear(Calendar.MILLISECOND);
+
+    val expected = calendar.getTime();
+    assertEquals(expected, epaOpProvidePrescription.getEpaAuthoredOn());
   }
 
   @Test

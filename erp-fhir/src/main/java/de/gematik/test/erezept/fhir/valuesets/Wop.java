@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
 
 /** <a href="https://applications.kbv.de/S_ITA_WOP_V1.00.xhtml">ITA WOP</a> */
 @Getter
-public enum Wop implements IValueSet {
+@RequiredArgsConstructor
+public enum Wop implements FromValueSet {
   DUMMY("00", "Dummy bei eGK"),
   SCHLESWIG_HOLSTEIN("01", "Schleswig-Holstein"),
   HAMBURG("02", "Hamburg"),
@@ -56,18 +58,9 @@ public enum Wop implements IValueSet {
   ;
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.WOP;
-  public static final String VERSION = "1.00";
-  public static final String DESCRIPTION = "NO DESCRIPTION";
-  public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
 
   private final String code;
   private final String display;
-  private final String definition = "N/A definition in profile";
-
-  Wop(String code, String display) {
-    this.code = code;
-    this.display = display;
-  }
 
   @Override
   public KbvCodeSystem getCodeSystem() {
@@ -75,13 +68,13 @@ public enum Wop implements IValueSet {
   }
 
   public Extension asExtension() {
-    return new Extension(DeBasisStructDef.GKV_WOP.getCanonicalUrl(), this.asCoding());
+    return DeBasisProfilStructDef.GKV_WOP.asExtension(this.asCoding());
   }
 
-  public static Wop fromCode(@NonNull String coding) {
+  public static Wop fromCode(String code) {
     return Arrays.stream(Wop.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(wop -> wop.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(Wop.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(Wop.class, code));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
@@ -30,8 +31,7 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
@@ -131,7 +131,7 @@ public class PrescriptionsDeleter implements Callable<Integer> {
               "\tError ({0}) while deleting Prescription {1}: {2}",
               response.getStatusCode(),
               task.getTaskId().getValue(),
-              OperationOutcomeWrapper.extractFrom(response.getAsOperationOutcome())));
+              OperationOutcomeExtractor.extractFrom(response.getAsOperationOutcome())));
     } else {
       System.out.println(
           format(

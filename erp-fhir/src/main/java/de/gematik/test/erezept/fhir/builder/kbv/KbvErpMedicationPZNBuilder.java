@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,24 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.NonNull;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Ratio;
-import org.hl7.fhir.r4.model.StringType;
 
 public class KbvErpMedicationPZNBuilder
-    extends AbstractResourceBuilder<KbvErpMedicationPZNBuilder> {
+    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationPZNBuilder> {
 
   private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
 
@@ -52,41 +48,12 @@ public class KbvErpMedicationPZNBuilder
   private PZN pzn;
   private String medicationName;
 
+  private String packagingSize;
   private long amountNumerator;
   private String amountNumeratorUnit;
 
   public static KbvErpMedicationPZNBuilder builder() {
     return new KbvErpMedicationPZNBuilder();
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationPZNBuilder faker() {
-    return faker(PZN.random().getValue());
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationPZNBuilder faker(String pzn) {
-    return faker(pzn, fakerDrugName());
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationPZNBuilder faker(String pzn, String name) {
-    return faker(pzn, name, MedicationCategory.C_00);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationPZNBuilder faker(
-      String pzn, String name, MedicationCategory category) {
-    return builder()
-        .type(BaseMedicationType.MEDICAL_PRODUCT) // for now only Medical Products
-        .category(category)
-        .isVaccine(false)
-        .normgroesse(fakerValueSet(StandardSize.class))
-        .darreichungsform(
-            fakerValueSet(
-                Darreichungsform.class, List.of(Darreichungsform.PUE, Darreichungsform.LYE)))
-        .amount(fakerAmount(), "Stk")
-        .pzn(pzn, name);
   }
 
   /**
@@ -104,37 +71,37 @@ public class KbvErpMedicationPZNBuilder
 
   public KbvErpMedicationPZNBuilder type(BaseMedicationType type) {
     this.baseMedicationType = type;
-    return self();
+    return this;
   }
 
   public KbvErpMedicationPZNBuilder category(MedicationCategory category) {
     this.category = category;
-    return self();
+    return this;
   }
 
   public KbvErpMedicationPZNBuilder isVaccine(boolean isVaccine) {
     this.isVaccine = isVaccine;
-    return self();
+    return this;
   }
 
   public KbvErpMedicationPZNBuilder normgroesse(StandardSize size) {
     this.normgroesse = size;
-    return self();
+    return this;
   }
 
   public KbvErpMedicationPZNBuilder darreichungsform(Darreichungsform form) {
     this.darreichungsform = form;
-    return self();
+    return this;
   }
 
-  public KbvErpMedicationPZNBuilder pzn(@NonNull String pzn, @NonNull String medicationName) {
+  public KbvErpMedicationPZNBuilder pzn(String pzn, String medicationName) {
     return pzn(PZN.from(pzn), medicationName);
   }
 
-  public KbvErpMedicationPZNBuilder pzn(@NonNull PZN pzn, @NonNull String medicationName) {
+  public KbvErpMedicationPZNBuilder pzn(PZN pzn, String medicationName) {
     this.pzn = pzn;
     this.medicationName = medicationName;
-    return self();
+    return this;
   }
 
   public KbvErpMedicationPZNBuilder amount(long numerator) {
@@ -144,17 +111,24 @@ public class KbvErpMedicationPZNBuilder
   public KbvErpMedicationPZNBuilder amount(long numerator, String unit) {
     this.amountNumerator = numerator;
     this.amountNumeratorUnit = unit;
-    return self();
+    return this;
   }
 
+  public KbvErpMedicationPZNBuilder packagingSize(String packagingSize) {
+    return packagingSize(packagingSize, "ml");
+  }
+
+  public KbvErpMedicationPZNBuilder packagingSize(String packagingSize, String unit) {
+    this.packagingSize = packagingSize;
+    this.amountNumeratorUnit = unit;
+    return this;
+  }
+
+  @Override
   public KbvErpMedication build() {
-    val medication = new KbvErpMedication();
-
-    val profile = KbvItaErpStructDef.MEDICATION_PZN.asCanonicalType(kbvItaErpVersion);
-    val meta = new Meta().setProfile(List.of(profile));
-
-    // set FHIR-specific values provided by HAPI
-    medication.setId(this.getResourceId()).setMeta(meta);
+    val medication =
+        this.createResource(
+            KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_PZN, kbvItaErpVersion);
     this.defaultAmount();
 
     val amount = new Ratio();
@@ -164,10 +138,9 @@ public class KbvErpMedicationPZNBuilder
       extensions.add(baseMedicationType.asExtension());
 
       val numerator = amount.getNumerator();
-      numerator
-          .addExtension()
-          .setValue(new StringType(String.valueOf(amountNumerator)))
-          .setUrl(KbvItaErpStructDef.PACKAGING_SIZE.getCanonicalUrl());
+      val psizeValue =
+          Optional.ofNullable(this.packagingSize).orElse(String.valueOf(amountNumerator));
+      numerator.addExtension(KbvItaErpStructDef.PACKAGING_SIZE.asStringExtension(psizeValue));
     }
     amount.getNumerator().setUnit(amountNumeratorUnit);
     amount.getDenominator().setValue(1); // always 1 defined by the Profile (??)

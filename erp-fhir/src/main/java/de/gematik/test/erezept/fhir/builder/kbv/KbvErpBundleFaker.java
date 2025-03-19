@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +20,24 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.r4.InstitutionalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,51 +47,50 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Quantity;
 
 public class KbvErpBundleFaker {
+
   private PrescriptionId prescriptionId = fakerPrescriptionId();
   private final KbvCoverageFaker kbvCoverageFaker;
-  private final MedicationRequestFaker medicationRequestFaker;
+  private final KbvErpMedicationRequestFaker medicationRequestFaker;
   private final Map<String, Consumer<KbvErpBundleBuilder>> builderConsumers = new HashMap<>();
   private static final String KEY_COVERAGE = "coverage"; // key used for builderConsumers map
 
   private KbvErpBundleFaker() {
-    val assignerOrganization = AssignerOrganizationFaker.builder().fake();
+    val assignerOrganization = KbvAssignerOrganizationFaker.builder().fake();
     val patient =
-        PatientFaker.builder()
-            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+        KbvPatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
             .withAssignerRef(assignerOrganization)
             .fake();
-    val practitioner = PractitionerFaker.builder().fake();
+    val practitioner = KbvPractitionerFaker.builder().fake();
     kbvCoverageFaker =
-        KbvCoverageFaker.builder()
-            .withInsuranceType(VersicherungsArtDeBasis.GKV)
-            .withBeneficiary(patient);
+        KbvCoverageFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).withBeneficiary(patient);
 
     val kbvErpMedication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
     medicationRequestFaker =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withPatient(patient)
             .withRequester(practitioner)
             .withMedication(kbvErpMedication)
             .withAuthorDate(new Date())
             .withSubstitution(fakerBool());
 
-    builderConsumers.put("patient", b -> b.patient(patient));
-    builderConsumers.put(
-        "medOrganization",
-        b -> b.medicalOrganization(MedicalOrganizationFaker.medicalPractice().fake()));
-    builderConsumers.put("assignerOrganization", b -> b.assigner(assignerOrganization));
-    builderConsumers.put("practitioner", b -> b.practitioner(practitioner));
-    builderConsumers.put("medication", b -> b.medication(kbvErpMedication));
+    this.withPatient(patient)
+        .withCustodian(KbvMedicalOrganizationFaker.medicalPractice().fake())
+        .withAssignerOrganization(assignerOrganization)
+        .withPractitioner(practitioner)
+        .withMedication(kbvErpMedication);
   }
 
   public static KbvErpBundleFaker builder() {
     return new KbvErpBundleFaker();
   }
 
-  public KbvErpBundleFaker withVersion(KbvItaErpVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
+  public KbvErpBundleFaker withVersion(KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
+    builderConsumers.put("version", b -> b.version(erpVersion));
+    medicationRequestFaker.withVersion(erpVersion);
+    kbvCoverageFaker.withVersion(forVersion);
     return this;
   }
 
@@ -114,10 +114,10 @@ public class KbvErpBundleFaker {
   }
 
   public KbvErpBundleFaker withKvnr(KVNR kvnr) {
-    val newAssignerOrg = AssignerOrganizationFaker.builder().fake();
+    val newAssignerOrg = KbvAssignerOrganizationFaker.builder().fake();
     val patient =
-        PatientFaker.builder()
-            .withKvnrAndInsuranceType(kvnr, VersicherungsArtDeBasis.GKV)
+        KbvPatientFaker.builder()
+            .withKvnrAndInsuranceType(kvnr, InsuranceTypeDe.GKV)
             .withAssignerRef(newAssignerOrg)
             .fake();
     this.withAssignerOrganization(newAssignerOrg);
@@ -155,11 +155,6 @@ public class KbvErpBundleFaker {
 
   public KbvErpBundleFaker withAccident(AccidentExtension accident) {
     medicationRequestFaker.withAccident(accident);
-    return this;
-  }
-
-  public KbvErpBundleFaker withMedicationRequestVersion(KbvItaErpVersion version) {
-    medicationRequestFaker.withVersion(version);
     return this;
   }
 
@@ -209,22 +204,19 @@ public class KbvErpBundleFaker {
     return this;
   }
 
-  public KbvErpBundleFaker withCustodian(MedicalOrganization organization) {
-    builderConsumers.computeIfPresent(
-        "medOrganization", (key, defaultValue) -> b -> b.medicalOrganization(organization));
+  public KbvErpBundleFaker withCustodian(KbvMedicalOrganization organization) {
+    builderConsumers.put("medOrganization", b -> b.medicalOrganization(organization));
     return this;
   }
 
   public KbvErpBundleFaker withAssignerOrganization(InstitutionalOrganization organization) {
-    builderConsumers.computeIfPresent(
-        "assignerOrganization", (key, defaultValue) -> b -> b.assigner(organization));
+    builderConsumers.put("assignerOrganization", b -> b.assigner(organization));
     return this;
   }
 
   public KbvErpBundleFaker withPractitioner(KbvPractitioner practitioner) {
     medicationRequestFaker.withRequester(practitioner);
-    builderConsumers.computeIfPresent(
-        "practitioner", (key, defaultValue) -> b -> b.practitioner(practitioner));
+    builderConsumers.put("practitioner", b -> b.practitioner(practitioner));
     return this;
   }
 
@@ -245,8 +237,7 @@ public class KbvErpBundleFaker {
 
   public KbvErpBundleFaker withMedication(KbvErpMedication medication) {
     medicationRequestFaker.withMedication(medication);
-    builderConsumers.computeIfPresent(
-        "medication", (key, defaultValue) -> b -> b.medication(medication));
+    builderConsumers.put("medication", b -> b.medication(medication));
     return this;
   }
 
@@ -274,7 +265,7 @@ public class KbvErpBundleFaker {
     if (!builderConsumers.containsKey(KEY_COVERAGE)) {
       medicationRequestFaker.withInsurance(coverage);
     }
-    builderConsumers.computeIfAbsent(KEY_COVERAGE, key -> b -> b.insurance(coverage));
+    builderConsumers.put(KEY_COVERAGE, b -> b.insurance(coverage));
     builderConsumers.put(
         "medicationRequest", b -> b.medicationRequest(medicationRequestFaker.fake()));
 

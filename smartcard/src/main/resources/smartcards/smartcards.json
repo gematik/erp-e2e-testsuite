@@ -203,90 +203,11 @@
     ]
   },
   {
-    "iccsn": "80276883501400000011",
-    "note": "Kassenidentität (Bitmarck) ohne gültigen Private Key",
-    "identifier": "L010926049",
-    "type": "EGK",
-    "ownerName": "Thomas Gottschalk",
-    "stores": [
-      "egk/80276883501400000011/80276883501400000011_C.CH.AUT_E256_gen.p12",
-      "egk/80276883501400000011/80276883501400000011_C.CH.AUT_R2048_gen.p12"
-    ]
-  },
-  {
-    "iccsn": "80276881025548404901",
-    "note": "Kassenidentität (khk) ohne gültigen Private Key",
-    "identifier": "K010122116",
-    "type": "EGK",
-    "ownerName": "Gerda Galle",
-    "stores": [
-      "egk/80276881025548404901/80276881025548404901_C.CH.AUT_R2048_gen.p12",
-      "egk/80276881025548404901/80276881025548404901_C.CH.AUT_E256_gen.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883309999982341",
-    "note": "Kassenidentität (Mobil ISC) ohne gültigen Private Key",
-    "identifier": "C012823411",
-    "type": "EGK",
-    "ownerName": "Maria Neumann",
-    "stores": [
-      "egk/80276883309999982341/80276883309999982341_C.CH.AUT_E256_gen.p12",
-      "egk/80276883309999982341/80276883309999982341_C.CH.AUT_R2048_gen.p12"
-    ]
-  },
-  {
-    "iccsn": "80276882999999992121",
-    "note": "Kassenidentität (GKVI) ohne gültigen Private Key",
-    "identifier": "A111721219",
-    "type": "EGK",
-    "ownerName": "Fabian Krause",
-    "stores": [ ]
-  },
-  {
-    "iccsn": "80276883169999962222",
-    "note": "Kassenidentität (ITS Care) ohne gültigen Private Key",
-    "identifier": "A010222220",
-    "type": "EGK",
-    "ownerName": "Martha Koch",
-    "stores": [
-      "egk/80276883169999962222/80276883169999962222_C.CH.AUT_R2048_gen.p12",
-      "egk/80276883169999962222/80276883169999962222_C.CH.AUT_E256_gen.p12"
-    ]
-  },
-  {
-    "iccsn": "80276881299985314267",
-    "note": "Kassenidentität (Kubus) ohne gültigen Private Key",
-    "identifier": "A010626711",
-    "type": "EGK",
-    "ownerName": "Sofia Herrmann",
-    "stores": [
-      "egk/80276881299985314267/80276881299985314267_C.CH.AUT_E256_gen.p12",
-      "egk/80276881299985314267/80276881299985314267_C.CH.AUT_R2048_gen.p12"
-    ]
-  },
-  {
     "iccsn": "80276881040001935352",
     "note": "Kassenidentität (TK) ohne gültigen Private Key",
     "identifier": "T046142499",
     "type": "EGK",
     "ownerName": "Juliane Mustermann",
-    "stores": []
-  },
-  {
-    "iccsn": "80276881129999213224",
-    "note": "Kassenidentität (Arge AOK) ohne gültigen Private Key",
-    "identifier": "A010932240",
-    "type": "EGK",
-    "ownerName": "Julian Nageslmann",
-    "stores": []
-  },
-  {
-    "iccsn": "80276881700000400001",
-    "note": "Kassenidentität (ITSC) ohne gültigen Private Key",
-    "identifier": "R517158879",
-    "type": "EGK",
-    "ownerName": "Lucius Fox",
     "stores": []
   },
   {
@@ -360,6 +281,86 @@
     ]
   },
   {
+    "iccsn": "80276883110000163685",
+    "note": "EML - EMILIA RU IBM Charlie ,iod: 1.2.840.10045.4.3.2 , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110694231",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Feli Ulrica A. d' AubertinóTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163685/80276883110000163685-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163686",
+    "note": "EML -  EMILIA RU IBM Dora , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110651116",
+    "type": "EGK",
+    "ownerName": "Dr. Aphrodite Nicole Leni-Paula Maude Marie-Ella",
+    "stores": [
+      "egk/80276883110000163686/80276883110000163686-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163684",
+    "note": "EML - EMILIA RU IBM Bert , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110632787",
+    "type": "EGK",
+    "ownerName": "Alfons Harald Alfons S. Freiherr HilféTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163684/80276883110000163684-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163097",
+    "note": "EML - Gräfin Koerbér , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110664909",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Isabelle I. K. Gräfin KoerbérTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163097/80276883110000163097-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163096",
+    "note": "EML - Freifrau Bräuer , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110616998",
+    "type": "EGK",
+    "ownerName": "Virginia Flora Nora Freifrau BräuerTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163096/80276883110000163096-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163095",
+    "note": "EML -EMILIA RU RISE Bert , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110655255",
+    "type": "EGK",
+    "ownerName": "Flora D.-M. J. C. S. Gräfin CôllinsTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163095/80276883110000163095-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154832",
+    "note": "EML -EMILIA TU IBM Dora , valid until: 02.11.2028, 00:59:59 MEZ",
+    "identifier": "X110655255",
+    "type": "EGK",
+    "ownerName": "Dr. Francesco TóboggenTEST-ONLY",
+    "stores": [
+      "egk/80276883110000154832/80276883110000154832-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000154827",
+    "note": "EML -EMILIA TU RISE Dora , valid until: 02.11.2028, 00:59:59 MEZ",
+    "identifier": "X110568351",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Hans Konstantin H. von MüllerTEST-ONLY",
+    "stores": [
+      "egk/80276883110000154827/80276883110000154827-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
     "iccsn": "80276883110000163961",
     "note": "IKNR 109500969; valid until Wed Mar 21 23:59:59 UTC 2029",
     "identifier": "X110609524",
@@ -368,6 +369,17 @@
     "stores": [
       "egk/80276883110000163961/80276883110000163961-C_CH_AUT_E256.p12",
       "egk/80276883110000163961/80276883110000163961-C_CH_AUT_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000168560",
+    "note": "IKNR 109500969; valid until Tue Feb 12 23:59:59 UTC 2030; Only for Egk in der Apotheke",
+    "identifier": "X110699891",
+    "type": "EGK",
+    "ownerName": "Prof. Dr. Tina Eusebia Stauffenbëërg-KleinschmidtTEST-ONLY",
+    "stores": [
+      "egk/80276883110000168560/80276883110000168560-C_CH_AUT_E256.p12",
+      "egk/80276883110000168560/80276883110000168560-C_CH_AUT_R2048.p12"
     ]
   },
   {
@@ -624,7 +636,7 @@
     "iccsn": "80276883110000163954",
     "note": "Oid: 1.2.276.0.76.4.59, valid until Nov 20 23:59:59 2029 GMT",
     "type": "SMC_B",
-    "ownerName": "Betriebsstñtte Kostentrñger GKV Dr. Heiner OldenburgTEST-ONLY",
+    "ownerName": "Betriebsstätte Kostenträger GKV Dr. Heiner Oldenburg",
     "stores": [
       "smcb/80276883110000163954/80276883110000163954-C_SMCB_AUT_R2048_X509.p12",
       "smcb/80276883110000163954/80276883110000163954-C_SMCB_ENC_R2048_X509.p12",
@@ -682,6 +694,28 @@
       "hba/80276001011699901726/80276001011699901726-C_HP_QES_E256.p12",
       "hba/80276001011699901726/80276001011699901726-C_HP_ENC_E256.p12",
       "hba/80276001011699901726/80276001011699901726-C_HP_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699901343",
+    "type": "HBA",
+    "note": "KEINE TELEMATIK-ID in QES vorhanden! KEIN RSA -> Nur ECC; valid until 27.01.2030, 23:59:59 MEZ",
+    "ownerName": "Arzt Michael Meierhofer TEST-ONLY",
+    "stores": [
+      "hba/80276001011699901343/Arzt-Meierhofer-C_HP_AUT_E256.p12",
+      "hba/80276001011699901343/Arzt-Meierhofer-C_HP_ENC_E256.p12",
+      "hba/80276001011699901343/Arzt-Meierhofer-C_HP_QES_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001011699901344",
+    "type": "HBA",
+    "note": "KEINE TELEMATIK-ID in QES vorhanden! KEIN RSA -> Nur ECC; valid until 27.01.2030, 23:59:59 MEZ",
+    "ownerName": "Arzt Norbert Neuland TEST-ONLY",
+    "stores": [
+      "hba/80276001011699901344/Arzt-Neuland-C_HP_AUT_E256.p12",
+      "hba/80276001011699901344/Arzt-Neuland-C_HP_ENC_E256.p12",
+      "hba/80276001011699901344/Arzt-Neuland-C_HP_QES_E256.p12"
     ]
   },
   {

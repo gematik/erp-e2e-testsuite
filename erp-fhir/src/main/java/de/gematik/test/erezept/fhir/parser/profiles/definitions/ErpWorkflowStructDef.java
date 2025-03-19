@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.definitions;
 
-import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
+import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ErpWorkflowStructDef implements IStructureDefinition<ErpWorkflowVersion> {
+public enum ErpWorkflowStructDef implements WithStructureDefinition<ErpWorkflowVersion> {
   SUPPLY_OPTIONS_TYPE("https://gematik.de/fhir/StructureDefinition/SupplyOptionsType"),
   SUPPLY_OPTIONS_TYPE_12(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType"),

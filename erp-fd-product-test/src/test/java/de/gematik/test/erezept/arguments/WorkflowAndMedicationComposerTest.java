@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.gematik.test.erezept.arguments;
 
 import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.workflowAndMedicationComposer;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.workflowPharmacyOnlyAndMedicationComposer;
 import static org.junit.jupiter.api.Assertions.*;
 
 import lombok.val;
@@ -29,5 +30,12 @@ class WorkflowAndMedicationComposerTest {
     val wAMC = workflowAndMedicationComposer().create().toList();
     assertFalse(wAMC.isEmpty());
     assertEquals(16, wAMC.size());
+  }
+
+  @Test
+  void shouldBuildWorkflowPharmacyOnlyAndMedicationCorrect() {
+    val wAMC = workflowPharmacyOnlyAndMedicationComposer().toList();
+    assertFalse(wAMC.isEmpty());
+    assertEquals(8, wAMC.size());
   }
 }

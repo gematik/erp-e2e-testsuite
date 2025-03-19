@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,13 @@
 package de.gematik.test.erezept.fhir.values;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.val;
@@ -34,9 +37,9 @@ class InsuranceCoverageInfoTest {
 
   static Stream<Arguments> coverageDataImplementors() {
     return Stream.of(
-        arguments(VersicherungsArtDeBasis.PKV, List.of(PkvInsuranceCoverageInfo.values())),
-        arguments(VersicherungsArtDeBasis.GKV, List.of(GkvInsuranceCoverageInfo.values())),
-        arguments(VersicherungsArtDeBasis.BG, List.of(BGInsuranceCoverageInfo.values())));
+        arguments(InsuranceTypeDe.PKV, List.of(PkvInsuranceCoverageInfo.values())),
+        arguments(InsuranceTypeDe.GKV, List.of(GkvInsuranceCoverageInfo.values())),
+        arguments(InsuranceTypeDe.BG, List.of(BGInsuranceCoverageInfo.values())));
   }
 
   @Test
@@ -63,8 +66,7 @@ class InsuranceCoverageInfoTest {
 
   @ParameterizedTest(name = "{0} Name must not exceed max length of 45")
   @MethodSource("coverageDataImplementors")
-  void shouldNotExceedMaxNameLength(
-      VersicherungsArtDeBasis type, List<InsuranceCoverageInfo> data) {
+  void shouldNotExceedMaxNameLength(InsuranceTypeDe type, List<InsuranceCoverageInfo> data) {
     data.forEach(
         cid ->
             assertTrue(
@@ -76,7 +78,7 @@ class InsuranceCoverageInfoTest {
 
   @ParameterizedTest(name = "{0} IKNRs must have length of 9 digits")
   @MethodSource("coverageDataImplementors")
-  void shouldMatchIknrLength(VersicherungsArtDeBasis type, List<InsuranceCoverageInfo> data) {
+  void shouldMatchIknrLength(InsuranceTypeDe type, List<InsuranceCoverageInfo> data) {
     data.forEach(
         icd ->
             assertEquals(
@@ -88,8 +90,8 @@ class InsuranceCoverageInfoTest {
   }
 
   @ParameterizedTest(name = "Random Insurance Coverage Information for {0}")
-  @EnumSource(value = VersicherungsArtDeBasis.class)
-  void shouldGetRandomFor(VersicherungsArtDeBasis insuranceKind) {
+  @EnumSource(value = InsuranceTypeDe.class)
+  void shouldGetRandomFor(InsuranceTypeDe insuranceKind) {
     val data = InsuranceCoverageInfo.randomFor(insuranceKind);
     assertNotNull(data.getIknr());
     assertNotNull(data.getName());
@@ -129,5 +131,12 @@ class InsuranceCoverageInfoTest {
     val elementBg = InsuranceCoverageInfo.getByIknr("120390887");
     assertTrue(elementBg.isPresent());
     elementBg.ifPresent(cov -> assertEquals(BGInsuranceCoverageInfo.BG_BAU, cov));
+  }
+
+  @Test
+  void shouldGetGkvOptions() {
+    val options = InsuranceCoverageInfo.coverageOptionsFor(InsuranceTypeDe.GKV);
+    assertTrue(options.isPresent());
+    options.ifPresent(c -> assertEquals(GkvInsuranceCoverageInfo.class, c));
   }
 }

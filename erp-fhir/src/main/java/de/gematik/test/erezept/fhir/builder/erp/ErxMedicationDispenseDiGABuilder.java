@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,14 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.extensions.erp.DeepLink;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseDiGA;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import java.util.List;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 
 @Slf4j
@@ -62,15 +60,14 @@ public class ErxMedicationDispenseDiGABuilder
     return this;
   }
 
+  @Override
   public ErxMedicationDispenseDiGA build() {
-    val medDisp = new ErxMedicationDispenseDiGA();
+    val medDisp =
+        this.createResource(
+            ErxMedicationDispenseDiGA::new,
+            ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA,
+            erpWorkflowVersion);
     buildBase(medDisp);
-
-    val profile =
-        ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA.asCanonicalType(erpWorkflowVersion, true);
-    val meta = new Meta().setProfile(List.of(profile));
-    // set FHIR-specific values provided by HAPI
-    medDisp.setId(this.getResourceId()).setMeta(meta);
 
     val medicationReference = new Reference();
     this.medication

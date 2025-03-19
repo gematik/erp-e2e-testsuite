@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,21 @@
 package de.gematik.test.erezept.actions;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
@@ -35,12 +43,13 @@ import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
@@ -60,7 +69,10 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,9 +81,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.stubbing.Answer;
 
 @Slf4j
-class IssuePrescriptionTest {
+class IssuePrescriptionTest extends ErpFhirParsingTest {
 
-  private static FhirParser fhir;
   private static DoctorActor prescribingDoctor;
   private static DoctorActor responsibleDoctor;
   private static PatientActor patient;
@@ -81,7 +92,6 @@ class IssuePrescriptionTest {
   static void setup() {
     StopwatchProvider.init();
     CoverageReporter.getInstance().startTestcase("don't care");
-    fhir = new FhirParser();
 
     val config = ErpFdTestsuiteFactory.create();
     // init doctor
@@ -98,7 +108,7 @@ class IssuePrescriptionTest {
         UseTheKonnektor.with(smcb)
             .and(hba)
             .and(CryptoSystem.RSA_2048)
-            .on(config.instantiateDoctorKonnektor(docConfig));
+            .on(config.instantiateKonnektorClient(docConfig));
 
     prescribingDoctor.can(useErpClient);
     prescribingDoctor.can(provideBaseData);
@@ -146,7 +156,7 @@ class IssuePrescriptionTest {
   void shouldCreateValidPrescriptionFromRandomKbvBundleBuilder(
       String label, Function<DoctorActor, ErpInteraction<ErxTask>> function) {
 
-    log.trace(format("Execute {0}", label));
+    log.trace("Execute {}", label);
     val draftTask = mock(ErxTask.class);
     when(draftTask.getTaskId())
         .thenReturn(TaskId.from(PrescriptionId.random())); // don't care about concrete value
@@ -162,19 +172,18 @@ class IssuePrescriptionTest {
     doAnswer(
             (Answer<String>)
                 invocation -> {
-                  final Object[] args = invocation.getArguments();
-                  val encoded = fhir.encode((Resource) args[0], (EncodingType) args[1], true);
+                  val args = invocation.getArguments();
+                  val encoded = parser.encode((Resource) args[0], (EncodingType) args[1], false);
 
                   // make sure the resource provided is valid
-                  val result = fhir.validate(encoded);
+                  val result = parser.validate(encoded);
 
                   if (!result.isSuccessful()) {
                     System.out.println(encoded);
-                    result.getMessages().forEach(System.out::println);
+                    ValidatorUtil.printValidationResult(result);
                   }
 
                   assertTrue(result.isSuccessful());
-
                   return encoded;
                 })
         .when(useErpClient)
@@ -218,7 +227,7 @@ class IssuePrescriptionTest {
                           resource ->
                               assertEquals(1, resource.getExtensionsByUrl(extensionUrl).size()));
 
-                  return fhir.encode(kbvBundle, (EncodingType) args[1], true);
+                  return parser.encode(kbvBundle, (EncodingType) args[1], true);
                 })
         .when(useErpClient)
         .encode(any(), any());
@@ -257,13 +266,13 @@ class IssuePrescriptionTest {
                       kbvBundle
                           .getCoverage()
                           .getExtensionByUrl(
-                              DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
+                              DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
                   val codingValue = dmpExtension.getValue().castToCoding(dmpExtension.getValue());
                   assertEquals("42", codingValue.getCode());
                   assertEquals(
                       DmpKennzeichen.CODE_SYSTEM.getCanonicalUrl(), codingValue.getSystem());
 
-                  return fhir.encode(kbvBundle, (EncodingType) args[1], true);
+                  return parser.encode(kbvBundle, (EncodingType) args[1], true);
                 })
         .when(useErpClient)
         .encode(any(), any());
@@ -275,7 +284,7 @@ class IssuePrescriptionTest {
                   val ext =
                       b.getCoverage()
                           .getExtensionByUrl(
-                              DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
+                              DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl());
                   ext.getValue().castToCoding(ext.getValue()).setCode("42");
                 })
             .withRandomKbvBundle());

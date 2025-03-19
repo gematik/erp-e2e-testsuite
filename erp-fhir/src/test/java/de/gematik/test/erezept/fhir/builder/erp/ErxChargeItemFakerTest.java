@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,29 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
-import de.gematik.test.erezept.fhir.references.erp.ErxReceiptReference;
-import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Date;
+import java.util.UUID;
 import lombok.val;
 import org.hl7.fhir.r4.model.ChargeItem;
 import org.junit.jupiter.api.Test;
 
-class ErxChargeItemFakerTest extends ParsingTest {
+class ErxChargeItemFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakeChargeItemWithVersion() {
     val chargeItem =
@@ -82,15 +81,11 @@ class ErxChargeItemFakerTest extends ParsingTest {
 
   @Test
   void buildFakeChargeItemWithReceipt() {
-    val erxReceipt = mock(ErxReceipt.class);
-    when(erxReceipt.getId()).thenReturn("Bundle/12345");
-    val erxReceiptRef = mock(ErxReceiptReference.class);
+    val erxReceipt = new ErxReceipt();
+    erxReceipt.setId("12345");
     val chargeItem = ErxChargeItemFaker.builder().withReceipt(erxReceipt).fake();
-    val chargeItem2 = ErxChargeItemFaker.builder().withReceiptReference(erxReceiptRef).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
   }
 
   @Test
@@ -130,11 +125,10 @@ class ErxChargeItemFakerTest extends ParsingTest {
 
   @Test
   void buildFakeChargeItemWithVerordnung() {
-    val kbvBundle = mock(KbvErpBundle.class);
-    when(kbvBundle.getReference()).thenReturn(new KbvBundleReference("123"));
-    val chargeItem = ErxChargeItemFaker.builder().withVerordnung(kbvBundle.getReference()).fake();
+    val kbvBundle = KbvErpBundleFaker.builder().fake();
+    val chargeItem = ErxChargeItemFaker.builder().withVerordnung(kbvBundle.asReference()).fake();
     val chargeItem2 = ErxChargeItemFaker.builder().withVerordnung(kbvBundle).fake();
-    val chargeItem3 = ErxChargeItemFaker.builder().withVerordnung("123").fake();
+    val chargeItem3 = ErxChargeItemFaker.builder().withVerordnung(kbvBundle.getLogicalId()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
     val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     val result3 = ValidatorUtil.encodeAndValidate(parser, chargeItem3);
@@ -145,16 +139,14 @@ class ErxChargeItemFakerTest extends ParsingTest {
 
   @Test
   void buildFakeChargeItemWithAbgabedatensatz() {
-    val davBundle = DavAbgabedatenFaker.builder(fakerPrescriptionId()).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(fakerPrescriptionId()).fake();
     val chargeItem =
         ErxChargeItemFaker.builder()
             .withAbgabedatensatz(davBundle, b -> "helloworld".getBytes())
             .fake();
     val chargeItem2 =
         ErxChargeItemFaker.builder()
-            .withAbgabedatensatz(
-                ErxChargeItemBuilder.forPrescription(fakerPrescriptionId()).getResourceId(),
-                "faked binary content".getBytes())
+            .withAbgabedatensatz(UUID.randomUUID().toString(), "faked binary content".getBytes())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
     val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);

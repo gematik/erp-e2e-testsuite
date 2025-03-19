@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -28,11 +29,11 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
 import de.gematik.test.erezept.fhir.values.LANR;
-import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.stream.Stream;
@@ -77,12 +78,7 @@ public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
             "999999991", "A_23891-01 Validierung der ANR-Prüfziffer in KBV_PR_FOR_Practitioner")
         .arguments(
             "333333300", "A_23891-01 Validierung der ANR-Prüfziffer in KBV_PR_FOR_Practitioner")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .multiply(2, List.of("Gündüla Gunther", "Adelheid Ulmenwald")) // Arzt und Zahnarzt
         .create();
@@ -98,7 +94,7 @@ public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
           + " zulässige Nummern akzeptiert")
   @MethodSource("validAnrComposer")
   void activateValidAnrZanrInPractitioner(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       DoctorActor doctors,
       String anr) {
@@ -123,7 +119,7 @@ public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, String anr, DoctorActor doctorActor) {
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     AccidentExtension accident = null;
-    if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
+    if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
     val kbvBundleBuilder =
@@ -141,8 +137,8 @@ public class ActivateValidPractitionerAnrAndZanr extends ErpTest {
                 kbvBundle.getPractitioner().getIdentifier().stream()
                     .filter(
                         it ->
-                            KbvNamingSystem.BASE_ANR.match(it)
-                                || KbvNamingSystem.ZAHNARZTNUMMER.match(it))
+                            KbvNamingSystem.BASE_ANR.matches(it)
+                                || KbvNamingSystem.ZAHNARZTNUMMER.matches(it))
                     .findFirst()
                     .orElseThrow()
                     .setValue(anr))

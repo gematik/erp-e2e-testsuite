@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
@@ -66,7 +66,7 @@ public class PrescribePharmaceuticals extends PrescribeUseCase<KbvErpBundle> {
 
   public Response withKbvBundle(KbvErpBundle kbvBundle) {
     val insuranceKind =
-        kbvBundle.getCoverage().getInsuranceKindOptional().orElse(VersicherungsArtDeBasis.GKV);
+        kbvBundle.getCoverage().getInsuranceKindOptional().orElse(InsuranceTypeDe.GKV);
     val flowType = PrescriptionFlowType.fromInsuranceKind(insuranceKind, isDirectAssignment);
 
     val prescriptionData = this.prescribeFor(kbvBundle, flowType);

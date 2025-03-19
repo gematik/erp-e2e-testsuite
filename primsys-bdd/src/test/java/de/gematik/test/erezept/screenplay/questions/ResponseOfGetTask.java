@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,21 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.vsdm.types.VsdmPatient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.ActorRole;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -41,7 +44,6 @@ public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
   private final TaskGetCommand cmd;
 
   private ResponseOfGetTask(ActorRole role, TaskGetCommand cmd) {
-    super(format("GET /Task as {0}", role));
     this.role = role;
     this.cmd = cmd;
   }
@@ -72,12 +74,23 @@ public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
     return response;
   }
 
-  public static ResponseOfGetTask asPharmacy(String examEvidence) {
-    log.info(format("Download all open task with exam evidence {0}", examEvidence));
+  public static ResponseOfGetTask asPharmacy(
+      Egk egk, String examEvidence, LocalDate insuranceStartDate, String street) {
+    return asPharmacy(
+        egk,
+        examEvidence,
+        Base64.getUrlEncoder()
+            .encodeToString(VsdmPatient.generateHash(insuranceStartDate, street)));
+  }
+
+  public static ResponseOfGetTask asPharmacy(Egk egk, String examEvidence, String hcv) {
+    log.info("Download all open task with exam evidence '{}' and hash '{}'", examEvidence, hcv);
     return new ResponseOfGetTask(
         ActorRole.PHARMACY,
         examEvidence != null
             ? new TaskGetByExamEvidenceCommand(examEvidence)
+                .andKvnr(KVNR.from(egk.getKvnr()))
+                .andHcv(hcv)
             : new TaskGetByExamEvidenceCommand());
   }
 }

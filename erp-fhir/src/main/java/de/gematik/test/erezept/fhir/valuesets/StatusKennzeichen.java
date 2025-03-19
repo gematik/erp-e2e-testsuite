@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,20 @@ package de.gematik.test.erezept.fhir.valuesets;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 import org.hl7.fhir.r4.model.Extension;
 
-/** https://applications.kbv.de/S_KBV_STATUSKENNZEICHEN_V1.01.xhtml */
+/**
+ * <a href="https://applications.kbv.de/S_KBV_STATUSKENNZEICHEN_V1.01.xhtml">KBV
+ * Statuskennzeichen</a>
+ */
 @Getter
-public enum StatusKennzeichen implements IValueSet {
+public enum StatusKennzeichen implements FromValueSet {
   NONE("00", "ohne Ersatzverordnungskennzeichen"),
   ASV("01", "ASV-Kennzeichen"),
   RELEASE_MGMT("04", "Entlassmanagement-Kennzeichen"),
@@ -70,9 +73,9 @@ public enum StatusKennzeichen implements IValueSet {
     return format("{0} ({1})", code, display);
   }
 
-  public static StatusKennzeichen fromCode(@NonNull String code) {
+  public static StatusKennzeichen fromCode(String code) {
     return Arrays.stream(StatusKennzeichen.values())
-        .filter(scp -> scp.code.equals(code))
+        .filter(sk -> sk.code.equals(code))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(StatusKennzeichen.class, code));
   }

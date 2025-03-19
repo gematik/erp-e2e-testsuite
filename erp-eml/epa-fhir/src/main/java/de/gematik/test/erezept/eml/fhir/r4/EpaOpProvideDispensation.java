@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.eml.fhir.r4;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirStrucDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.GematikDirStrucDef;
 import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import java.util.Date;
 import org.hl7.fhir.r4.model.Parameters;
@@ -34,16 +34,7 @@ public class EpaOpProvideDispensation extends Parameters {
   }
 
   public Date getEpaWhenHandedOver() {
-    return ((EpaMedicationDispense)
-            getRxDispensationParameter().getPart().stream()
-                .filter(part -> part.getName().equals("medicationDispense"))
-                .findFirst()
-                .orElseThrow(
-                    () ->
-                        new MissingFieldException(
-                            this.getClass(), EpaMedStructDef.EPA_MEDICATION_DISPENSE))
-                .getResource())
-        .getWhenHandedOver();
+    return this.getEpaMedicationDispense().getWhenHandedOver();
   }
 
   public RxPrescriptionId getEpaPrescriptionId() {
@@ -59,16 +50,19 @@ public class EpaOpProvideDispensation extends Parameters {
     return getRxDispensationParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medicationDispense"))
         .filter(
-            entry -> EpaMedStructDef.EPA_MEDICATION_DISPENSE.matches(entry.getResource().getMeta()))
+            entry -> EpaMedicationStructDef.EPA_MEDICATION_DISPENSE.matches(entry.getResource()))
         .map(entry -> (EpaMedicationDispense) entry.getResource())
         .findFirst()
-        .orElseThrow();
+        .orElseThrow(
+            () ->
+                new MissingFieldException(
+                    this.getClass(), EpaMedicationStructDef.EPA_MEDICATION_DISPENSE));
   }
 
   public EpaMedication getEpaMedication() {
     return getRxDispensationParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medication"))
-        .filter(entry -> EpaMedStructDef.EPA_MEDICATION.matches(entry.getResource().getMeta()))
+        .filter(entry -> EpaMedicationStructDef.EPA_MEDICATION.matches(entry.getResource()))
         .map(entry -> (EpaMedication) entry.getResource())
         .findFirst()
         .orElseThrow();
@@ -77,7 +71,7 @@ public class EpaOpProvideDispensation extends Parameters {
   public EpaOrganisation getEpaOrganisation() {
     return getRxDispensationParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("organization"))
-        .filter(entry -> GematikDirStrucDef.ORGANIZATION.matches(entry.getResource().getMeta()))
+        .filter(entry -> GematikDirStrucDef.ORGANIZATION.matches(entry.getResource()))
         .map(entry -> (EpaOrganisation) entry.getResource())
         .findFirst()
         .orElseThrow(

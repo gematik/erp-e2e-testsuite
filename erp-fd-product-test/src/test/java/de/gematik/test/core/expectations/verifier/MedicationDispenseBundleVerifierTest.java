@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,34 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.containsAllPZNsForNewProfiles;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.containsAllPZNsForOldProfiles;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyAllPerformerIdsAre;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyCountOfContainedMedication;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsAfter;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsBefore;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsEqual;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsSortedSerialAscend;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverWithPredicate;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenPreparedIsBefore;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenPreparedWithPredicate;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MedicationDispenseBundleVerifierTest extends ParsingTest {
+class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
 
   ErxMedicationDispenseBundle validMedDisp =
       parser.decode(
@@ -257,14 +267,6 @@ class MedicationDispenseBundleVerifierTest extends ParsingTest {
   void shouldThrowWhileDetectingCorrectContainedMedicationDispenses() {
     val partOfMedDisp = validMedDisp.getMedicationDispenses().subList(0, 4);
     val step = containsAllPZNsForOldProfiles(partOfMedDisp);
-    assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
-  }
-
-  @Test
-  void shouldThrowWhileDetectingAMissingContainedMedicationDispenses() {
-    val medDispList = List.of(ErxMedicationDispenseFaker.builder().withPzn("123456789").fake());
-
-    val step = containsAllPZNsForOldProfiles(medDispList);
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 

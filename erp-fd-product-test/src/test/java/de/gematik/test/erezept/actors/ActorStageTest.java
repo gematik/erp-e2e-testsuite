@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,20 @@ package de.gematik.test.erezept.actors;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.core.exceptions.MissingCacheException;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -85,6 +91,39 @@ class ActorStageTest {
 
       // make sure the actor is instantiated only once
       assertEquals(pharmacy, pharmacy2);
+    }
+  }
+
+  @Test
+  void getKtrNamed() {
+    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
+      val erpClient = mock(ErpClient.class);
+      erpClientFactoryMockedStatic
+          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
+          .thenReturn(erpClient);
+
+      val ktr = assertDoesNotThrow(() -> stage.getKtrNamed("AOK Bremen"));
+      val ktr2 = stage.getKtrNamed("AOK Bremen");
+
+      // make sure the actor is instantiated only once
+      assertEquals(ktr, ktr2);
+      assertNotNull(ktr.abilityTo(UseTheErpClient.class));
+      assertNotNull(ktr.abilityTo(UseTheKonnektor.class));
+      assertNotNull(ktr.abilityTo(UseSMCB.class));
+    }
+  }
+
+  @Test
+  void shouldThrowOnUnsupportedActorType() {
+    assertThrows(
+        MissingCacheException.class,
+        () -> stage.instrumentNewActor(MyTestActor.class, "Leonie Hütter"));
+  }
+
+  private static class MyTestActor extends ErpActor {
+
+    protected MyTestActor() {
+      super(ActorType.PATIENT, "test");
     }
   }
 }

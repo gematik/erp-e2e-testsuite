@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,20 @@ package de.gematik.test.erezept.fhir.values;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.de.HL7CodeSystem;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import java.util.Objects;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
 /** <a href="https://de.wikipedia.org/wiki/Betriebsst%C3%A4ttennummer">Betriebsstättennummer</a> */
-public class BSNR extends Value<String> {
+public class BSNR extends SemanticValue<String, KbvNamingSystem> {
 
-  private static final Hl7CodeSystem CODE_SYSTEM = Hl7CodeSystem.HL7_V2_0203;
+  private static final HL7CodeSystem CODE_SYSTEM = HL7CodeSystem.HL7_V2_0203;
   private static final String CODE = IdentifierTypeDe.BSNR.getCode();
 
   public BSNR(String value) {
@@ -51,7 +52,7 @@ public class BSNR extends Value<String> {
     return id;
   }
 
-  public static Hl7CodeSystem getCodeSystem() {
+  public static HL7CodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

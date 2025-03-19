@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package de.gematik.test.erezept.screenplay.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -47,9 +48,7 @@ public class SafeAbilityTest {
     val actor = OnStage.theActor("Marty");
     val provideBaseData =
         ProvidePatientBaseData.forPatient(
-            KVNR.random(),
-            GemFaker.fakerName(),
-            GemFaker.fakerValueSet(VersicherungsArtDeBasis.class));
+            KVNR.random(), GemFaker.fakerName(), GemFaker.fakerValueSet(InsuranceTypeDe.class));
     actor.can(provideBaseData);
 
     val actual = SafeAbility.getAbility(actor, ProvidePatientBaseData.class);

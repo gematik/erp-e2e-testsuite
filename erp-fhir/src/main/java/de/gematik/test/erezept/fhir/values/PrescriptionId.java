@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,23 @@ package de.gematik.test.erezept.fhir.values;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Reference;
 
-public class PrescriptionId extends Value<String> {
+public class PrescriptionId extends SemanticValue<String, ErpWorkflowNamingSystem> {
 
   public static final ErpWorkflowNamingSystem NAMING_SYSTEM =
-      ErpWorkflowNamingSystem.PRESCRIPTION_ID;
+      ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
 
   public PrescriptionId(final String value) {
-    this(
-        ErpWorkflowVersion.getDefaultVersion().isEqual("1.1.1")
-            ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
-            : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121,
-        value);
+    this(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, value);
   }
 
   public PrescriptionId(final ErpWorkflowNamingSystem system, final String value) {
@@ -68,17 +64,11 @@ public class PrescriptionId extends Value<String> {
    * @param system to use for encoding the PrescriptionId value
    * @return the PrescriptionId as Identifier
    */
-  public Identifier asIdentifier(INamingSystem system) {
+  public Identifier asIdentifier(WithNamingSystem system) {
     return new Identifier().setSystem(system.getCanonicalUrl()).setValue(this.getValue());
   }
 
-  /**
-   * see {@link this#asIdentifier(INamingSystem)}
-   *
-   * @param system
-   * @return
-   */
-  public Reference asReference(INamingSystem system) {
+  public Reference asReference(WithNamingSystem system) {
     val ref = new Reference();
     ref.setIdentifier(asIdentifier(system));
     return ref;
@@ -108,7 +98,7 @@ public class PrescriptionId extends Value<String> {
         Stream.of(
                 ErpWorkflowNamingSystem.PRESCRIPTION_ID,
                 ErpWorkflowNamingSystem.PRESCRIPTION_ID_121)
-            .filter(ns -> ns.match(identifier.getSystem()))
+            .filter(ns -> ns.matches(identifier.getSystem()))
             .findFirst()
             .orElseThrow(
                 () ->
@@ -142,7 +132,7 @@ public class PrescriptionId extends Value<String> {
   public static boolean isPrescriptionId(String system) {
     if (system == null) return false;
 
-    return ErpWorkflowNamingSystem.PRESCRIPTION_ID.match(system)
-        || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.match(system);
+    return ErpWorkflowNamingSystem.PRESCRIPTION_ID.matches(system)
+        || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.matches(system);
   }
 }

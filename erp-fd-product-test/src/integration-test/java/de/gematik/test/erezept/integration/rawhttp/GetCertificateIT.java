@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttp
 import de.gematik.bbriccs.utils.CertificateAuthoritySupplier;
 import de.gematik.bbriccs.utils.RootCertificateAuthorityList;
 import de.gematik.bbriccs.utils.TiTrustedEnvironmentAnchor;
-import de.gematik.bbriccs.utils.dto.CertificateAuthorityDto;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
@@ -38,25 +37,23 @@ import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
+@Tag("PKI")
 class GetCertificateIT extends ErpTest {
 
   private static final Function<Integer, String> subjectCNFun =
@@ -101,7 +98,7 @@ class GetCertificateIT extends ErpTest {
   @Actor(name = "Sina Hüllmann")
   private PatientActor patient;
 
-  @TestcaseId("GET_CA_CERTIFICATE_01")
+  @TestcaseId("GET_PKI_CERTIFICATES_01")
   @Test
   @DisplayName("Der Fachdienst liefert alle KompCAs der TSL zurück")
   void verifyCaCerts() {
@@ -114,7 +111,7 @@ class GetCertificateIT extends ErpTest {
             .isCorrect());
   }
 
-  @TestcaseId("GET_CA_CERTIFICATE_02")
+  @TestcaseId("GET_PKI_CERTIFICATES_02")
   @ParameterizedTest
   @DisplayName(
       "Der Fachdienst liefert die korrekte Cross-RootCA-Chain zu allen KompCAs von einer gegebenen"
@@ -127,12 +124,8 @@ class GetCertificateIT extends ErpTest {
     val resp = patient.performs(CallCertificateFromBackend.withRootCa(rootCaSubjectCN));
 
     val chainRootCrossCAs =
-        rootCAs
-            .getChainOfCrossRootCAs(
-                expectedCAs, Objects.requireNonNull(rootCAs.getRootCABy(rootCaSubjectCN)))
-            .stream()
-            .map(CertificateAuthorityDto::getCert)
-            .collect(Collectors.toSet());
+        rootCAs.getChainOfCrossRootCAByCompCAs(
+            expectedCAs, Objects.requireNonNull(rootCAs.getRootCABy(rootCaSubjectCN)));
 
     patient.attemptsTo(
         VerifyRawHttp.that(resp, PKICertificatesDTOEnvelop.class)
@@ -141,7 +134,7 @@ class GetCertificateIT extends ErpTest {
             .isCorrect());
   }
 
-  @TestcaseId("GET_CA_CERTIFICATE_03")
+  @TestcaseId("GET_PKI_CERTIFICATES_03")
   @ParameterizedTest
   @DisplayName("Der Fachdienst liefert einen StatusCode 40x für eine invalide Anfrage zurück")
   @MethodSource("invalidRootCASubjectCNs")

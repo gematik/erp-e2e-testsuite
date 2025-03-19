@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.getFaker;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.fhir.valuesets.epa.EpaDrugCategory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class GemErpMedicationFaker {
 
     if (fakerBool()) withAmount(getFaker().random().nextLong(20), randomElement("St", "ml", "mg"));
 
-    if (fakerBool()) withLotNumber(getFaker().regexify("[0-9]{8,10}"));
+    if (fakerBool()) withLotNumber(fakerLotNumber());
   }
 
   public static GemErpMedicationFaker builder() {

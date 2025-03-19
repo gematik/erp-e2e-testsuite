@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ package de.gematik.test.erezept.fhir.extensions.erp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class SupplyOptionsTypeTest {
+class SupplyOptionsTypeTest extends ErpFhirBuildingTest {
 
   @ParameterizedTest
   @CsvSource({

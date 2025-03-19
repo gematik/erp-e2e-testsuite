@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,32 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
-import java.time.LocalDate;
-import java.time.Month;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AbdaErpPkvVersion implements ProfileVersion<AbdaErpPkvVersion> {
-  V1_1_0("1.1.0", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2023, Month.JUNE, 30)),
-  V1_2_0("1.2.0", LocalDate.of(2023, Month.JULY, 1), LocalDate.of(2070, Month.DECEMBER, 31));
+public enum AbdaErpPkvVersion implements ProfileVersion {
+  V1_1_0("1.1.0"),
+  V1_2_0("1.2.0"),
+  V1_3("1.3.0");
 
+  public static final String PROFILE_NAME = "de.abda.erezeptabgabedatenpkv";
   private final String version;
-  private final LocalDate validFromDate;
-  private final LocalDate validUntilDate;
-  private final CustomProfiles customProfile = CustomProfiles.ABDA_ERP_ABGABE_PKV;
+
+  @Override
+  public String getName() {
+    return PROFILE_NAME;
+  }
+
+  @Override
+  public boolean omitPatch() {
+    return true;
+  }
 
   public static AbdaErpPkvVersion getDefaultVersion() {
-    return ProfileVersion.getDefaultVersion(
-        AbdaErpPkvVersion.class, CustomProfiles.ABDA_ERP_ABGABE_PKV);
+    return VersionUtil.getDefaultVersion(AbdaErpPkvVersion.class, PROFILE_NAME);
   }
 }

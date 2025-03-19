@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,37 +18,27 @@ package de.gematik.test.erezept.fhir.parser.profiles.version;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import java.util.Arrays;
+import java.util.stream.Stream;
 import lombok.val;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class AbdaErpPkvVersionTest {
+class AbdaErpPkvVersionTest extends ErpFhirBuildingTest {
 
-  @Test
-  void getDefaultVersionViaCurrentDate() {
+  @ParameterizedTest
+  @MethodSource
+  @ClearSystemProperty(key = AbdaErpPkvVersion.PROFILE_NAME)
+  void getDefaultVersionViaSystemProperty(AbdaErpPkvVersion version) {
+    System.setProperty(AbdaErpPkvVersion.PROFILE_NAME, version.getVersion());
     val defaultVersion = AbdaErpPkvVersion.getDefaultVersion();
-
-    // Note: this assertion will break in the future!
-    assertEquals(AbdaErpPkvVersion.V1_2_0, defaultVersion);
+    assertEquals(version, defaultVersion);
   }
 
-  @Test
-  void getDefaultVersionViaSystemProperty() {
-    val propertyName = CustomProfiles.ABDA_ERP_ABGABE_PKV.getName();
-    Arrays.stream(AbdaErpPkvVersion.values())
-        .forEach(
-            version -> {
-              System.setProperty(propertyName, version.getVersion());
-              val defaultVersion = AbdaErpPkvVersion.getDefaultVersion();
-              assertEquals(version, defaultVersion);
-            });
-  }
-
-  @AfterEach
-  void cleanProperties() {
-    val propertyName = CustomProfiles.ABDA_ERP_ABGABE_PKV.getName();
-    System.clearProperty(propertyName);
+  static Stream<Arguments> getDefaultVersionViaSystemProperty() {
+    return Arrays.stream(AbdaErpPkvVersion.values()).map(Arguments::of);
   }
 }

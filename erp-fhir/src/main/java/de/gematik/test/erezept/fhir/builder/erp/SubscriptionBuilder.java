@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import lombok.AllArgsConstructor;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import org.hl7.fhir.r4.model.Subscription;
@@ -25,18 +26,18 @@ import org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent;
 import org.hl7.fhir.r4.model.Subscription.SubscriptionChannelType;
 import org.hl7.fhir.r4.model.Subscription.SubscriptionStatus;
 
-@AllArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Setter
-public class SubscriptionBuilder extends AbstractResourceBuilder<SubscriptionBuilder> {
+public class SubscriptionBuilder extends ResourceBuilder<Subscription, SubscriptionBuilder> {
 
-  private String criteria;
+  private final String criteria;
 
   public static SubscriptionBuilder forCriteria(String criteria) {
     return new SubscriptionBuilder(criteria);
   }
 
+  @Override
   public Subscription build() {
-
     val subscription = new Subscription();
     subscription.setStatus(SubscriptionStatus.REQUESTED);
     subscription.setReason("none");

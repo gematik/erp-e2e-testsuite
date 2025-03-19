@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import java.util.Optional;
+import lombok.Getter;
 
 /**
  * <a href="https://www.pkv.de/verband/ueber-uns/mitglieder-pkv-verband/">PKV Verband</a> <a
@@ -195,33 +196,19 @@ public enum PkvInsuranceCoverageInfo implements InsuranceCoverageInfo {
       "Krankenversicherung AG, 70163 Stuttgart, Tel. +49 711 662-0, Fax +49 711 662-2520",
       "168141392");
 
-  private final String naming;
-  private final String contact;
-  private final String iknr;
+  private final String name;
+  @Getter private final String contact;
+  @Getter private final String iknr;
+  @Getter private final InsuranceTypeDe insuranceType = InsuranceTypeDe.PKV;
 
-  PkvInsuranceCoverageInfo(String naming, String contact, String iknr) {
-    this.naming = naming;
+  PkvInsuranceCoverageInfo(String name, String contact, String iknr) {
+    this.name = name;
     this.contact = contact;
     this.iknr = iknr;
   }
 
   public String getName() {
-    var name = this.naming;
-    if (name.length() > 45) return name.substring(0, 45);
-    return name;
-  }
-
-  public String getContact() {
-    return this.contact;
-  }
-
-  public String getIknr() {
-    return this.iknr;
-  }
-
-  @Override
-  public VersicherungsArtDeBasis getInsuranceType() {
-    return VersicherungsArtDeBasis.PKV;
+    return InsuranceCoverageInfo.shortenName(this.name);
   }
 
   static Optional<PkvInsuranceCoverageInfo> getByIknr(String iknr) {

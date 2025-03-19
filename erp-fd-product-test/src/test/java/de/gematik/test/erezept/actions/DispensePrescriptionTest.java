@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,9 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -38,7 +39,7 @@ import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class DispensePrescriptionTest {
+class DispensePrescriptionTest extends ErpFhirBuildingTest {
   private static PharmacyActor pharmacy;
   private static UseTheErpClient useErpClient;
 
@@ -57,7 +58,7 @@ class DispensePrescriptionTest {
     val secret = Secret.fromString("123456789");
 
     val action =
-        DispensePrescription.forPrescription(taskId, secret)
+        DispensePrescription.withCredentials(taskId, secret)
             .withMedDsp(List.of(ErxMedicationDispenseFaker.builder().fake()));
 
     val resource = new ErxMedicationDispenseBundle();
@@ -76,7 +77,7 @@ class DispensePrescriptionTest {
     val secret = Secret.fromString("123456");
 
     val params = new GemDispenseOperationParameters();
-    val action = DispensePrescription.forPrescription(taskId, secret).withParameters(params);
+    val action = DispensePrescription.withCredentials(taskId, secret).withParameters(params);
 
     val resource = new ErxMedicationDispenseBundle();
     val response =

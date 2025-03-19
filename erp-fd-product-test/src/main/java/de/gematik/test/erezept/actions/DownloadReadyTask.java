@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package de.gematik.test.erezept.actions;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.vsdm.types.VsdmPatient;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
+import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,60 +40,88 @@ public class DownloadReadyTask extends ErpAction<ErxTaskBundle> {
 
   private final TaskGetCommand cmd;
 
-  /**
-   * This method is mainly intended for PN3 with kvnr
-   *
-   * @param examEvidence
-   * @param kvnr
-   * @return
-   */
-  public static DownloadReadyTask withExamEvidence(VsdmExamEvidence examEvidence, KVNR kvnr) {
+  public static DownloadReadyTask with(VsdmExamEvidence examEvidence, Egk egk) {
+    return with(examEvidence, egk, List.of());
+  }
+
+  public static DownloadReadyTask with(
+      VsdmExamEvidence examEvidence, Egk egk, List<IQueryParameter> queryParameter) {
+    val street = egk.getOwnerData().getStreet();
+    return with(
+        examEvidence,
+        KVNR.from(egk.getKvnr()),
+        egk.getInsuranceStartDate(),
+        street == null ? "" : street,
+        queryParameter);
+  }
+
+  public static DownloadReadyTask with(
+      VsdmExamEvidence examEvidence, KVNR kvnr, LocalDate insuranceStartDate, String street) {
+    return with(examEvidence, kvnr, insuranceStartDate, street, List.of());
+  }
+
+  public static DownloadReadyTask with(
+      VsdmExamEvidence examEvidence,
+      KVNR kvnr,
+      LocalDate insuranceStartDate,
+      String street,
+      List<IQueryParameter> queryParameter) {
+    return with(
+        examEvidence.encode(), kvnr, generateHash(insuranceStartDate, street), queryParameter);
+  }
+
+  public static DownloadReadyTask withoutPnwParameter(
+      KVNR kvnr, LocalDate insuranceStartDate, String street) {
+    return with(null, kvnr, generateHash(insuranceStartDate, street), List.of());
+  }
+
+  public static DownloadReadyTask with(
+      String examEvidence, KVNR kvnr, LocalDate insuranceStartDate, String street) {
+    return with(examEvidence, kvnr, generateHash(insuranceStartDate, street), List.of());
+  }
+
+  public static DownloadReadyTask withoutHcvParameter(VsdmExamEvidence examEvidence, KVNR kvnr) {
+    return with(examEvidence.encode(), kvnr, null, List.of());
+  }
+
+  public static DownloadReadyTask withoutKvnrParameter(
+      VsdmExamEvidence examEvidence, LocalDate insuranceStartDate, String street) {
+    return with(examEvidence, null, insuranceStartDate, street, List.of());
+  }
+
+  private static String generateHash(LocalDate insuranceStartDate, String street) {
+    return Base64.getUrlEncoder()
+        .encodeToString(VsdmPatient.generateHash(insuranceStartDate, street == null ? "" : street));
+  }
+
+  public static DownloadReadyTask with(
+      String examEvidenceAsBase64, KVNR kvnr, String hcv, List<IQueryParameter> queryParameter) {
     log.info(
-        format(
-            "Request Get /Task as pharmacy with exam evidence {0} and kvnr {1} ",
-            examEvidence, kvnr));
-    val cmd = new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64()).andKvnr(kvnr);
+        "Request Get /Task as pharmacy with exam evidence {}, kvnr {}, hcv {} and QueryParam {} ",
+        examEvidenceAsBase64,
+        kvnr,
+        hcv,
+        queryParameter);
+    var cmd =
+        examEvidenceAsBase64 != null
+            ? new TaskGetByExamEvidenceCommand(examEvidenceAsBase64)
+            : new TaskGetByExamEvidenceCommand();
+    cmd.andAdditionalQuery(queryParameter);
+    if (kvnr != null) {
+      cmd = cmd.andKvnr(kvnr);
+    }
+    if (hcv != null) {
+      cmd = cmd.andHcv(hcv);
+    }
     return new DownloadReadyTask(cmd);
   }
 
   public static DownloadReadyTask asPatient(List<IQueryParameter> queryParameter) {
     val cmd = new DownloadReadyTask(new TaskGetCommand(queryParameter));
     log.info(
-        format(
-            "Request Get /Task with Query {0} as as Patient with Sort- or PagingParams ",
-            queryParameter));
+        "Request Get /Task with Query {} as as Patient with Sort- or PagingParams ",
+        queryParameter);
     return cmd;
-  }
-
-  public static DownloadReadyTask withExamEvidenceAnOptionalQueryParams(
-      VsdmExamEvidence examEvidence, KVNR kvnr, List<IQueryParameter> queryParameter) {
-    log.info(
-        format(
-            "Request Get /Task as pharmacy with exam evidence {0} and kvnr {1} and QueryParam {2} ",
-            examEvidence, kvnr, queryParameter));
-    val cmd =
-        new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64())
-            .andKvnr(kvnr)
-            .andAdditionalQuery(queryParameter);
-    return new DownloadReadyTask(cmd);
-  }
-
-  public static DownloadReadyTask withExamEvidence(VsdmExamEvidence examEvidence) {
-    log.info(format("Request Get /Task as pharmacy with exam evidence {0}", examEvidence));
-    val cmd = new TaskGetByExamEvidenceCommand(examEvidence.encodeAsBase64());
-    return new DownloadReadyTask(cmd);
-  }
-
-  public static DownloadReadyTask withoutExamEvidence(KVNR kvnr) {
-    log.info(format("Request Get /Task as pharmacy without exam evidence but with kvnr {0}", kvnr));
-    val cmd = new TaskGetByExamEvidenceCommand().andKvnr(kvnr);
-    return new DownloadReadyTask(cmd);
-  }
-
-  public static DownloadReadyTask withInvalidExamEvidence() {
-    log.info(format("Request Get /Task as pharmacy with invalid exam evidence"));
-    val cmd = new TaskGetByExamEvidenceCommand("abc");
-    return new DownloadReadyTask(cmd);
   }
 
   @Override

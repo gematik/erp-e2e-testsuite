@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.12.0</version>
+        <version>0.13.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -45,11 +45,6 @@
             <artifactId>fhir-codec-brick</artifactId>
             <scope>test</scope>
             <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>de.gematik.bbriccs</groupId>
-            <artifactId>resource-loader-brick</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>

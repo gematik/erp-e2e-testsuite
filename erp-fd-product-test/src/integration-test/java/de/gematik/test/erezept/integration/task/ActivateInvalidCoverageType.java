@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -27,7 +28,6 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -55,15 +55,15 @@ public class ActivateInvalidCoverageType extends ErpTest {
 
   private static Stream<Arguments> baseGkvComposer() {
     return ArgumentComposer.composeWith()
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+        .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+        .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
         .create();
   }
 
   private static Stream<Arguments> basePkvComposer() {
     return ArgumentComposer.composeWith()
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+        .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+        .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
         .create();
   }
 
@@ -77,7 +77,7 @@ public class ActivateInvalidCoverageType extends ErpTest {
           + " belegt ist")
   @MethodSource("baseGkvComposer")
   void activateGkvPrescriptionWithPkvCoverage(
-      VersicherungsArtDeBasis insuranceType, PrescriptionAssignmentKind assignmentKind) {
+      InsuranceTypeDe insuranceType, PrescriptionAssignmentKind assignmentKind) {
 
     sina.changePatientInsuranceType(insuranceType);
 
@@ -107,7 +107,7 @@ public class ActivateInvalidCoverageType extends ErpTest {
           + " belegt ist")
   @MethodSource("basePkvComposer")
   void activatePkvPrescriptionWithGkvCoverage(
-      VersicherungsArtDeBasis insuranceType, PrescriptionAssignmentKind assignmentKind) {
+      InsuranceTypeDe insuranceType, PrescriptionAssignmentKind assignmentKind) {
 
     sina.changePatientInsuranceType(insuranceType);
 

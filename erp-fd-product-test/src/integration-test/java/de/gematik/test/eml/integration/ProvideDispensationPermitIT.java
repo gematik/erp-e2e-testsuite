@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,23 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_COMPOUNDING;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_FREITEXT;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_INGREDIENT;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_PZN;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ClosePrescriptionWithoutDispensation;
+import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -35,16 +45,21 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -73,6 +88,12 @@ import org.junit.runner.RunWith;
 @Tag("EpaEml")
 public class ProvideDispensationPermitIT extends ErpTest {
 
+  private final List<IQueryParameter> searchParams =
+      IQueryParameter.search()
+          .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
+          .sortedBy("date", SortOrder.DESCENDING)
+          .createParameter();
+
   @Actor(name = "Günther Angermänn")
   private PatientActor patient;
 
@@ -84,17 +105,11 @@ public class ProvideDispensationPermitIT extends ErpTest {
 
   private ErxAcceptBundle acceptance;
 
-  private final List<IQueryParameter> searchParams =
-      IQueryParameter.search()
-          .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
-          .sortedBy("date", SortOrder.DESCENDING)
-          .createParameter();
-
   public static Stream<Arguments> workflowAndMedicationComposer() {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
   }
 
-  @TestcaseId("EML_Provide_Prescription_with_Consent_01")
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_01")
   @ParameterizedTest(
       name =
           "[{index}] -> für einen Flow Type {2} sollen die zum Epa-Aktensystem gesendete"
@@ -104,7 +119,7 @@ public class ProvideDispensationPermitIT extends ErpTest {
           + " Aktensystem den Werten der Dispensation entspricht")
   @MethodSource("workflowAndMedicationComposer")
   void checkSubmittedPrescriptionInformation(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {
@@ -128,16 +143,17 @@ public class ProvideDispensationPermitIT extends ErpTest {
 
     val dispenseAction = determineDispenseAction(task, acceptance);
 
-    val dispensation = pharmacy.performs(dispenseAction);
+    val dispensationInterAction = pharmacy.performs(dispenseAction);
 
-    pharmacy.attemptsTo(Verify.that(dispensation).withExpectedType().isCorrect());
+    pharmacy.attemptsTo(Verify.that(dispensationInterAction).withExpectedType().isCorrect());
     pharmacy.performs(
         ClosePrescriptionWithoutDispensation.forTheTask(task, acceptance.getSecret()));
 
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvideDispensation.forDispensation(
-            dispensation.getExpectedResponse().getMedicationDispenses().get(0),
-            TelematikID.from(SafeAbility.getAbility(pharmacy, UseSMCB.class).getTelematikID())));
+            dispensationInterAction.getExpectedResponse(),
+            TelematikID.from(SafeAbility.getAbility(pharmacy, UseSMCB.class).getTelematikID()),
+            task.getPrescriptionId()));
 
     val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
     patient.attemptsTo(
@@ -211,9 +227,9 @@ public class ProvideDispensationPermitIT extends ErpTest {
     Secret secret = Secret.fromString(acceptance.getSecret().getValue());
 
     if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
-      return DispensePrescription.forPrescription(taskId, secret).withMedDsp(getMedDisp(task));
+      return DispensePrescription.withCredentials(taskId, secret).withMedDsp(getMedDisp(task));
     } else {
-      return DispensePrescription.forPrescription(taskId, secret)
+      return DispensePrescription.withCredentials(taskId, secret)
           .withParameters(getDispenseParameters(task));
     }
   }

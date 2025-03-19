@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.erezept.fhir.parser.profiles.systems;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
+import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum KbvNamingSystem implements INamingSystem {
+public enum KbvNamingSystem implements WithNamingSystem {
   PRUEFNUMMER("https://fhir.kbv.de/NamingSystem/KBV_NS_FOR_Pruefnummer"),
   BASE_BSNR("https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR"),
   BASE_ANR("https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR"),

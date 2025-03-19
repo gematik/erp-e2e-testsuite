@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class MedicationDispenseSearchByIdCommandTest {
     // the Identifier for the search as described in A_22070
     val identifier =
         URLEncoder.encode(
-            format("{0}|{1}", prescriptionId.getSystemAsString(), prescriptionId.getValue()),
+            format("{0}|{1}", prescriptionId.getSystemUrl(), prescriptionId.getValue()),
             StandardCharsets.UTF_8);
     assertEquals(format("/MedicationDispense?identifier={0}", identifier), cmd.getRequestLocator());
     assertEquals(HttpRequestMethod.GET, cmd.getMethod());

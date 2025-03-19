@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.erezept.fhir.parser.profiles.systems;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CommonCodeSystem implements ICodeSystem {
+public enum CommonCodeSystem implements WithCodeSystem {
   PERFORMER_TYPE("urn:ietf:rfc:3986"),
   ORGANIZATION_TYPE("urn:ietf:rfc:3986"),
   UCUM("http://unitsofmeasure.org"), // Unified Code for Units of Measure

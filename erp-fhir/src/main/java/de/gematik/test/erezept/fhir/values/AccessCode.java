@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import org.hl7.fhir.r4.model.Identifier;
 
-public class AccessCode extends Value<String> {
+public class AccessCode extends SemanticValue<String, ErpWorkflowNamingSystem> {
 
   public AccessCode(final String accessCode) {
     super(ErpWorkflowNamingSystem.ACCESS_CODE, accessCode);

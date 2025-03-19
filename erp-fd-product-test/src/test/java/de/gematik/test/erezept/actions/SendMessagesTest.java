@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package de.gematik.test.erezept.actions;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actions.communication.SendMessages;
@@ -30,13 +31,14 @@ import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory;
 import java.util.UUID;
 import lombok.val;
@@ -65,23 +67,27 @@ class SendMessagesTest {
   void shouldBuildDispenseRequest() {
     val communicationDisReqMessage =
         new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, "testMessage");
-    val tsk = mock(ErxTask.class);
+    val task = mock(ErxTask.class);
+    val flowType = PrescriptionFlowType.FLOW_TYPE_160;
+    val prescriptionId = PrescriptionId.random(flowType);
 
-    when(tsk.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
-    when(tsk.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
+    when(task.getTaskId()).thenReturn(prescriptionId.toTaskId());
+    when(task.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
+    when(task.getFlowType()).thenReturn(flowType);
 
     val payload =
-        ErxCommunicationBuilder.builder()
-            .basedOnTask(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
-            .recipient(patientActor.getKvnr().getValue())
-            .buildDispReq(communicationDisReqMessage);
+        ErxCommunicationBuilder.forDispenseRequest(communicationDisReqMessage)
+            .basedOn(prescriptionId.toTaskId(), AccessCode.random())
+            .flowType(flowType)
+            .receiver(patientActor.getKvnr().getValue())
+            .build();
 
     val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
 
     when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
     val com =
         SendMessages.to(pharmacyActor)
-            .forTask(tsk)
+            .forTask(task)
             .addManipulator(
                 ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators())
             .asDispenseRequest(communicationDisReqMessage);
@@ -98,10 +104,10 @@ class SendMessagesTest {
     when(tsk.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
     when(tsk.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
     val payload =
-        ErxCommunicationBuilder.builder()
-            .basedOnTask(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
-            .recipient(pharmacyActor.getTelematikId().getValue())
-            .buildReply(communicationReplyMessage);
+        ErxCommunicationBuilder.asReply(communicationReplyMessage)
+            .basedOn(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
+            .receiver(pharmacyActor.getTelematikId().getValue())
+            .build();
     val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
 
     when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
@@ -123,11 +129,11 @@ class SendMessagesTest {
     when(tsk.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
     when(tsk.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
     val payload =
-        ErxCommunicationBuilder.builder()
-            .basedOnTask(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
-            .recipient(pharmacyActor.getTelematikId().getValue())
+        ErxCommunicationBuilder.asReply(testReply)
+            .basedOn(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
+            .receiver(pharmacyActor.getTelematikId().getValue())
             .supplyOptions(SupplyOptionsType.ON_PREMISE)
-            .buildReply(testReply);
+            .build();
     val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
     when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
     val sentReplyComm =
@@ -139,15 +145,38 @@ class SendMessagesTest {
   @Test
   void shouldSendWithCustomCommunication() {
     val payload =
-        ErxCommunicationBuilder.builder()
-            .basedOnTask(TaskId.from(PrescriptionId.random()), AccessCode.random())
-            .recipient(pharmacyActor.getTelematikId().getValue())
+        ErxCommunicationBuilder.asReply(
+                new CommunicationReplyMessage(SupplyOptionsType.ON_PREMISE, "testReply"))
+            .basedOn(TaskId.from(PrescriptionId.random()), AccessCode.random())
+            .receiver(pharmacyActor.getTelematikId().getValue())
             .supplyOptions(SupplyOptionsType.ON_PREMISE)
-            .buildReply(new CommunicationReplyMessage(SupplyOptionsType.ON_PREMISE, "testReply"));
+            .build();
     val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
     when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
 
     val sentReplyComm = SendMessages.withCommunication(payload);
+    val interActionComm = sentReplyComm.answeredBy(patientActor);
+    assertNotNull(interActionComm.getExpectedType());
+  }
+
+  @Test
+  void shouldSendWithCustomTaskValues() {
+    val testReply = new CommunicationReplyMessage(SupplyOptionsType.ON_PREMISE, "testReply");
+    val task = mock(ErxTask.class);
+    when(task.getTaskId()).thenReturn(PrescriptionId.random().toTaskId());
+    when(task.getAccessCode()).thenReturn(AccessCode.random());
+    val payload =
+        ErxCommunicationBuilder.asReply(testReply)
+            .basedOn(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
+            .receiver(pharmacyActor.getTelematikId().getValue())
+            .supplyOptions(SupplyOptionsType.ON_PREMISE)
+            .build();
+    val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
+    when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
+    val sentReplyComm =
+        SendMessages.to(patientActor)
+            .with(TaskId.from("123.456.789"), AccessCode.random())
+            .asReply(testReply, pharmacyActor);
     val interActionComm = sentReplyComm.answeredBy(patientActor);
     assertNotNull(interActionComm.getExpectedType());
   }

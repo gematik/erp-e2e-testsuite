@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,10 +71,15 @@ class RemoteKonnektorTest {
   }
 
   private static Stream<Arguments> provideSigningArguments() {
+    // excluded, as these SmartCards do NOT have an RSA-QES certificate
+    val excludeList = List.of("80276001011699901343", "80276001011699901344");
+
     val hbas = SmartcardArchive.fromResources().getHbaCards();
+
     val algorithms = Arrays.stream(CryptoSystem.values()).toList();
     val isIncludeRevocationInfo = List.of(true, false);
     return hbas.stream()
+        .filter(hba -> !excludeList.contains(hba.getIccsn()))
         .flatMap(
             hba ->
                 algorithms.stream()

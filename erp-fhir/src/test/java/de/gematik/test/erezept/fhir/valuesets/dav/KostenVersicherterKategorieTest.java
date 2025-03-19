@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import org.junit.jupiter.api.Test;
 
 class KostenVersicherterKategorieTest {
@@ -54,10 +53,5 @@ class KostenVersicherterKategorieTest {
   @Test
   void testInvalidValueSetException() {
     assertThrows(InvalidValueSetException.class, () -> KostenVersicherterKategorie.fromCode("4"));
-  }
-
-  @Test
-  void shouldHaveDefinition() {
-    assertNotNull(KostenVersicherterKategorie.ZUZAHLUNG.getDefinition());
   }
 }

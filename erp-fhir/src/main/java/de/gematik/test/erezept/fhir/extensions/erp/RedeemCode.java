@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.StringType;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -32,9 +31,7 @@ public class RedeemCode {
   private final String value;
 
   public Extension asExtension() {
-    val ext = new Extension(ErpWorkflowStructDef.REDEEM_CODE.getCanonicalUrl());
-    ext.setValue(new StringType(value));
-    return ext;
+    return ErpWorkflowStructDef.REDEEM_CODE.asStringExtension(value);
   }
 
   public static RedeemCode from(String code) {

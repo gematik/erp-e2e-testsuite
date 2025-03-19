@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 
-public class AsvTeamNumber extends Value<String> {
+public class AsvTeamNumber extends SemanticValue<String, DeBasisProfilNamingSystem> {
 
   private AsvTeamNumber(String value) {
-    super(DeBasisNamingSystem.TEAMNUMMER, value);
+    super(DeBasisProfilNamingSystem.ASV_TEAMNUMMER, value);
   }
 
   public static AsvTeamNumber from(String value) {

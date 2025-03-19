@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public interface InsuranceCoverageInfo {
 
   String getIknr();
 
-  VersicherungsArtDeBasis getInsuranceType();
+  InsuranceTypeDe getInsuranceType();
 
   static List<Class<? extends InsuranceCoverageInfo>> getImplementors() {
     return List.of(
@@ -58,12 +58,27 @@ public interface InsuranceCoverageInfo {
     return result;
   }
 
-  static InsuranceCoverageInfo randomFor(VersicherungsArtDeBasis insuranceKind) {
-    return insuranceKind
-        .getCoverageOptions()
+  @SuppressWarnings("unchecked")
+  static <T extends InsuranceCoverageInfo> Optional<Class<T>> coverageOptionsFor(
+      InsuranceTypeDe insuranceKind) {
+    return switch (insuranceKind) {
+      case GKV -> Optional.of((Class<T>) GkvInsuranceCoverageInfo.class);
+      case PKV -> Optional.of((Class<T>) PkvInsuranceCoverageInfo.class);
+      case BG -> Optional.of((Class<T>) BGInsuranceCoverageInfo.class);
+      default -> Optional.empty();
+    };
+  }
+
+  static InsuranceCoverageInfo randomFor(InsuranceTypeDe insuranceKind) {
+    return coverageOptionsFor(insuranceKind)
         .map(options -> GemFaker.randomElement(options.getEnumConstants()))
         .stream()
         .findFirst()
         .orElse(DynamicInsuranceCoverageInfo.random());
+  }
+
+  static String shortenName(String name) {
+    if (name.length() > 45) return name.substring(0, 45);
+    return name;
   }
 }

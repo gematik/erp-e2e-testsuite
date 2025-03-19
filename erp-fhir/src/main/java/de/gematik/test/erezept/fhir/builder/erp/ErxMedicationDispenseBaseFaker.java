@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerTelematikId;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBase;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,8 +39,7 @@ public abstract class ErxMedicationDispenseBaseFaker<
   protected final Map<String, Consumer<B>> builderConsumers = new HashMap<>();
 
   protected ErxMedicationDispenseBaseFaker() {
-    withPerformer(fakerTelematikId());
-    withPrescriptionId(fakerPrescriptionId());
+    this.withPerformer(fakerTelematikId()).withPrescriptionId(fakerPrescriptionId());
   }
 
   @SuppressWarnings("unchecked")

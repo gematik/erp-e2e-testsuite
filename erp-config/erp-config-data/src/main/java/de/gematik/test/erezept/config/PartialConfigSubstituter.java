@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,12 +78,9 @@ public class PartialConfigSubstituter {
   }
 
   private void applyUpdate(JsonNode root, KeyValuePair kvp) {
-    log.trace(format("Traverse: {0}", kvp.getNonPrefixedKey()));
+    log.trace("Traverse: {}", kvp.getNonPrefixedKey());
     val leafNodeParents = traverse(root, kvp);
-    log.trace(
-        format(
-            "Found {0} leaf elements for key {1}",
-            leafNodeParents.size(), kvp.getNonPrefixedKey()));
+    log.trace("Found {} leaf elements for key {}", leafNodeParents.size(), kvp.getNonPrefixedKey());
     leafNodeParents.forEach(
         p -> {
           val value = kvp.value.equalsIgnoreCase("null") ? null : kvp.value;
@@ -145,7 +142,7 @@ public class PartialConfigSubstituter {
               .findFirst();
     }
 
-    optionalPcsFile.ifPresent(pcs -> log.info(format("Read .pcs-file from {0}", pcs)));
+    optionalPcsFile.ifPresent(pcs -> log.info("Read .pcs-file from {}", pcs));
 
     AtomicReference<List<KeyValuePair>> kvpList = new AtomicReference<>();
     optionalPcsFile.ifPresentOrElse(
@@ -164,7 +161,7 @@ public class PartialConfigSubstituter {
         .findFirst()
         .ifPresentOrElse(
             ppcs -> {
-              log.info(format("Read secrets from {0}", ppcs));
+              log.info("Read secrets from {}", ppcs);
               kvpList.set(mergeSystemProperties(ppcs));
             },
             () -> kvpList.set(readSystemProperties()));
@@ -179,7 +176,7 @@ public class PartialConfigSubstituter {
     try (val br = new BufferedReader(new FileReader(pcsFile))) {
       br.lines()
           .filter(line -> !line.startsWith("#")) // filter comment lines
-          .filter(line -> !line.isEmpty() && !line.isBlank()) // filter empty lines
+          .filter(line -> !line.isBlank()) // filter empty lines
           .map(this::prependPrefix)
           .map(this::splitLine)
           .forEach(ret::add);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package de.gematik.test.erezept.client.usecases;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class BundlePagingCommandTest extends ParsingTest {
+class BundlePagingCommandTest extends ErpFhirParsingTest {
 
   private static ErxAuditEventBundle erxAuditEventBundle;
 

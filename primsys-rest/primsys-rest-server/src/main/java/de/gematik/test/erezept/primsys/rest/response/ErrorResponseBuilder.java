@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package de.gematik.test.erezept.primsys.rest.response;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -71,7 +71,7 @@ public class ErrorResponseBuilder {
   private static <R extends Resource> String extractErrorMessage(ErpResponse<R> erpResponse) {
     if (erpResponse.isOperationOutcome()) {
       val oo = erpResponse.getAsOperationOutcome();
-      return OperationOutcomeWrapper.extractFrom(oo);
+      return OperationOutcomeExtractor.extractFrom(oo);
     } else if (erpResponse.isEmptyBody()) {
       throw ErrorResponseBuilder.createInternalErrorException(
           400, "Unknown Error: expected OperationOutcome but received an empty body");

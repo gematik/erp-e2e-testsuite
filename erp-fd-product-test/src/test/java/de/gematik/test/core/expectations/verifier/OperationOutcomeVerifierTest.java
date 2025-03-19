@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,5 +145,29 @@ class OperationOutcomeVerifierTest {
     oOResource.addIssue().getDetails().setText("FHIR-Validation error");
     val step = operationOutcomeContainsInDetailText("FHIR-Validation error", ErpAfos.A_23888);
     step.apply(oOResource);
+  }
+
+  @Test
+  void shouldVerify_oOHasInDetailsTextOneOf() {
+    val oOResource = createOperationOutcome();
+    oOResource.addIssue().getDetails().setText("FHIR-Validation error");
+    val step = hasAnyOfDetailsText(ErpAfos.A_23888, "FHIR-Validation error", "nonsenseError");
+    step.apply(oOResource);
+  }
+
+  @Test
+  void shouldThrowWhileVerify_oOHasInDetailsTextOneOf() {
+    val oOResource = createOperationOutcome();
+    oOResource.addIssue().getDetails().setText("nonsense text");
+    val step = hasAnyOfDetailsText(ErpAfos.A_23888, "FHIR-Validation error");
+    assertThrows(AssertionError.class, () -> step.apply(oOResource));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyWithoutDetailsText_oOHasInDetailsTextOneOf() {
+    val oOResource = createOperationOutcome();
+    oOResource.getIssueFirstRep().getDetails().setText(null);
+    val step = hasAnyOfDetailsText(ErpAfos.A_23888, "FHIR-Validation error");
+    assertThrows(AssertionError.class, () -> step.apply(oOResource));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,19 @@
 
 package de.gematik.test.core.expectations.emlverifier;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlDispensationIdIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlHandedOverIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationDispenseMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlOrganisationHasSMCBTelematikId;
+import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
@@ -28,8 +37,8 @@ import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
@@ -42,8 +51,12 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
-class EpaOpProvideDispensationVerifierTest {
+@SetSystemProperty(
+    key = ERP_FHIR_PROFILES_TOGGLE,
+    value = "1.3.0") // TODO: these tests work only for 1.3.0
+class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
   private static final Date testDate_22_01_2025 =
       DateConverter.getInstance().localDateToDate(LocalDate.of(2025, Month.JANUARY, 22));
   private static EpaOpProvideDispensation validEpaOpProvideDispensation;
@@ -347,13 +360,13 @@ class EpaOpProvideDispensationVerifierTest {
 
   @Test
   void shouldVerifyOrganisationSmcbIdInEmlDispensationCorrect() {
-    val step = emlOrganisationHasSmcbTelematikId(TelematikID.from("9-2.58.00000040"));
+    val step = emlOrganisationHasSMCBTelematikId(TelematikID.from("9-2.58.00000040"));
     assertDoesNotThrow(() -> step.apply(validEpaOpProvideDispensation));
   }
 
   @Test
   void shouldThrowWhileVerifyOrganisationSmcbIdInEmlDispensation() {
-    val step = emlOrganisationHasSmcbTelematikId(TelematikID.from("91-2.123.123456789"));
+    val step = emlOrganisationHasSMCBTelematikId(TelematikID.from("91-2.123.123456789"));
     assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
   }
 

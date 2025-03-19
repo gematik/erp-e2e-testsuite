@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.primsys.data.HealthAppRequestDto;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class HealthAppRequestDataMapperTest {
+class HealthAppRequestDataMapperTest extends ErpFhirParsingTest {
 
   @Test
   void shouldMapFromHealthAppRequest() {
@@ -48,8 +49,8 @@ class HealthAppRequestDataMapperTest {
             .name("Vantis KHK und Herzinfarkt 001")
             .build();
 
-    val patient = PatientFaker.builder().fake();
-    val practitioner = PractitionerFaker.builder().fake();
+    val patient = KbvPatientFaker.builder().fake();
+    val practitioner = KbvPractitionerFaker.builder().fake();
     val coverage = KbvCoverageFaker.builder().fake();
     val mapper =
         HealthAppRequestDataMapper.from(dto)

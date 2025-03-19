@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class MultiplePrescriptionExtensionTest {
+class MultiplePrescriptionExtensionTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldCreateNonMultiple() {

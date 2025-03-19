@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
+import org.hl7.fhir.r4.model.Coding;
 
 @Getter
-public enum PayorType implements IValueSet {
+public enum PayorType implements FromValueSet {
   SKT("SKT", "Sonstige Kostenträger"),
   UK("UK", "Unfallkassen"),
   ;
@@ -48,14 +49,18 @@ public enum PayorType implements IValueSet {
     return CODE_SYSTEM;
   }
 
-  public static PayorType fromCode(@NonNull String coding) {
-    return Arrays.stream(PayorType.values())
-        .filter(pt -> pt.code.equals(coding))
-        .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(PayorType.class, coding));
+  public static PayorType fromCode(Coding coding) {
+    return fromCode(coding.getCode());
   }
 
-  public static PayorType fromDisplay(@NonNull String displayValue) {
+  public static PayorType fromCode(String code) {
+    return Arrays.stream(PayorType.values())
+        .filter(pt -> pt.code.equals(code))
+        .findFirst()
+        .orElseThrow(() -> new InvalidValueSetException(PayorType.class, code));
+  }
+
+  public static PayorType fromDisplay(String displayValue) {
     return Arrays.stream(PayorType.values())
         .filter(pt -> pt.display.toLowerCase().contains(displayValue.toLowerCase()))
         .findFirst()

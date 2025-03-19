@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,11 +69,8 @@ public class LocalSigner {
   public byte[] signDocument(boolean isIncludeRevocationInfo, byte[] data) {
     val signingDate = new Date();
     val mimeType = MimeTypeEnum.XML; // Note: only XML for now!
-    log.info(
-        format(
-            "Sign {0} with {1} Bytes at {2}",
-            mimeType.getMimeTypeString(), data.length, signingDate));
-    log.debug(format("To be signed data as Base64:\n{0}", Base64.toBase64String(data)));
+    log.info("Sign {} with {} Bytes at {}", mimeType.getMimeTypeString(), data.length, signingDate);
+    log.debug("To be signed data as Base64:\n{}", Base64.toBase64String(data));
     val inMemDocument = new InMemoryDocument(data);
     inMemDocument.setMimeType(mimeType);
 
@@ -88,7 +85,7 @@ public class LocalSigner {
       val signatureValue =
           signingToken.sign(dataToSign, signParams.getDigestAlgorithm(), privateKeyEntry);
 
-      log.info("Sign XML with " + signatureValue);
+      log.info("Sign XML with {}", signatureValue);
       val signedDocument =
           (CMSSignedDocument) cades.signDocument(inMemDocument, signParams, signatureValue);
       if (isIncludeRevocationInfo) {
@@ -146,9 +143,7 @@ public class LocalSigner {
         };
 
     log.trace(
-        format(
-            "Encryption Algorithm for signing from {0} to {1}",
-            this.signingKey.getCryptoSystem(), ret));
+        "Encryption Algorithm for signing from {} to {}", this.signingKey.getCryptoSystem(), ret);
     return ret;
   }
 

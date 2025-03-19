@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,16 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import java.util.ArrayList;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
 
-class DispensePrescriptionAsBundleCommandWithoutSecretTest {
+class DispensePrescriptionAsBundleCommandWithoutSecretTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldDispenseAsBundleCorrect() {
@@ -63,8 +65,7 @@ class DispensePrescriptionAsBundleCommandWithoutSecretTest {
     assertEquals(
         testString,
         (((Bundle.BundleEntryComponent)
-                    ((java.util.ArrayList<?>) ((Bundle) command.getRequestBody().get()).getEntry())
-                        .get(0))
+                    ((ArrayList<?>) ((Bundle) command.getRequestBody().get()).getEntry()).get(0))
                 .getResource())
             .getId());
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,20 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.val;
 import org.hl7.fhir.r4.model.DateType;
+import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -271,6 +272,26 @@ class TaskVerifierTest {
     task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
 
     val step = hasCorrectAcceptDate(PrescriptionFlowType.FLOW_TYPE_200);
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldDetectTaskStatusCorrect() {
+    val task = new ErxTask();
+    task.setStatus(Task.TaskStatus.INPROGRESS);
+    val testStatus = Task.TaskStatus.INPROGRESS;
+
+    val step = taskIsInStatus(testStatus, ErpAfos.A_24034);
+    assertDoesNotThrow(() -> step.apply(task));
+  }
+
+  @Test
+  void shouldFailsWhileDetectTaskStatus() {
+    val task = new ErxTask();
+    task.setStatus(Task.TaskStatus.COMPLETED);
+    val testStatus = Task.TaskStatus.INPROGRESS;
+
+    val step = taskIsInStatus(testStatus, ErpAfos.A_24034);
     assertThrows(AssertionError.class, () -> step.apply(task));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.app.task;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.Environment;
@@ -25,7 +26,6 @@ import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class SetUpDevice implements Task {
 
   private final Environment environment; // required for @Step-Annotation!!
   private final EnvironmentConfiguration environmentConfiguration;
-  private final VersicherungsArtDeBasis insuranceKind;
+  private final InsuranceTypeDe insuranceKind;
   private final SmartcardArchive sca;
 
   @Override
@@ -70,13 +70,13 @@ public class SetUpDevice implements Task {
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
     private final EnvironmentConfiguration environmentConfiguration;
-    private VersicherungsArtDeBasis insuranceKind;
+    private InsuranceTypeDe insuranceKind;
 
     public Builder withInsuranceType(String insuranceKind) {
-      return withInsuranceType(VersicherungsArtDeBasis.fromCode(insuranceKind));
+      return withInsuranceType(InsuranceTypeDe.fromCode(insuranceKind));
     }
 
-    public Builder withInsuranceType(VersicherungsArtDeBasis insuranceKind) {
+    public Builder withInsuranceType(InsuranceTypeDe insuranceKind) {
       this.insuranceKind = insuranceKind;
       return this;
     }

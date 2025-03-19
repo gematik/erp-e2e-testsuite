@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package de.gematik.test.erezept.primsys.rest;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.fhir.anonymizer.AnonymizerFacade;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,7 +36,7 @@ import org.hl7.fhir.r4.model.Resource;
 @Path("anonymize")
 public class AnonymizerResource {
 
-  private static ActorContext actors = ActorContext.getInstance();
+  private static final ActorContext actors = ActorContext.getInstance();
   private final AnonymizerFacade anonymizer = new AnonymizerFacade();
 
   @POST

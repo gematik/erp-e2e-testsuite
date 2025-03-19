@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 
-import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -33,22 +35,20 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationPZNFaker {
+
   private final Map<String, Consumer<KbvErpMedicationPZNBuilder>> builderConsumers =
       new HashMap<>();
 
   private KbvErpMedicationPZNFaker() {
-    builderConsumers.put("pznMedication", b -> b.pzn(PZN.random(), fakerDrugName()));
-    builderConsumers.put("type", b -> b.type(BaseMedicationType.MEDICAL_PRODUCT));
-    builderConsumers.put("category", b -> b.category(MedicationCategory.C_00));
-    builderConsumers.put("vaccine", b -> b.isVaccine(false));
-    builderConsumers.put("standardSize", b -> b.normgroesse(StandardSize.NB));
-    builderConsumers.put(
-        "supplyForm",
-        b ->
-            b.darreichungsform(
-                GemFaker.fakerValueSet(
-                    Darreichungsform.class, List.of(Darreichungsform.PUE, Darreichungsform.LYE))));
-    builderConsumers.put("amount", b -> b.amount(fakerAmount(), "Stk"));
+    val supplyForm =
+        fakerValueSet(Darreichungsform.class, List.of(Darreichungsform.PUE, Darreichungsform.LYE));
+    this.withPznMedication(PZN.random(), fakerDrugName())
+        .withType(BaseMedicationType.MEDICAL_PRODUCT)
+        .withCategory(MedicationCategory.C_00)
+        .withVaccine(fakerBool())
+        .withStandardSize(fakerValueSet(StandardSize.class))
+        .withSupplyForm(supplyForm)
+        .withAmount(fakerAmount(), "Stk");
   }
 
   public static KbvErpMedicationPZNFaker builder() {
@@ -61,29 +61,27 @@ public class KbvErpMedicationPZNFaker {
   }
 
   public KbvErpMedicationPZNFaker withType(BaseMedicationType type) {
-    builderConsumers.computeIfPresent("type", (key, defaultValue) -> b -> b.type(type));
+    builderConsumers.put("type", b -> b.type(type));
     return this;
   }
 
   public KbvErpMedicationPZNFaker withCategory(MedicationCategory category) {
-    builderConsumers.computeIfPresent("category", (key, defaultValue) -> b -> b.category(category));
+    builderConsumers.put("category", b -> b.category(category));
     return this;
   }
 
   public KbvErpMedicationPZNFaker withVaccine(boolean vaccine) {
-    builderConsumers.computeIfPresent("vaccine", (key, defaultValue) -> b -> b.isVaccine(vaccine));
+    builderConsumers.put("vaccine", b -> b.isVaccine(vaccine));
     return this;
   }
 
   public KbvErpMedicationPZNFaker withStandardSize(StandardSize size) {
-    builderConsumers.computeIfPresent(
-        "standardSize", (key, defaultValue) -> b -> b.normgroesse(size));
+    builderConsumers.put("standardSize", b -> b.normgroesse(size));
     return this;
   }
 
   public KbvErpMedicationPZNFaker withSupplyForm(Darreichungsform form) {
-    builderConsumers.computeIfPresent(
-        "supplyForm", (key, defaultValue) -> b -> b.darreichungsform(form));
+    builderConsumers.put("supplyForm", b -> b.darreichungsform(form));
     return this;
   }
 
@@ -92,8 +90,7 @@ public class KbvErpMedicationPZNFaker {
   }
 
   public KbvErpMedicationPZNFaker withPznMedication(PZN pzn, String medicationName) {
-    builderConsumers.computeIfPresent(
-        "pznMedication", (key, defaultValue) -> b -> b.pzn(pzn, medicationName));
+    builderConsumers.put("pznMedication", b -> b.pzn(pzn, medicationName));
     return this;
   }
 
@@ -102,8 +99,7 @@ public class KbvErpMedicationPZNFaker {
   }
 
   public KbvErpMedicationPZNFaker withAmount(long numerator, String unit) {
-    builderConsumers.computeIfPresent(
-        "amount", (key, defaultValue) -> b -> b.amount(numerator, unit));
+    builderConsumers.put("amount", b -> b.amount(numerator, unit));
     return this;
   }
 

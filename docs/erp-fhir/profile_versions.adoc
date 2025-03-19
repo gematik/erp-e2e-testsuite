@@ -24,7 +24,7 @@ Der FHIR-Validator unterstützt die drei folgenden Validierungs-Modi:
 
 Der Validierungs-Modus kann über die folgenden Möglichkeiten eingestellt werden:
 
-1. **parsers.yaml**: hier kann jedem einzelnen Validator ein eigener Modus mittels `mode: "normal"` eingestellt werden.
+1. **configuration.yaml**: hier kann jedem einzelnen Validator ein eigener Modus mittels `mode: "normal"` eingestellt werden.
 
 2. **System Property**: vor der Ausführung kann mittels `-Derp.fhir.validator.mode=pedantic` eingestellt werden
 
@@ -35,7 +35,7 @@ Der Validierungs-Modus kann über die folgenden Möglichkeiten eingestellt werde
 
 Die Einstellungen werden dabei von 1 nach 4 abgearbeitet. Das impliziert die folgenden Regeln:
 
-- für die alten Profile ist in der `parsers.yaml` der Modus auf `NORMAL` eingestellt und kann damit weder über die System Property noch über die Umgebungsvariable verändert werden.
+- für die alten Profile ist in der `configuration.yaml` der Modus auf `NORMAL` eingestellt und kann damit weder über die System Property noch über die Umgebungsvariable verändert werden.
 - Wird auf dem Host-System über die Umgebungsvariable ein Modus eingestellt, so kann dieser vor jedem Start weiterhin über die System Property übersteuert werden.
 
 === FHIR Generierung

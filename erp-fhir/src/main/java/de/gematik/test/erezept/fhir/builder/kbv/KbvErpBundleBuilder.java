@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.InstitutionalOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.InstitutionalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.PkvTariff;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.Date;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -86,10 +86,10 @@ public class KbvErpBundleBuilder
     return self();
   }
 
+  @Override
   public KbvErpBundle build() {
     checkRequired();
-    val profileCanonical = KbvItaErpStructDef.BUNDLE.asCanonicalType(version);
-    val kbv = this.createResource(KbvErpBundle::new, profileCanonical);
+    val kbv = this.createResource(KbvErpBundle::new, KbvItaErpStructDef.BUNDLE, version);
 
     // set FHIR-specific values provided by HAPI
     kbv.setType(Bundle.BundleType.DOCUMENT);
@@ -121,7 +121,7 @@ public class KbvErpBundleBuilder
     val isPkvCoverage =
         coverage
             .getInsuranceKindOptional()
-            .map(insuranceKind -> insuranceKind.equals(VersicherungsArtDeBasis.PKV))
+            .map(insuranceKind -> insuranceKind.equals(InsuranceTypeDe.PKV))
             .orElse(false);
     if (isPkvCoverage && isOldProfile) {
       kbv.addEntry(compositionBuilder.createEntryFor(assignerOrganization));
@@ -161,7 +161,7 @@ public class KbvErpBundleBuilder
 
     if (version.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
       // old profile
-      if (coverage.getInsuranceKind() == VersicherungsArtDeBasis.PKV) {
+      if (coverage.getInsuranceKind() == InsuranceTypeDe.PKV) {
         // assigner organization not required from kbv.ita.erp-1.1.0??
         this.checkRequired(
             assignerOrganization,
@@ -179,13 +179,12 @@ public class KbvErpBundleBuilder
                   // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
                   // "Berufsgenossenschaft"
                   // and the patient is in this case always GKV (gesetzlich krankenversichert)
-                  if (!coverage.getInsuranceKind().equals(VersicherungsArtDeBasis.BG)) {
+                  if (!coverage.getInsuranceKind().equals(InsuranceTypeDe.BG)) {
                     log.warn(
-                        format(
-                            "Accident set to {0} and insurance is of type {1} but must be {2}",
-                            accident.accidentCauseType().getDisplay(),
-                            coverage.getInsuranceKind(),
-                            VersicherungsArtDeBasis.BG));
+                        "Accident set to {} and insurance is of type {} but must be {}",
+                        accident.accidentCauseType().getDisplay(),
+                        coverage.getInsuranceKind(),
+                        InsuranceTypeDe.BG);
                   }
                 });
       }

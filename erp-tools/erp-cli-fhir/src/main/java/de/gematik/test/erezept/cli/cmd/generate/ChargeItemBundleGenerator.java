@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.cli.param.InputDirectoryParameter;
 import de.gematik.test.erezept.cli.param.OutputDirectoryParameter;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;

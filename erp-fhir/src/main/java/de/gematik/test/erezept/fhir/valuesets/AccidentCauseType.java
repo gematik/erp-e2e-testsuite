@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AccidentCauseType implements IValueSet {
+public enum AccidentCauseType implements FromValueSet {
   ACCIDENT("1", "Unfall"),
   ACCIDENT_AT_WORK("2", "Arbeitsunfall (Berufsgenossenschaft/Unfallkasse)"),
   //   SUPPLY_PROBLEMS("3", "Versorgungsleiden"), // not yet allowed by the profiles
@@ -42,13 +42,13 @@ public enum AccidentCauseType implements IValueSet {
   private final String definition = "N/A";
 
   @Override
-  public ICodeSystem getCodeSystem() {
+  public WithCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
-  public static AccidentCauseType fromCode(@NonNull String code) {
+  public static AccidentCauseType fromCode(String code) {
     return Arrays.stream(AccidentCauseType.values())
-        .filter(pt -> pt.code.equals(code))
+        .filter(act -> act.code.equals(code))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(AccidentCauseType.class, code));
   }

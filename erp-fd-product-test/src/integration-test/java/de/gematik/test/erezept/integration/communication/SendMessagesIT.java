@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
@@ -105,7 +105,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePharmaciesCommunicationWithCorrectStringLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    val prescTask = prescribe(assignmentKind);
+    val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val response =
         pharma.performs(
@@ -131,7 +131,7 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectStringLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
-    final ErxTask prescTask = prescribe(assignmentKind);
+    final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
     val cDRM = new CommunicationDisReqMessage(supplyOptionsType, getRandomString(500));
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
@@ -159,7 +159,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePatientCommunicationWithCorrectVersion(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    val prescTask = prescribe(assignmentKind);
+    val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
         new CommunicationDisReqMessage(
@@ -185,7 +185,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePharmaciesCommunicationWithCorrectSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    final ErxTask prescTask = prescribe(assignmentKind);
+    final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
         new CommunicationReplyMessage(
@@ -210,7 +210,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePatientCommunicationWithCorrectSupplyOption(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    val prescTask = prescribe(assignmentKind);
+    val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
         new CommunicationDisReqMessage(
@@ -235,7 +235,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePharmaciesCommunicationWithCorrectPickUpCodeDCM(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    final ErxTask prescTask = prescribe(assignmentKind);
+    final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
         new CommunicationReplyMessage(
@@ -273,7 +273,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePatientCommunicationWithCorrectNameLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    val prescTask = prescribe(assignmentKind);
+    val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
         new CommunicationDisReqMessage(
@@ -302,7 +302,7 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithCorrectPickUpCodHR(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
-    final ErxTask prescTask = prescribe(assignmentKind);
+    final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
     val replyMessage =
         new CommunicationReplyMessage(
             1, supplyOptionsType.getLabel(), getRandomString(500), null, "12345678", null);
@@ -333,7 +333,7 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWitCorrectUrlLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
-    final ErxTask prescTask = prescribe(assignmentKind);
+    final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
     val replyMessage =
         new CommunicationReplyMessage(
             1,
@@ -363,7 +363,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePatientCommunicationWithCorrectPhoneLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    val prescTask = prescribe(assignmentKind);
+    val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
         new CommunicationDisReqMessage(
@@ -387,7 +387,7 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWitEscapeQuotes(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
-    final ErxTask prescTask = prescribe(assignmentKind);
+    final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
     val replyMessage =
         new CommunicationReplyMessage(
             1,
@@ -408,8 +408,8 @@ public class SendMessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_10")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
-              + " {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Der Versicherte schickt eine Communication DispRequest mit validem"
+              + " Json-Content mit {0} und SupplyOption {1} an die Apotheke!")
   @DisplayName(
       "Es wird geprüft, dass der Fachdienst CommunicationDispenseRequest des Patienten mit"
           + " EscapeQuotes akzeptiert")
@@ -417,7 +417,7 @@ public class SendMessagesIT extends ErpTest {
   void shouldValidatePatientCommunicationWithEscapeQuotes(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
-    val prescTask = prescribe(assignmentKind);
+    val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
         new CommunicationDisReqMessage(
@@ -433,13 +433,5 @@ public class SendMessagesIT extends ErpTest {
     // cleanup
     pharma.performs(
         ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
-  }
-
-  private ErxTask prescribe(PrescriptionAssignmentKind assignmentKind) {
-    return doc.performs(
-            IssuePrescription.forPatient(patient)
-                .ofAssignmentKind(assignmentKind)
-                .withRandomKbvBundle())
-        .getExpectedResponse();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.google.common.base.Strings;
-import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
+import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,7 +57,8 @@ public class AdminResource {
 
     if (request != null) {
       if (request.profile != null) {
-        System.setProperty(ParserConfigurations.SYS_PROP_TOGGLE, request.profile.getVersion());
+        System.setProperty(
+            ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE, request.profile.getVersion());
       }
 
       return Response.accepted(AdminResponse.withMessage("configuration changed")).build();
@@ -68,7 +69,6 @@ public class AdminResource {
 
   @Data
   public static class AdminResponse {
-
     private String message;
 
     public static AdminResponse withMessage(String message) {

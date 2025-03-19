@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ package de.gematik.test.erezept.primsys.model;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemDispenseCloseOperationPharmaceuticalsBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -124,7 +124,7 @@ public abstract class AbstractDispensingUseCase {
    * @param medications which are dispensed by the pharmacy
    * @param isSubstituted denotes if the MedicationDispense contains substituted medications
    * @param <P> is the concrete type of Parameters-Structure
-   * @return a Parameters-Structure to perform the $dispnse/$close operation
+   * @return a Parameters-Structure to perform the $dispense/$close operation
    */
   private <P extends Parameters> P feedOperationInputParameterBuilder(
       GemDispenseCloseOperationPharmaceuticalsBuilder<P> builder,

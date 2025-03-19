@@ -6,7 +6,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.12.0</version>
+        <version>0.13.1</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
@@ -21,6 +21,26 @@
         <failsafeFailRerun>0</failsafeFailRerun>
         <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-api</artifactId>
+                <version>4.28.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-remote-driver</artifactId>
+                <version>4.28.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.appium</groupId>
+                <artifactId>java-client</artifactId>
+                <version>9.4.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -43,19 +63,13 @@
             <artifactId>fhir-codec-brick</artifactId>
             <scope>test</scope>
             <type>test-jar</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>de.gematik.refv</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>io.appium</groupId>
-            <artifactId>java-client</artifactId>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
@@ -196,25 +210,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <resourceBundles>
-                        <resourceBundle>
-                            de.gematik.test.erezept:smartcard:${project.parent.version}
-                        </resourceBundle>
-                    </resourceBundles>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>

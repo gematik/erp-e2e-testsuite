@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,8 +92,7 @@ public class ErpResponseExpectation<T extends Resource> {
     // if e.g. the ErpResponse already signalises that the payload is not of the expected type
     int stepIdx = 1;
     for (val step : this.responseSteps) {
-      log.info(
-          format("+- [{0}] {1}: {2}", stepIdx++, step.getRequirement(), step.getExpectation()));
+      log.info("+- [{}] {}: {}", stepIdx++, step.getRequirement(), step.getExpectation());
       step.apply(actual);
     }
     if (expectedPayloadType == null) return;

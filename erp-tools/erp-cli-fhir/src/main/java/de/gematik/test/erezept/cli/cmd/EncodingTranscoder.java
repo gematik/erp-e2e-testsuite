@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 package de.gematik.test.erezept.cli.cmd;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.cli.param.InputOutputDirectoryParameter;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
@@ -55,10 +53,7 @@ public class EncodingTranscoder implements Callable<Integer> {
       val originalFileName = f.getName();
       val originalEncoding = EncodingType.fromString(originalFileName);
       val flippedEncoding = originalEncoding.flipEncoding();
-      log.info(
-          format(
-              "read {0} as {1} and transform to {2}",
-              f.getName(), originalEncoding, flippedEncoding));
+      log.info("read {} as {} and transform to {}", f.getName(), originalEncoding, flippedEncoding);
 
       String originalContent;
       try (val fis = new FileInputStream(f)) {

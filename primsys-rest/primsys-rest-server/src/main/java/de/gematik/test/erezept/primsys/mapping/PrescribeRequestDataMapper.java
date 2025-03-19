@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
@@ -94,8 +94,8 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
   }
 
   public KbvErpBundle createKbvBundle(String doctorName) {
-    val practitioner = PractitionerFaker.builder().withName(doctorName).fake();
-    val organization = MedicalOrganizationFaker.medicalPractice().fake();
+    val practitioner = KbvPractitionerFaker.builder().withName(doctorName).fake();
+    val organization = KbvMedicalOrganizationFaker.medicalPractice().fake();
     val patient = this.getPatient();
     val coverage = this.getCoverage();
     val medication = this.getMedication();
@@ -115,7 +115,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
             .medicationRequest(medicationRequest)
             .medication(medication);
 
-    val isPkv = coverage.getInsuranceKind() == VersicherungsArtDeBasis.PKV;
+    val isPkv = coverage.getInsuranceKind() == InsuranceTypeDe.PKV;
     val isOldProfile = KbvItaForVersion.getDefaultVersion().compareTo(KbvItaForVersion.V1_0_3) == 0;
     if (isPkv && isOldProfile) {
       // assigner organization was only required in KbvItaFor 1.0.3
@@ -123,7 +123,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
       // we do not have the AssignerOrganization (which was faked anyway for getting a Reference +
       // Name
       // build a faked one matching the Reference of the patient
-      builder.assigner(AssignerOrganizationFaker.builder().forPatient(patient).fake());
+      builder.assigner(KbvAssignerOrganizationFaker.builder().forPatient(patient).fake());
     }
 
     return builder.build();

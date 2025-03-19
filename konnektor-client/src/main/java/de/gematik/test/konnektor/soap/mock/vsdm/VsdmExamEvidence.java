@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,14 @@
 package de.gematik.test.konnektor.soap.mock.vsdm;
 
 import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.vsdm.VsdmCheckDigitVersion;
 import de.gematik.test.konnektor.exceptions.ParsingExamEvidenceException;
-import jakarta.xml.bind.JAXBContext;
+import de.gematik.test.konnektor.soap.mock.utils.CdmVersion;
+import de.gematik.test.konnektor.soap.mock.utils.XmlEncoder;
+import de.gematik.ws.fa.vsds.PN;
 import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -41,133 +32,64 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Optional;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(
-    name = "",
-    propOrder = {"ts", "e", "pz"})
-@XmlRootElement(name = "PN")
 @RequiredArgsConstructor
-@AllArgsConstructor
-@Getter
 @Slf4j
 public class VsdmExamEvidence {
-  // <?xml version="1.0" encoding="UTF-8" standalone="yes"?><PN
-  // xmlns="http://ws.gematik.de/fa/vsdm/pnw/v1.0"
-  // CDM_VERSION="1.0.0"><TS></TS><E></E><PZ>ODAyNzY4ODEwMjU1NDg0MzEzMDEwMDAwMDAwMDA2Mzg0MjMzMjAyMjA4MDgxMzQ4MzM=</PZ></PN>
 
-  @XmlElement(name = "TS", required = true)
-  private String ts;
+  private final PN pn;
 
-  @XmlElement(name = "E", required = true)
-  private BigInteger e;
-
-  @XmlElement(name = "PZ")
-  private String pz;
-
-  @XmlAttribute(name = "CDM_VERSION")
-  private String cdmVersion;
-
-  public static VsdmExamEvidence parse(String examEvidenceAsBase64)
-      throws ParsingExamEvidenceException {
-    byte[] decode = Base64.getDecoder().decode(examEvidenceAsBase64.getBytes());
-    try {
-      val decompress = decompress(decode);
-      val jaxbContext = JAXBContext.newInstance(VsdmExamEvidence.class);
-      val jaxbUnMarshaller = jaxbContext.createUnmarshaller();
-      return (VsdmExamEvidence) jaxbUnMarshaller.unmarshal(new StringReader(decompress));
-    } catch (IOException | JAXBException e) {
-      throw new ParsingExamEvidenceException(examEvidenceAsBase64);
-    }
-  }
-
-  @SneakyThrows
-  public String asXml() {
-    val ret = new StringWriter();
-    val jaxbContext = JAXBContext.newInstance(VsdmExamEvidence.class);
-    val jaxbMarshaller = jaxbContext.createMarshaller();
-    jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-    jaxbMarshaller.marshal(this, ret);
-    return ret.toString();
-  }
-
-  public Optional<String> getChecksum() {
-    return pz != null ? Optional.of(pz) : Optional.empty();
-  }
-
-  public byte[] encode() {
-    return compress(asXml().getBytes(StandardCharsets.UTF_8));
-  }
-
-  @SneakyThrows
-  private byte[] compress(byte[] data) {
-    val baos = new ByteArrayOutputStream();
-    try (baos;
-        GZIPOutputStream out = new GZIPOutputStream(baos)) {
-      out.write(data);
-    }
-    return baos.toByteArray();
-  }
-
-  private static String decompress(byte[] data) throws IOException {
-    val ret = new StringBuilder();
-    try (GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(data))) {
-      ret.append(new String(in.readAllBytes()));
-    }
-    return ret.toString();
-  }
-
-  public String encodeAsBase64() {
-    return Base64.getEncoder().encodeToString(encode());
+  public Optional<String> getCheckDigit() {
+    return pn.getPZ() != null
+        ? Optional.of(Base64.getEncoder().encodeToString(pn.getPZ()))
+        : Optional.empty();
   }
 
   public static VsdmExamEvidenceBuilder asOnlineMode(VsdmService service, Egk egk) {
     return new VsdmExamEvidenceBuilder(service, egk);
   }
 
-  public static VsdmExamEvidenceBuilder asOnlineTestMode(Egk egk) {
-    return new VsdmExamEvidenceBuilder(VsdmService.instantiateWithTestKey(), egk);
-  }
-
   public static VsdmExamEvidenceBuilder asOfflineMode() {
     return new VsdmExamEvidenceBuilder();
   }
 
-  @Override
-  public String toString() {
-    return "VsdmExamEvidence{"
-        + "ts='"
-        + ts
-        + '\''
-        + ", e="
-        + e
-        + ", pz='"
-        + pz
-        + '\''
-        + ", cdmVersion='"
-        + cdmVersion
-        + '\''
-        + '}';
+  public static VsdmExamEvidence parse(String base64) {
+    try {
+      val pn = XmlEncoder.parse(PN.class, base64);
+      log.debug("VsdmExamEvidence: {}", XmlEncoder.asXml(pn).replace("\n", ""));
+      if (pn.getPZ() != null && pn.getPZ().length > 0) {
+        val version = VsdmCheckDigitVersion.fromData(pn.getPZ());
+        log.debug("Checkdigit Version: {}", version);
+      }
+      return new VsdmExamEvidence(pn);
+    } catch (JAXBException | IOException e) {
+      throw new ParsingExamEvidenceException(base64, e);
+    }
+  }
+
+  public String encode() {
+    return XmlEncoder.encode(pn);
+  }
+
+  public String asXml() {
+    return XmlEncoder.asXml(pn);
   }
 
   public static class VsdmExamEvidenceBuilder {
 
     private final VsdmService vsdmService;
     private final Egk egk;
-    private VsdmChecksum checksum;
 
     private final DateTimeFormatter timestampFormatter =
         DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.from(ZoneOffset.UTC));
 
-    private Instant timestamp = Instant.now();
+    private Instant iatTimestamp = Instant.now();
+    private VsdmService.CheckDigitConfiguration checkDigitCfg =
+        VsdmService.CheckDigitConfiguration.DEFAULT;
+    private VsdmCheckDigitVersion checkDigitVersion = VsdmCheckDigitVersion.V2;
 
     protected VsdmExamEvidenceBuilder(VsdmService service, Egk egk) {
       this.vsdmService = service;
@@ -178,63 +100,44 @@ public class VsdmExamEvidence {
       this(null, null);
     }
 
-    public VsdmExamEvidenceBuilder withExpiredTimestamp() {
-      this.timestamp = this.timestamp.minus(30, ChronoUnit.MINUTES).minus(1, ChronoUnit.SECONDS);
-      if (isOnlineMode()) {
-        checksum.setTimestamp(timestamp);
-      }
+    public VsdmExamEvidenceBuilder withExpiredIatTimestamp() {
+      this.iatTimestamp =
+          this.iatTimestamp.minus(30, ChronoUnit.MINUTES).minus(1, ChronoUnit.SECONDS);
       return this;
     }
 
-    public VsdmExamEvidenceBuilder withInvalidTimestamp() {
-      this.timestamp = this.timestamp.plus(31, ChronoUnit.MINUTES);
-      if (isOnlineMode()) {
-        checksum.setTimestamp(timestamp);
-      }
+    public VsdmExamEvidenceBuilder withInvalidIatTimestamp() {
+      this.iatTimestamp = this.iatTimestamp.plus(31, ChronoUnit.MINUTES);
       return this;
     }
 
-    public VsdmExamEvidenceBuilder checksumWithInvalidManufacturer() {
-      if (isOnlineMode()) {
-        this.checksum = vsdmService.checksumWithInvalidManufacturer(egk.getKvnr());
-      }
+    public VsdmExamEvidenceBuilder with(VsdmService.CheckDigitConfiguration cfg) {
+      this.checkDigitCfg = cfg;
       return this;
     }
 
-    public VsdmExamEvidenceBuilder checksumWithInvalidVersion() {
-      if (isOnlineMode()) {
-        this.checksum = vsdmService.checksumWithInvalidVersion(egk.getKvnr());
-      }
-      return this;
-    }
-
-    public VsdmExamEvidenceBuilder checksumWithUpdateReason(VsdmUpdateReason reason) {
-      if (isOnlineMode()) {
-        checksum.setUpdateReason(reason);
-      }
+    public VsdmExamEvidenceBuilder with(VsdmCheckDigitVersion version) {
+      this.checkDigitVersion = version;
       return this;
     }
 
     private boolean isOnlineMode() {
-      if (checksum == null && vsdmService != null) {
-        checksum = vsdmService.checksumFor(egk.getKvnr());
-      }
       return vsdmService != null;
     }
 
-    public VsdmExamEvidenceBuilder checksumWithInvalidKvnr() {
-      if (isOnlineMode()) {
-        this.checksum = vsdmService.checksumFor("ABC");
-      }
-      return this;
-    }
-
-    public VsdmExamEvidence generate(VsdmExamEvidenceResult result) {
-      return new VsdmExamEvidence(
-          timestampFormatter.format(timestamp),
-          BigInteger.valueOf(result.getResult()),
-          isOnlineMode() ? vsdmService.sign(checksum) : null,
-          "1.0.0");
+    public VsdmExamEvidence build(VsdmExamEvidenceResult result) {
+      val pn = new PN();
+      pn.setE(BigInteger.valueOf(result.getResult()));
+      pn.setTS(timestampFormatter.format(iatTimestamp));
+      pn.setCDMVERSION(CdmVersion.V1.getVersion());
+      pn.setPZ(
+          isOnlineMode()
+              ? Base64.getDecoder()
+                  .decode(
+                      vsdmService.requestCheckDigitFor(
+                          checkDigitCfg, egk, checkDigitVersion, iatTimestamp))
+              : null);
+      return new VsdmExamEvidence(pn);
     }
   }
 }

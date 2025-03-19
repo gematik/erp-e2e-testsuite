@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,13 +183,27 @@ public class PharmacyResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Path("{pharmacyId}/withEvidence")
   public Response getPrescriptionsByEvidence(
-      @PathParam("pharmacyId") String pharmacyId, @QueryParam("evidence") String examEvidence) {
+      @PathParam("pharmacyId") String pharmacyId,
+      @QueryParam("evidence") String examEvidence,
+      @QueryParam("kvnr") @Nullable String kvnr,
+      @QueryParam("hcv") @Nullable String hcv) {
     val pharmacy = actors.getPharmacyOrThrowNotFound(pharmacyId);
-    log.info(
-        "Pharmacy {} will read all prescriptions with ExamEvidence '{}'",
-        pharmacy.getName(),
-        examEvidence);
-    return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionsByEvidence(examEvidence);
+    if (hcv != null) {
+      log.info(
+          "Pharmacy {} will read all prescriptions with ExamEvidence '{}', kvnr {} and hcv {}",
+          pharmacy.getName(),
+          examEvidence,
+          kvnr,
+          hcv);
+      return new GetPrescriptionsWithPNUseCase(pharmacy)
+          .getPrescriptionsByEvidence(examEvidence, kvnr, hcv);
+    } else {
+      log.info(
+          "Pharmacy {} will read all prescriptions with ExamEvidence '{}'",
+          pharmacy.getName(),
+          examEvidence);
+      return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionsByEvidence(examEvidence);
+    }
   }
 
   @GET

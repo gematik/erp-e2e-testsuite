@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.integration.task;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -29,7 +30,6 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -70,9 +70,7 @@ class ActivateWithResponsablePractitioner extends ErpTest {
       "E-Rezept als verordnender Arzt in Weiterbildung mit verantwortlichen Arzt ausstellen")
   @MethodSource("responsibleDoctor")
   void activateWithDoctorInTraining(
-      VersicherungsArtDeBasis insuranceType,
-      PayorType payorType,
-      QualificationType responsibleDoctorType) {
+      InsuranceTypeDe insuranceType, PayorType payorType, QualificationType responsibleDoctorType) {
     sina.changePatientInsuranceType(insuranceType);
     sina.setPayorType(payorType);
     prescribingDoctor.changeQualificationType(QualificationType.DOCTOR_IN_TRAINING);
@@ -98,11 +96,7 @@ class ActivateWithResponsablePractitioner extends ErpTest {
         .arguments(QualificationType.DOCTOR)
         .arguments(QualificationType.DENTIST)
         .arguments(QualificationType.DOCTOR_AS_REPLACEMENT)
-        .multiply(
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.GKV,
-                VersicherungsArtDeBasis.PKV))
+        .multiply(List.of(InsuranceTypeDe.BG, InsuranceTypeDe.GKV, InsuranceTypeDe.PKV))
         .multiply(1, payorTypes)
         .create();
   }

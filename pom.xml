@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>0.12.0</version>
+    <version>0.13.1</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -50,8 +50,7 @@
         <version.maven-javadoc-plugin>3.5.0</version.maven-javadoc-plugin>
         <version.maven-owasp-plugin>8.2.1</version.maven-owasp-plugin>
         <version.hapi-fhir>7.2.3</version.hapi-fhir>
-        <version.serenity>4.1.20</version.serenity>
-        <version.appium>9.2.2</version.appium>
+        <version.serenity>4.2.16</version.serenity>
         <version.idp-client>28.0.2</version.idp-client>
         <version.spotless>2.41.1</version.spotless>
         <version.fasterxml.jackson>2.18.1</version.fasterxml.jackson>
@@ -72,7 +71,7 @@
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
         <version.jersey>4.0.0-M1</version.jersey>
         <version.poto>3.0.0-185</version.poto>
-        <version.bricks>0.1.10</version.bricks>
+        <version.bricks>0.4.0</version.bricks>
 
         <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
 
@@ -119,81 +118,97 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.test.erezept</groupId>
+                <artifactId>epa-mock-client</artifactId>
+                <version>0.13.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.test.erezept</groupId>
+                <artifactId>epa-fhir</artifactId>
+                <version>0.13.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.test.erezept</groupId>
+                <artifactId>epa-fhir</artifactId>
+                <version>0.13.1</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>pharmacy-service-provider-ws-client</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -306,18 +321,11 @@
                 <version>7.18.0</version>
             </dependency>
 
-            <!--
-            NOTE: appium-client is already included in serenity-core,
-            but by this we can explicitly control the version
-            -->
             <dependency>
-                <groupId>io.appium</groupId>
-                <artifactId>java-client</artifactId>
-                <version>${version.appium}</version>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-bricks</artifactId>
+                <version>${version.bricks}</version>
             </dependency>
-
-
-            <!-- Briccss -->
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>fhir-hapi-fuzzing-brick</artifactId>
@@ -335,17 +343,22 @@
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
-                <artifactId>fhir-coding-system-brick</artifactId>
-                <version>${version.bricks}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>fhir-validation-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-coding-system-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>fhir-de-basisprofil-r4-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-ucum-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
             <dependency>
@@ -399,34 +412,12 @@
                 <artifactId>ca-supplier-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>vsdm-check-digit-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
 
-            <!-- HAPI FHIR -->
-            <dependency>
-                <groupId>ca.uhn.hapi.fhir</groupId>
-                <artifactId>hapi-fhir-structures-r4</artifactId>
-                <version>${version.hapi-fhir}</version>
-            </dependency>
-            <dependency>
-                <groupId>ca.uhn.hapi.fhir</groupId>
-                <artifactId>hapi-fhir-validation</artifactId>
-                <version>${version.hapi-fhir}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>ca.uhn.hapi.fhir</groupId>
-                <artifactId>hapi-fhir-validation-resources-r4</artifactId>
-                <version>${version.hapi-fhir}</version>
-            </dependency>
-            <dependency>
-                <groupId>ca.uhn.hapi.fhir</groupId>
-                <artifactId>hapi-fhir-caching-caffeine</artifactId>
-                <version>${version.hapi-fhir}</version>
-            </dependency>
 
             <!-- DSS and Crypto -->
             <dependency>
@@ -737,6 +728,7 @@
                     </properties>
                     <skip>${skip.unittests}</skip>
                     <parallel>classes</parallel>
+                    <runOrder>random</runOrder>
                 </configuration>
             </plugin>
             <plugin>
@@ -847,5 +839,47 @@
             <url>${snapshotDeploymentRepository}</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>publish</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
 

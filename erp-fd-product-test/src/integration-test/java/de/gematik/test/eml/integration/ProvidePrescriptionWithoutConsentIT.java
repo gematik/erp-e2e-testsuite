@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,21 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleDoesNotContainLogFor;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_COMPOUNDING;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_FREITEXT;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_INGREDIENT;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_PZN;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckErpDoesNotProvidePrescriptionToEpa;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.GetPrescriptionById;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.TaskAbort;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -31,10 +39,13 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -68,7 +79,7 @@ public class ProvidePrescriptionWithoutConsentIT extends ErpTest {
   @Actor(name = "Dr. Schraßer")
   private DoctorActor doc;
 
-  @TestcaseId("EML_Provide_Prescription_with_Consent_Decision_Deny_01")
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_DENY_01")
   @ParameterizedTest(
       name =
           "[{index}] -> für einen Flow Type {2} soll die vom {1} erstellte Prescription nicht zum"
@@ -78,7 +89,7 @@ public class ProvidePrescriptionWithoutConsentIT extends ErpTest {
           + " übermittelt ist")
   @MethodSource("workflowAndMedicationComposer")
   void checkSubmittedPrescriptionInformation(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {

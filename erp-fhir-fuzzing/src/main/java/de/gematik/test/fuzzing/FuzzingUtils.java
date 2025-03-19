@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,18 @@
 
 package de.gematik.test.fuzzing;
 
+import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
 import lombok.val;
 
 public class FuzzingUtils {
@@ -29,15 +37,15 @@ public class FuzzingUtils {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V extends Enum<?> & IStructureDefinition<? extends ProfileVersion<?>>>
+  public static <V extends Enum<?> & WithStructureDefinition<? extends ProfileVersion>>
       Class<V> randomStructureDefinitionClass() {
     val d =
         GemFaker.randomElement(
             AbdaErpBasisStructDef.class,
             AbdaErpPkvStructDef.class,
-            DeBasisStructDef.class,
+            DeBasisProfilStructDef.class,
             ErpWorkflowStructDef.class,
-            Hl7StructDef.class,
+            HL7StructDef.class,
             KbvBasisStructDef.class,
             KbvItaErpStructDef.class,
             KbvItaForStructDef.class,
@@ -46,7 +54,7 @@ public class FuzzingUtils {
   }
 
   @SuppressWarnings("java:S1452") // concrete VersionType not required here!
-  public static IStructureDefinition<? extends ProfileVersion<?>> randomStructureDefinition() {
+  public static WithStructureDefinition<? extends ProfileVersion> randomStructureDefinition() {
     val c = randomStructureDefinitionClass();
     return GemFaker.fakerValueSet(c);
   }

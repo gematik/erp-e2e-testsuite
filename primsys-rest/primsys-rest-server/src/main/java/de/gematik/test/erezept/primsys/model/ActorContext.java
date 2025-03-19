@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.PrimSysRestFactory;
 import de.gematik.test.erezept.primsys.actors.BaseActor;
 import de.gematik.test.erezept.primsys.actors.Doctor;
+import de.gematik.test.erezept.primsys.actors.HealthInsurance;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
@@ -49,12 +50,15 @@ public class ActorContext {
 
   @Getter private final List<Pharmacy> pharmacies;
 
+  @Getter private final List<HealthInsurance> healthInsurances;
+
   private final ContextData contextData;
 
   private ActorContext(PrimSysRestFactory factory) {
     this.environment = factory.getActiveEnvironment();
     this.doctors = factory.createDoctorActors();
     this.pharmacies = factory.createPharmacyActors();
+    this.healthInsurances = factory.createHealthInsuranceActors();
 
     contextData = new ContextData();
   }

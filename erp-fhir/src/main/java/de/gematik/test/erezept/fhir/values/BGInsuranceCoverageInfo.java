@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import java.util.Optional;
+import lombok.Getter;
 
 /**
  * <a
@@ -141,35 +142,20 @@ public enum BGInsuranceCoverageInfo implements InsuranceCoverageInfo {
   VERWALTUNG_ERFURT("BG Verwaltung", "99084 Erfurt, Koenbergkstr. 1", "121690030"),
   ZUCKER("BG Zucker", "55127 Mainz, Lortzingstraße 2", "120390865");
 
-  private final String naming;
-  private final String contact;
-  private final String iknr;
+  private final String name;
+  @Getter private final String contact;
+  @Getter private final String iknr;
+  @Getter private final InsuranceTypeDe insuranceType = InsuranceTypeDe.BG;
 
-  BGInsuranceCoverageInfo(String naming, String contact, String iknr) {
-    this.naming = naming;
+  BGInsuranceCoverageInfo(String name, String contact, String iknr) {
+    this.name = name;
     this.contact = contact;
     this.iknr = iknr;
   }
 
   @Override
   public String getName() {
-    var name = this.naming;
-    if (name.length() > 45) return name.substring(0, 45);
-    return name;
-  }
-
-  public String getContact() {
-    return this.contact;
-  }
-
-  @Override
-  public String getIknr() {
-    return this.iknr;
-  }
-
-  @Override
-  public VersicherungsArtDeBasis getInsuranceType() {
-    return VersicherungsArtDeBasis.BG;
+    return InsuranceCoverageInfo.shortenName(this.name);
   }
 
   static Optional<BGInsuranceCoverageInfo> getByIknr(String iknr) {

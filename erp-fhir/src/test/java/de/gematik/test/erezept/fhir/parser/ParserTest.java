@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,81 +17,28 @@
 package de.gematik.test.erezept.fhir.parser;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.RegExUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-class ParserTest extends ParsingTest {
-
-  @Test
-  // TODO: still required? Remove or move to ErxAuditEventTest
-  void shouldParseErxAuditEvents() {
-    val basePath = "fhir/valid/erp/1.1.1/";
-    val auditEvents = List.of("AuditEvent_01.json");
-
-    auditEvents.stream()
-        .map(filename -> basePath + filename)
-        .map(ResourceLoader::readFileFromResource)
-        .forEach(
-            content -> {
-              val auditEvent = parser.decode(ErxAuditEvent.class, content);
-              assertNotNull(auditEvent, "Valid ErxAuditEvent must be parseable");
-
-              val expectedAction = RegExUtil.getAuditEventAction(content).orElseThrow();
-              val actualAction = auditEvent.getAction();
-              assertEquals(expectedAction, actualAction, "AuditEvent Action does not match");
-            });
-  }
-
-  @Test
-  @Disabled("cost too much test-time and is not very useful")
-  void roundtripAllAuditEvents() {
-    val basePath = "fhir/valid/erp/1.1.1/";
-    val auditEvents = List.of("AuditEvent_01.json");
-
-    auditEvents.stream()
-        .map(filename -> basePath + filename)
-        .forEach(
-            filepath ->
-                EncodingUtil.validateRoundtripEncoding(parser, filepath, ErxAuditEvent.class));
-  }
-
-  @Test
-  @Disabled("cost too much test-time and is not very useful")
-  void roundtripAllTasks() {
-    val basePath = "fhir/valid/erp/1.1.1/";
-    val tasks =
-        List.of(
-            "Task_01.xml",
-            "Task_02.xml",
-            "Task_03.xml",
-            "Task_03.json",
-            "Task_04.xml",
-            "Task_05.xml",
-            "Task_06.xml");
-
-    tasks.stream()
-        .map(filename -> basePath + filename)
-        .forEach(
-            filepath -> EncodingUtil.validateRoundtripEncoding(parser, filepath, ErxTask.class));
-  }
+class ParserTest extends ErpFhirParsingTest {
 
   @Test
   void shouldParseOfficialOldKbvBundleResources() {
@@ -100,7 +47,7 @@ class ParserTest extends ParsingTest {
 
     kbvBundleResources.forEach(
         file -> {
-          log.info(format("Parse KBV Bundle {0}", file.getName()));
+          log.trace("Parse KBV Bundle {}", file.getName());
           val content = ResourceLoader.readString(file);
           val kbvBundle = parser.decode(KbvErpBundle.class, content);
           assertNotNull(kbvBundle);
@@ -118,7 +65,7 @@ class ParserTest extends ParsingTest {
           val entries = kbvBundle.getEntry();
 
           assertEquals(id, kbvBundle.getLogicalId());
-          assertTrue(KbvItaErpStructDef.BUNDLE.match(bundleMetaProfile));
+          assertTrue(KbvItaErpStructDef.BUNDLE.matches(bundleMetaProfile));
           assertEquals("1.0.2", bundleMetaProfileVersion);
           assertEquals(
               ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl(), prescriptionNamingSystem);
@@ -136,7 +83,7 @@ class ParserTest extends ParsingTest {
 
     kbvBundleResources.forEach(
         file -> {
-          log.info(format("Parse KBV Bundle {0}", file.getName()));
+          log.trace("Parse KBV Bundle {}", file.getName());
           val content = ResourceLoader.readString(file);
           val kbvBundle = parser.decode(KbvErpBundle.class, content);
           assertNotNull(kbvBundle);
@@ -152,7 +99,7 @@ class ParserTest extends ParsingTest {
           val entries = kbvBundle.getEntry();
 
           assertEquals(id, kbvBundle.getLogicalId());
-          assertTrue(KbvItaErpStructDef.BUNDLE.match(bundleMetaProfile));
+          assertTrue(KbvItaErpStructDef.BUNDLE.matches(bundleMetaProfile));
           assertEquals("1.1.0", bundleMetaProfileVersion);
           assertEquals(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, prescriptionNamingSystem);
           assertEquals(expectedPrescriptionId, kbvBundle.getPrescriptionId());
@@ -186,7 +133,7 @@ class ParserTest extends ParsingTest {
                       format("fhir/valid/dav/{0}.{1}", id, encoding.toFileExtension()));
               val resource = parser.decode(content);
               assertTrue(resource.getId().contains(id));
-              assertEquals(DavAbgabedatenBundle.class, resource.getClass());
+              assertEquals(DavPkvAbgabedatenBundle.class, resource.getClass());
             });
   }
 
@@ -204,45 +151,5 @@ class ParserTest extends ParsingTest {
     val resource2 = parser.decode(contentJson);
     assertTrue(resource.getId().contains(id));
     assertEquals(KbvErpBundle.class, resource2.getClass());
-  }
-
-  @Test
-  @Disabled("cost too much test-time and is not very useful")
-  void roundtripAllKbvBundles() {
-    val basePath = "fhir/valid/kbv/1.0.2/bundle/";
-    val kbvBundle = ResourceLoader.getResourceFilesInDirectory(basePath);
-
-    kbvBundle.stream()
-        .map(file -> basePath + file.getName())
-        .forEach(
-            filepath ->
-                EncodingUtil.validateRoundtripEncoding(parser, filepath, KbvErpBundle.class));
-  }
-
-  @Test
-  void shouldNotAcceptNullOnValidate() {
-    String content = null;
-    assertThrows(NullPointerException.class, () -> parser.validate(content)); // null on purpose!
-    assertThrows(NullPointerException.class, () -> parser.isValid(content)); // null on purpose!
-  }
-
-  @Test
-  void shouldNotAcceptNullOnDecode() {
-    assertThrows(
-        NullPointerException.class,
-        () -> parser.decode(KbvErpBundle.class, null)); // null on purpose!
-    assertThrows(
-        NullPointerException.class,
-        () -> parser.decode(KbvErpMedication.class, null, EncodingType.XML)); // null on purpose!
-    assertThrows(NullPointerException.class, () -> parser.decode(null)); // null on purpose!
-    assertThrows(
-        NullPointerException.class,
-        () -> parser.decode(null, EncodingType.JSON)); // null on purpose!
-  }
-
-  @Test
-  void shouldNotAcceptNullOnEncode() {
-    assertThrows(NullPointerException.class, () -> parser.encode(null, EncodingType.XML));
-    assertThrows(NullPointerException.class, () -> parser.encode(null, EncodingType.JSON, true));
   }
 }

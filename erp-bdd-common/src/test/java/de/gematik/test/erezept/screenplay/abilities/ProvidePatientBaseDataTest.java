@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,26 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 
-class ProvidePatientBaseDataTest extends ParsingTest {
+class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
 
   @Test
   void shouldCreateGkvPatientFullName() {
@@ -47,7 +52,7 @@ class ProvidePatientBaseDataTest extends ParsingTest {
     assertEquals("X123456789", patient.getPatient().getKvnr().getValue());
     assertNotNull(patient.getIknr());
     assertFalse(patient.getIknr().isEmpty());
-    assertEquals(IKNR.from(patient.getIknr()), patient.getInsuranceIknr());
+    assertEquals(IKNR.asSidIknr(patient.getIknr()), patient.getInsuranceIknr());
     assertFalse(patient.getRememberedConsent().isPresent());
     assertFalse(patient.hasRememberedConsent());
     assertNotNull(patient.getInsuranceCoverage());
@@ -69,7 +74,7 @@ class ProvidePatientBaseDataTest extends ParsingTest {
     assertEquals("X123456789", patient.getPatient().getKvnr().getValue());
     assertNotNull(patient.getIknr());
     assertFalse(patient.getIknr().isEmpty());
-    assertEquals(IKNR.from(patient.getIknr()), patient.getInsuranceIknr());
+    assertEquals(IKNR.asSidIknr(patient.getIknr()), patient.getInsuranceIknr());
     assertFalse(patient.getRememberedConsent().isPresent());
     assertFalse(patient.hasRememberedConsent());
     assertNotNull(patient.getInsuranceCoverage());
@@ -118,18 +123,18 @@ class ProvidePatientBaseDataTest extends ParsingTest {
   void shouldGetCoverageInsuranceType() {
     val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
 
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getCoverageInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, patient.getCoverageInsuranceType());
     assertTrue(patient.getPatient().hasPkvKvnr());
   }
 
   @Test
   void shouldGetChangedCoverageInsuranceType() {
     val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
-    patient.setCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+    patient.setCoverageInsuranceType(InsuranceTypeDe.BG);
 
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
-    assertEquals(VersicherungsArtDeBasis.BG, patient.getCoverageInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.BG, patient.getCoverageInsuranceType());
     assertTrue(patient.isPKV());
     assertFalse(patient.isGKV());
     assertTrue(patient.getPatient().hasPkvKvnr());
@@ -146,7 +151,7 @@ class ProvidePatientBaseDataTest extends ParsingTest {
     val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
     patient.setPayorType(payorType);
 
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, patient.getPatientInsuranceType());
     assertTrue(patient.isPKV());
     assertFalse(patient.isGKV());
     assertTrue(patient.getPatient().hasPkvKvnr());

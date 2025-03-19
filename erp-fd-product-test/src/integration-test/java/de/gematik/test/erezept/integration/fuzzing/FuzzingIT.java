@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 
 package de.gematik.test.erezept.integration.fuzzing;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeBetween;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 
 import ca.uhn.fhir.parser.LenientErrorHandler;
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.fhir.fuzzing.FuzzingEngine;
 import de.gematik.bbriccs.fhir.fuzzing.impl.FuzzingEngineImpl;
 import de.gematik.test.core.annotations.Actor;
@@ -27,7 +31,13 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.FhirRequirements;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.abilities.UseHapiFuzzer;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ActivatePrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.TaskCreate;
+import de.gematik.test.erezept.actions.TheTask;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.communication.GetMessage;
 import de.gematik.test.erezept.actions.communication.SendMessages;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -41,16 +51,14 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.IKNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.FuzzingIterationsToggle;
@@ -121,8 +129,7 @@ public class FuzzingIT extends ErpTest {
   @ParameterizedTest(name = "[{index}] -> SmartFuzzing mit ''{0}''")
   @MethodSource("fuzzingStrength")
   void runCompleteWorkflowWithBricksFuzzer(double fuzzingStrength) {
-    val insuranceType =
-        GemFaker.randomElement(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV);
+    val insuranceType = GemFaker.randomElement(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV);
     val assignmentKind =
         GemFaker.randomElement(
             PrescriptionAssignmentKind.PHARMACY_ONLY, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
@@ -207,8 +214,7 @@ public class FuzzingIT extends ErpTest {
   @ParameterizedTest(name = "[{index}] -> SmartFuzzing mit ''{0}''")
   @MethodSource("fuzzingStrength")
   void runCommunicationsWithBricksFuzzer(double fuzzingStrength) {
-    val insuranceType =
-        GemFaker.randomElement(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV);
+    val insuranceType = GemFaker.randomElement(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV);
     val assignmentKind =
         GemFaker.randomElement(
             PrescriptionAssignmentKind.PHARMACY_ONLY, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
@@ -244,16 +250,16 @@ public class FuzzingIT extends ErpTest {
 
     // fuzzing communication messages
     val infoReqCom =
-        ErxCommunicationBuilder.builder()
-            .basedOnTaskId(task.getTaskId())
+        ErxCommunicationBuilder.forInfoRequest("Hallo, das ist meine &lt;Request&gt; <Nachricht>!")
+            .basedOn(task.getTaskId())
             .status("unknown")
             .medication(medication)
-            .insurance(IKNR.from("104212059"))
-            .recipient(pharmacy.getTelematikId().getValue())
+            .insurance(IKNR.asArgeIknr("104212059"))
+            .receiver(pharmacy.getTelematikId().getValue())
             .substitution(false)
             .flowType(
                 PrescriptionFlowType.fromPrescriptionId(PrescriptionId.from(task.getTaskId())))
-            .buildInfoReq("Hallo, das ist meine &lt;Request&gt; <Nachricht>!");
+            .build();
 
     val infoReqResponse = patient.performs(SendMessages.withCommunication(infoReqCom));
     patient.attemptsTo(
@@ -282,13 +288,13 @@ public class FuzzingIT extends ErpTest {
             });
 
     val replyCom =
-        ErxCommunicationBuilder.builder()
-            .basedOnTaskId(task.getTaskId())
-            .recipient(patient.getKvnr().getValue())
+        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+            .basedOn(task.getTaskId())
+            .receiver(patient.getKvnr().getValue())
             .sender(pharmacy.getTelematikId().getValue())
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(SupplyOptionsType.SHIPMENT)
-            .buildReply(new CommunicationReplyMessage());
+            .build();
     val replyResponse = pharmacy.performs(SendMessages.withCommunication(replyCom));
     pharmacy.attemptsTo(
         Verify.that(replyResponse)

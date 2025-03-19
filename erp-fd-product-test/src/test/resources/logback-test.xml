@@ -17,6 +17,9 @@
     <logger name="de.gematik" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="de.gematik.bbriccs.fhir" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
 
     <logger name="com.github.tomakehurst.wiremock" level="WARN">
         <appender-ref ref="STDOUT"/>

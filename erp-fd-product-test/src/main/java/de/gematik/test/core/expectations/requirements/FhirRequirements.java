@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.core.expectations.requirements;
 
 import lombok.Getter;
 
+@Getter
 public enum FhirRequirements implements RequirementsSet {
   LOGICAL_ID(
       "FHIR_2.26.3.3",
@@ -36,8 +37,7 @@ public enum FhirRequirements implements RequirementsSet {
           + " MedicationDispense whenHandedOver beschreibt eine Übergangszeit für die Angabe des"
           + " Formats. Diese Übergangszeit ist nicht mehr relevant."),
   ;
-
-  @Getter private final Requirement requirement;
+  private final Requirement requirement;
 
   FhirRequirements(String id, String description) {
     this.requirement = new Requirement(id, description);

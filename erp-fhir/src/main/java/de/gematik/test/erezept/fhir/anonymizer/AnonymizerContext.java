@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.anonymizer;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.Hl7StructDef;
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.DateType;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.Type;
 
 @Slf4j
 public class AnonymizerContext {
@@ -54,7 +59,7 @@ public class AnonymizerContext {
     val anonymizer = getTypedAnonymizer(type);
     anonymizer.ifPresent(a -> a.anonymize(this, resource));
     val ret = anonymizer.isPresent();
-    log.info("Anonymization of {} {}: {}", type.getSimpleName(), resource.getIdPart(), ret);
+    log.trace("Anonymization of {} {}: {}", type.getSimpleName(), resource.getIdPart(), ret);
     return ret;
   }
 
@@ -104,8 +109,8 @@ public class AnonymizerContext {
         .forEach(
             l -> {
               l.getExtension().forEach(ext -> this.anonymize(ext.getValue()));
-              val houseNumber = l.getExtensionString(Hl7StructDef.HOUSE_NUMBER.getCanonicalUrl());
-              val streetName = l.getExtensionString(Hl7StructDef.STREET_NAME.getCanonicalUrl());
+              val houseNumber = l.getExtensionString(HL7StructDef.HOUSE_NUMBER.getCanonicalUrl());
+              val streetName = l.getExtensionString(HL7StructDef.STREET_NAME.getCanonicalUrl());
               val addressLine = format("{0} {1}", streetName, houseNumber);
               this.anonymize(l, () -> addressLine);
             });

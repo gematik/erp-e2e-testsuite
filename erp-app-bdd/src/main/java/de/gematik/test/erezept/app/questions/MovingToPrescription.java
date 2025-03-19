@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,19 @@ package de.gematik.test.erezept.app.questions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.ListPageElement;
 import de.gematik.test.erezept.app.mobile.ScrollDirection;
-import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
+import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
+import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -63,9 +65,8 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
 
   private void checkPrescriptionNotShown(UseIOSApp app) {
     log.info(
-        format(
-            "Prescription {0} was not found in backend: ensure its not shown in the app",
-            taskId.getValue()));
+        "Prescription {} was not found in backend: ensure its not shown in the app",
+        taskId.getValue());
     /*
      How many prescriptions should be checked to ensure the prescription is not shown anymore
      Note: this operation is costly and can take up to several minutes,
@@ -88,16 +89,13 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
 
   private void proceedWithBackendPrescription(ErxPrescriptionBundle fdPrescription, UseIOSApp app) {
     log.info(
-        format(
-            "Prescription {0} was found in backend: ensure its shown in the app",
-            taskId.getValue()));
+        "Prescription {} was found in backend: ensure its shown in the app", taskId.getValue());
     val isMvo =
         fdPrescription.getKbvBundle().map(x -> x.getMedicationRequest().isMultiple()).orElse(false);
     log.info(
-        format(
-            "Found {0}Prescription {1} in the backend",
-            isMvo ? "MVO-" : "",
-            fdPrescription.getKbvBundle().map(x -> x.getMedication().getMedicationName())));
+        "Found {}Prescription {} in the backend",
+        isMvo ? "MVO-" : "",
+        fdPrescription.getKbvBundle().map(x -> x.getMedication().getMedicationName()));
 
     val medication =
         fdPrescription

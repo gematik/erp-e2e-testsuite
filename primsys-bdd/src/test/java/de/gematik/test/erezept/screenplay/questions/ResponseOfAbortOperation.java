@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
@@ -49,7 +49,6 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
 
   private ResponseOfAbortOperation(
       ActorRole role, DequeStrategy deque, Map<String, String> replacementMap) {
-    super("Task/$abort");
     this.role = role;
     this.deque = deque;
     this.replacementMap = replacementMap;
@@ -59,7 +58,7 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
   public ErpResponse<Resource> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
-    TaskAbortCommand cmd =
+    val cmd =
         switch (role) {
           case DOCTOR -> abortAsDoctor(actor);
           case PATIENT -> abortAsPatient(actor);
@@ -79,9 +78,10 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     val accessCode = toDelete.getAccessCode();
     val cmd = new TaskAbortCommand(taskId, accessCode);
     log.info(
-        format(
-            "Doctor {0} is asking for the response of {1} with AccessCode {2}",
-            actor.getName(), cmd.getRequestLocator(), accessCode));
+        "Doctor {} is asking for the response of {} with AccessCode {}",
+        actor.getName(),
+        cmd.getRequestLocator(),
+        accessCode);
     return cmd;
   }
 
@@ -94,9 +94,11 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     val secret = this.getSecret(toDelete);
     val cmd = new TaskAbortCommand(taskId, accessCode, secret);
     log.info(
-        format(
-            "Pharmacy {0} is asking for the response of {1} with AccessCode {2} and Secret {3}",
-            actor.getName(), cmd.getRequestLocator(), accessCode, secret));
+        "Pharmacy {} is asking for the response of {} with AccessCode {} and Secret {}",
+        actor.getName(),
+        cmd.getRequestLocator(),
+        accessCode,
+        secret);
     return cmd;
   }
 
@@ -107,9 +109,7 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     val taskId = toDelete.getTaskId();
     val cmd = new TaskAbortCommand(taskId);
     log.info(
-        format(
-            "Patient {0} is asking for the response of {1}",
-            actor.getName(), cmd.getRequestLocator()));
+        "Patient {} is asking for the response of {}", actor.getName(), cmd.getRequestLocator());
     return cmd;
   }
 
@@ -121,9 +121,9 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     val accessCode = toDelete.getAccessCode();
     val cmd = new TaskAbortCommand(taskId, accessCode);
     log.info(
-        format(
-            "Representative {0} is asking for the response of {1}",
-            actor.getName(), cmd.getRequestLocator()));
+        "Representative {} is asking for the response of {}",
+        actor.getName(),
+        cmd.getRequestLocator());
     return cmd;
   }
 
@@ -131,7 +131,7 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     var secret = acceptBundle.getSecret();
     val replacementSecret = this.replacementMap.get("secret");
     if (replacementSecret != null) {
-      log.info(format("Found a replacement secret for $abort: {0}", replacementSecret));
+      log.info("Found a replacement secret for $abort: {}", replacementSecret);
       secret = new Secret(replacementSecret);
     }
     return secret;

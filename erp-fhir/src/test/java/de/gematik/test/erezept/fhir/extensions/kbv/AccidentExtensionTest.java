@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -39,17 +40,11 @@ class AccidentExtensionTest {
     return Stream.of(Arguments.of(KbvItaErpVersion.V1_0_2), Arguments.of(KbvItaErpVersion.V1_1_0));
   }
 
-  @AfterEach
-  void cleanVersionProperties() {
-    System.clearProperty(CustomProfiles.KBV_ITA_ERP.getName());
-  }
-
   @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldBuildAccidentExtension(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val ae = AccidentExtension.accident();
     val outer = ae.asExtension();
@@ -75,8 +70,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldBuildAccidentExtensionWithFaker(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     for (var i = 0; i < 5; i++) {
       val ae = AccidentExtension.faker();
@@ -93,8 +87,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldEqualAccidents(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val date = new Date();
     val ae1 = AccidentExtension.accident(date);
@@ -107,8 +100,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldNotEqualOnDifferentAccidentDates(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val cal = Calendar.getInstance();
     cal.add(Calendar.DATE, -1);
@@ -122,8 +114,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldEqualAccidentsAtWork(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val date = new Date();
     val ae1 = AccidentExtension.accidentAtWork(date).atWorkplace("Arbeitsplatz");
@@ -136,8 +127,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldNotEqualAccidentsAtWorkOnDifferentWorkplaces(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val date = new Date();
     val ae1 = AccidentExtension.accidentAtWork(date).atWorkplace("Arbeitsplatz");
@@ -150,8 +140,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldEqualAccidentsOccupationalDiseases(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val ae1 = AccidentExtension.occupationalDisease();
     val ae2 = AccidentExtension.occupationalDisease();
@@ -163,8 +152,7 @@ class AccidentExtensionTest {
   @MethodSource("kbvBundleVersions")
   @ClearSystemProperty(key = "kbv.ita.erp")
   void shouldNotEqualOnDifferentCauses(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(
-        kbvItaErpVersion.getCustomProfile().getName(), kbvItaErpVersion.getVersion());
+    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
 
     val ae1 = AccidentExtension.accident();
     val ae2 = AccidentExtension.accidentAtWork().atWorkplace();
@@ -192,7 +180,7 @@ class AccidentExtensionTest {
   @SuppressWarnings("java:S5785")
   void shouldNotEqualOnOtherType() {
     val ae = AccidentExtension.accident();
-    assertFalse(ae.equals(null));
-    assertFalse(ae.equals("Hello World"));
+    assertNotEquals(null, ae);
+    assertNotEquals("Hello World", ae);
   }
 }

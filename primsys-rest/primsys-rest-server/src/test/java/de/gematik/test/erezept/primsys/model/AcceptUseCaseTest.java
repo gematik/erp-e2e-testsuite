@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,28 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
+import de.gematik.test.konnektor.soap.mock.LocalSigner;
 import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -48,6 +53,7 @@ class AcceptUseCaseTest extends TestWithActorContext {
   void shouldAcceptPrescription() {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(1);
+    val hba = SmartcardArchive.fromResources().getHbaByICCSN("80276001011699901501");
     val mockClient = pharmacy.getClient();
 
     val prescriptionId = PrescriptionId.random();
@@ -56,11 +62,14 @@ class AcceptUseCaseTest extends TestWithActorContext {
 
     val acceptBundle = mock(ErxAcceptBundle.class);
     val task = mock(ErxTask.class);
-    when(acceptBundle.getKbvBundleAsString())
+    when(acceptBundle.getSignedKbvBundle())
         .thenReturn(
-            fhir.encode(
-                KbvErpBundleFaker.builder().withPrescriptionId(prescriptionId).fake(),
-                EncodingType.XML));
+            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+                .signDocument(
+                    false,
+                    parser.encode(
+                        KbvErpBundleFaker.builder().withPrescriptionId(prescriptionId).fake(),
+                        EncodingType.XML)));
 
     when(acceptBundle.getTask()).thenReturn(task);
     when(task.getPrescriptionId()).thenReturn(prescriptionId);

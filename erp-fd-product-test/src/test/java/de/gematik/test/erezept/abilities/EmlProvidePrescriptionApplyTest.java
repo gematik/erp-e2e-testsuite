@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,15 @@ package de.gematik.test.erezept.abilities;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.exceptions.EpaMockClientException;
 import de.gematik.test.eml.tasks.EmlProvidePrescriptionApply;
 import de.gematik.test.erezept.eml.EpaMockClient;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +46,7 @@ class EmlProvidePrescriptionApplyTest {
 
   @Test
   void shouldProvidePrescription() {
-    KVNR kvnr = KVNR.random();
+    val kvnr = KVNR.random();
     val task = EmlProvidePrescriptionApply.forKvnr(kvnr);
     when(mockClient.setProvidePrescriptionApply(kvnr)).thenReturn(true);
     task.performAs(actor);
@@ -52,7 +55,7 @@ class EmlProvidePrescriptionApplyTest {
 
   @Test
   void shouldThrowExceptionIfPrescriptionProvideApplyFails() {
-    KVNR kvnr = KVNR.random();
+    val kvnr = KVNR.random();
     val task = EmlProvidePrescriptionApply.forKvnr(kvnr);
     when(mockClient.setProvidePrescriptionApply(kvnr)).thenReturn(false);
     assertThrows(EpaMockClientException.class, () -> task.performAs(actor));
@@ -60,11 +63,11 @@ class EmlProvidePrescriptionApplyTest {
 
   @Test
   void shouldSetProvidePrescriptionApply() {
-    KVNR kvnr = KVNR.random();
+    val kvnr = KVNR.random();
     val mockClient = mock(EpaMockClient.class);
     val useTheEpaMockClient = UseTheEpaMockClient.with(mockClient);
     when(mockClient.configRequest(any())).thenReturn(true);
-    boolean result = useTheEpaMockClient.setProvidePrescriptionApply(kvnr);
+    val result = useTheEpaMockClient.setProvidePrescriptionApply(kvnr);
     assertTrue(result);
   }
 }

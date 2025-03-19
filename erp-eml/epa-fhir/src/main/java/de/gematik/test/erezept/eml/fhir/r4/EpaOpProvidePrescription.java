@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package de.gematik.test.erezept.eml.fhir.r4;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirStrucDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.GematikDirStrucDef;
 import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
 import java.util.Date;
 import org.hl7.fhir.r4.model.Parameters;
@@ -45,7 +45,7 @@ public class EpaOpProvidePrescription extends Parameters {
   public EpaMedication getEpaMedication() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medication"))
-        .filter(entry -> EpaMedStructDef.EPA_MEDICATION.matches(entry.getResource().getMeta()))
+        .filter(entry -> EpaMedicationStructDef.EPA_MEDICATION.matches(entry.getResource()))
         .map(entry -> (EpaMedication) entry.getResource())
         .findFirst()
         .orElseThrow();
@@ -54,8 +54,7 @@ public class EpaOpProvidePrescription extends Parameters {
   public EpaMedicationRequest getEpaMedicationRequest() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medicationRequest"))
-        .filter(
-            entry -> EpaMedStructDef.EPA_MEDICATION_REQUEST.matches(entry.getResource().getMeta()))
+        .filter(entry -> EpaMedicationStructDef.EPA_MEDICATION_REQUEST.matches(entry.getResource()))
         .map(entry -> (EpaMedicationRequest) entry.getResource())
         .findFirst()
         .orElseThrow();
@@ -64,7 +63,7 @@ public class EpaOpProvidePrescription extends Parameters {
   public EpaOrganisation getEpaOrganisation() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("organization"))
-        .filter(entry -> GematikDirStrucDef.ORGANIZATION.matches(entry.getResource().getMeta()))
+        .filter(entry -> GematikDirStrucDef.ORGANIZATION.matches(entry.getResource()))
         .map(entry -> (EpaOrganisation) entry.getResource())
         .findFirst()
         .orElseThrow();
@@ -73,7 +72,7 @@ public class EpaOpProvidePrescription extends Parameters {
   public EpaPractitioner getEpaPractitioner() {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("practitioner"))
-        .filter(entry -> GematikDirStrucDef.PRACTITIONER.matches(entry.getResource().getMeta()))
+        .filter(entry -> GematikDirStrucDef.PRACTITIONER.matches(entry.getResource()))
         .map(entry -> (EpaPractitioner) entry.getResource())
         .findFirst()
         .orElseThrow();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCountry;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.pharmacyName;
 
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.valuesets.Country;
+import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -32,10 +36,9 @@ public class PharmacyOrganizationFaker {
       new HashMap<>();
 
   private PharmacyOrganizationFaker() {
-    builderConsumers.put("iknr", b -> b.iknr(IKNR.random()));
-    builderConsumers.put("name", b -> b.name(pharmacyName()));
-    builderConsumers.put(
-        "address", b -> b.address(fakerCountry(), fakerCity(), fakerZipCode(), fakerStreetName()));
+    this.withIknr(IKNR.randomStringValue());
+    this.withName(pharmacyName());
+    this.withAddress(fakerCountry(), fakerCity(), fakerZipCode(), fakerStreetName());
   }
 
   public static PharmacyOrganizationFaker builder() {
@@ -48,23 +51,22 @@ public class PharmacyOrganizationFaker {
   }
 
   public PharmacyOrganizationFaker withName(String name) {
-    builderConsumers.computeIfPresent("name", (key, defaultValue) -> b -> b.name(name));
+    builderConsumers.put("name", b -> b.name(name));
     return this;
   }
 
   public PharmacyOrganizationFaker withIknr(IKNR iknr) {
-    builderConsumers.computeIfPresent("iknr", (key, defaultValue) -> b -> b.iknr(iknr));
+    builderConsumers.put("iknr", b -> b.iknr(iknr));
     return this;
   }
 
   public PharmacyOrganizationFaker withIknr(String iknr) {
-    return this.withIknr(IKNR.from(iknr));
+    return this.withIknr(IKNR.asSidIknr(iknr));
   }
 
   public PharmacyOrganizationFaker withAddress(
       Country country, String city, String postal, String street) {
-    builderConsumers.computeIfPresent(
-        "address", (key, defaultValue) -> b -> b.address(country, city, postal, street));
+    builderConsumers.put("address", b -> b.address(country, city, postal, street));
     return this;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.integration.task;
 
+import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.*;
 import static de.gematik.test.core.expectations.verifier.AcceptBundleVerifier.isInProgressStatus;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
@@ -23,9 +24,9 @@ import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifie
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
 import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.*;
-import static de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis.*;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.*;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -39,7 +40,6 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -76,12 +76,11 @@ class TaskAcceptUsecase extends ErpTest {
   @DisplayName("Akzeptieren eines E-Rezeptes als Abgebende Apotheke")
   @MethodSource("prescriptionTypesProvider")
   void acceptTask(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowType) {
 
     sina.changePatientInsuranceType(insuranceType);
-
     val activation =
         doctor.performs(
             IssuePrescription.forPatient(sina)

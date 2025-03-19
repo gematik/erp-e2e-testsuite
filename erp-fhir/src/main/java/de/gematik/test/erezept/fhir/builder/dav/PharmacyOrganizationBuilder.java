@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,14 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.builder.AddressBuilder;
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.test.erezept.fhir.builder.AbstractOrganizationBuilder;
-import de.gematik.test.erezept.fhir.builder.AddressBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.valuesets.Country;
-import lombok.NonNull;
-import lombok.val;
-import org.hl7.fhir.r4.model.Address;
+import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
 
 /**
  * This builder will build an Organization which represents an institution that is capable of
@@ -36,61 +31,51 @@ import org.hl7.fhir.r4.model.Address;
  * an organization is the required IKNR (Institutionskennzeichen)
  */
 public class PharmacyOrganizationBuilder
-    extends AbstractOrganizationBuilder<PharmacyOrganizationBuilder> {
+    extends AbstractOrganizationBuilder<PharmacyOrganization, PharmacyOrganizationBuilder> {
 
-  private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
+  private AbdaErpPkvVersion version = AbdaErpPkvVersion.getDefaultVersion();
   private IKNR iknr;
 
   public static PharmacyOrganizationBuilder builder() {
     return new PharmacyOrganizationBuilder();
   }
 
-  @Deprecated(forRemoval = true)
-  public static PharmacyOrganizationBuilder faker() {
-    return faker(pharmacyName());
-  }
-
-  @Deprecated(forRemoval = true)
-  public static PharmacyOrganizationBuilder faker(@NonNull String name) {
-    val builder = builder();
-    builder.name(name).iknr(IKNR.random()).address(fakerCity(), fakerZipCode(), fakerStreetName());
-    return builder;
-  }
-
   public PharmacyOrganizationBuilder version(AbdaErpPkvVersion version) {
-    this.abdaErpPkvVersion = version;
+    this.version = version;
     return self();
   }
 
-  public PharmacyOrganizationBuilder address(
-      @NonNull String city, @NonNull String postal, @NonNull String street) {
+  public PharmacyOrganizationBuilder address(String city, String postal, String street) {
     return address(Country.D, city, postal, street);
   }
 
   public PharmacyOrganizationBuilder address(
-      @NonNull Country country,
-      @NonNull String city,
-      @NonNull String postal,
-      @NonNull String street) {
+      Country country, String city, String postal, String street) {
     return address(
-        AddressBuilder.address(country, city, postal, street, Address.AddressType.PHYSICAL));
+        AddressBuilder.ofPhysicalType()
+            .country(country)
+            .city(city)
+            .postal(postal)
+            .street(street)
+            .build());
   }
 
-  public PharmacyOrganizationBuilder iknr(@NonNull String value) {
-    return iknr(IKNR.from(value));
+  public PharmacyOrganizationBuilder iknr(String value) {
+    return iknr(IKNR.asSidIknr(value));
   }
 
-  public PharmacyOrganizationBuilder iknr(@NonNull IKNR value) {
+  public PharmacyOrganizationBuilder iknr(IKNR value) {
     this.iknr = value;
     return self();
   }
 
+  @Override
   public PharmacyOrganization build() {
     checkRequired();
     return PharmacyOrganization.fromOrganization(
         buildOrganizationWith(
-            () -> AbdaErpPkvStructDef.APOTHEKE.asCanonicalType(abdaErpPkvVersion, true),
-            iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID)));
+            () -> AbdaErpPkvStructDef.APOTHEKE.asCanonicalType(version),
+            iknr.asIdentifier(DeBasisProfilNamingSystem.IKNR_SID)));
   }
 
   protected void checkRequired() {

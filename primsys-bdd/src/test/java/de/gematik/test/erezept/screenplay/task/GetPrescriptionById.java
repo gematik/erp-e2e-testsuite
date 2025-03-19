@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,17 @@
 package de.gematik.test.erezept.screenplay.task;
 
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskById;
+import de.gematik.test.erezept.screenplay.questions.VerifyDocumentResponse;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
+import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class GetPrescriptionById implements Task {
+
   private final DequeStrategy deque;
 
   public GetPrescriptionById(DequeStrategy deque) {
@@ -38,17 +40,21 @@ public class GetPrescriptionById implements Task {
 
   @Override
   public <T extends Actor> void performAs(T actor) {
-    val acceptBundleResp = actor.asksFor(ResponseOfGetTaskById.asPharmacy(deque));
-    val erxAcceptBundle = acceptBundleResp.getExpectedResource();
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
 
-    // toDo reduce after check if ErxTaskBundle and ErxAcceptBundle AND ErxAcceptBundle from
-    // get/Task/{id}?=ac "TaskGetByIdAsAcceptBundleCommand()" are similar
-    val dmc = deque.chooseFrom(prescriptionManager.getAssignedList());
-    erxAcceptBundle.getTask().addIdentifier(dmc.getAccessCode().asIdentifier());
+    val response = actor.asksFor(ResponseOfGetTaskById.asPharmacy(deque));
+    val acceptBundle = response.getExpectedResource();
 
-    val konnektor = SafeAbility.getAbility(actor, UseTheKonnektor.class);
-    konnektor.verifyDocument(erxAcceptBundle.getSignedKbvBundle());
-    prescriptionManager.appendAcceptedPrescription(erxAcceptBundle);
+    // Note: A_24179 on "erneuter Abruf Verordnung" the FD does not send the AccessCode again
+    val dmc = deque.chooseFrom(prescriptionManager.getAssignedList());
+    acceptBundle.getTask().addIdentifier(dmc.getAccessCode().asIdentifier());
+
+    actor.attemptsTo(
+        Ensure.that(
+                "the verifyDocument for the signed KBV-Bundle",
+                VerifyDocumentResponse.forGivenDocument(acceptBundle.getSignedKbvBundle()))
+            .isTrue());
+
+    prescriptionManager.appendAcceptedPrescription(acceptBundle);
   }
 }

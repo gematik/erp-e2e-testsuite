@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ package de.gematik.test.erezept.app.task;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -38,23 +38,23 @@ class PlatformScreenplayUtilTest {
     val androidTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             PlatformType.ANDROID,
-            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV, null),
-            () -> new SetUpIosDevice(environment, VersicherungsArtDeBasis.BG, null));
-    assertSame(androidTask.getClass(), SetUpAndroidDevice.class);
+            () -> new SetUpAndroidDevice(InsuranceTypeDe.GKV, null),
+            () -> new SetUpIosDevice(environment, InsuranceTypeDe.BG, null));
+    assertSame(SetUpAndroidDevice.class, androidTask.getClass());
 
     val iosTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             PlatformType.IOS,
-            () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV, null),
-            () -> new SetUpIosDevice(environment, VersicherungsArtDeBasis.BG, null));
-    assertSame(iosTask.getClass(), SetUpIosDevice.class);
+            () -> new SetUpAndroidDevice(InsuranceTypeDe.GKV, null),
+            () -> new SetUpIosDevice(environment, InsuranceTypeDe.BG, null));
+    assertSame(SetUpIosDevice.class, iosTask.getClass());
 
     assertThrows(
         UnsupportedPlatformException.class,
         () ->
             PlatformScreenplayUtil.chooseTaskForPlatform(
                 PlatformType.DESKTOP,
-                () -> new SetUpAndroidDevice(VersicherungsArtDeBasis.GKV, null),
-                () -> new SetUpIosDevice(environment, VersicherungsArtDeBasis.BG, null)));
+                () -> new SetUpAndroidDevice(InsuranceTypeDe.GKV, null),
+                () -> new SetUpIosDevice(environment, InsuranceTypeDe.BG, null)));
   }
 }

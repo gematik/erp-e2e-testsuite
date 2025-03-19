@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Meta;
 
 public class KbvErpMedicationFreeTextBuilder
-    extends AbstractResourceBuilder<KbvErpMedicationFreeTextBuilder> {
+    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationFreeTextBuilder> {
 
   private final List<Extension> extensions = new LinkedList<>();
   private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
@@ -41,17 +41,6 @@ public class KbvErpMedicationFreeTextBuilder
 
   public static KbvErpMedicationFreeTextBuilder builder() {
     return new KbvErpMedicationFreeTextBuilder();
-  }
-
-  public static KbvErpMedicationFreeTextBuilder faker() {
-    return faker("3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen");
-  }
-
-  public static KbvErpMedicationFreeTextBuilder faker(String freiTextInCoding) {
-
-    return new KbvErpMedicationFreeTextBuilder()
-        .darreichung("Lutscher mit Brausepulverfüllu")
-        .freeText(freiTextInCoding);
   }
 
   public KbvErpMedicationFreeTextBuilder version(KbvItaErpVersion version) {
@@ -91,20 +80,20 @@ public class KbvErpMedicationFreeTextBuilder
     return self();
   }
 
+  @Override
   public KbvErpMedication build() {
     checkRequired();
-    val medicationFreeTextComp = new KbvErpMedication();
-    val profile = KbvItaErpStructDef.MEDICATION_FREETEXT.asCanonicalType(kbvItaErpVersion);
-    val meta = new Meta().setProfile(List.of(profile));
-    medicationFreeTextComp.setId(this.getResourceId()).setMeta(meta);
-    medicationFreeTextComp.setCode(MedicationType.FREETEXT.asCodeableConcept());
-    medicationFreeTextComp.getCode().setText(nameOreFreetext);
-    if (darreichungsform != null)
-      medicationFreeTextComp.setForm(new CodeableConcept().setText(darreichungsform));
+    val medication =
+        this.createResource(
+            KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_FREETEXT, kbvItaErpVersion);
+    medication.setCode(MedicationType.FREETEXT.asCodeableConcept());
+    medication.getCode().setText(nameOreFreetext);
+    Optional.ofNullable(darreichungsform)
+        .ifPresent(df -> medication.setForm(new CodeableConcept().setText(df)));
     extensions.add(category.asExtension());
     extensions.add(KbvItaErpStructDef.MEDICATION_VACCINE.asBooleanExtension(isVaccine));
-    medicationFreeTextComp.setExtension(extensions);
-    return medicationFreeTextComp;
+    medication.setExtension(extensions);
+    return medication;
   }
 
   private void checkRequired() {

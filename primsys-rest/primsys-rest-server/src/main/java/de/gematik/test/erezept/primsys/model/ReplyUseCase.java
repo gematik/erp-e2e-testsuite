@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,13 +56,13 @@ public class ReplyUseCase {
       String message,
       String sender) {
     val erxCommunication =
-        ErxCommunicationBuilder.builder()
-            .basedOnTaskId(taskId)
-            .recipient(kvnr)
+        ErxCommunicationBuilder.asReply(message)
+            .basedOn(taskId)
+            .receiver(kvnr)
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(type)
             .sender(sender)
-            .buildReply(message);
+            .build();
 
     val communicationPostCommand = new CommunicationPostCommand(erxCommunication);
     val replyResponse = actor.erpRequest(communicationPostCommand);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.core.expectations.requirements;
 
 import lombok.Getter;
 
+@Getter
 public enum ErpAfos implements RequirementsSet {
   A_19018("A_19018", "Rollenprüfung Verordnender stellt Rezept ein"),
   A_19019("A_19019", "Generierung Rezept-ID"),
@@ -39,6 +40,7 @@ public enum ErpAfos implements RequirementsSet {
           + " dem Task zugrunde liegenden Verordnungsdatensatzes>"),
 
   A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
+  A_19405("A_19405-01", "E-Rezept-Fachdienst - Rollenprüfung Versicherter liest MedicationDispens"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
   A_19514("A_19514-03", "HTTP Status-Codes"),
   A_19520("A_19520-01", "E-Rezept-Fachdienst - Nachrichten abrufen - für Empfänger filtern"),
@@ -78,14 +80,14 @@ public enum ErpAfos implements RequirementsSet {
   A_22351("A_22351", "E-Rezept-Fachdienst - Consent schreiben - FHIR-Validierung"),
   A_23455("A_23455", "E-Rezept-Fachdienst - Prüfung Prüfziffer - keine Prüfziffer"),
   A_23450(
-      "A_23450",
+      "A_23450-01",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Prüfung Prüfungsnachweis"),
   A_23451(
       "A_23451-01",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Zeitraum Akzeptanz"
           + " Prüfungsnachweis"),
   A_23452(
-      "A_23452-02",
+      "A_23452-03",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Filter Status, KVNR und"
           + " Workflowtype"),
   A_23454("A_23454", "E-Rezept-Fachdienst - Prüfung Prüfziffer"),
@@ -133,6 +135,8 @@ public enum ErpAfos implements RequirementsSet {
       "A_24178",
       "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"
           + " in-progress"),
+  A_24285_01(
+      "A_24285_01", "E-Rezept-Fachdienst - Dispensierinformationen bereitstellen - Zeitstempel"),
   A_24434(
       "A_24434",
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Betroffene"
@@ -170,7 +174,7 @@ public enum ErpAfos implements RequirementsSet {
   A_25206("A_25206", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3"),
   A_25207(
       "A_25207", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - AcceptPN3 false"),
-  A_25208("A_25208", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - URL kvnr"),
+  A_25208("A_25208-01", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - URL kvnr"),
   A_25209(
       "A_25209",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - AcceptPN3 true- Filter Status,"
@@ -180,9 +184,25 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filteroperatoren"
           + " für Datumsabfragen"),
   A_25962("A_25962", "E-Rezept-Fachdienst - ePA - Medication Service - Versichertenprotokoll"),
+  A_26320(
+      "A_26320",
+      " E-Rezept-Fachdienst - Nachricht einstellen - Dispense Request - Prüfung Status Task"),
+  A_26321(
+      "A_26321 ",
+      "E-Rezept-Fachdienst - Nachricht einstellen - Dispense Request - Prüfung Ende Gültigkeit"
+          + " Task"),
+  A_26327(
+      "A_26327",
+      "E-Rezept-Fachdienst - Nachricht einstellen - Dispense Request - Prüfung Beginn Gültigkeit"
+          + " Task"),
   A_26337("A_26337", "E-Rezept-Fachdienst - Task schließen - Zeitstempel MedicationDispense"),
-  ;
-  @Getter private final Requirement requirement;
+  A_27287("A_27287", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Vergleich KVNR"),
+  A_27346("A_27346", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - URL hcv"),
+  A_27347("A_27347", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Vergleich hcv"),
+  A_27446(
+      "A_27446",
+      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - Ratelimit pro Telematik-ID prüfen");
+  private final Requirement requirement;
 
   ErpAfos(String id, String description) {
     this.requirement = new Requirement(id, description);

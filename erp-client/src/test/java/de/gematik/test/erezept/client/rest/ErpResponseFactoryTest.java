@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -42,9 +42,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class ErpResponseFactoryTest {
+class ErpResponseFactoryTest extends ErpFhirParsingTest {
 
-  private static FhirParser fhir;
   private static ErpResponseFactory responseFactory;
   private static final Map<String, String> HEADERS_JSON =
       Map.of("content-type", MediaType.FHIR_JSON.asString());
@@ -58,12 +57,11 @@ class ErpResponseFactoryTest {
 
   @BeforeAll
   static void setUp() {
-    fhir = new FhirParser();
-    responseFactory = new ErpResponseFactory(fhir, false);
+    responseFactory = new ErpResponseFactory(parser, false);
   }
 
   private String encodeTestRessource(Resource resource, EncodingType type) {
-    return fhir.encode(resource, type);
+    return parser.encode(resource, type);
   }
 
   @Test
@@ -213,14 +211,14 @@ class ErpResponseFactoryTest {
 
   @Test
   void shouldValidateEmptyContentCorrectly() {
-    val rf = new ErpResponseFactory(fhir, true);
+    val rf = new ErpResponseFactory(parser, true);
     val response = rf.createFrom(201, HEADERS_JSON, testToken, "", Resource.class);
     assertTrue(response.isValidPayload());
   }
 
   @Test
   void shouldValidateOperationOutcomeCorrectly() {
-    val rf = new ErpResponseFactory(fhir, true);
+    val rf = new ErpResponseFactory(parser, true);
     val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
@@ -229,7 +227,7 @@ class ErpResponseFactoryTest {
 
   @Test
   void shouldFailOnInvalidOperationOutcomeCorrectly() {
-    val rf = new ErpResponseFactory(fhir, true);
+    val rf = new ErpResponseFactory(parser, true);
     val testOperationOutcome =
         encodeTestRessource(createOperationOutcome(), EncodingType.JSON).replace("issue", "issues");
     val response =
@@ -241,7 +239,7 @@ class ErpResponseFactoryTest {
   @ValueSource(strings = {"", " ", "\t", "\n", "\r", "\r\n"})
   @NullSource
   void shouldNotFailOnBlankContent(String content) {
-    val validatingResponseFactory = new ErpResponseFactory(fhir, true);
+    val validatingResponseFactory = new ErpResponseFactory(parser, true);
     val response =
         assertDoesNotThrow(
             () ->

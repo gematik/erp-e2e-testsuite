@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,26 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
 
-/** https://applications.kbv.de/S_KBV_DMP.xhtml https://www.kbv.de/html/dmp.php */
+/**
+ * <a href="https://applications.kbv.de/S_KBV_DMP.xhtml">S_KBV_DMP</a> <a
+ * href="https://www.kbv.de/html/dmp.php">Disease-Management-Programme</a>
+ *
+ * <p>DMP-Kennzeichen: gibt an, in welchen DMPs ein Versicherter eingeschrieben ist (§ 267 Abs. 2
+ * Satz 4 SGB V). Die Angabe ist auf der EGK vorhanden und auf der KVK Teil des Feldes:
+ * Statusergänzung.
+ */
 @Getter
-public enum DmpKennzeichen implements IValueSet {
+@RequiredArgsConstructor
+public enum DmpKennzeichen implements FromValueSet {
   NOT_SET("00", "Nicht gesetzt"),
   DM2("01", "DM2"),
   BRK("02", "BRK"),
@@ -73,21 +82,8 @@ public enum DmpKennzeichen implements IValueSet {
   BRUSTKREBS_UND_COPD_UND_DIABETES_TYP_1_UND_KHK("58", "Brustkrebs, COPD, Diabetes Typ 1 und KHK");
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.DMP;
-  public static final String VERSION = "1.06";
-  public static final String DESCRIPTION =
-      "DMP-Kennzeichen: gibt an, in welchen DMPs ein Versicherter eingeschrieben ist (§ 267 Abs. 2"
-          + " Satz 4 SGB V). Die Angabe ist auf der EGK vorhanden und auf der KVK Teil des Feldes:"
-          + " Statusergänzung.";
-  public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
-
   private final String code;
   private final String display;
-  private final String definition = "N/A definition in profile";
-
-  DmpKennzeichen(String code, String display) {
-    this.code = code;
-    this.display = display;
-  }
 
   @Override
   public KbvCodeSystem getCodeSystem() {
@@ -95,13 +91,14 @@ public enum DmpKennzeichen implements IValueSet {
   }
 
   public Extension asExtension() {
-    return new Extension(DeBasisStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl(), this.asCoding());
+    return new Extension(
+        DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN.getCanonicalUrl(), this.asCoding());
   }
 
-  public static DmpKennzeichen fromCode(@NonNull String coding) {
+  public static DmpKennzeichen fromCode(String code) {
     return Arrays.stream(DmpKennzeichen.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(dmp -> dmp.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(PersonGroup.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(DmpKennzeichen.class, code));
   }
 }

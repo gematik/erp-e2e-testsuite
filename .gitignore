@@ -13,6 +13,8 @@
 *.ipa
 *.xcarchive
 *.pcs
+/.sdkmanrc
+
 COPYRIGHT_HEADER
 Jenkinsfile
 *.Jenkinsfile

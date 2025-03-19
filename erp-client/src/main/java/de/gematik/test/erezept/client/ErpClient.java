@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.client;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpVersion;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
@@ -30,17 +31,18 @@ import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.rest.ValidationResultHelper;
 import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.client.vau.VauClient;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -69,8 +71,8 @@ public class ErpClient {
 
   // client state
   private IdpTokenResult idpToken;
-  private Instant idpTokenUpdated; // point in time when the IDP token was updated
   private Supplier<IdpTokenResult> authentication;
+  @Default private Instant idpTokenValidUntil = Instant.MIN;
 
   /**
    * Initializes the ERP-Client to use vau client and idp client. Beforehand, the authentication
@@ -127,7 +129,10 @@ public class ErpClient {
       log.info("Refresh the IDP Token");
       try {
         idpToken = authentication.get();
-        idpTokenUpdated = Instant.now();
+        idpTokenValidUntil =
+            Instant.now()
+                .plus(idpToken.getExpiresIn(), ChronoUnit.SECONDS)
+                .minus(30, ChronoUnit.SECONDS);
       } catch (NullPointerException npe) {
         // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
         // broken!
@@ -140,15 +145,7 @@ public class ErpClient {
   }
 
   private boolean idpTokenExpired() {
-    boolean ret;
-    if (idpToken == null) {
-      ret = true; // actually not expired but hasn't been fetched yet
-    } else {
-      val now = Instant.now();
-      val diff = Duration.between(idpTokenUpdated, now).getSeconds();
-      ret = diff >= idpToken.getExpiresIn();
-    }
-    return ret;
+    return idpTokenValidUntil.isBefore(Instant.now());
   }
 
   public String encode(Resource resource, EncodingType encoding) {

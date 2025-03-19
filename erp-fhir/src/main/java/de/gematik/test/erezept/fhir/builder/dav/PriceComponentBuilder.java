@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static java.text.MessageFormat.*;
-
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.util.*;
-import de.gematik.test.erezept.fhir.valuesets.dav.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import de.gematik.bbriccs.fhir.builder.ElementBuilder;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.util.Currency;
+import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.Invoice;
+import org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent;
 
 @Slf4j
-public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponentBuilder> {
+public class PriceComponentBuilder
+    extends ElementBuilder<InvoiceLineItemPriceComponentComponent, PriceComponentBuilder> {
 
   @SuppressWarnings("java:S1068") // will be used in the future!
   private AbdaErpPkvVersion abdaErpPkvVersion;
@@ -57,7 +57,7 @@ public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponen
     return self();
   }
 
-  public PriceComponentBuilder type(@NonNull String typeCode) {
+  public PriceComponentBuilder type(String typeCode) {
     return type(Invoice.InvoicePriceComponentType.fromCode(typeCode));
   }
 
@@ -87,21 +87,16 @@ public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponen
     return self();
   }
 
-  public PriceComponentBuilder currency(@NonNull Currency currency) {
+  public PriceComponentBuilder currency(Currency currency) {
     this.currency = currency;
     return self();
   }
 
+  @Override
   public Invoice.InvoiceLineItemPriceComponentComponent build() {
+    checkRequired();
     val pc = new Invoice.InvoiceLineItemPriceComponentComponent();
     pc.setType(priceComponentType);
-
-    if (!category.equals(KostenVersicherterKategorie.ZUZAHLUNG)) {
-      log.warn(
-          format(
-              "Given {0} is {1} ({2}) which might be not allowed by the profile!",
-              KostenVersicherterKategorie.class.getSimpleName(), category, category.getDisplay()));
-    }
     pc.addExtension(DavExtensions.getInsurantCost(category, insurantCost, currency));
 
     val amount = pc.getAmount();
@@ -109,5 +104,15 @@ public class PriceComponentBuilder extends AbstractResourceBuilder<PriceComponen
     pc.setFactor(factor);
 
     return pc;
+  }
+
+  private void checkRequired() {
+    if (!category.equals(KostenVersicherterKategorie.ZUZAHLUNG)) {
+      log.warn(
+          "Given {} is {} ({}) which might be not allowed by the profile!",
+          KostenVersicherterKategorie.class.getSimpleName(),
+          category,
+          category.getDisplay());
+    }
   }
 }

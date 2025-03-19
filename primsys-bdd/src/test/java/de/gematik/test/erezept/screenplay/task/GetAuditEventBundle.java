@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.AuditEventGetByIdCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.questions.FhirResponseQuestion;
@@ -36,7 +34,6 @@ public class GetAuditEventBundle extends FhirResponseQuestion<ErxAuditEventBundl
   private final Actor patient;
 
   protected GetAuditEventBundle(PrescriptionId prescriptionId, Actor patient) {
-    super("Get /AuditEvent");
     this.prescriptionId = prescriptionId;
     this.patient = patient;
   }
@@ -46,17 +43,16 @@ public class GetAuditEventBundle extends FhirResponseQuestion<ErxAuditEventBundl
   }
 
   @Override
-  @Step("{0} fragt beim Fachdienst, nach Protokolleinträgen zur Prescription #prescriptionId .")
+  @Step("{0} fragt beim Fachdienst, nach Protokolleinträgen zur Prescription #prescriptionId")
   public ErpResponse<ErxAuditEventBundle> answeredBy(Actor actor) {
+    log.info(
+        "Actor {} fetches AuditEvents for PrescriptionId {}",
+        patient.getName(),
+        prescriptionId.getValue());
     val erpClient = SafeAbility.getAbility(patient, UseTheErpClient.class);
 
-    val auditEvent = erpClient.request(new AuditEventGetByIdCommand(prescriptionId));
-    log.info(
-        format(
-            "Actor {0} received AuditEvent with for PrescriptionId {1}",
-            patient.getName(), prescriptionId));
-
-    return auditEvent;
+    val cmd = new AuditEventGetByIdCommand(prescriptionId);
+    return erpClient.request(cmd);
   }
 
   public static class Builder {

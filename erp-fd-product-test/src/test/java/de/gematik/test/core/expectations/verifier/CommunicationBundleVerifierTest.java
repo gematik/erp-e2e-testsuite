@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,25 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.containsOnlyIdentifierWith;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.receivedDateIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.sentDateIsEqual;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifyReceivedDateWithPredicate;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateIsAfter;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateIsBefore;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateIsSortedAscend;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateWithPredicate;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunicationBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunicationBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
@@ -35,7 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-class CommunicationBundleVerifierTest extends ParsingTest {
+class CommunicationBundleVerifierTest extends ErpFhirParsingTest {
 
   private final ErxCommunicationBundle dipRequest =
       parser.decode(

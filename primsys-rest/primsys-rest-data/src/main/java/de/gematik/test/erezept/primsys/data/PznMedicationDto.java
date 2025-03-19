@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ public class PznMedicationDto {
   private boolean vaccine = false;
   private StandardSizeDto standardSize;
   private SupplyFormDto supplyForm;
-  private Integer amount;
-  private String amountUnit;
+  private String packagingSize;
+  private String packagingUnit;
   private String pzn;
   private String name;
 
@@ -54,8 +54,8 @@ public class PznMedicationDto {
     private boolean vaccine = false;
     private StandardSizeDto standardSize;
     private SupplyFormDto supplyForm;
-    private Integer amount;
-    private String amountUnit;
+    private String packagingSize;
+    private String packagingUnit;
     private final String pzn;
     private final String name;
 
@@ -74,9 +74,9 @@ public class PznMedicationDto {
       return this;
     }
 
-    public Builder amount(int amount, String amountUnit) {
-      this.amount = amount;
-      this.amountUnit = amountUnit;
+    public Builder amount(String packagingSize, String packagingUnit) {
+      this.packagingSize = packagingSize;
+      this.packagingUnit = packagingUnit;
       return this;
     }
 
@@ -87,8 +87,8 @@ public class PznMedicationDto {
           vaccine,
           standardSize,
           supplyForm,
-          amount,
-          amountUnit,
+          packagingSize,
+          packagingUnit,
           pzn,
           name);
     }

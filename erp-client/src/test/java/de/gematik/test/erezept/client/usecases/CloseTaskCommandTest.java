@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,37 +21,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.GemCloseOperationParameters;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.val;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class CloseTaskCommandTest {
-
-  private FhirParser parser;
-
-  @BeforeEach
-  void setup() {
-    parser = new FhirParser();
-  }
+class CloseTaskCommandTest extends ErpFhirParsingTest {
 
   @Test
   void getRequestLocator() {
-    val md = ErxMedicationDispenseFaker.builder().withPerformer("performerid").fake();
     val taskId = TaskId.from("123456");
     val secret = "7890123";
     val cmd = new CloseTaskCommand(taskId, new Secret(secret));
@@ -111,13 +102,8 @@ class CloseTaskCommandTest {
     val result = parser.validate(rawBody);
 
     if (!result.isSuccessful()) {
-
       // give me some hints if the encoded result is invalid
-      val r =
-          result.getMessages().stream()
-              .map(m -> "(" + m.getLocationString() + ") " + m.getMessage())
-              .collect(Collectors.joining("\n"));
-      System.out.println(format("Errors: {0}\n{1}", result.getMessages().size(), r));
+      ValidatorUtil.printValidationResult(result);
     }
 
     assertTrue(result.isSuccessful());

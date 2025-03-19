@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,28 @@ package de.gematik.test.fuzzing.kbv;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.WithSystem;
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerFaker;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.values.ZANR;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.fuzzing.FuzzingUtils;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -45,7 +51,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeType;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.DomainResource;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.IntegerType;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.StringType;
 
 public class KbvBundleManipulatorFactory {
 
@@ -86,62 +101,84 @@ public class KbvBundleManipulatorFactory {
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code 59",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "59")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "59")));
 
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code 15",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "15")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "15")));
 
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code 99",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "99")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "99")));
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code 29",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "29")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "29")));
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code ' '",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, " ")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, " ")));
 
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code ?",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "?")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "?")));
 
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code 0 (!= 00)",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "0")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "0")));
 
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code 13",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "13")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "13")));
 
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code Asthma",
             b ->
                 changeExtensionCode(
-                    b.getCoverage(), DeBasisStructDef.GKV_DMP_KENNZEICHEN, "asthma")));
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "asthma")));
 
     manipulators.add(
         NamedEnvelope.of(
             "Besondere Personengruppen Code -T",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_PERSON_GROUP, "-T")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_PERSON_GROUP, "-T")));
 
     manipulators.add(
         NamedEnvelope.of(
             "Besondere Personengruppen Code 0 (!= 00)",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_PERSON_GROUP, "0")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_PERSON_GROUP, "0")));
 
     manipulators.add(
         NamedEnvelope.of(
             "Besondere Personengruppen Code 10",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_PERSON_GROUP, "10")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_PERSON_GROUP, "10")));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -156,16 +193,19 @@ public class KbvBundleManipulatorFactory {
     manipulators.add(
         NamedEnvelope.of(
             "GKV Versichertenart P",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_VERSICHERTENART, "P")));
+            b ->
+                changeExtensionCode(
+                    b.getCoverage(), DeBasisProfilStructDef.GKV_VERSICHERTENART, "P")));
 
     manipulators.add(
         NamedEnvelope.of(
-            "WOP 40", b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_WOP, "40")));
+            "WOP 40",
+            b -> changeExtensionCode(b.getCoverage(), DeBasisProfilStructDef.GKV_WOP, "40")));
 
     manipulators.add(
         NamedEnvelope.of(
             "WOP 1000",
-            b -> changeExtensionCode(b.getCoverage(), DeBasisStructDef.GKV_WOP, "1000")));
+            b -> changeExtensionCode(b.getCoverage(), DeBasisProfilStructDef.GKV_WOP, "1000")));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -284,7 +324,9 @@ public class KbvBundleManipulatorFactory {
             b ->
                 b.getMedication().getExtension().stream()
                     .filter(
-                        ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
+                        ext ->
+                            ext.getUrl()
+                                .equals(DeBasisProfilStructDef.NORMGROESSE.getCanonicalUrl()))
                     .forEach(
                         ext ->
                             ext.getValue().castToCode(ext.getValue()).setValue("Keine Angabe"))));
@@ -295,7 +337,9 @@ public class KbvBundleManipulatorFactory {
             b ->
                 b.getMedication().getExtension().stream()
                     .filter(
-                        ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
+                        ext ->
+                            ext.getUrl()
+                                .equals(DeBasisProfilStructDef.NORMGROESSE.getCanonicalUrl()))
                     .forEach(ext -> ext.getValue().castToCode(ext.getValue()).setValue("ABC"))));
 
     manipulators.add(
@@ -304,7 +348,9 @@ public class KbvBundleManipulatorFactory {
             b ->
                 b.getMedication().getExtension().stream()
                     .filter(
-                        ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
+                        ext ->
+                            ext.getUrl()
+                                .equals(DeBasisProfilStructDef.NORMGROESSE.getCanonicalUrl()))
                     .forEach(
                         ext -> ext.getValue().castToCode(ext.getValue()).setValue("Hello World"))));
 
@@ -314,7 +360,9 @@ public class KbvBundleManipulatorFactory {
             b ->
                 b.getMedication().getExtension().stream()
                     .filter(
-                        ext -> ext.getUrl().equals(DeBasisStructDef.NORMGROESSE.getCanonicalUrl()))
+                        ext ->
+                            ext.getUrl()
+                                .equals(DeBasisProfilStructDef.NORMGROESSE.getCanonicalUrl()))
                     .forEach(
                         ext ->
                             ext.getValue()
@@ -326,14 +374,14 @@ public class KbvBundleManipulatorFactory {
             "Vaccine-Extension mit StringType",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvItaErpStructDef.MEDICATION_VACCINE.match(ext.getUrl()))
+                    .filter(KbvItaErpStructDef.MEDICATION_VACCINE::matches)
                     .forEach(ext -> ext.setValue(new StringType("false")))));
     manipulators.add(
         NamedEnvelope.of(
             "Vaccine-Extension mit IntegerType",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvItaErpStructDef.MEDICATION_VACCINE.match(ext.getUrl()))
+                    .filter(KbvItaErpStructDef.MEDICATION_VACCINE::matches)
                     .forEach(ext -> ext.setValue(new IntegerType(1)))));
 
     manipulators.add(
@@ -345,14 +393,11 @@ public class KbvBundleManipulatorFactory {
             "MedicationType-manipulator RandomValue",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvBasisStructDef.BASE_MEDICATION_TYPE.match(ext.getUrl()))
+                    .filter(ext -> KbvBasisStructDef.BASE_MEDICATION_TYPE.matches(ext.getUrl()))
                     .forEach(
                         ext -> {
-                          String newCode;
-                          do {
-                            newCode = String.valueOf(GemFaker.fakerAmount(10, 990000000));
-                          } while (BaseMedicationType.MEDICAL_PRODUCT.getCode() == newCode
-                              || BaseMedicationType.PHARM_BIO_PRODUCT.getCode() == newCode);
+                          val newCode =
+                              String.valueOf(GemFaker.getFaker().random().nextInt(10, 990000000));
                           ext.setValue(new CodeType(newCode));
                         })));
 
@@ -361,7 +406,7 @@ public class KbvBundleManipulatorFactory {
             "MedicationType-manipulator Null-Setter",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvBasisStructDef.BASE_MEDICATION_TYPE.match(ext.getUrl()))
+                    .filter(ext -> KbvBasisStructDef.BASE_MEDICATION_TYPE.matches(ext.getUrl()))
                     .forEach(ext -> ext.setValue(new CodeType(null)))));
 
     manipulators.add(
@@ -369,7 +414,7 @@ public class KbvBundleManipulatorFactory {
             "MedicationCategory-manipulator set 0",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .filter(KbvItaErpStructDef.MEDICATION_CATEGORY::matches)
                     .forEach(ext -> ext.setValue(new CodeType("0")))));
 
     manipulators.add(
@@ -377,7 +422,7 @@ public class KbvBundleManipulatorFactory {
             "MedicationCategory-manipulator set null",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .filter(KbvItaErpStructDef.MEDICATION_CATEGORY::matches)
                     .forEach(ext -> ext.setValue(new CodeType(null)))));
 
     manipulators.add(
@@ -385,7 +430,7 @@ public class KbvBundleManipulatorFactory {
             "MedicationCategory-manipulator set 04",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .filter(KbvItaErpStructDef.MEDICATION_CATEGORY::matches)
                     .forEach(ext -> ext.setValue(new CodeType("04")))));
 
     manipulators.add(
@@ -393,7 +438,7 @@ public class KbvBundleManipulatorFactory {
             "MedicationCategory-manipulator set the 100",
             b ->
                 b.getMedication().getExtension().stream()
-                    .filter(ext -> KbvItaErpStructDef.MEDICATION_CATEGORY.match(ext.getUrl()))
+                    .filter(KbvItaErpStructDef.MEDICATION_CATEGORY::matches)
                     .forEach(ext -> ext.setValue(new CodeType("the 100")))));
 
     return manipulators;
@@ -526,10 +571,10 @@ public class KbvBundleManipulatorFactory {
                       .filter(id -> id.getType().getCodingFirstRep().getCode().equals("BSNR"))
                       .findFirst()
                       .orElseThrow(
-                          () -> new MissingFieldException(MedicalOrganization.class, "BSNR"));
+                          () -> new MissingFieldException(KbvMedicalOrganization.class, "BSNR"));
               iknrIdentifier
                   .setValue("7421111100")
-                  .setSystem(DeBasisNamingSystem.IKNR.getCanonicalUrl());
+                  .setSystem(DeBasisProfilNamingSystem.IKNR.getCanonicalUrl());
             }));
 
     manipulators.add(
@@ -541,7 +586,7 @@ public class KbvBundleManipulatorFactory {
                       .filter(id -> id.getType().getCodingFirstRep().getCode().equals("BSNR"))
                       .findFirst()
                       .orElseThrow(
-                          () -> new MissingFieldException(MedicalOrganization.class, "BSNR"));
+                          () -> new MissingFieldException(KbvMedicalOrganization.class, "BSNR"));
               iknrIdentifier
                   .getType()
                   .getCodingFirstRep()
@@ -558,14 +603,15 @@ public class KbvBundleManipulatorFactory {
                       .filter(id -> id.getType().getCodingFirstRep().getCode().equals("BSNR"))
                       .findFirst()
                       .orElseThrow(
-                          () -> new MissingFieldException(MedicalOrganization.class, "BSNR"));
+                          () -> new MissingFieldException(KbvMedicalOrganization.class, "BSNR"));
               iknrIdentifier
                   .getType()
                   .getCodingFirstRep()
                   .setSystem(IdentifierTypeDe.CODE_SYSTEM.getCanonicalUrl())
                   .setCode(IdentifierTypeDe.KZVA.getCode());
               iknrIdentifier
-                  .setSystem(DeBasisNamingSystem.KZVA_ABRECHNUNGSNUMMER.getCanonicalUrl())
+                  .setSystem(
+                      DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER.getCanonicalUrl())
                   .setValue("721L11101");
             }));
     manipulators.add(
@@ -577,14 +623,15 @@ public class KbvBundleManipulatorFactory {
                       .filter(id -> id.getType().getCodingFirstRep().getCode().equals("BSNR"))
                       .findFirst()
                       .orElseThrow(
-                          () -> new MissingFieldException(MedicalOrganization.class, "BSNR"));
+                          () -> new MissingFieldException(KbvMedicalOrganization.class, "BSNR"));
               iknrIdentifier
                   .getType()
                   .getCodingFirstRep()
                   .setSystem(IdentifierTypeDe.CODE_SYSTEM.getCanonicalUrl())
                   .setCode(IdentifierTypeDe.KZVA.getCode());
               iknrIdentifier
-                  .setSystem(DeBasisNamingSystem.KZVA_ABRECHNUNGSNUMMER.getCanonicalUrl())
+                  .setSystem(
+                      DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER.getCanonicalUrl())
                   .setValue("7211111010");
             }));
 
@@ -595,10 +642,10 @@ public class KbvBundleManipulatorFactory {
               val addressLine = b.getPatient().getAddressFirstRep().getLine().get(0);
               addressLine.setValue("Bahnhofstr.  14");
               addressLine
-                  .getExtensionByUrl(Hl7StructDef.STREET_NAME.getCanonicalUrl())
+                  .getExtensionByUrl(HL7StructDef.STREET_NAME.getCanonicalUrl())
                   .setValue(new StringType("Bahnhofstr.  "));
               addressLine
-                  .getExtensionByUrl(Hl7StructDef.HOUSE_NUMBER.getCanonicalUrl())
+                  .getExtensionByUrl(HL7StructDef.HOUSE_NUMBER.getCanonicalUrl())
                   .setValue(new StringType("14"));
             }));
 
@@ -663,8 +710,8 @@ public class KbvBundleManipulatorFactory {
                     .getNameFirstRep()
                     .getFamilyElement()
                     .addExtension(
-                        Hl7StructDef.HUMAN_OWN_PREFIX.getCanonicalUrl(),
-                        new StringType("von und zu aber echt jetzt"))));
+                        HL7StructDef.HUMAN_OWN_PREFIX.asStringExtension(
+                            "von und zu aber echt jetzt"))));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -674,7 +721,7 @@ public class KbvBundleManipulatorFactory {
                     .getNameFirstRep()
                     .getFamilyElement()
                     .addExtension(
-                        DeBasisStructDef.HUMAN_NAMENSZUSATZ.getCanonicalUrl(),
+                        DeBasisProfilStructDef.HUMAN_NAMENSZUSATZ.getCanonicalUrl(),
                         new StringType("Graf Freiherr der Letzte"))));
 
     manipulators.add(
@@ -810,7 +857,8 @@ public class KbvBundleManipulatorFactory {
                               qualification.getCode().getCoding().stream()
                                   .anyMatch(
                                       code ->
-                                          KbvCodeSystem.BERUFSBEZEICHNUNG.match(code.getSystem())))
+                                          KbvCodeSystem.BERUFSBEZEICHNUNG.matches(
+                                              code.getSystem())))
                       .findFirst();
               jobTitleOpt.ifPresent(jt -> practitioner.getQualification().remove(jt));
             }));
@@ -822,7 +870,7 @@ public class KbvBundleManipulatorFactory {
                 b.getEntry()
                     .add(
                         new Bundle.BundleEntryComponent()
-                            .setResource(PractitionerFaker.builder().fake()))));
+                            .setResource(KbvPractitionerFaker.builder().fake()))));
 
     manipulators.add(
         NamedEnvelope.of(
@@ -859,7 +907,7 @@ public class KbvBundleManipulatorFactory {
     return manipulators;
   }
 
-  private static void changeExtensionCode(DomainResource resource, IWithSystem url, String code) {
+  private static void changeExtensionCode(DomainResource resource, WithSystem url, String code) {
     val ext = resource.getExtensionByUrl(url.getCanonicalUrl());
     val coding = ext.getValue().castToCoding(ext.getValue());
     coding.setCode(code);

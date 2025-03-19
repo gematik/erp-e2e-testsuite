@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package de.gematik.test.konnektor.soap.mock.vsdm;
 
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.vsdm.VsdmCheckDigitVersion;
 import de.gematik.test.konnektor.exceptions.ParsingExamEvidenceException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -42,6 +42,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class VsdmExamEvidenceTest {
+  private final DateTimeFormatter timestampFormatter =
+      DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.from(ZoneOffset.UTC));
 
   private static Egk egk;
 
@@ -51,16 +53,13 @@ class VsdmExamEvidenceTest {
     egk = archive.getEgk(0);
   }
 
-  private final DateTimeFormatter timestampFormatter =
-      DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.from(ZoneOffset.UTC));
-
   @Test
   void generateValidBase64EncodedEvidences() {
     for (val result : VsdmExamEvidenceResult.values()) {
-      val examEvidence = VsdmExamEvidence.asOfflineMode().generate(result);
-      assertNotNull(examEvidence.asXml());
+      val examEvidence = VsdmExamEvidence.asOfflineMode().build(result);
+      assertNotNull(examEvidence);
       assertNotNull(examEvidence.encode());
-      val evidenceAsBase64 = examEvidence.encodeAsBase64().getBytes(StandardCharsets.UTF_8);
+      val evidenceAsBase64 = examEvidence.encode().getBytes(StandardCharsets.UTF_8);
       assertDoesNotThrow(() -> Base64.getDecoder().decode(evidenceAsBase64));
     }
   }
@@ -69,9 +68,9 @@ class VsdmExamEvidenceTest {
   void withExpiredTimestamp() {
     val expected = Instant.now().minus(30, ChronoUnit.MINUTES);
     var examEvidence =
-        VsdmExamEvidence.asOnlineTestMode(egk)
-            .withExpiredTimestamp()
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
+        VsdmExamEvidence.asOfflineMode()
+            .withExpiredIatTimestamp()
+            .build(VsdmExamEvidenceResult.NO_UPDATES);
     var expiredTimestamp = parseTimestamp(examEvidence.asXml());
 
     assertTrue(
@@ -80,8 +79,8 @@ class VsdmExamEvidenceTest {
 
     examEvidence =
         VsdmExamEvidence.asOfflineMode()
-            .withExpiredTimestamp()
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
+            .withExpiredIatTimestamp()
+            .build(VsdmExamEvidenceResult.NO_UPDATES);
     expiredTimestamp = parseTimestamp(examEvidence.asXml());
     assertTrue(
         expiredTimestamp.isBefore(expected),
@@ -94,9 +93,9 @@ class VsdmExamEvidenceTest {
 
     var expiredTimestamp =
         parseTimestamp(
-            VsdmExamEvidence.asOnlineTestMode(egk)
-                .withInvalidTimestamp()
-                .generate(VsdmExamEvidenceResult.NO_UPDATES)
+            VsdmExamEvidence.asOfflineMode()
+                .withInvalidIatTimestamp()
+                .build(VsdmExamEvidenceResult.NO_UPDATES)
                 .asXml());
 
     assertTrue(
@@ -106,8 +105,8 @@ class VsdmExamEvidenceTest {
     expiredTimestamp =
         parseTimestamp(
             VsdmExamEvidence.asOfflineMode()
-                .withInvalidTimestamp()
-                .generate(VsdmExamEvidenceResult.NO_UPDATES)
+                .withInvalidIatTimestamp()
+                .build(VsdmExamEvidenceResult.NO_UPDATES)
                 .asXml());
     assertTrue(
         expiredTimestamp.isAfter(expected),
@@ -116,7 +115,7 @@ class VsdmExamEvidenceTest {
 
   @Test
   void evidenceWithoutChecksum() {
-    val examEvidence = VsdmExamEvidence.asOfflineMode().generate(VsdmExamEvidenceResult.ERROR_EGK);
+    val examEvidence = VsdmExamEvidence.asOfflineMode().build(VsdmExamEvidenceResult.ERROR_EGK);
     assertFalse(examEvidence.asXml().contains("<PZ>"));
   }
 
@@ -129,10 +128,25 @@ class VsdmExamEvidenceTest {
 
   @ParameterizedTest
   @EnumSource(VsdmExamEvidenceResult.class)
-  void validExamEvidenceParsing(VsdmExamEvidenceResult result) {
-    val evidence = VsdmExamEvidence.asOfflineMode().generate(result);
-    val evidenceAsBase64 = evidence.encodeAsBase64();
+  void validOfflineExamEvidenceParsing(VsdmExamEvidenceResult result) {
+    val evidence = VsdmExamEvidence.asOfflineMode().build(result);
+    val evidenceAsBase64 = evidence.encode();
     assertDoesNotThrow(() -> VsdmExamEvidence.parse(evidenceAsBase64));
+
+    val evidenceWithoutChecksum = VsdmExamEvidence.parse(evidenceAsBase64);
+    assertDoesNotThrow(evidenceWithoutChecksum::getCheckDigit);
+  }
+
+  @ParameterizedTest
+  @EnumSource(VsdmExamEvidenceResult.class)
+  void validOnlineExamEvidenceParsing(VsdmExamEvidenceResult result) {
+    val evidence =
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), egk).build(result);
+    val evidenceAsBase64 = evidence.encode();
+    assertDoesNotThrow(() -> VsdmExamEvidence.parse(evidenceAsBase64));
+
+    val evidenceWithChecksum = VsdmExamEvidence.parse(evidenceAsBase64);
+    assertDoesNotThrow(evidenceWithChecksum::getCheckDigit);
   }
 
   @Test
@@ -140,62 +154,14 @@ class VsdmExamEvidenceTest {
     assertThrows(ParsingExamEvidenceException.class, () -> VsdmExamEvidence.parse("abc"));
   }
 
-  @Test
-  void checksumWithInvalidManufacturer() {
-    val evidence =
-        VsdmExamEvidence.asOnlineTestMode(egk)
-            .checksumWithInvalidManufacturer()
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
-    // the manufacturer identifier defined for gematik for the HMacKey is 's'
-    assertEquals('y', VsdmChecksum.parse(evidence.getChecksum().orElseThrow()).getIdentifier());
-    assertDoesNotThrow(
-        () ->
-            VsdmExamEvidence.asOfflineMode()
-                .checksumWithInvalidManufacturer()
-                .generate(VsdmExamEvidenceResult.NO_UPDATES));
-  }
-
-  @Test
-  void checksumWithInvalidVersion() {
-    val evidence =
-        VsdmExamEvidence.asOnlineTestMode(egk)
-            .checksumWithInvalidVersion()
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
-    assertEquals('0', VsdmChecksum.parse(evidence.getChecksum().orElseThrow()).getVersion());
-    assertDoesNotThrow(
-        () ->
-            VsdmExamEvidence.asOfflineMode()
-                .checksumWithInvalidVersion()
-                .generate(VsdmExamEvidenceResult.NO_UPDATES));
-  }
-
   @ParameterizedTest
-  @EnumSource(value = VsdmUpdateReason.class, names = "INVALID", mode = EnumSource.Mode.EXCLUDE)
-  void checksumWithUpdateReason(VsdmUpdateReason reason) {
-    val evidence =
-        VsdmExamEvidence.asOnlineTestMode(egk)
-            .checksumWithUpdateReason(reason)
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
-    assertEquals(
-        reason, VsdmChecksum.parse(evidence.getChecksum().orElseThrow()).getUpdateReason());
+  @EnumSource(value = VsdmService.CheckDigitConfiguration.class)
+  void checksumWithInvalidManufacturer(VsdmService.CheckDigitConfiguration cfg) {
     assertDoesNotThrow(
         () ->
             VsdmExamEvidence.asOfflineMode()
-                .checksumWithUpdateReason(reason)
-                .generate(VsdmExamEvidenceResult.NO_UPDATES));
-  }
-
-  @Test
-  void checksumWithInvalidKvnr() {
-    assertDoesNotThrow(
-        () ->
-            VsdmExamEvidence.asOfflineMode()
-                .checksumWithInvalidKvnr()
-                .generate(VsdmExamEvidenceResult.NO_UPDATES));
-    assertDoesNotThrow(
-        () ->
-            VsdmExamEvidence.asOnlineTestMode(egk)
-                .checksumWithInvalidKvnr()
-                .generate(VsdmExamEvidenceResult.NO_UPDATES));
+                .with(cfg)
+                .with(VsdmCheckDigitVersion.V2)
+                .build(VsdmExamEvidenceResult.NO_UPDATES));
   }
 }

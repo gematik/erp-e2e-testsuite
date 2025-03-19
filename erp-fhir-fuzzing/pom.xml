@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.12.0</version>
+        <version>0.13.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -26,16 +26,10 @@
 
         <!-- this one is only required to mock FHIR resources from erp-fhir/util! can be removed in the future!! -->
         <dependency>
-            <artifactId>erp-fhir</artifactId>
             <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>de.gematik.bbriccs</groupId>
-            <artifactId>resource-loader-brick</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
 </project>

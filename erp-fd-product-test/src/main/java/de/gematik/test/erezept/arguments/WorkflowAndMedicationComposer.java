@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package de.gematik.test.erezept.arguments;
 
+import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.*;
 import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.*;
-import static de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis.*;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.DIRECT_ASSIGNMENT;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
 
 import de.gematik.test.core.ArgumentComposer;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.junit.jupiter.params.provider.Arguments;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowAndMedicationComposer {
@@ -47,5 +49,16 @@ public class WorkflowAndMedicationComposer {
                 MEDICATION_COMPOUNDING,
                 MEDICATION_FREITEXT,
                 MEDICATION_INGREDIENT));
+  }
+
+  public static Stream<Arguments> workflowPharmacyOnlyAndMedicationComposer() {
+    return ArgumentComposer.composeWith()
+        .arguments(GKV, PHARMACY_ONLY, FLOW_TYPE_160)
+        .arguments(PKV, PHARMACY_ONLY, FLOW_TYPE_200)
+        .multiply(
+            3,
+            List.of(
+                MEDICATION_PZN, MEDICATION_COMPOUNDING, MEDICATION_FREITEXT, MEDICATION_INGREDIENT))
+        .create();
   }
 }

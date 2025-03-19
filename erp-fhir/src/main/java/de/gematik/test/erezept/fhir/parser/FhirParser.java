@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,18 @@
 
 package de.gematik.test.erezept.fhir.parser;
 
-import static java.text.MessageFormat.format;
-
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.ValidationResult;
-import de.gematik.test.erezept.fhir.parser.profiles.FhirProfiledValidator;
-import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
+import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
 import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
@@ -44,19 +35,14 @@ public class FhirParser {
 
   @Getter private final FhirContext ctx;
   private final ProfileExtractor profileExtractor;
-  private final List<FhirProfiledValidator> validators;
-  private final FhirProfiledValidator defaultProfileValidator;
-  private final ValidatorMode genericValidatorMode = ValidatorMode.getDefault();
-  private final FhirValidator genericValidator;
+  private final ValidatorFhir validator;
   private IParser xmlParser;
   private IParser jsonParser;
 
   public FhirParser() {
     this.ctx = ProfileFhirParserFactory.createDecoderContext();
     this.profileExtractor = new ProfileExtractor();
-    this.validators = ProfileFhirParserFactory.getProfiledValidators();
-    this.defaultProfileValidator = this.validators.get(0);
-    this.genericValidator = ProfileFhirParserFactory.createGenericFhirValidator(this.ctx);
+    this.validator = ProfileFhirParserFactory.getProfiledValidators();
   }
 
   /**
@@ -67,38 +53,11 @@ public class FhirParser {
    *     unsuccessful ValidationResult otherwise
    */
   public ValidationResult validate(String content) {
-    if (this.profileExtractor.isUnprofiledSearchSet(content)) {
-      log.trace("Validate FHIR unprofiled SearchsetBundle with length {}", content.length());
-      return validateSearchsetBundle(content);
-    } else {
-      log.trace("Validate FHIR Resource with length {}", content.length());
-      val p = chooseProfileValidator(() -> this.profileExtractor.extractProfile(content));
-      return p.validate(content);
-    }
-  }
-
-  private ValidationResult validateSearchsetBundle(String bundle) {
-    // 1. validate the whole bundle without any profiles
-    var vrBundle = this.genericValidator.validateWithResult(bundle);
-    vrBundle = genericValidatorMode.adjustResult(vrBundle);
-    val validationMessages = new LinkedList<>(vrBundle.getMessages());
-
-    // 2. now validate each entry with a profiled validator
-    val parser =
-        EncodingType.guessFromContent(bundle).choose(this::getXmlParser, this::getJsonParser);
-    parser.parseResource(Bundle.class, bundle).getEntry().stream()
-        .map(Bundle.BundleEntryComponent::getResource)
-        .forEach(
-            r -> {
-              val validator = chooseProfileValidator(r);
-              val vr = validator.validate(r);
-              validationMessages.addAll(vr.getMessages());
-            });
-    return new ValidationResult(this.getCtx(), validationMessages);
+    return this.validator.validate(content);
   }
 
   public boolean isValid(String content) {
-    return validate(content).isSuccessful();
+    return this.validator.isValid(content);
   }
 
   public <T extends Resource> T decode(Class<T> expectedClass, String content) {
@@ -148,46 +107,6 @@ public class FhirParser {
     return this.jsonParser;
   }
 
-  private FhirProfiledValidator chooseProfileValidator(Resource resource) {
-    val profile = resource.getMeta().getProfile().stream().map(PrimitiveType::getValue).findFirst();
-    return chooseProfileValidator(() -> profile);
-  }
-
-  private FhirProfiledValidator chooseProfileValidator(Supplier<Optional<String>> profileSupplier) {
-    val profileUrlOpt = profileSupplier.get();
-    AtomicReference<FhirProfiledValidator> chosenParser = new AtomicReference<>();
-    profileUrlOpt.ifPresentOrElse(
-        url -> chosenParser.set(chooseProfileValidator(url)),
-        () -> {
-          val defaultParser = this.defaultProfileValidator;
-          log.debug(
-              format(
-                  "Could not determine the Profile from given content! Use default parser ''{0}''",
-                  defaultParser.getName()));
-          chosenParser.set(defaultParser);
-        });
-
-    val chosenValidator = chosenParser.get();
-    val profileUrl = profileUrlOpt.orElse("no found profile");
-    log.debug(format("Choose Validator {0} for {1}", chosenValidator.getName(), profileUrl));
-    return chosenValidator;
-  }
-
-  private FhirProfiledValidator chooseProfileValidator(String profileUrl) {
-    val parserOpt = this.validators.stream().filter(p -> p.doesSupport(profileUrl)).findFirst();
-
-    if (parserOpt.isPresent()) {
-      log.debug(format("Use Parser ''{0}'' for {1}", parserOpt.get().getName(), profileUrl));
-    } else {
-      log.debug(
-          format(
-              "No supporting Parser found for {0}, use Parser ''{1}'' as default",
-              profileUrl, this.defaultProfileValidator.getName()));
-    }
-
-    return parserOpt.orElse(this.defaultProfileValidator);
-  }
-
   /**
    * Well, this method is mainly used to fix "the bug" basedOn-References with contained AccessCodes
    * in ErxCommunicationDispReq messages
@@ -212,7 +131,7 @@ public class FhirParser {
    * @return the fixed encoded String
    */
   private String fixBeforeDecode(String content) {
-    if (this.profileExtractor.isUnprofiledSearchSet(content)) {
+    if (profileExtractor.isUnprofiledSearchSet(content)) {
       return content.replace("\"Task/", "\"/Task/");
     } else {
       // no need to change anything if it's not a searchset collection

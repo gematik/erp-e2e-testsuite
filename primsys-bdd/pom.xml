@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.12.0</version>
+        <version>0.13.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -180,6 +180,12 @@
             <artifactId>konnektor-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
             <scope>test</scope>
@@ -193,51 +199,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <resourceBundles>
-                        <resourceBundle>
-                            de.gematik.test.erezept:smartcard:${project.parent.version}
-                        </resourceBundle>
-                    </resourceBundles>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <artifactId>erp-bdd-common</artifactId>
-                                    <groupId>de.gematik.test.erezept</groupId>
-                                    <version>${project.parent.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/classes</outputDirectory>
-                                    <includes>**/*.class</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -306,7 +267,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>0.12.0</version>
+                <version>0.13.1</version>
             </plugin>
         </plugins>
     </build>

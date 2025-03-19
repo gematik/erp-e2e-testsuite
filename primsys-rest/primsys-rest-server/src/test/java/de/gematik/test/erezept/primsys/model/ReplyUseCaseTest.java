@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
-import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.testutil.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.primsys.TestWithActorContext;

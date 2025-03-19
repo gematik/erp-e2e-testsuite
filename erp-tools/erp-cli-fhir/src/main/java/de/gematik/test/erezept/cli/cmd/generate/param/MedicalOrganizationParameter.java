@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.builder.*;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import lombok.*;
-import picocli.*;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationBuilder;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import lombok.Getter;
+import picocli.CommandLine;
 
 @Getter
 public class MedicalOrganizationParameter implements BaseResourceParameter {
@@ -60,8 +60,8 @@ public class MedicalOrganizationParameter implements BaseResourceParameter {
     return this.getOrDefault(bsnr, GemFaker::fakerBsnr);
   }
 
-  public MedicalOrganization createMedicalOrganization() {
-    return MedicalOrganizationBuilder.builder()
+  public KbvMedicalOrganization createMedicalOrganization() {
+    return KbvMedicalOrganizationBuilder.builder()
         .name(getOrganizationName())
         .bsnr(getBsnr())
         .phone(GemFaker.fakerPhone())

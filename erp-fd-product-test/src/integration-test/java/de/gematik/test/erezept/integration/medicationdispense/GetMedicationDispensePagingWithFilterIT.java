@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,9 @@ import de.gematik.test.erezept.fhir.date.DateConverter;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -57,11 +55,6 @@ public class GetMedicationDispensePagingWithFilterIT extends ErpTest {
 
   @Actor(name = "Am Waldesrand")
   private PharmacyActor pharmacy;
-
-  @BeforeAll
-  static void setTimeZone() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-  }
 
   @TestcaseId("ERP_MEDICATION_DISPENSE_PAGING_PAGING_01")
   @Test

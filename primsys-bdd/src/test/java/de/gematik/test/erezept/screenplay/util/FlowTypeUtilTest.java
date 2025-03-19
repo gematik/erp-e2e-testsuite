@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package de.gematik.test.erezept.screenplay.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.List;
 import lombok.val;
 import org.junit.Test;
@@ -38,12 +38,13 @@ public class FlowTypeUtilTest {
             PrescriptionFlowType.FLOW_TYPE_200);
 
     assertEquals(expected.size(), codes.size());
+
     for (var i = 0; i < codes.size(); i++) {
       val exp = expected.get(i);
       val code = codes.get(i);
       val actual =
           FlowTypeUtil.getFlowType(
-              code, VersicherungsArtDeBasis.BG, PrescriptionAssignmentKind.PHARMACY_ONLY);
+              code, InsuranceTypeDe.BG, PrescriptionAssignmentKind.PHARMACY_ONLY);
       assertEquals(exp, actual);
     }
   }
@@ -57,19 +58,13 @@ public class FlowTypeUtilTest {
                 InvalidValueSetException.class,
                 () ->
                     FlowTypeUtil.getFlowType(
-                        code,
-                        VersicherungsArtDeBasis.BG,
-                        PrescriptionAssignmentKind.PHARMACY_ONLY)));
+                        code, InsuranceTypeDe.BG, PrescriptionAssignmentKind.PHARMACY_ONLY)));
   }
 
   @Test
   public void shouldReasonWorkflowType() {
     val insuranceKinds =
-        List.of(
-            VersicherungsArtDeBasis.GKV,
-            VersicherungsArtDeBasis.GKV,
-            VersicherungsArtDeBasis.PKV,
-            VersicherungsArtDeBasis.PKV);
+        List.of(InsuranceTypeDe.GKV, InsuranceTypeDe.GKV, InsuranceTypeDe.PKV, InsuranceTypeDe.PKV);
     val assignementKinds =
         List.of(
             PrescriptionAssignmentKind.PHARMACY_ONLY,
@@ -97,12 +92,12 @@ public class FlowTypeUtilTest {
   public void should160OnUnsupportedInsuranceKind() {
     val unsupported =
         List.of(
-            VersicherungsArtDeBasis.BG,
-            VersicherungsArtDeBasis.BEI,
-            VersicherungsArtDeBasis.GPV,
-            VersicherungsArtDeBasis.PPV,
-            VersicherungsArtDeBasis.SEL,
-            VersicherungsArtDeBasis.SOZ);
+            InsuranceTypeDe.BG,
+            InsuranceTypeDe.BEI,
+            InsuranceTypeDe.GPV,
+            InsuranceTypeDe.PPV,
+            InsuranceTypeDe.SEL,
+            InsuranceTypeDe.SOZ);
 
     unsupported.forEach(
         ik ->

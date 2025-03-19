@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import java.util.List;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -54,8 +55,11 @@ class BNetzAVLCaTest {
   @ParameterizedTest
   @EnumSource(value = CryptoSystem.class, mode = Mode.EXCLUDE, names = "RSA_PSS_2048")
   void shouldReturnCertificateWhenEECertificatesIssuerExists(CryptoSystem algorithm) {
-    SmartcardArchive.fromResources()
-        .getHbaCards()
+    // excluded, as these SmartCards do NOT have an RSA-QES certificate
+    val excludeList = List.of("80276001011699901343", "80276001011699901344");
+
+    SmartcardArchive.fromResources().getHbaCards().stream()
+        .filter(hba -> !excludeList.contains(hba.getIccsn()))
         .forEach(
             hba -> {
               val eeCert = hba.getQesCertificate(algorithm);

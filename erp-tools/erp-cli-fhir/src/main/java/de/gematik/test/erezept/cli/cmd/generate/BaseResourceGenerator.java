@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,30 @@
 
 package de.gematik.test.erezept.cli.cmd.generate;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.cli.description.*;
-import de.gematik.test.erezept.cli.exceptions.*;
-import de.gematik.test.erezept.cli.indexmap.*;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.test.erezept.cli.description.FhirResourceDescriber;
+import de.gematik.test.erezept.cli.exceptions.CliException;
+import de.gematik.test.erezept.cli.indexmap.ExampleDetailsMap;
+import de.gematik.test.erezept.cli.indexmap.ExampleEntry;
 import de.gematik.test.erezept.cli.param.OutputDirectoryParameter;
-import de.gematik.test.erezept.fhir.parser.*;
-import de.gematik.test.fuzzing.core.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.*;
-import javax.annotation.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
-import picocli.CommandLine.*;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
+import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.Resource;
+import picocli.CommandLine.ExitCode;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
 
 @Slf4j
 @Getter
@@ -101,9 +109,10 @@ public abstract class BaseResourceGenerator implements Callable<Integer> {
     for (var i = 0; i < this.getNumOfElements(); i++) {
       val resource = resourceSupplier.get();
       log.info(
-          format(
-              "Create {0} ({1}) {2}",
-              resource.getResourceType(), resource.getClass().getSimpleName(), resource.getId()));
+          "Create {} ({}) {}",
+          resource.getResourceType(),
+          resource.getClass().getSimpleName(),
+          resource.getId());
       val description = describer.acceptResource(resource);
       val entry = this.writeFhirResource(fhir, resource, description);
       edm.addEntry(entry);
@@ -111,16 +120,16 @@ public abstract class BaseResourceGenerator implements Callable<Integer> {
       if (this.shouldInvalidate()) {
         if (mutators == null) {
           log.warn(
-              format(
-                  "Invalidation Manipulators for {0} not yet implemented",
-                  resource.getClass().getSimpleName()));
+              "Invalidation Manipulators for {} not yet implemented",
+              resource.getClass().getSimpleName());
         } else {
           var index = 1;
           for (val m : mutators) {
             log.info(
-                format(
-                    "Manipulate {0} {1} with {2}",
-                    resource.getClass().getSimpleName(), resource.getId(), m.getName()));
+                "Manipulate {} {} with {}",
+                resource.getClass().getSimpleName(),
+                resource.getId(),
+                m.getName());
             val fResource = copyFunction.apply(resource);
             m.getParameter().accept(fResource); // perform the Manipulator!!
             val fDescription = format("{0} | Manipulator: {1}", description, m.getName());

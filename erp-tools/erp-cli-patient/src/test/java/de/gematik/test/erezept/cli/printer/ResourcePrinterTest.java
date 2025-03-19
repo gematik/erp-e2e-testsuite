@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.google.common.base.Strings;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -28,7 +29,7 @@ import java.util.stream.IntStream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class ResourcePrinterTest {
+class ResourcePrinterTest extends ErpFhirParsingTest {
 
   @Test
   void shouldPrintMedicationDispensesWithoutThrowingExceptions() throws IOException {

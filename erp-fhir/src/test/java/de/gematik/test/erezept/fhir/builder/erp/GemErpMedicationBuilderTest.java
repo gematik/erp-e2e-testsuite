@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,33 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
+import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.fhir.valuesets.epa.EpaDrugCategory;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.junit.jupiter.api.Test;
 
-class GemErpMedicationBuilderTest extends ParsingTest {
+class GemErpMedicationBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildGemErpMedicationWithFixedValues() {
@@ -123,6 +126,10 @@ class GemErpMedicationBuilderTest extends ParsingTest {
                     Darreichungsform.KPG)) // mapping Kombipackung not possible yet
             .withAmount(100, "Packung")
             .fake();
+
+    val kbvResult = ValidatorUtil.encodeAndValidate(parser, kbvMedication);
+    assertTrue(kbvResult.isSuccessful());
+
     val gemMedication =
         GemErpMedicationBuilder.from(kbvMedication)
             .version(ErpWorkflowVersion.V1_4_0)
@@ -139,7 +146,7 @@ class GemErpMedicationBuilderTest extends ParsingTest {
     assertEquals(kbvMedication.getStandardSize(), gemMedication.getStandardSize().orElse(null));
     assertEquals(kbvMedication.getDarreichungsform(), gemMedication.getDarreichungsform());
     assertEquals(
-        kbvMedication.getMedicationAmount(),
+        kbvMedication.getPackagingSizeOrEmpty(),
         gemMedication.getAmountNumerator().orElse(Integer.MIN_VALUE));
     assertEquals(kbvMedication.isVaccine(), gemMedication.isVaccine());
 
@@ -171,7 +178,7 @@ class GemErpMedicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
 
     assertEquals(
-        kbvMedication.getMedicationAmount(),
+        kbvMedication.getPackagingSizeOrEmpty(),
         gemMedication.getAmountNumerator().orElse(Integer.MIN_VALUE));
     // assertEquals(kbvMedication.getPackagingUnit(), gemMedication.getAmountNumeratorUnit());
     assertEquals("Stk", gemMedication.getAmountNumeratorUnit().orElse(null));
@@ -251,7 +258,7 @@ class GemErpMedicationBuilderTest extends ParsingTest {
             .version(ErpWorkflowVersion.V1_4_0)
             .lotNumber("123123")
             .build();
-    val result = ValidatorUtil.encodeAndValidate(parser, gemMedication, false);
+    val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
     assertTrue(result.isSuccessful());
   }
 
@@ -268,7 +275,7 @@ class GemErpMedicationBuilderTest extends ParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test()
+  @Test
   void shouldBuildFromMedicationCompoundingWithMissingStrengthParams() {
     val kbvMedicComp =
         KbvErpMedicationCompoundingFaker.builder().withPackaging("im Karton eben").fake();
@@ -314,18 +321,17 @@ class GemErpMedicationBuilderTest extends ParsingTest {
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
     assertTrue(result.isSuccessful());
-    assertEquals(medName, gemMedication.getName().get());
+    assertEquals(medName, gemMedication.getName().orElse("definetly a wrong name"));
     assertTrue(gemMedication.isVaccine());
     assertEquals(
         "im Fass",
-        String.valueOf(
-            gemMedication.getExtension().stream()
-                .filter(ex -> EpaMedStructDef.PACKAGING_EXTENSION.matches(ex.getUrl()))
-                .findFirst()
-                .get()
-                .getValue()));
+        gemMedication.getExtension().stream()
+            .filter(EpaMedicationStructDef.PACKAGING_EXTENSION::matches)
+            .findFirst()
+            .map(ext -> ext.getValue().castToString(ext.getValue()).getValue())
+            .orElse("definitely non matching string"));
     assertEquals(
-        String.valueOf(Darreichungsform.ATO.getDisplay()),
+        Darreichungsform.ATO.getDisplay(),
         String.valueOf(gemMedication.getIngredient().get(0).getExtensionFirstRep().getValue()));
     assertEquals(
         pzn,
@@ -402,13 +408,14 @@ class GemErpMedicationBuilderTest extends ParsingTest {
         .getStrength()
         .getNumerator()
         .setSystem("http://hl7.org");
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setCode("null");
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setValue(0);
+    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setCode(null);
+    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setValue(null);
     kbvErpMedicationIngredient
         .getIngredientFirstRep()
         .getStrength()
         .getDenominator()
-        .setSystem("http://hl7.org");
+        .setSystem("http://hl7.org")
+        .setValueElement(null);
     kbvErpMedicationIngredient
         .getIngredientFirstRep()
         .getStrength()
@@ -427,9 +434,8 @@ class GemErpMedicationBuilderTest extends ParsingTest {
   }
 
   @Test
-  void shouldNotBuildAnIngredientCompondingMedication() {
-    val builder = GemErpMedicationBuilder.builder();
-    builder.isIngredient().isCompounding().isVaccine(true);
+  void shouldNotBuildAnIngredientCompoundingMedication() {
+    val builder = GemErpMedicationBuilder.builder().isIngredient().isCompounding().isVaccine(true);
     assertThrows(BuilderException.class, builder::build);
   }
 }

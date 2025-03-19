@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
+import de.gematik.test.erezept.fhir.builder.erp.ErxComPrescriptionBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
@@ -43,62 +42,67 @@ import net.serenitybdd.screenplay.Task;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RedeemPrescription implements Task {
 
-  private final ErxCommunicationBuilder communicationBuilder;
+  private final ErxComPrescriptionBuilder<?> communicationBuilder;
   private final boolean isAssignToPharmacist;
-  private final DequeStrategy strategy;
+  private final DequeStrategy deque;
 
-  public static RedeemPrescription reserve(Actor pharmacist, DequeStrategy strategy) {
+  public static RedeemPrescription reserve(Actor pharmacist, DequeStrategy deque) {
     val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
 
+    // TODO replace this
+    val message = "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
     val communicationBuilder =
-        ErxCommunicationBuilder.builder()
-            .recipient(useSMCBAbility.getTelematikID())
+        ErxCommunicationBuilder.forInfoRequest(message)
+            .receiver(useSMCBAbility.getTelematikID())
             .supplyOptions(SupplyOptionsType.createDefault())
             // TODO replace this
-            .insurance(IKNR.from("104212059"))
+            .insurance(IKNR.asArgeIknr("104212059"))
             .flowType(PrescriptionFlowType.FLOW_TYPE_160);
-    return new RedeemPrescription(communicationBuilder, false, strategy);
+    return new RedeemPrescription(communicationBuilder, false, deque);
   }
 
-  public static RedeemPrescription assign(Actor pharmacist, DequeStrategy strategy) {
+  public static RedeemPrescription assign(Actor pharmacist, DequeStrategy deque) {
     val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
 
-    val communicationBuilder =
-        ErxCommunicationBuilder.builder().recipient(useSMCBAbility.getTelematikID());
+    // TODO replace this
+    val message =
+        new CommunicationDisReqMessage(
+            SupplyOptionsType.DELIVERY,
+            "Dr. Maximilian von Muster",
+            List.of("wohnhaft bei Emilia Fischer", "Bundesallee 312", "123. OG", "12345 Berlin"),
+            "Bitte im Morsecode klingeln: -.-.",
+            "004916094858168");
 
-    return new RedeemPrescription(communicationBuilder, true, strategy);
+    val communicationBuilder =
+        ErxCommunicationBuilder.forDispenseRequest(message)
+            .receiver(useSMCBAbility.getTelematikID());
+
+    return new RedeemPrescription(communicationBuilder, true, deque);
   }
 
   @Override
   public <T extends Actor> void performAs(T actor) {
     val managePatientPrescriptions =
         SafeAbility.getAbility(actor, ManagePatientPrescriptions.class);
-    val prescription =
-        strategy.chooseFrom(managePatientPrescriptions.getFullDetailedPrescriptions());
+    val prescription = deque.chooseFrom(managePatientPrescriptions.getFullDetailedPrescriptions());
 
     final ErxCommunication communication;
     if (!isAssignToPharmacist) {
-      // TODO replace this
-      val message = "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
-
       prescription
           .getKbvBundle()
           .ifPresent(kbvErpBundle -> communicationBuilder.medication(kbvErpBundle.getMedication()));
-      communicationBuilder.basedOnTaskId(prescription.getTask().getTaskId());
-      communication = communicationBuilder.buildInfoReq(message);
+      communicationBuilder.basedOn(prescription.getTask().getTaskId());
+      communication = communicationBuilder.build();
     } else {
-      val message =
-          new CommunicationDisReqMessage(
-              SupplyOptionsType.DELIVERY,
-              "Dr. Maximilian von Muster",
-              List.of("wohnhaft bei Emilia Fischer", "Bundesallee 312", "123. OG", "12345 Berlin"),
-              "Bitte im Morsecode klingeln: -.-.",
-              "004916094858168");
-
-      communicationBuilder
-          .basedOnTask(prescription.getTask().getTaskId(), prescription.getTask().getAccessCode())
-          .flowType(prescription.getTask().getFlowType());
-      communication = communicationBuilder.buildDispReq(message);
+      communicationBuilder.flowType(prescription.getTask().getFlowType());
+      communicationBuilder.basedOn(
+          prescription.getTask().getTaskId(), prescription.getTask().getAccessCode());
+      // TODO: check me later, builder not working because of IDEA issues?
+      //      communicationBuilder
+      //          .basedOn(prescription.getTask().getTaskId(),
+      // prescription.getTask().getAccessCode())
+      //          .flowType(prescription.getTask().getFlowType());
+      communication = communicationBuilder.build();
     }
 
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
@@ -108,9 +112,9 @@ public class RedeemPrescription implements Task {
       erpClientAbility.request(communicationCmd).getExpectedResource();
     } catch (UnexpectedResponseResourceError urre) {
       log.warn(
-          format(
-              "Sending message {0} to pharmacy {1} failed",
-              communication.getBasedOnReferenceId(), communication.getRecipientId()));
+          "Sending message {} to pharmacy {} failed",
+          communication.getBasedOnReferenceId(),
+          communication.getRecipientId());
       throw urre;
     }
   }

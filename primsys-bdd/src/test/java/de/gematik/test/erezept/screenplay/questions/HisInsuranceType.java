@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
@@ -25,9 +25,9 @@ import net.serenitybdd.screenplay.Question;
 
 public class HisInsuranceType implements Question<Boolean> {
 
-  private final VersicherungsArtDeBasis expectedInsuranceType;
+  private final InsuranceTypeDe expectedInsuranceType;
 
-  private HisInsuranceType(VersicherungsArtDeBasis expected) {
+  private HisInsuranceType(InsuranceTypeDe expected) {
     this.expectedInsuranceType = expected;
   }
 
@@ -38,10 +38,10 @@ public class HisInsuranceType implements Question<Boolean> {
   }
 
   public static HisInsuranceType equalsExpected(String insuranceType) {
-    return equalsExpected(VersicherungsArtDeBasis.fromCode(insuranceType));
+    return equalsExpected(InsuranceTypeDe.fromCode(insuranceType));
   }
 
-  public static HisInsuranceType equalsExpected(VersicherungsArtDeBasis insuranceType) {
+  public static HisInsuranceType equalsExpected(InsuranceTypeDe insuranceType) {
     return new HisInsuranceType(insuranceType);
   }
 }

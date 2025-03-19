@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package de.gematik.test.erezept.cli.cmd.generate;
 
 import static java.text.MessageFormat.*;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.cli.cmd.generate.param.*;
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import de.gematik.test.fuzzing.kbv.*;
@@ -79,7 +80,7 @@ public class KbvBundleGenerator extends BaseResourceGenerator {
     val medicationRequest = medReqParam.createMedicationRequest();
 
     val flowType =
-        patientParam.getKvnrParameter().getInsuranceType() == VersicherungsArtDeBasis.GKV
+        patientParam.getKvnrParameter().getInsuranceType() == InsuranceTypeDe.GKV
             ? GemFaker.randomElement(
                 PrescriptionFlowType.FLOW_TYPE_160, PrescriptionFlowType.FLOW_TYPE_169)
             : PrescriptionFlowType.FLOW_TYPE_200;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -35,18 +36,18 @@ public class RawHttpRespBodyCertVerifier {
   }
 
   public static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsAddRoots(
-      Set<X509Certificate> expected) {
+      Collection<X509Certificate> expected) {
     return bodyContainsCert(PKICertificatesDTOEnvelop::getAddRoots, expected, " add_roots");
   }
 
   public static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsCaCerts(
-      Set<X509Certificate> expected) {
+      Collection<X509Certificate> expected) {
     return bodyContainsCert(PKICertificatesDTOEnvelop::getCaCerts, expected, "ca_cert");
   }
 
   private static VerificationStep<PKICertificatesDTOEnvelop> bodyContainsCert(
       Function<PKICertificatesDTOEnvelop, Set<X509Certificate>> certFunction,
-      Set<X509Certificate> expected,
+      Collection<X509Certificate> expected,
       String objectUnderTest) {
     Predicate<PKICertificatesDTOEnvelop> predicate =
         body ->

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.systems;
 
-import de.gematik.test.erezept.fhir.parser.profiles.*;
-import lombok.*;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PatientenrechnungCodeSystem implements ICodeSystem {
+public enum PatientenrechnungCodeSystem implements WithCodeSystem {
   CONSENT_TYPE("https://gematik.de/fhir/erpchrg/CodeSystem/GEM_ERPCHRG_CS_ConsentType");
 
   private final String canonicalUrl;

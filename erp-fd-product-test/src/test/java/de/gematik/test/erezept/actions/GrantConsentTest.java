@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,30 @@
 
 package de.gematik.test.erezept.actions;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.ConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.ConsentPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxConsentBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
-import de.gematik.test.erezept.fhir.resources.erp.ErxConsentBundle;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
+import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GrantConsentTest {
+class GrantConsentTest extends ErpFhirBuildingTest {
   private ErpClient erpClientMock;
   private MockActorsUtils mockUtil;
 
-  private PharmacyActor pharmacyActor;
   private PatientActor patientActor;
 
   @BeforeEach
@@ -49,7 +48,6 @@ class GrantConsentTest {
     this.mockUtil = new MockActorsUtils();
     val actorStage = mockUtil.actorStage;
     this.erpClientMock = mockUtil.erpClientMock;
-    pharmacyActor = actorStage.getPharmacyNamed("Stadtapotheke");
     patientActor = actorStage.getPatientNamed("Leonie Hütter");
   }
 

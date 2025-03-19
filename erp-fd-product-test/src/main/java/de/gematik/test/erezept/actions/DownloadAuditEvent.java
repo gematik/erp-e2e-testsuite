@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static java.text.MessageFormat.*;
 import de.gematik.test.erezept.*;
 import de.gematik.test.erezept.client.rest.param.*;
 import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import java.util.List;
 import lombok.*;
 import lombok.extern.slf4j.*;

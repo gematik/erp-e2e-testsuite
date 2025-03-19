@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.cli.converter.KvnrConverter;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import picocli.CommandLine;
 
 public class KvnrParameter implements BaseResourceParameter {
@@ -35,25 +35,25 @@ public class KvnrParameter implements BaseResourceParameter {
   @CommandLine.Option(
       names = {"--insurance-type"},
       paramLabel = "<TYPE>",
-      type = VersicherungsArtDeBasis.class,
+      type = InsuranceTypeDe.class,
       description =
           "The Type of the Insurance from ${COMPLETION-CANDIDATES} for the Patient-Section")
-  private VersicherungsArtDeBasis versicherungsArt;
+  private InsuranceTypeDe versicherungsArt;
 
   public KVNR getKvnr() {
     return this.getOrDefault(kvnr, KVNR::random);
   }
 
-  public VersicherungsArtDeBasis getInsuranceType() {
-    return getInsuranceType(VersicherungsArtDeBasis.GKV);
+  public InsuranceTypeDe getInsuranceType() {
+    return getInsuranceType(InsuranceTypeDe.GKV);
   }
 
-  public VersicherungsArtDeBasis getInsuranceType(VersicherungsArtDeBasis defaultValue) {
+  public InsuranceTypeDe getInsuranceType(InsuranceTypeDe defaultValue) {
     return getOrDefault(versicherungsArt, () -> defaultValue);
   }
 
   public IdentifierTypeDe getIdentifierTypeDe() {
-    return getInsuranceType().equals(VersicherungsArtDeBasis.GKV)
+    return getInsuranceType().equals(InsuranceTypeDe.GKV)
         ? IdentifierTypeDe.GKV
         : IdentifierTypeDe.PKV;
   }

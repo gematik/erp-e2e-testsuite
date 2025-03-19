@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,26 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.PZN;
 import java.util.Date;
 import java.util.Optional;
 import lombok.val;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Medication;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -201,6 +197,61 @@ class PrescriptionBundleVerifierTest {
     when(prescriptionBundle.getTask()).thenReturn(task);
 
     val step = bundleHasLastMedicationDispenseDate();
+    assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldFailWhenLastMedicationDispenseDateAfterCloseHasIncorrectPrecision() {
+    val task = mock(ErxTask.class);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+
+    val invalidDate = new InstantType("2025-01-22T00:00:00Z");
+    invalidDate.setPrecision(TemporalPrecisionEnum.DAY);
+    assertEquals(TemporalPrecisionEnum.DAY, invalidDate.getPrecision());
+
+    when(prescriptionBundle.getTask()).thenReturn(task);
+    when(task.getLastMedicationDispenseDateElement()).thenReturn(Optional.of(invalidDate));
+
+    val step = bundleHasLastMedicationDispenseDateAfterClose();
+    assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldVerifyPrescriptionStatus() {
+    val erxTask = mock(ErxTask.class);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    when(prescriptionBundle.getTask()).thenReturn(erxTask);
+
+    when(erxTask.getStatus()).thenReturn(Task.TaskStatus.DRAFT);
+    val step = prescriptionInStatus(Task.TaskStatus.DRAFT);
+    step.apply(prescriptionBundle); // Should pass without exception
+
+    when(erxTask.getStatus()).thenReturn(Task.TaskStatus.COMPLETED);
+    val failingStep = prescriptionInStatus(Task.TaskStatus.DRAFT);
+    assertThrows(AssertionError.class, () -> failingStep.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldDetectPrescriptionStatusCorrect() {
+    val task = new ErxTask();
+    task.setStatus(Task.TaskStatus.INPROGRESS);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    when(prescriptionBundle.getTask()).thenReturn(task);
+    val testStatus = Task.TaskStatus.INPROGRESS;
+
+    val step = prescriptionHasStatus(testStatus, ErpAfos.A_24034);
+    assertDoesNotThrow(() -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldFailsWhileDetectPrescriptionStatus() {
+    val task = new ErxTask();
+    task.setStatus(Task.TaskStatus.COMPLETED);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    when(prescriptionBundle.getTask()).thenReturn(task);
+    val testStatus = Task.TaskStatus.INPROGRESS;
+
+    val step = prescriptionHasStatus(testStatus, ErpAfos.A_24034);
     assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
   }
 }

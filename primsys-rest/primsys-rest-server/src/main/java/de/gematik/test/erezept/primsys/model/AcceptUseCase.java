@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package de.gematik.test.erezept.primsys.model;
 
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
 import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
+import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import jakarta.ws.rs.core.Response;
 import lombok.val;
 
@@ -42,7 +43,10 @@ public class AcceptUseCase {
     val acceptResponse = actor.erpRequest(acceptCommand);
     val acceptedTask = acceptResponse.getExpectedResource();
 
-    val kbvBundle = actor.decode(KbvErpBundle.class, acceptedTask.getKbvBundleAsString());
+    val kbvBundle =
+        actor.decode(
+            KbvErpBundle.class,
+            LocalVerifier.parse(acceptedTask.getSignedKbvBundle()).getDocument());
     val acceptData =
         AcceptedPrescriptionDto.withPrescriptionId(
                 acceptedTask.getTask().getPrescriptionId().getValue())
@@ -51,7 +55,7 @@ public class AcceptUseCase {
             .withSecret(acceptedTask.getSecret().getValue())
             .coveredBy(
                 CoverageDataMapper.from(kbvBundle.getCoverage(), kbvBundle.getPatient()).getDto())
-            .prescriptionReference(kbvBundle.getReference().getReference())
+            .prescriptionReference(kbvBundle.getLogicalId())
             .andMedication(KbvPznMedicationDataMapper.from(kbvBundle.getMedication()).getDto());
 
     ActorContext.getInstance().addAcceptedPrescription(acceptData);

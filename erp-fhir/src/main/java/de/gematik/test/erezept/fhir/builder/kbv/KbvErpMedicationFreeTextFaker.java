@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
+
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,14 +27,14 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationFreeTextFaker {
+
   private final Map<String, Consumer<KbvErpMedicationFreeTextBuilder>> builderConsumers =
       new HashMap<>();
 
   private KbvErpMedicationFreeTextFaker() {
-    builderConsumers.put("darreichungsform", b -> b.darreichung("Lutscher mit Brausepulverfüllu"));
-    builderConsumers.put(
-        "freetext",
-        b -> b.freeText("3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen"));
+    this.withDosageForm("Lutscher mit Brausepulverfü...") // TODO: why only 30 characters?
+        .withFreeText("3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen")
+        .withVaccine(fakerBool());
   }
 
   public static KbvErpMedicationFreeTextFaker builder() {
@@ -50,7 +52,7 @@ public class KbvErpMedicationFreeTextFaker {
   }
 
   public KbvErpMedicationFreeTextFaker withFreeText(String freeText) {
-    builderConsumers.computeIfPresent("freetext", (key, defaultValue) -> b -> b.freeText(freeText));
+    builderConsumers.put("freetext", b -> b.freeText(freeText));
     return this;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
+class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build KBV MedicationCompounding with KbvItaErpVersion {0}")
@@ -54,13 +53,12 @@ class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
 
     assertTrue(
         medicationCompounding.getExtension().stream()
-            .filter(ex -> (KbvItaErpStructDef.COMPOUNDING_INSTRUCTION.match(ex.getUrl())))
+            .filter(KbvItaErpStructDef.COMPOUNDING_INSTRUCTION::matches)
             .findAny()
             .stream()
             .findFirst()
             .isPresent());
     assertTrue(result.isSuccessful());
-    assertEquals(0, result.getMessages().size());
   }
 
   @Test
@@ -78,9 +76,10 @@ class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
       productionInstruction =
           ProductionInstruction.asCompounding("freitext Z.B.: gerührt nicht geschüttelt");
     } else {
-      if (bool.equals("Package"))
+      if (bool.equals("Package")) {
         productionInstruction =
             ProductionInstruction.asPackaging("freitext Z.B.: Achtung! jetzt kommt ein Karton!!!");
+      }
     }
     val medicationCompounding =
         KbvErpMedicationCompoundingBuilder.builder()
@@ -98,28 +97,9 @@ class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
   }
 
   @Test
-  void shouldThrowNullPointer() {
-    var builder = new KbvErpMedicationCompoundingBuilder();
-    assertThrows(
-        java.lang.NullPointerException.class,
-        () -> {
-          builder.medicationIngredient(null, null);
-        });
-    assertThrows(
-        java.lang.NullPointerException.class,
-        () -> {
-          builder.medicationIngredient("null", null, "null");
-        });
-  }
-
-  @Test
   void fakerWithoutRequiredShouldThrowException1() {
     val builder = KbvErpMedicationCompoundingBuilder.builder();
-    assertThrows(
-        BuilderException.class,
-        () -> {
-          val test1 = builder.build();
-        });
+    assertThrows(BuilderException.class, builder::build);
   }
 
   @Test
@@ -127,11 +107,7 @@ class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
     val builder2 =
         KbvErpMedicationCompoundingBuilder.builder()
             .productionInstruction(ProductionInstruction.random());
-    assertThrows(
-        BuilderException.class,
-        () -> {
-          val test2 = builder2.build();
-        });
+    assertThrows(BuilderException.class, builder2::build);
   }
 
   @Test
@@ -140,23 +116,14 @@ class KbvErpMedicationCompoundingBuilderTest extends ParsingTest {
         KbvErpMedicationCompoundingBuilder.builder()
             .productionInstruction(ProductionInstruction.random());
 
-    assertThrows(
-        BuilderException.class,
-        () -> {
-          val test3 = builder3.build();
-        });
+    assertThrows(BuilderException.class, builder3::build);
   }
 
   @Test
   void fakerWithoutRequiredShouldThrowException4() {
-    val builder4 =
-        KbvErpMedicationCompoundingBuilder.builder().medicationIngredient("p", "pp").builder();
+    val builder4 = KbvErpMedicationCompoundingBuilder.builder().medicationIngredient("p", "pp");
 
-    assertThrows(
-        BuilderException.class,
-        () -> {
-          val test4 = builder4.build();
-        });
+    assertThrows(BuilderException.class, builder4::build);
   }
 
   @Test

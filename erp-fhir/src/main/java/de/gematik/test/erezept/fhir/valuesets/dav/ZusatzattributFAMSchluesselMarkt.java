@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
-public enum ZusatzattributFAMSchluesselMarkt implements IValueSet {
+public enum ZusatzattributFAMSchluesselMarkt implements FromValueSet {
   NICHT_BETROFFEN("0", "nicht betroffen"),
   GENERIKA("1", "Generika"),
   SOLITAER("2", "Solitär"),
@@ -37,9 +36,6 @@ public enum ZusatzattributFAMSchluesselMarkt implements IValueSet {
 
   public static final AbdaCodeSystem CODE_SYSTEM =
       AbdaCodeSystem.ZUSATZATTRIBUTE_FAM_SCHLUESSEL_MARKT;
-  public static final String VERSION = "1.2";
-  public static final String DESCRIPTION = "";
-  public static final String PUBLISHER = "DAV";
 
   private final String code;
   private final String display;
@@ -54,7 +50,7 @@ public enum ZusatzattributFAMSchluesselMarkt implements IValueSet {
     return CODE_SYSTEM;
   }
 
-  public static ZusatzattributFAMSchluesselMarkt fromCode(@NonNull String code) {
+  public static ZusatzattributFAMSchluesselMarkt fromCode(String code) {
     return Arrays.stream(ZusatzattributFAMSchluesselMarkt.values())
         .filter(zafamsm -> zafamsm.code.equals(code))
         .findFirst()

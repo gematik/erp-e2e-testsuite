@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -44,8 +46,8 @@ class KvnrParameterTest {
     assertDoesNotThrow(() -> cmdline.parseArgs("--kvnr", "X123456789", "--insurance-type", "GKV"));
 
     assertEquals("X123456789", kvidp.getKvnr().getValue());
-    assertEquals(VersicherungsArtDeBasis.GKV, kvidp.getInsuranceType());
-    assertEquals(VersicherungsArtDeBasis.GKV, kvidp.getInsuranceType(VersicherungsArtDeBasis.PKV));
+    assertEquals(InsuranceTypeDe.GKV, kvidp.getInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, kvidp.getInsuranceType(InsuranceTypeDe.PKV));
     assertEquals(IdentifierTypeDe.GKV, kvidp.getIdentifierTypeDe());
   }
 
@@ -55,7 +57,7 @@ class KvnrParameterTest {
     val cmdline = new CommandLine(kvidp);
     assertDoesNotThrow(() -> cmdline.parseArgs());
 
-    assertEquals(VersicherungsArtDeBasis.PKV, kvidp.getInsuranceType(VersicherungsArtDeBasis.PKV));
+    assertEquals(InsuranceTypeDe.PKV, kvidp.getInsuranceType(InsuranceTypeDe.PKV));
     assertEquals(IdentifierTypeDe.GKV, kvidp.getIdentifierTypeDe());
   }
 
@@ -64,7 +66,7 @@ class KvnrParameterTest {
     val kvidp = new KvnrParameter();
     val cmdline = new CommandLine(kvidp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--insurance-type", "PPV"));
-    assertEquals(VersicherungsArtDeBasis.PPV, kvidp.getInsuranceType());
+    assertEquals(InsuranceTypeDe.PPV, kvidp.getInsuranceType());
     assertEquals(IdentifierTypeDe.PKV, kvidp.getIdentifierTypeDe());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,20 @@ package de.gematik.test.erezept.abilities;
 
 import com.beust.jcommander.Strings;
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.test.erezept.client.exceptions.FhirValidationException;
-import de.gematik.test.erezept.eml.*;
+import de.gematik.test.erezept.eml.DownloadRequestByPrescriptionId;
+import de.gematik.test.erezept.eml.EpaMockClient;
+import de.gematik.test.erezept.eml.ErpEmlLog;
+import de.gematik.test.erezept.eml.PutConfiguration;
+import de.gematik.test.erezept.eml.RuleDto;
+import de.gematik.test.erezept.eml.RuleIdentifier;
+import de.gematik.test.erezept.eml.RuleTemplate;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.experimental.Delegate;
@@ -80,7 +86,7 @@ public class UseTheEpaMockClient implements Ability {
     val validationResults =
         re.stream().map(epaFhirCodec::validate).filter(vr -> !vr.isSuccessful()).toList();
     if (!validationResults.isEmpty()) {
-      log.info("Response From FD {}", request.get(0).request().bodyAsString());
+      log.debug("Response From FD {}", request.get(0).request().bodyAsString());
       val errorMessage =
           EntryStream.of(validationResults)
               .map(

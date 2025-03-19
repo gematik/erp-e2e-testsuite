@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpRespBodyCertVerifier;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 import lombok.SneakyThrows;
@@ -38,7 +38,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @WireMockTest()
-class RawHttpRespBodyCertVerifierTest extends ParsingTest {
+class RawHttpRespBodyCertVerifierTest extends ErpFhirParsingTest {
 
   private static final String CERT_BODY_PATH = "certexamples/86028_ExampleData.json";
   private static X509Certificate kompCA;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.integration.task;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -29,7 +30,6 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.FuzzingIncrementsToggle;
 import de.gematik.test.erezept.toggle.FuzzingIterationsToggle;
@@ -208,8 +208,7 @@ class ActivateFuzzedKbvBundles extends ErpTest {
       name = "[{index}] -> Verordnender Arzt stellt ein smartFuzzed E-Rezept mit ''{0}'' aus")
   @MethodSource("fuzzingContextProvider")
   void activatePrescriptionWithSmartFuzzer(FuzzConfig fuzzConfig) {
-    var insuranceType =
-        GemFaker.randomElement(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV);
+    var insuranceType = GemFaker.randomElement(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV);
     var assignmentKind =
         GemFaker.randomElement(
             PrescriptionAssignmentKind.PHARMACY_ONLY, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);

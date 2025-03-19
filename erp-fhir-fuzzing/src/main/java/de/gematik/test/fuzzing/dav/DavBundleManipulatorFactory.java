@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.fuzzing.dav;
 
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -34,16 +34,16 @@ public class DavBundleManipulatorFactory {
     throw new AssertionError("Do not instantiate");
   }
 
-  public static List<NamedEnvelope<FuzzingMutator<DavAbgabedatenBundle>>>
+  public static List<NamedEnvelope<FuzzingMutator<DavPkvAbgabedatenBundle>>>
       getAllDavBundleManipulators() {
     val manipulators = new LinkedList<>(getDavBundleManipulators());
     manipulators.addAll(getInvoiceManipulators());
     return manipulators;
   }
 
-  public static List<NamedEnvelope<FuzzingMutator<DavAbgabedatenBundle>>>
+  public static List<NamedEnvelope<FuzzingMutator<DavPkvAbgabedatenBundle>>>
       getDavBundleManipulators() {
-    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<DavAbgabedatenBundle>>>();
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<DavPkvAbgabedatenBundle>>>();
 
     manipulators.add(
         NamedEnvelope.of(
@@ -55,8 +55,9 @@ public class DavBundleManipulatorFactory {
     return manipulators;
   }
 
-  public static List<NamedEnvelope<FuzzingMutator<DavAbgabedatenBundle>>> getInvoiceManipulators() {
-    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<DavAbgabedatenBundle>>>();
+  public static List<NamedEnvelope<FuzzingMutator<DavPkvAbgabedatenBundle>>>
+      getInvoiceManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<DavPkvAbgabedatenBundle>>>();
 
     manipulators.add(
         NamedEnvelope.of(

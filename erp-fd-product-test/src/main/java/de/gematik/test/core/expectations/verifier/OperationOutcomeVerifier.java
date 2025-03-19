@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
+import java.util.Arrays;
 import java.util.function.Predicate;
 import lombok.val;
 import org.hl7.fhir.r4.model.OperationOutcome;
@@ -72,6 +73,25 @@ public class OperationOutcomeVerifier {
     val step =
         new VerificationStep.StepBuilder<OperationOutcome>(
             req.getRequirement(), format(EXPECTATION_TEMPLATE, text));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<OperationOutcome> hasAnyOfDetailsText(
+      RequirementsSet req, String... texts) {
+    Predicate<OperationOutcome> predicate =
+        oo ->
+            oo.getIssue().stream()
+                .anyMatch(
+                    issue -> {
+                      if (issue.hasDetails()) {
+                        return Arrays.stream(texts)
+                            .anyMatch(text -> issue.getDetails().getText().contains(text));
+                      }
+                      return false;
+                    });
+    val step =
+        new VerificationStep.StepBuilder<OperationOutcome>(
+            req.getRequirement(), format(EXPECTATION_TEMPLATE, texts));
     return step.predicate(predicate).accept();
   }
 }

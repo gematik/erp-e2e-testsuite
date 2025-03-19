@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,17 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import org.hl7.fhir.r4.model.Resource;
 
 public abstract class KbvBaseDocumentBundleBuilder<
-        V extends ProfileVersion<V>, R extends Resource, B extends ResourceBuilder<R, B>>
+        V extends ProfileVersion, R extends Resource, B extends ResourceBuilder<R, B>>
     extends ResourceBuilder<R, B> {
 
   protected V version;
@@ -40,7 +40,7 @@ public abstract class KbvBaseDocumentBundleBuilder<
   protected KbvPractitioner practitioner;
   protected KbvPractitioner attester;
   protected KbvCoverage coverage;
-  protected MedicalOrganization medicalOrganization; // the organization issuing the prescription
+  protected KbvMedicalOrganization medicalOrganization; // the organization issuing the prescription
 
   protected KbvBaseDocumentBundleBuilder(
       KbvBaseCompositionBuilder<V, ?> compositionBuilder, V defaultVersion) {
@@ -79,7 +79,7 @@ public abstract class KbvBaseDocumentBundleBuilder<
     return self();
   }
 
-  public B medicalOrganization(MedicalOrganization organization) {
+  public B medicalOrganization(KbvMedicalOrganization organization) {
     this.medicalOrganization = organization;
     return self();
   }

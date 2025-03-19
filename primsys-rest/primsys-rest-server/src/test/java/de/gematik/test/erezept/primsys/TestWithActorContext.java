@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,21 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.primsys.actors.Doctor;
+import de.gematik.test.erezept.primsys.actors.HealthInsurance;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.konnektor.Konnektor;
@@ -42,21 +44,22 @@ import de.gematik.test.konnektor.cfg.KonnektorFactory;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.stubbing.Answer;
 
-public abstract class TestWithActorContext {
+public abstract class TestWithActorContext extends ErpFhirParsingTest {
 
-  protected static final FhirParser fhir = new FhirParser();
-  private static final PrimsysConfigurationDto configDto =
-      ConfigurationReader.forPrimSysConfiguration().create();
-  private static final EnvironmentConfiguration env = createActiveEnvironment();
-  private static final SmartcardArchive sca = SmartcardArchive.fromResources();
-  private static final Konnektor softKonn = KonnektorFactory.createSoftKon();
+  protected static final PrimsysConfigurationDto configDto;
+  protected static final EnvironmentConfiguration env;
+  protected static final SmartcardArchive sca;
+  protected static final Konnektor softKonn;
 
-  @BeforeAll
-  static void initDefaultContextMock() {
+  static {
+    configDto = ConfigurationReader.forPrimSysConfiguration().create();
+    env = createActiveEnvironment();
+    sca = SmartcardArchive.fromResources();
+    softKonn = KonnektorFactory.createSoftKon();
+
     val mockFactory = mock(PrimSysRestFactory.class);
 
     try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
@@ -66,10 +69,12 @@ public abstract class TestWithActorContext {
 
       val mockedDoctors = TestWithActorContext.createDoctorActors();
       val mockedPharmacies = TestWithActorContext.createPharmacyActors();
+      val mockKtrs = TestWithActorContext.createKtrActors();
 
       when(mockFactory.getActiveEnvironment()).thenReturn(env);
       when(mockFactory.createDoctorActors()).thenReturn(mockedDoctors);
       when(mockFactory.createPharmacyActors()).thenReturn(mockedPharmacies);
+      when(mockFactory.createHealthInsuranceActors()).thenReturn(mockKtrs);
 
       ActorContext.init(mockFactory);
     }
@@ -87,14 +92,22 @@ public abstract class TestWithActorContext {
         .toList();
   }
 
+  private static List<HealthInsurance> createKtrActors() {
+    return TestWithActorContext.configDto.getActors().getHealthInsurances().stream()
+        .map(TestWithActorContext::createMockedHealthInsurance)
+        .toList();
+  }
+
   private static Doctor createMockDoctor(DoctorConfiguration cfg) {
-    // cfg.setAlgorithm(CryptoSystem.RSA_2048.getName());
     return new Doctor(cfg, env, softKonn, sca);
   }
 
   private static Pharmacy createMockedPharmacy(PharmacyConfiguration cfg) {
-    // cfg.setAlgorithm(CryptoSystem.ECC_256.getName());
     return new Pharmacy(cfg, env, softKonn, sca);
+  }
+
+  private static HealthInsurance createMockedHealthInsurance(HealthInsuranceConfiguration cfg) {
+    return new HealthInsurance(cfg, env, softKonn, sca);
   }
 
   private static EnvironmentConfiguration createActiveEnvironment() {
@@ -131,13 +144,13 @@ public abstract class TestWithActorContext {
               reset(erpClient); // clear all previous mocks from the client
 
               // now mock the fhir parser back in
-              when(erpClient.getFhir()).thenReturn(fhir);
+              when(erpClient.getFhir()).thenReturn(parser);
               when(erpClient.encode(any(), any()))
                   .thenAnswer(
                       (Answer<String>)
                           invocationOnMock -> {
                             val args = invocationOnMock.getArguments();
-                            return fhir.encode((IBaseResource) args[0], (EncodingType) args[1]);
+                            return parser.encode((IBaseResource) args[0], (EncodingType) args[1]);
                           });
             });
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.data.error.ErrorType;
 import jakarta.ws.rs.WebApplicationException;
@@ -33,7 +34,7 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
-class ErrorResponseBuilderTest {
+class ErrorResponseBuilderTest extends ErpFhirBuildingTest {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 

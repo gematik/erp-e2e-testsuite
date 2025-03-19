@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ public class PznDispensedMedicationDto extends PznMedicationDto {
       dto.setVaccine(medication.isVaccine());
       dto.setStandardSize(medication.getStandardSize());
       dto.setSupplyForm(medication.getSupplyForm());
-      dto.setAmount(medication.getAmount());
-      dto.setAmountUnit(medication.getAmountUnit());
+      dto.setPackagingSize(medication.getPackagingSize());
+      dto.setPackagingUnit(medication.getPackagingUnit());
       dto.setPzn(medication.getPzn());
       dto.setName(medication.getName());
       dto.setWhenHandedOver(new Date());

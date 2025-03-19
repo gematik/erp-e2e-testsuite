@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ public class MultiplePrescriptionExtension {
   }
 
   public Extension asExtension(KbvItaErpVersion kbvItaErpVersion) {
-    val outerExt = new Extension(KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.getCanonicalUrl());
+    val outerExt = KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.asExtension();
     val kennzeichenExt = new Extension("Kennzeichen", new BooleanType(isMultiple));
 
     val innerExtensions = new LinkedList<Extension>();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.exceptions.*;
-import java.util.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import java.util.List;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class StatusCoPaymentTest {
   @Test

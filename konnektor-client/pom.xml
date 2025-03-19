@@ -5,7 +5,7 @@
   <parent>
     <artifactId>erezept-testsuite</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>0.12.0</version>
+    <version>0.13.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -132,31 +132,14 @@
       <groupId>de.gematik.bbriccs</groupId>
       <artifactId>resource-loader-brick</artifactId>
     </dependency>
-
-
+    <dependency>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>vsdm-check-digit-brick</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- required when using the smartcard resources as raw file -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-remote-resources-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <resourceBundles>
-            <resourceBundle>de.gematik.test.erezept:smartcard:${project.parent.version}
-            </resourceBundle>
-          </resourceBundles>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>process</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -182,7 +165,7 @@
         <version>3.1.0</version>
         <executions>
           <execution>
-            <id>xjc</id>
+            <id>xjc.conn.servicedirectory</id>
             <goals>
               <goal>xjc</goal>
             </goals>
@@ -194,6 +177,21 @@
               <outputDirectory>${project.build.directory}/generated/src/main/java</outputDirectory>
               <clearOutputDir>false</clearOutputDir>
               <packageName>de.gematik.ws.conn.servicedirectory</packageName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>xjc.fa.vsds</id>
+            <goals>
+              <goal>xjc</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/resources/gematik_schemes/fa/vsds/Pruefungsnachweis.xsd</source>
+                <source>src/main/resources/gematik_schemes/fa/vsds/Schema_VSD.xsd</source>
+              </sources>
+              <outputDirectory>${project.build.directory}/generated/src/main/java</outputDirectory>
+              <clearOutputDir>false</clearOutputDir>
+              <packageName>de.gematik.ws.fa.vsds</packageName>
             </configuration>
           </execution>
         </executions>

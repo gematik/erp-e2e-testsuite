@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.gematik.test.erezept.actions.chargeitem;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import javax.annotation.Nullable;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package de.gematik.test.erezept.actors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -33,13 +33,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 
-class PatientActorTest extends ParsingTest {
+class PatientActorTest extends ErpFhirParsingTest {
 
   @Test
   void shouldProvideCorrectGkvData() {
     val patient = new PatientActor("Sina Hüllmann");
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
-    assertEquals(VersicherungsArtDeBasis.GKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, patient.getPatientInsuranceType());
     assertTrue(patient.getAssignerOrganization().isEmpty());
   }
 
@@ -47,7 +47,7 @@ class PatientActorTest extends ParsingTest {
   void shouldProvideCorrectPkvData() {
     val patient = new PatientActor("Sina Hüllmann");
     patient.can(ProvidePatientBaseData.forPkvPatient(KVNR.random(), patient.getName()));
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, patient.getPatientInsuranceType());
 
     if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_0_2) == 0)
       assertTrue(patient.getAssignerOrganization().isPresent());
@@ -59,13 +59,13 @@ class PatientActorTest extends ParsingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     // initialised as GKV
-    assertEquals(VersicherungsArtDeBasis.GKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, patient.getPatientInsuranceType());
     assertTrue(patient.getAssignerOrganization().isEmpty());
 
     // now change to PKV
-    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getCoverageInsuranceType());
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    assertEquals(InsuranceTypeDe.PKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, patient.getCoverageInsuranceType());
 
     if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_0_2) == 0)
       assertTrue(patient.getAssignerOrganization().isPresent());
@@ -77,14 +77,14 @@ class PatientActorTest extends ParsingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     // initialised as GKV
-    assertEquals(VersicherungsArtDeBasis.GKV, patient.getPatientInsuranceType());
-    assertEquals(VersicherungsArtDeBasis.GKV, patient.getCoverageInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, patient.getCoverageInsuranceType());
 
     // now change to PKV and BG
-    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
-    patient.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
-    assertEquals(VersicherungsArtDeBasis.PKV, patient.getPatientInsuranceType());
-    assertEquals(VersicherungsArtDeBasis.BG, patient.getCoverageInsuranceType());
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    patient.changeCoverageInsuranceType(InsuranceTypeDe.BG);
+    assertEquals(InsuranceTypeDe.PKV, patient.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.BG, patient.getCoverageInsuranceType());
 
     // change KVNR for TestCases
     val kvnr = "X123456789";

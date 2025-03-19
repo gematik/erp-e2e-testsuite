@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,17 @@ import de.gematik.test.erezept.actions.rawhttpactions.pki.OCSPBodyWrapper;
 import de.gematik.test.erezept.actors.PatientActor;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("OCSP Response Test")
-public class GetOCSPResponseIT extends ErpTest {
+@Tag("PKI")
+class GetOCSPResponseIT extends ErpTest {
 
   private static final String ISSUER_NAME = "GEM.SMCB-CA51 TEST-ONLY";
   private static final String CERT_SERIAL_NR = "206706423598360";
@@ -49,7 +48,6 @@ public class GetOCSPResponseIT extends ErpTest {
   @Actor(name = "Günther Angermänn")
   private PatientActor guenther;
 
-  @SuppressWarnings("unchecked")
   @TestcaseId("ERP_GET_OCSP_RESPONSE_01")
   @Test
   @DisplayName(

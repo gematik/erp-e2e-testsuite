@@ -1,0 +1,422 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-PR-EVDGA-HealthAppRequest" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_PR_EVDGA_HealthAppRequest" />
+  <version value="1.1.1" />
+  <name value="KBV_PR_EVDGA_HealthAppRequest" />
+  <status value="active" />
+  <date value="2025-01-22" />
+  <fhirVersion value="4.0.1" />
+  <kind value="resource" />
+  <abstract value="false" />
+  <type value="DeviceRequest" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/DeviceRequest" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="DeviceRequest">
+      <path value="DeviceRequest" />
+      <constraint>
+        <key value="-evdga-begrenzungDate" />
+        <severity value="error" />
+        <human value="Begrenzung der Datumsangabe auf 10 Zeichen JJJJ-MM-TT" />
+        <expression value="authoredOn.toString().length()=10" />
+      </constraint>
+      <constraint>
+        <key value="-evdga-angabeUnfallbetrieb" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ DeviceRequest enthält keinen Namen des Unfallsbetriebs, dieser ist aber Pflicht falls ein Unfallkennzeichen mit dem Wert &quot;2&quot; angegeben ist." />
+        <expression value="((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code.exists() and (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code='2') implies extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallbetrieb').exists()" />
+      </constraint>
+      <constraint>
+        <key value="-evdga-angabeUnfallbetriebVerbot" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ DeviceRequest enthält einen Namen des Unfallsbetriebs, dieser darf aber nicht angegeben werden, falls ein Unfallkennzeichen mit dem Wert ungleich &quot;2&quot; angegeben ist." />
+        <expression value="((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code.exists() and (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code!='2') implies extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallbetrieb').exists().not()" />
+      </constraint>
+      <constraint>
+        <key value="-evdga-angabeUnfalltag" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ DeviceRequest enthält keinen Unfalltag, dieser ist aber Pflicht falls ein Unfallkennzeichen mit dem Wert &quot;1&quot; oder &quot;2&quot; angegeben ist." />
+        <expression value="((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code.exists() and ((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code = '1' or (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code = '2')) implies extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfalltag').exists()" />
+      </constraint>
+    </element>
+    <element id="DeviceRequest.id">
+      <path value="DeviceRequest.id" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.meta">
+      <path value="DeviceRequest.meta" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.meta.versionId">
+      <path value="DeviceRequest.meta.versionId" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.meta.lastUpdated">
+      <path value="DeviceRequest.meta.lastUpdated" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.meta.source">
+      <path value="DeviceRequest.meta.source" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.meta.profile">
+      <path value="DeviceRequest.meta.profile" />
+      <min value="1" />
+      <max value="1" />
+      <fixedCanonical value="https://fhir.kbv.de/StructureDefinition/KBV_PR_EVDGA_HealthAppRequest|1.1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.meta.security">
+      <path value="DeviceRequest.meta.security" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.meta.tag">
+      <path value="DeviceRequest.meta.tag" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.implicitRules">
+      <path value="DeviceRequest.implicitRules" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.language">
+      <path value="DeviceRequest.language" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.text">
+      <path value="DeviceRequest.text" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.contained">
+      <path value="DeviceRequest.contained" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.extension">
+      <path value="DeviceRequest.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <max value="2" />
+    </element>
+    <element id="DeviceRequest.extension:SER">
+      <path value="DeviceRequest.extension" />
+      <sliceName value="SER" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_EVDGA_SER" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:SER.value[x]">
+      <path value="DeviceRequest.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:SER.value[x]:valueBoolean">
+      <path value="DeviceRequest.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen">
+      <path value="DeviceRequest.extension" />
+      <sliceName value="Unfallinformationen" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension">
+      <path value="DeviceRequest.extension.extension" />
+      <max value="3" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen">
+      <path value="DeviceRequest.extension.extension" />
+      <sliceName value="Unfallkennzeichen" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]">
+      <path value="DeviceRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding">
+      <path value="DeviceRequest.extension.extension.value[x]" />
+      <sliceName value="valueCoding" />
+      <mustSupport value="true" />
+      <binding>
+        <strength value="required" />
+        <valueSet value="https://fhir.kbv.de/ValueSet/KBV_VS_EVDGA_Accident_Type" />
+      </binding>
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding.system">
+      <path value="DeviceRequest.extension.extension.value[x].system" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding.code">
+      <path value="DeviceRequest.extension.extension.value[x].code" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallbetrieb">
+      <path value="DeviceRequest.extension.extension" />
+      <sliceName value="Unfallbetrieb" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallbetrieb.value[x]">
+      <path value="DeviceRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfallbetrieb.value[x]:valueString">
+      <path value="DeviceRequest.extension.extension.value[x]" />
+      <sliceName value="valueString" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfalltag">
+      <path value="DeviceRequest.extension.extension" />
+      <sliceName value="Unfalltag" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfalltag.value[x]">
+      <path value="DeviceRequest.extension.extension.value[x]" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.extension:Unfallinformationen.extension:Unfalltag.value[x]:valueDate">
+      <path value="DeviceRequest.extension.extension.value[x]" />
+      <sliceName value="valueDate" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.identifier">
+      <path value="DeviceRequest.identifier" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.instantiatesCanonical">
+      <path value="DeviceRequest.instantiatesCanonical" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.instantiatesUri">
+      <path value="DeviceRequest.instantiatesUri" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.basedOn">
+      <path value="DeviceRequest.basedOn" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.priorRequest">
+      <path value="DeviceRequest.priorRequest" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.groupIdentifier">
+      <path value="DeviceRequest.groupIdentifier" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.status">
+      <path value="DeviceRequest.status" />
+      <min value="1" />
+      <fixedCode value="active" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.intent">
+      <path value="DeviceRequest.intent" />
+      <fixedCode value="order" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.priority">
+      <path value="DeviceRequest.priority" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.code[x]">
+      <path value="DeviceRequest.code[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept">
+      <path value="DeviceRequest.code[x]" />
+      <sliceName value="codeCodeableConcept" />
+      <min value="1" />
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.coding">
+      <path value="DeviceRequest.code[x].coding" />
+      <min value="1" />
+      <max value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.coding.system">
+      <path value="DeviceRequest.code[x].coding.system" />
+      <min value="1" />
+      <fixedUri value="http://fhir.de/CodeSystem/ifa/pzn" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.coding.version">
+      <path value="DeviceRequest.code[x].coding.version" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.coding.code">
+      <path value="DeviceRequest.code[x].coding.code" />
+      <short value="Pharmazentralnummer (PZN) der DiGA-Verordnungseinheit" />
+      <definition value="Zur Verordnung der DiGA und ihrer spezifischen Verordnungseinheiten durch Arzt oder Psychotherapeut wird jeder DiGA-Verordnungseinheit bei der Aufnahme ins DiGA-Verzeichnis eine eineindeutige 8-stellige numerische Pharmazentralnummer (PZN) zugeordnet, eine Nummer, die den etablierten Standard zur Identifizierung z. B. unterschiedlicher Dosierungen und Packungsgrößen bei Arzneimitteln darstellt.&#xD;&#xA;Die PZN wird zentral von der Informationsstelle für Arzneimittelspezialitäten - IFA GmbH vergeben, die dem BfArM die benötigten PZN zur Zuordnung zu den DiGA-Verordnungseinheiten zur Verfügung stellt, sodass diese zusätzlich zur ID der Verordnungseinheit (DiGA-VE-ID) im Verzeichnis gelistet werden.&#xD;&#xA;Unabhängig vom Verfahren der Datenübertragung in die PVS stellt die PZN damit die für die Verordnung von DiGA relevante Kennnummer dar und DiGA bzw. ihre einzelnen Verordnungseinheiten können unter Nutzung der im Verzeichnis gelisteten und sukzessive in den PVS angezeigten PZN verordnet werden." />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.coding.display">
+      <path value="DeviceRequest.code[x].coding.display" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.coding.userSelected">
+      <path value="DeviceRequest.code[x].coding.userSelected" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.code[x]:codeCodeableConcept.text">
+      <path value="DeviceRequest.code[x].text" />
+      <short value="Bezeichnung der DiGA-Verordnungseinheit" />
+      <definition value="Unterschiedliche Verordnungseinheiten derselben DiGA erhalten im DiGA-Verzeichnis eine spezifische Bezeichnung, aus der erkenntlich ist, dass es sich um eine bestimmte Verordnungseinheit einer bestimmten, im Verzeichnis gelisteten DiGA handelt. Gemäß § 20 Absatz 1 DiGAV listet das BfArM in seinem Verzeichnis nach § 139e SGB V die nach § 33a Absatz 1 SGB V in der GKV erstattungsfähigen DiGA. Die Listung im Verzeichnis umfasst dabei sowohl die Bezeichnung der DiGA-Verordnungseinheit als auch die DiGA-VE-ID und die PZN. Zur unmittelbaren elektronischen Bereitstellung der verordnungsrelevanten Daten für die PVS stellt das BfArM eine entsprechende Schnittstelle (DiGA-API) bereit. Die etablierte Datenlieferweg über die IFA wird ebenfalls weiter genutzt." />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.parameter">
+      <path value="DeviceRequest.parameter" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.subject">
+      <path value="DeviceRequest.subject" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.1" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.subject.reference">
+      <path value="DeviceRequest.subject.reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.subject.type">
+      <path value="DeviceRequest.subject.type" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.subject.identifier">
+      <path value="DeviceRequest.subject.identifier" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.subject.display">
+      <path value="DeviceRequest.subject.display" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.encounter">
+      <path value="DeviceRequest.encounter" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.occurrence[x]">
+      <path value="DeviceRequest.occurrence[x]" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.authoredOn">
+      <path value="DeviceRequest.authoredOn" />
+      <short value="Ausstellungsdatum" />
+      <definition value="Das Ausstellungsdatum der Verordnung" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.requester">
+      <path value="DeviceRequest.requester" />
+      <min value="1" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner|1.1" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.requester.reference">
+      <path value="DeviceRequest.requester.reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.requester.type">
+      <path value="DeviceRequest.requester.type" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.requester.identifier">
+      <path value="DeviceRequest.requester.identifier" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.requester.display">
+      <path value="DeviceRequest.requester.display" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.performerType">
+      <path value="DeviceRequest.performerType" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.performer">
+      <path value="DeviceRequest.performer" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.reasonCode">
+      <path value="DeviceRequest.reasonCode" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.reasonReference">
+      <path value="DeviceRequest.reasonReference" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.insurance">
+      <path value="DeviceRequest.insurance" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage|1.1" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.insurance.reference">
+      <path value="DeviceRequest.insurance.reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="DeviceRequest.insurance.type">
+      <path value="DeviceRequest.insurance.type" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.insurance.identifier">
+      <path value="DeviceRequest.insurance.identifier" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.insurance.display">
+      <path value="DeviceRequest.insurance.display" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.supportingInfo">
+      <path value="DeviceRequest.supportingInfo" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.note">
+      <path value="DeviceRequest.note" />
+      <max value="0" />
+    </element>
+    <element id="DeviceRequest.relevantHistory">
+      <path value="DeviceRequest.relevantHistory" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

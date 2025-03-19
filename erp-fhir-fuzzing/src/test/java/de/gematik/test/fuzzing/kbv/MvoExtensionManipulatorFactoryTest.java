@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,20 @@
 
 package de.gematik.test.fuzzing.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -32,7 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class MvoExtensionManipulatorFactoryTest {
+class MvoExtensionManipulatorFactoryTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowOnConstructorCall() throws NoSuchMethodException {
@@ -55,12 +62,11 @@ class MvoExtensionManipulatorFactoryTest {
     manipulators.forEach(
         m -> {
           val patient =
-              PatientFaker.builder()
-                  .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+              KbvPatientFaker.builder()
+                  .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
                   .fake();
-          val coverage =
-              KbvCoverageFaker.builder().withInsuranceType(VersicherungsArtDeBasis.GKV).fake();
-          val practitioner = PractitionerFaker.builder().fake();
+          val coverage = KbvCoverageFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).fake();
+          val practitioner = KbvPractitionerFaker.builder().fake();
           val medication =
               KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 

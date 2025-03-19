@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.client.exceptions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import javax.annotation.Nullable;
 import lombok.val;
 import org.hl7.fhir.r4.model.OperationOutcome;
@@ -52,6 +52,6 @@ public class UnexpectedResponseResourceError extends AssertionError {
       Class<? extends Resource> expected, OperationOutcome operationOutcome) {
     return format(
         "Request expected Response of type {0} but received OperationOutcome: {1}",
-        expected.getSimpleName(), OperationOutcomeWrapper.from(operationOutcome));
+        expected.getSimpleName(), OperationOutcomeExtractor.extractFrom(operationOutcome));
   }
 }

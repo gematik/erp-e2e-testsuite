@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,33 +17,44 @@
 package de.gematik.test.erezept.fhir.parser.profiles;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.support.IValidationSupport;
-import ca.uhn.fhir.validation.FhirValidator;
-import de.gematik.test.erezept.fhir.parser.ErrorMessageFilter;
-import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
-import de.gematik.test.erezept.fhir.parser.profiles.cfg.ProfilesIndex;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseDiGA;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import java.util.*;
-import java.util.stream.Collectors;
-import lombok.SneakyThrows;
+import de.gematik.bbriccs.fhir.codec.ResourceTypeHint;
+import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
+import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
+import de.gematik.bbriccs.fhir.validation.ValidatorFhirFactory;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItvEvdgaStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitionerRole;
+import java.util.List;
+import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.common.hapi.validation.support.InMemoryTerminologyServerValidationSupport;
-import org.hl7.fhir.common.hapi.validation.support.SnapshotGeneratingValidationSupport;
-import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
-import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
 import org.hl7.fhir.r4.model.Configuration;
-import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 public class ProfileFhirParserFactory {
@@ -53,56 +64,100 @@ public class ProfileFhirParserFactory {
     Locale.setDefault(new Locale("en", "DE"));
   }
 
-  private static final Map<CustomProfiles, List<TypeHint<?, ?>>> TYPE_HINTS =
-      Map.of(
-          CustomProfiles.KBV_ITA_ERP,
-          List.of(
-              new TypeHint<>(KbvItaErpStructDef.BUNDLE, KbvErpBundle.class),
-              new TypeHint<>(KbvItaErpStructDef.PRESCRIPTION, KbvErpMedicationRequest.class),
-              new TypeHint<>(KbvItaErpStructDef.MEDICATION_PZN, KbvErpMedication.class)),
-          CustomProfiles.KBV_ITA_FOR,
-          List.of(
-              new TypeHint<>(KbvItaForStructDef.PRACTITIONER, KbvPractitioner.class),
-              new TypeHint<>(KbvItaForStructDef.PRACTITIONER_ROLE, KbvPractitionerRole.class),
-              new TypeHint<>(KbvItaForStructDef.ORGANIZATION, MedicalOrganization.class),
-              new TypeHint<>(KbvItaForStructDef.COVERAGE, KbvCoverage.class),
-              new TypeHint<>(KbvItaForStructDef.PATIENT, KbvPatient.class)),
-          CustomProfiles.KBV_ITV_EVDGA,
-          List.of(
-              new TypeHint<>(KbvItvEvdgaStructDef.BUNDLE, KbvEvdgaBundle.class),
-              new TypeHint<>(KbvItvEvdgaStructDef.HEALTH_APP_REQUEST, KbvHealthAppRequest.class)),
-          CustomProfiles.GEM_PATIENTENRECHNUNG,
-          List.of(
-              new TypeHint<>(PatientenrechnungStructDef.CHARGE_ITEM, ErxChargeItem.class),
-              new TypeHint<>(
-                  PatientenrechnungStructDef.COM_CHARGE_CHANGE_REPLY, ErxCommunication.class),
-              new TypeHint<>(
-                  PatientenrechnungStructDef.COM_CHARGE_CHANGE_REQ, ErxCommunication.class)),
-          CustomProfiles.GEM_ERP_WORKFLOW,
-          List.of(
-              new TypeHint<>(ErpWorkflowStructDef.TASK, ErxTask.class),
-              new TypeHint<>(ErpWorkflowStructDef.TASK_12, ErxTask.class),
-              new TypeHint<>(ErpWorkflowStructDef.AUDIT_EVENT, ErxAuditEvent.class),
-              new TypeHint<>(ErpWorkflowStructDef.CHARGE_ITEM, ErxChargeItem.class),
-              new TypeHint<>(ErpWorkflowStructDef.MEDICATION, GemErpMedication.class),
-              new TypeHint<>(ErpWorkflowStructDef.MEDICATION_DISPENSE, ErxMedicationDispense.class),
-              new TypeHint<>(
-                  ErpWorkflowStructDef.MEDICATION_DISPENSE_12, ErxMedicationDispense.class),
-              new TypeHint<>(
-                  ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA, ErxMedicationDispenseDiGA.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_DISP_REQ, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_DISP_REQ_12, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_INFO_REQ, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_INFO_REQ_12, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_REPLY, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_REPLY_12, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_REPRESENTATIVE, ErxCommunication.class),
-              new TypeHint<>(ErpWorkflowStructDef.COM_REPRESENTATIVE_12, ErxCommunication.class)),
-          CustomProfiles.ABDA_ERP_ABGABE_PKV,
-          List.of(
-              new TypeHint<>(AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ, DavAbgabedatenBundle.class)));
+  public static final String ERP_FHIR_PROFILES_CONFIG = "fhir/erp-configuration.yaml";
+  public static final String ERP_FHIR_PROFILES_TOGGLE = "erp.fhir.profile";
 
-  private static List<FhirProfiledValidator> profiledParsers;
+  private static final List<ResourceTypeHint<?, ?>> resourceTypeHints =
+      List.of(
+          ResourceTypeHint.forStructure(KbvItaErpStructDef.BUNDLE)
+              .forAllVersionsFrom(KbvItaErpVersion.class)
+              .mappingTo(KbvErpBundle.class),
+          ResourceTypeHint.forStructure(KbvItaErpStructDef.PRESCRIPTION)
+              .forAllVersionsFrom(KbvItaErpVersion.class)
+              .mappingTo(KbvErpMedicationRequest.class),
+          ResourceTypeHint.forStructure(KbvItaErpStructDef.MEDICATION_PZN)
+              .forAllVersionsFrom(KbvItaErpVersion.class)
+              .mappingTo(KbvErpMedication.class),
+          ResourceTypeHint.forStructure(KbvItvEvdgaStructDef.BUNDLE)
+              .forAllVersionsFrom(KbvItvEvdgaVersion.class)
+              .mappingTo(KbvEvdgaBundle.class),
+          ResourceTypeHint.forStructure(KbvItaForStructDef.PRACTITIONER)
+              .forAllVersionsFrom(KbvItaForVersion.class)
+              .mappingTo(KbvPractitioner.class),
+          ResourceTypeHint.forStructure(KbvItaForStructDef.PRACTITIONER_ROLE)
+              .forAllVersionsFrom(KbvItaForVersion.class)
+              .mappingTo(KbvPractitionerRole.class),
+          ResourceTypeHint.forStructure(KbvItaForStructDef.ORGANIZATION)
+              .forAllVersionsFrom(KbvItaForVersion.class)
+              .mappingTo(KbvMedicalOrganization.class),
+          ResourceTypeHint.forStructure(KbvItaForStructDef.COVERAGE)
+              .forAllVersionsFrom(KbvItaForVersion.class)
+              .mappingTo(KbvCoverage.class),
+          ResourceTypeHint.forStructure(KbvItaForStructDef.PATIENT)
+              .forAllVersionsFrom(KbvItaForVersion.class)
+              .mappingTo(KbvPatient.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.TASK)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxTask.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.TASK_12)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxTask.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.AUDIT_EVENT)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxAuditEvent.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.CHARGE_ITEM)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxChargeItem.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(GemErpMedication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION_DISPENSE)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxMedicationDispense.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION_DISPENSE_12)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxMedicationDispense.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxMedicationDispenseDiGA.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_DISP_REQ)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_DISP_REQ_12)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_INFO_REQ)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_INFO_REQ_12)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_REPLY)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_REPLY_12)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_REPRESENTATIVE)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_REPRESENTATIVE_12)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(PatientenrechnungStructDef.CHARGE_ITEM)
+              .forAllVersionsFrom(PatientenrechnungVersion.class)
+              .mappingTo(ErxChargeItem.class),
+          ResourceTypeHint.forStructure(PatientenrechnungStructDef.COM_CHARGE_CHANGE_REPLY)
+              .forAllVersionsFrom(PatientenrechnungVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(PatientenrechnungStructDef.COM_CHARGE_CHANGE_REQ)
+              .forAllVersionsFrom(PatientenrechnungVersion.class)
+              .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ)
+              .forAllVersionsFrom(AbdaErpPkvVersion.class)
+              .mappingTo(DavPkvAbgabedatenBundle.class));
+
+  private static ValidatorFhir profiledValidator;
 
   private ProfileFhirParserFactory() {
     throw new IllegalStateException("Utility class");
@@ -111,108 +166,25 @@ public class ProfileFhirParserFactory {
   public static FhirContext createDecoderContext() {
     val ctx = FhirContext.forR4();
 
-    // register the type hints to the FhirContext
-    TYPE_HINTS.forEach((profile, hints) -> hints.forEach(th -> th.register(ctx, profile)));
+    resourceTypeHints.forEach(th -> th.register(ctx));
     return ctx;
   }
 
-  public static FhirValidator createGenericFhirValidator(FhirContext ctx) {
-    val validator = ctx.newValidator();
-    val validationSupports = new ArrayList<IValidationSupport>();
-    validationSupports.add(ctx.getValidationSupport());
-    validationSupports.add(new InMemoryTerminologyServerValidationSupport(ctx));
-    validationSupports.add(new SnapshotGeneratingValidationSupport(ctx));
-
-    // configure the HAPI FhirParser
-    val fiv = new FhirInstanceValidator(ctx);
-    val validationSupportChain =
-        new ValidationSupportChain(validationSupports.toArray(IValidationSupport[]::new));
-
-    fiv.setValidationSupport(validationSupportChain);
-    fiv.setErrorForUnknownProfiles(false);
-    fiv.setNoTerminologyChecks(true);
-    fiv.setNoExtensibleWarnings(true);
-    fiv.setAnyExtensionsAllowed(true);
-
-    validator.registerValidatorModule(fiv);
-
-    val parserConfigurations = ParserConfigurations.getInstance();
-    val filter =
-        parserConfigurations.getProfileSettings().stream()
-            .flatMap(cfg -> cfg.getErrorFilter().stream())
-            .distinct()
-            .collect(Collectors.toList());
-
-    // the generic validator does not know any profiles!
-    filter.add("^Profile reference '.*' has not been checked because it is unknown$");
-    filter.add("^Unknown extension .*");
-
-    validator.registerValidatorModule(new ErrorMessageFilter(filter));
-    return validator;
-  }
-
-  public static List<FhirProfiledValidator> getProfiledValidators() {
-    if (profiledParsers == null) {
-      profiledParsers = createProfiledValidators();
+  public static ValidatorFhir getProfiledValidators() {
+    if (profiledValidator == null) {
+      profiledValidator = createProfiledValidators();
     }
 
-    return profiledParsers;
+    return profiledValidator;
   }
 
-  @SneakyThrows
-  private static List<FhirProfiledValidator> createProfiledValidators() {
-    val profilesIndex = ProfilesIndex.getInstance();
-    val parserConfigurations = ParserConfigurations.getInstance();
-
+  private static ValidatorFhir createProfiledValidators() {
     Configuration.setAcceptInvalidEnums(true); // can be made configurable if required
 
-    val parsers = new LinkedList<FhirProfiledValidator>();
-    parserConfigurations
-        .getProfileSettings()
-        .forEach(
-            parserCfg -> {
-              val ctx = FhirContext.forR4();
-              val supports =
-                  parserCfg.getProfiles().stream()
-                      .map(profile -> profilesIndex.getProfile(profile.getVersionedProfile()))
-                      .map(
-                          profileSourceDto ->
-                              (IValidationSupport)
-                                  new ValidationSupport(
-                                      profileSourceDto.getVersionedProfile(),
-                                      profileSourceDto.getFiles(),
-                                      ctx))
-                      .toList();
-              parsers.add(new FhirProfiledValidator(parserCfg, ctx, supports));
-            });
+    val erpConfigurator =
+        ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
 
-    return parsers;
-  }
-
-  private record TypeHint<T extends ProfileVersion<T>, R extends Resource>(
-      IStructureDefinition<T> definition, Class<R> mappingClass) {
-
-    @SuppressWarnings("unchecked")
-    private void register(FhirContext ctx, CustomProfiles profile) {
-      // register to the default StructureDefinition without any version
-      ctx.setDefaultTypeForProfile(definition.getCanonicalUrl(), mappingClass);
-
-      // get the corresponding enum class holding all available version for this profile
-      val versionEnumClass = profile.getVersionClass();
-
-      // register each available version
-      Arrays.stream(versionEnumClass.getEnumConstants())
-          .forEach(
-              version -> {
-                // register StructureDefinition with full SemVer e.g. http://my.profile|1.2.3
-                ctx.setDefaultTypeForProfile(
-                    definition.getVersionedUrl((T) version, false), mappingClass);
-
-                // register StructureDefinition with cropped Patch from SemVer e.g.
-                // http://my.profile|1.2
-                ctx.setDefaultTypeForProfile(
-                    definition.getVersionedUrl((T) version, true), mappingClass);
-              });
-    }
+    return ValidatorFhirFactory.createValidator(
+        FhirContext.forR4(), erpConfigurator.getProfileConfigurations());
   }
 }

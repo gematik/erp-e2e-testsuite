@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
 @SuppressWarnings({"java:S1192"})
-public enum ZusatzattributGruppe implements IValueSet {
+public enum ZusatzattributGruppe implements FromValueSet {
   MARKT("1", "Markt", "Pflichtangabe bei Fertigarzneimitteln"),
   RABATT("2", "Rabattvertragserfüllung", "Pflichtangabe bei Fertigarzneimitteln"),
   FAM("3", "Preisgünstiges FAM", "Pflichtangabe bei Fertigarzneimitteln"),
@@ -54,9 +53,7 @@ public enum ZusatzattributGruppe implements IValueSet {
   ;
 
   public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.ZUSATZATTRIBUTE_GRUPPE;
-  public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "Group of additional attributes";
-  public static final String PUBLISHER = "DAV";
 
   private final String code;
   private final String display;
@@ -71,7 +68,7 @@ public enum ZusatzattributGruppe implements IValueSet {
     return CODE_SYSTEM;
   }
 
-  public static ZusatzattributGruppe fromCode(@NonNull String code) {
+  public static ZusatzattributGruppe fromCode(String code) {
     return Arrays.stream(ZusatzattributGruppe.values())
         .filter(zag -> zag.code.equals(code))
         .findFirst()

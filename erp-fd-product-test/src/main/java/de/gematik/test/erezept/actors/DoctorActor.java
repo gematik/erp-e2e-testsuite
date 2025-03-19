@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 package de.gematik.test.erezept.actors;
 
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -37,14 +40,14 @@ public class DoctorActor extends ErpActor {
     return baseData.getPractitioner();
   }
 
+  public KbvMedicalOrganization getMedicalOrganization() {
+    val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
+    return baseData.getMedicalOrganization();
+  }
+
   public String getHbaTelematikId() {
     val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
     return baseData.getHbaTelematikId();
-  }
-
-  public MedicalOrganization getMedicalOrganization() {
-    val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
-    return baseData.getMedicalOrganization();
   }
 
   public void changeQualificationType(QualificationType type) {
@@ -53,5 +56,17 @@ public class DoctorActor extends ErpActor {
     if (type != QualificationType.MIDWIFE) {
       bd.setDoctorNumber(BaseANR.randomFromQualification(type));
     }
+  }
+
+  public ErxTask prescribeFor(PatientActor patient) {
+    return prescribeFor(patient, PrescriptionAssignmentKind.PHARMACY_ONLY);
+  }
+
+  public ErxTask prescribeFor(PatientActor patient, PrescriptionAssignmentKind assignmentKind) {
+    return this.performs(
+            IssuePrescription.forPatient(patient)
+                .ofAssignmentKind(assignmentKind)
+                .withRandomKbvBundle())
+        .getExpectedResponse();
   }
 }

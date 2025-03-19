@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.eml.fhir.values;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EmlNamingSystem;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationNamingSystem;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class RxPrescriptionIdTest {
   void shouldBuildFromStringCorrect() {
     val value = "testValue";
     val rxPrescId = RxPrescriptionId.from(value);
-    assertEquals(EmlNamingSystem.RX_PRESCRIPTION_ID, rxPrescId.getSystem());
+    assertEquals(EpaMedicationNamingSystem.RX_PRESCRIPTION_ID, rxPrescId.getSystem());
     assertEquals(value, rxPrescId.getValue());
   }
 }

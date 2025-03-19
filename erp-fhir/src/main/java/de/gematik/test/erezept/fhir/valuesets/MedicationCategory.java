@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
@@ -32,7 +33,7 @@ import org.hl7.fhir.r4.model.Extension;
  * <b>Published:</b> 2022-09-30 <br>
  */
 @Getter
-public enum MedicationCategory implements IValueSet {
+public enum MedicationCategory implements FromValueSet {
   C_00(
       "00", "Arzneimittel oder in die Arzneimittelversorgung nach § 31 SGB V einbezogenes Produkt"),
   C_01("01", "BtM"),
@@ -66,10 +67,10 @@ public enum MedicationCategory implements IValueSet {
     return new Extension(KbvItaErpStructDef.MEDICATION_CATEGORY.getCanonicalUrl(), this.asCoding());
   }
 
-  public static MedicationCategory fromCode(String coding) {
+  public static MedicationCategory fromCode(String code) {
     return Arrays.stream(MedicationCategory.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(mc -> mc.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(MedicationCategory.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(MedicationCategory.class, code));
   }
 }

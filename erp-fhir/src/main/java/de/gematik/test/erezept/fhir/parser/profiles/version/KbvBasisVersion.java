@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import java.time.LocalDate;
 import java.time.Month;
 import lombok.Getter;
@@ -24,20 +25,26 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum KbvBasisVersion implements ProfileVersion<KbvBasisVersion> {
-  /*
-  Note: validFromDate and validUntilDate are only required to distinguish the proper Version via current date.
-  This won't be needed for this profile thus valid throughout the whole time
-   */
+public enum KbvBasisVersion implements ProfileVersion {
   V1_1_3("1.1.3", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2070, Month.DECEMBER, 31)),
   V1_3_0("1.3.0", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2070, Month.DECEMBER, 31));
 
+  public static final String PROFILE_NAME = "kbv.basis";
   private final String version;
   private final LocalDate validFromDate;
   private final LocalDate validUntilDate;
-  private final CustomProfiles customProfile = CustomProfiles.KBV_BASIS;
+
+  @Override
+  public boolean omitZeroPatch() {
+    return false;
+  }
+
+  @Override
+  public String getName() {
+    return PROFILE_NAME;
+  }
 
   public static KbvBasisVersion getDefaultVersion() {
-    return ProfileVersion.getDefaultVersion(KbvBasisVersion.class, CustomProfiles.KBV_BASIS);
+    return VersionUtil.getDefaultVersion(KbvBasisVersion.class, PROFILE_NAME);
   }
 }

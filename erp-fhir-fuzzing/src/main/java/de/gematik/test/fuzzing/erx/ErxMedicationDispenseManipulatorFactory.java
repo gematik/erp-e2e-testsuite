@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package de.gematik.test.fuzzing.erx;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.time.LocalDateTime;
@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.DateTimeType;
 
@@ -56,13 +57,11 @@ public class ErxMedicationDispenseManipulatorFactory {
             "Set WhenPrepared DateTime after WhenHandedOver",
             dispense -> {
               // Get the current WhenHandedOver date
-              Date whenHandedOver = dispense.getWhenHandedOver();
-              if (whenHandedOver == null) {
-                // Default to current date if WhenHandedOver is not set
-                whenHandedOver = getCurrentDateTime();
-              }
+              val whenHandedOver =
+                  Optional.ofNullable(dispense.getWhenHandedOver()).orElse(getCurrentDateTime());
+
               // Set WhenPrepared to a date after WhenHandedOver
-              Date whenPrepared =
+              val whenPrepared =
                   Date.from(whenHandedOver.toInstant().plusSeconds(60 * 60 * 24)); // Add 1 day
               dispense.setWhenPreparedElement(new DateTimeType(whenPrepared));
             }));

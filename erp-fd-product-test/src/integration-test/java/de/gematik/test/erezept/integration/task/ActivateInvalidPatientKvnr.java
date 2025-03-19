@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.integration.task;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -30,7 +31,6 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.stream.Stream;
@@ -101,11 +101,7 @@ public class ActivateInvalidPatientKvnr extends ErpTest {
             "ein 'C' an 5. Stelle ist",
             KbvProfileRules.KVNR_VALIDATION,
             "FHIR-Validation error")
-        .multiply(
-            List.of(
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV,
-                VersicherungsArtDeBasis.BG))
+        .multiply(List.of(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV, InsuranceTypeDe.BG))
         .multiply(PrescriptionAssignmentKind.class)
         .create();
   }
@@ -120,7 +116,7 @@ public class ActivateInvalidPatientKvnr extends ErpTest {
   @MethodSource("baseKVNRComposer")
   void activateInvalidPatientInBundle(
       PrescriptionAssignmentKind assignmentKind,
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       String kvnr,
       String declaration,
       RequirementsSet requirementsSet,

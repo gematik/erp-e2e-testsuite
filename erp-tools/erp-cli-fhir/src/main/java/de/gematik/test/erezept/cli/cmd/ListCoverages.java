@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
@@ -33,10 +33,10 @@ public class ListCoverages implements Callable<Integer> {
   @CommandLine.Option(
       names = {"--coverage-type", "--insurance-type", "--type"},
       paramLabel = "<TYPE>",
-      type = VersicherungsArtDeBasis.class,
+      type = InsuranceTypeDe.class,
       description =
           "The Type of the Insurance from ${COMPLETION-CANDIDATES} for the Coverage-Section")
-  private VersicherungsArtDeBasis insuranceType;
+  private InsuranceTypeDe insuranceType;
 
   @Override
   public Integer call() throws Exception {

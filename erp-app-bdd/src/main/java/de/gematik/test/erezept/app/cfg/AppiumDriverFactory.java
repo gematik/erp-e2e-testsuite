@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.app.cfg;
 
 import static java.text.MessageFormat.format;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.app.abilities.UseAndroidApp;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
@@ -27,13 +28,17 @@ import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import java.net.URL;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.http.ClientConfig;
 
 @Slf4j
@@ -61,27 +66,46 @@ public class AppiumDriverFactory {
               userName, userDeviceConfig.getName()));
     }
 
-    val capsBuilder =
-        DesiredCapabilitiesBuilder.initForScenario(scenarioName)
-            .app(appConfig, appiumConfig.getProvisioningProfilePostfix())
-            .device(userDeviceConfig)
-            .appium(appiumConfig);
-    val caps = capsBuilder.create();
+    // build default
+    val bundleIdCapability =
+        appConfig.getPackageName() + appiumConfig.getProvisioningProfilePostfix();
+    val appPathCapability =
+        Optional.ofNullable(appConfig.getAppFile())
+            .orElseGet(() -> format("cloud:{0}", appConfig.getPackageName()));
+    val xcuiTestOptions =
+        new XCUITestOptions()
+            .setUdid(userDeviceConfig.getUdid())
+            .setBundleId(bundleIdCapability)
+            .setApp(appPathCapability)
+            .setEnforceAppInstall(userDeviceConfig.isEnforceInstall())
+            .setFullReset(userDeviceConfig.isFullReset())
+            .setNoReset(false)
+            .setAutoDismissAlerts(false); // could we set this to true?
+
+    val vendorOptions = new HashMap<String, String>();
+    vendorOptions.put("appiumVersion", appiumConfig.getVersion());
+    vendorOptions.put("accessKey", appiumConfig.getAccessKey());
+    vendorOptions.put("testName", scenarioName);
+
+    xcuiTestOptions.setCapability("digitalai:options", vendorOptions);
 
     if (config.shouldLogCapabilityStatement()) {
-      val json = capsBuilder.asJson();
+      val json =
+          new ObjectMapper()
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(xcuiTestOptions.toJson());
       log.info(
-          format(
-              "DesiredCapabilities for {0} ({1}) running on {2}\n{3}",
-              userDeviceConfig.getName(),
-              userDeviceConfig.getPlatform(),
-              userDeviceConfig.getAppium(),
-              json));
+          "DesiredCapabilities for {} ({}) running on {}\n{}",
+          userDeviceConfig.getName(),
+          userDeviceConfig.getPlatform(),
+          userDeviceConfig.getAppium(),
+          json);
     }
 
-    log.info(
-        format("Create AppiumDriver for Platform {0} at {1}", platform, appiumConfig.getUrl()));
+    log.info("Create AppiumDriver for Platform {} at {}", platform, appiumConfig.getUrl());
     if (platform == PlatformType.ANDROID) {
+      // TODO: not implemented yed to Android
+      val caps = new DesiredCapabilities();
       val driver = new AndroidDriver(new URL(appiumConfig.getUrl()), caps);
       driver.setSetting("driver", "compose");
       return (UseTheApp<T>) new UseAndroidApp(driver, appiumConfig);
@@ -92,11 +116,11 @@ public class AppiumDriverFactory {
               .connectionTimeout(Duration.ofMinutes(3))
               .readTimeout(Duration.ofMinutes(10))
               .withRetries();
-      val driver = connectDriver(() -> new IOSDriver(clientConfig, caps));
+      val driver = connectDriver(() -> new IOSDriver(clientConfig, xcuiTestOptions));
       log.info("Driver connected for XCUITest");
       return (UseTheApp<T>) new UseIOSApp(driver, appiumConfig);
     } else {
-      log.error(format("Given Platform {0} not yet supported", platform));
+      log.error("Given Platform {} not yet supported", platform);
       throw new UnsupportedPlatformException(platform);
     }
   }
@@ -117,6 +141,9 @@ public class AppiumDriverFactory {
     } while (currentTry < maxRetries);
 
     throw new SessionNotCreatedException(
-        format("Failed to create driver session after {0} attempts", maxRetries), lastException);
+        format(
+            "Failed to create driver session after {0} attempts with {1}",
+            maxRetries, lastException.getMessage()),
+        lastException);
   }
 }

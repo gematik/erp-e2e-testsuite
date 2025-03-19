@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,25 @@
 
 package de.gematik.test.erezept.pspwsclient;
 
-import static java.text.MessageFormat.format;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.pspwsclient.dataobjects.PspMessage;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +79,7 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
     val proxyAddress = System.getProperty(SYS_VAR_PROXY_HOST);
     val proxyPort = Integer.parseInt(System.getProperty(SYS_VAR_PROXY_PORT, "3128"));
     if (proxyAddress != null) {
-      log.info("proxy was set to address: " + proxyAddress + ":" + proxyPort);
+      log.info("proxy was set to address: {}:{}", proxyAddress, proxyPort);
       this.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, proxyPort)));
     }
   }
@@ -200,7 +207,7 @@ public class PharmaServiceProviderWSClient extends org.java_websocket.client.Web
     // save current time plus WAITING_TIME_IN_MILLIS
     final long finishTime = System.currentTimeMillis() + WAITING_TIME_IN_MILLIS * 5;
     while (!this.isConnected() && System.currentTimeMillis() <= finishTime) {
-      log.info(format("wait for isNotConnected()... iterations in {0} sec.", x));
+      log.info("wait for isNotConnected()... iterations in {} sec.", x);
       Thread.currentThread().join(500);
       x = x + 0.5;
     }

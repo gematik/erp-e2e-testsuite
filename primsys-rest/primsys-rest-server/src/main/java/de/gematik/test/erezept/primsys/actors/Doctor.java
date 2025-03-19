@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvBaseBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvBaseBundle;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.primsys.data.actors.DoctorDto;
 import de.gematik.test.konnektor.Konnektor;
@@ -32,8 +32,6 @@ import lombok.val;
 
 public class Doctor extends BaseActor {
 
-  private final Konnektor konnektor;
-
   @Getter private final Hba hba;
   private final CardInfo hbaHandle;
 
@@ -42,9 +40,8 @@ public class Doctor extends BaseActor {
       EnvironmentConfiguration env,
       Konnektor konnektor,
       SmartcardArchive sca) {
-    super(cfg, env, sca);
+    super(cfg, env, konnektor, sca);
 
-    this.konnektor = konnektor;
     this.hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
     this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package de.gematik.test.erezept.fhir.anonymizer;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 import lombok.val;
@@ -33,7 +33,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class AnonymizerFacadeTest extends ParsingTest {
+class AnonymizerFacadeTest extends ErpFhirParsingTest {
 
   @ParameterizedTest
   @MethodSource
@@ -76,11 +76,7 @@ class AnonymizerFacadeTest extends ParsingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "fhir/valid/kbv/1.0.2/bundle/sdf6s75f-d959-43f0-8ac4-sd6f7sd6.xml",
-        "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"
-      })
+  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"})
   void shouldAnonymizePatient(String path) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
@@ -106,7 +102,7 @@ class AnonymizerFacadeTest extends ParsingTest {
     val anonymizedKvnr = patient.getKvnr();
     assertNotEquals(originalKvnr.getValue(), anonymizedKvnr.getValue());
     assertEquals(originalKvnr.getValue().length(), anonymizedKvnr.getValue().length());
-    assertEquals(originalKvnr.getSystemAsString(), anonymizedKvnr.getSystemAsString());
+    assertEquals(originalKvnr.getSystemUrl(), anonymizedKvnr.getSystemUrl());
   }
 
   @ParameterizedTest
