@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -40,7 +38,6 @@ public class ResponseOfRejectOperation extends FhirResponseQuestion<Resource> {
   private final Map<String, String> replacementMap;
 
   private ResponseOfRejectOperation(DequeStrategy deque, Map<String, String> replacementMap) {
-    super("Task/$reject");
     this.deque = deque;
     this.replacementMap = replacementMap;
   }
@@ -61,7 +58,7 @@ public class ResponseOfRejectOperation extends FhirResponseQuestion<Resource> {
     var secret = acceptBundle.getSecret();
     val replacementSecret = this.replacementMap.get("secret");
     if (replacementSecret != null) {
-      log.info(format("Found a replacement secret for $abort: {0}", replacementSecret));
+      log.info("Found a replacement secret for $abort: {}", replacementSecret);
       secret = new Secret(replacementSecret);
     }
     return secret;

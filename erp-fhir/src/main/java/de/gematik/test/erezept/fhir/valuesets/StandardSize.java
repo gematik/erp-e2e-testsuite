@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
-import org.hl7.fhir.r4.model.CodeType;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
 
-/** https://applications.kbv.de/S_KBV_NORMGROESSE_V1.00.xhtml */
+/** <a href="https://applications.kbv.de/S_KBV_NORMGROESSE_V1.00.xhtml">Normgröße</a> */
 @Getter
-public enum StandardSize implements IValueSet {
+@RequiredArgsConstructor
+public enum StandardSize implements FromValueSet {
   KA("KA", "Kein Angabe"),
   KTP("KTP", "Keine therapiegerechte Packungsgröße"),
   N1("N1", "Normgröße 1"),
@@ -36,35 +37,24 @@ public enum StandardSize implements IValueSet {
   NB("NB", "Nicht betroffen"),
   SONSTIGES("Sonstiges", "Sonstiges");
 
-  public static final DeBasisCodeSystem CODE_SYSTEM = DeBasisCodeSystem.NORMGROESSE;
-  public static final String VERSION = "1.00";
-  public static final String DESCRIPTION =
-      "Bildet die zulässigen Normgrößen im Rahmen der elektronischen Arzneimittelverordnung ab.";
-  public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
+  public static final DeBasisProfilCodeSystem CODE_SYSTEM = DeBasisProfilCodeSystem.NORMGROESSE;
 
   private final String code;
   private final String display;
-  private final String definition = "N/A definition in profile";
-
-  StandardSize(String code, String display) {
-    this.code = code;
-    this.display = display;
-  }
 
   @Override
-  public DeBasisCodeSystem getCodeSystem() {
+  public DeBasisProfilCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
   public Extension asExtension() {
-    return new Extension(
-        DeBasisStructDef.NORMGROESSE.getCanonicalUrl(), new CodeType(this.getCode()));
+    return DeBasisProfilStructDef.NORMGROESSE.asCodeExtension(this.getCode());
   }
 
-  public static StandardSize fromCode(@NonNull String coding) {
+  public static StandardSize fromCode(String code) {
     return Arrays.stream(StandardSize.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(size -> size.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(StandardSize.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(StandardSize.class, code));
   }
 }

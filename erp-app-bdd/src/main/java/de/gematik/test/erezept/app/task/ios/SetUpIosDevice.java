@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
@@ -25,7 +26,6 @@ import de.gematik.test.erezept.app.task.ChangeTheEnvironment;
 import de.gematik.test.erezept.app.task.CreateNewProfile;
 import de.gematik.test.erezept.app.task.NavigateThroughCardwall;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import net.serenitybdd.screenplay.Task;
 public class SetUpIosDevice implements Task {
 
   private final EnvironmentConfiguration environment;
-  private final VersicherungsArtDeBasis insuranceKind;
+  private final InsuranceTypeDe insuranceKind;
   private final SmartcardArchive sca;
 
   @Override

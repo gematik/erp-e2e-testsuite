@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import de.gematik.test.erezept.screenplay.questions.HasDownloadableOpenTask;
 import de.gematik.test.erezept.screenplay.questions.HasRetrieved;
 import de.gematik.test.erezept.screenplay.questions.RetrieveExamEvidence;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
@@ -35,40 +33,22 @@ import net.serenitybdd.screenplay.ensure.Ensure;
 public class EgkInPharmacySteps {
 
   @Wenn("^die Apotheke (.+) die E-Rezepte mit der eGK von (.+) abruft$")
+  @Dann("^kann die (?:Krankenhaus-)Apotheke (.+) die E-Rezepte mit der eGK von (.+) abrufen$")
   public void whenPharmacyRequestPrescriptionsWithEgk(String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
     val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
-    val examEvidence = thePharmacy.asksFor(RetrieveExamEvidence.with(egk));
+    val examEvidenceData = thePharmacy.asksFor(RetrieveExamEvidence.with(egk));
 
     when(thePharmacy)
-        .attemptsTo(Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence)).isTrue());
+        .attemptsTo(Ensure.that(HasDownloadableOpenTask.with(egk, examEvidenceData)).isTrue());
   }
 
   @Wenn(
       "^die Apotheke (.+) für die eGK von (.+) (?:einen alten|keinen) Prüfungsnachweis"
           + " (?:verwendet|abruft)$")
-  @Wenn("^die Krankenhaus-Apotheke (.+) die E-Rezepte mit der eGK von (.+) abruft$")
   public void whenPharmacyUseExpiredEvidence(String pharmName, String patientName) {
     // dummy step to increase comprehensibility in the test scenario
-  }
-
-  @Dann(
-      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil der Prüfungsnachweis"
-          + " zeitlich ungültig ist$")
-  public void thenPharmacyCanNotRequestPrescriptionsWithExpiredEvidence(
-      String pharmName, String patientName) {
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    val thePatient = OnStage.theActorCalled(patientName);
-    val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
-    val examEvidence =
-        VsdmExamEvidence.asOnlineTestMode(egk)
-            .withExpiredTimestamp()
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
-    when(thePharmacy)
-        .attemptsTo(
-            Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence.encodeAsBase64()))
-                .isFalse());
   }
 
   @Dann(
@@ -77,8 +57,11 @@ public class EgkInPharmacySteps {
   public void thenPharmacyCanNotRequestPrescriptionsWithoutEvidence(
       String pharmName, String patientName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
     when(thePharmacy)
-        .attemptsTo(Ensure.that(HasDownloadableOpenTask.withoutExamEvidence()).isFalse());
+        .attemptsTo(
+            Ensure.that(HasDownloadableOpenTask.withoutProofOfPatientPresent(egk)).isFalse());
   }
 
   @Dann(
@@ -91,22 +74,5 @@ public class EgkInPharmacySteps {
     then(thePharmacy)
         .attemptsTo(
             Ensure.that(HasRetrieved.theLastAcceptedPrescriptionBy(otherPharmacy)).isFalse());
-  }
-
-  @Dann(
-      "^kann die Apotheke (.+) die E-Rezepte von (.+) nicht abrufen, weil Krankenhaus-Apotheken"
-          + " nicht berechtigt sind$")
-  public void thenHospitalPharmacyCanNotRequestPrescriptions(String pharmName, String patientName) {
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    val thePatient = OnStage.theActorCalled(patientName);
-    val egk = SafeAbility.getAbility(thePatient, ProvideEGK.class).getEgk();
-    val examEvidence =
-        VsdmExamEvidence.asOnlineTestMode(egk)
-            .withExpiredTimestamp()
-            .generate(VsdmExamEvidenceResult.NO_UPDATES);
-    when(thePharmacy)
-        .attemptsTo(
-            Ensure.that(HasDownloadableOpenTask.withExamEvidence(examEvidence.encodeAsBase64()))
-                .isFalse());
   }
 }

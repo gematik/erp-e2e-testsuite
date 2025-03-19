@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -55,28 +53,21 @@ public class TheLastPrescription implements Question<Boolean> {
     TaskGetByIdCommand cmd;
     if (lastDmc.isRepresentative()) {
       log.info(
-          format(
-              "{0} fetches the Prescription {1} as representative with AccessCode {2}",
-              actor.getName(), lastDmc.getTaskId(), lastDmc.getAccessCode().getValue()));
+          "{} fetches the Prescription {} as representative with AccessCode {}",
+          actor.getName(),
+          lastDmc.getTaskId(),
+          lastDmc.getAccessCode().getValue());
       cmd = new TaskGetByIdCommand(lastDmc.getTaskId(), lastDmc.getAccessCode());
     } else {
-      log.info(
-          format(
-              "{0} fetches the Prescription {1} as owner", actor.getName(), lastDmc.getTaskId()));
+      log.info("{} fetches the Prescription {} as owner", actor.getName(), lastDmc.getTaskId());
       cmd = new TaskGetByIdCommand(lastDmc.getTaskId());
     }
 
     val response = erpClientAbility.request(cmd);
-
-    // be default assume false; if response does not contain the expected body no further checks
-    // needed, simply return false
-    val answer = new AtomicBoolean(false);
-
-    response
+    return response
         .getResourceOptional()
-        .ifPresent(prescription -> answer.set(checkPrescription(actor, prescription, lastDmc)));
-
-    return answer.get();
+        .map(prescription -> checkPrescription(actor, prescription, lastDmc))
+        .orElse(false);
   }
 
   private boolean checkPrescription(
@@ -88,8 +79,9 @@ public class TheLastPrescription implements Question<Boolean> {
     answer.compareAndSet(true, checkAccessCode(prescriptionBundle, dmc));
 
     // 3. check if the KVNR is okay only if this is not a representative DMC
-    if (!dmc.isRepresentative())
-      answer.compareAndSet(true, checkPatientId(actor, prescriptionBundle));
+    if (!dmc.isRepresentative()) {
+      answer.compareAndSet(true, checkPatientKvid(actor, prescriptionBundle));
+    }
 
     return answer.get();
   }
@@ -102,7 +94,7 @@ public class TheLastPrescription implements Question<Boolean> {
    * @return true if prescription and DMC have the same Prescription-ID false otherwise
    */
   private boolean checkTaskId(ErxPrescriptionBundle prescriptionBundle, DmcPrescription dmc) {
-    return prescriptionBundle.getTask().getTaskId().equals(dmc.getTaskId());
+    return prescriptionBundle.getTask().getTaskId().getValue().equals(dmc.getTaskId().getValue());
   }
 
   /**
@@ -138,18 +130,15 @@ public class TheLastPrescription implements Question<Boolean> {
    * @return false if the prescription has a KVID which does not match the KVID of the actor, true
    *     otherwise
    */
-  private boolean checkPatientId(Actor actor, ErxPrescriptionBundle prescriptionBundle) {
+  private boolean checkPatientKvid(Actor actor, ErxPrescriptionBundle prescriptionBundle) {
     val baseData = SafeAbility.getAbility(actor, ProvidePatientBaseData.class);
     val expectedKviId = baseData.getKvnr();
 
-    // Assume true by default because prescriptionBundle does not necessarily have a KVID e.g. for
-    // PKV
-    val kvidCheck = new AtomicBoolean(true);
-    prescriptionBundle
+    return prescriptionBundle
         .getKbvBundle()
-        .flatMap(kbvErpBundle -> kbvErpBundle.getPatient().getGkvId())
-        .ifPresent(kvid -> kvidCheck.set(expectedKviId.equals(kvid)));
-    return kvidCheck.get();
+        .map(kbvErpBundle -> kbvErpBundle.getPatient().getKvnr())
+        .map(kvid -> kvid.getValue().equals(expectedKviId.getValue()))
+        .orElse(false);
   }
 
   public static Builder from(String stack) {
@@ -169,6 +158,7 @@ public class TheLastPrescription implements Question<Boolean> {
   }
 
   public static class Builder {
+
     private final DmcStack stack;
 
     private Builder(DmcStack stack) {

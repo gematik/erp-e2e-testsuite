@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
-import java.time.LocalDate;
-import java.time.Month;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PatientenrechnungVersion implements ProfileVersion<PatientenrechnungVersion> {
-  V1_0_0("1.0.0", LocalDate.of(2023, Month.JULY, 1), LocalDate.of(2070, Month.DECEMBER, 31));
+public enum PatientenrechnungVersion implements ProfileVersion {
+  V1_0_0("1.0.0");
 
+  public static final String PROFILE_NAME = "de.gematik.erezept-patientenrechnung.r4";
   private final String version;
-  private final LocalDate validFromDate;
-  private final LocalDate validUntilDate;
-  private final CustomProfiles customProfile = CustomProfiles.GEM_PATIENTENRECHNUNG;
+
+  @Override
+  public String getName() {
+    return PROFILE_NAME;
+  }
 }

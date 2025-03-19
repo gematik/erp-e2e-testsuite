@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,22 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
-import lombok.val;
 import org.hl7.fhir.r4.model.Practitioner;
 
 @SuppressWarnings("java:S110")
 public class EpaPractitioner extends Practitioner {
 
   public TelematikID getTelematikId() {
-    val id =
-        this.getIdentifier().stream()
-            .filter(
-                iD ->
-                    iD.getSystem()
-                        .matches(DeBasisProfilNamingSystem.SID_TELEMATIK_ID.getCanonicalUrl()))
-            .findFirst()
-            .orElseThrow()
-            .getValue();
-    return TelematikID.from(id);
+    return this.getIdentifier().stream()
+        .filter(DeBasisProfilNamingSystem.TELEMATIK_ID_SID::matches)
+        .map(identifier -> TelematikID.from(identifier.getValue()))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new MissingFieldException(
+                    this.getClass(), DeBasisProfilNamingSystem.TELEMATIK_ID_SID));
   }
 }

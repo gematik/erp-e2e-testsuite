@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package de.gematik.test.erezept.primsys.actors;
 
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.dav.PharmacyOrganizationFaker;
-import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
+import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import de.gematik.test.konnektor.commands.ReadVsdCommand;
@@ -32,19 +31,12 @@ import lombok.val;
 
 public class Pharmacy extends BaseActor {
 
-  private final Konnektor konnektor;
-  private final CardInfo smcbHandle;
-
   public Pharmacy(
       PharmacyConfiguration cfg,
       EnvironmentConfiguration env,
       Konnektor konnektor,
       SmartcardArchive sca) {
-    super(cfg, env, sca);
-
-    this.konnektor = konnektor;
-    this.smcbHandle =
-        konnektor.execute(GetCardHandleCommand.forSmartcard(this.getSmcb())).getPayload();
+    super(cfg, env, konnektor, sca);
   }
 
   public byte[] signDocument(String document) {

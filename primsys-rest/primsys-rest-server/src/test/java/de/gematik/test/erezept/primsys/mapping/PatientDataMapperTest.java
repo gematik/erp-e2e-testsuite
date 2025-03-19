@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ package de.gematik.test.erezept.primsys.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-class PatientDataMapperTest {
+class PatientDataMapperTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldCreateRandomDto() {
@@ -41,7 +42,7 @@ class PatientDataMapperTest {
 
   @RepeatedTest(5)
   void shouldNotMissAnyFields() {
-    val patient = PatientFaker.builder().fake();
+    val patient = KbvPatientFaker.builder().fake();
     val mapper = PatientDataMapper.from(patient);
     val dto = mapper.getDto();
 

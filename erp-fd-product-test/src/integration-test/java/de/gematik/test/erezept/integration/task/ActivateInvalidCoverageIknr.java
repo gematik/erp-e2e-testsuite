@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -33,13 +34,12 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.function.Consumer;
@@ -75,11 +75,7 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
         .arguments("12119124", "die IKNR ohne Prüfziffer")
         .arguments("1234567891", "die IKNR zu lang")
         .arguments("12C45678", "ein Buchstabe enthalten")
-        .multiply(
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.GKV,
-                VersicherungsArtDeBasis.PKV))
+        .multiply(List.of(InsuranceTypeDe.BG, InsuranceTypeDe.GKV, InsuranceTypeDe.PKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .create();
   }
@@ -92,7 +88,7 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
   @DisplayName("Es muss geprüft werden, dass der Fachdienst die IKNR  korrekt validiert")
   @MethodSource("baseIKNRComposer")
   void activatePrescriptionWithInvalidIknr(
-      VersicherungsArtDeBasis versicherungsArtDeBasis,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind prescriptionAssignmentKind,
       String iknr,
       String reason) {
@@ -102,18 +98,18 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
             + " Versicherungsstatus entspricht nicht den Prüfziffer-Validierungsregeln.";
     AccidentExtension accident = null;
     Consumer<KbvErpBundle> kbvErpBundleConsumer;
-    if (versicherungsArtDeBasis.equals(VersicherungsArtDeBasis.BG)) {
+    if (insuranceType.equals(InsuranceTypeDe.BG)) {
       detailedText =
           "Ungültiges Institutionskennzeichen (IKNR): Das übergebene Institutionskennzeichen des"
               + " Kostenträgers entspricht nicht den Prüfziffer-Validierungsregeln.";
       requirementsSet = ErpAfos.A_24030;
-      sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+      sina.changeCoverageInsuranceType(InsuranceTypeDe.BG);
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
       kbvErpBundleConsumer =
           kbvBundle ->
               kbvBundle.getCoverage().getPayorFirstRep().getIdentifier().getExtension().stream()
-                  .filter(ext -> KbvItaForStructDef.ALTERNATIVE_IK.match(ext.getUrl()))
+                  .filter(ext -> KbvItaForStructDef.ALTERNATIVE_IK.matches(ext.getUrl()))
                   .forEach(ext -> ext.getValue().castToIdentifier(ext.getValue()).setValue(iknr));
 
     } else {
@@ -151,7 +147,7 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
 
   private KbvErpMedicationRequest getMedicationRequest(
       AccidentExtension accident, KbvErpMedication medication) {
-    return MedicationRequestFaker.builder()
+    return KbvErpMedicationRequestFaker.builder()
         .withPatient(sina.getPatientData())
         .withInsurance(sina.getInsuranceCoverage())
         .withRequester(doctorActor.getPractitioner())

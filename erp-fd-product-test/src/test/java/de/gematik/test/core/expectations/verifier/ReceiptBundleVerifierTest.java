@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.util.Base64;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ReceiptBundleVerifierTest extends ParsingTest {
+class ReceiptBundleVerifierTest extends ErpFhirParsingTest {
 
   private static final String NEW_RECEIPT_VERSION =
       "fhir/valid/erp/1.2.0/receiptbundle/NeueVersion_0e0f861-0000-0000-0003-000000000000.xml";

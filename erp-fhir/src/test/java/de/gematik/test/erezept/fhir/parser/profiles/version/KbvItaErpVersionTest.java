@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.erezept.fhir.parser.profiles.version;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import java.util.Arrays;
 import lombok.val;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class KbvItaErpVersionTest {
+class KbvItaErpVersionTest extends ErpFhirBuildingTest {
 
   @Test
   void getDefaultVersionViaCurrentDate() {
@@ -35,20 +35,14 @@ class KbvItaErpVersionTest {
   }
 
   @Test
+  @ClearSystemProperty(key = "kbv.ita.erp")
   void getDefaultVersionViaSystemProperty() {
-    val propertyName = CustomProfiles.KBV_ITA_ERP.getName();
     Arrays.stream(KbvItaErpVersion.values())
         .forEach(
             version -> {
-              System.setProperty(propertyName, version.getVersion());
+              System.setProperty("kbv.ita.erp", version.getVersion());
               val defaultVersion = KbvItaErpVersion.getDefaultVersion();
               assertEquals(version, defaultVersion);
             });
-  }
-
-  @AfterEach
-  void cleanProperties() {
-    val propertyName = CustomProfiles.KBV_ITA_ERP.getName();
-    System.clearProperty(propertyName);
   }
 }

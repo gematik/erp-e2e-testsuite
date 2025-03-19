@@ -18,6 +18,14 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
+    <logger name="de.gematik.test.erezept.fhir" level="TRACE" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="de.gematik.bbriccs.fhir" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.fhir.valuesets.epa.EpaDrugCategory;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PznMedicationBatchDto;
 import de.gematik.test.erezept.primsys.data.valuesets.MedicationCategoryDto;
@@ -54,7 +54,9 @@ public class GemErpMedicationDataMapper
     this.setIfPresent(
         dto::getSupplyForm,
         dtoForm -> builder.darreichungsform(Darreichungsform.fromCode(dtoForm.getCode())));
-    this.setIfPresent(dto::getAmount, dtoAmount -> builder.amount(dtoAmount, dto.getAmountUnit()));
+    this.setIfPresent(
+        dto::getPackagingSize,
+        dtoPackagingSize -> builder.packaging(dtoPackagingSize + " " + dto.getPackagingUnit()));
     this.setIfPresent(dto::getPzn, dtoPzn -> builder.pzn(PZN.from(dtoPzn), dto.getName()));
     this.setIfPresent(
         dto::getCategory,
@@ -73,8 +75,10 @@ public class GemErpMedicationDataMapper
     medication
         .getDarreichungsform()
         .ifPresent(df -> dto.setSupplyForm(SupplyFormDto.fromCode(df.getCode())));
-    medication.getAmountNumerator().ifPresent(dto::setAmount);
-    medication.getAmountNumeratorUnit().ifPresent(dto::setAmountUnit);
+    medication
+        .getAmountNumerator()
+        .ifPresent(amount -> dto.setPackagingSize(String.valueOf(amount)));
+    medication.getAmountNumeratorUnit().ifPresent(dto::setPackagingUnit);
     medication.getPzn().ifPresent(pzn -> dto.setPzn(pzn.getValue()));
     medication.getName().ifPresent(dto::setName);
     medication

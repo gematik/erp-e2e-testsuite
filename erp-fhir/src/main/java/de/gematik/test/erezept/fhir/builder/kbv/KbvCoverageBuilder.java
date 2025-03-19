@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.values.IKNR;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,13 +37,12 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Coverage;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 
-public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuilder> {
+public class KbvCoverageBuilder extends ResourceBuilder<KbvCoverage, KbvCoverageBuilder> {
 
-  private static final List<IValueSet> REQUIRE_ALTERNATIVE_IKNR =
-      List.of(VersicherungsArtDeBasis.BG, PayorType.UK);
+  private static final List<FromValueSet> REQUIRE_ALTERNATIVE_IKNR =
+      List.of(InsuranceTypeDe.BG, PayorType.UK);
   private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
 
   private PersonGroup personGroup = PersonGroup.NOT_SET;
@@ -52,7 +50,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   private Wop wop = Wop.DUMMY;
   private VersichertenStatus versichertenStatus = VersichertenStatus.MEMBERS;
   private static final Coverage.CoverageStatus coverageStatus = Coverage.CoverageStatus.ACTIVE;
-  private IValueSet versicherungsArt;
+  private FromValueSet versicherungsArt;
 
   private Reference beneficiary;
   private IKNR iknr;
@@ -64,7 +62,7 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
   }
 
   public static KbvCoverageBuilder insurance(String iknr, String insuranceName) {
-    return insurance(new IKNR(iknr), insuranceName);
+    return insurance(IKNR.asArgeIknr(iknr), insuranceName);
   }
 
   public static KbvCoverageBuilder insurance(IKNR iknr, String insuranceName) {
@@ -89,22 +87,22 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
 
   public KbvCoverageBuilder personGroup(PersonGroup personGroup) {
     this.personGroup = personGroup;
-    return self();
+    return this;
   }
 
   public KbvCoverageBuilder dmpKennzeichen(DmpKennzeichen kennzeichen) {
     this.dmpKennzeichen = kennzeichen;
-    return self();
+    return this;
   }
 
   public KbvCoverageBuilder wop(Wop wop) {
     this.wop = wop;
-    return self();
+    return this;
   }
 
   public KbvCoverageBuilder versichertenStatus(VersichertenStatus status) {
     this.versichertenStatus = status;
-    return self();
+    return this;
   }
 
   /**
@@ -116,34 +114,26 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
    * @param versicherungsArt is the kind of Insurance of this coverage
    * @return self
    */
-  public KbvCoverageBuilder versicherungsArt(VersicherungsArtDeBasis versicherungsArt) {
+  public KbvCoverageBuilder versicherungsArt(InsuranceTypeDe versicherungsArt) {
     this.versicherungsArt = versicherungsArt;
-    return self();
+    return this;
   }
 
   public KbvCoverageBuilder versicherungsArt(PayorType payorType) {
     this.versicherungsArt = payorType;
-    return self();
+    return this;
   }
 
   public KbvCoverageBuilder beneficiary(KbvPatient patient) {
     if (this.versicherungsArt == null) versicherungsArt(patient.getInsuranceKind());
-    return beneficiary(new SubjectReference(patient.getId()));
+    this.beneficiary = patient.asReference();
+    return this;
   }
 
-  public KbvCoverageBuilder beneficiary(SubjectReference subject) {
-    this.beneficiary = subject.asReference();
-    return self();
-  }
-
+  @Override
   public KbvCoverage build() {
-    val coverage = new KbvCoverage();
-
-    val profile = KbvItaForStructDef.COVERAGE.asCanonicalType(kbvItaForVersion);
-    val meta = new Meta().setProfile(List.of(profile));
-
-    // set FHIR-specific values provided by HAPI
-    coverage.setId(this.getResourceId()).setMeta(meta);
+    val coverage =
+        this.createResource(KbvCoverage::new, KbvItaForStructDef.COVERAGE, kbvItaForVersion);
 
     val extensions = new LinkedList<Extension>();
     extensions.add(personGroup.asExtension());
@@ -158,17 +148,17 @@ public class KbvCoverageBuilder extends AbstractResourceBuilder<KbvCoverageBuild
     if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
       mainIknrIdentifier = iknr.asIdentifier();
     } else {
-      mainIknrIdentifier = iknr.asIdentifier(DeBasisNamingSystem.IKNR_SID);
+      mainIknrIdentifier = iknr.asIdentifier(DeBasisProfilNamingSystem.IKNR_SID);
     }
     insuranceRef.setIdentifier(mainIknrIdentifier);
 
     if (requiresAlternativeIknr()) {
-      val altIknr = IKNR.from("121191241"); // just a dummy for now!
+      val altIknr = IKNR.asArgeIknr("121191241"); // just a dummy for now!
       Identifier alternativeIkIdentifier;
       if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
         alternativeIkIdentifier = altIknr.asIdentifier();
       } else {
-        alternativeIkIdentifier = altIknr.asIdentifier(DeBasisNamingSystem.IKNR_SID);
+        alternativeIkIdentifier = altIknr.asIdentifier(DeBasisProfilNamingSystem.IKNR_SID);
       }
       val altIkExtension = new Extension(KbvItaForStructDef.ALTERNATIVE_IK.getCanonicalUrl());
       altIkExtension.setValue(alternativeIkIdentifier);

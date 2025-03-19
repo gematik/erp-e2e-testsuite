@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,26 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import de.gematik.test.erezept.fhir.parser.profiles.CustomProfiles;
-import java.time.LocalDate;
-import java.time.Month;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum KbvItvEvdgaVersion implements ProfileVersion<KbvItvEvdgaVersion> {
-  V1_0_0("1.0.0", LocalDate.of(1970, Month.JANUARY, 1), LocalDate.of(2070, Month.DECEMBER, 31));
+public enum KbvItvEvdgaVersion implements ProfileVersion {
+  V1_1("1.1.1");
 
+  private static final String PROFILE_NAME = "kbv.itv.evdga";
   private final String version;
-  private final LocalDate validFromDate;
-  private final LocalDate validUntilDate;
-  private final CustomProfiles customProfile = CustomProfiles.KBV_ITV_EVDGA;
+  private final String name = PROFILE_NAME;
+
+  @Override
+  public boolean omitPatch() {
+    return true;
+  }
 
   public static KbvItvEvdgaVersion getDefaultVersion() {
-    return ProfileVersion.getDefaultVersion(KbvItvEvdgaVersion.class, CustomProfiles.KBV_ITV_EVDGA);
+    return VersionUtil.getDefaultVersion(KbvItvEvdgaVersion.class, PROFILE_NAME);
   }
 }

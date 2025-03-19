@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,29 @@ import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerif
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleContainsPzn;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
+import de.gematik.test.erezept.actions.GetPrescriptionById;
+import de.gematik.test.erezept.actions.IsValidSignature;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.stream.Stream;
@@ -71,7 +81,7 @@ public class ActivateMedicationCompounding extends ErpTest {
         .arguments("Creme", "3 Komponenten Creme")
         .arguments("Pomade", "die 60er sind zurück")
         .arguments("Uran Spray", "leuchtet so schön")
-        .multiply(0, List.of(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .create();
   }
@@ -85,7 +95,7 @@ public class ActivateMedicationCompounding extends ErpTest {
       "Prüfe den Inhalt der MedicationCompounding als Patient und die Signatur als Apotheke")
   @MethodSource("medicationCompoundingComposer")
   void activateMedicationCompoundingAnCheckAsConsumer(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       String medicineName,
       String freetext) {
@@ -96,18 +106,18 @@ public class ActivateMedicationCompounding extends ErpTest {
         KbvErpMedicationCompoundingFaker.builder()
             .withMedicationIngredient(pzn, medicineName, freetext)
             .fake();
-    val assigner = AssignerOrganizationFaker.builder().fake();
+    val assigner = KbvAssignerOrganizationFaker.builder().fake();
     val insurance =
         KbvCoverageFaker.builder().withInsuranceType(patient.getCoverageInsuranceType()).fake();
     val medicationRequest =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withPatient(patient.getPatientData())
             .withMedication(medication)
             .withRequester(doc.getPractitioner())
             .withInsurance(insurance)
             .fake();
 
-    val organisation = MedicalOrganizationFaker.builder().fake();
+    val organisation = KbvMedicalOrganizationFaker.builder().fake();
     val kbvBundleBuilder =
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
             .patient(patient.getPatientData())

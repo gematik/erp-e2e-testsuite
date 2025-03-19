@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 package de.gematik.test.erezept.primsys.rest.response;
 
-import de.gematik.test.erezept.fhir.parser.profiles.cfg.ParserConfigurations;
+import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+
+import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
 import de.gematik.test.erezept.primsys.data.info.BuildInfoDto;
 import de.gematik.test.erezept.primsys.data.info.FhirInfoDto;
 import de.gematik.test.erezept.primsys.data.info.InfoDto;
@@ -55,23 +58,16 @@ public class InfoResponseBuilder {
   private static FhirInfoDto createFhirInfo() {
     val fhirInfo = new FhirInfoDto();
 
-    val conf = ParserConfigurations.getInstance();
-    val defaultConf = conf.getDefaultConfiguration().orElse(conf.getProfileSettings().get(0));
+    val conf =
+        ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
+    val defaultConf = conf.getDefaultProfile();
 
     defaultConf
         .getProfiles()
         .forEach(
             profile -> fhirInfo.getConfiguration().put(profile.getName(), profile.getVersion()));
 
-    val envSetVersion =
-        System.getProperty(
-            ParserConfigurations.SYS_PROP_TOGGLE, System.getenv(ParserConfigurations.ENV_TOGGLE));
-
-    if (envSetVersion == null || envSetVersion.isEmpty() || envSetVersion.isBlank()) {
-      fhirInfo.setConfigured("default");
-    } else {
-      fhirInfo.setConfigured(envSetVersion);
-    }
+    fhirInfo.setConfigured(defaultConf.getId());
 
     return fhirInfo;
   }

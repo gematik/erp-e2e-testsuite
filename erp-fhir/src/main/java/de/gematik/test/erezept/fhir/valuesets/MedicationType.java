@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
-public enum MedicationType implements IValueSet {
+public enum MedicationType implements FromValueSet {
   INGREDIENT("wirkstoff", "Wirkstoff"),
   FREETEXT("freitext", "Freitext"),
   COMPOUNDING("rezeptur", "Rezeptur");
@@ -44,11 +44,11 @@ public enum MedicationType implements IValueSet {
     this.definition = "N/A definition in profile";
   }
 
-  public static MedicationType fromCode(@NonNull String coding) {
+  public static MedicationType fromCode(String code) {
     return Arrays.stream(MedicationType.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(mt -> mt.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(MedicationType.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(MedicationType.class, code));
   }
 
   @Override

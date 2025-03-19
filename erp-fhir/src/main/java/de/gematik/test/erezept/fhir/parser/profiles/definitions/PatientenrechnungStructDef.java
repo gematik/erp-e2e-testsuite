@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.definitions;
 
-import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
+import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PatientenrechnungStructDef implements IStructureDefinition<PatientenrechnungVersion> {
+public enum PatientenrechnungStructDef
+    implements WithStructureDefinition<PatientenrechnungVersion> {
   CHARGE_ITEM("https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_ChargeItem"),
   GEM_ERPCHRG_PR_CONSENT(
       "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_Consent"),

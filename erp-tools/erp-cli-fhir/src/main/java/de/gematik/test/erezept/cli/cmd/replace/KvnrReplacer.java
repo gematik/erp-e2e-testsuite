@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package de.gematik.test.erezept.cli.cmd.replace;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.test.erezept.cli.converter.StringListConverter;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -42,8 +42,11 @@ import picocli.CommandLine.ExitCode;
     mixinStandardHelpOptions = true)
 public class KvnrReplacer extends BaseResourceReplacer {
 
-  private static final List<DeBasisNamingSystem> KVID_SYSTEMS =
-      List.of(DeBasisNamingSystem.KVID, DeBasisNamingSystem.KVID_GKV, DeBasisNamingSystem.KVID_PKV);
+  private static final List<DeBasisProfilNamingSystem> KVID_SYSTEMS =
+      List.of(
+          DeBasisProfilNamingSystem.KVID,
+          DeBasisProfilNamingSystem.KVID_GKV_SID,
+          DeBasisProfilNamingSystem.KVID_PKV_SID);
 
   @CommandLine.Option(
       names = {"--to"},
@@ -78,9 +81,10 @@ public class KvnrReplacer extends BaseResourceReplacer {
     } else {
       // Note: extend further resources which might contain a KVNR here!
       log.warn(
-          format(
-              "Given Resource {0} of type {1} ({2}) is not supported for this operation",
-              originalName, resource.getResourceType(), resource.getClass().getSimpleName()));
+          "Given Resource {} of type {} ({}) is not supported for this operation",
+          originalName,
+          resource.getResourceType(),
+          resource.getClass().getSimpleName());
     }
   }
 
@@ -103,8 +107,7 @@ public class KvnrReplacer extends BaseResourceReplacer {
   private boolean replaceKvnr(KbvPatient patient, String kvnr) {
     val hasChanged = new AtomicReference<>(false);
     patient.getIdentifier().stream()
-        .filter(
-            identifier -> KVID_SYSTEMS.stream().anyMatch(ns -> ns.match(identifier.getSystem())))
+        .filter(identifier -> KVID_SYSTEMS.stream().anyMatch(ns -> ns.matches(identifier)))
         .findAny()
         .ifPresent(
             identifier -> {
@@ -118,15 +121,12 @@ public class KvnrReplacer extends BaseResourceReplacer {
       FhirParser parser, Resource resource, String originalName, String kvnr, boolean hasChanged) {
     if (hasChanged) {
       log.info(
-          format(
-              "Replace KVNR to {0} in {1} ({2})",
-              kvnr, resource.getClass().getSimpleName(), originalName));
+          "Replace KVNR to {} in {} ({})", kvnr, resource.getClass().getSimpleName(), originalName);
       val encodingType = EncodingType.fromString(originalName);
       val content = parser.encode(resource, encodingType, true);
       inputOutputDirectory.writeFile(format("{0}_{1}", kvnr, originalName), content);
     } else {
-      log.warn(
-          format("{0} does not have any KVID Identifier", resource.getClass().getSimpleName()));
+      log.warn("{} does not have any KVID Identifier", resource.getClass().getSimpleName());
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,18 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Enumeration;
 
 public class ErxMedicationDispenseBundleBuilder
-    extends AbstractResourceBuilder<ErxMedicationDispenseBundleBuilder> {
+    extends ResourceBuilder<Bundle, ErxMedicationDispenseBundleBuilder> {
 
   private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private final List<ErxMedicationDispense> medicationDispenses;
@@ -43,22 +40,6 @@ public class ErxMedicationDispenseBundleBuilder
 
   private ErxMedicationDispenseBundleBuilder(List<ErxMedicationDispense> medicationDispenses) {
     this.medicationDispenses = medicationDispenses;
-  }
-
-  @Deprecated(since = "recently")
-  public static ErxMedicationDispenseBundleBuilder faker(
-      int amount, KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
-    val medicationDispenses = new ArrayList<ErxMedicationDispense>();
-    IntStream.range(0, amount)
-        .forEach(
-            idx ->
-                medicationDispenses.add(
-                    ErxMedicationDispenseFaker.builder()
-                        .withKvnr(kvnr)
-                        .withPerformer(performerId)
-                        .withPrescriptionId(prescriptionId)
-                        .fake()));
-    return of(medicationDispenses);
   }
 
   public static ErxMedicationDispenseBundleBuilder empty() {
@@ -80,6 +61,7 @@ public class ErxMedicationDispenseBundleBuilder
     return self();
   }
 
+  @Override
   public Bundle build() {
     val bundleType =
         new Enumeration<>(new Bundle.BundleTypeEnumFactory(), Bundle.BundleType.COLLECTION);
@@ -90,8 +72,7 @@ public class ErxMedicationDispenseBundleBuilder
       mdBundle
           .getMeta()
           .addProfile(
-              ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.getVersionedUrl(
-                  erpWorkflowVersion, true));
+              ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.getVersionedUrl(erpWorkflowVersion));
 
       // Note: HAPI seems to skip the tags on serialization, why?
       mdBundle

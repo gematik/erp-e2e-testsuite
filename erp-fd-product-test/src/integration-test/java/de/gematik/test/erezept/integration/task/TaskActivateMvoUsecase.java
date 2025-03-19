@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrect
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectMvoExpiryDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -35,10 +36,9 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionIdExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.InvalidMvoIDAcceptToogle;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -81,7 +81,7 @@ class TaskActivateMvoUsecase extends ErpTest {
   @DisplayName("Mehrfachverordnung als Verordnender Arzt an eine/n Versicherte/n ausstellen")
   @MethodSource("mvoPrescriptionTypesProvider")
   void activateMvoPrescription(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<MultiplePrescriptionExtension> mvo) {
 
@@ -122,7 +122,7 @@ class TaskActivateMvoUsecase extends ErpTest {
           + " ausstellen")
   @MethodSource("invalidRatioMvoPrescriptionTypesProvider")
   void activateMvoPrescriptionWithInvalidRatio(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<MultiplePrescriptionExtension> mvo,
       RequirementsSet req) {
@@ -160,7 +160,7 @@ class TaskActivateMvoUsecase extends ErpTest {
           + " Versicherte/n ausstellen")
   @MethodSource("mvoExtensionManipulator")
   void activateMvoPrescriptionWithManipulatedExtension(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<KbvErpBundle>> kbvBundleMutator) {
 
@@ -200,7 +200,7 @@ class TaskActivateMvoUsecase extends ErpTest {
           + " Versicherte/n ausstellen")
   @MethodSource("mvoWithInvalidStatuskennzeichen")
   void activateMvoPrescriptionWithInvalidStatuskennzeichen(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       StatusKennzeichen statusKennzeichen,
       RequirementsSet req) {
@@ -238,7 +238,7 @@ class TaskActivateMvoUsecase extends ErpTest {
           + " Versicherte/n ausstellen")
   @MethodSource("mvoIdExtension")
   void activateMvoPrescriptionWithInvalidIdExtension(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<MultiplePrescriptionIdExtension> idExt,
       boolean expectSuccess) {
@@ -383,9 +383,9 @@ class TaskActivateMvoUsecase extends ErpTest {
   }
 
   private static Stream<Arguments> multiplyWithFlowTypes(ArgumentComposer composer) {
-    val insuranceArguments = new ArrayList<VersicherungsArtDeBasis>(2);
-    insuranceArguments.add(VersicherungsArtDeBasis.GKV);
-    insuranceArguments.add(VersicherungsArtDeBasis.PKV);
+    val insuranceArguments = new ArrayList<InsuranceTypeDe>(2);
+    insuranceArguments.add(InsuranceTypeDe.GKV);
+    insuranceArguments.add(InsuranceTypeDe.PKV);
     composer.multiply(
         List.of(
             PrescriptionAssignmentKind.PHARMACY_ONLY,

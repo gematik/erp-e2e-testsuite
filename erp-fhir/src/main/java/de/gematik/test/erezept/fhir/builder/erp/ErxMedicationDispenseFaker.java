@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;
 import lombok.val;
 import org.hl7.fhir.r4.model.Medication;
@@ -33,17 +31,14 @@ public class ErxMedicationDispenseFaker
     extends ErxMedicationDispenseBaseFaker<
         ErxMedicationDispense, ErxMedicationDispenseFaker, ErxMedicationDispenseBuilder> {
 
-  private static final String KEY_MEDICATION = "medication"; // key used for builderConsumers map
-
   private ErxMedicationDispenseFaker() {
     super();
-    builderConsumers.put("batch", b -> b.batch(fakerLotNumber(), fakerFutureExpirationDate()));
+    this.withBatch(fakerLotNumber(), fakerFutureExpirationDate());
 
-    if (fakerBool()
-        && ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
-      withMedication(GemErpMedicationFaker.builder().fake());
-    } else {
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
       withMedication(KbvErpMedicationPZNFaker.builder().fake());
+    } else {
+      withMedication(GemErpMedicationFaker.builder().fake());
     }
   }
 
@@ -51,15 +46,8 @@ public class ErxMedicationDispenseFaker
     return new ErxMedicationDispenseFaker();
   }
 
-  public ErxMedicationDispenseFaker withPzn(String pzn) {
-    val newMedication =
-        KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake();
-    builderConsumers.put(KEY_MEDICATION, b -> b.medication(newMedication));
-    return this;
-  }
-
   public ErxMedicationDispenseFaker withMedication(KbvErpMedication medication) {
-    builderConsumers.put(KEY_MEDICATION, b -> b.medication(medication));
+    builderConsumers.put("medication", b -> b.medication(medication));
     return this;
   }
 

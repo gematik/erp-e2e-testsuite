@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import java.util.List;
 import lombok.val;

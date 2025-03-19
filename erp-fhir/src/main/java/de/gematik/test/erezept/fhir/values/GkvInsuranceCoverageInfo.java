@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import java.util.Optional;
+import lombok.Getter;
 
 /**
  * <a
@@ -169,27 +170,17 @@ public enum GkvInsuranceCoverageInfo implements InsuranceCoverageInfo {
   VEREINIGTE_BKK("Vereinigte BK", "105330191"),
   WMF_BKK("WMF BKK", "108036441");
 
-  private final String naming;
-  private final String iknr;
+  private final String name;
+  @Getter private final String iknr;
+  @Getter private final InsuranceTypeDe insuranceType = InsuranceTypeDe.GKV;
 
-  GkvInsuranceCoverageInfo(String naming, String iknr) {
-    this.naming = naming;
+  GkvInsuranceCoverageInfo(String name, String iknr) {
+    this.name = name;
     this.iknr = iknr;
   }
 
   public String getName() {
-    var name = this.naming;
-    if (name.length() > 45) return name.substring(0, 45);
-    return name;
-  }
-
-  public String getIknr() {
-    return this.iknr;
-  }
-
-  @Override
-  public VersicherungsArtDeBasis getInsuranceType() {
-    return VersicherungsArtDeBasis.GKV;
+    return InsuranceCoverageInfo.shortenName(this.name);
   }
 
   static Optional<GkvInsuranceCoverageInfo> getByIknr(String iknr) {

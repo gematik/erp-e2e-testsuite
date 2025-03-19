@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -74,7 +74,7 @@ public class ManageDoctorsPrescriptions implements Ability, HasTeardown, RefersT
                     erpClient.request(new TaskAbortCommand(task.getTaskId(), task.getAccessCode()));
                 response
                     .getResourceOptional(OperationOutcome.class)
-                    .map(OperationOutcomeWrapper::extractFrom)
+                    .map(OperationOutcomeExtractor::extractFrom)
                     .ifPresent(
                         errorMessage ->
                             log.info(

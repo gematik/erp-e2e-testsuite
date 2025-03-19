@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.github.javafaker.service.RandomService;
 import de.gematik.bbriccs.fhir.builder.FakerBrick;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import java.util.Locale;
@@ -33,8 +34,12 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
-class KbvHealthAppRequestFakerTest extends ParsingTest {
+@SetSystemProperty(
+    key = ERP_FHIR_PROFILES_TOGGLE,
+    value = "1.4.0") // before 1.4.0 EVDGA was not available
+class KbvHealthAppRequestFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFakeHealthAppRequest() {

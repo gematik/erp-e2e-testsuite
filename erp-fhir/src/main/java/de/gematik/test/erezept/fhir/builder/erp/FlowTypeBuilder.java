@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -23,7 +24,7 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Parameters;
 
-public class FlowTypeBuilder {
+public class FlowTypeBuilder extends ResourceBuilder<Parameters, FlowTypeBuilder> {
 
   private ErpWorkflowVersion version = ErpWorkflowVersion.getDefaultVersion();
   private PrescriptionFlowType flowType;
@@ -35,19 +36,20 @@ public class FlowTypeBuilder {
     return builder;
   }
 
-  public static Parameters build(PrescriptionFlowType flowType) {
-    return builder(flowType).build();
-  }
-
   public FlowTypeBuilder version(ErpWorkflowVersion version) {
     this.version = version;
     return this;
   }
 
+  public static Parameters build(PrescriptionFlowType flowType) {
+    return builder(flowType).build();
+  }
+
+  @Override
   public Parameters build() {
     Coding flowTypeCoding;
 
-    if (version.compareTo(ErpWorkflowVersion.V1_2_0) < 0) {
+    if (version.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       flowTypeCoding = flowType.asCoding();
     } else {
       flowTypeCoding = flowType.asCoding(ErpWorkflowCodeSystem.FLOW_TYPE_12);

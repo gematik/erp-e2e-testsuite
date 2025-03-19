@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,29 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemCommunicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
-import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ICommunicationType;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
-import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.ChargeItemChangeAuthorization;
 import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
@@ -52,7 +57,6 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
   private final Builder builder;
 
   private ResponseOfPostCommunication(Builder builder) {
-    super(format("POST {0}", builder.type));
     this.builder = builder;
   }
 
@@ -91,13 +95,12 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val communication = this.createCommunication(actor);
 
     log.info(
-        format(
-            "{0} is sending a {1} to {2} basedOn {3} (AccessCode {4})",
-            actor.getName(),
-            builder.type,
-            builder.receiver.getName(),
-            communication.getBasedOnReferenceId(),
-            communication.getBasedOnAccessCodeString().orElse("n/a")));
+        "{} is sending a {} to {} basedOn {} (AccessCode {})",
+        actor.getName(),
+        builder.type,
+        builder.receiver.getName(),
+        communication.getBasedOnReferenceId(),
+        communication.getBasedOnAccessCodeString().orElse("n/a"));
 
     val cmd = new CommunicationPostCommand(communication);
     return erpClient.request(cmd);
@@ -159,9 +162,9 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val prescription = actor.asksFor(FullPrescriptionBundle.forTask(task));
 
     val erxBuilder =
-        ErxCommunicationBuilder.builder()
-            .recipient(receiverId)
-            .basedOnTaskId(prescription.getTask().getTaskId())
+        ErxCommunicationBuilder.forInfoRequest(builder.message)
+            .receiver(receiverId)
+            .basedOn(prescription.getTask().getTaskId())
             .supplyOptions(SupplyOptionsType.ON_PREMISE)
             .insurance(baseData.getInsuranceIknr())
             .flowType(task.getFlowType());
@@ -169,7 +172,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     prescription
         .getKbvBundle()
         .ifPresent(kbvErpBundle -> erxBuilder.medication(kbvErpBundle.getMedication()));
-    return erxBuilder.buildInfoReq(builder.message);
+    return erxBuilder.build();
   }
 
   private ErxCommunication createDispenseRequestAs(Actor actor) {
@@ -183,11 +186,11 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val message = new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, builder.message);
 
     val accessCode = prescription.getTask().getAccessCode();
-    return ErxCommunicationBuilder.builder()
-        .recipient(receiverId)
-        .basedOnTask(prescription.getTask().getTaskId(), accessCode)
+    return ErxCommunicationBuilder.forDispenseRequest(message)
+        .receiver(receiverId)
+        .basedOn(prescription.getTask().getTaskId(), accessCode)
         .flowType(prescription.getTask().getFlowType())
-        .buildDispReq(message);
+        .build();
   }
 
   private ErxCommunication createRepresentativeCommunicationAs(Actor actor) {
@@ -200,11 +203,11 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val prescription = actor.asksFor(DownloadTaskById.withId(dmc.getTaskId()));
 
     val accessCode = prescription.getTask().getAccessCode();
-    return ErxCommunicationBuilder.builder()
-        .recipient(receiverId.getValue())
-        .basedOnTask(prescription.getTask().getTaskId(), accessCode)
+    return ErxCommunicationBuilder.forRepresentative(builder.message)
+        .receiver(receiverId.getValue())
+        .basedOn(prescription.getTask().getTaskId(), accessCode)
         .flowType(prescription.getTask().getFlowType())
-        .buildRepresentative(builder.message);
+        .build();
   }
 
   private ErxCommunication createReplyAs(Actor actor) {
@@ -214,12 +217,12 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val messageForResponse = this.fetchExpectedMessageFromBackend(actor);
     val message = new CommunicationReplyMessage();
 
-    return ErxCommunicationBuilder.builder()
-        .recipient(receiverId.getValue())
-        .basedOnTaskId(messageForResponse.getBasedOnReferenceId())
+    return ErxCommunicationBuilder.asReply(message)
+        .receiver(receiverId.getValue())
+        .basedOn(messageForResponse.getBasedOnReferenceId())
         .availabilityStatus(AvailabilityStatus.AS_30)
         .supplyOptions(SupplyOptionsType.ON_PREMISE)
-        .buildReply(message);
+        .build();
   }
 
   private ErxCommunication createChangeReqAs(Actor actor) {
@@ -231,11 +234,11 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
             ResponseOfGetChargeItemBundle.forPrescription(builder.basedOnDequeStrategy)
                 .asPatient());
     val chargeItem = chargeItemResponse.getExpectedResource();
-    return ErxChargeItemCommunicationBuilder.builder()
-        .basedOnChargeItem(chargeItem.getChargeItem())
-        .recipient(receiverId)
+    return ErxCommunicationBuilder.forChargeItemChangeRequest(builder.message)
+        .basedOn(chargeItem.getChargeItem())
+        .receiver(receiverId)
         .sender(sender.getValue())
-        .buildReq(builder.message);
+        .build();
   }
 
   private ErxCommunication createChangeReplyAs(Actor actor) {
@@ -246,11 +249,11 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val chargeItemId = messageForResponse.getBasedOnReferenceId();
 
     storeChargeItemAuthorizedBy(actor, messageForResponse);
-    return ErxChargeItemCommunicationBuilder.builder()
-        .basedOnChargeItem(chargeItemId)
-        .recipient(receiverId.getValue())
+    return ErxCommunicationBuilder.forChargeItemChangeReply(builder.message)
+        .basedOn(chargeItemId)
+        .receiver(receiverId.getValue())
         .sender(senderId)
-        .buildReply(builder.message);
+        .build();
   }
 
   private void storeChargeItemAuthorizedBy(Actor actor, ErxCommunication communication) {

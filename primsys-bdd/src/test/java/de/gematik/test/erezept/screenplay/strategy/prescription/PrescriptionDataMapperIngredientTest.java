@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,28 @@
 
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.Map;
+import lombok.val;
 import net.serenitybdd.screenplay.Actor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-class PrescriptionDataMapperIngredientTest {
+class PrescriptionDataMapperIngredientTest extends ErpFhirParsingTest {
 
   @Mock private Actor patient;
-  @Mock private PrescriptionAssignmentKind type;
-  private PrescriptionDataMapperIngredient prescriptionDataMapper;
-
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-    List<Map<String, String>> medications = List.of(Map.of("key", "value"));
-    prescriptionDataMapper = new PrescriptionDataMapperIngredient(patient, type, medications);
-  }
 
   @Test
   void shouldGetKbvErpMedicationCorrect() {
-    Map<String, String> medMap =
+    val medMap =
         Map.of(
             "Name", "TestDrug",
             "Verordnungskategorie", "00",
@@ -53,14 +47,26 @@ class PrescriptionDataMapperIngredientTest {
             "Denominator", "1",
             "NumeratorUnit", "mg",
             "Normgröße", "NB");
-    KbvErpMedication medication = prescriptionDataMapper.getKbvErpMedication(medMap);
+    val medications = List.of(Map.of("key", "value"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperIngredient(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    val medication = prescriptionDataMapper.getKbvErpMedication(medMap);
+
     assertNotNull(medication);
     assertEquals("TestDrug", medication.getIngredientFirstRep().getItemCodeableConcept().getText());
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(vr.isSuccessful());
   }
 
   @Test
   void shouldFailWhileGettingKbvErpMedication() {
     Map<String, String> medMap = null;
+    val medications = List.of(Map.of("key", "value"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperIngredient(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
     assertThrows(
         NullPointerException.class, () -> prescriptionDataMapper.getKbvErpMedication(medMap));
   }

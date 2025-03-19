@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@ package de.gematik.test.core.expectations.verifier;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -37,10 +39,10 @@ public class TaskBundleVerifier {
     throw new AssertionError("do not instantiate!");
   }
 
-  public static VerificationStep<ErxTaskBundle> doesContainsErxTasksWithoutQES(ErpAfos afo) {
+  public static VerificationStep<ErxTaskBundle> doesNotContainQES(ErpAfos afo) {
     Predicate<Resource> isErxTask =
         resource ->
-            resource instanceof Task && ErpWorkflowStructDef.TASK_12.match(resource.getMeta());
+            resource instanceof Task && ErpWorkflowStructDef.TASK_12.matches(resource.getMeta());
     Predicate<ErxTaskBundle> onlyErxTaskInEntries =
         bundle ->
             bundle.getEntry().stream()
@@ -78,7 +80,7 @@ public class TaskBundleVerifier {
     Predicate<ErxTaskBundle> predicate =
         bundle ->
             bundle.getTasks().stream()
-                .map(tsk -> DateConverter.getInstance().dateToLocalDate(tsk.getAuthoredOn()))
+                .map(task -> DateConverter.getInstance().dateToLocalDate(task.getAuthoredOn()))
                 .allMatch(localDatePredicate);
     return new VerificationStep.StepBuilder<ErxTaskBundle>(ErpAfos.A_25515, description)
         .predicate(predicate)
@@ -97,7 +99,7 @@ public class TaskBundleVerifier {
     return step.predicate(verify).accept();
   }
 
-  public static VerificationStep<ErxTaskBundle> doesNotContainsExpiredErxTasks(ErpAfos afo) {
+  public static VerificationStep<ErxTaskBundle> doesNotContainExpiredTasks(ErpAfos afo) {
     val compareDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
     Predicate<ErxTaskBundle> verify =
         bundle ->
@@ -107,7 +109,62 @@ public class TaskBundleVerifier {
             afo.getRequirement(),
             format(
                 "Das ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf keine"
-                    + " abgelaufenden E-Rezepte enthalten."));
+                    + " abgelaufenen E-Rezepte enthalten."));
+    return step.predicate(verify).accept();
+  }
+
+  public static VerificationStep<ErxTaskBundle> hasNoTasks() {
+    Predicate<ErxTaskBundle> verify = bundle -> bundle.getTasks().isEmpty();
+    val step =
+        new VerificationStep.StepBuilder<ErxTaskBundle>(
+            ErpAfos.A_23452.getRequirement(),
+            format(
+                "Das ErxTaskBundle, abgerufen über Egk in der Apotheke als Apotheker, darf nur"
+                    + " E-Rezepte des Patienten mit der KVNR aus dem Prüfungsnachweis enthalten."));
+    return step.predicate(verify).accept();
+  }
+
+  public static VerificationStep<ErxTaskBundle> containsOnlyTasksWith(
+      Task.TaskStatus status, ErpAfos req) {
+    Predicate<ErxTaskBundle> verify =
+        bundle -> bundle.getTasks().stream().allMatch(it -> it.getStatus().equals(status));
+    val step =
+        new VerificationStep.StepBuilder<ErxTaskBundle>(
+            req.getRequirement(),
+            format(
+                "Im Bundle dürfen nur Task mit Status {0} enthalten sein. (Task.status = \"{0}\")",
+                status.getDisplay()));
+    return step.predicate(verify).accept();
+  }
+
+  public static VerificationStep<ErxTaskBundle> containsOnlyTasksFor(KVNR kvnr, ErpAfos req) {
+    Predicate<ErxTaskBundle> verify =
+        bundle ->
+            bundle.getTasks().stream()
+                .allMatch(
+                    it ->
+                        it.getForKvnr()
+                            .map(egkKvnr -> egkKvnr.getValue().equals(kvnr.getValue()))
+                            .orElse(false));
+    val step =
+        new VerificationStep.StepBuilder<ErxTaskBundle>(
+            req.getRequirement(),
+            format("Im Bundle dürfen nur Task für die KVNR {0} enthalten sein", kvnr.getValue()));
+    return step.predicate(verify).accept();
+  }
+
+  public static VerificationStep<ErxTaskBundle> containsOnlyTasksWith(
+      PrescriptionFlowType prescriptionFlowType, ErpAfos req) {
+    Predicate<ErxTaskBundle> verify =
+        bundle ->
+            bundle.getTasks().stream()
+                .allMatch(it -> it.getFlowType().equals(prescriptionFlowType));
+    val step =
+        new VerificationStep.StepBuilder<ErxTaskBundle>(
+            req.getRequirement(),
+            format(
+                "Im Bundle dürfen nur Task mit Workflowtype {0} enthalten sein",
+                prescriptionFlowType.getCode()));
     return step.predicate(verify).accept();
   }
 }

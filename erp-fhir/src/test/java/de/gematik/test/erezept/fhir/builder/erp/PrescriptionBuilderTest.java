@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 import org.junitpioneer.jupiter.*;
 
-class PrescriptionBuilderTest extends ParsingTest {
+class PrescriptionBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build PrescriptionActivation for ErpWorkflowVersion {0}")
   @MethodSource(
       "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
-  @ClearSystemProperty(key = "erp.fhir.profile")
+  @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   void buildSimplePrescription(String erpFhirProfileVersion) {
-    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
+    System.setProperty(ERP_FHIR_PROFILES_TOGGLE, erpFhirProfileVersion);
     val signed = new byte[] {1, 2, 3, 4};
 
     val param = PrescriptionBuilder.builder().build(signed);

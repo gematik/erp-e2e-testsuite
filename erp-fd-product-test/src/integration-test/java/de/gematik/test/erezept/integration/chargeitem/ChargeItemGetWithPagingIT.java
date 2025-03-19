@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,26 @@ package de.gematik.test.erezept.integration.chargeitem;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.*;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsCountOfGivenLinks;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsEntriesOfCount;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsTotalCountOf;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.expectedParamsIn;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.hasElementAtPosition;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.hasSameEntryIds;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.minimumCountOfEntriesOf;
 import static org.junit.Assert.assertTrue;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
+import de.gematik.test.erezept.actions.GrantConsent;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.bundlepaging.DownloadBundle;
 import de.gematik.test.erezept.actions.chargeitem.GetChargeItems;
 import de.gematik.test.erezept.actions.chargeitem.PostChargeItem;
@@ -37,12 +49,10 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.ChargeItemDeleteCommand;
 import de.gematik.test.erezept.client.usecases.search.ChargeItemSearch;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxConsentBuilder;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.util.Date;
 import java.util.LinkedList;
@@ -52,7 +62,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -91,7 +104,7 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
     for (val chargeItem : chargeItemList) {
       val erg = erpClient.request(new ChargeItemDeleteCommand(chargeItem.getPrescriptionId()));
       if (erg.isOperationOutcome()) {
-        log.info(OperationOutcomeWrapper.extractFrom(erg.getAsOperationOutcome()));
+        log.info(OperationOutcomeExtractor.extractFrom(erg.getAsOperationOutcome()));
       }
     }
   }
@@ -120,7 +133,7 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
 
     val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
     pharmacy.performs(ClosePrescription.acceptedWith(acceptation));
-    val davAbgabedatenBundle = DavAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
+    val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
 
     return pharmacy
         .performs(
@@ -137,12 +150,12 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
   }
 
   private void grandConsentAsPkv(PatientActor patientActor) {
-    patientActor.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+    patientActor.changePatientInsuranceType(InsuranceTypeDe.PKV);
     val consent = ErxConsentBuilder.forKvnr(patientActor.getKvnr()).build();
     consent.setDateTime(new Date());
     patientActor.performs(GrantConsent.forOneSelf().withDefaultConsent());
 
-    patientActor.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+    patientActor.changePatientInsuranceType(InsuranceTypeDe.PKV);
   }
 
   @TestcaseId("ERP_CHARGE_ITEM_PAGING_01")
@@ -508,7 +521,6 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
           + " folgenden Wert erhöht wird ")
   void shouldHaveCorrectTotalCountAsPatient() {
     ensurePrecondition();
-    patient.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
 
     val firstCall =
         patient.performs(
@@ -520,6 +532,8 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
                             .createParameter())
                     .build()));
 
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+
     val newTask =
         doctor
             .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
@@ -529,7 +543,7 @@ public class ChargeItemGetWithPagingIT extends ErpTest {
     val acceptation =
         pharmacy.performs(AcceptPrescription.forTheTask(newTask)).getExpectedResponse();
     pharmacy.performs(ClosePrescription.acceptedWith(acceptation));
-    val davAbgabedatenBundle = DavAbgabedatenFaker.builder(newTask.getPrescriptionId()).fake();
+    val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(newTask.getPrescriptionId()).fake();
     val response =
         pharmacy
             .performs(

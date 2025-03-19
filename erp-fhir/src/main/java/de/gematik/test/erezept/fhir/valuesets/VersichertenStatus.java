@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,37 +16,29 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
 
-/** https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_VERSICHERTENSTATUS */
+/**
+ * <a
+ * href="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_VERSICHERTENSTATUS">Versichertenstatus</a>
+ */
 @Getter
-public enum VersichertenStatus implements IValueSet {
+@RequiredArgsConstructor
+public enum VersichertenStatus implements FromValueSet {
   MEMBERS("1", "Mitglieder"),
   FAMILY_MEMBERS("3", "Familienangehoerige"),
   PENSIONER("5", "Rentner");
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.VERSICHERTEN_STATUS;
-  public static final String VERSION = "1.02";
-  public static final String DESCRIPTION =
-      "Versichertenstatus gibt an, ob ein Versicherter ein Familienversicherter, Mitglied oder"
-          + " Rentner ist. Auf der KVK ist diese Angabe Teil des Feldes VERSICHERTENSTATUS - die 1."
-          + " Stelle.";
-  public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
-
   private final String code;
   private final String display;
-  private final String definition = "N/A";
-
-  VersichertenStatus(String code, String display) {
-    this.code = code;
-    this.display = display;
-  }
 
   @Override
   public KbvCodeSystem getCodeSystem() {
@@ -54,13 +46,14 @@ public enum VersichertenStatus implements IValueSet {
   }
 
   public Extension asExtension() {
-    return new Extension(DeBasisStructDef.GKV_VERSICHERTENART.getCanonicalUrl(), this.asCoding());
+    return new Extension(
+        DeBasisProfilStructDef.GKV_VERSICHERTENART.getCanonicalUrl(), this.asCoding());
   }
 
-  public static VersichertenStatus fromCode(@NonNull String coding) {
+  public static VersichertenStatus fromCode(String code) {
     return Arrays.stream(VersichertenStatus.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(mc -> mc.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(VersichertenStatus.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(VersichertenStatus.class, code));
   }
 }

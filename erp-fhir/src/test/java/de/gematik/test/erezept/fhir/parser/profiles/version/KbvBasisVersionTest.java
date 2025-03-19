@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@ package de.gematik.test.erezept.fhir.parser.profiles.version;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.*;
 import org.junit.jupiter.api.*;
 
-class KbvBasisVersionTest {
+class KbvBasisVersionTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldGetDefaultVersion() {
     val defaultVersion = KbvBasisVersion.getDefaultVersion();
-    assertEquals(KbvBasisVersion.V1_1_3, defaultVersion);
-    assertEquals("1.1.3", defaultVersion.getVersion());
+    assertEquals(KbvBasisVersion.V1_3_0, defaultVersion);
+    assertEquals("1.3.0", defaultVersion.getVersion());
   }
 }

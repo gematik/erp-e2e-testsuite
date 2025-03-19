@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@ package de.gematik.test.erezept.fhir.values;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import java.util.InputMismatchException;
 import java.util.List;
 import org.hl7.fhir.r4.model.Identifier;
 
-public class TelematikID extends Value<String> {
+public class TelematikID extends SemanticValue<String, ErpWorkflowNamingSystem> {
 
   private static final List<ErpWorkflowNamingSystem> TELEMATIK_ID_SYSTEMS =
       List.of(ErpWorkflowNamingSystem.TELEMATIK_ID_SID, ErpWorkflowNamingSystem.TELEMATIK_ID);
@@ -42,7 +43,7 @@ public class TelematikID extends Value<String> {
 
   public static TelematikID from(Identifier identifier) {
     return TELEMATIK_ID_SYSTEMS.stream()
-        .filter(ewns -> ewns.match(identifier))
+        .filter(ewns -> ewns.matches(identifier))
         .map(ewns -> new TelematikID(ewns, identifier.getValue()))
         .findFirst()
         .orElseThrow(

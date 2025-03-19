@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,19 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.strategy.pharmacy.AuthorizedChargeItemStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.function.Function;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,6 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
 
   private ResponseOfPutChargeItem(
       AuthorizedChargeItemStrategy strategy, @Nullable Actor apothecary) {
-    super("PUT /ChargeItem");
     this.strategy = strategy;
     this.apothecary = apothecary;
   }
@@ -56,26 +54,19 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
 
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
+    // decide who should sign the DAV-Bundle
+    val smartcardType =
+        Optional.ofNullable(this.apothecary)
+            .map(a -> SmartcardType.HBA)
+            .orElse(SmartcardType.SMC_B);
+    val konnektorOwner = Optional.ofNullable(this.apothecary).orElse(actor);
+
     // use a random faked DavBundle for now
-    val davBundle = DavAbgabedatenFaker.builder(strategy.getPrescriptionId()).fake();
-    Function<DavAbgabedatenBundle, byte[]> signer;
-    if (apothecary != null) {
-      // sign as apothecary with HBA
-      val konnektor = SafeAbility.getAbility(apothecary, UseTheKonnektor.class);
-      signer =
-          (b) -> {
-            val encoded = erpClient.encode(b, EncodingType.XML);
-            return konnektor.signDocumentWithHba(encoded).getPayload();
-          };
-    } else {
-      // sign as pharmacy with SMC-B
-      val konnektor = SafeAbility.getAbility(actor, UseTheKonnektor.class);
-      signer =
-          (b) -> {
-            val encoded = erpClient.encode(b, EncodingType.XML);
-            return konnektor.signDocumentWithSmcb(encoded).getPayload();
-          };
-    }
+    val davBundle = DavPkvAbgabedatenFaker.builder(strategy.getPrescriptionId()).fake();
+    val signer =
+        konnektorOwner.asksFor(
+            TheFhirDocumentSigner.withEncoder(b -> erpClient.encode(davBundle, EncodingType.XML))
+                .using(smartcardType));
 
     // get the original ChargeItem first
     val theChargeItem = strategy.getChargeItem();
@@ -90,7 +81,7 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
         .getSupportingInformation()
         .removeIf(
             si ->
-                AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ.match(si.getDisplay())
+                AbdaErpPkvStructDef.PKV_ABGABEDATENSATZ.matches(si.getDisplay())
                     || si.getDisplay().equals("Binary"));
 
     // create a new contained resource
@@ -125,6 +116,7 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
+
     private final AuthorizedChargeItemStrategy strategy;
 
     public ResponseOfPutChargeItem signedByPharmacy() {

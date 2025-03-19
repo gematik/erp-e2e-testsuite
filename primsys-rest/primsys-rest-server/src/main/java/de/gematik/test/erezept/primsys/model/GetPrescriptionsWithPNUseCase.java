@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
-import de.gematik.test.erezept.fhir.values.Value;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.ShallowPrescriptionDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
@@ -35,8 +36,29 @@ public class GetPrescriptionsWithPNUseCase {
     this.pharmacy = pharmacy;
   }
 
+  /**
+   * @param examEvidence - the evidence with contained check digit V1
+   * @return return all open tasks matching the contained kvnr
+   */
   public Response getPrescriptionsByEvidence(String examEvidence) {
-    val response = this.pharmacy.erpRequest(new TaskGetByExamEvidenceCommand(examEvidence));
+    return getPrescriptionsByEvidence(examEvidence, null, null);
+  }
+
+  /**
+   * @param examEvidence - the evidence with contained check digit V2
+   * @param kvnr -
+   * @param hcv - Hash value of insurance start date and street of the insured person
+   * @return return all open tasks matching the contained kvnr
+   */
+  public Response getPrescriptionsByEvidence(String examEvidence, String kvnr, String hcv) {
+    val command = new TaskGetByExamEvidenceCommand(examEvidence);
+    if (kvnr != null) {
+      command.andKvnr(KVNR.from(kvnr));
+    }
+    if (hcv != null) {
+      command.andHcv(hcv);
+    }
+    val response = this.pharmacy.erpRequest(command);
     val prescriptionsAsDto = new ArrayList<ShallowPrescriptionDto>();
     val resource =
         response
@@ -51,7 +73,8 @@ public class GetPrescriptionsWithPNUseCase {
               dto.setPrescriptionId(erxTask.getPrescriptionId().getValue());
               dto.setTaskId(erxTask.getTaskId().getValue());
               dto.setAccessCode(erxTask.getAccessCode().getValue());
-              dto.setKvnr(erxTask.getForKvnr().map(Value::getValue).orElse("entry is empty"));
+              dto.setKvnr(
+                  erxTask.getForKvnr().map(SemanticValue::getValue).orElse("entry is empty"));
 
               prescriptionsAsDto.add(dto);
             });

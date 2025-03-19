@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 
 package de.gematik.test.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import org.hl7.fhir.r4.model.Coding;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -26,11 +30,11 @@ class HelperTest {
 
   @Test
   void shouldCompareCodingCorrect() {
-    var coding1 = new org.hl7.fhir.r4.model.Coding();
+    var coding1 = new Coding();
     coding1.setCode("code1");
     coding1.setSystem("system1");
 
-    var coding2 = new org.hl7.fhir.r4.model.Coding();
+    var coding2 = new Coding();
     coding2.setCode("code1");
     coding2.setSystem("system1");
 
@@ -46,11 +50,11 @@ class HelperTest {
     "'code2' ,'system1', 'code2',  'system2'",
   })
   void shouldFailCompareCoding(String code1, String system1, String code2, String system2) {
-    var coding1 = new org.hl7.fhir.r4.model.Coding();
+    var coding1 = new Coding();
     coding1.setCode(code1);
     coding1.setSystem(system1);
 
-    var coding2 = new org.hl7.fhir.r4.model.Coding();
+    var coding2 = new Coding();
     coding2.setCode(code2);
     coding2.setSystem(system2);
 
@@ -61,40 +65,41 @@ class HelperTest {
 
   @Test
   void shouldFindSystem() {
-    var coding1 = new org.hl7.fhir.r4.model.Coding();
+    var coding1 = new Coding();
     coding1.setCode("code1");
     coding1.setSystem("system1");
 
-    var coding2 = new org.hl7.fhir.r4.model.Coding();
+    var coding2 = new Coding();
     coding2.setCode("code2");
     coding2.setSystem("system1");
 
-    var coding3 = new org.hl7.fhir.r4.model.Coding();
+    var coding3 = new Coding();
     coding3.setCode("code3");
     coding3.setSystem("system3");
 
-    var codings = java.util.List.of(coding2, coding3);
+    var codings = List.of(coding2, coding3);
 
     var result = Helper.findBySystem(coding1, codings);
 
+    assertTrue(result.isPresent());
     assertEquals(coding2, result.get());
   }
 
   @Test
   void shouldFailWhileSearchingSystem() {
-    var coding1 = new org.hl7.fhir.r4.model.Coding();
+    var coding1 = new Coding();
     coding1.setCode("code1");
     coding1.setSystem("system1");
 
-    var coding2 = new org.hl7.fhir.r4.model.Coding();
+    var coding2 = new Coding();
     coding2.setCode("code2");
     coding2.setSystem("system2");
 
-    var coding3 = new org.hl7.fhir.r4.model.Coding();
+    var coding3 = new Coding();
     coding3.setCode("code3");
     coding3.setSystem("system3");
 
-    var codings = java.util.List.of(coding2, coding3);
+    var codings = List.of(coding2, coding3);
 
     var result = Helper.findBySystem(coding1, codings);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,16 +41,15 @@ public enum SupplyOptionsType {
   }
 
   public Extension asExtension(ErpWorkflowVersion version) {
-
     ErpWorkflowStructDef structDef;
     if (version.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       structDef = ErpWorkflowStructDef.SUPPLY_OPTIONS_TYPE;
     } else {
       structDef = ErpWorkflowStructDef.SUPPLY_OPTIONS_TYPE_12;
     }
-    val ext = new Extension(structDef.getCanonicalUrl());
+    val ext = structDef.asExtension();
     ext.addExtension(new Extension(label, new BooleanType(true)));
-    for (SupplyOptionsType other : SupplyOptionsType.values()) {
+    for (val other : SupplyOptionsType.values()) {
       if (other != this) {
         ext.addExtension(new Extension(other.label, new BooleanType(false)));
       }

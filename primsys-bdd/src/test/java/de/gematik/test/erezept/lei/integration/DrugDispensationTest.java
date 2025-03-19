@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,9 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -50,7 +51,7 @@ import net.serenitybdd.screenplay.actors.OnStage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DrugDispensationTest {
+class DrugDispensationTest extends ErpFhirBuildingTest {
 
   private PrescriptionId prescriptionId;
   private Actor patient;

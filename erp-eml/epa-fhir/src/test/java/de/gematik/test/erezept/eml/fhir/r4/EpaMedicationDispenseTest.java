@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ import org.junit.jupiter.api.Test;
 
 class EpaMedicationDispenseTest {
 
-  private final EpaMedicationDispense medicationDispense = new EpaMedicationDispense();
-
   @Test
   void getPerformer() {
     val performer = new MedicationDispense.MedicationDispensePerformerComponent();
     performer.setActor(new Reference("Organization/3856402c-7636-4fbd-98bd-d278852b8e88"));
+
+    val medicationDispense = new EpaMedicationDispense();
     medicationDispense.setPerformer(List.of(performer));
     assertEquals(
         Optional.of("Organization/3856402c-7636-4fbd-98bd-d278852b8e88"),
@@ -42,6 +42,8 @@ class EpaMedicationDispenseTest {
   @Test
   void getEpaMedicationReference() {
     val testString = "Medication/3b990824-3814-4d75-80b1-e2935827f8f0";
+
+    val medicationDispense = new EpaMedicationDispense();
     medicationDispense.setMedication(new Reference().setReference(testString));
     assertEquals(testString, medicationDispense.getEpaMedicationReference());
   }

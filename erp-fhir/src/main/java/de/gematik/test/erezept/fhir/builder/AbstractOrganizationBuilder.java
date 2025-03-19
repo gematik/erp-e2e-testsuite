@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.val;
 import org.hl7.fhir.r4.model.Address;
@@ -26,33 +28,35 @@ import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Resource;
 
-public abstract class AbstractOrganizationBuilder<T extends AbstractOrganizationBuilder<T>>
-    extends AbstractResourceBuilder<T> {
+public abstract class AbstractOrganizationBuilder<
+        R extends Resource, B extends AbstractOrganizationBuilder<R, B>>
+    extends ResourceBuilder<R, B> {
 
   protected final List<ContactPoint> contactPoints = new LinkedList<>();
   protected String name;
   protected Address address;
 
-  public T name(String name) {
+  public B name(String name) {
     this.name = name;
     return self();
   }
 
-  public T address(Address address) {
+  public B address(Address address) {
     this.address = address;
     return self();
   }
 
-  public T phone(String phoneNumber) {
+  public B phone(String phoneNumber) {
     return this.contact(ContactPoint.ContactPointSystem.PHONE, phoneNumber);
   }
 
-  public T email(String email) {
+  public B email(String email) {
     return this.contact(ContactPoint.ContactPointSystem.EMAIL, email);
   }
 
-  public T contact(ContactPoint.ContactPointSystem system, String value) {
+  public B contact(ContactPoint.ContactPointSystem system, String value) {
     this.contactPoints.add(new ContactPoint().setSystem(system).setValue(value));
     return self();
   }
@@ -68,15 +72,11 @@ public abstract class AbstractOrganizationBuilder<T extends AbstractOrganization
 
     val profile = profileSupplier.get();
     val meta = new Meta().setProfile(List.of(profile));
-
-    // set FHIR-specific values provided by HAPI
     organization.setId(this.getResourceId()).setMeta(meta);
 
     organization.setIdentifier(identifiers).setName(name).setTelecom(contactPoints);
 
-    if (address != null) {
-      organization.setAddress(List.of(address));
-    }
+    Optional.ofNullable(address).map(List::of).ifPresent(organization::setAddress);
 
     return organization;
   }

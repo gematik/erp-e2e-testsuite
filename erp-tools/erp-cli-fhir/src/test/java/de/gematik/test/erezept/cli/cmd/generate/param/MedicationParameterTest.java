@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import lombok.*;
 import org.junit.jupiter.api.*;
 import picocli.*;
 
-class MedicationParameterTest {
+class MedicationParameterTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldNotRequireAnyOptions() {

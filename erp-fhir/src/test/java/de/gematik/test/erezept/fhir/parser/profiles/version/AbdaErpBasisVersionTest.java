@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,31 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.version;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.parser.profiles.*;
-import java.util.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
-import org.junitpioneer.jupiter.*;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import java.util.Arrays;
+import java.util.stream.Stream;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class AbdaErpBasisVersionTest {
+class AbdaErpBasisVersionTest extends ErpFhirBuildingTest {
 
-  @Test
-  void getDefaultVersionViaCurrentDate() {
+  @ParameterizedTest
+  @MethodSource
+  @ClearSystemProperty(key = AbdaErpBasisVersion.PROFILE_NAME)
+  void getDefaultVersionViaSystemProperty(AbdaErpBasisVersion version) {
+    System.setProperty(AbdaErpBasisVersion.PROFILE_NAME, version.getVersion());
     val defaultVersion = AbdaErpBasisVersion.getDefaultVersion();
-
-    // Note: this assertion might break in the future!
-    assertEquals(AbdaErpBasisVersion.V1_3_1, defaultVersion);
+    assertEquals(version, defaultVersion);
   }
 
-  @Test
-  @ClearSystemProperty(key = "de.abda.erezeptabgabedatenbasis")
-  void getDefaultVersionViaSystemProperty() {
-    val propertyName = CustomProfiles.ABDA_ERP_BASIS.getName();
-    Arrays.stream(AbdaErpBasisVersion.values())
-        .forEach(
-            version -> {
-              System.setProperty(propertyName, version.getVersion());
-              val defaultVersion = AbdaErpBasisVersion.getDefaultVersion();
-              assertEquals(version, defaultVersion);
-            });
+  static Stream<Arguments> getDefaultVersionViaSystemProperty() {
+    return Arrays.stream(AbdaErpBasisVersion.values()).map(Arguments::of);
   }
 
   @Test
@@ -53,11 +49,5 @@ class AbdaErpBasisVersionTest {
     assertEquals(0, AbdaErpBasisVersion.V1_2_1.compareTo(AbdaErpBasisVersion.V1_2_1));
     assertEquals(0, AbdaErpBasisVersion.V1_3_1.compareTo(AbdaErpBasisVersion.V1_3_1));
     assertEquals(-1, AbdaErpBasisVersion.V1_2_1.compareTo(AbdaErpBasisVersion.V1_3_1));
-  }
-
-  @AfterEach
-  void cleanProperties() {
-    val propertyName = CustomProfiles.ABDA_ERP_BASIS.getName();
-    System.clearProperty(propertyName);
   }
 }

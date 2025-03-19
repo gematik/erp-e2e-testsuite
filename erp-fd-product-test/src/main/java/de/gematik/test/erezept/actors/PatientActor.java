@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,24 @@ package de.gematik.test.erezept.actors;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.AssignerOrganization;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.kbv.AssignerOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Optional;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Slf4j
-@Getter
 public class PatientActor extends ErpActor {
 
   public PatientActor(String name) {
@@ -53,7 +51,7 @@ public class PatientActor extends ErpActor {
     return SafeAbility.getAbility(this, ProvideEGK.class).getEgk();
   }
 
-  public void changePatientInsuranceType(VersicherungsArtDeBasis insuranceType) {
+  public void changePatientInsuranceType(InsuranceTypeDe insuranceType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     bd.setPatientInsuranceType(insuranceType);
   }
@@ -82,17 +80,17 @@ public class PatientActor extends ErpActor {
     return bd.getPayorType();
   }
 
-  public void changeCoverageInsuranceType(VersicherungsArtDeBasis coverageType) {
+  public void changeCoverageInsuranceType(InsuranceTypeDe coverageType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     bd.setCoverageInsuranceType(coverageType);
   }
 
-  public VersicherungsArtDeBasis getPatientInsuranceType() {
+  public InsuranceTypeDe getPatientInsuranceType() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getPatientInsuranceType();
   }
 
-  public VersicherungsArtDeBasis getCoverageInsuranceType() {
+  public InsuranceTypeDe getCoverageInsuranceType() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getCoverageInsuranceType();
   }
@@ -110,14 +108,14 @@ public class PatientActor extends ErpActor {
   public Optional<AssignerOrganization> getAssignerOrganization() {
     Optional<AssignerOrganization> ret = Optional.empty();
     // an assigner Organization for PKV is only required for kbv.ita.erp == 1.0.2
-    if (this.getPatientInsuranceType() == VersicherungsArtDeBasis.PKV
+    if (this.getPatientInsuranceType() == InsuranceTypeDe.PKV
         && KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
 
       // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
       // Reference + Name
       // build a faked one matching the Reference of the patient
       val fakedAssignerOrganization =
-          AssignerOrganizationFaker.builder().forPatient(this.getPatientData()).fake();
+          KbvAssignerOrganizationFaker.builder().forPatient(this.getPatientData()).fake();
       ret = Optional.of(fakedAssignerOrganization);
     }
     return ret;

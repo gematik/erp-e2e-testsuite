@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,18 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
-class ErxMedicationDispenseBundleFakerTest extends ParsingTest {
+@SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.3.0") // no longer required in 1.4.0
+class ErxMedicationDispenseBundleFakerTest extends ErpFhirParsingTest {
+
   @Test
   void buildFakeMedicationDispenseBundleBuilder() {
     val bundle = ErxMedicationDispenseBundleFaker.build().fake();

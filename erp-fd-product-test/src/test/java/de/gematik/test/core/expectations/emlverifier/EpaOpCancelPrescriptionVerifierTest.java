@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import de.gematik.test.core.expectations.verifier.emlverifier.EpaOpCancelPrescri
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
 import java.time.Month;
@@ -34,7 +35,7 @@ import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class EpaOpCancelPrescriptionVerifierTest {
+class EpaOpCancelPrescriptionVerifierTest extends ErpFhirBuildingTest {
 
   private static EpaOpCancelPrescription epaOpCancelPrescription;
   private static final Date testDate_22_01_2025 =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -33,8 +34,11 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
+import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.FhirCloseSlicingToggle;
 import de.gematik.test.fuzzing.FuzzingUtils;
@@ -80,11 +84,11 @@ class ActivateInvalidKbvBundles extends ErpTest {
   private static ArgumentComposer baseComposer() {
     return ArgumentComposer.composeWith()
         .arguments(
-            VersicherungsArtDeBasis.GKV, // given insurance kind
+            InsuranceTypeDe.GKV, // given insurance kind
             PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-        .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-        .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+        .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+        .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+        .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
   }
 
   private static List<Extension> optionalExtensions() {
@@ -216,7 +220,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
           + " kbv.ita.erp 1.0.2 gefordert werden")
   @MethodSource("optionalCompositionExtensions")
   void activatePrescriptionWithOptionalCompositionExtensions(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
@@ -233,7 +237,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
           + " kbv.ita.erp 1.0.2 gefordert werden")
   @MethodSource("optionalMedicationExtensions")
   void activatePrescriptionWithOptionalMedicationExtensions(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
@@ -250,7 +254,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
           + " kbv.ita.erp 1.0.2 gefordert werden")
   @MethodSource("optionalMedicationRequestExtensions")
   void activatePrescriptionWithOptionalMedicationRequestExtensions(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
@@ -267,7 +271,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
           + " 1.0.2 gefordert werden")
   @MethodSource("optionalCoverageExtensions")
   void activatePrescriptionWithOptionalCoverageExtensions(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
@@ -284,7 +288,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
           + " 1.0.2 gefordert werden")
   @MethodSource("optionalPatientExtensions")
   void activatePrescriptionWithOptionalPatientExtensions(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 
@@ -433,7 +437,7 @@ class ActivateInvalidKbvBundles extends ErpTest {
   }
 
   private void activatePrescriptionWithOptionalExtensions(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<Consumer<IssuePrescription.Builder>> extensionProvider) {
 

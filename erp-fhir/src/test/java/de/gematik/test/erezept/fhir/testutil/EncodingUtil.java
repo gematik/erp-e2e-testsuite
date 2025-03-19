@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import static java.text.MessageFormat.format;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -58,16 +58,14 @@ public class EncodingUtil {
     val originalValidationResult = parser.validate(originalContent);
     assertTrue(originalValidationResult.isSuccessful());
     log.info(
-        format(
-            "Validation of original File {0} : {1}",
-            filepath, originalValidationResult.isSuccessful()));
+        "Validation of original File {} : {}", filepath, originalValidationResult.isSuccessful());
 
     // parse the original content to an object
     val originalEncoding = EncodingType.fromString(filepath);
     val originalObject = parser.decode(clazz, originalContent, originalEncoding);
     assertNotNull(
         format("{0} must result in {1}", filepath, clazz.getSimpleName()), originalObject);
-    log.info(format("File {0} parsed to {1}", filepath, originalObject));
+    log.info("File {} parsed to {}", filepath, originalObject);
 
     // re-encode the original object to its origin encoding and validate again
     val newOriginalContent = reEncode(parser, originalObject, originalEncoding);
@@ -85,26 +83,26 @@ public class EncodingUtil {
 
     if (vr.isSuccessful()) {
       log.info(
-          format(
-              "{0} re-encoded to {1} : {2}",
-              resource.getClass().getSimpleName(), encoding, vr.isSuccessful()));
+          "{} re-encoded to {} : {}",
+          resource.getClass().getSimpleName(),
+          encoding,
+          vr.isSuccessful());
     } else {
       log.error(
-          format(
-              "Encoding of Resource {0} produces invalid {1} output with {2} errors\n{3}",
-              resource.getClass().getSimpleName(),
-              encoding,
-              vr.getMessages().size(),
-              vr.getMessages().stream()
-                  .map(
-                      svm ->
-                          svm.getMessage()
-                              + " -> (line: "
-                              + svm.getLocationLine()
-                              + "; col: "
-                              + svm.getLocationCol()
-                              + ")")
-                  .collect(Collectors.joining("\n"))));
+          "Encoding of Resource {} produces invalid {} output with {} errors\n{}",
+          resource.getClass().getSimpleName(),
+          encoding,
+          vr.getMessages().size(),
+          vr.getMessages().stream()
+              .map(
+                  svm ->
+                      svm.getMessage()
+                          + " -> (line: "
+                          + svm.getLocationLine()
+                          + "; col: "
+                          + svm.getLocationCol()
+                          + ")")
+              .collect(Collectors.joining("\n")));
     }
 
     assertTrue(vr.isSuccessful());

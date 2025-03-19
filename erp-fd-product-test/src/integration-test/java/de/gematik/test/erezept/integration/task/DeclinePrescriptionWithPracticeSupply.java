@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
@@ -29,13 +30,12 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.SupplyRequestBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
   @DisplayName("invalides E-Rezept mit PracticeSupply und MedicationRequest ausstellen")
   @Test
   void activateInvalidPrescriptionWithPracticeSupplyAndMedicationRequest() {
-    sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
+    sina.changePatientInsuranceType(InsuranceTypeDe.GKV);
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
     val coverage = KbvCoverageFaker.builder().fake();
@@ -73,11 +73,11 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
             UUID.randomUUID().toString(),
             coverage,
             medication,
-            MedicalOrganizationFaker.builder().fake(),
+            KbvMedicalOrganizationFaker.builder().fake(),
             supplyRequest);
 
     kbvBundleBuilder.medicationRequest(
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withPatient(sina.getPatientData())
             .withMedication(medication)
             .withRequester(doctor.getPractitioner())
@@ -100,7 +100,7 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
   @DisplayName("valides E-Rezept mit PracticeSupply wird vom FD abgelehnt")
   @Test
   void activateValidPrescriptionWithPracticeSupply() {
-    sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
+    sina.changePatientInsuranceType(InsuranceTypeDe.GKV);
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
     val kbvBundleBuilder =
@@ -108,7 +108,7 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
             UUID.randomUUID().toString(),
             KbvCoverageFaker.builder().fake(),
             medication,
-            MedicalOrganizationFaker.builder().fake(),
+            KbvMedicalOrganizationFaker.builder().fake(),
             supplyRequest);
 
     val issuePrescription =
@@ -136,7 +136,7 @@ class DeclinePrescriptionWithPracticeSupply extends ErpTest {
       String prescriptionId,
       KbvCoverage coverage,
       Medication medication,
-      MedicalOrganization organization,
+      KbvMedicalOrganization organization,
       SupplyRequest supplyRequest) {
     return KbvErpBundleBuilder.forPrescription(prescriptionId)
         .practitioner(doctor.getPractitioner())

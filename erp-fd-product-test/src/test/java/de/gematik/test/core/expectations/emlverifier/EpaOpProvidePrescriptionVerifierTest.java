@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,32 @@
 
 package de.gematik.test.core.expectations.emlverifier;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.*;
-import static de.gematik.test.erezept.eml.fhir.parser.profiles.UseFulCodeSystems.SNOMED_SCT;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlAuthoredOnIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationRequestMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlOrganisationHasSmcbTelematikId;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPractitionerHasHbaTelematikId;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPrescriptionIdIsEqualTo;
+import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.SNOMED_SCT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -41,7 +52,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.MedicationRequest;
+import org.hl7.fhir.r4.model.Quantity;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,7 +63,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class EpaOpProvidePrescriptionVerifierTest {
+class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
 
   private static final Date testDate_22_01_2025 =
       DateConverter.getInstance().localDateToDate(LocalDate.of(2025, Month.JANUARY, 22));
@@ -58,34 +72,35 @@ class EpaOpProvidePrescriptionVerifierTest {
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithIngredient;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithCompounding;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithFreeText;
-  private static FhirCodec fhir;
+
+  private static FhirCodec epaFhir;
 
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("not needed");
-    fhir = EpaFhirFactory.create();
+    epaFhir = EpaFhirFactory.create();
     epaOpProvidePrescription =
-        fhir.decode(
+        epaFhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/Parameters-example-epa-op-provide-prescription-erp-input-parameters-1.json"));
     epaOpProvidePrescriptionWithPzn =
-        fhir.decode(
+        epaFhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
     epaOpProvidePrescriptionWithFreeText =
-        fhir.decode(
+        epaFhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/providePrescrFromEpaMockAsMedFreeText.json"));
     epaOpProvidePrescriptionWithCompounding =
-        fhir.decode(
+        epaFhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/providePrescrWithMedCompoundingFromFD.json"));
     epaOpProvidePrescriptionWithIngredient =
-        fhir.decode(
+        epaFhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/providePrescrFromEpaMockAsMedIngredient.json"));
@@ -449,7 +464,7 @@ class EpaOpProvidePrescriptionVerifierTest {
             .setQuantity(new Quantity().setValue(1).setSystem("http://unitsofmeasure.org"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -462,7 +477,7 @@ class EpaOpProvidePrescriptionVerifierTest {
   }
 
   @Test
-  void shouldThrowWileValidateEpaMedicationRequestDate() {
+  void shouldThrowWhileValidateEpaMedicationRequestDate() {
     val testDate =
         DateConverter.getInstance().localDateToDate(LocalDate.of(2000, Month.JANUARY, 22));
     val dispRequest =
@@ -470,13 +485,12 @@ class EpaOpProvidePrescriptionVerifierTest {
             .setQuantity(new Quantity().setValue(1).setSystem("http://unitsofmeasure.org"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
-        MedicationRequestFaker.builder()
-            .withAuthorDate(new Date())
+        KbvErpMedicationRequestFaker.builder()
+            .withAuthorDate(testDate)
             .withMedication(medication)
             .fake();
     medRequ
         .setStatus(MedicationRequest.MedicationRequestStatus.ACTIVE)
-        .setAuthoredOn(testDate)
         .setDispenseRequest(dispRequest);
 
     val step = emlMedicationRequestMapsTo(medRequ);
@@ -490,7 +504,7 @@ class EpaOpProvidePrescriptionVerifierTest {
             .setQuantity(new Quantity().setValue(2).setSystem("http://unitsofmeasure.org"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -510,7 +524,7 @@ class EpaOpProvidePrescriptionVerifierTest {
             .setQuantity(new Quantity().setValue(1).setSystem("http://fakeSystem.eu"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -530,7 +544,7 @@ class EpaOpProvidePrescriptionVerifierTest {
             .setQuantity(new Quantity().setValue(1).setSystem("http://unitsofmeasure.org"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -583,7 +597,7 @@ class EpaOpProvidePrescriptionVerifierTest {
   @Test
   void shouldThrowWhileValidateEpaMedicationWithMedicationCompoundingWithSnomed() {
     val epaMed =
-        fhir.decode(
+        epaFhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/providePrescrWithMedCompoundingFromFD.json"));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-class MedicationRequestDataMapperTest {
+class MedicationRequestDataMapperTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldValidMvoOnNull() {
@@ -61,12 +62,12 @@ class MedicationRequestDataMapperTest {
 
   @RepeatedTest(5)
   void shouldNotMissAnyFields() {
-    val practitioner = PractitionerFaker.builder().fake();
-    val patient = PatientFaker.builder().fake();
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val patient = KbvPatientFaker.builder().fake();
     val coverage = KbvCoverageFaker.builder().fake();
     val medication = KbvErpMedicationPZNFaker.builder().fake();
 
-    val mrFaker = MedicationRequestFaker.builder();
+    val mrFaker = KbvErpMedicationRequestFaker.builder();
 
     if (fakerBool()) {
       mrFaker.withNote(GemFaker.getFaker().backToTheFuture().quote());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -65,7 +65,7 @@ public class ChargeItemParameter implements BaseResourceParameter {
     val fhir = new FhirParser();
 
     val prescriptionId = prescriptionIdParameter.getPrescriptionId();
-    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(prescriptionId).fake();
     // only encoded, but not signed because we don't have a signer here
     val encodedDavBundle =
         fhir.encode(davBundle, EncodingType.XML).getBytes(StandardCharsets.UTF_8);

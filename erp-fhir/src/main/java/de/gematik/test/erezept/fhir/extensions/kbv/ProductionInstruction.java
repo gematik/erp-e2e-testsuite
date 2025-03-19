@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructD
 import lombok.Getter;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.StringType;
 
 @Getter
 public class ProductionInstruction {
@@ -30,7 +29,6 @@ public class ProductionInstruction {
   private final String display;
 
   private ProductionInstruction(KbvItaErpStructDef strucDef, String display) {
-
     this.display = display;
     this.strucDef = strucDef;
   }
@@ -48,9 +46,9 @@ public class ProductionInstruction {
   }
 
   /**
-   * maximum length of string in Medication.extension:Verpackung.value[x]:valueString in
-   * https://simplifier.net/packages/kbv.ita.erp/1.0.2 has to have max digits of 60 from
-   * kbv.ita.erp/1.0.3
+   * maximum length of string in Medication.extension:Verpackung.value[x]:valueString in <a
+   * href="https://simplifier.net/packages/kbv.ita.erp/1.0.2">kbv.ita.erp</a> has to have max digits
+   * of 60 from kbv.ita.erp/1.0.3
    *
    * @param freitext as String
    * @return ProductionInstruction
@@ -65,17 +63,18 @@ public class ProductionInstruction {
   }
 
   public Extension asExtension() {
-    return new Extension(strucDef.getCanonicalUrl(), new StringType(display));
+    return strucDef.asStringExtension(display);
   }
 
   /**
    * maximum length of string in Medication.extension:Herstellungsanweisung.value[x]:valueString in
-   * https://simplifier.net/packages/kbv.ita.erp/1.0.2 has to have max digits of 60
+   * <a href="https://simplifier.net/packages/kbv.ita.erp/1.0.2">kbv.ita.erp</a> has to have max
+   * digits of 60
    *
-   * @param maxLength
+   * @param maxLength of the display string
    */
   public Extension asExtension(int maxLength) {
     val cuttedDisply = display.substring(0, Integer.min(display.length(), maxLength - 1));
-    return new Extension(strucDef.getCanonicalUrl(), new StringType(cuttedDisply));
+    return strucDef.asStringExtension(cuttedDisply);
   }
 }

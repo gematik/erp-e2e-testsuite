@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import java.util.Date;
 import java.util.stream.Stream;
@@ -31,16 +31,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
-class KbvHealthAppRequestBuilderTest extends ParsingTest {
+@SetSystemProperty(
+    key = ERP_FHIR_PROFILES_TOGGLE,
+    value = "1.4.0") // before 1.4.0 EVDGA was not available
+class KbvHealthAppRequestBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildHealthAppRequestWithFixedValues() {
     val har =
-        KbvHealthAppRequestBuilder.forPatient(PatientFaker.builder().fake())
-            .version(KbvItvEvdgaVersion.V1_0_0)
+        KbvHealthAppRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
             .insurance(KbvCoverageFaker.builder().fake())
-            .requester(PractitionerFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
             .healthApp("17946626", "HelloBetter Schmerzen 001")
             .status(DeviceRequestStatus.ACTIVE)
             .intent(RequestIntent.ORDER)
@@ -56,9 +59,9 @@ class KbvHealthAppRequestBuilderTest extends ParsingTest {
   @MethodSource
   void shouldBuildHealthAppRequestWithFixedValuesWithAccident(AccidentExtension accidentExtension) {
     val har =
-        KbvHealthAppRequestBuilder.forPatient(PatientFaker.builder().fake())
+        KbvHealthAppRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
             .insurance(KbvCoverageFaker.builder().fake())
-            .requester(PractitionerFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
             .healthApp("17946626", "HelloBetter Schmerzen 001")
             .accident(accidentExtension)
             .build();

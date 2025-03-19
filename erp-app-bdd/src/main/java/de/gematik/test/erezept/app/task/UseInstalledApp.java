@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.app.task;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
@@ -27,7 +28,6 @@ import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.app.task.ios.SetVirtualEgkOnIOS;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class UseInstalledApp implements Task {
 
   private final Actor deviceOwner;
   private final EnvironmentConfiguration environment;
-  private final VersicherungsArtDeBasis insuranceKind;
+  private final InsuranceTypeDe insuranceKind;
   private final SmartcardArchive sca;
 
   @Override
@@ -83,13 +83,13 @@ public class UseInstalledApp implements Task {
 
     private final Actor deviceOwner;
     private EnvironmentConfiguration environment;
-    private VersicherungsArtDeBasis insuranceKind;
+    private InsuranceTypeDe insuranceKind;
 
     public Builder withInsuranceType(String insuranceKind) {
-      return withInsuranceType(VersicherungsArtDeBasis.fromCode(insuranceKind));
+      return withInsuranceType(InsuranceTypeDe.fromCode(insuranceKind));
     }
 
-    public Builder withInsuranceType(VersicherungsArtDeBasis insuranceKind) {
+    public Builder withInsuranceType(InsuranceTypeDe insuranceKind) {
       this.insuranceKind = insuranceKind;
       return this;
     }

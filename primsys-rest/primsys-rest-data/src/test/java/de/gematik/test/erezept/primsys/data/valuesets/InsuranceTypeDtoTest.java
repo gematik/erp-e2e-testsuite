@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
 import java.util.Arrays;
 import lombok.val;
@@ -43,7 +43,7 @@ class InsuranceTypeDtoTest {
 
   @Test
   void shouldHaveAllInsuranceTypes() {
-    Arrays.stream(VersicherungsArtDeBasis.values())
+    Arrays.stream(InsuranceTypeDe.values())
         .forEach(
             vs -> {
               val dto = assertDoesNotThrow(() -> InsuranceTypeDto.fromCode(vs.getCode()));
@@ -57,7 +57,7 @@ class InsuranceTypeDtoTest {
     Arrays.stream(InsuranceTypeDto.values())
         .forEach(
             dto -> {
-              val vs = assertDoesNotThrow(() -> VersicherungsArtDeBasis.fromCode(dto.getCode()));
+              val vs = assertDoesNotThrow(() -> InsuranceTypeDe.fromCode(dto.getCode()));
               assertEquals(vs.getCode(), dto.getCode());
               assertEquals(vs.getDisplay(), dto.getDisplay());
             });

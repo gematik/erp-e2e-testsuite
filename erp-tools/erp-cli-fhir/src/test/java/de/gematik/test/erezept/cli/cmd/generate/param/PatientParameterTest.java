@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,17 @@
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.valuesets.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
-import picocli.*;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+import picocli.CommandLine;
 
-class PatientParameterTest {
+class PatientParameterTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldNotRequireAnyOptions() {
@@ -35,7 +38,7 @@ class PatientParameterTest {
     assertNotNull(pp.getBirthDate());
     assertNotNull(pp.getKvnrParameter().getKvnr());
     assertNotNull(pp.createPatient());
-    assertEquals(VersicherungsArtDeBasis.GKV, pp.getKvnrParameter().getInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, pp.getKvnrParameter().getInsuranceType());
   }
 
   @Test
@@ -43,7 +46,7 @@ class PatientParameterTest {
     val pp = new PatientParameter();
     val cmdline = new CommandLine(pp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--insurance-type", "PKV"));
-    assertEquals(VersicherungsArtDeBasis.PKV, pp.getKvnrParameter().getInsuranceType());
+    assertEquals(InsuranceTypeDe.PKV, pp.getKvnrParameter().getInsuranceType());
     assertNotNull(pp.createPatient());
   }
 }

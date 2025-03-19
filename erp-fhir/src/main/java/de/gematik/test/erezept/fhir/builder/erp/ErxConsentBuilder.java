@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,27 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.resources.erp.ErxConsent;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.ActCode;
-import de.gematik.test.erezept.fhir.valuesets.ConsentScope;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.ActCode;
+import de.gematik.bbriccs.fhir.de.valueset.ConsentScope;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.systems.PatientenrechnungCodeSystem;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.valuesets.ConsentType;
 import java.util.Date;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.Consent;
 
-public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder> {
+public class ErxConsentBuilder extends ResourceBuilder<ErxConsent, ErxConsentBuilder> {
 
   private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private KVNR kvnr;
@@ -66,34 +71,26 @@ public class ErxConsentBuilder extends AbstractResourceBuilder<ErxConsentBuilder
     return self();
   }
 
+  @Override
   public ErxConsent build() {
-    val consent = new ErxConsent();
-
     CanonicalType profile;
-    INamingSystem kvnrNamingSystem;
-    ICodeSystem consentTypeCodeSystem;
+    DeBasisProfilNamingSystem kvnrNamingSystem;
+    WithCodeSystem consentTypeCodeSystem;
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       profile = ErpWorkflowStructDef.CONSENT.asCanonicalType();
-      kvnrNamingSystem = DeBasisNamingSystem.KVID;
+      kvnrNamingSystem = DeBasisProfilNamingSystem.KVID;
       consentTypeCodeSystem = ErpWorkflowCodeSystem.CONSENT_TYPE;
     } else {
       profile =
           PatientenrechnungStructDef.GEM_ERPCHRG_PR_CONSENT.asCanonicalType(
-              PatientenrechnungVersion.V1_0_0, true);
-      kvnrNamingSystem = DeBasisNamingSystem.KVID_PKV;
+              PatientenrechnungVersion.V1_0_0);
+      kvnrNamingSystem = DeBasisProfilNamingSystem.KVID_PKV_SID;
       consentTypeCodeSystem = PatientenrechnungCodeSystem.CONSENT_TYPE;
     }
-    val meta = new Meta().setProfile(List.of(profile));
 
-    // set FHIR-specific values provided by HAPI
-    consent.setMeta(meta);
+    val consent = this.createResource(ErxConsent::new, profile);
 
-    consent.setPatient(
-        new Reference()
-            .setIdentifier(
-                new Identifier()
-                    .setSystem(kvnrNamingSystem.getCanonicalUrl())
-                    .setValue(kvnr.getValue())));
+    consent.setPatient(kvnr.asReference(kvnrNamingSystem, false));
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);
     consent.setScope(scope.asCodeableConcept());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent.Representation;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent.Representation;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -115,54 +117,29 @@ public class AuditEventVerifier {
   }
 
   /**
-   * the Verifier checks the content of the first 3 Elements. from time to time we recognized that
-   * the searched content was in the second or third AuditEvent In addition, the actor can also
-   * change in the future, so the string used for the search is cut off at the beginning
+   * Verifies that the given `ErxAuditEventBundle` contains an `ErxAuditEvent` that matches the
+   * specified representation and the recorded timestamp is after the given timestamp.
    *
-   * @param representation
-   * @return as it matches or not
+   * @param representation the representation to match against the `ErxAuditEvent`
+   * @param timestamp the timestamp to compare against the recorded time of the `ErxAuditEvent`
+   * @return a `VerificationStep`
    */
-  public VerificationStep<ErxAuditEventBundle> oneOfFirstThreeElementsCorrespondsTo(
-      Representation representation) {
+  public VerificationStep<ErxAuditEventBundle> contains(
+      Representation representation, Instant timestamp) {
     Predicate<ErxAuditEventBundle> predicate =
-        bundle -> {
-          val auditEvents = bundle.getAuditEvents();
-          val upperLimit = Math.min(auditEvents.size(), 3);
-          val filteredAuditEvent =
-              auditEvents.subList(0, upperLimit).stream()
-                  .filter(ae -> ae.getFirstText().contains(representation.getText().substring(12)))
-                  .findAny();
-          if (auditEvents.isEmpty() || filteredAuditEvent.isEmpty()) {
-            return false;
-          }
-
-          log.info(
-              format(
-                  "Der erste Eintrag im Versichertenprotokoll entspricht \"{0}\"",
-                  filteredAuditEvent.get().getFirstText()));
-          return corresponds(filteredAuditEvent.get(), representation);
-        };
+        bundle ->
+            bundle.getAuditEvents().stream()
+                .filter(ae -> ae.getRecorded().toInstant().isAfter(timestamp.minusSeconds(5)))
+                .map(ae -> corresponds(ae, representation))
+                .findAny()
+                .orElse(false);
     return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
             ErpAfos.A_19284.getRequirement(),
             format(
-                "Der erste Eintrag im Versichertenprotokoll entspricht nicht  \"{0}\"",
-                replacePlaceholder(representation.getText())))
-        .predicate(predicate)
-        .accept();
-  }
-
-  public VerificationStep<ErxAuditEventBundle> contains(Representation representation) {
-    Predicate<ErxAuditEventBundle> predicate =
-        bundle -> {
-          val auditEvents = bundle.getAuditEvents();
-          return auditEvents.stream().anyMatch(ae -> corresponds(ae, representation));
-        };
-
-    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
-            ErpAfos.A_19284.getRequirement(),
-            format(
-                "Im Versichertenprotokoll wurde folgender Eintrag nicht gefunden: {0}",
-                replacePlaceholder(representation.getText())))
+                "Die Liste der letzten Versichertenprotokolle (> {1}) enthält den Eintrag \"{0}\""
+                    + " nicht  \"{0}\"",
+                replacePlaceholder(representation.getText()),
+                timestamp.truncatedTo(ChronoUnit.SECONDS)))
         .predicate(predicate)
         .accept();
   }

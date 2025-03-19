@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
-public enum KostenVersicherterKategorie implements IValueSet {
+public enum KostenVersicherterKategorie implements FromValueSet {
   ZUZAHLUNG("0", "Zuzahlung"),
   MEHRKOSTEN("1", "Mehrkosten (Apothekenverkaufspreis minus Festbetrag)"),
   EIGENBETEILIGUNG(
@@ -34,24 +33,17 @@ public enum KostenVersicherterKategorie implements IValueSet {
       "Eigenbeteiligung des Versicherten bei Verordnungen im Rahmen der künstlichen Befruchtung");
 
   public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.KOSTEN_VERSICHERTER_KATEGORIE;
-  public static final String VERSION = "1.1";
   public static final String DESCRIPTION = "Category of the cost";
-  public static final String PUBLISHER = "DAV";
 
   private final String code;
   private final String display;
-
-  @Override
-  public String getDefinition() {
-    return "n/a";
-  }
 
   @Override
   public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
-  public static KostenVersicherterKategorie fromCode(@NonNull String code) {
+  public static KostenVersicherterKategorie fromCode(String code) {
     return Arrays.stream(KostenVersicherterKategorie.values())
         .filter(kvk -> kvk.code.equals(code))
         .findFirst()

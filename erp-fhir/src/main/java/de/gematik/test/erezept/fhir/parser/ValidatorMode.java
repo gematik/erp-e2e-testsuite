@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import de.gematik.test.erezept.fhir.exceptions.FhirValidatorException;
+import de.gematik.bbriccs.fhir.conf.exceptions.FhirConfigurationException;
 import java.util.Arrays;
 import lombok.val;
 
@@ -63,7 +63,7 @@ public enum ValidatorMode {
         .findFirst()
         .orElseThrow(
             () ->
-                new FhirValidatorException(
+                new FhirConfigurationException(
                     format("Unable to set FHIR Validator Mode {0} from configuration", value)));
   }
 
@@ -75,7 +75,7 @@ public enum ValidatorMode {
           .findFirst()
           .orElseThrow(
               () ->
-                  new FhirValidatorException(
+                  new FhirConfigurationException(
                       format(
                           "Unable to set FHIR Validator Mode {0} from SystemProperty/Environment",
                           conf)));

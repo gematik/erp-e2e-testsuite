@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseGetCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class GetMedicationDispenseTest {
+class GetMedicationDispenseTest extends ErpFhirBuildingTest {
   private static PharmacyActor pharmacist;
   private static PatientActor sina;
 

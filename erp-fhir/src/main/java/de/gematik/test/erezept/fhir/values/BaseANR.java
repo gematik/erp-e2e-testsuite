@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,55 +18,56 @@ package de.gematik.test.erezept.fhir.values;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.WithChecksum;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
+import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
+import de.gematik.bbriccs.fhir.coding.WithSystem;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.HL7CodeSystem;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.INamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.IWithSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.Hl7CodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
+@Getter
 public abstract class BaseANR implements WithChecksum {
 
   @Getter
   public enum ANRType {
-    LANR(Hl7CodeSystem.HL7_V2_0203, KbvNamingSystem.BASE_ANR, IdentifierTypeDe.LANR),
+    LANR(HL7CodeSystem.HL7_V2_0203, KbvNamingSystem.BASE_ANR, IdentifierTypeDe.LANR),
     ZANR(
-        DeBasisCodeSystem.IDENTIFIER_TYPE_DE_BASIS,
-        DeBasisNamingSystem.ZAHNARZTNUMMER,
+        DeBasisProfilCodeSystem.IDENTIFIER_TYPE_DE_BASIS,
+        DeBasisProfilNamingSystem.KZBV_ZAHNARZTNUMMER,
         IdentifierTypeDe.ZANR);
 
-    private final ICodeSystem codeSystem;
-    private final INamingSystem namingSystem;
+    private final WithCodeSystem codeSystem;
+    private final WithNamingSystem namingSystem;
     private final IdentifierTypeDe codeType;
 
-    ANRType(ICodeSystem codeSystem, INamingSystem namingSystem, IdentifierTypeDe codeType) {
+    ANRType(WithCodeSystem codeSystem, WithNamingSystem namingSystem, IdentifierTypeDe codeType) {
       this.codeSystem = codeSystem;
       this.namingSystem = namingSystem;
       this.codeType = codeType;
     }
 
-    public static ANRType fromCode(@NonNull String code) {
+    public static ANRType fromCode(String code) {
       return ANRType.valueOf(code.toUpperCase());
     }
 
-    public static List<ICodeSystem> validCodeSystems() {
+    public static List<WithCodeSystem> validCodeSystems() {
       return Arrays.stream(ANRType.values()).map(ANRType::getCodeSystem).toList();
     }
 
-    public static List<INamingSystem> validNamingSystems() {
+    public static List<WithNamingSystem> validNamingSystems() {
       return Arrays.stream(ANRType.values()).map(ANRType::getNamingSystem).toList();
     }
 
@@ -75,14 +76,15 @@ public abstract class BaseANR implements WithChecksum {
     }
   }
 
-  @Getter private final ANRType type;
-  @Getter private final String value;
+  private final ANRType type;
+  private final String value;
 
   protected BaseANR(ANRType type, String value) {
     this.type = type;
     this.value = value;
   }
 
+  @Override
   public boolean isValid() {
     val rawVal = value.substring(0, 6);
     val actContNo = value.substring(6, 7);
@@ -90,7 +92,12 @@ public abstract class BaseANR implements WithChecksum {
     return String.valueOf(expConNo).equals(actContNo);
   }
 
-  public final INamingSystem getNamingSystem() {
+  @Override
+  public int getChecksum() {
+    return Integer.parseInt(value.substring(6, 7));
+  }
+
+  public final WithNamingSystem getNamingSystem() {
     return this.type.getNamingSystem();
   }
 
@@ -102,7 +109,7 @@ public abstract class BaseANR implements WithChecksum {
     return asIdentifier(this.getNamingSystem());
   }
 
-  public Identifier asIdentifier(INamingSystem namingSystem) {
+  public Identifier asIdentifier(WithNamingSystem namingSystem) {
     val id = new Identifier();
     id.getType()
         .addCoding(new Coding().setCode(this.type.name()).setSystem(this.getCodeSystemUrl()));
@@ -110,7 +117,7 @@ public abstract class BaseANR implements WithChecksum {
     return id;
   }
 
-  public final ICodeSystem getCodeSystem() {
+  public final WithCodeSystem getCodeSystem() {
     return this.type.getCodeSystem();
   }
 
@@ -175,7 +182,7 @@ public abstract class BaseANR implements WithChecksum {
         List.of(
             KbvNamingSystem.BASE_ANR.getCanonicalUrl(),
             KbvNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl(),
-            DeBasisNamingSystem.ZAHNARZTNUMMER.getCanonicalUrl());
+            DeBasisProfilNamingSystem.KZBV_ZAHNARZTNUMMER.getCanonicalUrl());
     return validNamingSystems.contains(identifier.getSystem());
   }
 
@@ -185,7 +192,7 @@ public abstract class BaseANR implements WithChecksum {
 
   public static boolean isPractitioner(Coding coding) {
     val practitionerCodeSystems =
-        ANRType.validCodeSystems().stream().map(IWithSystem::getCanonicalUrl).toList();
+        ANRType.validCodeSystems().stream().map(WithSystem::getCanonicalUrl).toList();
 
     if (!practitionerCodeSystems.contains(coding.getSystem())) {
       return false; // no CodeSystem of a ANRType found

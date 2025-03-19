@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class AcceptedPrescriptionDtoTest {
                     .build())
             .andMedication(
                 PznMedicationDto.medicine("07765007", "NEUPRO 8MG/24H PFT 7 ST")
-                    .amount(3, "Stk")
+                    .amount("3", "Stk")
                     .standardSize(StandardSizeDto.N1)
                     .isVaccine(false)
                     .supplyForm(SupplyFormDto.GPA)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.values.*;
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.konnektor.soap.mock.LocalSigner;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -36,6 +43,8 @@ class PrescriptionToDispenseStrategyTest {
 
   @Test
   void shouldUseNotManipulatedPrescription() {
+    val hba = SmartcardArchive.fromResources().getHbaByICCSN("80276001011699901501");
+
     val stack = ManagePharmacyPrescriptions.itWorksWith();
     val erxBundle = mock(ErxAcceptBundle.class);
     val erxTask = mock(ErxTask.class);
@@ -50,7 +59,10 @@ class PrescriptionToDispenseStrategyTest {
     when(erxBundle.getTaskId()).thenReturn(TaskId.from("890"));
     when(erxBundle.hasConsent()).thenReturn(false);
     when(erxBundle.getKbvBundleId()).thenReturn("678");
-    when(erxBundle.getKbvBundleAsString()).thenReturn("<xml>bundle</xml>");
+    when(erxBundle.getSignedKbvBundle())
+        .thenReturn(
+            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+                .signDocument(false, "<xml>bundle</xml>"));
 
     stack.appendAcceptedPrescription(erxBundle);
     val strategy = PrescriptionToDispenseStrategy.withDequeue(DequeStrategy.FIFO).initialize(stack);

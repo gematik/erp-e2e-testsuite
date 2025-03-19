@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ProfileVersion;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,12 +35,11 @@ import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Composition.CompositionAttestationMode;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 
 public abstract class KbvBaseCompositionBuilder<
-        V extends ProfileVersion<V>, B extends ResourceBuilder<Composition, B>>
+        V extends ProfileVersion, B extends ResourceBuilder<Composition, B>>
     extends ResourceBuilder<Composition, B> {
 
   /**
@@ -174,13 +173,9 @@ public abstract class KbvBaseCompositionBuilder<
     return new Bundle.BundleEntryComponent().setResource(composition).setFullUrl(fullUrl);
   }
 
+  @Override
   public Composition build() {
-    val composition = new Composition();
-
-    val meta = new Meta().setProfile(List.of(this.getProfile()));
-
-    // set FHIR-specific values provided by HAPI
-    composition.setId(this.getResourceId()).setMeta(meta);
+    val composition = this.createResource(Composition::new, this.getProfile());
     composition.setDate(new Date());
 
     composition
@@ -203,5 +198,5 @@ public abstract class KbvBaseCompositionBuilder<
 
   protected abstract String getTitle();
 
-  protected abstract ICodeSystem getSectionCodeSystem();
+  protected abstract WithCodeSystem getSectionCodeSystem();
 }

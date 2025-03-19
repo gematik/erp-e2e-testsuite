@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -28,7 +30,7 @@ import org.hl7.fhir.r4.model.Medication;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class EpaMedicationTest {
+class EpaMedicationTest extends EpaFhirParsingTest {
 
   private static final String MEDICATION_AS_STRING =
       ResourceLoader.readFileFromResource("fhir/forunittests/Medication-SumatripanMedication.json");
@@ -41,15 +43,14 @@ class EpaMedicationTest {
 
   @BeforeAll
   static void setup() {
-    val fh = EpaFhirFactory.create();
-    medication = fh.decode(EpaMedication.class, MEDICATION_AS_STRING);
-    askMedication = fh.decode(EpaMedication.class, ASK_MEDIC_AS_STRING);
+    medication = epaFhir.decode(EpaMedication.class, MEDICATION_AS_STRING);
+    askMedication = epaFhir.decode(EpaMedication.class, ASK_MEDIC_AS_STRING);
   }
 
   @Test
   void shouldGetPzn() {
     assertTrue(medication.getPzn().isPresent());
-    assertTrue(medication.getPzn().get().getValue().length() > 0);
+    assertFalse(medication.getPzn().get().getValue().isEmpty());
   }
 
   @Test
@@ -79,14 +80,14 @@ class EpaMedicationTest {
   @Test
   void isVaccineShouldFindFalse() {
     val med = new EpaMedication();
-    med.getExtension().add(EpaMedStructDef.VACCINE_EXT.asBooleanExtension(false));
+    med.getExtension().add(EpaMedicationStructDef.VACCINE_EXT.asBooleanExtension(false));
     assertFalse(med.isVaccine());
   }
 
   @Test
   void isVaccineShouldFindTrue() {
     val med = new EpaMedication();
-    med.getExtension().add(EpaMedStructDef.VACCINE_EXT.asBooleanExtension(true));
+    med.getExtension().add(EpaMedicationStructDef.VACCINE_EXT.asBooleanExtension(true));
     assertTrue(med.isVaccine());
   }
 

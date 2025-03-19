@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.cli.param.TaskStatusWrapper;
 import de.gematik.test.erezept.client.ErpClient;
@@ -25,10 +26,9 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import java.text.SimpleDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -98,7 +98,7 @@ public class PrescriptionsReader extends BaseRemoteCommand {
               "=> {0} Prescription: {1} ({2}) authored-on: {3}",
               task.getStatus(),
               task.getPrescriptionId().getValue(),
-              task.getPrescriptionId().getSystemAsString(),
+              task.getPrescriptionId().getSystemUrl(),
               task.getAuthoredOn()));
     }
   }
@@ -124,7 +124,7 @@ public class PrescriptionsReader extends BaseRemoteCommand {
             "=> {0} Prescription: {1} ({2})",
             prescription.getTask().getStatus(),
             prescriptionId.getValue(),
-            prescriptionId.getSystemAsString()));
+            prescriptionId.getSystemUrl()));
     System.out.println(format("{0}", medicationRequest.getDescription()));
     System.out.println(
         format(

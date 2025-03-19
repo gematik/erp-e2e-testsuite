@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseDiGA;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Parameters;
 
 @Slf4j
@@ -56,13 +55,7 @@ public class GemCloseOperationDiGABuilder<P extends Parameters>
 
   @Override
   public P build() {
-    // TODO: will be available after final move to bricks builder
-    // val parameters = this.createResource(Parameters::new,
-    // ErpWorkflowStructDef.CLOSE_OPERATION_INPUT_PARAM, version);
-    val parameters = this.constructor.get();
-    val profile = this.structureDefinition.asCanonicalType(version, true);
-    val meta = new Meta().setProfile(List.of(profile));
-    parameters.setId(this.getResourceId()).setMeta(meta);
+    val parameters = this.createResource(constructor, structureDefinition, version);
 
     this.dispensations.forEach(
         disp -> {

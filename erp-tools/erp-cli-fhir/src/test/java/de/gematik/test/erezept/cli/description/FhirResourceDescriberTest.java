@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
 
-class FhirResourceDescriberTest {
+class FhirResourceDescriberTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldAcceptDescribedResource() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,70 +19,69 @@ package de.gematik.test.erezept.eml.fhir;
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.codec.ResourceTypeHint;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaVersion;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirStrucDef;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.GematikDirVersion;
-import de.gematik.test.erezept.eml.fhir.r4.*;
-import java.util.Arrays;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
+import de.gematik.test.erezept.eml.fhir.profile.GematikDirStrucDef;
+import de.gematik.test.erezept.eml.fhir.profile.GematikDirVersion;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedication;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedicationDispense;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedicationRequest;
+import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelDispensation;
+import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
+import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
+import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
+import de.gematik.test.erezept.eml.fhir.r4.EpaOrganisation;
+import de.gematik.test.erezept.eml.fhir.r4.EpaPractitioner;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
 
-@SuppressWarnings("java:S6204") // the suppressed check is 'Replace this usage of
-// 'Stream.collect(Collectors.toList())' with 'Stream.toList()', but we need
-// mutable lists
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EpaFhirFactory {
 
   private static List<ResourceTypeHint<?, ?>> getTypeHints() {
     val list = new LinkedList<ResourceTypeHint<?, ?>>();
     // EpaFhir
-    list.addAll(registerEpaStruc(EpaMedStructDef.EPA_MEDICATION, EpaMedication.class));
-    list.addAll(
-        registerEpaStruc(EpaMedStructDef.EPA_MEDICATION_DISPENSE, EpaMedicationDispense.class));
-    list.addAll(
-        registerEpaStruc(EpaMedStructDef.EPA_MEDICATION_REQUEST, EpaMedicationRequest.class));
-    list.addAll(
-        registerEpaStruc(
-            EpaMedStructDef.EPA_OP_PROVIDE_PRESCRIPTION, EpaOpProvidePrescription.class));
-    list.addAll(
-        registerEpaStruc(
-            EpaMedStructDef.EPA_OP_CANCEL_PRESCRIPTION, EpaOpCancelPrescription.class));
-    list.addAll(
-        registerEpaStruc(
-            EpaMedStructDef.EPA_OP_PROVIDE_DISPENSATION, EpaOpProvideDispensation.class));
-    list.addAll(
-        registerEpaStruc(
-            EpaMedStructDef.EPA_OP_CANCEL_DISPENSATION, EpaOpCancelDispensation.class));
-    // GematikFhir
-    list.addAll(registerGematikDirStruc(GematikDirStrucDef.PRACTITIONER, EpaPractitioner.class));
-    list.addAll(registerGematikDirStruc(GematikDirStrucDef.ORGANIZATION, EpaOrganisation.class));
-    return list;
-  }
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_MEDICATION)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaMedication.class));
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_MEDICATION_DISPENSE)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaMedicationDispense.class));
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_MEDICATION_REQUEST)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaMedicationRequest.class));
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_OP_PROVIDE_PRESCRIPTION)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaOpProvidePrescription.class));
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_OP_CANCEL_PRESCRIPTION)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaOpCancelPrescription.class));
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_OP_PROVIDE_DISPENSATION)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaOpProvideDispensation.class));
+    list.add(
+        ResourceTypeHint.forStructure(EpaMedicationStructDef.EPA_OP_CANCEL_DISPENSATION)
+            .forAllVersionsFrom(EpaMedicationVersion.class)
+            .mappingTo(EpaOpCancelDispensation.class));
 
-  private static <R extends Resource> List<ResourceTypeHint<EpaVersion, R>> registerEpaStruc(
-      EpaMedStructDef def, Class<R> rClass) {
-    val list =
-        Arrays.stream(EpaVersion.values())
-            .map(v -> ResourceTypeHint.forStructure(def, v, rClass))
-            .collect(Collectors.toList());
-    list.add(ResourceTypeHint.forStructure(def, rClass));
-    return list;
-  }
-
-  private static <R extends Resource>
-      List<ResourceTypeHint<GematikDirVersion, R>> registerGematikDirStruc(
-          GematikDirStrucDef def, Class<R> rClass) {
-    val list =
-        Arrays.stream(GematikDirVersion.values())
-            .map(v -> ResourceTypeHint.forStructure(def, v, rClass))
-            .collect(Collectors.toList());
-    list.add(ResourceTypeHint.forStructure(def, rClass));
+    // GematikFhirDirectory
+    list.add(
+        ResourceTypeHint.forStructure(GematikDirStrucDef.PRACTITIONER)
+            .forAllVersionsFrom(GematikDirVersion.class)
+            .mappingTo(EpaPractitioner.class));
+    list.add(
+        ResourceTypeHint.forStructure(GematikDirStrucDef.ORGANIZATION)
+            .forAllVersionsFrom(GematikDirVersion.class)
+            .mappingTo(EpaOrganisation.class));
     return list;
   }
 

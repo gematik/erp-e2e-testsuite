@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,22 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCountry;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerStreetName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.IKNR;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class PharmacyOrganizationFakerTest extends ParsingTest {
+class PharmacyOrganizationFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakePharmacyOrganizationWithVersion() {
     val pharmacy =
@@ -47,7 +51,7 @@ class PharmacyOrganizationFakerTest extends ParsingTest {
 
   @Test
   void buildFakePharmacyOrganizationWithIknr() {
-    val iknr = IKNR.random();
+    val iknr = IKNR.randomSidIknr();
     val pharmacy = PharmacyOrganizationFaker.builder().withIknr(iknr).fake();
     val pharmacy2 = PharmacyOrganizationFaker.builder().withIknr(iknr.getValue()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, pharmacy);

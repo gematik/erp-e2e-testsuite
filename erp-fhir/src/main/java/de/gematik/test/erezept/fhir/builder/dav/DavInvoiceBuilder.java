@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,22 @@
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.dav.VatRate;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
+import de.gematik.test.erezept.fhir.r4.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.dav.InvoiceType;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nullable;
-import lombok.Data;
-import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.Invoice;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.StringType;
 
-public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder> {
+public class DavInvoiceBuilder extends ResourceBuilder<DavInvoice, DavInvoiceBuilder> {
 
   private AbdaErpPkvVersion abdaErpPkvVersion = AbdaErpPkvVersion.getDefaultVersion();
 
@@ -81,12 +77,12 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
     return self();
   }
 
-  public DavInvoiceBuilder currency(@NonNull Currency currency) {
+  public DavInvoiceBuilder currency(Currency currency) {
     this.currency = currency;
     return self();
   }
 
-  public DavInvoiceBuilder status(@NonNull String status) {
+  public DavInvoiceBuilder status(String status) {
     return status(Invoice.InvoiceStatus.fromCode(status.toLowerCase()));
   }
 
@@ -101,53 +97,44 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
     return self();
   }
 
+  @Override
   public DavInvoice build() {
-    val invoice = new DavInvoice();
-
-    val profile =
-        AbdaErpPkvStructDef.PKV_ABRECHNUNGSZEILEN.asCanonicalType(abdaErpPkvVersion, true);
-    val meta = new Meta().setProfile(List.of(profile));
-
-    // set FHIR-specific values provided by HAPI
-    invoice.setId(this.getResourceId());
-    invoice.setMeta(meta);
+    val invoice =
+        this.createResource(
+            DavInvoice::new, AbdaErpPkvStructDef.PKV_ABRECHNUNGSZEILEN, abdaErpPkvVersion);
 
     invoice.setType(type.asCodeableConcept());
     invoice.setStatus(this.status);
 
     for (var i = 0; i < priceComponents.size(); i++) {
       val item = priceComponents.get(i);
-      item.getPc().addExtension(vatRate);
+      item.pc().addExtension(vatRate);
 
       val lineItemComponent = invoice.addLineItem();
       lineItemComponent.setSequence(i + 1);
-      lineItemComponent.addPriceComponent(item.getPc());
+      lineItemComponent.addPriceComponent(item.pc());
       val chargeItem = lineItemComponent.getChargeItemCodeableConcept();
-      chargeItem.addCoding(item.pzn.asCoding());
-      chargeItem.setText(item.text);
+      chargeItem.addCoding(item.pzn.asCoding()).setText(item.text);
 
       if (item.hasBatch()) {
-        lineItemComponent
-            .addExtension()
-            .setUrl(AbdaErpBasisStructDef.CHARGENBEZEICHNUNG.getCanonicalUrl())
-            .setValue(new StringType(item.batchDesignation));
+        lineItemComponent.addExtension(
+            AbdaErpBasisStructDef.CHARGENBEZEICHNUNG.asStringExtension(item.batchDesignation));
       }
     }
 
     val totalCost = calculateTotalCost();
     val insurantCost = calculateInsurantCost();
 
-    val totalGross = invoice.getTotalGross();
-    totalGross.setCurrency(currency.getCode()).setValueElement(Currency.asDecimalType(totalCost));
+    val totalGross = currency.asMoney(totalCost);
     totalGross.addExtension(DavExtensions.getGesamtZuzahlung(currency, insurantCost));
-
+    invoice.setTotalGross(totalGross);
     return invoice;
   }
 
   private float calculateTotalCost() {
     return (float)
         priceComponents.stream()
-            .map(PriceComponentData::getPc)
+            .map(PriceComponentData::pc)
             .mapToDouble(pc -> pc.getAmount().getValue().doubleValue())
             .sum();
   }
@@ -155,16 +142,11 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
   private float calculateInsurantCost() {
     return (float)
         priceComponents.stream()
-            .map(PriceComponentData::getPc)
+            .map(PriceComponentData::pc)
             .mapToDouble(
                 pc ->
                     pc.getExtension().stream()
-                        .filter(
-                            ext ->
-                                ext.getUrl()
-                                    .equals(
-                                        AbdaErpBasisStructDef.KOSTEN_VERSICHERTER
-                                            .getCanonicalUrl()))
+                        .filter(AbdaErpBasisStructDef.KOSTEN_VERSICHERTER::matches)
                         .map(ext -> ext.getExtensionByUrl("Kostenbetrag"))
                         .mapToDouble(
                             ext ->
@@ -173,13 +155,14 @@ public class DavInvoiceBuilder extends AbstractResourceBuilder<DavInvoiceBuilder
             .sum();
   }
 
-  @Data
-  private static class PriceComponentData {
-    private final Invoice.InvoiceLineItemPriceComponentComponent pc;
-    private final PZN pzn;
-    private final String text;
-    @Nullable private final String batchDesignation; // NOTE: batch not yet allowed for PKV
-
+  /**
+   * @param batchDesignation NOTE: batch not yet allowed for PKV
+   */
+  private record PriceComponentData(
+      Invoice.InvoiceLineItemPriceComponentComponent pc,
+      PZN pzn,
+      String text,
+      @Nullable String batchDesignation) {
     public boolean hasBatch() {
       return this.batchDesignation != null;
     }

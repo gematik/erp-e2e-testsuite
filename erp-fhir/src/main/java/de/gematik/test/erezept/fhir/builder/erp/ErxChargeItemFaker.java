@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,22 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerTelematikId;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.insuranceName;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
-import de.gematik.test.erezept.fhir.references.dav.AbgabedatensatzReference;
-import de.gematik.test.erezept.fhir.references.erp.ErxReceiptReference;
-import de.gematik.test.erezept.fhir.references.kbv.KbvBundleReference;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.dav.AbgabedatensatzReference;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Date;
@@ -40,19 +42,21 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.val;
 import org.hl7.fhir.r4.model.ChargeItem;
+import org.hl7.fhir.r4.model.Reference;
 
 public class ErxChargeItemFaker {
+
   private final Map<String, Consumer<ErxChargeItemBuilder>> builderConsumers = new HashMap<>();
   private PrescriptionId prescriptionId = fakerPrescriptionId();
-  private static final String KEY_ABGABEDATENSATZ =
-      "abgabedatensatz"; // key used for builderConsumers map
 
   private ErxChargeItemFaker() {
-    builderConsumers.put("accessCode", b -> b.accessCode(AccessCode.random()));
-    builderConsumers.put("subject", b -> b.subject(KVNR.random(), insuranceName()));
-    builderConsumers.put("enterer", b -> b.enterer(fakerTelematikId()));
-    builderConsumers.put("verordnung", b -> b.verordnung(UUID.randomUUID().toString()));
-    builderConsumers.put("markingFlag", b -> b.markingFlag(true, false, false));
+    this.withAccessCode(AccessCode.random())
+        .withSubject(KVNR.random(), insuranceName())
+        .withEnterer(fakerTelematikId())
+        .withVerordnung(UUID.randomUUID().toString())
+        .withAbgabedatensatz(
+            UUID.randomUUID().toString(), GemFaker.getFaker().chuckNorris().fact().getBytes())
+        .withMarkingFlag(fakerBool(), fakerBool(), fakerBool());
   }
 
   public static ErxChargeItemFaker builder() {
@@ -70,8 +74,7 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemFaker withAccessCode(AccessCode accessCode) {
-    builderConsumers.computeIfPresent(
-        "accessCode", (key, defaultValue) -> b -> b.accessCode(accessCode));
+    builderConsumers.put("accessCode", b -> b.accessCode(accessCode));
     return this;
   }
 
@@ -89,24 +92,17 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemFaker withSubject(KVNR kvnr, String kvnrAssignerName) {
-    builderConsumers.computeIfPresent(
-        "subject", (key, defaultValue) -> b -> b.subject(kvnr, kvnrAssignerName));
-    return this;
-  }
-
-  public ErxChargeItemFaker withReceiptReference(ErxReceiptReference reference) {
-    builderConsumers.put("receiptReference", b -> b.receiptReference(reference));
+    builderConsumers.put("subject", b -> b.subject(kvnr, kvnrAssignerName));
     return this;
   }
 
   public ErxChargeItemFaker withReceipt(ErxReceipt receipt) {
-    val ref = new ErxReceiptReference(receipt);
-    return this.withReceiptReference(ref);
+    builderConsumers.put("receiptReference", b -> b.receipt(receipt));
+    return this;
   }
 
   public ErxChargeItemFaker withEnterer(TelematikID telematikId) {
-    builderConsumers.computeIfPresent(
-        "enterer", (key, defaultValue) -> b -> b.enterer(telematikId));
+    builderConsumers.put("enterer", b -> b.enterer(telematikId));
     return this;
   }
 
@@ -124,8 +120,7 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemFaker withMarkingFlag(MarkingFlag markingFlag) {
-    builderConsumers.computeIfPresent(
-        "markingFlag", (key, defaultValue) -> b -> b.markingFlag(markingFlag));
+    builderConsumers.put("markingFlag", b -> b.markingFlag(markingFlag));
     return this;
   }
 
@@ -135,21 +130,21 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemFaker withVerordnung(String id) {
-    return this.withVerordnung(new KbvBundleReference(id));
+    builderConsumers.put("verordnung", b -> b.verordnung(id));
+    return this;
   }
 
-  public ErxChargeItemFaker withVerordnung(KbvBundleReference reference) {
-    builderConsumers.computeIfPresent(
-        "verordnung", (key, defaultValue) -> b -> b.verordnung(reference));
+  public ErxChargeItemFaker withVerordnung(Reference reference) {
+    builderConsumers.put("verordnung", b -> b.verordnung(reference));
     return this;
   }
 
   public ErxChargeItemFaker withVerordnung(KbvErpBundle bundle) {
-    return this.withVerordnung(bundle.getReference());
+    return this.withVerordnung(bundle.asReference());
   }
 
   public ErxChargeItemFaker withAbgabedatensatz(
-      DavAbgabedatenBundle bundle, Function<DavAbgabedatenBundle, byte[]> signer) {
+      DavPkvAbgabedatenBundle bundle, Function<DavPkvAbgabedatenBundle, byte[]> signer) {
     return withAbgabedatensatz(bundle.getReference(), signer.apply(bundle));
   }
 
@@ -158,7 +153,7 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemFaker withAbgabedatensatz(AbgabedatensatzReference reference, byte[] signed) {
-    builderConsumers.put(KEY_ABGABEDATENSATZ, b -> b.abgabedatensatz(reference, signed));
+    builderConsumers.put("abgabedatensatz", b -> b.abgabedatensatz(reference, signed));
     return this;
   }
 
@@ -168,9 +163,6 @@ public class ErxChargeItemFaker {
 
   public ErxChargeItemBuilder toBuilder() {
     val builder = ErxChargeItemBuilder.forPrescription(prescriptionId);
-    builderConsumers.computeIfAbsent(
-        KEY_ABGABEDATENSATZ,
-        key -> b -> b.abgabedatensatz(builder.getResourceId(), "faked binary content".getBytes()));
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

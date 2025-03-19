@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import static java.text.MessageFormat.format;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.io.File;
 import java.util.List;
@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 
+@Deprecated
 @Slf4j
 public class ValidatorUtil {
 
@@ -51,7 +52,7 @@ public class ValidatorUtil {
   public static void validateFile(
       FhirParser parser, File file, Consumer<Boolean> validationAssertion, boolean printResult) {
 
-    log.info(format("Validate {0}", file.getName()));
+    log.info("Validate {}", file.getName());
     val content = ResourceLoader.readString(file);
     val vr = parser.validate(content);
     if (printResult) {
@@ -88,7 +89,7 @@ public class ValidatorUtil {
     // encode and check if encoded content is valid
     val encoded = parser.encode(resource, encodingType, prettyPrint);
 
-    if (printEncoded) log.info("\n\n##########\n" + encoded + "\n##########");
+    if (printEncoded) log.info("\n\n##########\n{}\n##########", encoded);
 
     val result = parser.validate(encoded);
     printValidationResult(result);
@@ -117,9 +118,9 @@ public class ValidatorUtil {
                           m.getLocationLine()))
               .collect(Collectors.joining("\n\t"));
       log.warn(
-          format(
-              "--- Found Validation Messages after validation: {0} ---\n\t{1}\n------",
-              result.getMessages().stream().filter(messageFilter).count(), r));
+          "--- Found Validation Messages after validation: {} ---\n\t{}\n------",
+          result.getMessages().stream().filter(messageFilter).count(),
+          r);
     }
   }
 }

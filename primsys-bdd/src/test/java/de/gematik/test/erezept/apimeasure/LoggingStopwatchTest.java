@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import java.time.Duration;
 import java.util.Map;
 import lombok.val;

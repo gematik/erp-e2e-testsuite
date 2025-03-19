@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.actions.MockActorsUtils;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.hl7.fhir.r4.model.Bundle;

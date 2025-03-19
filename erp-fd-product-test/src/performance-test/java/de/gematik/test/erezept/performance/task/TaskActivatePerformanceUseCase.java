@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.performance.task;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -32,11 +33,10 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
@@ -79,19 +79,19 @@ class TaskActivatePerformanceUseCase extends ErpTest {
 
     return ArgumentComposer.composeWith()
         .arguments(
-            VersicherungsArtDeBasis.GKV, // given insurance kind
+            InsuranceTypeDe.GKV, // given insurance kind
             PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
             DurationOperationRequirement.ACTIVATE_FLOWTYPE_160) // expected flow type
         .arguments(
-            VersicherungsArtDeBasis.GKV,
+            InsuranceTypeDe.GKV,
             PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
             DurationOperationRequirement.ACTIVATE_FLOWTYPE_169)
         .arguments(
-            VersicherungsArtDeBasis.PKV,
+            InsuranceTypeDe.PKV,
             PrescriptionAssignmentKind.PHARMACY_ONLY,
             DurationOperationRequirement.ACTIVATE_FLOWTYPE_200)
         .arguments(
-            VersicherungsArtDeBasis.PKV,
+            InsuranceTypeDe.PKV,
             PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
             DurationOperationRequirement.ACTIVATE_FLOWTYPE_209)
         .create();
@@ -103,7 +103,7 @@ class TaskActivatePerformanceUseCase extends ErpTest {
   @MethodSource("prescriptionTypesProvider")
   @Tag("ERP_PERFORMANCE_TASK_ACTIVATE_01")
   void activatePrescription(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       DurationOperationRequirement expectedActivateDuration) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.actions;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -23,17 +24,17 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
+import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import jakarta.annotation.Nullable;
 import java.util.Date;
 import java.util.LinkedList;
@@ -65,7 +66,7 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
     val kvnr = acceptBundle.getTask().getForKvnr().orElseThrow();
     val telematikId = SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID();
 
-    val kbvAsString = acceptBundle.getKbvBundleAsString();
+    val kbvAsString = LocalVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
     val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
 
     if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {

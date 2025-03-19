@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,13 @@ public class ActorStage {
   private final Map<String, DoctorActor> doctors;
   private final Map<String, PatientActor> patients;
   private final Map<String, PharmacyActor> pharmacies;
+  private final Map<String, KtrActor> ktrs;
 
   public ActorStage() {
     this.doctors = new HashMap<>();
     this.patients = new HashMap<>();
     this.pharmacies = new HashMap<>();
+    this.ktrs = new HashMap<>();
   }
 
   public DoctorActor getDoctorNamed(String name) {
@@ -47,6 +49,10 @@ public class ActorStage {
 
   public PharmacyActor getPharmacyNamed(String name) {
     return getFromCache(PharmacyActor.class, pharmacies, name);
+  }
+
+  public KtrActor getKtrNamed(String name) {
+    return getFromCache(KtrActor.class, ktrs, name);
   }
 
   private <T extends ErpActor> T getFromCache(Class<T> klass, Map<String, T> cache, String name) {
@@ -70,6 +76,9 @@ public class ActorStage {
     } else if (klass.equals(PharmacyActor.class)) {
       config.equipAsPharmacy(actor);
       pharmacies.put(name, (PharmacyActor) actor);
+    } else if (klass.equals(KtrActor.class)) {
+      config.equipAsKtr(actor);
+      ktrs.put(name, (KtrActor) actor);
     } else {
       throw new MissingCacheException(klass);
     }

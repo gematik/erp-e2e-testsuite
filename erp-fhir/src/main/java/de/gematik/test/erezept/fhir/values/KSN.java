@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
 /** Krankenhausstandortnummer */
-public class KSN extends Value<String> {
+public class KSN extends SemanticValue<String, DeBasisProfilNamingSystem> {
 
   private KSN(String value) {
-    super(DeBasisNamingSystem.STANDORTNUMMER, value);
+    super(DeBasisProfilNamingSystem.STANDORTNUMMER, value);
   }
 
   @Override

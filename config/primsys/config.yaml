@@ -26,6 +26,20 @@ actors:
       qualificationType: Arzt
       konnektor: Soft-Konn
 
+    - name: Michael Meierhofer
+      description: "Arzt OHNE Telematik-ID im HBA"
+      smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
+      hbaIccsn: 80276001011699901343
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: Norbert Neuland
+      description: "Arzt OHNE Telematik-ID im HBA"
+      smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
+      hbaIccsn: 80276001011699901344
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
     - name: Finn Stauffenberg
       description: "Akteur mit Psychotherapeut-HBA und Psychotherapeutische Praxis SMC-B"
       smcbIccsn: 80276883110000163952 # Psychotherapeutische Praxis Hillbert Freiherr Cördes
@@ -126,33 +140,13 @@ actors:
     - name: Aenna Gondern # Kassenidentität ohne validen privaten Schlüssel
       egkIccsn: 80276881040001935352
 
-    - name: Gerda 'kkh' Galle
-      egkIccsn: 80276881025548404901
+    - name: Tina Kleinschmidt # Für Egk in der Apotheke / AuditEvents
+      egkIccsn: 80276883110000168560
 
-    - name: Fabian 'GKVI' Krause
-      egkIccsn: 80276882999999992121
-
-    - name: Juliane 'TK' Sommer
-      egkIccsn: 80276881040001935352
-
-    - name: Thomas 'Bitmarck' Gottschalk
-      egkIccsn: 80276883501400000011  #Abgelaufen seit 2024.11.09
-
-    - name: Martha 'ITS Care' Koch
-      egkIccsn: 80276883169999962222  #Abgelaufen seit 2024.04.26
-
-    - name: Maria 'Mobil ISC' Neumann
-      egkIccsn: 80276883309999982341  #Abgelaufen seit 2024.04.20
-
-    - name: Sofia 'Kubus' Herrmann
-      egkIccsn: 80276881299985314267
-
-    - name: Julian 'Arge AOK' Nagelsmann
-      egkIccsn: 80276881129999213224
-
-    - name: Lucius 'ITSC' Fox
-      egkIccsn: 80276881700000400001
-
+  healthInsurances:
+    - name: AOK Bremen
+      smcbIccsn: 80276883110000163954
+      konnektor: Soft-Konn
 
 environments:
   - name: TU

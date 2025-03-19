@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,19 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.references.kbv.MedicationReference;
-import de.gematik.test.erezept.fhir.references.kbv.RequesterReference;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.List;
-import lombok.NonNull;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
-import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.StringType;
@@ -46,22 +40,14 @@ import org.hl7.fhir.r4.model.SupplyRequest;
  * defined @ KBV and allowed, and forbidden by A_23384 out of C_11292 if MedicationRequest is
  * contained
  */
-public class SupplyRequestBuilder extends AbstractResourceBuilder<SupplyRequestBuilder> {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyRequestBuilder> {
 
   private Date authoredOn = new Date();
   private TemporalPrecisionEnum temporalPrecision = TemporalPrecisionEnum.DAY;
   private KbvCoverage coverage;
   private Reference medicationReference;
   private Reference requesterReference;
-  private KbvPatient patient;
-
-  private SupplyRequestBuilder() {}
-
-  public static SupplyRequestBuilder fakeForPatient(KbvPatient patient) {
-    val srb = new SupplyRequestBuilder();
-    srb.patient = patient;
-    return srb;
-  }
 
   public static SupplyRequestBuilder withCoverage(KbvCoverage coverage) {
     val srb = new SupplyRequestBuilder();
@@ -69,23 +55,13 @@ public class SupplyRequestBuilder extends AbstractResourceBuilder<SupplyRequestB
     return srb;
   }
 
-  /**
-   * to build a valid SupplyRequest it is mandatory to set up: requesterReference with
-   * "requester(@NonNull Practitioner practitioner)", coverage with "coverage(KbvCoverage coverage)"
-   * and medication with "medication(@NonNull KbvErpMedication medication)"
-   *
-   * @return valid SupplyRequest designed by "KBV_PR_ERP_PracticeSupply" profile
-   */
+  @Override
   public SupplyRequest build() {
     checkRequiredAttributes();
-    SupplyRequest sR = new SupplyRequest();
-    sR.setId(this.getResourceId());
+    val sR = this.createResource(SupplyRequest::new, KbvItaErpStructDef.SUPPLY_REQUEST);
+
     sR.setAuthoredOnElement(new DateTimeType(authoredOn, temporalPrecision));
     addKostentraegerExtension(sR);
-    sR.setMeta(new Meta());
-    sR.getMeta()
-        .setProfile(
-            List.of(new CanonicalType(KbvItaErpStructDef.SUPPLY_REQUEST.getCanonicalUrl())));
     sR.setQuantity(this.getQuantity());
     sR.setRequester(requesterReference);
     sR.setItem(medicationReference);
@@ -96,9 +72,8 @@ public class SupplyRequestBuilder extends AbstractResourceBuilder<SupplyRequestB
     val ktExt = sR.addExtension();
     ktExt.setUrl("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_PracticeSupply_Payor");
     val ikIdentifier =
-        new Identifier()
-            .setSystem(DeBasisNamingSystem.IKNR_SID.getCanonicalUrl())
-            .setValue(coverage.getIknr().getValue());
+        DeBasisProfilNamingSystem.IKNR_SID.asIdentifier(coverage.getIknr().getValue());
+
     ktExt.addExtension(new Extension("IK", ikIdentifier));
     ktExt.addExtension(new Extension("Name", new StringType(coverage.getName())));
     ktExt.addExtension("Kostentraegertyp", coverage.getInsuranceKind().asCoding());
@@ -111,19 +86,19 @@ public class SupplyRequestBuilder extends AbstractResourceBuilder<SupplyRequestB
         .setValue(new SecureRandom().nextInt(0, 5));
   }
 
-  public SupplyRequestBuilder requester(@NonNull Practitioner practitioner) {
-    this.requesterReference = new RequesterReference(practitioner.getId()).asReference();
-    return self();
+  public SupplyRequestBuilder requester(KbvPractitioner practitioner) {
+    this.requesterReference = practitioner.asReference();
+    return this;
   }
 
-  public SupplyRequestBuilder coverage(@NonNull KbvCoverage coverage) {
+  public SupplyRequestBuilder coverage(KbvCoverage coverage) {
     this.coverage = coverage;
-    return self();
+    return this;
   }
 
   public SupplyRequestBuilder authoredOn(Date date) {
     this.authoredOn = date;
-    return self();
+    return this;
   }
 
   public SupplyRequestBuilder authoredOn(Date date, TemporalPrecisionEnum temporalPrecision) {
@@ -131,9 +106,9 @@ public class SupplyRequestBuilder extends AbstractResourceBuilder<SupplyRequestB
     return authoredOn(date);
   }
 
-  public SupplyRequestBuilder medication(@NonNull KbvErpMedication medication) {
-    this.medicationReference = new MedicationReference(medication.getId()).asReference();
-    return self();
+  public SupplyRequestBuilder medication(KbvErpMedication medication) {
+    this.medicationReference = medication.asReference();
+    return this;
   }
 
   private void checkRequiredAttributes() {

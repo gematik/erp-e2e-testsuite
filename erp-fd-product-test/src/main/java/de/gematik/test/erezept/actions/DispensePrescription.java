@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package de.gematik.test.erezept.actions;
 
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.resources.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
@@ -35,7 +35,7 @@ public class DispensePrescription extends ErpAction<ErxMedicationDispenseBundle>
 
   private final DispensePrescriptionAsBundleCommand dispensePrescriptionAsBundleCommand;
 
-  public static Builder forPrescription(TaskId taskId, Secret secret) {
+  public static Builder withCredentials(TaskId taskId, Secret secret) {
     return new Builder(taskId, secret);
   }
 

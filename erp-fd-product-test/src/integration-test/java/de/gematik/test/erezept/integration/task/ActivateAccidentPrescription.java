@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleContainsAccident;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -35,15 +37,13 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.core.ParameterPair;
@@ -84,7 +84,7 @@ class ActivateAccidentPrescription extends ErpTest {
   @DisplayName("E-Rezept mit validem Unfallkennzeichen ausstellen")
   @MethodSource("validAccidentTypes")
   void activatePrescriptionWithValidAccidentExtension(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       AccidentExtension accident) {
 
@@ -93,7 +93,7 @@ class ActivateAccidentPrescription extends ErpTest {
     if (!accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT)) {
       // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
       // "Berufsgenossenschaft"
-      sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+      sina.changeCoverageInsuranceType(InsuranceTypeDe.BG);
     }
 
     val medication =
@@ -134,7 +134,7 @@ class ActivateAccidentPrescription extends ErpTest {
   @DisplayName("E-Rezept mit ungültigem Unfallkennzeichen ausstellen")
   @MethodSource("accidentTypesWithManipulators")
   void activatePrescriptionWithInvalidatedAccidentExtension(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       NamedEnvelope<ParameterPair<AccidentExtension, Consumer<KbvErpBundle>>>
           kbvBundleManipulator) {
@@ -145,7 +145,7 @@ class ActivateAccidentPrescription extends ErpTest {
     if (!accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT)) {
       // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
       // "Berufsgenossenschaft"
-      sina.changeCoverageInsuranceType(VersicherungsArtDeBasis.BG);
+      sina.changeCoverageInsuranceType(InsuranceTypeDe.BG);
     }
 
     val medication =
@@ -183,11 +183,11 @@ class ActivateAccidentPrescription extends ErpTest {
     val composer =
         ArgumentComposer.composeWith()
             .arguments(
-                VersicherungsArtDeBasis.GKV, // given insurance kind
+                InsuranceTypeDe.GKV, // given insurance kind
                 PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+            .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
 
     return composer.multiplyAppend(accidentTypes).create();
   }
@@ -246,11 +246,11 @@ class ActivateAccidentPrescription extends ErpTest {
     val composer =
         ArgumentComposer.composeWith()
             .arguments(
-                VersicherungsArtDeBasis.GKV, // given insurance kind
+                InsuranceTypeDe.GKV, // given insurance kind
                 PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-            .arguments(VersicherungsArtDeBasis.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .arguments(VersicherungsArtDeBasis.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+            .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
 
     return composer.multiplyAppend(accidentTypes).create();
   }
@@ -266,7 +266,7 @@ class ActivateAccidentPrescription extends ErpTest {
             () ->
                 new MissingFieldException(
                     KbvErpMedicationRequest.class,
-                    KbvItaForStructDef.ACCIDENT,
+                    //                    KbvItaForStructDef.ACCIDENT,  // TODO
                     KbvItaErpStructDef.ACCIDENT));
   }
 

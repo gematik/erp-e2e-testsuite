@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,31 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
-public enum InvoiceType implements IValueSet {
+public enum InvoiceType implements FromValueSet {
   ABRECHNUNGSZEILEN("Abrechnungszeilen", "Abrechnungszeilen eines eAbgabdatensatzes"),
   ZUSATZDATENEINHEIT("ZusatzdatenEinheit", "Einheit einer ZusatzdatenHerstellung");
 
   public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.INVOICE_TYPE;
-  public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "Type of the Invoice";
-  public static final String PUBLISHER = "DAV";
 
   private final String code;
   private final String display;
-
-  @Override
-  public String getDefinition() {
-    return "n/A";
-  }
 
   @Override
   public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
-  public static InvoiceType fromCode(@NonNull String code) {
+  public static InvoiceType fromCode(String code) {
     return Arrays.stream(InvoiceType.values())
         .filter(eit -> eit.code.equalsIgnoreCase(code))
         .findFirst()

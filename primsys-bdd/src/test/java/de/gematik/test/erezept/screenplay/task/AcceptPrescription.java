@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,10 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import static java.text.MessageFormat.format;
-
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.strategy.pharmacy.AcceptStrategy;
-import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -34,9 +29,9 @@ import net.serenitybdd.screenplay.Task;
 @Slf4j
 public class AcceptPrescription implements Task {
 
-  private final AcceptStrategy strategy;
+  private final DequeStrategy strategy;
 
-  private AcceptPrescription(AcceptStrategy strategy) {
+  private AcceptPrescription(DequeStrategy strategy) {
     this.strategy = strategy;
   }
 
@@ -45,21 +40,14 @@ public class AcceptPrescription implements Task {
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val konnektor = SafeAbility.getAbility(actor, UseTheKonnektor.class);
 
-    strategy.initialize(prescriptionManager);
-    DmcPrescription prescriptionToAccept = strategy.getDmcPrescription();
+    val prescriptionToAccept = this.strategy.chooseFrom(prescriptionManager.getAssignedList());
 
     val acceptedResponse =
         actor.asksFor(ResponseOfAcceptOperation.forPrescription(prescriptionToAccept));
 
-    try {
-      val acceptedTask = acceptedResponse.getExpectedResource();
-      konnektor.verifyDocument(acceptedTask.getSignedKbvBundle());
-      prescriptionManager.appendAcceptedPrescription(acceptedTask);
-    } catch (UnexpectedResponseResourceError urre) {
-      log.warn(format("Accepting Prescription {0} failed", prescriptionToAccept.getTaskId()));
-      // re-throw for possible decorators
-      throw urre;
-    }
+    val acceptedTask = acceptedResponse.getExpectedResource();
+    konnektor.verifyDocument(acceptedTask.getSignedKbvBundle());
+    prescriptionManager.appendAcceptedPrescription(acceptedTask);
   }
 
   public static AcceptPrescription fromStack(String order) {
@@ -67,6 +55,6 @@ public class AcceptPrescription implements Task {
   }
 
   public static AcceptPrescription fromStack(DequeStrategy dequeue) {
-    return new AcceptPrescription(AcceptStrategy.fromStack(dequeue));
+    return new AcceptPrescription(dequeue);
   }
 }

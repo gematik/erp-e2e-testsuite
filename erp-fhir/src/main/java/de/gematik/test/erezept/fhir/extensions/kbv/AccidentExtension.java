@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import java.util.Date;
 import java.util.Objects;
@@ -53,7 +53,7 @@ public record AccidentExtension(
   }
 
   private Extension asItaErpExtension() {
-    val outerExtension = new Extension(KbvItaErpStructDef.ACCIDENT.getCanonicalUrl());
+    val outerExtension = KbvItaErpStructDef.ACCIDENT.asExtension();
     fillOuterExtension(outerExtension, "unfallkennzeichen", "unfalltag", "unfallbetrieb");
     return outerExtension;
   }
@@ -64,7 +64,7 @@ public record AccidentExtension(
    * @return Extension adhering to version 1.1.0
    */
   private Extension asItaForExtension() {
-    val outerExtension = new Extension(KbvItaForStructDef.ACCIDENT.getCanonicalUrl());
+    val outerExtension = KbvItaForStructDef.ACCIDENT.asExtension();
     fillOuterExtension(outerExtension, "Unfallkennzeichen", "Unfalltag", "Unfallbetrieb");
     return outerExtension;
   }
@@ -150,21 +150,21 @@ public record AccidentExtension(
             .findFirst()
             .orElse(null);
 
-    val workpalce =
+    val workplace =
         extension.getExtension().stream()
             .filter(ext -> ext.getUrl().equalsIgnoreCase("Unfallbetrieb"))
             .map(ext -> ext.getValue().castToString(ext.getValue()).getValue())
             .findFirst()
             .orElse(null);
 
-    return new AccidentExtension(causeType, accidentDay, workpalce);
+    return new AccidentExtension(causeType, accidentDay, workplace);
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    AccidentExtension that = (AccidentExtension) o;
+    val that = (AccidentExtension) o;
     return accidentCauseType == that.accidentCauseType
         && Objects.equals(accidentDay, that.accidentDay)
         && Objects.equals(workplace, that.workplace);

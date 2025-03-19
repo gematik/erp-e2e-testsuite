@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class DynamicInsuranceCoverageInfo implements InsuranceCoverageInfo {
 
   private final String name;
   private final String iknr;
-  private final VersicherungsArtDeBasis insuranceType;
+  private final InsuranceTypeDe insuranceType;
 
   @Override
   public String getName() {
@@ -40,7 +41,7 @@ public class DynamicInsuranceCoverageInfo implements InsuranceCoverageInfo {
   }
 
   @Override
-  public VersicherungsArtDeBasis getInsuranceType() {
+  public InsuranceTypeDe getInsuranceType() {
     return this.insuranceType;
   }
 
@@ -52,23 +53,23 @@ public class DynamicInsuranceCoverageInfo implements InsuranceCoverageInfo {
     return random(GemFaker.fakerValueSet(Wop.class));
   }
 
-  public static InsuranceCoverageInfo random(VersicherungsArtDeBasis insuranceType) {
+  public static InsuranceCoverageInfo random(InsuranceTypeDe insuranceType) {
     return new DynamicInsuranceCoverageInfo(
-        GemFaker.insuranceName(), IKNR.random().getValue(), insuranceType);
+        GemFaker.insuranceName(), IKNR.randomStringValue(), insuranceType);
   }
 
   public static InsuranceCoverageInfo random(Wop wop) {
     return new DynamicInsuranceCoverageInfo(
         GemFaker.insuranceName(wop),
-        IKNR.random().getValue(),
-        GemFaker.fakerValueSet(VersicherungsArtDeBasis.class));
+        IKNR.randomStringValue(),
+        GemFaker.fakerValueSet(InsuranceTypeDe.class));
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class IntermediateBuilder {
     private final String name;
 
-    public FinalBuilder ofType(VersicherungsArtDeBasis type) {
+    public FinalBuilder ofType(InsuranceTypeDe type) {
       return new FinalBuilder(name, type);
     }
   }
@@ -76,7 +77,7 @@ public class DynamicInsuranceCoverageInfo implements InsuranceCoverageInfo {
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class FinalBuilder {
     private final String name;
-    private final VersicherungsArtDeBasis type;
+    private final InsuranceTypeDe type;
 
     public InsuranceCoverageInfo withIknr(String iknr) {
       return new DynamicInsuranceCoverageInfo(this.name, iknr, type);

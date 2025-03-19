@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,16 @@
 
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
-import static java.text.MessageFormat.format;
-
 import com.google.common.base.Strings;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicationRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.resources.kbv.MedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -68,9 +66,9 @@ public abstract class PrescriptionDataMapper {
   protected KbvPatient getPatientBaseData() {
     val baseData = SafeAbility.getAbility(patient, ProvidePatientBaseData.class);
     log.info(
-        format(
-            "Issue ePrescription to patient {0} with insurance type {1}",
-            baseData.getFullName(), baseData.getPatientInsuranceType()));
+        "Issue ePrescription to patient {} with insurance type {}",
+        baseData.getFullName(),
+        baseData.getPatientInsuranceType());
     return baseData.getPatient();
   }
 
@@ -93,7 +91,7 @@ public abstract class PrescriptionDataMapper {
    * @return a fully built KBV-Bundle
    */
   public List<Pair<KbvErpBundleBuilder, PrescriptionFlowType>> createKbvBundles(
-      KbvPractitioner practitioner, MedicalOrganization organization) {
+      KbvPractitioner practitioner, KbvMedicalOrganization organization) {
     val kbvPatient = getPatientBaseData();
     val insurance =
         SafeAbility.getAbility(patient, ProvidePatientBaseData.class).getInsuranceCoverage();
@@ -104,7 +102,7 @@ public abstract class PrescriptionDataMapper {
 
   private Pair<KbvErpBundleBuilder, PrescriptionFlowType> createKbvBundle(
       KbvPractitioner practitioner,
-      MedicalOrganization organization,
+      KbvMedicalOrganization organization,
       KbvPatient patient,
       KbvCoverage insurance,
       Map<String, String> medMap) {
@@ -156,7 +154,7 @@ public abstract class PrescriptionDataMapper {
     val medication = getKbvErpMedication(medMap);
 
     val medicationRequest =
-        MedicationRequestBuilder.forPatient(patient)
+        KbvErpMedicationRequestBuilder.forPatient(patient)
             .insurance(insurance)
             .requester(practitioner)
             .medication(medication)

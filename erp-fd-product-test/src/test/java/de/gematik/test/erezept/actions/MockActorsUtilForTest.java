@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package de.gematik.test.erezept.actions;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class MockActorsUtilForTest {
 
   @Test
-  void ShouldGenerateMockResponse() {
+  void shouldGenerateMockResponse() {
     val payloadMock = mock(ErxCommunication.class);
     val response = new MockActorsUtils().createErpResponse(payloadMock, ErxCommunication.class);
     assertNotNull(response);
@@ -38,7 +38,6 @@ class MockActorsUtilForTest {
   @Test
   void shouldBuildDefaultContext() {
     val utilMock = new MockActorsUtils();
-    assertNotNull(utilMock.fhir);
     assertNotNull(utilMock.actorStage);
     assertNotNull(utilMock.erpClientMock);
   }

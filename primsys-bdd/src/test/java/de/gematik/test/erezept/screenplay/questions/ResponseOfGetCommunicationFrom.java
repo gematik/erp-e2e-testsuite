@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -42,7 +42,6 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
   private final Actor sender;
 
   private ResponseOfGetCommunicationFrom(DequeStrategy deque, Actor sender) {
-    super("GET /Communication");
     this.deque = deque;
     this.sender = sender;
   }

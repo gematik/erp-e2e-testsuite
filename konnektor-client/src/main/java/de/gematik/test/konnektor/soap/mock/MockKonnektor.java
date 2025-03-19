@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,7 @@ import de.gematik.ws.conn.cardservice.v8.Cards;
 import de.gematik.ws.conn.connectorcontext.v2.ContextType;
 import de.gematik.ws.conn.signatureservice.wsdl.v7.FaultMessage;
 import de.gematik.ws.tel.error.v2.Error;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import javax.xml.datatype.DatatypeFactory;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -110,8 +107,11 @@ public class MockKonnektor {
   }
 
   public boolean verifyDocument(byte[] data) {
-    val verifier = new LocalVerifier();
-    return verifier.verify(data);
+    try {
+      return LocalVerifier.verify(data);
+    } catch (UnsupportedOperationException | NoSuchElementException e) {
+      return false;
+    }
   }
 
   public String getJobNumber(ContextType context) { // NOSONAR: I will need this parameter later on

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,17 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.*;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.fuzzing.erx.ErxChargeItemManipulatorFactory;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class PostChargeItemTest extends ParsingTest {
+class PostChargeItemTest extends ErpFhirParsingTest {
   private static final String ACCEPT_BUNDLE_PATH =
       "fhir/valid/erp/1.2.0/acceptbundle/cef4b960-7ce4-4755-b4ce-3b01a30ec2f0.xml";
   private ErpClient erpClientMock;
@@ -68,7 +68,7 @@ class PostChargeItemTest extends ParsingTest {
   @Test
   void shouldPostChargeItem() {
     val davAbgabedatenBundle =
-        DavAbgabedatenFaker.builder(PrescriptionId.from("123.456.789")).fake();
+        DavPkvAbgabedatenFaker.builder(PrescriptionId.from("123.456.789")).fake();
 
     val erpResponse =
         mockUtil.createErpResponse(ErxChargeItemFaker.builder().fake(), ErxChargeItem.class, 201);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
@@ -38,7 +39,6 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
@@ -107,7 +107,7 @@ class SetUpIosDeviceTest {
     val baseData = actor.abilityTo(ProvidePatientBaseData.class);
     assertNotNull(baseData);
     assertEquals(egk.getKvnr(), baseData.getKvnr().getValue());
-    assertEquals(VersicherungsArtDeBasis.GKV, baseData.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, baseData.getPatientInsuranceType());
   }
 
   @Test
@@ -140,6 +140,6 @@ class SetUpIosDeviceTest {
     val baseData = actor.abilityTo(ProvidePatientBaseData.class);
     assertNotNull(baseData);
     assertEquals("X110406067", baseData.getKvnr().getValue());
-    assertEquals(VersicherungsArtDeBasis.GKV, baseData.getPatientInsuranceType());
+    assertEquals(InsuranceTypeDe.GKV, baseData.getPatientInsuranceType());
   }
 }

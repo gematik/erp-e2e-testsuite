@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.actors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 import lombok.val;
@@ -28,12 +28,10 @@ class ActorTypeTest {
   void shouldToStringReadableTypes() {
     val map =
         Map.of(
-            ActorType.PATIENT,
-            "Versicherte/r",
-            ActorType.DOCTOR,
-            "Arzt/Ärztin",
-            ActorType.PHARMACY,
-            "Apotheke");
+            ActorType.PATIENT, "Versicherte/r",
+            ActorType.DOCTOR, "Arzt/Ärztin",
+            ActorType.PHARMACY, "Apotheke",
+            ActorType.HEALTH_INSURANCE, "Krankenkasse");
 
     map.forEach((key, value) -> assertEquals(value, key.toString()));
   }

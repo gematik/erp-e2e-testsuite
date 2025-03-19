@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package de.gematik.test.erezept.fhir.extensions.erp;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
+import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
@@ -62,8 +62,8 @@ public class MarkingFlag {
     return asParameters(PatientenrechnungStructDef.MARKING_FLAG);
   }
 
-  private Extension asExtension(IStructureDefinition<?> structureDefinition) {
-    val markingFlag = new Extension(structureDefinition.getCanonicalUrl());
+  private Extension asExtension(WithStructureDefinition<?> structureDefinition) {
+    val markingFlag = structureDefinition.asExtension();
     val extInsurance = new Extension("insuranceProvider", new BooleanType(insuranceProvider));
     val extSubsidy = new Extension("subsidy", new BooleanType(subsidy));
     val extTaxOffice = new Extension("taxOffice", new BooleanType(taxOffice));
@@ -71,21 +71,22 @@ public class MarkingFlag {
     return markingFlag;
   }
 
-  private Parameters asParameters(IStructureDefinition<?> structureDefinition) {
+  private Parameters asParameters(WithStructureDefinition<?> structureDefinition) {
     val parameters = new Parameters();
 
-    this.addParam(parameters, structureDefinition, "insuranceProvider", this.insuranceProvider);
-    this.addParam(parameters, structureDefinition, "subsidy", this.subsidy);
-    this.addParam(parameters, structureDefinition, "taxOffice", this.taxOffice);
+    this.addParam(
+        parameters,
+        structureDefinition.getCanonicalUrl(),
+        "insuranceProvider",
+        this.insuranceProvider);
+    this.addParam(parameters, structureDefinition.getCanonicalUrl(), "subsidy", this.subsidy);
+    this.addParam(parameters, structureDefinition.getCanonicalUrl(), "taxOffice", this.taxOffice);
 
     return parameters;
   }
 
   private void addParam(
-      Parameters parameters,
-      IStructureDefinition<?> structureDefinition,
-      String name,
-      boolean value) {
+      Parameters parameters, String structureDefinitionUrl, String name, boolean value) {
     val operation = parameters.addParameter().setName("operation");
     operation.addPart().setName("type").setValue(new CodeType("add"));
     operation
@@ -95,7 +96,7 @@ public class MarkingFlag {
             new StringType(
                 format(
                     "ChargeItem.extension(''{0}'').extension(''{1}'')",
-                    structureDefinition.getCanonicalUrl(), name)));
+                    structureDefinitionUrl, name)));
 
     operation.addPart().setName("name").setValue(new StringType("valueBoolean"));
     operation.addPart().setName("value").setValue(new BooleanType(value));

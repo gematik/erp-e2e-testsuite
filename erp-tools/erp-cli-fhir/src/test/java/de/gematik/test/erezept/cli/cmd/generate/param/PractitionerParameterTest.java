@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.BaseANR.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.stream.*;
@@ -28,7 +29,7 @@ import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 import picocli.*;
 
-class PractitionerParameterTest {
+class PractitionerParameterTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldNotRequireAnyOptions() {

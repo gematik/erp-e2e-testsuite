@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,17 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
-public enum ConsentType implements IValueSet {
+public enum ConsentType implements FromValueSet {
   CHARGCONS("CHARGCONS", "Consent for saving electronic charge item", "N/A");
 
   public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.CONSENT_TYPE;
-  public static final String VERSION = "1.1.0";
-  public static final String DESCRIPTION = "Type of Consents for the ePrescription";
-  public static final String PUBLISHER = "gematik GmbH";
 
   private final String code;
   private final String display;
@@ -46,7 +43,7 @@ public enum ConsentType implements IValueSet {
     return CODE_SYSTEM;
   }
 
-  public static ConsentType fromCode(@NonNull String code) {
+  public static ConsentType fromCode(String code) {
     return Arrays.stream(ConsentType.values())
         .filter(pt -> pt.code.equals(code))
         .findFirst()

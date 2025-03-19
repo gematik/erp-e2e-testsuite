@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
-import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ICommunicationType;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;

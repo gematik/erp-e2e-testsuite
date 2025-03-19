@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.HashMap;
@@ -28,13 +28,16 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationIngredientFaker {
+
   private final Map<String, Consumer<KbvErpMedicationIngredientBuilder>> builderConsumers =
       new HashMap<>();
 
   private KbvErpMedicationIngredientFaker() {
-    builderConsumers.put("dosageForm", b -> b.darreichungsform(fakerDosage()));
-    builderConsumers.put("ingredientComponent", b -> b.ingredientComponent(2, 1, "wölckhen"));
-    builderConsumers.put("drugName", b -> b.drugName(fakerDrugName()));
+    this.withDosageForm(fakerDosage())
+        .withIngredientComponent(2, 1, "Wölckhen")
+        .withDrugName(fakerDrugName())
+        .withVaccine(fakerBool())
+        .withStandardSize(fakerValueSet(StandardSize.class));
   }
 
   public static KbvErpMedicationIngredientFaker builder() {
@@ -71,8 +74,7 @@ public class KbvErpMedicationIngredientFaker {
   }
 
   public KbvErpMedicationIngredientFaker withDosageForm(String df) {
-    builderConsumers.computeIfPresent(
-        "dosageForm", (key, defaultValue) -> b -> b.darreichungsform(df));
+    builderConsumers.put("dosageForm", b -> b.darreichungsform(df));
     return this;
   }
 
@@ -82,9 +84,7 @@ public class KbvErpMedicationIngredientFaker {
 
   public KbvErpMedicationIngredientFaker withIngredientComponent(
       long numerator, long deNom, String unit) {
-    builderConsumers.computeIfPresent(
-        "ingredientComponent",
-        (key, defaultValue) -> b -> b.ingredientComponent(numerator, deNom, unit));
+    builderConsumers.put("ingredientComponent", b -> b.ingredientComponent(numerator, deNom, unit));
     return this;
   }
 
@@ -94,7 +94,7 @@ public class KbvErpMedicationIngredientFaker {
   }
 
   public KbvErpMedicationIngredientFaker withDrugName(String drugName) {
-    builderConsumers.computeIfPresent("drugName", (key, defaultValue) -> b -> b.drugName(drugName));
+    builderConsumers.put("drugName", b -> b.drugName(drugName));
     return this;
   }
 

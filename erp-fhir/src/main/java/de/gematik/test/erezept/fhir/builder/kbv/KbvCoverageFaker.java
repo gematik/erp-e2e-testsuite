@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,41 +20,44 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder.insurance;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.values.BGInsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.values.DynamicInsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.values.PkvInsuranceCoverageInfo;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvCoverageFaker {
-  private VersicherungsArtDeBasis insurance =
-      randomElement(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV);
+
+  private InsuranceTypeDe insurance = randomElement(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV);
   private final Map<String, Consumer<KbvCoverageBuilder>> builderConsumers = new HashMap<>();
   private static final String DMP = "dmpKennzeichen";
 
   private KbvCoverageFaker() {
-    builderConsumers.put("personGroup", b -> b.personGroup(fakerValueSet(PersonGroup.class)));
-    builderConsumers.put(DMP, b -> b.dmpKennzeichen(fakerValueSet(DmpKennzeichen.class)));
-    builderConsumers.put("wop", b -> b.wop(fakerValueSet(Wop.class)));
-    builderConsumers.put(
-        "versichertenStatus", b -> b.versichertenStatus(fakerValueSet(VersichertenStatus.class)));
-    builderConsumers.put(
-        "beneficiary",
-        b ->
-            b.beneficiary(
-                PatientFaker.builder().withKvnrAndInsuranceType(KVNR.random(), insurance).fake()));
+    this.withPersonGroup(fakerValueSet(PersonGroup.class))
+        .withDmpKennzeichen(fakerValueSet(DmpKennzeichen.class))
+        .withWop(fakerValueSet(Wop.class))
+        .withInsuranceStatus(fakerValueSet(VersichertenStatus.class))
+        .withBeneficiary(
+            KbvPatientFaker.builder().withKvnrAndInsuranceType(KVNR.random(), insurance).fake());
   }
 
   public static KbvCoverageFaker builder() {
     return new KbvCoverageFaker();
   }
 
-  public KbvCoverageFaker withInsuranceType(VersicherungsArtDeBasis insuranceType) {
+  public KbvCoverageFaker withInsuranceType(InsuranceTypeDe insuranceType) {
     this.insurance = insuranceType;
     return this;
   }
@@ -65,36 +68,28 @@ public class KbvCoverageFaker {
   }
 
   public KbvCoverageFaker withPersonGroup(PersonGroup group) {
-    builderConsumers.computeIfPresent(
-        "personGroup", (key, defaultValue) -> b -> b.personGroup(group));
+    builderConsumers.put("personGroup", b -> b.personGroup(group));
     return this;
   }
 
   public KbvCoverageFaker withDmpKennzeichen(DmpKennzeichen kennzeichen) {
-    builderConsumers.computeIfPresent(
-        DMP, (key, defaultValue) -> b -> b.dmpKennzeichen(kennzeichen));
+    builderConsumers.put(DMP, b -> b.dmpKennzeichen(kennzeichen));
     return this;
   }
 
   public KbvCoverageFaker withWop(Wop wop) {
-    builderConsumers.computeIfPresent("wop", (key, defaultValue) -> b -> b.wop(wop));
+    builderConsumers.put("wop", b -> b.wop(wop));
     return this;
   }
 
   public KbvCoverageFaker withInsuranceStatus(VersichertenStatus status) {
-    builderConsumers.computeIfPresent(
-        "versichertenStatus", (key, defaultValue) -> b -> b.versichertenStatus(status));
+    builderConsumers.put("versichertenStatus", b -> b.versichertenStatus(status));
     return this;
   }
 
   public KbvCoverageFaker withBeneficiary(KbvPatient patient) {
     this.withInsuranceType(patient.getInsuranceKind());
-    return this.withBeneficiary(new SubjectReference(patient.getId()));
-  }
-
-  public KbvCoverageFaker withBeneficiary(SubjectReference reference) {
-    builderConsumers.computeIfPresent(
-        "beneficiary", (key, defaultValue) -> b -> b.beneficiary(reference));
+    builderConsumers.put("beneficiary", b -> b.beneficiary(patient));
     return this;
   }
 

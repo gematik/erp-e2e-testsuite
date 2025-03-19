@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
@@ -92,22 +91,6 @@ class UseTheAppTest {
 
     val driverAbility = new UseAndroidApp(driver, appiumConfig);
     assertEquals(2, driverAbility.getWebElementListLen(Onboarding.NEXT_BUTTON));
-  }
-
-  @Test
-  void shouldTapOnElementByLabel() {
-    val driver = mock(IOSDriver.class);
-    val webElement = mock(WebElement.class);
-    val elements = List.of(webElement);
-    when(driver.findElement(any())).thenReturn(webElement);
-    when(webElement.isEnabled()).thenReturn(true);
-    val driverAbility = new UseIOSApp(driver, appiumConfig);
-
-    when(driver.findElements(any(By.class))).thenReturn(elements);
-    when(elements.get(0).getText()).thenReturn("label");
-
-    driverAbility.tapByLabel(Onboarding.NEXT_BUTTON, "label");
-    verify(webElement).click();
   }
 
   @Test

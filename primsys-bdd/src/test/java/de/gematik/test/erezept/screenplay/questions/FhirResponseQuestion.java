@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,5 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import net.serenitybdd.screenplay.Question;
 import org.hl7.fhir.r4.model.Resource;
 
-public abstract class FhirResponseQuestion<R extends Resource> implements Question<ErpResponse<R>> {
-
-  private final String operationName;
-
-  protected FhirResponseQuestion(String operationName) {
-    this.operationName = operationName;
-  }
-
-  public final String getOperationName() {
-    return this.operationName;
-  }
-
-  @Override
-  public String toString() {
-    return getOperationName();
-  }
-}
+public abstract class FhirResponseQuestion<R extends Resource>
+    implements Question<ErpResponse<R>> {}

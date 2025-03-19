@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.primsys.mapping.InvoiceDataMapper;
 import java.util.List;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class InvoiceDataTest {
+class InvoiceDataTest extends ErpFhirBuildingTest {
 
   private final String testString =
       """
@@ -102,7 +102,7 @@ class InvoiceDataTest {
     val mapper = new ObjectMapper();
     val result = mapper.readValue(testString, InvoiceData.class);
     assertEquals("EUR", result.getCurrency());
-    PriceComponentData priceComponentData = result.getPriceComponents().get(0);
+    val priceComponentData = result.getPriceComponents().get(0);
     assertEquals(12.3f, priceComponentData.getInsurantCost());
   }
 
@@ -111,7 +111,7 @@ class InvoiceDataTest {
   void shouldConvertCorrectToDavInvoice() {
     val mapper = new ObjectMapper();
     val result = mapper.readValue(testString, InvoiceData.class);
-    DavInvoice davInvoice = new InvoiceDataMapper(result).convert();
+    val davInvoice = new InvoiceDataMapper(result).convert();
     assertTrue(davInvoice.hasId());
     assertTrue(davInvoice.hasStatus());
     assertEquals("INFORMATIONAL", davInvoice.getPriceComponents().get(0).getType().name());
@@ -122,7 +122,7 @@ class InvoiceDataTest {
   void shouldConvertCorrectIncompleteStringToDavInvoice() {
     val mapper = new ObjectMapper();
     val result = mapper.readValue(testStringIncomplete, InvoiceData.class);
-    DavInvoice davInvoice = new InvoiceDataMapper(result).convert();
+    val davInvoice = new InvoiceDataMapper(result).convert();
     assertTrue(davInvoice.hasId());
     assertTrue(davInvoice.hasStatus());
     assertEquals("INFORMATIONAL", davInvoice.getPriceComponents().get(0).getType().name());

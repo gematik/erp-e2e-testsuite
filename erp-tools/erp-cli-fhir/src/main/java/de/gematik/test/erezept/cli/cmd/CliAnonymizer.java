@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.cli.param.InputOutputDirectoryParameter;
 import de.gematik.test.erezept.fhir.anonymizer.AnonymizationType;
 import de.gematik.test.erezept.fhir.anonymizer.AnonymizerFacade;
 import de.gematik.test.erezept.fhir.anonymizer.BlackingStrategy;
 import de.gematik.test.erezept.fhir.anonymizer.CharReplacementStrategy;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
@@ -90,11 +90,12 @@ public class CliAnonymizer implements Callable<Integer> {
 
       if (anonymized) {
         log.info(
-            format(
-                "Anonymized {0} -> {1}/{2}",
-                f.getName(), inputOutputDirectory.getOut(), anonymizedFileName));
+            "Anonymized {} -> {}/{}",
+            f.getName(),
+            inputOutputDirectory.getOut(),
+            anonymizedFileName);
       } else {
-        log.warn(format("{0} was NOT anonymized", f.getName()));
+        log.warn("{} was NOT anonymized", f.getName());
       }
 
       val anonymizedContent = fhir.encode(resource, originalEncoding, prettyPrint);

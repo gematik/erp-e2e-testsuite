@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,51 @@
 
 package de.gematik.test.erezept.primsys.data.actors;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.primsys.exceptions.InvalidActorRoleException;
-import java.util.List;
-import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class ActorTypeTest {
+class ActorTypeTest {
 
-  @Test
-  public void createValidDoctorRoles() {
-    val docStrings = List.of("Arzt", "arzt", "Doctor", "doctor");
-    docStrings.forEach(ds -> assertEquals(ActorType.DOCTOR, ActorType.fromString(ds)));
+  @ParameterizedTest
+  @ValueSource(strings = {"Arzt", "arzt", "Doctor", "doctor"})
+  void shouldMapValidDoctorRoles(String input) {
+    assertEquals(ActorType.DOCTOR, ActorType.fromString(input));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"Apotheke", "apotheke", "Pharmacy", "pharmacy"})
+  void shouldMapValidPharmacyRoles(String input) {
+    assertEquals(ActorType.PHARMACY, ActorType.fromString(input));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"KTR", "ktr", "Krankenkasse", "kostenträger"})
+  void shouldMapValidKtrRoles(String input) {
+    assertEquals(ActorType.HEALTH_INSURANCE, ActorType.fromString(input));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", "Artz", "Apoteke", "TEST"})
+  void shouldThrowOnInvalidActorRoles(String input) {
+    assertThrows(InvalidActorRoleException.class, () -> ActorType.fromString(input));
+    assertFalse(ActorType.optionalFromString(input).isPresent());
   }
 
   @Test
-  public void createValidPharmacyRoles() {
-    val pharmStrings = List.of("Apotheke", "apotheke", "Pharmacy", "pharmacy");
-    pharmStrings.forEach(ds -> assertEquals(ActorType.PHARMACY, ActorType.fromString(ds)));
-  }
-
-  @Test
-  public void createInvalidActorRoles() {
-    val invalid = List.of("", "Artz", "Apoteke", "TEST");
-    invalid.forEach(
-        inv -> {
-          assertThrows(InvalidActorRoleException.class, () -> ActorType.fromString(inv));
-          assertFalse(ActorType.optionalFromString(inv).isPresent());
-        });
-  }
-
-  @Test
-  public void shouldReturnReadable() {
+  void shouldReturnReadable() {
     assertNotNull(ActorType.DOCTOR.toString());
   }
 
   @Test
-  public void createValidOptionalDoctor() {
+  void createValidOptionalDoctor() {
     assertTrue(ActorType.optionalFromString("Doctor").isPresent());
   }
 }

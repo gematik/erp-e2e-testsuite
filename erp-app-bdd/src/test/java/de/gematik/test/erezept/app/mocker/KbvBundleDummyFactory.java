@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,21 @@
 
 package de.gematik.test.erezept.app.mocker;
 
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import java.util.Date;
 import lombok.val;
 
@@ -36,24 +43,24 @@ public class KbvBundleDummyFactory {
 
   public static KbvErpBundle createSimpleKbvBundle(
       PrescriptionId prescriptionId, StatusCoPayment coPayment, MultiplePrescriptionExtension mvo) {
-    val practitioner = PractitionerFaker.builder().fake();
-    val medicalOrganization = MedicalOrganizationFaker.builder().fake();
-    val assignerOrganization = AssignerOrganizationFaker.builder().fake();
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val medicalOrganization = KbvMedicalOrganizationFaker.builder().fake();
+    val assignerOrganization = KbvAssignerOrganizationFaker.builder().fake();
 
     val patient =
-        PatientFaker.builder()
-            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+        KbvPatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
             .withAssignerRef(assignerOrganization)
             .fake();
     val insurance =
         KbvCoverageFaker.builder()
-            .withInsuranceType(VersicherungsArtDeBasis.GKV)
+            .withInsuranceType(InsuranceTypeDe.GKV)
             .withBeneficiary(patient)
             .fake();
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
     val medicationRequest =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withPatient(patient)
             .withInsurance(insurance)
             .withRequester(practitioner)

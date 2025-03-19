@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,8 +98,8 @@ public class ActorsInitializationSteps {
    *     identifizieren
    */
   @Angenommen(
-      "^(?:der Arzt|die Ärztin) (.+) hat Zugriff auf (?:seinen|ihren) HBA und auf die SMC-B der"
-          + " Praxis$")
+      "^(?:der Arzt|die Ärztin|der Psychotherapeut|die Psychotherapeutin) (.+) hat Zugriff auf"
+          + " (?:seinen|ihren) HBA und auf die SMC-B der Praxis$")
   public void initDoctor(String docName) {
     log.trace("Initialize Doctor {}", docName);
     val theActor = OnStage.theActorCalled(docName);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,21 @@ import static de.gematik.test.core.Helper.findBySystem;
 import static java.text.MessageFormat.format;
 
 import com.google.common.base.Strings;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -310,15 +314,13 @@ public class EpaOpProvidePrescriptionVerifier {
     givenValues.put(
         MEDICATION_EXTENSION_IMPFSTOFF,
         compoundingPrescription.getEpaMedication().getExtension().stream()
-            .filter(ext -> EpaMedStructDef.VACCINE_EXT.matches(ext.getUrl()))
+            .filter(EpaMedicationStructDef.VACCINE_EXT::matches)
             .map(extension -> extension.getValue().primitiveValue())
             .findFirst());
     givenValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
-        compoundingPrescription
-            .getEpaMedication()
-            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
-            .stream()
+        compoundingPrescription.getEpaMedication().getExtension().stream()
+            .filter(EpaMedicationStructDef.DRUG_CATEGORY_EXT::matches)
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
 
@@ -340,7 +342,7 @@ public class EpaOpProvidePrescriptionVerifier {
       givenValues.put(
           INGREDIENT_CODE_CON_CODE,
           ingredientComp.getItemCodeableConcept().getCoding().stream()
-              .filter(co -> co.getSystem().equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
+              .filter(DeBasisProfilCodeSystem.PZN::matches)
               .map(Coding::getCode)
               .findFirst());
       givenValues.put(
@@ -349,8 +351,8 @@ public class EpaOpProvidePrescriptionVerifier {
       givenValues.put(
           INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
           ingredientComp.getItemCodeableConcept().getCoding().stream()
+              .filter(DeBasisProfilCodeSystem.PZN::matches)
               .map(Coding::getSystem)
-              .filter(system -> system.equals(DeBasisCodeSystem.PZN.getCanonicalUrl()))
               .findFirst());
 
       // in ErpWorkflowVersion.V1_4_0 ++ the PZN-Object is in a Contained Resource & not in the
@@ -363,14 +365,14 @@ public class EpaOpProvidePrescriptionVerifier {
       givenValues.put(
           INGREDIENT_CODE_CON_CODE,
           containedPznCC.getCoding().stream()
-              .filter(DeBasisCodeSystem.PZN::match)
+              .filter(DeBasisProfilCodeSystem.PZN::matches)
               .map(Coding::getCode)
               .findFirst());
       givenValues.put(
           INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
           containedPznCC.getCoding().stream()
               .map(Coding::getSystem)
-              .filter(DeBasisCodeSystem.PZN::match)
+              .filter(DeBasisProfilCodeSystem.PZN::matches)
               .findFirst());
       givenValues.put(INGREDIENT_CODE_CON_TEXT, Optional.ofNullable(containedPznCC.getText()));
     }
@@ -412,14 +414,14 @@ public class EpaOpProvidePrescriptionVerifier {
     givenValues.put(
         MEDICATION_EXTENSION_IMPFSTOFF,
         freeTextPrescription.getEpaMedication().getExtension().stream()
-            .filter(ex -> EpaMedStructDef.VACCINE_EXT.matches(ex.getUrl()))
+            .filter(ex -> EpaMedicationStructDef.VACCINE_EXT.matches(ex.getUrl()))
             .map(ext -> ext.getValue().primitiveValue())
             .findFirst());
     givenValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         freeTextPrescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedicationStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -459,7 +461,7 @@ public class EpaOpProvidePrescriptionVerifier {
         MEDICATION_EXTENSION_IMPFSTOFF,
         prescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaMedStructDef.VACCINE_EXT.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedicationStructDef.VACCINE_EXT.getCanonicalUrl())
             .stream()
             .map(ex -> ex.getValue().primitiveValue())
             .findFirst());
@@ -467,7 +469,7 @@ public class EpaOpProvidePrescriptionVerifier {
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         prescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedicationStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -532,14 +534,14 @@ public class EpaOpProvidePrescriptionVerifier {
         Optional.ofNullable(
             pznPrescription
                 .getEpaMedication()
-                .getExtensionByUrl(EpaMedStructDef.VACCINE_EXT.getCanonicalUrl())
+                .getExtensionByUrl(EpaMedicationStructDef.VACCINE_EXT.getCanonicalUrl())
                 .getValue()
                 .primitiveValue()));
     givenValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
         pznPrescription
             .getEpaMedication()
-            .getExtensionsByUrl(EpaMedStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
+            .getExtensionsByUrl(EpaMedicationStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl())
             .stream()
             .map(ext -> ext.getValue().castToCoding(ext.getValue()).getCode())
             .findFirst());
@@ -561,7 +563,7 @@ public class EpaOpProvidePrescriptionVerifier {
     givenValues.put(
         "Medication.amount.numerator.value",
         pznPrescription.getEpaMedication().getAmount().getNumerator().getExtension().stream()
-            .filter(ex -> EpaMedStructDef.EXT_MED_PACKAGING_SIZE.matches(ex.getUrl()))
+            .filter(ex -> EpaMedicationStructDef.EXT_MED_PACKAGING_SIZE.matches(ex.getUrl()))
             .map(ext -> ext.getValue().primitiveValue())
             .findFirst());
     givenValues.put(
@@ -579,13 +581,13 @@ public class EpaOpProvidePrescriptionVerifier {
     givenValues.put(
         "PZN",
         pznPrescription.getEpaMedication().getCode().getCoding().stream()
-            .filter(DeBasisCodeSystem.PZN::match)
+            .filter(DeBasisProfilCodeSystem.PZN::matches)
             .map(Coding::getCode)
             .findFirst());
     givenValues.put(
         "Medication.form.coding:kbvDarreichungsform.code",
         pznPrescription.getEpaMedication().getForm().getCoding().stream()
-            .filter(KbvCodeSystem.DARREICHUNGSFORM::match)
+            .filter(KbvCodeSystem.DARREICHUNGSFORM::matches)
             .map(Coding::getCode)
             .findFirst());
     return givenValues;
@@ -611,14 +613,14 @@ public class EpaOpProvidePrescriptionVerifier {
     expectedValues.put(
         "System",
         expectedMedication.getCode().getCoding().stream()
-            .filter(DeBasisCodeSystem.PZN::match)
+            .filter(DeBasisProfilCodeSystem.PZN::matches)
             .map(Coding::getSystem)
             .findFirst());
     expectedValues.put("PZN", Optional.ofNullable(expectedMedication.getPzn().get(0)));
     expectedValues.put(
         "Medication.form.coding:kbvDarreichungsform.code",
         expectedMedication.getForm().getCoding().stream()
-            .filter(KbvCodeSystem.DARREICHUNGSFORM::match)
+            .filter(KbvCodeSystem.DARREICHUNGSFORM::matches)
             .map(Coding::getCode)
             .findFirst());
     expectedValues.put(
@@ -656,7 +658,7 @@ public class EpaOpProvidePrescriptionVerifier {
 
   private static boolean isPznMedication(KbvErpMedication givenMedication) {
     return !givenMedication.getCode().getCoding().stream()
-        .filter(DeBasisCodeSystem.PZN::match)
+        .filter(DeBasisProfilCodeSystem.PZN::matches)
         .toList()
         .isEmpty();
   }

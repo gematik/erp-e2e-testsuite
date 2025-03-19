@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.primsys.data.CoverageDto;
 import de.gematik.test.erezept.primsys.data.valuesets.PayorTypeDto;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-class CoverageDataMapperTest {
+class CoverageDataMapperTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldGenerateRandomDto() {
@@ -47,14 +48,14 @@ class CoverageDataMapperTest {
   void shouldCompleteCoverageWithPayorTypeNotNull() {
     val dto = CoverageDto.ofType(PayorTypeDto.SKT).build();
     val beneficiary = mock(KbvPatient.class);
-    when(beneficiary.getInsuranceKind()).thenReturn(VersicherungsArtDeBasis.GKV);
+    when(beneficiary.getInsuranceKind()).thenReturn(InsuranceTypeDe.GKV);
     val coverageDataMapper = CoverageDataMapper.from(dto, beneficiary);
     assertNotNull(coverageDataMapper);
   }
 
   @RepeatedTest(5)
   void shouldNotMissAnyFields() {
-    val patient = PatientFaker.builder().fake();
+    val patient = KbvPatientFaker.builder().fake();
     val coverage = KbvCoverageFaker.builder().fake();
     val mapper = CoverageDataMapper.from(coverage, patient);
     val dto = mapper.getDto();

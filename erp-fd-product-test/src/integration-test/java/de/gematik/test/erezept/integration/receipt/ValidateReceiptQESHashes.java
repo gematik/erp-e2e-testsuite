@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.integration.receipt;
 
 import static de.gematik.test.core.expectations.verifier.ReceiptBundleVerifier.compareSignatureHashWith;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -30,7 +31,6 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -71,12 +71,7 @@ public class ValidateReceiptQESHashes extends ErpTest {
             .arguments(
                 PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
                 PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .multiply(
-                0,
-                List.of(
-                    VersicherungsArtDeBasis.BG,
-                    VersicherungsArtDeBasis.PKV,
-                    VersicherungsArtDeBasis.GKV))
+            .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
             .multiply(1, PrescriptionAssignmentKind.class);
     return composer.create();
   }
@@ -89,8 +84,7 @@ public class ValidateReceiptQESHashes extends ErpTest {
               + " Verordnung dem Binary Hash des Quittungsbundles entsprechen.")
   @DisplayName("Verifizierung der QES Hashes im Lebenszyklus eines E-Rezeptes")
   @MethodSource("testCaseComposer")
-  void validateHashes(
-      VersicherungsArtDeBasis insuranceType, PrescriptionAssignmentKind assignmentKind) {
+  void validateHashes(InsuranceTypeDe insuranceType, PrescriptionAssignmentKind assignmentKind) {
 
     val sigObserver = new ByteArrayOutputStream();
     patientActor.changePatientInsuranceType(insuranceType);

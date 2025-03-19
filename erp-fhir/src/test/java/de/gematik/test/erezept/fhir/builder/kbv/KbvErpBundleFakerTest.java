@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,30 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.mvo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.QuantityBuilder;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.junit.jupiter.api.Test;
 
-class KbvErpBundleFakerTest extends ParsingTest {
+class KbvErpBundleFakerTest extends ErpFhirParsingTest {
+
   @Test
   void buildFakeKbvErpBundleWithPrescriptionId() {
     val bundle = KbvErpBundleFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
@@ -63,14 +67,14 @@ class KbvErpBundleFakerTest extends ParsingTest {
     val bundle = KbvErpBundleFaker.builder().withKvnr(kvnr).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
-    assertEquals(kvnr, bundle.getPatient().getKvnr());
+    assertEquals(kvnr.getValue(), bundle.getPatient().getKvnr().getValue());
   }
 
   @Test
   void buildFakeKbvEprBundleWithPatient() {
     val patient =
-        PatientFaker.builder()
-            .withKvnrAndInsuranceType(KVNR.random(), VersicherungsArtDeBasis.GKV)
+        KbvPatientFaker.builder()
+            .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
             .fake();
     val bundle = KbvErpBundleFaker.builder().withPatient(patient).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
@@ -113,7 +117,7 @@ class KbvErpBundleFakerTest extends ParsingTest {
   void buildFakeKbvErpBundleWithMedicationRequestVersion() {
     val bundle =
         KbvErpBundleFaker.builder()
-            .withMedicationRequestVersion(KbvItaErpVersion.getDefaultVersion())
+            .withVersion(KbvItaErpVersion.getDefaultVersion(), KbvItaForVersion.getDefaultVersion())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
@@ -180,10 +184,10 @@ class KbvErpBundleFakerTest extends ParsingTest {
     val bundle =
         KbvErpBundleFaker.builder()
             .withPractitioner(
-                PractitionerFaker.builder()
+                KbvPractitionerFaker.builder()
                     .withQualificationType(QualificationType.DOCTOR_IN_TRAINING)
                     .fake())
-            .withAttester(PractitionerFaker.builder().fake())
+            .withAttester(KbvPractitionerFaker.builder().fake())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());

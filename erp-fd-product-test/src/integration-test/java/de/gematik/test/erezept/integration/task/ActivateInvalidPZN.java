@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -30,10 +31,11 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.stream.Stream;
@@ -87,12 +89,7 @@ public class ActivateInvalidPZN extends ErpTest {
             "da ein Buchstabe enthalten ist",
             "Ungültige PZN: Die übergebene Pharmazentralnummer entspricht nicht den"
                 + " vorgeschriebenen Prüfziffer-Validierungsregeln.")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .create();
   }
@@ -101,12 +98,7 @@ public class ActivateInvalidPZN extends ErpTest {
     return ArgumentComposer.composeWith()
         .arguments("2488849", "da die PZN zu kurz ist", "FHIR-Validation error")
         .arguments("123456789", "da die PZN zu lang ist", "FHIR-Validation error")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .create();
   }
@@ -122,7 +114,7 @@ public class ActivateInvalidPZN extends ErpTest {
           + " (ErpAfos.A_23892)")
   @MethodSource("basePZNTestcaseComposer")
   void activateInvalidPznInMedicationPZN(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       String pzn,
       String declaration,
@@ -152,7 +144,7 @@ public class ActivateInvalidPZN extends ErpTest {
           + " validiert wird (ErpAfos.A_24034)")
   @MethodSource("basePZNTestcaseComposer")
   void activateInvalidPznInMedicationCompounding(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       String pzn,
       String declaration,
@@ -185,7 +177,7 @@ public class ActivateInvalidPZN extends ErpTest {
           + " (FHIR-Validation_Error)")
   @MethodSource("basePZNTestcaseComposerAsFhirValidationError")
   void activateInvalidPznInMedicationPznAsFhirValidationError(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       String pzn,
       String declaration,
@@ -217,7 +209,7 @@ public class ActivateInvalidPZN extends ErpTest {
           + " validiert wird (FHIR-Validation_Error)")
   @MethodSource("basePZNTestcaseComposerAsFhirValidationError")
   void activateInvalidPznInMedicationCompoundingAsFhirValidationError(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       String pzn,
       String declaration,
@@ -248,7 +240,7 @@ public class ActivateInvalidPZN extends ErpTest {
       KbvErpMedication medication) {
 
     AccidentExtension accident = null;
-    if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
+    if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
     val kbvBundleBuilder =

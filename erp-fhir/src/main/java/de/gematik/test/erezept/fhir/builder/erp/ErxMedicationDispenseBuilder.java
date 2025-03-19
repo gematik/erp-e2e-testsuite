@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,24 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.values.PZN;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Reference;
 
 @Slf4j
@@ -59,37 +51,6 @@ public class ErxMedicationDispenseBuilder
 
   protected ErxMedicationDispenseBuilder(KVNR kvnr) {
     super(kvnr);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static ErxMedicationDispenseBuilder faker(
-      KVNR kvnr, String performerId, PrescriptionId prescriptionId) {
-    return faker(kvnr, performerId, PZN.random().getValue(), prescriptionId);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static ErxMedicationDispenseBuilder faker(
-      KVNR kvnr, String performerId, String pzn, PrescriptionId prescriptionId) {
-    return faker(
-        kvnr,
-        performerId,
-        KbvErpMedicationPZNFaker.builder().withPznMedication(pzn, fakerDrugName()).fake(),
-        prescriptionId);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static ErxMedicationDispenseBuilder faker(
-      @NonNull KVNR kvnr,
-      String performerId,
-      KbvErpMedication medication,
-      PrescriptionId prescriptionId) {
-    val builder = forKvnr(kvnr);
-    builder
-        .medication(medication)
-        .performerId(performerId)
-        .prescriptionId(prescriptionId)
-        .batch(fakerLotNumber(), fakerFutureExpirationDate());
-    return builder;
   }
 
   public static ErxMedicationDispenseBuilder forKvnr(KVNR kvnr) {
@@ -144,26 +105,20 @@ public class ErxMedicationDispenseBuilder
   @Override
   public ErxMedicationDispense build() {
     checkRequired();
-    val medDisp = new ErxMedicationDispense();
-    buildBase(medDisp);
-
     CanonicalType profile;
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       log.warn(
-          format(
-              "building {0} ({1}) with Version {2} is deprecated!",
-              ErxMedicationDispense.class.getSimpleName(),
-              ErpWorkflowStructDef.MEDICATION_DISPENSE.getCanonicalUrl(),
-              ErpWorkflowVersion.V1_1_1.getVersion()));
+          "building {} ({}) with Version {} is deprecated!",
+          ErxMedicationDispense.class.getSimpleName(),
+          ErpWorkflowStructDef.MEDICATION_DISPENSE.getCanonicalUrl(),
+          ErpWorkflowVersion.V1_1_1.getVersion());
       profile = ErpWorkflowStructDef.MEDICATION_DISPENSE.asCanonicalType(erpWorkflowVersion);
     } else {
-      profile =
-          ErpWorkflowStructDef.MEDICATION_DISPENSE_12.asCanonicalType(erpWorkflowVersion, true);
+      profile = ErpWorkflowStructDef.MEDICATION_DISPENSE_12.asCanonicalType(erpWorkflowVersion);
     }
 
-    val meta = new Meta().setProfile(List.of(profile));
-    // set FHIR-specific values provided by HAPI
-    medDisp.setId(this.getResourceId()).setMeta(meta);
+    val medDisp = this.createResource(ErxMedicationDispense::new, profile);
+    buildBase(medDisp);
 
     // set medication properly by version
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
@@ -197,17 +152,19 @@ public class ErxMedicationDispenseBuilder
   private void checkRequired() {
     this.checkRequired(baseMedication, "MedicationDispense requires a Medication");
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
-      if (this.baseMedication instanceof GemErpMedication)
+      if (this.baseMedication instanceof GemErpMedication) {
         throw new BuilderException(
             format(
                 "in {0} is no {1} allowed",
                 erpWorkflowVersion, GemErpMedication.class.getSimpleName()));
+      }
     } else {
-      if (this.baseMedication instanceof KbvErpMedication)
+      if (this.baseMedication instanceof KbvErpMedication) {
         throw new BuilderException(
             format(
                 "in {0} is no {1} allowed",
                 erpWorkflowVersion, KbvErpMedication.class.getSimpleName()));
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ package de.gematik.test.core.expectations.verifier;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.TelematikID;
-import de.gematik.test.erezept.fhir.values.Value;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -107,12 +108,14 @@ public class MedicationDispenseBundleVerifier {
       List<GemErpMedication> medications) {
 
     val expectedPzn =
-        medications.stream().flatMap(m -> m.getPzn().stream().map(Value::getValue)).toList();
+        medications.stream()
+            .flatMap(m -> m.getPzn().stream().map(SemanticValue::getValue))
+            .toList();
 
     Function<ErxMedicationDispenseBundle, List<String>> pznProvider =
         bundle ->
             bundle.getMedications().stream()
-                .flatMap(m -> m.getPzn().stream().map(Value::getValue))
+                .flatMap(m -> m.getPzn().stream().map(SemanticValue::getValue))
                 .toList();
 
     return containsAllPZNs(expectedPzn, pznProvider);
@@ -198,7 +201,7 @@ public class MedicationDispenseBundleVerifier {
     Predicate<ErxMedicationDispenseBundle> predicate =
         bundle ->
             bundle.getMedicationDispenses().stream()
-                .map(medDisp -> medDisp.getPerformerIdFirstRep())
+                .map(ErxMedicationDispenseBase::getPerformerIdFirstRep)
                 .allMatch(pId -> pId.equals(telematikID.getValue()));
     return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
             ErpAfos.A_25515,

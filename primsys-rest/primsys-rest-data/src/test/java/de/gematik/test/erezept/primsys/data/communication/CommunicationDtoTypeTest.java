@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package de.gematik.test.erezept.primsys.data.communication;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
-import de.gematik.test.erezept.fhir.resources.erp.ChargeItemCommunicationType;
-import de.gematik.test.erezept.fhir.resources.erp.CommunicationType;
-import de.gematik.test.erezept.fhir.resources.erp.ICommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.r4.erp.ICommunicationType;
 import de.gematik.test.erezept.primsys.exceptions.InvalidCodeValueException;
 import java.util.stream.Stream;
 import lombok.val;

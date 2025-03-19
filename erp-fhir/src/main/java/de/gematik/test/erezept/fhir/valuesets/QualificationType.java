@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 
 /** <a href="https://simplifier.net/for/kbvcsforqualificationtype">...</a> */
 @Getter
-public enum QualificationType implements IValueSet {
+public enum QualificationType implements FromValueSet {
   DOCTOR("00", "Arzt"),
   DENTIST("01", "Zahnarzt"),
   MIDWIFE("02", "Hebamme"),
@@ -46,14 +46,14 @@ public enum QualificationType implements IValueSet {
     this.display = display;
   }
 
-  public static QualificationType fromCode(@NonNull String coding) {
+  public static QualificationType fromCode(String coding) {
     return Arrays.stream(QualificationType.values())
         .filter(qt -> qt.code.equals(coding))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(QualificationType.class, coding));
   }
 
-  public static QualificationType fromDisplay(@NonNull String display) {
+  public static QualificationType fromDisplay(String display) {
     return Arrays.stream(QualificationType.values())
         .filter(qt -> qt.display.equalsIgnoreCase(display))
         .findFirst()

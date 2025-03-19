@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.erezept.fhir.parser.profiles.systems;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.ICodeSystem;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ErpWorkflowCodeSystem implements ICodeSystem {
+public enum ErpWorkflowCodeSystem implements WithCodeSystem {
   FLOW_TYPE("https://gematik.de/fhir/CodeSystem/Flowtype"),
   FLOW_TYPE_12("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType"),
   AVAILABILITY_STATUS("https://gematik.de/fhir/CodeSystem/AvailabilityStatus"),

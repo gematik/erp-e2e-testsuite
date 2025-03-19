@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
 
 class EpaOrganisationTest {
@@ -30,11 +29,9 @@ class EpaOrganisationTest {
   @Test
   void shouldGetCorrectTelematikId() {
     val epaOrganisation = new EpaOrganisation();
+
     epaOrganisation.setIdentifier(
-        List.of(
-            new Identifier()
-                .setValue("123.asd")
-                .setSystem(DeBasisProfilNamingSystem.SID_TELEMATIK_ID.getCanonicalUrl())));
+        List.of(DeBasisProfilNamingSystem.TELEMATIK_ID_SID.asIdentifier("123.asd")));
     assertEquals(TelematikID.from("123.asd"), epaOrganisation.getTelematikId());
   }
 }

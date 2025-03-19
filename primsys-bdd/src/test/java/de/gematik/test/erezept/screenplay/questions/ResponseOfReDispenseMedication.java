@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
@@ -31,6 +31,7 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -43,14 +44,10 @@ import net.serenitybdd.screenplay.Actor;
  * medications which shall not be allowed
  */
 @Slf4j
+@RequiredArgsConstructor
 public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxReceipt> {
 
   private final DequeStrategy deque;
-
-  private ResponseOfReDispenseMedication(DequeStrategy deque) {
-    super("Task/$close");
-    this.deque = deque;
-  }
 
   public static ResponseOfReDispenseMedication fromStack(String order) {
     return fromStack(DequeStrategy.fromString(order));
@@ -68,8 +65,7 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
     val receipt = deque.chooseFrom(prescriptionManager.getReceiptsList());
 
     val cmd = dispensePrescribedMedication(receipt, smcb.getTelematikID());
-    val resp = erpClientAbility.request(cmd);
-    return resp;
+    return erpClientAbility.request(cmd);
   }
 
   private CloseTaskCommand dispensePrescribedMedication(

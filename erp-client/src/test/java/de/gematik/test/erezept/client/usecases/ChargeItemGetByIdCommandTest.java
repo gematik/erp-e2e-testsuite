@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,60 +21,57 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.*;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class ChargeItemGetByIdCommandTest {
+class ChargeItemGetByIdCommandTest extends ErpFhirParsingTest {
 
   @Test
   void getRequestLocatorCorrectIDTest() {
-    var prescriptionID = PrescriptionId.random();
-    ChargeItemDeleteCommand chargeItemDeleteCommand = new ChargeItemDeleteCommand(prescriptionID);
-    var requestString = chargeItemDeleteCommand.getRequestLocator();
-    var requestStringArray = requestString.split("/");
+    val prescriptionID = PrescriptionId.random();
+    val chargeItemDeleteCommand = new ChargeItemDeleteCommand(prescriptionID);
+    val requestString = chargeItemDeleteCommand.getRequestLocator();
+    val requestStringArray = requestString.split("/");
     assertEquals(prescriptionID.getValue(), requestStringArray[2]);
   }
 
   @Test
-  void getRequestLocatorCoorectLengthTest() {
-    var prescriptionID = PrescriptionId.random();
+  void getRequestLocatorCorrectLengthTest() {
+    val prescriptionID = PrescriptionId.random();
     val chargeItemGetByIdCommand = new ChargeItemGetByIdCommand(prescriptionID);
     assertEquals(34, chargeItemGetByIdCommand.getRequestLocator().length());
   }
 
   @Test
   void getRequestLocatorStartsWithSlashTest() {
-    var prescriptionID = PrescriptionId.random();
-    ChargeItemGetByIdCommand chargeItemGetByIdCommand =
-        new ChargeItemGetByIdCommand(prescriptionID);
-    var requestString = chargeItemGetByIdCommand.getRequestLocator();
+    val prescriptionID = PrescriptionId.random();
+    val chargeItemGetByIdCommand = new ChargeItemGetByIdCommand(prescriptionID);
+    val requestString = chargeItemGetByIdCommand.getRequestLocator();
     assertTrue(requestString.startsWith("/"));
   }
 
   @Test
   void getRequestLocatorSecondEntryIsChargeItemTest() {
-    var prescriptionID = PrescriptionId.random();
-    ChargeItemGetByIdCommand chargeItemGetByIdCommand =
-        new ChargeItemGetByIdCommand(prescriptionID);
-    var requestString = chargeItemGetByIdCommand.getRequestLocator();
-    var requestStringArray = requestString.split("/");
+    val prescriptionID = PrescriptionId.random();
+    val chargeItemGetByIdCommand = new ChargeItemGetByIdCommand(prescriptionID);
+    val requestString = chargeItemGetByIdCommand.getRequestLocator();
+    val requestStringArray = requestString.split("/");
     assertEquals("ChargeItem", requestStringArray[1]);
   }
 
   @Test
   void getRequestBodyNotNullTest() {
-    var prescriptionID = PrescriptionId.random();
-    ChargeItemGetByIdCommand chargeItemGetByIdCommand =
-        new ChargeItemGetByIdCommand(prescriptionID);
+    val prescriptionID = PrescriptionId.random();
+    val chargeItemGetByIdCommand = new ChargeItemGetByIdCommand(prescriptionID);
     assertNotNull(chargeItemGetByIdCommand.getRequestBody());
   }
 
   @Test
   void getRequestBodyOptionalEmptyStringTest() {
-    var prescriptionID = PrescriptionId.random();
-    ChargeItemGetByIdCommand chargeItemGetByIdCommand =
-        new ChargeItemGetByIdCommand(prescriptionID);
+    val prescriptionID = PrescriptionId.random();
+    val chargeItemGetByIdCommand = new ChargeItemGetByIdCommand(prescriptionID);
     assertTrue(chargeItemGetByIdCommand.getRequestBody().isEmpty());
   }
 
@@ -84,5 +81,7 @@ class ChargeItemGetByIdCommandTest {
     val prescriptionID = PrescriptionId.random();
     val cmd = new ChargeItemGetByIdCommand(prescriptionID, ac);
     assertTrue(cmd.getRequestLocator().contains(format("ac={0}", ac.getValue())));
+
+    parser.isValid("");
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
-import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.r4.erp.*;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.*;
 import lombok.*;
 import org.junit.jupiter.api.*;
 
-class ChargeItemPutCommandTest {
+class ChargeItemPutCommandTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldBuildCorrectRequest() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,31 @@
 
 package de.gematik.test.erezept.fhir.valuesets.dav;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
-import de.gematik.test.erezept.fhir.valuesets.IValueSet;
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
-public enum MedicationDispenseType implements IValueSet {
+public enum MedicationDispenseType implements FromValueSet {
   ABGABE("Abgabeinformationen", "MedicationDispense repräsentiert Abgabeinformationen"),
   ZUSATZ("ZusatzdatenHerstellung", "MedicationDispense repräsentiert ZusatzdatenHerstellung");
 
   public static final AbdaCodeSystem CODE_SYSTEM = AbdaCodeSystem.MEDICATIONDISPENSE_TYPE;
-  public static final String VERSION = "1.2";
   public static final String DESCRIPTION = "Type of the dispensed medication";
-  public static final String PUBLISHER = "DAV";
 
   private final String code;
   private final String display;
-
-  @Override
-  public String getDefinition() {
-    return DESCRIPTION;
-  }
 
   @Override
   public AbdaCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
-  public static MedicationDispenseType fromCode(@NonNull String code) {
+  public static MedicationDispenseType fromCode(String code) {
     return Arrays.stream(MedicationDispenseType.values())
         .filter(mdt -> mdt.code.equalsIgnoreCase(code))
         .findFirst()

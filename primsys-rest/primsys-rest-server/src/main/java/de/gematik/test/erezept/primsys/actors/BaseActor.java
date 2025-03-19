@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,25 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.parser.DataFormatException;
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.smartcards.SmcB;
+import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.parser.profiles.ProfileExtractor;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
+import de.gematik.test.konnektor.Konnektor;
+import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -54,24 +59,47 @@ public abstract class BaseActor {
   private final SmcB smcb;
   private final ActorDto actorInfo;
 
-  protected BaseActor(DoctorConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
-    this.name = cfg.getName();
-    this.identifier = createIdentifier(this.name);
-    this.type = ActorType.DOCTOR;
-    this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+  protected final Konnektor konnektor;
+  protected final CardInfo smcbHandle;
 
-    this.client = ErpClientFactory.createErpClient(env, cfg);
-    this.client.authenticateWith(smcb);
-    this.algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
-    this.actorInfo = this.initActorSummary();
+  protected BaseActor(
+      DoctorConfiguration cfg,
+      EnvironmentConfiguration env,
+      Konnektor konnektor,
+      SmartcardArchive sca) {
+    this(ActorType.DOCTOR, cfg, env, konnektor, sca);
   }
 
   protected BaseActor(
-      PharmacyConfiguration cfg, EnvironmentConfiguration env, SmartcardArchive sca) {
+      PharmacyConfiguration cfg,
+      EnvironmentConfiguration env,
+      Konnektor konnektor,
+      SmartcardArchive sca) {
+    this(ActorType.PHARMACY, cfg, env, konnektor, sca);
+  }
+
+  protected BaseActor(
+      HealthInsuranceConfiguration cfg,
+      EnvironmentConfiguration env,
+      Konnektor konnektor,
+      SmartcardArchive sca) {
+    this(ActorType.HEALTH_INSURANCE, cfg, env, konnektor, sca);
+  }
+
+  private BaseActor(
+      ActorType actorType,
+      PsActorConfiguration cfg,
+      EnvironmentConfiguration env,
+      Konnektor konnektor,
+      SmartcardArchive sca) {
     this.name = cfg.getName();
     this.identifier = createIdentifier(this.name);
-    this.type = ActorType.PHARMACY;
+    this.type = actorType;
     this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+    this.konnektor = konnektor;
+
+    this.smcbHandle =
+        konnektor.execute(GetCardHandleCommand.forSmartcard(this.getSmcb())).getPayload();
 
     this.client = ErpClientFactory.createErpClient(env, cfg);
     this.client.authenticateWith(smcb);

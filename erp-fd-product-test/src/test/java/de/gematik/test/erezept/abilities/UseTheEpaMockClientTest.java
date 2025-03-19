@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,13 @@ import de.gematik.test.erezept.client.exceptions.FhirValidationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
 import de.gematik.test.erezept.eml.EpaMockDownloadRequest;
 import de.gematik.test.erezept.eml.ErpEmlLog;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class UseTheEpaMockClientTest {
+class UseTheEpaMockClientTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldCreateUseTheEpaMockClientInstance() {

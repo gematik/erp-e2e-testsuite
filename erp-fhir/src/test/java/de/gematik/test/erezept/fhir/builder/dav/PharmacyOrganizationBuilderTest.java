@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@ package de.gematik.test.erezept.fhir.builder.dav;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.values.IKNR;
-import de.gematik.test.erezept.fhir.valuesets.Country;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-class PharmacyOrganizationBuilderTest extends ParsingTest {
+class PharmacyOrganizationBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build DAV DispensedMedication with E-Rezept FHIR Profiles {0}")
@@ -39,9 +39,9 @@ class PharmacyOrganizationBuilderTest extends ParsingTest {
     val pharmacy =
         PharmacyOrganizationBuilder.builder()
             .version(version)
-            .setResourceId(organizationResourceId)
+            .setId(organizationResourceId)
             .name("Adler-Apotheke")
-            .iknr(IKNR.from("757299999"))
+            .iknr(IKNR.asDefaultIknr("757299999"))
             // .phone("+490309876543")  // well, possible but not allowed by DAV profile
             // .email("info@adler.de")
             .address(Country.D, "Berlin", "10623", "Wegelystraße 3")
@@ -50,7 +50,7 @@ class PharmacyOrganizationBuilderTest extends ParsingTest {
     val result = ValidatorUtil.encodeAndValidate(parser, pharmacy);
     assertTrue(result.isSuccessful());
     assertEquals("Adler-Apotheke", pharmacy.getName());
-    assertEquals(IKNR.from("757299999"), pharmacy.getIknr());
+    assertEquals(IKNR.asDefaultIknr("757299999"), pharmacy.getIknr());
   }
 
   @Test

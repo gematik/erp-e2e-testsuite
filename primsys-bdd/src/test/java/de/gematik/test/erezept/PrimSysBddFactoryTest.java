@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
@@ -32,7 +33,6 @@ import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.exceptions.WebSocketException;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.pspwsclient.PSPClient;
 import de.gematik.test.erezept.pspwsclient.config.PSPClientFactory;
 import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
@@ -141,6 +141,26 @@ class PrimSysBddFactoryTest {
   }
 
   @Test
+  void shouldEquipAsHealthInsuranceInstitution() {
+    val name = factory.getDto().getActors().getHealthInsurances().get(0).getName();
+    val lei = OnStage.theActorCalled(name);
+
+    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
+      val erpClient = mock(ErpClient.class);
+      erpClientFactoryMockedStatic
+          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
+          .thenReturn(erpClient);
+
+      assertDoesNotThrow(() -> factory.equipAsHealthInsurance(lei));
+      assertNotNull(lei.abilityTo(UseTheKonnektor.class));
+      assertNotNull(lei.abilityTo(UseTheErpClient.class));
+      assertNotNull(lei.abilityTo(UseSMCB.class));
+      assertNotNull(lei.abilityTo(ManagePharmacyPrescriptions.class));
+      assertNotNull(lei.abilityTo(ManageCommunications.class));
+    }
+  }
+
+  @Test
   void shouldEquipAsApothecary() {
     val name = factory.getDto().getActors().getApothecaries().get(0).getName();
     val apothecary = OnStage.theActorCalled(name);
@@ -151,9 +171,9 @@ class PrimSysBddFactoryTest {
 
   @ParameterizedTest(name = "Equip Actor as {0} Patient")
   @EnumSource(
-      value = VersicherungsArtDeBasis.class,
+      value = InsuranceTypeDe.class,
       names = {"GKV", "PKV"})
-  void shouldEquipAsGkvPatient(VersicherungsArtDeBasis insuranceType) {
+  void shouldEquipAsGkvPatient(InsuranceTypeDe insuranceType) {
     val name = factory.getDto().getActors().getPatients().get(0).getName();
     val patient = OnStage.theActorCalled(name);
 
@@ -173,7 +193,7 @@ class PrimSysBddFactoryTest {
       assertNotNull(patient.abilityTo(ManageCommunications.class));
       assertNotNull(patient.abilityTo(DecideUserBehaviour.class));
 
-      if (insuranceType.equals(VersicherungsArtDeBasis.PKV)) {
+      if (insuranceType.equals(InsuranceTypeDe.PKV)) {
         assertNotNull(patient.abilityTo(ManageChargeItems.class));
       } else {
         assertNull(patient.abilityTo(ManageChargeItems.class));
@@ -183,9 +203,9 @@ class PrimSysBddFactoryTest {
 
   @ParameterizedTest(name = "Equip Actor as {0} Patient for VSDM")
   @EnumSource(
-      value = VersicherungsArtDeBasis.class,
+      value = InsuranceTypeDe.class,
       names = {"GKV", "PKV"})
-  void shouldEquipAsGkvPatientForVsdm(VersicherungsArtDeBasis insuranceType) {
+  void shouldEquipAsGkvPatientForVsdm(InsuranceTypeDe insuranceType) {
     val name = factory.getDto().getActors().getPatients().get(0).getName();
     val patient = OnStage.theActorCalled(name);
 
@@ -199,7 +219,7 @@ class PrimSysBddFactoryTest {
     assertNotNull(patient.abilityTo(ManageCommunications.class));
     assertNotNull(patient.abilityTo(DecideUserBehaviour.class));
 
-    if (insuranceType.equals(VersicherungsArtDeBasis.PKV)) {
+    if (insuranceType.equals(InsuranceTypeDe.PKV)) {
       assertNotNull(patient.abilityTo(ManageChargeItems.class));
     } else {
       assertNull(patient.abilityTo(ManageChargeItems.class));

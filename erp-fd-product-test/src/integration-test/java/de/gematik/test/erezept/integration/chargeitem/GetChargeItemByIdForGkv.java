@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package de.gematik.test.erezept.integration.chargeitem;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
@@ -26,7 +27,6 @@ import de.gematik.test.erezept.actions.chargeitem.GetChargeItemById;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -53,7 +53,7 @@ public class GetChargeItemByIdForGkv extends ErpTest {
   @TestcaseId("ERP_CHARGE_ITEM_GKV_01")
   @DisplayName("Abrufen von Abrechnungsinformation für einen GKV Versicherten")
   void getChargeItemForGkv() {
-    sina.changePatientInsuranceType(VersicherungsArtDeBasis.GKV);
+    sina.changePatientInsuranceType(InsuranceTypeDe.GKV);
     val activation = doctor.performs(IssuePrescription.forPatient(sina).withRandomKbvBundle());
     val task = activation.getExpectedResponse();
     val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task));

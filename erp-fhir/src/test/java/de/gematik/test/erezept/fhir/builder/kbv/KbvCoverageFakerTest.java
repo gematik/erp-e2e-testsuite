@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,17 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class KbvCoverageFakerTest extends ParsingTest {
+class KbvCoverageFakerTest extends ErpFhirParsingTest {
 
   @Test
   void buildFakeKbvCoverageWithPersonGroup() {
@@ -63,22 +66,17 @@ class KbvCoverageFakerTest extends ParsingTest {
 
   @Test
   void buildFakeKbvCoverageWithBeneficiary() {
-    val patient = PatientFaker.builder().fake();
-    val coverage =
-        KbvCoverageFaker.builder().withBeneficiary(new SubjectReference(patient.getId())).fake();
-    val coverage2 = KbvCoverageFaker.builder().withBeneficiary(patient).fake();
+    val patient = KbvPatientFaker.builder().fake();
+    val coverage = KbvCoverageFaker.builder().withBeneficiary(patient).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, coverage2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
   }
 
   @Test
   void buildFakeKbvCoverageWithInsuranceType() {
     val coverage =
         KbvCoverageFaker.builder()
-            .withInsuranceType(
-                randomElement(VersicherungsArtDeBasis.PKV, VersicherungsArtDeBasis.GKV))
+            .withInsuranceType(randomElement(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import de.gematik.test.core.extensions.ErpTestExtension;
 import de.gematik.test.erezept.actors.ActorStage;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
+import de.gematik.test.erezept.actors.KtrActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
@@ -105,6 +106,25 @@ public abstract class ErpTest {
    */
   public PharmacyActor getPharmacyNamed(String name) {
     return stage.getPharmacyNamed(name);
+  }
+
+  /**
+   * This method provides a convenient way of retrieving a KTR by its name. This is an alternative
+   * to the annotated approach and can be even combined. However, this method might come handy if
+   * you need a specific actor only in one single Testcase within an ErpTest. By using this method
+   * you can save on unnecessary instantiation/initialisation of the actor in Testcases where the
+   * actor is not required.
+   *
+   * <p>In contrast, if you need the actor throughout all/most Testcases within an ErpTest it should
+   * be much easier to use the annotated approach via {@code @Actor(name = "NAME") PharmacyActor
+   * pharmacy;}
+   *
+   * @param name is the name of the actor which will identify the actor from the configuration file
+   * @return an initialized KtrActor or throw a {@link ConfigurationMappingException} if the name
+   *     could not be found in the configuration
+   */
+  public KtrActor getKtrNamed(String name) {
+    return stage.getKtrNamed(name);
   }
 
   /**

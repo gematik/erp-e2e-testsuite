@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,35 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.junitpioneer.jupiter.*;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.ActCode;
+import de.gematik.bbriccs.fhir.de.valueset.ConsentScope;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import lombok.val;
+import org.hl7.fhir.r4.model.Consent;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class ErxConsentBuilderTest extends ParsingTest {
+class ErxConsentBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build CommunicationInfoReq with E-Rezept FHIR Profiles {0}")
   @MethodSource(
       "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
-  @ClearSystemProperty(key = "erp.fhir.profile")
+  @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   void buildConsentWithFixedValues(String erpFhirProfileVersion) {
-    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
-    val kvnr = KVNR.from("X234567890");
+    System.setProperty(ERP_FHIR_PROFILES_TOGGLE, erpFhirProfileVersion);
+    val kvnr = KVNR.asPkv("X234567890");
     val erxConsent =
         ErxConsentBuilder.forKvnr(kvnr)
-            .policyRule(ActCode.OPTIN) // by default Opt-in
-            .status(Consent.ConsentState.ACTIVE) // by default ACTIVE
-            .scope(ConsentScope.PATIENT_PRIVACY) // by default Patient-Privacy
+            .policyRule(ActCode.OPTIN)
+            .status(Consent.ConsentState.ACTIVE)
+            .scope(ConsentScope.PATIENT_PRIVACY)
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, erxConsent);
@@ -57,9 +59,9 @@ class ErxConsentBuilderTest extends ParsingTest {
     val erxConsent =
         ErxConsentBuilder.forKvnr(kvid)
             .version(version)
-            .policyRule(ActCode.OPTIN) // by default Opt-in
-            .status(Consent.ConsentState.ACTIVE) // by default ACTIVE
-            .scope(ConsentScope.PATIENT_PRIVACY) // by default Patient-Privacy
+            .policyRule(ActCode.OPTIN)
+            .status(Consent.ConsentState.ACTIVE)
+            .scope(ConsentScope.PATIENT_PRIVACY)
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, erxConsent);

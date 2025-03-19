@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,23 @@ package de.gematik.test.erezept.primsys.model;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
 import de.gematik.test.erezept.client.usecases.ICommand;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenBuilder;
-import de.gematik.test.erezept.fhir.builder.dav.DavDispensedMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenBuilder;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvDispensedMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
-import de.gematik.test.erezept.fhir.references.erp.ErxReceiptReference;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.dav.DavDispensedMedication;
-import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
-import de.gematik.test.erezept.fhir.resources.dav.PharmacyOrganization;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.dav.DavInvoice;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvDispensedMedication;
+import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
@@ -141,7 +141,7 @@ public class ChargeItemUseCase {
             .status("billable")
             .enterer(pharmacy.getSmcb().getTelematikId())
             .subject(KVNR.from(acceptData.getForKvnr()), acceptData.getInsurance().getName())
-            .receiptReference(new ErxReceiptReference(dispenseData.getReceipt()))
+            .receipt(ErxReceipt.asReferenceFromId(dispenseData.getReceipt()))
             .verordnung(acceptData.getPrescriptionReference())
             .abgabedatensatz(davBundle.getReference(), signedDavBundle)
             .build();
@@ -158,19 +158,19 @@ public class ChargeItemUseCase {
                     404, format("no dispensed medication for PrescriptionId {0} found", taskId)));
   }
 
-  private DavAbgabedatenBundle createAbgabedatenBundle(
+  private DavPkvAbgabedatenBundle createAbgabedatenBundle(
       String prescriptionId, DavInvoice davInvoice, PharmacyOrganization pharmacyOrg) {
     val dispMed = createDispensedMedicationFor(prescriptionId, davInvoice, pharmacyOrg);
-    return DavAbgabedatenBuilder.builder(PrescriptionId.from(prescriptionId))
+    return DavPkvAbgabedatenBuilder.builder(PrescriptionId.from(prescriptionId))
         .invoice(davInvoice)
         .medication(dispMed)
         .pharmacy(pharmacyOrg)
         .build();
   }
 
-  private DavDispensedMedication createDispensedMedicationFor(
+  private DavPkvDispensedMedication createDispensedMedicationFor(
       String prescriptionId, DavInvoice davInvoice, PharmacyOrganization pharmacyOrg) {
-    return DavDispensedMedicationBuilder.builder()
+    return DavPkvDispensedMedicationBuilder.builder()
         .prescription(PrescriptionId.from(prescriptionId))
         .pharmacy(pharmacyOrg)
         .invoice(davInvoice)

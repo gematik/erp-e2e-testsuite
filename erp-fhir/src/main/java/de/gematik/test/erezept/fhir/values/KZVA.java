@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
-import de.gematik.test.erezept.fhir.valuesets.IdentifierTypeDe;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
 
-public class KZVA extends Value<String> {
+public class KZVA extends SemanticValue<String, DeBasisProfilNamingSystem> {
 
   private KZVA(String value) {
-    super(DeBasisNamingSystem.KZVA_ABRECHNUNGSNUMMER_SID, value);
+    super(DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID, value);
   }
 
   @Override

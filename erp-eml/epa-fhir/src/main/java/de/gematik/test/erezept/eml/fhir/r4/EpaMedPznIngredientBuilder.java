@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,29 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static de.gematik.test.erezept.eml.fhir.parser.profiles.UseFulCodeSystems.SNOMED_SCT;
+import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.SNOMED_SCT;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaMedStructDef;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EpaVersion;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class EpaMedPznIngredientBuilder
     extends ResourceBuilder<EpaMedPznIngredient, EpaMedPznIngredientBuilder> {
 
   private PZN pzn;
-  private final EpaVersion version = EpaVersion.getDefaultVersion();
+  private final EpaMedicationVersion version = EpaMedicationVersion.getDefaultVersion();
   private String textInCoding;
   @Nullable private String displayInPzn;
   @Nullable private CodeableConcept codeableCocept;
@@ -77,7 +76,7 @@ public class EpaMedPznIngredientBuilder
             + " CodeableConcept");
     val epaMed =
         this.createResource(
-            EpaMedPznIngredient::new, EpaMedStructDef.MEDICATION_PZN_INGREDIENT, version);
+            EpaMedPznIngredient::new, EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT, version);
     epaMed.addExtension(createSnomedExt());
     Optional.ofNullable(this.pzn).ifPresent(pz -> epaMed.getCode().addCoding(pz.asCoding()));
     Optional.ofNullable(this.displayInPzn)
@@ -88,12 +87,11 @@ public class EpaMedPznIngredientBuilder
     return epaMed;
   }
 
-  @NotNull
   private static Extension createSnomedExt() {
     // this extention follows the instruction of: Transformationsregel F_017
     // https://wiki.gematik.de/display/B714ERPFD/Transformationsregel+F_017
     val snomedExt = new Extension();
-    snomedExt.setUrl(EpaMedStructDef.EPA_MED_TYPE_EXT.getCanonicalUrl());
+    snomedExt.setUrl(EpaMedicationStructDef.EPA_MED_TYPE_EXT.getCanonicalUrl());
     val snomedCode = new Coding();
     snomedCode.setSystem(SNOMED_SCT.getCanonicalUrl());
     snomedCode.setVersion("http://snomed.info/sct/900000000000207008/version/20240201");

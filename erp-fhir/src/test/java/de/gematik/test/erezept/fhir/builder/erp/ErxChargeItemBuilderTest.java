@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,21 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.dav.DavAbgabedatenFaker;
+import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.UUID;
 import lombok.val;
@@ -39,7 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class ErxChargeItemBuilderTest extends ParsingTest {
+class ErxChargeItemBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build ChargeItem using old profiles {0}")
   @ValueSource(booleans = {true, false})
@@ -49,7 +50,7 @@ class ErxChargeItemBuilderTest extends ParsingTest {
             ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
             : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     val prescriptionId = PrescriptionId.random(prescriptionIdSystem);
-    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(prescriptionId).fake();
     val kbvBundle = KbvErpBundleFaker.builder().fake();
     val erxReceipt = mock(ErxReceipt.class);
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
@@ -82,7 +83,7 @@ class ErxChargeItemBuilderTest extends ParsingTest {
             ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
             : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     val prescriptionId = PrescriptionId.random(prescriptionIdSystem);
-    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(prescriptionId).fake();
     val erxReceipt = mock(ErxReceipt.class);
     when(erxReceipt.getId()).thenReturn("Bundle/12345");
 
@@ -113,7 +114,7 @@ class ErxChargeItemBuilderTest extends ParsingTest {
             ? ErpWorkflowNamingSystem.PRESCRIPTION_ID
             : ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
     val prescriptionId = PrescriptionId.random(prescriptionIdSystem);
-    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(prescriptionId).fake();
 
     val chargeItemBuilder =
         ErxChargeItemBuilder.forPrescription(prescriptionId)
@@ -163,12 +164,12 @@ class ErxChargeItemBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build ErxChargeItem with E-Rezept FHIR Profiles {0}")
   @MethodSource(
       "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpFhirProfileVersions")
-  @ClearSystemProperty(key = "erp.fhir.profile")
+  @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   void shouldSetPrescriptionIdSystemCorrect(String erpFhirProfileVersion) {
-    System.setProperty("erp.fhir.profile", erpFhirProfileVersion);
+    System.setProperty(ERP_FHIR_PROFILES_TOGGLE, erpFhirProfileVersion);
 
     val prescriptionId = PrescriptionId.random();
-    val davBundle = DavAbgabedatenFaker.builder(prescriptionId).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(prescriptionId).fake();
 
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(prescriptionId)

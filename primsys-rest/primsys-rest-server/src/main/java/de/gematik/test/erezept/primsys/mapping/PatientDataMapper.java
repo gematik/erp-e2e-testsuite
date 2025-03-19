@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.Country;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.AssignerOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.Country;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
 import java.util.stream.Collectors;
@@ -52,13 +52,13 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
   protected KbvPatient convertInternal() {
     // anyway, if no check was performed on the KVNR, we will still use a random one
     val kvnr = hasKvnr() ? getKvnr() : KVNR.random();
-    return PatientBuilder.builder()
+    return KbvPatientBuilder.builder()
         .kvnr(kvnr, getInsuranceKind())
         .name(dto.getFirstName(), dto.getLastName())
         .birthDate(dto.getBirthDate())
         .address(Country.D, dto.getCity(), dto.getPostal(), dto.getStreet())
         .assigner(
-            AssignerOrganizationFaker.builder()
+            KbvAssignerOrganizationFaker.builder()
                 .fake()) // will only be used for GKV with old profiles
         .build();
   }
@@ -71,8 +71,8 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
     return KVNR.from(dto.getKvnr());
   }
 
-  private VersicherungsArtDeBasis getInsuranceKind() {
-    return VersicherungsArtDeBasis.fromCode(dto.getInsuranceType().name());
+  private InsuranceTypeDe getInsuranceKind() {
+    return InsuranceTypeDe.fromCode(dto.getInsuranceType().name());
   }
 
   public static PatientDataMapper from(KbvPatient patient) {
@@ -99,6 +99,6 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
   }
 
   public static PatientDto randomDto() {
-    return from(PatientFaker.builder().fake()).getDto();
+    return from(KbvPatientFaker.builder().fake()).getDto();
   }
 }

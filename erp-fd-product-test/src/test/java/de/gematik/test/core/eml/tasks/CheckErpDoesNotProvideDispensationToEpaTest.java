@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.eml.tasks.CheckErpDoesNotProvideDispensationToEpa;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.GemaTestActor;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import lombok.val;
@@ -44,20 +41,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class CheckErpDoesNotProvideDispensationToEpaTest extends ParsingTest {
-  private static KbvErpBundle kbvErpBundle;
+class CheckErpDoesNotProvideDispensationToEpaTest extends ErpFhirParsingTest {
 
   @BeforeAll
   static void setup() {
     OnStage.setTheStage(new Cast() {});
     CoverageReporter.getInstance().startTestcase("not needed");
-    val fhir = EpaFhirFactory.create();
-
-    kbvErpBundle =
-        parser.decode(
-            KbvErpBundle.class,
-            ResourceLoader.readFileFromResource(
-                "fhir/valid/kbv/1.1.0/bundle/manipulated/ManipulatedForUnitTestfe9200db-d503-4a1b-bd13-96ab375f9bab.xml"));
   }
 
   @AfterEach

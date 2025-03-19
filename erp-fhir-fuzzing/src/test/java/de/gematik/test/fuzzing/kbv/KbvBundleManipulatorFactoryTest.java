@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.*;
 import org.junitpioneer.jupiter.*;
 
 @Slf4j
-class KbvBundleManipulatorFactoryTest extends ParsingTest {
+class KbvBundleManipulatorFactoryTest extends ErpFhirParsingTest {
 
   private static final boolean DEBUG = false;
 
@@ -85,11 +85,17 @@ class KbvBundleManipulatorFactoryTest extends ParsingTest {
                             assertFalse(result.isSuccessful(), m.getName());
                           } else {
                             log.warn(
-                                format(
-                                    "''{0}'' manipulation was not detected as invalid by HAPI",
-                                    m.getName()));
+                                "''{}'' manipulation was not detected as invalid by HAPI",
+                                m.getName());
                           }
                         });
     assertAll("Should fail on manipulated KbvErpBundle", executables);
+  }
+
+  @Test
+  void shouldHaveAdditionalMvoMutators() {
+    val withoutMvo = KbvBundleManipulatorFactory.getAllKbvBundleManipulators();
+    val withMvo = KbvBundleManipulatorFactory.getAllKbvBundleManipulators(true);
+    assertTrue(withMvo.size() > withoutMvo.size());
   }
 }

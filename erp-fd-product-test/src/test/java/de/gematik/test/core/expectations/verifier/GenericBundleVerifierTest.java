@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,16 @@ import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GenericBundleVerifierTest extends ParsingTest {
+class GenericBundleVerifierTest extends ErpFhirParsingTest {
   private ErxAuditEventBundle secondErxAuditEventBundle;
   private ErxAuditEventBundle firstErxAuditEventBundle;
 

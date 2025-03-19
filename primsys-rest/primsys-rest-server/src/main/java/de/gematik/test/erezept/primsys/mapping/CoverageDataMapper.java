@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,21 @@ package de.gematik.test.erezept.primsys.mapping;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
+import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
+import de.gematik.test.erezept.fhir.valuesets.Wop;
 import de.gematik.test.erezept.primsys.data.CoverageDto;
-import de.gematik.test.erezept.primsys.data.valuesets.*;
+import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
+import de.gematik.test.erezept.primsys.data.valuesets.InsurantStateDto;
+import de.gematik.test.erezept.primsys.data.valuesets.PayorTypeDto;
+import de.gematik.test.erezept.primsys.data.valuesets.PersonGroupDto;
+import de.gematik.test.erezept.primsys.data.valuesets.WopDto;
 import lombok.val;
 
 public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
@@ -93,8 +101,8 @@ public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
     return VersichertenStatus.fromCode(dto.getInsurantState().getCode());
   }
 
-  private VersicherungsArtDeBasis getInsuranceType() {
-    return VersicherungsArtDeBasis.fromCode(dto.getInsuranceType().getCode());
+  private InsuranceTypeDe getInsuranceType() {
+    return InsuranceTypeDe.fromCode(dto.getInsuranceType().getCode());
   }
 
   public static CoverageDataMapper from(KbvCoverage coverage, KbvPatient beneficiary) {
@@ -125,7 +133,7 @@ public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
   }
 
   public static CoverageDto randomDto() {
-    val insuranceType = fakerValueSet(VersicherungsArtDeBasis.class);
+    val insuranceType = fakerValueSet(InsuranceTypeDe.class);
     val insurance = InsuranceCoverageInfo.randomFor(insuranceType);
     return CoverageDto.ofType(InsuranceTypeDto.fromCode(insuranceType.getCode()))
         .personGroup(fakerValueSet(PersonGroupDto.class))

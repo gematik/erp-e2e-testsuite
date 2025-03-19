@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * corresponding to FHIR-ValueSet {@link
- * de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis}
- */
+/** corresponding to FHIR-ValueSet {@link de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe} */
 @Getter
 @RequiredArgsConstructor
 public enum InsuranceTypeDto {

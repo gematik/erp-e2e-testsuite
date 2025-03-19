@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package de.gematik.test.erezept.cli.cmd.generate;
 
 import de.gematik.test.erezept.fhir.builder.dav.*;
-import de.gematik.test.erezept.fhir.resources.dav.*;
+import de.gematik.test.erezept.fhir.r4.dav.*;
 import de.gematik.test.fuzzing.dav.*;
 import lombok.extern.slf4j.*;
 import lombok.val;
@@ -37,13 +37,13 @@ public class DavBundleGenerator extends BaseResourceGenerator {
         this::createDavAbgabedaten,
         DavBundleManipulatorFactory.getAllDavBundleManipulators(),
         original -> {
-          val copy = new DavAbgabedatenBundle();
+          val copy = new DavPkvAbgabedatenBundle();
           original.copyValues(copy);
           return copy;
         });
   }
 
-  private DavAbgabedatenBundle createDavAbgabedaten() {
-    return DavAbgabedatenFaker.builder().fake();
+  private DavPkvAbgabedatenBundle createDavAbgabedaten() {
+    return DavPkvAbgabedatenFaker.builder().fake();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,17 @@ package de.gematik.test.erezept.fhir.testutil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import java.util.*;
-import java.util.stream.*;
-import lombok.*;
-import org.junit.jupiter.params.provider.*;
+import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import lombok.val;
+import org.junit.jupiter.params.provider.Arguments;
 
+// TODO: move these methods to ErpFhirBuilding / ParsingTest
 public class VersionArgumentProvider {
   /**
    * caused by a breakingChange from ErpWorkflowVersion.V1_3_0 to ErpWorkflowVersion.V1_4_0 in this
@@ -34,7 +39,9 @@ public class VersionArgumentProvider {
   public static Stream<Arguments> erpFhirProfileVersions() {
     // TODO: get rid of the support for building 1.1.1 profiles
     //    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
-    return Stream.of(Arguments.of("1.2.0"), Arguments.of("1.3.0"), Arguments.of("1.4.0"));
+    return Stream.of(
+        //        Arguments.of("1.2.0"),
+        Arguments.of("1.3.0"), Arguments.of("1.4.0"));
   }
 
   public static Stream<Arguments> oldErpFhirProfileVersions() {

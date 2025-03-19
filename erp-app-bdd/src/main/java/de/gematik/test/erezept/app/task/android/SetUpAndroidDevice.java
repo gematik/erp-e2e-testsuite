@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package de.gematik.test.erezept.app.task.android;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
@@ -29,8 +31,6 @@ import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.exceptions.TestcaseAbortedException;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.jwt.JWTDecoder;
 import de.gematik.test.erezept.operator.UIProvider;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -48,7 +48,7 @@ import net.serenitybdd.screenplay.Task;
 @RequiredArgsConstructor
 public class SetUpAndroidDevice implements Task {
 
-  private final VersicherungsArtDeBasis insuranceKind;
+  private final InsuranceTypeDe insuranceKind;
   private final SmartcardArchive sca;
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package de.gematik.test.erezept.screenplay.util;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import javax.annotation.Nullable;
 
 public class FlowTypeUtil {
@@ -40,7 +40,7 @@ public class FlowTypeUtil {
    */
   public static PrescriptionFlowType getFlowType(
       @Nullable String code,
-      VersicherungsArtDeBasis insuranceKind,
+      InsuranceTypeDe insuranceKind,
       PrescriptionAssignmentKind prescriptionKind) {
     PrescriptionFlowType ret;
     if (code != null) {
@@ -52,9 +52,9 @@ public class FlowTypeUtil {
   }
 
   private static PrescriptionFlowType getFlowType(
-      VersicherungsArtDeBasis insuranceKind, PrescriptionAssignmentKind prescriptionKind) {
+      InsuranceTypeDe insuranceKind, PrescriptionAssignmentKind prescriptionKind) {
     PrescriptionFlowType ret;
-    if (insuranceKind == VersicherungsArtDeBasis.GKV) {
+    if (insuranceKind == InsuranceTypeDe.GKV) {
       if (prescriptionKind == PrescriptionAssignmentKind.PHARMACY_ONLY) {
         ret = PrescriptionFlowType.FLOW_TYPE_160;
       } else if (prescriptionKind == PrescriptionAssignmentKind.DIRECT_ASSIGNMENT) {
@@ -66,7 +66,7 @@ public class FlowTypeUtil {
                 "Issue prescription for {0} patient with {1}",
                 insuranceKind.getCode(), prescriptionKind.getGerman()));
       }
-    } else if (insuranceKind == VersicherungsArtDeBasis.PKV) {
+    } else if (insuranceKind == InsuranceTypeDe.PKV) {
       if (prescriptionKind == PrescriptionAssignmentKind.PHARMACY_ONLY) {
         ret = PrescriptionFlowType.FLOW_TYPE_200;
       } else if (prescriptionKind == PrescriptionAssignmentKind.DIRECT_ASSIGNMENT) {

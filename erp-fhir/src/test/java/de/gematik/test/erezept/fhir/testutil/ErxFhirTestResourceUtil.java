@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ package de.gematik.test.erezept.fhir.testutil;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAuditEventBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.values.TelematikID;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
@@ -69,6 +71,7 @@ public class ErxFhirTestResourceUtil {
     val narrative = new Narrative();
     narrative.setDivAsString(format("<div xmlns=\"http://www.w3.org/1999/xhtml\">{0}</div>", text));
     erxAuditEvent.setText(narrative);
+    erxAuditEvent.setRecorded(Date.from(Instant.now()));
     erxAuditEvent.setAction(action);
     val agentReference =
         new Reference().setIdentifier(new Identifier().setValue(telematikId.getValue()));

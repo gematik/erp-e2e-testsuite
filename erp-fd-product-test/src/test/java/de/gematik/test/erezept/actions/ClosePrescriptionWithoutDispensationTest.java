@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,9 @@ import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.util.Map;
@@ -37,7 +38,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class ClosePrescriptionWithoutDispensationTest {
+class ClosePrescriptionWithoutDispensationTest extends ErpFhirBuildingTest {
 
   private static PharmacyActor pharmacy;
   private static UseTheErpClient useErpClient;

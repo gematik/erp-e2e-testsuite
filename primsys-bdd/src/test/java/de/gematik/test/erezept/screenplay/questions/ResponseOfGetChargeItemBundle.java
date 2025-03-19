@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static java.text.MessageFormat.*;
 import de.gematik.test.erezept.client.rest.*;
 import de.gematik.test.erezept.client.usecases.*;
 import de.gematik.test.erezept.exceptions.InvalidActorRoleException;
-import de.gematik.test.erezept.fhir.resources.erp.*;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.strategy.*;
@@ -41,7 +41,6 @@ public class ResponseOfGetChargeItemBundle extends FhirResponseQuestion<ErxCharg
 
   private ResponseOfGetChargeItemBundle(
       DequeStrategy deque, ActorRole role, @Nullable AccessCode accessCode) {
-    super("GET /ChargeItem");
     this.deque = deque;
     this.role = role;
     this.accessCode = accessCode;

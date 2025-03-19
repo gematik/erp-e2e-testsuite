@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
@@ -37,6 +39,7 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor
@@ -61,6 +64,7 @@ public class SendMessages extends ErpAction<ErxCommunication> {
   }
 
   @Override
+  @Step("{0} sendet eine Communication ")
   public ErpInteraction<ErxCommunication> answeredBy(Actor actor) {
     fuzzingMutators.forEach(m -> m.getParameter().accept(communication));
     val cmd = new CommunicationPostCommand(communication);
@@ -72,10 +76,20 @@ public class SendMessages extends ErpAction<ErxCommunication> {
     private final Actor receiver;
     private final List<NamedEnvelope<FuzzingMutator<ErxCommunication>>> fuzzingMutators =
         new LinkedList<>();
-    private ErxTask erxTask;
+
+    private AccessCode accessCode;
+
+    private TaskId taskId;
 
     public Builder forTask(ErxTask erxTask) {
-      this.erxTask = erxTask;
+      this.taskId = erxTask.getTaskId();
+      this.accessCode = erxTask.getAccessCode();
+      return this;
+    }
+
+    public Builder with(TaskId taskId, AccessCode accessCode) {
+      this.taskId = taskId;
+      this.accessCode = accessCode;
       return this;
     }
 
@@ -88,12 +102,12 @@ public class SendMessages extends ErpAction<ErxCommunication> {
     public SendMessages asReply(CommunicationReplyMessage message, ErpActor sender) {
       val patientBaseData = SafeAbility.getAbility(receiver, ProvidePatientBaseData.class);
       val communication =
-          ErxCommunicationBuilder.builder()
+          ErxCommunicationBuilder.asReply(message)
               .sender(((PharmacyActor) sender).getTelematikId().getValue())
-              .recipient(patientBaseData.getKvnr().getValue())
-              .basedOnTask(erxTask.getTaskId(), erxTask.getAccessCode())
+              .receiver(patientBaseData.getKvnr().getValue())
+              .basedOn(taskId, accessCode)
               .supplyOptions(SupplyOptionsType.getSupplyOptionType(message.supplyOptionsType()))
-              .buildReply(message);
+              .build();
       return withCommunication(communication, fuzzingMutators);
     }
 
@@ -101,11 +115,11 @@ public class SendMessages extends ErpAction<ErxCommunication> {
       val useSmcb = SafeAbility.getAbility(receiver, UseSMCB.class);
       val telematikId = TelematikID.from(useSmcb.getTelematikID());
       val communication =
-          ErxCommunicationBuilder.builder()
-              .recipient(telematikId.getValue())
-              .basedOnTask(erxTask.getTaskId(), erxTask.getAccessCode())
-              .flowType(erxTask.getFlowType())
-              .buildDispReq(message);
+          ErxCommunicationBuilder.forDispenseRequest(message)
+              .receiver(telematikId.getValue())
+              .basedOn(taskId, accessCode)
+              .flowType(taskId.getFlowType())
+              .build();
       return withCommunication(communication, fuzzingMutators);
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
 import java.util.stream.Stream;
@@ -76,7 +80,7 @@ class PrescriptionFlowTypeTest {
   @ParameterizedTest(name = "#{index} - WorkflowType from InsuranceKind {0} expected to be {1}")
   @MethodSource("defaultPrescriptionFlowTypes")
   void shouldGenerateFromInsuranceKind(
-      VersicherungsArtDeBasis insuranceKind, PrescriptionFlowType expectation) {
+      InsuranceTypeDe insuranceKind, PrescriptionFlowType expectation) {
     assertEquals(expectation, PrescriptionFlowType.fromInsuranceKind(insuranceKind));
     assertEquals(expectation, PrescriptionFlowType.fromInsuranceKind(insuranceKind, false));
     assertFalse(PrescriptionFlowType.fromInsuranceKind(insuranceKind).isDirectAssignment());
@@ -85,22 +89,22 @@ class PrescriptionFlowTypeTest {
   @ParameterizedTest(name = "#{index} - WorkflowType from InsuranceKind {0} expected to be {1}")
   @MethodSource("directAssignmentPrescriptionFlowTypes")
   void shouldGenerateFromInsuranceKindWithDirectAssignment(
-      VersicherungsArtDeBasis insuranceKind, PrescriptionFlowType expectation) {
+      InsuranceTypeDe insuranceKind, PrescriptionFlowType expectation) {
     assertEquals(expectation, PrescriptionFlowType.fromInsuranceKind(insuranceKind, true));
     assertTrue(PrescriptionFlowType.fromInsuranceKind(insuranceKind, true).isDirectAssignment());
   }
 
   static Stream<Arguments> defaultPrescriptionFlowTypes() {
     return Stream.of(
-        arguments(VersicherungsArtDeBasis.GKV, PrescriptionFlowType.FLOW_TYPE_160),
-        arguments(VersicherungsArtDeBasis.PKV, PrescriptionFlowType.FLOW_TYPE_200),
-        arguments(VersicherungsArtDeBasis.BG, PrescriptionFlowType.FLOW_TYPE_160));
+        arguments(InsuranceTypeDe.GKV, PrescriptionFlowType.FLOW_TYPE_160),
+        arguments(InsuranceTypeDe.PKV, PrescriptionFlowType.FLOW_TYPE_200),
+        arguments(InsuranceTypeDe.BG, PrescriptionFlowType.FLOW_TYPE_160));
   }
 
   static Stream<Arguments> directAssignmentPrescriptionFlowTypes() {
     return Stream.of(
-        arguments(VersicherungsArtDeBasis.GKV, PrescriptionFlowType.FLOW_TYPE_169),
-        arguments(VersicherungsArtDeBasis.PKV, PrescriptionFlowType.FLOW_TYPE_209),
-        arguments(VersicherungsArtDeBasis.BG, PrescriptionFlowType.FLOW_TYPE_169));
+        arguments(InsuranceTypeDe.GKV, PrescriptionFlowType.FLOW_TYPE_169),
+        arguments(InsuranceTypeDe.PKV, PrescriptionFlowType.FLOW_TYPE_209),
+        arguments(InsuranceTypeDe.BG, PrescriptionFlowType.FLOW_TYPE_169));
   }
 }

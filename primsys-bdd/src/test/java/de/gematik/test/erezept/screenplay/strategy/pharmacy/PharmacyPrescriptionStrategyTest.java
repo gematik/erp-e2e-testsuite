@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,22 @@
 
 package de.gematik.test.erezept.screenplay.strategy.pharmacy;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.exceptions.StrategyInitializationException;
-import de.gematik.test.erezept.fhir.resources.erp.*;
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import lombok.*;
-import net.serenitybdd.screenplay.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+import org.junit.jupiter.api.Test;
 
 class PharmacyPrescriptionStrategyTest {
 

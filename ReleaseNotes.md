@@ -1,5 +1,22 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 0.13.0
+* erp-eml:
+    - adapt CheckEpaOpProvideDispensation to handle medicationDispenses in Profile 1.3.0 and 1.4.0
+* erp-fhir:
+    - Update `de.abda.erezeptabgabedatenpkv` to version 1.3.0
+* erp-e2e:
+    - Add new testcases for C_11881 and C_12143 (Feature Egk in der Apotheke)
+    - Add IssueDiGAPrescription for workflow 162 
+    - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
+* erp-fd-product-test:
+    - Add new testcases C_12162 and C_12143 (Feature Egk in der Apotheke)
+    - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
+* primsys-rest:
+  - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
+* smartcard:
+  - add two HBAs without TelematikId in QES Certificates.
+
 ## Release 0.10.0
 
 Module:

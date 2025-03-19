@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,23 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class EpaPractitionerTest {
+class EpaPractitionerTest extends EpaFhirParsingTest {
 
   @SneakyThrows
   @Test
   void shouldResponseTelematikIdFromPractitioner() {
-    val fhir = EpaFhirFactory.create();
     val path = "fhir/valid/directory/Practitioner-TIPractitionerExample001.json";
     val medicationAsString = ResourceLoader.readFileFromResource(path);
-    val epaMedic = fhir.decode(EpaPractitioner.class, medicationAsString);
+    val epaMedic = epaFhir.decode(EpaPractitioner.class, medicationAsString);
 
     assertEquals(TelematikID.from("1-1.58.00000040"), epaMedic.getTelematikId());
   }

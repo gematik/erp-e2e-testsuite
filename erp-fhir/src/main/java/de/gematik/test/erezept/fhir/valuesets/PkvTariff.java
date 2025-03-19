@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ import org.hl7.fhir.r4.model.Extension;
 
 @Getter
 @AllArgsConstructor
-public enum PkvTariff implements IValueSet {
+public enum PkvTariff implements FromValueSet {
   INDIVIDUAL("01", "Individualtarif"),
   STANDARD("02", "Standardtarif"),
   BASIS("03", "Basistarif"),

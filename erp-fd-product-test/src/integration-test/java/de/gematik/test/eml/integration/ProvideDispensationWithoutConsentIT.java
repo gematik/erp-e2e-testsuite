@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,24 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleDoesNotContainLogFor;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_COMPOUNDING;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_FREITEXT;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_INGREDIENT;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_PZN;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckErpDoesNotProvideDispensationToEpa;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ClosePrescriptionWithoutDispensation;
+import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -37,15 +47,17 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
 import java.util.Date;
@@ -91,7 +103,7 @@ public class ProvideDispensationWithoutConsentIT extends ErpTest {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
   }
 
-  @TestcaseId("EML_Provide_Dispensation_without_Consent_Decision_01")
+  @TestcaseId("EML_PROVIDE_DISPENSATION_WITH_CONSENT_DECISION_DENY_01")
   @ParameterizedTest(
       name =
           "[{index}] -> für einen Flow Type {2} sollen die Information zur Provide-Dispensation"
@@ -101,7 +113,7 @@ public class ProvideDispensationWithoutConsentIT extends ErpTest {
           + " Aktensystem gefunden werden")
   @MethodSource("workflowAndMedicationComposer")
   void checkSubmittedDispensationInformation(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {
@@ -155,7 +167,7 @@ public class ProvideDispensationWithoutConsentIT extends ErpTest {
     if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
       dispensation =
           pharmacy.performs(
-              DispensePrescription.forPrescription(acceptance.getTaskId(), acceptance.getSecret())
+              DispensePrescription.withCredentials(acceptance.getTaskId(), acceptance.getSecret())
                   .withMedDsp(
                       List.of(getMedDspBuilder(task).medication(getMedication(task)).build())));
     }
@@ -171,7 +183,7 @@ public class ProvideDispensationWithoutConsentIT extends ErpTest {
 
       dispensation =
           pharmacy.performs(
-              DispensePrescription.forPrescription(acceptance.getTaskId(), acceptance.getSecret())
+              DispensePrescription.withCredentials(acceptance.getTaskId(), acceptance.getSecret())
                   .withParameters(
                       GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
                           .with(gemMedDsp, gemMedication)

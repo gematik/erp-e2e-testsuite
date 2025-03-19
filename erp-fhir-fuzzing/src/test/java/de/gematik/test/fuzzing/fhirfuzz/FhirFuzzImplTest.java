@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,20 @@
 package de.gematik.test.fuzzing.fhirfuzz;
 
 import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.MetaFuzzerImpl;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzConfig;
@@ -37,7 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-class FhirFuzzImplTest extends ParsingTest {
+class FhirFuzzImplTest extends ErpFhirParsingTest {
 
   private static FuzzConfig fuzzConfig;
   private static FuzzerContext fuzzerContext;
@@ -161,6 +168,7 @@ class FhirFuzzImplTest extends ParsingTest {
     fhirFuzz.getContext().getFuzzConfig().setUsedPercentOfMutators(0.002f);
     fhirFuzz.getContext().getFuzzConfig().setPercentOfAll(100f);
     fhirFuzz.getContext().getFuzzConfig().setPercentOfEach(100f);
+    // TODO: why does validation not work properly here?
     assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
     fhirFuzz.fuzzTilInvalid(bundle, parser);
     assertFalse(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
@@ -175,11 +183,12 @@ class FhirFuzzImplTest extends ParsingTest {
     fhirFuzz.getContext().getFuzzConfig().getDetailSetup().clear();
     fhirFuzz.getContext().getFuzzConfig().setPercentOfEach(0f);
 
-    val mockPrarser = mock(FhirParser.class);
-    when(mockPrarser.encode(any(), any())).thenReturn("is´so");
-    when(mockPrarser.isValid(anyString())).thenReturn(true);
+    val mockParser = mock(FhirParser.class);
+    when(mockParser.encode(any(), any())).thenReturn("is´so");
+    when(mockParser.isValid(anyString())).thenReturn(true);
+    // TODO: why does validation not work properly here?
     assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
-    fhirFuzz.fuzzTilInvalid(bundle, mockPrarser);
-    verify(mockPrarser, times(25)).isValid(anyString());
+    fhirFuzz.fuzzTilInvalid(bundle, mockParser);
+    verify(mockParser, times(25)).isValid(anyString());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.definitions;
 
-import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
+import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvBasisVersion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum KbvBasisStructDef implements IStructureDefinition<KbvBasisVersion> {
-  BASE_MEDICATION_TYPE("https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Medication_Type");
+public enum KbvBasisStructDef implements WithStructureDefinition<KbvBasisVersion> {
+  BASE_MEDICATION_TYPE("https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Medication_Type"),
+  SUPPORTING_PRESCRIPTION_REF("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle"),
+  BINARY("Binary");
 
   private final String canonicalUrl;
 }

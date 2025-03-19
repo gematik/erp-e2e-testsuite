@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,10 @@
 
 package de.gematik.test.erezept.fhir.values;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import java.util.List;
-import lombok.val;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
 
-public class AsvFachgruppennummer extends Value<String> {
+public class AsvFachgruppennummer extends SemanticValue<String, KbvNamingSystem> {
 
   private AsvFachgruppennummer(String value) {
     super(KbvNamingSystem.ASV_FACHGRUPPENNUMMER, value);
@@ -30,17 +27,5 @@ public class AsvFachgruppennummer extends Value<String> {
 
   public static AsvFachgruppennummer from(String s) {
     return new AsvFachgruppennummer(s);
-  }
-
-  public CodeableConcept asCodeableConcept() {
-    val coding = asCoding();
-    return new CodeableConcept().setCoding(List.of(coding));
-  }
-
-  private Coding asCoding() {
-    val coding = new Coding();
-    coding.setCode(this.getValue());
-    coding.setSystem(this.getSystemAsString());
-    return coding;
   }
 }

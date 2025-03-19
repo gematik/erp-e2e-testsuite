@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package de.gematik.test.erezept.integration.communication;
 
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.*;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.containsCommunicationWithId;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.containsCountOfCommunication;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.onlySenderWith;
 import static de.gematik.test.core.expectations.verifier.CommunicationVerifier.emptyReceivedElement;
 import static de.gematik.test.core.expectations.verifier.CommunicationVerifier.presentReceivedElement;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
@@ -24,6 +26,7 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -31,7 +34,11 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier;
 import de.gematik.test.core.expectations.verifier.CommunicationVerifier;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.ClosePrescription;
+import de.gematik.test.erezept.actions.GetPrescriptionById;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.communication.GetMessage;
 import de.gematik.test.erezept.actions.communication.GetMessages;
 import de.gematik.test.erezept.actions.communication.SendMessages;
@@ -43,10 +50,9 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.stream.Stream;
@@ -90,7 +96,7 @@ public class GetMessagesIT extends ErpTest {
         .arguments()
         .multiply(0, PrescriptionAssignmentKind.class)
         .multiply(1, SupplyOptionsType.class)
-        .multiply(2, List.of(VersicherungsArtDeBasis.GKV, VersicherungsArtDeBasis.PKV))
+        .multiply(2, List.of(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV))
         .create();
   }
 
@@ -104,8 +110,8 @@ public class GetMessagesIT extends ErpTest {
   void shouldNotGetForeignCommunicationsAsPharmacy(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
-    hanna.changePatientInsuranceType(VersicherungsArtDeBasis.PKV);
+      InsuranceTypeDe insuranceType) {
+    hanna.changePatientInsuranceType(InsuranceTypeDe.PKV);
     val task = prescribe(assignmentKind, hanna);
     val dispRequest =
         hanna.performs(
@@ -154,7 +160,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldGetCorrectCountOfNewCommunicationsAsPharmacy(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     hanna.changePatientInsuranceType(insuranceType);
     val getNewCommunicationFirst =
         woodlandPharma.performs(
@@ -200,7 +206,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldNotGetForeignCommunicationsAsPatient(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
     val replyMessage =
@@ -247,7 +253,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldGetCorrectCountOfNewCommunicationsAsPatient(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
     val communicationCount =
@@ -284,7 +290,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldGetCorrectRecipientCommunications(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
 
@@ -340,7 +346,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldGetCorrectSenderCommunications(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
 
     val task = prescribe(assignmentKind, sina);
@@ -399,7 +405,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldSetSystemTimeByGetCommunication(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
     val disRequest =
@@ -439,7 +445,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldSetReceivedDatesProperly(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
 
@@ -518,7 +524,7 @@ public class GetMessagesIT extends ErpTest {
   void shouldForbidGetCommunicationWhenClosed(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      VersicherungsArtDeBasis insuranceType) {
+      InsuranceTypeDe insuranceType) {
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
 

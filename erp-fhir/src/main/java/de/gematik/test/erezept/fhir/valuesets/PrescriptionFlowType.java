@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ package de.gematik.test.erezept.fhir.valuesets;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
 
@@ -38,7 +39,7 @@ import org.hl7.fhir.r4.model.Extension;
  * <b>Status:</b> draft
  */
 @Getter
-public enum PrescriptionFlowType implements IValueSet {
+public enum PrescriptionFlowType implements FromValueSet {
   FLOW_TYPE_160("160", "Muster 16 (Apothekenpflichtige Arzneimittel)"),
   FLOW_TYPE_162("162", "Muster 16 (Digitale Gesundheitsanwendungen)"),
   FLOW_TYPE_169("169", "Muster 16 (Direkte Zuweisung)"),
@@ -92,25 +93,25 @@ public enum PrescriptionFlowType implements IValueSet {
     return format("{0}", display);
   }
 
-  public static PrescriptionFlowType fromCode(@NonNull String value) {
+  public static PrescriptionFlowType fromCode(String value) {
     return Arrays.stream(PrescriptionFlowType.values())
         .filter(pft -> pft.code.equals(value))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(PrescriptionFlowType.class, value));
   }
 
-  public static PrescriptionFlowType fromPrescriptionId(@NonNull PrescriptionId prescriptionId) {
+  public static PrescriptionFlowType fromPrescriptionId(PrescriptionId prescriptionId) {
     val rawFlowType = prescriptionId.getValue().substring(0, 3);
     return PrescriptionFlowType.fromCode(rawFlowType);
   }
 
-  public static PrescriptionFlowType fromInsuranceKind(VersicherungsArtDeBasis insuranceKind) {
+  public static PrescriptionFlowType fromInsuranceKind(InsuranceTypeDe insuranceKind) {
     return fromInsuranceKind(insuranceKind, false);
   }
 
   public static PrescriptionFlowType fromInsuranceKind(
-      VersicherungsArtDeBasis insuranceKind, boolean asDirectAssignment) {
-    var baseTypeCode = insuranceKind.equals(VersicherungsArtDeBasis.PKV) ? 200 : 160;
+      InsuranceTypeDe insuranceKind, boolean asDirectAssignment) {
+    var baseTypeCode = insuranceKind.equals(InsuranceTypeDe.PKV) ? 200 : 160;
     if (asDirectAssignment) {
       baseTypeCode += 9;
     }

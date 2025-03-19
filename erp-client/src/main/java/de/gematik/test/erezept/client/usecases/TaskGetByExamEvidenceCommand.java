@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,41 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import java.util.Base64;
 import java.util.List;
-import lombok.NonNull;
+import lombok.val;
 
 public class TaskGetByExamEvidenceCommand extends TaskGetCommand {
 
   public TaskGetByExamEvidenceCommand() {}
 
   /** Get all Tasks without any sorting or filtering */
-  public TaskGetByExamEvidenceCommand(@NonNull String examEvidence) {
+  public TaskGetByExamEvidenceCommand(String examEvidence) {
     queryParameters.add(new QueryParameter("pnw", examEvidence));
   }
 
-  public TaskGetByExamEvidenceCommand andKvnr(@NonNull KVNR kvnr) {
+  public TaskGetByExamEvidenceCommand andKvnr(KVNR kvnr) {
     queryParameters.add(new QueryParameter("kvnr", kvnr.getValue()));
+    return this;
+  }
+
+  public TaskGetByExamEvidenceCommand andHcv(byte[] hcv) {
+    val encodedHvc = Base64.getUrlEncoder().encodeToString(hcv);
+    return andHcv(encodedHvc);
+  }
+
+  public TaskGetByExamEvidenceCommand andHcv(String encodedHvc) {
+    queryParameters.add(new QueryParameter("hcv", encodedHvc));
     return this;
   }
 
   /**
    * get Tasks with different possible Sort- or FilterOptions
    *
-   * @param queryParameter
+   * @param queryParameter - List of IQueryParameter
    * @return TaskGetByExamEvidenceCommand
    */
   public TaskGetByExamEvidenceCommand andAdditionalQuery(List<IQueryParameter> queryParameter) {

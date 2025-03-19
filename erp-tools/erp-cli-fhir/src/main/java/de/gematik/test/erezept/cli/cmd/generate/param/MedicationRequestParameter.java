@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.gematik.test.erezept.cli.cmd.generate.param;
 import de.gematik.test.erezept.fhir.builder.*;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.resources.kbv.*;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.*;
 import javax.annotation.Nullable;
 import lombok.*;
@@ -83,7 +83,7 @@ public class MedicationRequestParameter implements BaseResourceParameter {
   @Setter private KbvErpMedication medication;
 
   public KbvPatient getPatient() {
-    return this.getOrDefault(patient, () -> PatientFaker.builder().fake());
+    return this.getOrDefault(patient, () -> KbvPatientFaker.builder().fake());
   }
 
   public KbvCoverage getInsurance() {
@@ -91,7 +91,7 @@ public class MedicationRequestParameter implements BaseResourceParameter {
   }
 
   public KbvPractitioner getPractitioner() {
-    return this.getOrDefault(practitioner, () -> PractitionerFaker.builder().fake());
+    return this.getOrDefault(practitioner, () -> KbvPractitionerFaker.builder().fake());
   }
 
   public KbvErpMedication getMedication() {
@@ -116,7 +116,7 @@ public class MedicationRequestParameter implements BaseResourceParameter {
 
   public KbvErpMedicationRequest createMedicationRequest() {
     val mvo = mvoOnly ? GemFaker.mvo(true) : GemFaker.mvo();
-    return MedicationRequestBuilder.forPatient(this.getPatient())
+    return KbvErpMedicationRequestBuilder.forPatient(this.getPatient())
         .insurance(getInsurance())
         .requester(getPractitioner())
         .medication(getMedication())

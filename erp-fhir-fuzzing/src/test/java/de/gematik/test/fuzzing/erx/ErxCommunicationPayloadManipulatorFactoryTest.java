@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package de.gematik.test.fuzzing.erx;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +33,7 @@ import java.lang.reflect.Modifier;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class ErxCommunicationPayloadManipulatorFactoryTest {
+class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldThrowOnConstructorCall() throws NoSuchMethodException {
@@ -60,10 +62,7 @@ class ErxCommunicationPayloadManipulatorFactoryTest {
                   "123ewrßiokx-mclöv90ß-2331");
 
           val comRepl =
-              ErxCommunicationBuilder.builder()
-                  .basedOnTask("test", "Test2")
-                  .recipient("!")
-                  .buildReply(cRM);
+              ErxCommunicationBuilder.asReply(cRM).basedOn("test", "Test2").receiver("!").build();
           m.getParameter().accept(comRepl);
           val cont = comRepl.getPayloadFirstRep().getContent();
           val stringCont = cont.castToString(cont).getValue();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
 import lombok.val;
 import org.hl7.fhir.r4.model.Binary;
 import org.hl7.fhir.r4.model.Parameters;
 
-public class PrescriptionBuilder extends AbstractResourceBuilder<PrescriptionBuilder> {
+public class PrescriptionBuilder {
 
   private PrescriptionBuilder() {}
 

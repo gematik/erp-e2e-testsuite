@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
@@ -29,11 +30,10 @@ import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvEvdgaBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PatientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerFaker;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -85,8 +85,8 @@ class PrescribeDiGaTest extends TestWithActorContext {
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
 
-    val patient = PatientFaker.builder().fake();
-    val practitioner = PractitionerFaker.builder().fake();
+    val patient = KbvPatientFaker.builder().fake();
+    val practitioner = KbvPractitionerFaker.builder().fake();
     val coverage = KbvCoverageFaker.builder().fake();
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(prescriptionId)
@@ -98,10 +98,10 @@ class PrescribeDiGaTest extends TestWithActorContext {
                     .withInsurance(coverage)
                     .withRequester(practitioner)
                     .fake())
-            .medicalOrganization(MedicalOrganizationFaker.builder().fake())
+            .medicalOrganization(KbvMedicalOrganizationFaker.builder().fake())
             .build();
 
-    val xml = fhir.encode(evdgaBundle, EncodingType.XML);
+    val xml = parser.encode(evdgaBundle, EncodingType.XML);
     try (val response = PrescribeDiGa.as(doctor).withEvdga(xml)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());

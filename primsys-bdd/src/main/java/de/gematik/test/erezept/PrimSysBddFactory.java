@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.DummyEgk;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
@@ -31,8 +33,6 @@ import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.exceptions.WebSocketException;
-import de.gematik.test.erezept.fhir.values.KVNR;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.pspwsclient.config.PSPClientFactory;
 import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
@@ -142,6 +142,26 @@ public class PrimSysBddFactory extends ConfiguredFactory {
         .can(ProvideApoVzdInformation.withName(cfg.getApoVzdName()));
   }
 
+  public void equipAsHealthInsurance(Actor theHealthInsurance) {
+    val name = theHealthInsurance.getName();
+    val cfg = this.getConfig(name, dto.getActors().getHealthInsurances());
+    val smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    val useTheKonnektor =
+        UseTheKonnektor.with(smcb)
+            .and(algorithm)
+            .on(konnektorFactory.createKonnektorClient(cfg.getKonnektor()));
+    val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
+
+    givenThat(theHealthInsurance)
+        .whoCan(useTheKonnektor)
+        .can(UseTheErpClient.with(erpClient).authenticatingWith(useTheKonnektor))
+        .can(UseSMCB.itHasAccessTo(smcb))
+        .can(ManagePharmacyPrescriptions.itWorksWith())
+        .can(ManageCommunications.heExchanges());
+  }
+
   public void equipAsApothecary(Actor theApothecary) {
     val name = theApothecary.getName();
     val cfg = this.getConfig(name, dto.getActors().getApothecaries());
@@ -211,7 +231,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
         .can(ManageCommunications.heExchanges())
         .can(DecideUserBehaviour.withGiven(dto.isPreferManualSteps()));
 
-    if (VersicherungsArtDeBasis.fromCode(insuranceType).equals(VersicherungsArtDeBasis.PKV)) {
+    if (InsuranceTypeDe.fromCode(insuranceType).equals(InsuranceTypeDe.PKV)) {
       givenThat(thePatient).can(ManageChargeItems.heReceives());
     }
   }

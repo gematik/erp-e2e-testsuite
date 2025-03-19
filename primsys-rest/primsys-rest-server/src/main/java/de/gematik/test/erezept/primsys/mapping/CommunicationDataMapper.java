@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import de.gematik.test.erezept.fhir.resources.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.primsys.data.communication.CommunicationDto;
 import de.gematik.test.erezept.primsys.data.communication.CommunicationDtoType;
 import de.gematik.test.erezept.primsys.data.communication.CommunicationReferenceDto;

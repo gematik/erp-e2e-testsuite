@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.DeBasisStructDef;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
 
-/** https://applications.kbv.de/S_KBV_PERSONENGRUPPE.xhtml */
+/** <a href="https://applications.kbv.de/S_KBV_PERSONENGRUPPE.xhtml">KBV Personengruppe</a> */
 @Getter
-public enum PersonGroup implements IValueSet {
+@RequiredArgsConstructor
+public enum PersonGroup implements FromValueSet {
   NOT_SET("00", "Nicht gesetzt"),
   SOZ("04", "SOZ"),
   BVG("06", "BVG"),
@@ -35,21 +37,8 @@ public enum PersonGroup implements IValueSet {
   ASY("09", "ASY");
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.PERSON_GROUP;
-  public static final String VERSION = "1.02";
-  public static final String DESCRIPTION =
-      "Personengruppe: kennzeichnet, zu welcher Personengruppe der Versicherte gehört (§ 264 SGB"
-          + " V). Die Angabe ist auf der EGK vorhanden und auf der KVK Teil des Feldes:"
-          + " Statusergänzung";
-  public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
-
   private final String code;
   private final String display;
-  private final String definition = "N/A definition in profile";
-
-  PersonGroup(String code, String display) {
-    this.code = code;
-    this.display = display;
-  }
 
   @Override
   public KbvCodeSystem getCodeSystem() {
@@ -57,12 +46,13 @@ public enum PersonGroup implements IValueSet {
   }
 
   public Extension asExtension() {
-    return new Extension(DeBasisStructDef.GKV_PERSON_GROUP.getCanonicalUrl(), this.asCoding());
+    return new Extension(
+        DeBasisProfilStructDef.GKV_PERSON_GROUP.getCanonicalUrl(), this.asCoding());
   }
 
-  public static PersonGroup fromCode(@NonNull String coding) {
+  public static PersonGroup fromCode(String coding) {
     return Arrays.stream(PersonGroup.values())
-        .filter(mc -> mc.code.equals(coding))
+        .filter(pg -> pg.code.equals(coding))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(PersonGroup.class, coding));
   }

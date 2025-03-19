@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>0.12.0</version>
+        <version>0.13.1</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
@@ -65,6 +65,10 @@
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-fhir</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir-fuzzing</artifactId>
         </dependency>
         <dependency>
@@ -86,7 +90,6 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
-        <!-- this one is only required to mock FHIR resources from erp-fhir/util! can be removed in the future!! -->
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
@@ -96,20 +99,17 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-fhir</artifactId>
-            <version>0.12.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-fhir</artifactId>
             <type>test-jar</type>
-            <version>0.12.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-mock-client</artifactId>
-            <version>0.12.0</version>
         </dependency>
 
         <dependency>
@@ -176,29 +176,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <resourceBundles>
-                        <resourceBundle>
-                            de.gematik.test.erezept:smartcard:${project.parent.version}
-                        </resourceBundle>
-                        <resourceBundle>
-                            <!--TODO following plugin won´t be required up to bricks 0.2.0-->
-                            de.gematik.test.erezept:epa-fhir:${project.parent.version}
-                        </resourceBundle>
-                    </resourceBundles>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.3.0</version>
@@ -236,7 +213,7 @@
                     <includes>
                         <!-- integration test against SUT everything in de.gematik.test.erezept -->
                         <include>%regex[.*/erezept/integration/.*.class]</include>
-                         <include>%regex[.*/eml/integration/.*.class]</include>
+                        <include>%regex[.*/eml/integration/.*.class]</include>
                         <include>%regex[.*/erezept/performance/.*.class]</include>
                     </includes>
                     <systemPropertyVariables>
@@ -266,12 +243,7 @@
                 <version>${version.serenity}</version>
                 <configuration>
                     <tags/>
-<!--                    <tags>${junit.tags}</tags>--> <!-- this does not work properly yet -->
                     <reports>single-page-html,json-summary</reports>
-                    <systemPropertyVariables>
-                        <report.customfields.Testsuite>Produkt-TestSuite v${project.version}</report.customfields.Testsuite>
-                        <report.customfields.Tester>${user.name}</report.customfields.Tester>
-                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public enum ActorType {
   DOCTOR("Arzt"),
-  PHARMACY("Apotheke");
+  PHARMACY("Apotheke"),
+  HEALTH_INSURANCE("Krankenkasse");
 
   @JsonValue private final String readable;
 
@@ -42,20 +43,15 @@ public enum ActorType {
 
   @JsonCreator
   public static ActorType fromString(String value) {
-    return switch (value.toLowerCase()) {
-      case "arzt", "doctor" -> DOCTOR;
-      case "apotheke", "pharmacy" -> PHARMACY;
-      default -> throw new InvalidActorRoleException(value);
-    };
+    return optionalFromString(value).orElseThrow(() -> new InvalidActorRoleException(value));
   }
 
   public static Optional<ActorType> optionalFromString(String value) {
-    Optional<ActorType> ret = Optional.empty();
-    try {
-      ret = Optional.of(fromString(value));
-    } catch (RuntimeException rte) {
-      log.warn(rte.getMessage());
-    }
-    return ret;
+    return switch (value.toLowerCase()) {
+      case "arzt", "doctor" -> Optional.of(DOCTOR);
+      case "apotheke", "pharmacy" -> Optional.of(PHARMACY);
+      case "kostenträger", "ktr", "krankenkasse" -> Optional.of(HEALTH_INSURANCE);
+      default -> Optional.empty();
+    };
   }
 }

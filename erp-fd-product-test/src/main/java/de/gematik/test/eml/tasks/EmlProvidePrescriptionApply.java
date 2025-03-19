@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package de.gematik.test.eml.tasks;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.exceptions.EpaMockClientException;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

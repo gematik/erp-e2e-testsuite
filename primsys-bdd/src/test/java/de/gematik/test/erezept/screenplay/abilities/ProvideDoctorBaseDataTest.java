@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class ProvideDoctorBaseDataTest {
+class ProvideDoctorBaseDataTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldCreateDoctorBaseDataFromValidConfig() {

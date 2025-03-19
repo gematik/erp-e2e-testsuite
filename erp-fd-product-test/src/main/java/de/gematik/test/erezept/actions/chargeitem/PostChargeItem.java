@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package de.gematik.test.erezept.actions.chargeitem;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
-import de.gematik.test.erezept.fhir.resources.dav.DavAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItem;
+import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
@@ -50,7 +50,7 @@ import org.hl7.fhir.r4.model.ChargeItem;
 public class PostChargeItem extends ErpAction<ErxChargeItem> {
 
   private final PatientActor patientActor;
-  private final DavAbgabedatenBundle davBundle;
+  private final DavPkvAbgabedatenBundle davBundle;
   private final PrescriptionId prescriptionId;
   private final Secret secret;
   private final String kbvBundleReference;
@@ -90,11 +90,11 @@ public class PostChargeItem extends ErpAction<ErxChargeItem> {
   @RequiredArgsConstructor
   public static class Builder {
     private final PatientActor patient;
-    private DavAbgabedatenBundle davAbgabedatenBundle;
+    private DavPkvAbgabedatenBundle davAbgabedatenBundle;
     private final List<NamedEnvelope<FuzzingMutator<ErxChargeItem>>> manipulator =
         new LinkedList<>();
 
-    public Builder davBundle(DavAbgabedatenBundle davAbgabedatenBundle) {
+    public Builder davBundle(DavPkvAbgabedatenBundle davAbgabedatenBundle) {
       this.davAbgabedatenBundle = davAbgabedatenBundle;
       return this;
     }

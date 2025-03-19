@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.screenplay.util.ChargeItemChangeAuthorization;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
@@ -191,7 +191,7 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
 
                 response
                     .getResourceOptional(OperationOutcome.class)
-                    .map(OperationOutcomeWrapper::extractFrom)
+                    .map(OperationOutcomeExtractor::extractFrom)
                     .ifPresent(
                         errorMessage ->
                             log.info(

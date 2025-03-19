@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.util.HashMap;
@@ -30,17 +30,15 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationCompoundingFaker {
+
   private final Map<String, Consumer<KbvErpMedicationCompoundingBuilder>> builderConsumers =
       new HashMap<>();
 
   private KbvErpMedicationCompoundingFaker() {
-    builderConsumers.put("darreichungsform", b -> b.darreichungsform("Zäpfchen, viel Spaß"));
-    builderConsumers.put(
-        "medicationIngredient",
-        b -> b.medicationIngredient(PZN.random(), fakerDrugName(), "freitext"));
-    builderConsumers.put("amount", b -> b.amount(5, 1, "Stk"));
-
-    this.withProductionInstruction("freitext");
+    this.withDosageForm("Zäpfchen, viel Spaß")
+        .withMedicationIngredient(PZN.random(), fakerDrugName(), "freitext")
+        .withAmount(5, 1, "Stk")
+        .withProductionInstruction(ProductionInstruction.asCompounding("freitext"));
   }
 
   public static KbvErpMedicationCompoundingFaker builder() {
@@ -48,8 +46,7 @@ public class KbvErpMedicationCompoundingFaker {
   }
 
   public KbvErpMedicationCompoundingFaker withDosageForm(String df) {
-    builderConsumers.computeIfPresent(
-        "darreichungsform", (key, defaultValue) -> b -> b.darreichungsform(df));
+    builderConsumers.put("darreichungsform", b -> b.darreichungsform(df));
     return this;
   }
 
@@ -84,8 +81,7 @@ public class KbvErpMedicationCompoundingFaker {
 
   public KbvErpMedicationCompoundingFaker withAmount(
       long numerator, long denominator, String unit) {
-    builderConsumers.computeIfPresent(
-        "amount", (key, defaultValue) -> b -> b.amount(numerator, denominator, unit));
+    builderConsumers.put("amount", b -> b.amount(numerator, denominator, unit));
     return this;
   }
 
@@ -116,14 +112,13 @@ public class KbvErpMedicationCompoundingFaker {
 
   public KbvErpMedicationCompoundingFaker withMedicationIngredient(
       String pzn, String medicationName, String freitextInPzn) {
-    builderConsumers.computeIfPresent(
-        "medicationIngredient",
-        (key, defaultValue) -> b -> b.medicationIngredient(pzn, medicationName, freitextInPzn));
+    builderConsumers.put(
+        "medicationIngredient", b -> b.medicationIngredient(pzn, medicationName, freitextInPzn));
     return this;
   }
 
   public KbvErpMedicationCompoundingFaker withResourceId(String resourceId) {
-    builderConsumers.put("resourceId", b -> b.setResourceId(resourceId));
+    builderConsumers.put("resourceId", b -> b.setId(resourceId));
     return this;
   }
 

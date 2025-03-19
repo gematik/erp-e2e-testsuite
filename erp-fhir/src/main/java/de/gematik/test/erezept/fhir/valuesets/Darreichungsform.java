@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
 import java.time.LocalDate;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 
 /**
  * kal: Well, couldn't find a proper english translation for that <br>
@@ -31,7 +31,7 @@ import lombok.NonNull;
  * and is not complete yet. Extend on demand!
  */
 @Getter
-public enum Darreichungsform implements IValueSet {
+public enum Darreichungsform implements FromValueSet {
   AEO("AEO", "Ätherisches Öl"),
   AMP("AMP", "Ampullen"),
   APA("APA", "Ampullenpaare"),
@@ -349,10 +349,10 @@ public enum Darreichungsform implements IValueSet {
     return CODE_SYSTEM;
   }
 
-  public static Darreichungsform fromCode(@NonNull String coding) {
+  public static Darreichungsform fromCode(String code) {
     return Arrays.stream(Darreichungsform.values())
-        .filter(pt -> pt.code.equals(coding))
+        .filter(df -> df.code.equals(code))
         .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(Darreichungsform.class, coding));
+        .orElseThrow(() -> new InvalidValueSetException(Darreichungsform.class, code));
   }
 }

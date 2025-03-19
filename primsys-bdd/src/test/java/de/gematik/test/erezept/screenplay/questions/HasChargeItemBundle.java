@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.exceptions.InvalidActorRoleException;
-import de.gematik.test.erezept.fhir.resources.erp.ErxChargeItemBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -68,7 +68,7 @@ public class HasChargeItemBundle implements Question<Boolean> {
     val chargeItemAbility = SafeAbility.getAbility(actor, ManageChargeItems.class);
     chargeItemAbility.update(chargeItem);
 
-    if (chargeItem.getReceiptReference().isEmpty() || chargeItemBundle.getReceipt().isEmpty()) {
+    if (chargeItem.getReceiptReference().isEmpty() && chargeItemBundle.getReceipt().isEmpty()) {
       return false;
     }
 
@@ -85,10 +85,9 @@ public class HasChargeItemBundle implements Question<Boolean> {
 
     if (!chargeItem.getPrescriptionId().equals(dispensed.getPrescriptionId())) {
       log.warn(
-          format(
-              "Prescription Id {0} of charge item do not match to "
-                  + "prescription Id {1} of the task.",
-              chargeItem.getPrescriptionId(), dispensed.getPrescriptionId()));
+          "Prescription Id {} of charge item do not match to " + "prescription Id {} of the task.",
+          chargeItem.getPrescriptionId(),
+          dispensed.getPrescriptionId());
       return false;
     }
 
@@ -98,8 +97,7 @@ public class HasChargeItemBundle implements Question<Boolean> {
     }
 
     if (chargeItem.getAccessCode().isPresent()) {
-      log.warn(
-          format("Charge Item contains the access code {0}.", chargeItem.getAccessCode().get()));
+      log.warn("Charge Item contains the access code {}.", chargeItem.getAccessCode().get());
       return false;
     }
 

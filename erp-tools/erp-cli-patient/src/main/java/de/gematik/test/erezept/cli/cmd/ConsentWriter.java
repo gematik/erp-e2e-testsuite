@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package de.gematik.test.erezept.cli.cmd;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.ConsentPostCommand;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import picocli.CommandLine;
@@ -33,16 +33,14 @@ public class ConsentWriter extends BaseRemoteCommand {
 
   @Override
   public void performFor(Egk egk, ErpClient erpClient) {
-    log.info(
-        format(
-            "Set PKV consent status for {0} from {1}", egk.getKvnr(), this.getEnvironmentName()));
+    log.info("Set PKV consent status for {} from {}", egk.getKvnr(), this.getEnvironmentName());
 
     val kvnr = KVNR.from(egk.getKvnr());
     val cmd = new ConsentPostCommand(kvnr);
     val response = erpClient.request(cmd);
 
     if (response.isOperationOutcome()) {
-      val message = OperationOutcomeWrapper.extractFrom(response.getAsOperationOutcome());
+      val message = OperationOutcomeExtractor.extractFrom(response.getAsOperationOutcome());
       System.out.println(format("Consent could not be set: {0}", message));
     } else {
       System.out.println(

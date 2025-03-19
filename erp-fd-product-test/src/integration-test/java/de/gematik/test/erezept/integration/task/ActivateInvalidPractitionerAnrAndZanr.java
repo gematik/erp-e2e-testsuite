@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.headerContentContains;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 
+import de.gematik.bbriccs.fhir.de.valueset.Country;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -32,11 +35,16 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.valuesets.*;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -92,12 +100,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
     return ArgumentComposer.composeWith()
         .arguments("123456700", "die 7. Stelle: 6 statt 7 ist")
         .arguments("456456700", "die 7. Stelle: 5 statt 7 ist")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .multiply(2, List.of("Gündüla Gunther", "Adelheid Ulmenwald"))
         .create();
@@ -109,12 +112,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
         .arguments("1234567891", "sie eine Stelle zu lang ist")
         .arguments("12345668", "sie 1 Stellen zu kurz ist")
         .arguments("1234L6789", "sie einen Buchstaben enthält")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .multiply(2, List.of("Gündüla Gunther", "Adelheid Ulmenwald"))
         .create();
@@ -126,12 +124,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
             "555555", "A_23891-01 Ausnahmeregelung für Fachgruppennummern mit Ordnungszahl 1-9")
         .arguments(
             "5555550", "A_23891-01 Ausnahmeregelung für Fachgruppennummern mit Ordnungszahl 0")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .multiply(2, List.of("Gündüla Gunther", "Adelheid Ulmenwald"))
         .create();
@@ -142,12 +135,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
         // Ausnahmen folgend A_23891 -> Hinweis: Keine Prüfziffer, da Fachgruppennummer in separatem
         // Element
         .arguments("A_23891 Hinweis: Keine Prüfziffer, da Fachgruppennummer in separatem Element")
-        .multiply(
-            0,
-            List.of(
-                VersicherungsArtDeBasis.BG,
-                VersicherungsArtDeBasis.PKV,
-                VersicherungsArtDeBasis.GKV))
+        .multiply(0, List.of(InsuranceTypeDe.BG, InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
         .multiply(1, PrescriptionAssignmentKind.class)
         .create();
   }
@@ -163,7 +151,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
           + " entsprechend A_24033 einen Warning Header zurück gibt")
   @MethodSource("afoInvalidANRComposer")
   void activateInvalidAnrZanrInPractitioner(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       DoctorActor doctors,
       String anr,
@@ -213,7 +201,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       "Es muss geprüft werden, dass der Fachdienst die ANR in Practitioner FHIR-Konform validiert")
   @MethodSource("fhirInvalidANRComposer")
   void activateFhirInvalidAnrZanrInPractitioner(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       DoctorActor doctors,
       String anr,
@@ -250,7 +238,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
           + " berücksichtigt")
   @MethodSource("exceptionAnrComposer")
   void activateValidAnrZanrInPractitioner(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       DoctorActor doctors,
       String anr,
@@ -289,9 +277,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
           + " die Ausnahme keine ANR durchleitet, da ASV berücksichtigt wird")
   @MethodSource("exceptionNoAnrComposer")
   void activatePractitionerWithoutANR(
-      VersicherungsArtDeBasis insuranceType,
-      PrescriptionAssignmentKind assignmentKind,
-      String reason) {
+      InsuranceTypeDe insuranceType, PrescriptionAssignmentKind assignmentKind, String reason) {
 
     val doc = this.getDoctorNamed("Adelheid Ulmenwald");
     SafeAbility.getAbility(doc, ProvideDoctorBaseData.class).setAsv(true);
@@ -300,11 +286,11 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
     patient.changePatientInsuranceType(insuranceType);
 
     AccidentExtension accident = null;
-    if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
+    if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
     medicationRequest =
-        MedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder()
             .withPatient(patient.getPatientData())
             .withInsurance(patient.getInsuranceCoverage())
             .withRequester(doc.getPractitioner())
@@ -313,7 +299,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
             .fake();
 
     val medicalOrganization =
-        MedicalOrganizationBuilder.builder()
+        KbvMedicalOrganizationBuilder.builder()
             .name("Arztpraxis Meyer")
             .bsnr("757299999")
             .phone("+490309876543")
@@ -322,7 +308,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
             .build();
 
     val assignerOrganization =
-        AssignerOrganizationBuilder.builder()
+        KbvAssignerOrganizationBuilder.builder()
             .name(patient.getInsuranceCoverage().getName())
             .iknr(patient.getInsuranceCoverage().getIknr())
             .phone("0301111111")
@@ -362,7 +348,7 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, String anr, DoctorActor doctorActor) {
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     AccidentExtension accident = null;
-    if (patient.getPatientInsuranceType().equals(VersicherungsArtDeBasis.BG))
+    if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
     val kbvBundleBuilder =
@@ -381,8 +367,8 @@ public class ActivateInvalidPractitionerAnrAndZanr extends ErpTest {
                 kbvBundle.getPractitioner().getIdentifier().stream()
                     .filter(
                         it ->
-                            KbvNamingSystem.BASE_ANR.match(it)
-                                || KbvNamingSystem.ZAHNARZTNUMMER.match(it))
+                            KbvNamingSystem.BASE_ANR.matches(it)
+                                || KbvNamingSystem.ZAHNARZTNUMMER.matches(it))
                     .findFirst()
                     .orElseThrow()
                     .setValue(anr))

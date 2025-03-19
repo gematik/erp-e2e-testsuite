@@ -1,0 +1,529 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-EVDGA-HealthAppRequest",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_EVDGA_HealthAppRequest",
+  "version": "1.1.1",
+  "name": "KBV_PR_EVDGA_HealthAppRequest",
+  "status": "active",
+  "date": "2025-01-22",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "DeviceRequest",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/DeviceRequest",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "DeviceRequest",
+        "path": "DeviceRequest",
+        "constraint": [
+          {
+            "key": "-evdga-begrenzungDate",
+            "severity": "error",
+            "human": "Begrenzung der Datumsangabe auf 10 Zeichen JJJJ-MM-TT",
+            "expression": "authoredOn.toString().length()=10"
+          },
+          {
+            "key": "-evdga-angabeUnfallbetrieb",
+            "severity": "error",
+            "human": "Die Ressource vom Typ DeviceRequest enthält keinen Namen des Unfallsbetriebs, dieser ist aber Pflicht falls ein Unfallkennzeichen mit dem Wert \"2\" angegeben ist.",
+            "expression": "((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code.exists() and (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code='2') implies extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallbetrieb').exists()"
+          },
+          {
+            "key": "-evdga-angabeUnfallbetriebVerbot",
+            "severity": "error",
+            "human": "Die Ressource vom Typ DeviceRequest enthält einen Namen des Unfallsbetriebs, dieser darf aber nicht angegeben werden, falls ein Unfallkennzeichen mit dem Wert ungleich \"2\" angegeben ist.",
+            "expression": "((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code.exists() and (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code!='2') implies extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallbetrieb').exists().not()"
+          },
+          {
+            "key": "-evdga-angabeUnfalltag",
+            "severity": "error",
+            "human": "Die Ressource vom Typ DeviceRequest enthält keinen Unfalltag, dieser ist aber Pflicht falls ein Unfallkennzeichen mit dem Wert \"1\" oder \"2\" angegeben ist.",
+            "expression": "((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code.exists() and ((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code = '1' or (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfallkennzeichen').value as Coding).code = '2')) implies extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfalltag').exists()"
+          }
+        ]
+      },
+      {
+        "id": "DeviceRequest.id",
+        "path": "DeviceRequest.id",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.meta",
+        "path": "DeviceRequest.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.meta.versionId",
+        "path": "DeviceRequest.meta.versionId",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.meta.lastUpdated",
+        "path": "DeviceRequest.meta.lastUpdated",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.meta.source",
+        "path": "DeviceRequest.meta.source",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.meta.profile",
+        "path": "DeviceRequest.meta.profile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://fhir.kbv.de/StructureDefinition/KBV_PR_EVDGA_HealthAppRequest|1.1",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.meta.security",
+        "path": "DeviceRequest.meta.security",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.meta.tag",
+        "path": "DeviceRequest.meta.tag",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.implicitRules",
+        "path": "DeviceRequest.implicitRules",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.language",
+        "path": "DeviceRequest.language",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.text",
+        "path": "DeviceRequest.text",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.contained",
+        "path": "DeviceRequest.contained",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.extension",
+        "path": "DeviceRequest.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "max": "2"
+      },
+      {
+        "id": "DeviceRequest.extension:SER",
+        "path": "DeviceRequest.extension",
+        "sliceName": "SER",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_EVDGA_SER"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:SER.value[x]",
+        "path": "DeviceRequest.extension.value[x]",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:SER.value[x]:valueBoolean",
+        "path": "DeviceRequest.extension.value[x]",
+        "sliceName": "valueBoolean",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen",
+        "path": "DeviceRequest.extension",
+        "sliceName": "Unfallinformationen",
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension",
+        "path": "DeviceRequest.extension.extension",
+        "max": "3"
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen",
+        "path": "DeviceRequest.extension.extension",
+        "sliceName": "Unfallkennzeichen",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]",
+        "path": "DeviceRequest.extension.extension.value[x]",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding",
+        "path": "DeviceRequest.extension.extension.value[x]",
+        "sliceName": "valueCoding",
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_EVDGA_Accident_Type"
+        }
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding.system",
+        "path": "DeviceRequest.extension.extension.value[x].system",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding.code",
+        "path": "DeviceRequest.extension.extension.value[x].code",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallbetrieb",
+        "path": "DeviceRequest.extension.extension",
+        "sliceName": "Unfallbetrieb",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallbetrieb.value[x]",
+        "path": "DeviceRequest.extension.extension.value[x]",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfallbetrieb.value[x]:valueString",
+        "path": "DeviceRequest.extension.extension.value[x]",
+        "sliceName": "valueString",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfalltag",
+        "path": "DeviceRequest.extension.extension",
+        "sliceName": "Unfalltag",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfalltag.value[x]",
+        "path": "DeviceRequest.extension.extension.value[x]",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.extension:Unfallinformationen.extension:Unfalltag.value[x]:valueDate",
+        "path": "DeviceRequest.extension.extension.value[x]",
+        "sliceName": "valueDate",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.identifier",
+        "path": "DeviceRequest.identifier",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.instantiatesCanonical",
+        "path": "DeviceRequest.instantiatesCanonical",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.instantiatesUri",
+        "path": "DeviceRequest.instantiatesUri",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.basedOn",
+        "path": "DeviceRequest.basedOn",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.priorRequest",
+        "path": "DeviceRequest.priorRequest",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.groupIdentifier",
+        "path": "DeviceRequest.groupIdentifier",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.status",
+        "path": "DeviceRequest.status",
+        "min": 1,
+        "fixedCode": "active",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.intent",
+        "path": "DeviceRequest.intent",
+        "fixedCode": "order",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.priority",
+        "path": "DeviceRequest.priority",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.code[x]",
+        "path": "DeviceRequest.code[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed"
+        },
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept",
+        "path": "DeviceRequest.code[x]",
+        "sliceName": "codeCodeableConcept",
+        "min": 1,
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.coding",
+        "path": "DeviceRequest.code[x].coding",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.coding.system",
+        "path": "DeviceRequest.code[x].coding.system",
+        "min": 1,
+        "fixedUri": "http://fhir.de/CodeSystem/ifa/pzn",
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.coding.version",
+        "path": "DeviceRequest.code[x].coding.version",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.coding.code",
+        "path": "DeviceRequest.code[x].coding.code",
+        "short": "Pharmazentralnummer (PZN) der DiGA-Verordnungseinheit",
+        "definition": "Zur Verordnung der DiGA und ihrer spezifischen Verordnungseinheiten durch Arzt oder Psychotherapeut wird jeder DiGA-Verordnungseinheit bei der Aufnahme ins DiGA-Verzeichnis eine eineindeutige 8-stellige numerische Pharmazentralnummer (PZN) zugeordnet, eine Nummer, die den etablierten Standard zur Identifizierung z. B. unterschiedlicher Dosierungen und Packungsgrößen bei Arzneimitteln darstellt.\r\nDie PZN wird zentral von der Informationsstelle für Arzneimittelspezialitäten - IFA GmbH vergeben, die dem BfArM die benötigten PZN zur Zuordnung zu den DiGA-Verordnungseinheiten zur Verfügung stellt, sodass diese zusätzlich zur ID der Verordnungseinheit (DiGA-VE-ID) im Verzeichnis gelistet werden.\r\nUnabhängig vom Verfahren der Datenübertragung in die PVS stellt die PZN damit die für die Verordnung von DiGA relevante Kennnummer dar und DiGA bzw. ihre einzelnen Verordnungseinheiten können unter Nutzung der im Verzeichnis gelisteten und sukzessive in den PVS angezeigten PZN verordnet werden.",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.coding.display",
+        "path": "DeviceRequest.code[x].coding.display",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.coding.userSelected",
+        "path": "DeviceRequest.code[x].coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.code[x]:codeCodeableConcept.text",
+        "path": "DeviceRequest.code[x].text",
+        "short": "Bezeichnung der DiGA-Verordnungseinheit",
+        "definition": "Unterschiedliche Verordnungseinheiten derselben DiGA erhalten im DiGA-Verzeichnis eine spezifische Bezeichnung, aus der erkenntlich ist, dass es sich um eine bestimmte Verordnungseinheit einer bestimmten, im Verzeichnis gelisteten DiGA handelt. Gemäß § 20 Absatz 1 DiGAV listet das BfArM in seinem Verzeichnis nach § 139e SGB V die nach § 33a Absatz 1 SGB V in der GKV erstattungsfähigen DiGA. Die Listung im Verzeichnis umfasst dabei sowohl die Bezeichnung der DiGA-Verordnungseinheit als auch die DiGA-VE-ID und die PZN. Zur unmittelbaren elektronischen Bereitstellung der verordnungsrelevanten Daten für die PVS stellt das BfArM eine entsprechende Schnittstelle (DiGA-API) bereit. Die etablierte Datenlieferweg über die IFA wird ebenfalls weiter genutzt.",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.parameter",
+        "path": "DeviceRequest.parameter",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.subject",
+        "path": "DeviceRequest.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.1"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.subject.reference",
+        "path": "DeviceRequest.subject.reference",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.subject.type",
+        "path": "DeviceRequest.subject.type",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.subject.identifier",
+        "path": "DeviceRequest.subject.identifier",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.subject.display",
+        "path": "DeviceRequest.subject.display",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.encounter",
+        "path": "DeviceRequest.encounter",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.occurrence[x]",
+        "path": "DeviceRequest.occurrence[x]",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.authoredOn",
+        "path": "DeviceRequest.authoredOn",
+        "short": "Ausstellungsdatum",
+        "definition": "Das Ausstellungsdatum der Verordnung",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.requester",
+        "path": "DeviceRequest.requester",
+        "min": 1,
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner|1.1"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.requester.reference",
+        "path": "DeviceRequest.requester.reference",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.requester.type",
+        "path": "DeviceRequest.requester.type",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.requester.identifier",
+        "path": "DeviceRequest.requester.identifier",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.requester.display",
+        "path": "DeviceRequest.requester.display",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.performerType",
+        "path": "DeviceRequest.performerType",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.performer",
+        "path": "DeviceRequest.performer",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.reasonCode",
+        "path": "DeviceRequest.reasonCode",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.reasonReference",
+        "path": "DeviceRequest.reasonReference",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.insurance",
+        "path": "DeviceRequest.insurance",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage|1.1"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.insurance.reference",
+        "path": "DeviceRequest.insurance.reference",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "DeviceRequest.insurance.type",
+        "path": "DeviceRequest.insurance.type",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.insurance.identifier",
+        "path": "DeviceRequest.insurance.identifier",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.insurance.display",
+        "path": "DeviceRequest.insurance.display",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.supportingInfo",
+        "path": "DeviceRequest.supportingInfo",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.note",
+        "path": "DeviceRequest.note",
+        "max": "0"
+      },
+      {
+        "id": "DeviceRequest.relevantHistory",
+        "path": "DeviceRequest.relevantHistory",
+        "max": "0"
+      }
+    ]
+  }
+}

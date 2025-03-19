@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package de.gematik.test.erezept.fhir.values;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +29,11 @@ class DynamicInsuranceCoverageInfoTest {
   void shouldGenerateDynamicCoverageData() {
     val data =
         DynamicInsuranceCoverageInfo.named("Farmer")
-            .ofType(VersicherungsArtDeBasis.SEL)
+            .ofType(InsuranceTypeDe.SEL)
             .withIknr("123123123");
     assertEquals("Farmer", data.getName());
     assertEquals("123123123", data.getIknr());
-    assertEquals(VersicherungsArtDeBasis.SEL, data.getInsuranceType());
+    assertEquals(InsuranceTypeDe.SEL, data.getInsuranceType());
   }
 
   @Test

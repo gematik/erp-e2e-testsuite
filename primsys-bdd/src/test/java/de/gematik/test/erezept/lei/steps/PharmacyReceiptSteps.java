@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import static net.serenitybdd.screenplay.GivenWhenThen.then;
 
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.questions.HasReceipts;
-import de.gematik.test.erezept.screenplay.questions.VerifyReceiptSignature;
 import de.gematik.test.erezept.screenplay.task.RetrieveReceiptAgain;
+import de.gematik.test.erezept.screenplay.task.VerifyReceiptSignature;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
@@ -109,7 +109,7 @@ public class PharmacyReceiptSteps {
           + " Konnektor validieren$")
   public void thenPharmacySuccessfullyValidatesSignatureofReceipt(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
-    then(thePharmacy).attemptsTo(Ensure.that(VerifyReceiptSignature.fromStack(order)).isTrue());
+    then(thePharmacy).attemptsTo(VerifyReceiptSignature.fromStack(order));
   }
 
   /**

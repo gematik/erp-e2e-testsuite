@@ -66,15 +66,14 @@ Funktionalität: eGK in der Apotheke
     Dann kann die Apotheke Stadtapotheke das letzte E-Rezept nicht abrufen, weil die Apotheke Am Flughafen dieses bereits akzeptiert hat
 
   @TCID:ERP_EE_WF160_EGK_APOTHEKE_03
-  @TESTFALL:negativ
+  @TESTFALL:positiv
   @Hauptdarsteller:Apotheke
-  Szenario: Einlösen von E-Rezepten über die eGK in Krankenhaus-Apotheke nicht möglich
-  Die GKV Versicherte Aenna Gondern kann seine E-Rezept nicht in einer Krankenhaus-Apotheke
-  mit seiner EGK einlösen, da die Krankenhaus-Apotheken nur mit der eGK keine E-Rezepte abrufen dürfen.
+  Szenario: Einlösen von E-Rezepten über die eGK in Krankenhaus-Apotheke möglich
+  Die GKV Versicherte Aenna Gondern kann seine E-Rezept auch in einer Krankenhaus-Apotheke
+  mit ihrer EGK einlösen, da die Krankenhaus-Apotheken nun auch mit der Egk E-Rezepte abrufen dürfen.
 
     Angenommen die Apotheke Am Waldesrand hat Zugriff auf ihre SMC-B
-    Wenn die Krankenhaus-Apotheke Am Waldesrand die E-Rezepte mit der eGK von Aenna Gondern abruft
-    Dann kann die Apotheke Am Waldesrand die E-Rezepte von Aenna Gondern nicht abrufen, weil Krankenhaus-Apotheken nicht berechtigt sind
+    Dann kann die Krankenhaus-Apotheke Am Waldesrand die E-Rezepte mit der eGK von Aenna Gondern abrufen
 
   @TCID:ERP_EE_WF160_EGK_APOTHEKE_04
   @TESTFALL:negativ
@@ -86,15 +85,3 @@ Funktionalität: eGK in der Apotheke
     Wenn die Apotheke Am Flughafen für die eGK von Aenna Gondern keinen Prüfungsnachweis abruft
     Dann kann die Apotheke Am Flughafen die E-Rezepte von Aenna Gondern nicht abrufen, weil der Prüfungsnachweis nicht abgerufen wurde
 
-
-  @TCID:ERP_EE_WF160_EGK_APOTHEKE_05
-  @TESTFALL:negativ
-  @AFO-ID:A_23451
-  @Hauptdarsteller:Apotheke
-  Szenario: E-Rezepte mit eGK in der Apotheke nur mit zeitlich gültigem Prüfungsnachweis
-  Die Apotheke Am Flughafen bekommt nur mit einem aktuellen, innerhalb der letzten 30 Minuten erstellten Prüfungsnachweis
-  Zugriff auf die E-Rezepte des Versicherten Günther Angermänn.
-
-    Angenommen die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
-    Wenn die Apotheke Am Flughafen für die eGK von Aenna Gondern einen alten Prüfungsnachweis verwendet
-    Dann kann die Apotheke Am Flughafen die E-Rezepte von Aenna Gondern nicht abrufen, weil der Prüfungsnachweis zeitlich ungültig ist

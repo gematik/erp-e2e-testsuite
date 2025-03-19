@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,17 @@ package de.gematik.test.eml.integration;
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpCancelPrescriptionWithTask;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.AcceptPrescription;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.GetPrescriptionById;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.TaskAbort;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -32,10 +38,13 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.fhir.valuesets.VersicherungsArtDeBasis;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -77,7 +86,7 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
   }
 
-  @TestcaseId("EML_Cancel_Prescription_with_Consent_Decision_Patient_01")
+  @TestcaseId("EML_CANCEL_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_AS_PATIENT_01")
   @ParameterizedTest(
       name =
           "[{index}] -> Für einen Flow Type {2} soll die stornierte Prescription mit {3} im"
@@ -85,9 +94,10 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
   @DisplayName(
       "Es muss geprüft werden, dass eine vom Patient stornierte Prescription korrekt im Epa-"
           + " Aktensystem erfasst wird")
-  @MethodSource("prescriptionTypesProvider")
+  @MethodSource(
+      "de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer#workflowPharmacyOnlyAndMedicationComposer")
   void checkCanceledPrescriptionInformationPatient(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {
@@ -143,7 +153,7 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
             .isCorrect());
   }
 
-  @TestcaseId("EML_Cancel_Prescription_with_Consent_Decision_Doctor_02")
+  @TestcaseId("EML_CANCEL_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_AS_DOCTOR_02")
   @ParameterizedTest(
       name =
           "[{index}] -> Für einen Flow Type {2} soll die stornierte Prescription mit {3} im"
@@ -153,7 +163,7 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
           + " Aktensystem erfasst wird")
   @MethodSource("prescriptionTypesProvider")
   void checkCanceledPrescriptionInformationDoctor(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {
@@ -206,7 +216,7 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
             .isCorrect());
   }
 
-  @TestcaseId("EML_Cancel_Prescription_with_Consent_Decision_Pharmacy_03")
+  @TestcaseId("EML_CANCEL_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_AS_PHARMACY_03")
   @ParameterizedTest(
       name =
           "[{index}] -> Für einen Flow Type {2} soll die stornierte Prescription mit {3} im"
@@ -216,7 +226,7 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
           + " Aktensystem erfasst wird")
   @MethodSource("prescriptionTypesProvider")
   void checkCanceledPrescriptionInformationPharmacy(
-      VersicherungsArtDeBasis insuranceType,
+      InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {

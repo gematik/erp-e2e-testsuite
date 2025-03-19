@@ -22,7 +22,7 @@
 @AFO-ID:A_18502
 @AFO-ID:A_18503
 Funktionalität: Apothekenpflichtige Medikamente für GKV-Versicherte
-  Die Erezept-Anwendungsfälle für apothekenpflichtige Medikamente für GKV-Versicherte (Workflow 160)
+  Die E-Rezept-Anwendungsfälle für apothekenpflichtige Medikamente für GKV-Versicherte (Workflow 160)
 
   Grundlage:
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis

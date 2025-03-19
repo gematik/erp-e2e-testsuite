@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,23 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItvEvdgaStructDef;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
-import de.gematik.test.erezept.fhir.references.kbv.CoverageReference;
-import de.gematik.test.erezept.fhir.references.kbv.RequesterReference;
-import de.gematik.test.erezept.fhir.references.kbv.SubjectReference;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvHealthAppRequest;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvHealthAppRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DeviceRequest;
 import org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestStatus;
 import org.hl7.fhir.r4.model.DeviceRequest.RequestIntent;
@@ -48,7 +46,7 @@ public class KbvHealthAppRequestBuilder
 
   private PZN pzn;
   private String name;
-  private Date authoredOn;
+  private Date authoredOn = new Date();
   private AccidentExtension accident;
   private Reference subjectReference;
   private Reference requesterReference;
@@ -59,13 +57,13 @@ public class KbvHealthAppRequestBuilder
 
   public static KbvHealthAppRequestBuilder forPatient(KbvPatient patient) {
     val har = new KbvHealthAppRequestBuilder();
-    har.subjectReference = new SubjectReference(patient.getId()).asReference();
+    har.subjectReference = patient.asReference();
     return har;
   }
 
   public KbvHealthAppRequestBuilder version(KbvItvEvdgaVersion version) {
     this.version = version;
-    return self();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder healthApp(String pzn, String name) {
@@ -75,53 +73,53 @@ public class KbvHealthAppRequestBuilder
   public KbvHealthAppRequestBuilder healthApp(PZN pzn, String name) {
     this.pzn = pzn;
     this.name = name;
-    return self();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder requester(KbvPractitioner practitioner) {
-    this.requesterReference = new RequesterReference(practitioner.getId()).asReference();
-    return self();
+    this.requesterReference = practitioner.asReference();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder insurance(KbvCoverage coverage) {
-    this.insuranceReference = new CoverageReference(coverage.getId()).asReference();
-    return self();
+    this.insuranceReference = coverage.asReference();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder authoredOn(Date date) {
     this.authoredOn = date;
-    return self();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder accident(AccidentExtension accident) {
     this.accident = accident;
-    return self();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder relatesToSocialCompensationLaw(
       boolean relatesToSocialCompensationLaw) {
     this.relatesToSocialCompensationLaw = relatesToSocialCompensationLaw;
-    return self();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder status(DeviceRequest.DeviceRequestStatus status) {
     this.status = status;
-    return self();
+    return this;
   }
 
   public KbvHealthAppRequestBuilder intent(DeviceRequest.RequestIntent intent) {
     this.intent = intent;
-    return self();
+    return this;
   }
 
+  @Override
   public KbvHealthAppRequest build() {
-    val profileCanonical = KbvItvEvdgaStructDef.HEALTH_APP_REQUEST.asCanonicalType(version, true);
-    val devReq = this.createResource(KbvHealthAppRequest::new, profileCanonical);
+    val devReq =
+        this.createResource(
+            KbvHealthAppRequest::new, KbvItvEvdgaStructDef.HEALTH_APP_REQUEST, version);
 
-    devReq
-        .addExtension()
-        .setUrl(KbvItvEvdgaStructDef.SER_EXTENSION.getCanonicalUrl())
-        .setValue(new BooleanType(relatesToSocialCompensationLaw));
+    devReq.addExtension(
+        KbvItvEvdgaStructDef.SER_EXTENSION.asBooleanExtension(relatesToSocialCompensationLaw));
     devReq.setStatus(status);
     devReq.setIntent(intent);
 
@@ -129,9 +127,7 @@ public class KbvHealthAppRequestBuilder
 
     devReq.getCodeCodeableConcept().addCoding(pzn.asCoding()).setText(name);
 
-    authoredOn = Optional.ofNullable(authoredOn).orElse(new Date());
-    devReq.setAuthoredOn(authoredOn);
-
+    devReq.setAuthoredOnElement(new DateTimeType(authoredOn, TemporalPrecisionEnum.DAY));
     devReq.setSubject(subjectReference);
     devReq.setRequester(requesterReference);
     devReq.setInsurance(List.of(insuranceReference));

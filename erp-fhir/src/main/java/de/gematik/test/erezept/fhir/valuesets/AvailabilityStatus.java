@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.Coding;
  * <b>Status:</b> draft
  */
 @Getter
-public enum AvailabilityStatus implements IValueSet {
+public enum AvailabilityStatus implements FromValueSet {
   AS_10("10", "sofort verfügbar"),
   AS_20("20", "noch Heute verfügbar"),
   AS_30("30", "am nächsten Werktag - vormittags"),
@@ -82,7 +82,7 @@ public enum AvailabilityStatus implements IValueSet {
     return coding;
   }
 
-  public static AvailabilityStatus fromCode(@NonNull String code) {
+  public static AvailabilityStatus fromCode(String code) {
     return Arrays.stream(AvailabilityStatus.values())
         .filter(pt -> pt.code.equals(code))
         .findFirst()

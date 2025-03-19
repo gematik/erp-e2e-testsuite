@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.rest.RestClient;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
@@ -36,6 +37,7 @@ import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.ApothecaryConfiguration;
 import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
@@ -46,7 +48,6 @@ import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
-import de.gematik.test.erezept.fhir.values.KVNR;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -82,7 +83,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipAsDoctor(A actor) {
     val name = actor.getName();
-    log.info(format("Equip Doctor {0}", name));
+    log.info("Equip Doctor {}", name);
 
     val cfg = this.getDoctorConfig(name);
     val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
@@ -90,7 +91,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     val useTheKonnektor =
-        UseTheKonnektor.with(smcb).and(hba).and(algorithm).on(instantiateDoctorKonnektor(cfg));
+        UseTheKonnektor.with(smcb).and(hba).and(algorithm).on(instantiateKonnektorClient(cfg));
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
@@ -101,7 +102,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipWithEpaMockClient(A actor) {
     val name = actor.getName();
-    log.info(format("Equip Actor {0} with EpaMockClient", name));
+    log.info("Equip Actor {} with EpaMockClient", name);
 
     val epaMockClientConfig = getActiveEnvironment().getEpaMockClient();
     val epaMockUrl = epaMockClientConfig.getEpaMockUrl();
@@ -122,14 +123,32 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipAsPharmacy(A actor) {
     val name = actor.getName();
-    log.info(format("Equip Pharmacy {0}", name));
+    log.info("Equip Pharmacy {}", name);
 
     val cfg = this.getPharmacyConfig(name);
     val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
     val useTheKonnektor =
-        UseTheKonnektor.with(smcb).and(algorithm).on(instantiatePharmacyKonnektor(cfg));
+        UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektorClient(cfg));
+    givenThat(actor)
+        .describedAs(cfg.getDescription())
+        .whoCan(UseSMCB.itHasAccessTo(smcb))
+        .can(useTheKonnektor)
+        .can(ManagePharmacyPrescriptions.itWorksWith())
+        .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor));
+  }
+
+  public <A extends Actor> void equipAsKtr(A actor) {
+    val name = actor.getName();
+    log.info("Equip KTR {}", name);
+
+    val cfg = this.getKtrConfig(name);
+    val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
+    val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    val useTheKonnektor =
+        UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektorClient(cfg));
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
@@ -140,7 +159,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipAsPatient(A actor) {
     val name = actor.getName();
-    log.info(format("Equip Patient {0}", name));
+    log.info("Equip Patient {}", name);
 
     val cfg = this.getPatientConfig(name);
     val egk = this.getEgkByICCSN(cfg.getEgkIccsn());
@@ -214,7 +233,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipAsApothecary(A actor) {
     val name = actor.getName();
-    log.info(format("Equip Apothecary {0}", name));
+    log.info("Equip Apothecary {}", name);
 
     val cfg = this.getApothecaryConfig(name);
     val hba = this.getHbaByICCSN(cfg.getHbaIccsn());
@@ -222,7 +241,10 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
     givenThat(actor)
         .describedAs(cfg.getDescription())
-        .can(UseTheKonnektor.with(hba).and(algorithm).on(instantiateApothecaryKonnektor(cfg)));
+        .can(
+            UseTheKonnektor.with(hba)
+                .and(algorithm)
+                .on(instantiateKonnektorClient(cfg.getKonnektor())));
   }
 
   private <C extends BaseActorConfiguration> UseTheErpClient useTheErpClientFrom(C config) {
@@ -252,6 +274,10 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     return getConfig(name, dto.getActors().getPharmacies());
   }
 
+  public HealthInsuranceConfiguration getKtrConfig(String name) {
+    return getConfig(name, dto.getActors().getHealthInsurances());
+  }
+
   public PatientConfiguration getPatientConfig(String name) {
     return getConfig(name, dto.getActors().getPatients());
   }
@@ -260,20 +286,12 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     return getConfig(name, dto.getActors().getApothecaries());
   }
 
+  public Konnektor instantiateKonnektorClient(PsActorConfiguration config) {
+    return instantiateKonnektorClient(config.getKonnektor());
+  }
+
   public Konnektor instantiateKonnektorClient(String name) {
     return KonnektorFactory.createKonnektor(this.getKonnektorConfig(name));
-  }
-
-  public Konnektor instantiateDoctorKonnektor(DoctorConfiguration docConfig) {
-    return instantiateKonnektorClient(docConfig.getKonnektor());
-  }
-
-  public Konnektor instantiatePharmacyKonnektor(PharmacyConfiguration pharmacyConfig) {
-    return instantiateKonnektorClient(pharmacyConfig.getKonnektor());
-  }
-
-  public Konnektor instantiateApothecaryKonnektor(ApothecaryConfiguration apothecaryConfig) {
-    return instantiateKonnektorClient(apothecaryConfig.getKonnektor());
   }
 
   private KonnektorConfiguration getKonnektorConfig(String name) {

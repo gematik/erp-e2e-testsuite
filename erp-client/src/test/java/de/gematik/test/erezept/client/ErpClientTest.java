@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
@@ -45,9 +46,8 @@ import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.client.vau.VauClient;
-import de.gematik.test.erezept.fhir.parser.EncodingType;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.security.cert.X509Certificate;
@@ -114,6 +114,7 @@ class ErpClientTest {
     when(mockSmartcard.getAutCertificate()).thenReturn(mockSmartCardCertificate);
     when(mockIdp.login(any())).thenReturn(mockToken);
     when(mockToken.getAccessToken()).thenReturn(mockJsonWebToken);
+    when(mockToken.getExpiresIn()).thenReturn(300);
     when(mockJsonWebToken.getRawString()).thenReturn("idptoken123");
 
     val mockResponse = mock(HttpBResponse.class);
@@ -139,7 +140,7 @@ class ErpClientTest {
     assertDoesNotThrow(() -> erpClient.request(cmd));
     assertDoesNotThrow(() -> erpClient.request(cmd));
     verify(mockToken, times(1)).getExpiresIn();
-    verify(mockIdp, times(2)).login(any());
+    verify(mockIdp, times(1)).login(any());
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static java.text.MessageFormat.format;
-
-import de.gematik.bbriccs.toggle.FeatureConfiguration;
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseBase;
-import de.gematik.test.erezept.fhir.resources.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,8 +37,8 @@ import org.hl7.fhir.r4.model.Reference;
 
 @Slf4j
 public abstract class ErxMedicationDispenseBaseBuilder<
-        M extends ErxMedicationDispenseBase, B extends AbstractResourceBuilder<B>>
-    extends AbstractResourceBuilder<B> {
+        M extends ErxMedicationDispenseBase, B extends ResourceBuilder<M, B>>
+    extends ResourceBuilder<M, B> {
 
   protected final SimpleDateFormat dateFormat10 = new SimpleDateFormat("yyyy-MM-dd");
   protected ErpWorkflowVersion erpWorkflowVersion;
@@ -70,15 +67,7 @@ public abstract class ErxMedicationDispenseBaseBuilder<
    * @return Builder
    */
   public B version(ErpWorkflowVersion version) {
-    val isOldProfile = version == ErpWorkflowVersion.V1_1_1;
-    val shouldOverwriteOldProfileVersion =
-        new FeatureConfiguration().getBooleanToggle("erp.fhir.medicationdispense.overwrite_111");
-    // this check is required because on old profiles we have 2 options here
-    if (isOldProfile && shouldOverwriteOldProfileVersion) {
-      this.erpWorkflowVersion = ErpWorkflowVersion.V1_2_0;
-    } else {
-      this.erpWorkflowVersion = version;
-    }
+    this.erpWorkflowVersion = version;
     return self();
   }
 
@@ -115,6 +104,7 @@ public abstract class ErxMedicationDispenseBaseBuilder<
     return self();
   }
 
+  @Override
   public abstract M build();
 
   protected void buildBase(ErxMedicationDispenseBase medDisp) {
@@ -130,11 +120,10 @@ public abstract class ErxMedicationDispenseBaseBuilder<
 
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
       log.warn(
-          format(
-              "building {0} ({1}) with Version {2} is deprecated!",
-              ErxMedicationDispense.class.getSimpleName(),
-              ErpWorkflowStructDef.MEDICATION_DISPENSE.getCanonicalUrl(),
-              ErpWorkflowVersion.V1_1_1.getVersion()));
+          "building {} ({}) with Version {} is deprecated!",
+          ErxMedicationDispense.class.getSimpleName(),
+          ErpWorkflowStructDef.MEDICATION_DISPENSE.getCanonicalUrl(),
+          ErpWorkflowVersion.V1_1_1.getVersion());
       val prescriptionIdentifier =
           this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
       medDisp.setIdentifier(List.of(prescriptionIdentifier));
@@ -164,22 +153,16 @@ public abstract class ErxMedicationDispenseBaseBuilder<
 
     // set the subject and performer properly by version
     if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      val subjectIdentifier =
-          new Identifier()
-              .setSystem(DeBasisNamingSystem.KVID.getCanonicalUrl())
-              .setValue(kvnr.getValue());
+      val subjectIdentifier = DeBasisProfilNamingSystem.KVID.asIdentifier(kvnr.getValue());
       medDisp.getSubject().setIdentifier(subjectIdentifier);
     } else if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
-      val subjectIdentifier =
-          new Identifier()
-              .setSystem(DeBasisNamingSystem.KVID_GKV.getCanonicalUrl())
-              .setValue(kvnr.getValue());
+      val subjectIdentifier = DeBasisProfilNamingSystem.KVID_GKV_SID.asIdentifier(kvnr.getValue());
       medDisp.getSubject().setIdentifier(subjectIdentifier);
     } else {
       val system =
           prescriptionId.getFlowType().isGkvType()
-              ? DeBasisNamingSystem.KVID_GKV.getCanonicalUrl()
-              : DeBasisNamingSystem.KVID_PKV.getCanonicalUrl();
+              ? DeBasisProfilNamingSystem.KVID_GKV_SID.getCanonicalUrl()
+              : DeBasisProfilNamingSystem.KVID_PKV_SID.getCanonicalUrl();
       val subjectIdentifier = new Identifier().setSystem(system).setValue(kvnr.getValue());
       medDisp.getSubject().setIdentifier(subjectIdentifier);
     }

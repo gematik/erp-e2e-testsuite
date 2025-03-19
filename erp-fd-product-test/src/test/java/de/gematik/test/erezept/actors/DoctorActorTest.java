@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,41 @@
 
 package de.gematik.test.erezept.actors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
+import de.gematik.test.erezept.actions.MockActorsUtils;
+import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
+import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
+import org.hl7.fhir.r4.model.Task;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class DoctorActorTest {
+class DoctorActorTest extends ErpFhirBuildingTest {
+
+  @BeforeAll
+  static void setup() {
+    StopwatchProvider.init();
+    CoverageReporter.getInstance().startTestcase("don't care");
+  }
 
   private DoctorActor createDoc(String name) {
-    StopwatchProvider.init();
     val config = ErpFdTestsuiteFactory.create();
     val doctor = new DoctorActor(name);
     val docConfig = config.getDoctorConfig(doctor.getName());
@@ -59,8 +77,29 @@ class DoctorActorTest {
   }
 
   @Test
-  void shouldResponseHbaTelematikId() {
+  void shouldHaveHbaTelematikId() {
     val doctor = createDoc("Adelheid Ulmenwald");
     assertNotNull(doctor.getHbaTelematikId());
+  }
+
+  @Test
+  void shouldPrescribe() {
+    val mockUtil = new MockActorsUtils();
+    val prescId = PrescriptionId.random();
+    val taskId = TaskId.from(prescId);
+    val draftTask = spy(new ErxTask());
+    doReturn(taskId).when(draftTask).getTaskId();
+    doReturn(prescId).when(draftTask).getPrescriptionId();
+    doReturn(AccessCode.random()).when(draftTask).getAccessCode();
+    doReturn(Task.TaskStatus.DRAFT).when(draftTask).getStatus();
+    val createResponse = mockUtil.createErpResponse(draftTask, ErxTask.class, 201);
+
+    val doc = mockUtil.actorStage.getDoctorNamed("Adelheid Ulmenwald");
+    val patient = mockUtil.actorStage.getPatientNamed("Sina Hüllmann");
+    when(mockUtil.erpClientMock.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+    when(mockUtil.erpClientMock.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+    val resp = doc.prescribeFor(patient);
+
+    assertEquals(prescId, resp.getPrescriptionId());
   }
 }

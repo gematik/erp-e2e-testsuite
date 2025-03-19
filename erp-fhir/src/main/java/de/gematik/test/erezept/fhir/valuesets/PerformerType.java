@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import de.gematik.test.erezept.fhir.exceptions.InvalidValueSetException;
+import de.gematik.bbriccs.fhir.coding.FromValueSet;
+import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * <br>
@@ -32,39 +33,29 @@ import lombok.NonNull;
  * <b>Status:</b> draft
  */
 @Getter
-public enum PerformerType implements IValueSet {
-  PHARMACIST("urn:oid:1.2.276.0.76.4.32", "Apotheker", "N/A definition in profile"),
-  PUBLIC_PHARMACY("urn:oid:1.2.276.0.76.4.54", "Öffentliche Apotheke", "N/A definition in profile"),
+@RequiredArgsConstructor
+public enum PerformerType implements FromValueSet {
+  PHARMACIST("urn:oid:1.2.276.0.76.4.32", "Apotheker"),
+  PUBLIC_PHARMACY("urn:oid:1.2.276.0.76.4.54", "Öffentliche Apotheke"),
   ;
 
   public static final CommonCodeSystem CODE_SYSTEM = CommonCodeSystem.PERFORMER_TYPE;
-  public static final String VERSION = "1.0.3";
-  public static final String DESCRIPTION = "Type of performer or organization";
-  public static final String PUBLISHER = "gematik GmbH";
-
   private final String code;
   private final String display;
-  private final String definition;
-
-  PerformerType(String code, String display, String definition) {
-    this.code = code;
-    this.display = display;
-    this.definition = definition;
-  }
 
   @Override
   public CommonCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 
-  public static PerformerType fromCode(@NonNull String coding) {
+  public static PerformerType fromCode(String coding) {
     return Arrays.stream(PerformerType.values())
         .filter(pt -> pt.code.equals(coding))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(PerformerType.class, coding));
   }
 
-  public static PerformerType fromDisplay(@NonNull String display) {
+  public static PerformerType fromDisplay(String display) {
     return Arrays.stream(PerformerType.values())
         .filter(pt -> pt.display.contains(display))
         .findFirst()

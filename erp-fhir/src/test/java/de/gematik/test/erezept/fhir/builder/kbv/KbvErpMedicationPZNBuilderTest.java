@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,23 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.*;
-import de.gematik.test.erezept.fhir.testutil.*;
-import de.gematik.test.erezept.fhir.values.PZN;
-import de.gematik.test.erezept.fhir.valuesets.*;
-import lombok.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import lombok.val;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-class KbvErpMedicationPZNBuilderTest extends ParsingTest {
+class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
@@ -35,7 +41,7 @@ class KbvErpMedicationPZNBuilderTest extends ParsingTest {
     val medication =
         KbvErpMedicationPZNBuilder.builder()
             .version(version)
-            .setResourceId(medicationResourceId)
+            .setId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
@@ -50,12 +56,32 @@ class KbvErpMedicationPZNBuilderTest extends ParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationWithFixedValuesAndPackagingSize(KbvItaErpVersion version) {
+    val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
+    val medication =
+        KbvErpMedicationPZNBuilder.builder()
+            .version(version)
+            .setId(medicationResourceId)
+            .category(MedicationCategory.C_00) // default C_00
+            .isVaccine(false) // default false
+            .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
+            .darreichungsform(Darreichungsform.TKA) // default TAB
+            .packagingSize("5x3") // default 10 {tbl}
+            .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
+            .build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationWithFixedValues2(KbvItaErpVersion version) {
     val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
     val medication =
         KbvErpMedicationPZNBuilder.builder()
             .version(version)
-            .setResourceId(medicationResourceId)
+            .setId(medicationResourceId)
             .category(MedicationCategory.C_00) // default C_00
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
@@ -71,17 +97,15 @@ class KbvErpMedicationPZNBuilderTest extends ParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with Faker for KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
   void shouldBuildMedicationWithFakerAndValidValues(KbvItaErpVersion version) {
-    val medicationResourceId = "e41d2c17-7632-486e-b24f-60c6c7a8b8d9";
     val randomPZN = PZN.random();
     val medication =
-        KbvErpMedicationPZNBuilder.faker(
-                randomPZN.getValue(), "Test Medikament", MedicationCategory.C_00)
-            .version(version)
-            .setResourceId(medicationResourceId)
-            .build();
+        KbvErpMedicationPZNFaker.builder()
+            .withPznMedication(randomPZN.getValue(), "Test Medikament")
+            .withCategory(MedicationCategory.C_00)
+            .withVersion(version)
+            .fake();
 
     assertNotNull(medication);
-    assertEquals(medicationResourceId, medication.getId());
     assertNotNull(medication.getCode());
     assertEquals("Test Medikament", medication.getCode().getText());
     assertFalse(

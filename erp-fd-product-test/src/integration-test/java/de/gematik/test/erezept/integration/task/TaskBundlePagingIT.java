@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,38 @@
 package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.*;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsAll5Links;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsTotalCountOf;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.expectedParamsIn;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.hasElementAtPosition;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.hasSameEntryIds;
 import static de.gematik.test.core.expectations.verifier.TaskBundleVerifier.authoredOnDateIsEqual;
 import static de.gematik.test.core.expectations.verifier.TaskBundleVerifier.verifyAuthoredOnDateWithPredicate;
 import static org.junit.Assert.assertTrue;
 
+import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.DownloadReadyTask;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.bundlepaging.DownloadBundle;
-import de.gematik.test.erezept.actors.*;
+import de.gematik.test.erezept.actors.ActorType;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.ErpActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.arguments.PagingArgumentComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
-import de.gematik.test.erezept.fhir.util.OperationOutcomeWrapper;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
@@ -54,7 +64,11 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -92,7 +106,7 @@ public class TaskBundlePagingIT extends ErpTest {
     for (val task : erxTasks) {
       val erg = erpClient.request(new TaskAbortCommand(task.getTaskId(), task.getAccessCode()));
       if (erg.isOperationOutcome()) {
-        log.info(OperationOutcomeWrapper.extractFrom(erg.getAsOperationOutcome()));
+        log.info(OperationOutcomeExtractor.extractFrom(erg.getAsOperationOutcome()));
       }
     }
   }
@@ -151,10 +165,10 @@ public class TaskBundlePagingIT extends ErpTest {
     return ArgumentComposer.composeWith()
         .arguments(
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Sina Hüllmann"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPatientNamed("Sina Hüllmann"))
         .arguments(
             "Apotheke",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPharmacyNamed("Am Flughafen"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPharmacyNamed("Am Flughafen"))
         .create();
   }
 
@@ -193,11 +207,8 @@ public class TaskBundlePagingIT extends ErpTest {
     } else {
       val examEvidence =
           VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-              .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
-      call =
-          actor.performs(
-              DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
-                  examEvidence, patient.getKvnr(), queryParams));
+              .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+      call = actor.performs(DownloadReadyTask.with(examEvidence, patient.getEgk(), queryParams));
     }
     return call;
   }
@@ -249,11 +260,10 @@ public class TaskBundlePagingIT extends ErpTest {
     ensurePrecondition();
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-            .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+            .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
     val firstCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
-                examEvidence, patient.getKvnr(), iQueryParameters));
+            DownloadReadyTask.with(examEvidence, patient.getEgk(), iQueryParameters));
 
     flughafenApo.attemptsTo(
         Verify.that(firstCall)
@@ -485,20 +495,20 @@ public class TaskBundlePagingIT extends ErpTest {
     ensurePrecondition();
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-            .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+            .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
     val firstCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
+            DownloadReadyTask.with(
                 examEvidence,
-                patient.getKvnr(),
+                patient.getEgk(),
                 IQueryParameter.search().sortedBy("date", SortOrder.ASCENDING).createParameter()));
 
     postTasks(5);
     val secondCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
+            DownloadReadyTask.with(
                 examEvidence,
-                patient.getKvnr(),
+                patient.getEgk(),
                 IQueryParameter.search().sortedBy("date", SortOrder.ASCENDING).createParameter()));
     flughafenApo.attemptsTo(
         Verify.that(secondCall)
@@ -591,12 +601,12 @@ public class TaskBundlePagingIT extends ErpTest {
     ensurePrecondition();
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-            .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+            .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
     val firstCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
+            DownloadReadyTask.with(
                 examEvidence,
-                patient.getKvnr(),
+                patient.getEgk(),
                 IQueryParameter.search()
                     .sortedBy("date", SortOrder.ASCENDING)
                     .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
@@ -617,12 +627,12 @@ public class TaskBundlePagingIT extends ErpTest {
     ensurePrecondition();
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-            .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+            .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
     val firstCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
+            DownloadReadyTask.with(
                 examEvidence,
-                patient.getKvnr(),
+                patient.getEgk(),
                 IQueryParameter.search()
                     .sortedBy("date", SortOrder.ASCENDING)
                     .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.NE)
@@ -704,12 +714,12 @@ public class TaskBundlePagingIT extends ErpTest {
     ensurePrecondition();
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-            .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+            .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
     val firstCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
+            DownloadReadyTask.with(
                 examEvidence,
-                patient.getKvnr(),
+                patient.getEgk(),
                 IQueryParameter.search()
                     .sortedBy("date", SortOrder.ASCENDING)
                     .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.GT)
@@ -735,12 +745,12 @@ public class TaskBundlePagingIT extends ErpTest {
     ensurePrecondition();
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk())
-            .generate(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
+            .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
     val firstCall =
         flughafenApo.performs(
-            DownloadReadyTask.withExamEvidenceAnOptionalQueryParams(
+            DownloadReadyTask.with(
                 examEvidence,
-                patient.getKvnr(),
+                patient.getEgk(),
                 IQueryParameter.search()
                     .sortedBy("date", SortOrder.ASCENDING)
                     .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.LT)

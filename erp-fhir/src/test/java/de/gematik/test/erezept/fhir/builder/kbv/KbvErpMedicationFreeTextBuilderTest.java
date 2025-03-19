@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import lombok.val;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class KbvErpMedicationFreeTextBuilderTest extends ParsingTest {
+class KbvErpMedicationFreeTextBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build KBV MedicationFreeText with KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
@@ -67,23 +67,6 @@ class KbvErpMedicationFreeTextBuilderTest extends ParsingTest {
             .freeText("Nasenstöpsel während des Nase putzens entfernen.")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationFreeText);
-    assertTrue(result.isSuccessful());
-  }
-
-  @Test
-  void fakerShouldWork() {
-    val medFreeText = KbvErpMedicationFreeTextFaker.builder().fake();
-    val result = ValidatorUtil.encodeAndValidate(parser, medFreeText);
-    assertTrue(result.isSuccessful());
-  }
-
-  @Test
-  void fakerWithTextShouldWork() {
-    val medFreeText =
-        KbvErpMedicationFreeTextFaker.builder()
-            .withFreeText("3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen")
-            .fake();
-    val result = ValidatorUtil.encodeAndValidate(parser, medFreeText);
     assertTrue(result.isSuccessful());
   }
 

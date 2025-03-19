@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 
+@Getter
 @Slf4j
 public abstract class ErpActor extends Actor {
 
-  @Getter protected final ActorType type;
+  protected final ActorType type;
 
   protected ErpActor(ActorType type, String name) {
     super(name);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package de.gematik.test.core.expectations.verifier;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Date;
 import java.util.function.Predicate;
@@ -183,6 +183,17 @@ public class TaskVerifier {
         new VerificationStep.StepBuilder<ErxTask>(
             ErpAfos.A_19445.getRequirement(),
             format("Das E-Rezept muss als AcceptDate den Wert {0} haben", expectedDate));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxTask> taskIsInStatus(
+      Task.TaskStatus taskStatus, RequirementsSet requirementsSet) {
+    Predicate<ErxTask> predicate = task -> task.getStatus().equals(taskStatus);
+
+    val step =
+        new VerificationStep.StepBuilder<ErxTask>(
+            requirementsSet,
+            format("Das E-Rezept muss im Status {0} sein", taskStatus.getDisplay()));
     return step.predicate(predicate).accept();
   }
 }

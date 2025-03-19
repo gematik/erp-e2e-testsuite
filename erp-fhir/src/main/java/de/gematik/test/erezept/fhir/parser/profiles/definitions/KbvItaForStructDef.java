@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package de.gematik.test.erezept.fhir.parser.profiles.definitions;
 
-import de.gematik.test.erezept.fhir.parser.profiles.IStructureDefinition;
+import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum KbvItaForStructDef implements IStructureDefinition<KbvItaForVersion> {
+public enum KbvItaForStructDef implements WithStructureDefinition<KbvItaForVersion> {
   PRACTITIONER("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner"),
   PRACTITIONER_ROLE("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_PractitionerRole"),
   ORGANIZATION("https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Organization"),

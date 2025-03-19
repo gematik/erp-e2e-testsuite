@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.dav.DavInvoiceBuilder;
 import de.gematik.test.erezept.fhir.builder.dav.PriceComponentBuilder;
 import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.resources.dav.DavInvoice;
+import de.gematik.test.erezept.fhir.r4.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.util.Currency;
-import de.gematik.test.erezept.fhir.values.PZN;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.data.PriceComponentData;

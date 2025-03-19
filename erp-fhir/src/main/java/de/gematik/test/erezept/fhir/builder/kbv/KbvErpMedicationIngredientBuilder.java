@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,24 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.test.erezept.fhir.builder.AbstractResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.DeBasisCodeSystem;
 import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Medication;
+import org.hl7.fhir.r4.model.Ratio;
 
 public class KbvErpMedicationIngredientBuilder
-    extends AbstractResourceBuilder<KbvErpMedicationIngredientBuilder> {
+    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationIngredientBuilder> {
 
   private static final long MINIMUM_OF_ONE = 1;
   private final List<Extension> extensions = new LinkedList<>();
@@ -50,24 +53,6 @@ public class KbvErpMedicationIngredientBuilder
 
   public static KbvErpMedicationIngredientBuilder builder() {
     return new KbvErpMedicationIngredientBuilder();
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationIngredientBuilder faker() {
-    return faker("MonsterPille");
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationIngredientBuilder faker(String drugName) {
-    return faker("aufs Auge legen", drugName);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static KbvErpMedicationIngredientBuilder faker(String darreichungsform, String drugName) {
-    return new KbvErpMedicationIngredientBuilder()
-        .darreichungsform(darreichungsform)
-        .ingredientComponent(2, 1, "wölkchen")
-        .drugName(drugName);
   }
 
   public KbvErpMedicationIngredientBuilder version(KbvItaErpVersion kbvItaErpVersion) {
@@ -135,34 +120,32 @@ public class KbvErpMedicationIngredientBuilder
     return self();
   }
 
+  @Override
   public KbvErpMedication build() {
     simpleMedicationIngredientBuilder();
     checkRequired();
-    val medicationIngredient = new KbvErpMedication();
-    val profile = KbvItaErpStructDef.MEDICATION_INGREDIENT.asCanonicalType(kbvItaErpVersion);
-    val meta = new Meta().setProfile(List.of(profile));
-    medicationIngredient.setId(this.getResourceId()).setMeta(meta);
+    val medication =
+        this.createResource(
+            KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_INGREDIENT, kbvItaErpVersion);
 
     if (amountNumerator != null) {
       val amount = new Ratio();
       amount
           .getNumerator()
-          .addExtension()
-          .setValue(new StringType(amountNumerator))
-          .setUrl(KbvItaErpStructDef.PACKAGING_SIZE.getCanonicalUrl());
+          .addExtension(KbvItaErpStructDef.PACKAGING_SIZE.asStringExtension(amountNumerator));
       amount.getNumerator().setUnit(amountNumeratorUnit);
       amount.getDenominator().setValue(amountDenominator);
-      medicationIngredient.setAmount(amount);
+      medication.setAmount(amount);
     }
     extensions.add(category.asExtension());
     extensions.add(KbvItaErpStructDef.MEDICATION_VACCINE.asBooleanExtension(isVaccine));
     extensions.add(standardSize.asExtension());
-    medicationIngredient.setExtension(extensions);
-    medicationIngredient
+    medication.setExtension(extensions);
+    medication
         .setCode(MedicationType.INGREDIENT.asCodeableConcept())
         .setForm(new CodeableConcept().setText(darreichungsform));
-    medicationIngredient.addIngredient(ingredient);
-    return medicationIngredient;
+    medication.addIngredient(ingredient);
+    return medication;
   }
 
   private void simpleMedicationIngredientBuilder() {
@@ -176,16 +159,10 @@ public class KbvErpMedicationIngredientBuilder
   }
 
   private CodeableConcept asNamedCodeable(String drugName) {
-    val codeable = new CodeableConcept(asCoding());
+    // https://www.bfarm.de/DE/Arzneimittel/Arzneimittelinformationen/Arzneimittel-recherchieren/AMIce/Datenbankinformation-AMIce-Arzneimittel/_node.html
+    val codeable = DeBasisProfilCodeSystem.ASK.asCodeableConcept("13374").setText(drugName);
     codeable.setText(drugName);
     return codeable;
-  }
-
-  private Coding asCoding() {
-    val coding = new Coding();
-    coding.setSystem(DeBasisCodeSystem.ASK_CODE.getCanonicalUrl()).setCode("13374"); // aus
-    // https://www.bfarm.de/DE/Arzneimittel/Arzneimittelinformationen/Arzneimittel-recherchieren/AMIce/Datenbankinformation-AMIce-Arzneimittel/_node.html
-    return coding;
   }
 
   private void checkRequired() {

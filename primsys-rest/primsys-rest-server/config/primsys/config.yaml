@@ -78,6 +78,10 @@ actors:
     - name: Günther Angermänn
       egkIccsn: 80276883110000163965
 
+  healthInsurances:
+    - name: AOK Bremen
+      smcbIccsn: 80276883110000163954
+
 
 environments:
   - name: TU

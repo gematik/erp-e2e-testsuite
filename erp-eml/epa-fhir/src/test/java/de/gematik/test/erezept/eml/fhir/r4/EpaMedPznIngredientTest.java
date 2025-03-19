@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package de.gematik.test.erezept.eml.fhir.r4;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class EpaMedPznIngredientTest {
+class EpaMedPznIngredientTest extends EpaFhirParsingTest {
 
   @Test
   void getPznShouldWork() {

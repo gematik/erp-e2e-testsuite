@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.getFaker;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.erp.DeepLink;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispenseDiGA;
-import de.gematik.test.erezept.fhir.values.PZN;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.val;
@@ -34,10 +34,10 @@ public class ErxMedicationDispenseDiGAFaker
 
   private ErxMedicationDispenseDiGAFaker() {
     super();
-    withDeepLink(DeepLink.random());
-    withRedeemCode(RedeemCode.random());
-    withPrescriptionId(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162));
-    withPzn(PZN.random().getValue(), getFaker().app().name());
+    this.withDeepLink(DeepLink.random())
+        .withRedeemCode(RedeemCode.random())
+        .withPrescriptionId(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
+        .withPzn(PZN.random().getValue(), getFaker().app().name());
   }
 
   public static ErxMedicationDispenseDiGAFaker builder() {

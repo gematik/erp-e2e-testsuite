@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,31 @@ package de.gematik.test.core.expectations.verifier;
 import static de.gematik.test.core.expectations.verifier.TaskBundleVerifier.authoredOnDateIsEqual;
 import static de.gematik.test.core.expectations.verifier.TaskBundleVerifier.verifyAuthoredOnDateWithPredicate;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTaskBundle;
-import de.gematik.test.erezept.fhir.testutil.ParsingTest;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Binary;
+import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-class TaskBundleVerifierTest extends ParsingTest {
+class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
   ErxTaskBundle bundle =
       getDecodedFromPath(
@@ -64,7 +72,7 @@ class TaskBundleVerifierTest extends ParsingTest {
     task.getContained().add(new Binary());
     erxTaskBundle2.addEntry().setResource(task);
 
-    val step = TaskBundleVerifier.doesContainsErxTasksWithoutQES(ErpAfos.A_25209);
+    val step = TaskBundleVerifier.doesNotContainQES(ErpAfos.A_25209);
     assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle1));
     assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle2));
   }
@@ -96,7 +104,7 @@ class TaskBundleVerifierTest extends ParsingTest {
             new java.text.SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
     erxTask.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
 
-    val step = TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_23452);
+    val step = TaskBundleVerifier.doesNotContainExpiredTasks(ErpAfos.A_23452);
     step.apply(erxTaskBundle);
   }
 
@@ -113,7 +121,7 @@ class TaskBundleVerifierTest extends ParsingTest {
             new java.text.SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
     erxTask.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
 
-    val step = TaskBundleVerifier.doesNotContainsExpiredErxTasks(ErpAfos.A_23452);
+    val step = TaskBundleVerifier.doesNotContainExpiredTasks(ErpAfos.A_23452);
     assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));
   }
 
@@ -151,5 +159,71 @@ class TaskBundleVerifierTest extends ParsingTest {
                 + testDate
                 + " enthalten");
     assertDoesNotThrow(() -> step.apply(bundle));
+  }
+
+  @Test
+  void shouldReturnTrueWhenNoTasksAreContained() {
+    val erxTaskBundle = new ErxTaskBundle();
+    val step = TaskBundleVerifier.hasNoTasks();
+    assertDoesNotThrow(() -> step.apply(erxTaskBundle));
+
+    erxTaskBundle.addEntry().setResource(new ErxTask());
+    assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));
+  }
+
+  @ParameterizedTest
+  @EnumSource(Task.TaskStatus.class)
+  void shouldOnlyContainsTaskWithStatus(Task.TaskStatus status) {
+    val step = TaskBundleVerifier.containsOnlyTasksWith(status, ErpAfos.A_23452);
+
+    val erxTaskBundle1 = new ErxTaskBundle();
+    val erxTask1 = new ErxTask();
+    erxTask1.setStatus(status);
+    erxTaskBundle1.addEntry().setResource(erxTask1);
+    assertDoesNotThrow(() -> step.apply(erxTaskBundle1));
+
+    val erxTaskBundle2 = new ErxTaskBundle();
+    Arrays.stream(Task.TaskStatus.values())
+        .forEach(
+            it -> {
+              val erxTask2 = new ErxTask();
+              erxTask2.setStatus(it);
+              erxTaskBundle2.addEntry().setResource(erxTask2);
+            });
+    assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle2));
+  }
+
+  @Test
+  void shouldOnlyContainsTasksForKvnr() {
+    val kvnr = KVNR.random();
+    val step = TaskBundleVerifier.containsOnlyTasksFor(kvnr, ErpAfos.A_23452);
+
+    val erxTask = mock(ErxTask.class);
+    when(erxTask.getForKvnr()).thenReturn(Optional.of(kvnr));
+
+    val erxTaskBundle = new ErxTaskBundle();
+    erxTaskBundle.addEntry().setResource(erxTask);
+    assertDoesNotThrow(() -> step.apply(erxTaskBundle));
+
+    erxTaskBundle.addEntry().setResource(new ErxTask());
+
+    assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));
+  }
+
+  @ParameterizedTest
+  @EnumSource(PrescriptionFlowType.class)
+  void shouldOnlyContainsTaskWithStatus(PrescriptionFlowType flowType) {
+    val step = TaskBundleVerifier.containsOnlyTasksWith(flowType, ErpAfos.A_23452);
+
+    val erxTaskBundle = new ErxTaskBundle();
+
+    Arrays.stream(PrescriptionFlowType.values())
+        .forEach(
+            it -> {
+              val erxTask = mock(ErxTask.class);
+              when(erxTask.getFlowType()).thenReturn(it);
+              erxTaskBundle.addEntry().setResource(erxTask);
+            });
+    assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));
   }
 }

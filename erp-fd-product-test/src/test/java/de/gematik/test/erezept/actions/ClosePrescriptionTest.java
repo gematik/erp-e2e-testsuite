@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.resources.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.resources.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.resources.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.resources.erp.ErxTask;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -42,6 +45,7 @@ import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
+import de.gematik.test.konnektor.soap.mock.LocalSigner;
 import java.util.*;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,10 +54,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
-class ClosePrescriptionTest {
+class ClosePrescriptionTest extends ErpFhirBuildingTest {
   private static PharmacyActor pharmacy;
   private static UseTheErpClient useErpClient;
-  private static ErxMedicationDispense erxMedicationDispense;
+  private static byte[] exampleQes;
 
   @BeforeAll
   static void setup() {
@@ -68,12 +72,14 @@ class ClosePrescriptionTest {
     pharmacy.can(useErpClient);
     pharmacy.can(useSmcb);
 
-    erxMedicationDispense = new ErxMedicationDispense();
+    val hba = SmartcardArchive.fromResources().getHbaByICCSN("80276001011699901501");
+    exampleQes = LocalSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, "Empty");
   }
 
   @ParameterizedTest
   @ValueSource(strings = {"1.3.0", "1.4.0"})
   @ClearSystemProperty(key = "erp.fhir.profile")
+  @SuppressWarnings("unchecked")
   void shouldPerformClosePrescription(String version) {
     System.setProperty("erp.fhir.profile", version);
 
@@ -84,7 +90,7 @@ class ClosePrescriptionTest {
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
     when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
-    when(mockAcceptBundle.getKbvBundleAsString()).thenReturn("EMPTY");
+    when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
     when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
@@ -113,6 +119,7 @@ class ClosePrescriptionTest {
   @ParameterizedTest
   @ValueSource(strings = {"1.3.0", "1.4.0"})
   @ClearSystemProperty(key = "erp.fhir.profile")
+  @SuppressWarnings("unchecked")
   void shouldClosePrescriptionWithAlternativeDates(String version) {
     System.setProperty("erp.fhir.profile", version);
 
@@ -123,10 +130,10 @@ class ClosePrescriptionTest {
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
     when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
-    when(mockAcceptBundle.getKbvBundleAsString()).thenReturn("EMPTY");
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
     when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
+    when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(useErpClient.decode(eq(KbvErpBundle.class), any()))
         .thenReturn(KbvErpBundleFaker.builder().withKvnr(KVNR.from("X123456789")).fake());
 
@@ -151,6 +158,7 @@ class ClosePrescriptionTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   void shouldApplyAllMutators() {
     FuzzingMutator<ErxMedicationDispense> mutator1 = mock(FuzzingMutator.class);
     FuzzingMutator<ErxMedicationDispense> mutator2 = mock(FuzzingMutator.class);

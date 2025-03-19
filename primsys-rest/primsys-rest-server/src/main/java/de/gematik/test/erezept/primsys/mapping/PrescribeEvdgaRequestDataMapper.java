@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package de.gematik.test.erezept.primsys.mapping;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvEvdgaBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.MedicalOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.PractitionerFaker;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvEvdgaBundle;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvHealthAppRequest;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.resources.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvHealthAppRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.primsys.data.HealthAppRequestDto;
@@ -88,8 +88,8 @@ public class PrescribeEvdgaRequestDataMapper extends BaseMapper<PrescribeEvdgaRe
   }
 
   public KbvEvdgaBundle createEvdgaBundle(String doctorName) {
-    val practitioner = PractitionerFaker.builder().withName(doctorName).fake();
-    val organization = MedicalOrganizationFaker.forPractitioner(practitioner).fake();
+    val practitioner = KbvPractitionerFaker.builder().withName(doctorName).fake();
+    val organization = KbvMedicalOrganizationFaker.forPractitioner(practitioner).fake();
     val patient = this.getPatient();
     val coverage = this.getCoverage();
     val healthAppRequest = this.getHealthAppRequest(practitioner);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
 import net.serenitybdd.screenplay.HasTeardown;
-import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
@@ -71,7 +70,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     this.driver = driver;
     this.platformType = platformType;
     this.appiumConfiguration = appiumConfiguration;
-    log.info(format("{0} Driver started with session ID {1}", platformType, driver.getSessionId()));
+    log.info("{} Driver started with session ID {}", platformType, driver.getSessionId());
   }
 
   public String getDriverName() {
@@ -96,7 +95,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
         .forEach(
             utility -> {
               if (pageSource.contains(utility.extractSourceLabel(this.platformType))) {
-                log.info(format("Found Utility Element {0}", utility.getElementName()));
+                log.info("Found Utility Element {}", utility.getElementName());
                 this.getOptionalWebElement(utility, pageSource)
                     .ifPresent(
                         webElement -> {
@@ -138,7 +137,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public void tap(PageElement pageElement) {
-    log.info(format("Tap ''{0}'' ({1})", pageElement.getFullName(), this.getLocator(pageElement)));
+    log.info("Tap ''{}'' ({})", pageElement.getFullName(), this.getLocator(pageElement));
     val element = this.getWebElement(pageElement);
     this.tap(element);
   }
@@ -178,7 +177,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
             Duration.ofMillis(0), PointerInput.Origin.viewport(), point.x, point.y));
     tap.addAction(finger.createPointerDown(PointerInput.MouseButton.MIDDLE.asArg()));
     tap.addAction(finger.createPointerUp(PointerInput.MouseButton.MIDDLE.asArg()));
-    log.info(format("Tap on Point at {0}/{1}", point.x, point.y));
+    log.info("Tap on Point at {}/{}", point.x, point.y);
     this.performGesture(tap);
   }
 
@@ -193,20 +192,8 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     element.click();
   }
 
-  @Deprecated(forRemoval = true)
-  public void tapByLabel(PageElement pageelement, @NotNull String label) {
-    val elements = this.getWebElements(pageelement);
-    elements.stream()
-        .filter(webElement -> webElement.getText().equals(label))
-        .findFirst()
-        .ifPresent(this::tap);
-  }
-
   public void input(final String text, PageElement pageElement) {
-    log.info(
-        format(
-            "Type {0} into {1} ({2})",
-            text, pageElement.getFullName(), this.getLocator(pageElement)));
+    log.info("Type {} into {} ({})", text, pageElement.getFullName(), this.getLocator(pageElement));
     val element = this.getWebElement(pageElement);
     element.clear(); // clear the default text in the input
     element.sendKeys(text);
@@ -221,9 +208,10 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
    */
   public void inputPassword(final String password, PageElement pageElement) {
     log.info(
-        format(
-            "Type Password {0} into {1} ({2})",
-            password, pageElement.getFullName(), this.getLocator(pageElement)));
+        "Type Password {} into {} ({})",
+        password,
+        pageElement.getFullName(),
+        this.getLocator(pageElement));
     val element = this.getWebElement(pageElement);
     element.clear();
     for (val c : password.toCharArray()) {
@@ -236,14 +224,14 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public void scroll(ScrollDirection direction, float distance) {
-    log.info(format("Scroll {0} with distance {1}", direction, distance));
+    log.info("Scroll {} with distance {}", direction, distance);
     driver.executeScript(
         "mobile:scroll",
         Map.of("direction", direction.name().toLowerCase(), "distance", String.valueOf(distance)));
   }
 
   public void scrollIntoView(ScrollDirection direction, PageElement pageElement) {
-    log.info(format("Scroll {0} until element {1} is found", direction, pageElement.getFullName()));
+    log.info("Scroll {} until element {} is found", direction, pageElement.getFullName());
     var scrollCounter = 20;
     boolean isDisplayed =
         this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
@@ -269,7 +257,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public void swipe(SwipeDirection direction, float factor, int millis) {
-    log.info(format("Swipe {0} on the Screen", direction));
+    log.info("Swipe {} on the Screen", direction);
     var screenDimension = driver.manage().window().getSize();
 
     val swipeDimension =
@@ -299,23 +287,23 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public final void waitUntilElementIsVisible(PageElement pageElement) {
-    log.info(format("Wait until element {0} is visible", pageElement.getFullName()));
+    log.info("Wait until element {} is visible", pageElement.getFullName());
     waitUntil(ExpectedConditions.presenceOfElementLocated(this.getLocator(pageElement)));
     waitUntil(ExpectedConditions.visibilityOfElementLocated(this.getLocator(pageElement)));
   }
 
   public final void waitUntilElementIsPresent(PageElement pageElement) {
-    log.info(format("Wait until element {0} is present", pageElement.getFullName()));
+    log.info("Wait until element {} is present", pageElement.getFullName());
     waitUntil(ExpectedConditions.presenceOfAllElementsLocatedBy(this.getLocator(pageElement)));
   }
 
   public final void waitUntilElementIsSelected(PageElement pageElement) {
-    log.info(format("Wait until element {0} is selected", pageElement.getFullName()));
+    log.info("Wait until element {} is selected", pageElement.getFullName());
     waitUntil(ExpectedConditions.elementToBeSelected(this.getLocator(pageElement)));
   }
 
   public final void waitUntilElementIsClickable(PageElement pageElement) {
-    log.info(format("Wait until element {0} is clickable", pageElement.getFullName()));
+    log.info("Wait until element {} is clickable", pageElement.getFullName());
     waitUntil(ExpectedConditions.elementToBeClickable(getWebElement(pageElement)));
   }
 
@@ -387,7 +375,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
 
   public void finish(Scenario scenario) {
     val status = scenario.getStatus();
-    log.info(format("Report Status: {0}", status));
+    log.info("Report Status: {}", status);
     val message = format("Scenario {0}: {1}", scenario.getId(), status);
     val reportScript =
         format("seetest:client.setReportStatus(\"{0}\", \"{1}\", \"\")", status, message);

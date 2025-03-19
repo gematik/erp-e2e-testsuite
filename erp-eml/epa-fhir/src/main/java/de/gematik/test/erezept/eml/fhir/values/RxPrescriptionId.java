@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 gematik GmbH
+ * Copyright 2025 gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package de.gematik.test.erezept.eml.fhir.values;
 
 import de.gematik.bbriccs.fhir.coding.SemanticValue;
-import de.gematik.test.erezept.eml.fhir.parser.profiles.EmlNamingSystem;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationNamingSystem;
 import org.hl7.fhir.r4.model.Identifier;
 
-public class RxPrescriptionId extends SemanticValue<String, EmlNamingSystem> {
+public class RxPrescriptionId extends SemanticValue<String, EpaMedicationNamingSystem> {
 
   private RxPrescriptionId(String value) {
-    super(EmlNamingSystem.RX_PRESCRIPTION_ID, value);
+    super(EpaMedicationNamingSystem.RX_PRESCRIPTION_ID, value);
   }
 
   public static RxPrescriptionId from(String value) {
