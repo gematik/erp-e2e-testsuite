@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.vau;
 
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
-import de.gematik.bbriccs.rest.HttpVersion;
 import de.gematik.bbriccs.rest.RawHttpCodec;
 import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
@@ -173,8 +176,9 @@ public class VauClient {
               .map(h -> new HttpHeader(h.getName(), h.getValue()))
               .toList();
       val response =
-          new HttpBResponse(
-              HttpVersion.HTTP_1_1, outerResponse.getStatus(), headers, outerResponse.getBody());
+          HttpBResponse.status(outerResponse.getStatus())
+              .headers(headers)
+              .withPayload(outerResponse.getBody());
       log.trace(
           "\n------- missing inner VAU-Response -------\n{}\n-------", httpCodec.encode(response));
       return response;

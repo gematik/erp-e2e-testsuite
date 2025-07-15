@@ -1,0 +1,362 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="561f4a7e-0616-4c92-b6d5-91217aea136f"/>
+    <type value="searchset"/>
+    <timestamp value="2025-06-25T11:34:18.616+00:00"/>
+    <total value="0"/>
+    <link>
+        <relation value="first"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&amp;_count=5"/>
+    </link>
+    <link>
+        <relation value="next"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&amp;_count=5&amp;_id=gt01ebd19c-bda7-6e30-0000-000000000000"/>
+    </link>
+    <link>
+        <relation value="prev"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&amp;_count=5&amp;_id=lt01ebd19c-bd7b-e5a8-0000-000000000000"/>
+    </link>
+    <link>
+        <relation value="self"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&amp;_count=5&amp;_id=ge01ebd19c-bd7b-e5a8-0000-000000000000&amp;_id=le01ebd19c-bda7-6e30-0000-000000000000"/>
+    </link>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bd7b-e5a8-3f84-8760b39f172f"/>
+        <resource>
+            <AuditEvent xmlns="http://hl7.org/fhir">
+                <id value="01ebd19c-bd7b-e5a8-3f84-8760b39f172f"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"/>
+                </meta>
+                <language value="de"/>
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID
+                        160.000.006.746.135.23 eingestellt.
+                    </div>
+                </text>
+                <type>
+                    <system value="http://terminology.hl7.org/CodeSystem/audit-event-type"/>
+                    <code value="rest"/>
+                </type>
+                <subtype>
+                    <system value="http://hl7.org/fhir/restful-interaction"/>
+                    <code value="update"/>
+                </subtype>
+                <action value="U"/>
+                <recorded value="2024-11-25T16:04:49.049+00:00"/>
+                <outcome value="0"/>
+                <agent>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/extra-security-role-type"/>
+                            <code value="humanuser"/>
+                            <display value="Human User"/>
+                        </coding>
+                    </type>
+                    <who>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="1-SMC-B-Testkarte-883110000117369"/>
+                        </identifier>
+                    </who>
+                    <name value="Praxis Blôch-BauerTEST-ONLY"/>
+                    <requestor value="false"/>
+                </agent>
+                <source>
+                    <site value="E-Rezept Fachdienst"/>
+                    <observer>
+                        <reference value="Device/1"/>
+                    </observer>
+                </source>
+                <entity>
+                    <what>
+                        <reference value="Task/160.000.006.746.135.23"/>
+                        <identifier>
+                            <use value="official"/>
+                            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                            <value value="160.000.006.746.135.23"/>
+                        </identifier>
+                    </what>
+                    <name value="X110614233"/>
+                    <description value="160.000.006.746.135.23"/>
+                </entity>
+            </AuditEvent>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bd83-2520-ffcf-7067ddac9aea"/>
+        <resource>
+            <AuditEvent xmlns="http://hl7.org/fhir">
+                <id value="01ebd19c-bd83-2520-ffcf-7067ddac9aea"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"/>
+                </meta>
+                <language value="de"/>
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">Veronika Gräfin Angermänn hat das Rezept mit der ID
+                        160.000.006.746.135.23 heruntergeladen.
+                    </div>
+                </text>
+                <type>
+                    <system value="http://terminology.hl7.org/CodeSystem/audit-event-type"/>
+                    <code value="rest"/>
+                </type>
+                <subtype>
+                    <system value="http://hl7.org/fhir/restful-interaction"/>
+                    <code value="read"/>
+                </subtype>
+                <action value="R"/>
+                <recorded value="2024-11-25T16:04:49.524+00:00"/>
+                <outcome value="0"/>
+                <agent>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/extra-security-role-type"/>
+                            <code value="humanuser"/>
+                            <display value="Human User"/>
+                        </coding>
+                    </type>
+                    <who>
+                        <identifier>
+                            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                            <value value="X110614233"/>
+                        </identifier>
+                    </who>
+                    <name value="Veronika Gräfin Angermänn"/>
+                    <requestor value="false"/>
+                </agent>
+                <source>
+                    <site value="E-Rezept Fachdienst"/>
+                    <observer>
+                        <reference value="Device/1"/>
+                    </observer>
+                </source>
+                <entity>
+                    <what>
+                        <reference value="Task/160.000.006.746.135.23"/>
+                        <identifier>
+                            <use value="official"/>
+                            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                            <value value="160.000.006.746.135.23"/>
+                        </identifier>
+                    </what>
+                    <name value="X110614233"/>
+                    <description value="160.000.006.746.135.23"/>
+                </entity>
+            </AuditEvent>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bd8e-1200-89c8-040f4b0bcc6a"/>
+        <resource>
+            <AuditEvent xmlns="http://hl7.org/fhir">
+                <id value="01ebd19c-bd8e-1200-89c8-040f4b0bcc6a"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"/>
+                </meta>
+                <language value="de"/>
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID
+                        160.000.006.746.135.23 gelöscht.
+                    </div>
+                </text>
+                <type>
+                    <system value="http://terminology.hl7.org/CodeSystem/audit-event-type"/>
+                    <code value="rest"/>
+                </type>
+                <subtype>
+                    <system value="http://hl7.org/fhir/restful-interaction"/>
+                    <code value="delete"/>
+                </subtype>
+                <action value="D"/>
+                <recorded value="2024-11-25T16:04:50.240+00:00"/>
+                <outcome value="0"/>
+                <agent>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/extra-security-role-type"/>
+                            <code value="humanuser"/>
+                            <display value="Human User"/>
+                        </coding>
+                    </type>
+                    <who>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="1-SMC-B-Testkarte-883110000117369"/>
+                        </identifier>
+                    </who>
+                    <name value="Praxis Blôch-BauerTEST-ONLY"/>
+                    <requestor value="false"/>
+                </agent>
+                <source>
+                    <site value="E-Rezept Fachdienst"/>
+                    <observer>
+                        <reference value="Device/1"/>
+                    </observer>
+                </source>
+                <entity>
+                    <what>
+                        <reference value="Task/160.000.006.746.135.23"/>
+                        <identifier>
+                            <use value="official"/>
+                            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                            <value value="160.000.006.746.135.23"/>
+                        </identifier>
+                    </what>
+                    <name value="X110614233"/>
+                    <description value="160.000.006.746.135.23"/>
+                </entity>
+            </AuditEvent>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bda0-bf40-b42d-47e1ec5edab3"/>
+        <resource>
+            <AuditEvent xmlns="http://hl7.org/fhir">
+                <id value="01ebd19c-bda0-bf40-b42d-47e1ec5edab3"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"/>
+                </meta>
+                <language value="de"/>
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID
+                        160.000.006.746.136.20 eingestellt.
+                    </div>
+                </text>
+                <type>
+                    <system value="http://terminology.hl7.org/CodeSystem/audit-event-type"/>
+                    <code value="rest"/>
+                </type>
+                <subtype>
+                    <system value="http://hl7.org/fhir/restful-interaction"/>
+                    <code value="update"/>
+                </subtype>
+                <action value="U"/>
+                <recorded value="2024-11-25T16:04:51.464+00:00"/>
+                <outcome value="0"/>
+                <agent>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/extra-security-role-type"/>
+                            <code value="humanuser"/>
+                            <display value="Human User"/>
+                        </coding>
+                    </type>
+                    <who>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="1-SMC-B-Testkarte-883110000117369"/>
+                        </identifier>
+                    </who>
+                    <name value="Praxis Blôch-BauerTEST-ONLY"/>
+                    <requestor value="false"/>
+                </agent>
+                <source>
+                    <site value="E-Rezept Fachdienst"/>
+                    <observer>
+                        <reference value="Device/1"/>
+                    </observer>
+                </source>
+                <entity>
+                    <what>
+                        <reference value="Task/160.000.006.746.136.20"/>
+                        <identifier>
+                            <use value="official"/>
+                            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                            <value value="160.000.006.746.136.20"/>
+                        </identifier>
+                    </what>
+                    <name value="X110614233"/>
+                    <description value="160.000.006.746.136.20"/>
+                </entity>
+            </AuditEvent>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bda7-6e30-87db-698eca07f8d9"/>
+        <resource>
+            <AuditEvent xmlns="http://hl7.org/fhir">
+                <id value="01ebd19c-bda7-6e30-87db-698eca07f8d9"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"/>
+                </meta>
+                <language value="de"/>
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">Veronika Gräfin Angermänn hat das Rezept mit der ID
+                        160.000.006.746.136.20 heruntergeladen.
+                    </div>
+                </text>
+                <type>
+                    <system value="http://terminology.hl7.org/CodeSystem/audit-event-type"/>
+                    <code value="rest"/>
+                </type>
+                <subtype>
+                    <system value="http://hl7.org/fhir/restful-interaction"/>
+                    <code value="read"/>
+                </subtype>
+                <action value="R"/>
+                <recorded value="2024-11-25T16:04:51.902+00:00"/>
+                <outcome value="0"/>
+                <agent>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/extra-security-role-type"/>
+                            <code value="humanuser"/>
+                            <display value="Human User"/>
+                        </coding>
+                    </type>
+                    <who>
+                        <identifier>
+                            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                            <value value="X110614233"/>
+                        </identifier>
+                    </who>
+                    <name value="Veronika Gräfin Angermänn"/>
+                    <requestor value="false"/>
+                </agent>
+                <source>
+                    <site value="E-Rezept Fachdienst"/>
+                    <observer>
+                        <reference value="Device/1"/>
+                    </observer>
+                </source>
+                <entity>
+                    <what>
+                        <reference value="Task/160.000.006.746.136.20"/>
+                        <identifier>
+                            <use value="official"/>
+                            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                            <value value="160.000.006.746.136.20"/>
+                        </identifier>
+                    </what>
+                    <name value="X110614233"/>
+                    <description value="160.000.006.746.136.20"/>
+                </entity>
+            </AuditEvent>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+</Bundle>

@@ -645,6 +645,26 @@
     ]
   },
   {
+    "iccsn": "ncpeh-smb-denmark",
+    "note": "Oid: 1.2.276.0.76.4.292, valid until 31.03.2030",
+    "type": "SMC_B",
+    "ownerName": "Dänemark (MT)",
+    "stores": [
+      "smb/ncpeh-denmark/NCPeH-C_SM-B_HCI_AUT_DK_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "ncpeh-smb-malta",
+    "note": "Oid: 1.2.276.0.76.4.292, valid until 31.03.2030",
+    "type": "SMC_B",
+    "ownerName": "Malta (MT)",
+    "stores": [
+      "smb/ncpeh-malta/NCPeH-C_SM-B_HCI_AUT_MT_E256.p12"
+    ]
+  },
+
+
+  {
     "iccsn": "80276883110000161759",
     "type": "HBA",
     "ownerName": "Sébastian Freiherr DômbrowskiTEST-ONLY",

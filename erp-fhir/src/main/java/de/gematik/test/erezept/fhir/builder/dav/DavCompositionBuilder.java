@@ -12,14 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.AbdaCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.AbdaCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.version.AbdaErpPkvVersion;
 import java.util.Date;
 import java.util.List;
 import lombok.val;

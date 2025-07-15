@@ -12,30 +12,32 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerName;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.TelematikID;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
 import java.util.UUID;
 import lombok.val;
-import org.hl7.fhir.r4.model.ChargeItem;
 import org.junit.jupiter.api.Test;
 
 class ErxChargeItemFakerTest extends ErpFhirParsingTest {
@@ -48,33 +50,33 @@ class ErxChargeItemFakerTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void buildFakeChargeItemWithAccessCode() {
+  void shouldFakeChargeItemWithCustomAccessCode01() {
     val chargeItem = ErxChargeItemFaker.builder().withAccessCode(AccessCode.random()).fake();
-    val chargeItem2 =
-        ErxChargeItemFaker.builder().withAccessCode(AccessCode.random().getValue()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
+    assertTrue(chargeItem.getAccessCode().isPresent());
+  }
+
+  @Test
+  void shouldFakeChargeItemWithCustomAccessCode02() {
+    val chargeItem = ErxChargeItemFaker.builder().withAccessCode("AccessTestCode123456").fake();
+    val res = ValidatorUtil.encodeAndValidate(parser, chargeItem);
+    assertTrue(res.isSuccessful());
+    assertTrue(chargeItem.getAccessCode().isPresent());
+    val accessCode = chargeItem.getAccessCode().get();
+    assertEquals("AccessTestCode123456", accessCode.getValue());
   }
 
   @Test
   void buildFakeChargeItemWithStatus() {
-    val chargeItem =
-        ErxChargeItemFaker.builder().withStatus(ChargeItem.ChargeItemStatus.BILLABLE).fake();
-    val chargeItem2 =
-        ErxChargeItemFaker.builder()
-            .withStatus(ChargeItem.ChargeItemStatus.BILLABLE.toCode())
-            .fake();
+    val chargeItem = ErxChargeItemFaker.builder().withStatus("billable").fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
   }
 
   @Test
   void buildFakeChargeItemWithSubject() {
-    val chargeItem = ErxChargeItemFaker.builder().withSubject(KVNR.random(), fakerName()).fake();
+    val chargeItem = ErxChargeItemFaker.builder().withSubject(KVNR.randomPkv(), fakerName()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
     assertTrue(result.isSuccessful());
   }
@@ -91,36 +93,23 @@ class ErxChargeItemFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakeChargeItemWithEnterer() {
     val telematikId = mock(TelematikID.class);
-    val chargeItem = ErxChargeItemFaker.builder().withEnterer(telematikId).fake();
-    val chargeItem2 = ErxChargeItemFaker.builder().withEnterer(telematikId.toString()).fake();
+    val chargeItem = ErxChargeItemFaker.builder().withEnterer(telematikId.getValue()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
   }
 
   @Test
   void buildFakeChargeItemWithEnteredDate() {
     val chargeItem = ErxChargeItemFaker.builder().withEnteredDate(new Date()).fake();
-    val chargeItem2 =
-        ErxChargeItemFaker.builder()
-            .withEnteredDate(new Date(), TemporalPrecisionEnum.SECOND)
-            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
   }
 
   @Test
   void buildFakeChargeItemWithMarkingFlag() {
-    val markingFlag = MarkingFlag.with(true, false, false);
-    val chargeItem = ErxChargeItemFaker.builder().withMarkingFlag(markingFlag).fake();
-    val chargeItem2 = ErxChargeItemFaker.builder().withMarkingFlag(true, false, false).fake();
+    val chargeItem = ErxChargeItemFaker.builder().withMarkingFlag(true, false, false).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
-    val result2 = ValidatorUtil.encodeAndValidate(parser, chargeItem2);
     assertTrue(result.isSuccessful());
-    assertTrue(result2.isSuccessful());
   }
 
   @Test
@@ -139,7 +128,7 @@ class ErxChargeItemFakerTest extends ErpFhirParsingTest {
 
   @Test
   void buildFakeChargeItemWithAbgabedatensatz() {
-    val davBundle = DavPkvAbgabedatenFaker.builder(fakerPrescriptionId()).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(PrescriptionId.random()).fake();
     val chargeItem =
         ErxChargeItemFaker.builder()
             .withAbgabedatensatz(davBundle, b -> "helloworld".getBytes())

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -36,7 +40,7 @@ class ChargeItemPostCommandTest extends ErpFhirBuildingTest {
 
   private ChargeItemPostCommand getChargeItemPostCommand(PrescriptionId prescriptionId) {
     val erxChargeItem = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId).fake();
-    return new ChargeItemPostCommand(erxChargeItem, new Secret("123"));
+    return new ChargeItemPostCommand(erxChargeItem, Secret.from("123"));
   }
 
   @Test
@@ -50,8 +54,8 @@ class ChargeItemPostCommandTest extends ErpFhirBuildingTest {
 
   @Test
   void getRequestLocatorTestCorrectLengthStartsWithSlashTest() {
-    ChargeItemPostCommand chargeItemPostCommand = getChargeItemPostCommand();
-    var requestString = chargeItemPostCommand.getRequestLocator();
+    val chargeItemPostCommand = getChargeItemPostCommand();
+    val requestString = chargeItemPostCommand.getRequestLocator();
     assertTrue(requestString.startsWith("/"));
   }
 
@@ -67,7 +71,7 @@ class ChargeItemPostCommandTest extends ErpFhirBuildingTest {
 
   @Test
   void getRequestBody() {
-    ChargeItemPostCommand chargeItemPostCommand = getChargeItemPostCommand();
+    val chargeItemPostCommand = getChargeItemPostCommand();
     assertTrue(chargeItemPostCommand.getRequestBody().isPresent());
   }
 }

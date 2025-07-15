@@ -12,23 +12,30 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.testutil;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.AuditEvent.AuditEventAction;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Narrative;
+import org.hl7.fhir.r4.model.Reference;
 
 public class ErxFhirTestResourceUtil {
 

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
@@ -48,7 +52,7 @@ class CoverageDataMapperTest extends ErpFhirBuildingTest {
   void shouldCompleteCoverageWithPayorTypeNotNull() {
     val dto = CoverageDto.ofType(PayorTypeDto.SKT).build();
     val beneficiary = mock(KbvPatient.class);
-    when(beneficiary.getInsuranceKind()).thenReturn(InsuranceTypeDe.GKV);
+    when(beneficiary.getInsuranceType()).thenReturn(InsuranceTypeDe.GKV);
     val coverageDataMapper = CoverageDataMapper.from(dto, beneficiary);
     assertNotNull(coverageDataMapper);
   }
@@ -63,7 +67,7 @@ class CoverageDataMapperTest extends ErpFhirBuildingTest {
     val mapper2 = CoverageDataMapper.from(dto, patient);
     val coverage2 = mapper2.convert();
 
-    assertEquals(coverage.getIknr(), coverage2.getIknr());
+    assertEquals(coverage.getIknrOrThrow(), coverage2.getIknrOrThrow());
     assertEquals(coverage.getInsuranceKind(), coverage2.getInsuranceKind());
     assertEquals(coverage.getName(), coverage2.getName());
     assertEquals(coverage.getPayorType(), coverage2.getPayorType());

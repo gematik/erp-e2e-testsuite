@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
@@ -20,10 +24,11 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+@Getter
 @EqualsAndHashCode
 public class TaskId {
 
-  @Getter private final String value;
+  private final String value;
 
   private TaskId(String value) {
     this.value = value;
@@ -37,16 +42,20 @@ public class TaskId {
     return this.toPrescriptionId().getFlowType();
   }
 
-  @Override
-  public String toString() {
-    return this.value;
-  }
-
   public static TaskId from(String value) {
     return new TaskId(value.trim());
   }
 
   public static TaskId from(PrescriptionId prescriptionId) {
     return from(prescriptionId.getValue());
+  }
+
+  public static TaskId random() {
+    return from(PrescriptionId.random());
+  }
+
+  @Override
+  public String toString() {
+    return this.value;
   }
 }

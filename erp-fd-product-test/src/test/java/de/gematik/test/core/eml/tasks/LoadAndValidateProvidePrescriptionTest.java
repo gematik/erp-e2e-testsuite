@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.eml.tasks;
@@ -23,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.eml.tasks.LoadAndValidateProvidePrescription;
@@ -31,7 +36,6 @@ import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.List;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -53,7 +57,7 @@ class LoadAndValidateProvidePrescriptionTest {
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
+                "fhir/valid/parameters/ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
   }
 
   @AfterEach

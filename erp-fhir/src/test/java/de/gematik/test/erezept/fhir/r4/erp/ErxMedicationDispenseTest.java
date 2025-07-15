@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -22,8 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import lombok.val;
@@ -32,44 +35,44 @@ import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseTest extends ErpFhirParsingTest {
-  private static final String BASE_PATH = "fhir/valid/erp/1.1.1/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.4.0/medicationdispense/";
 
   @Test
   void shouldEncodeSingleMedicationDispense() {
-    val fileName = "MedicationDispense_01.xml";
+    val fileName = "MedicationDispense.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationDispense = parser.decode(ErxMedicationDispense.class, content);
     assertNotNull(medicationDispense, "Valid MedicationDispense must be parseable");
-    assertEquals("12345678", medicationDispense.getPrescriptionId().getValue());
+    assertEquals("160.000.033.491.280.78", medicationDispense.getPrescriptionId().getValue());
     assertFalse(medicationDispense.isDiGA());
 
-    val medication = medicationDispense.getContainedKbvMedicationFirstRep();
-    assertNotNull(medication, "MedicationDispense must contain at leas one Medication");
-
-    assertEquals(MedicationCategory.C_00, medication.getCategoryFirstRep());
-    assertFalse(medication.isVaccine());
-    assertEquals("06313728", medication.getPznFirstRep());
-    assertEquals("Sumatriptan-1a Pharma 100 mg Tabletten", medication.getMedicationName());
-    assertEquals(Darreichungsform.TAB, medication.getDarreichungsform().orElseThrow());
-    // TODO: implement tests for further convenience methods on demand
-
-    assertEquals("X234567890", medicationDispense.getSubjectId().getValue());
-    assertEquals("606358757", medicationDispense.getPerformerIdFirstRep());
+    assertEquals("X123456789", medicationDispense.getSubjectId().getValue());
+    assertEquals("3-SMC-B-Testkarte-883110000095957", medicationDispense.getPerformerIdFirstRep());
 
     // Note: expectedHandedOver might change at winter time (written at 05.10.2021)
-    val expectedHandedOver = ZonedDateTime.of(2020, 3, 20, 3, 13, 0, 0, ZoneId.systemDefault());
+    val expectedHandedOver =
+        ZonedDateTime.of(LocalDateTime.of(2024, 4, 3, 0, 0), ZoneId.systemDefault());
     assertEquals(expectedHandedOver, medicationDispense.getZonedWhenHandedOver());
-    assertEquals("1-0-1-0", medicationDispense.getDosageInstructionTextFirstRep());
   }
 
   @Test
   void shouldCastFromMedicationDispense() {
-    val fileName = "MedicationDispense_01.xml";
+    val fileName = "MedicationDispense.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     Resource medicationDispense = parser.decode(MedicationDispense.class, content);
     val erxMedicationDispense = ErxMedicationDispense.fromMedicationDispense(medicationDispense);
     assertNotNull(erxMedicationDispense);
+  }
+
+  @Test
+  void shouldGetFromMedicationDispenseTheReedemCode() {
+    val fileName = "MedicationDispense-DiGA-Name-And-PZN.json";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val erxMedicationDispense = parser.decode(ErxMedicationDispense.class, content);
+    assertNotNull(erxMedicationDispense);
+    assertEquals("DE12345678901234", erxMedicationDispense.getRedeemCode().get().getValue());
   }
 }

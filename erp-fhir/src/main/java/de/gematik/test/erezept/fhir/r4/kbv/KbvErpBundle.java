@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -20,8 +24,7 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import java.util.Date;
@@ -32,7 +35,6 @@ import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -44,10 +46,6 @@ import org.hl7.fhir.r4.model.SupplyRequest;
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
 public class KbvErpBundle extends KbvBaseBundle {
-
-  public String getLogicalId() {
-    return IdentifierUtil.getUnqualifiedId(this.id);
-  }
 
   @Override
   public Reference asReference() {
@@ -154,20 +152,6 @@ public class KbvErpBundle extends KbvBaseBundle {
     this.getMedicationRequest()
         .getInsuranceFirstRep()
         .setReference(newCoverageReference.getReference());
-  }
-
-  public Optional<AssignerOrganization> getAssignerOrganization() {
-    return this.entry.stream()
-        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Organization))
-        .filter(
-            orgEntry ->
-                ((Organization) orgEntry.getResource())
-                    .getIdentifier().stream().anyMatch(DeBasisProfilNamingSystem.IKNR::matches))
-        .map(
-            entry ->
-                FhirEntryReplacer.cast(
-                    AssignerOrganization.class, entry, AssignerOrganization::fromOrganization))
-        .findFirst();
   }
 
   public KbvErpMedication getMedication() {

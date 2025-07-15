@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -31,8 +35,10 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.AsvFachgruppennummer;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
@@ -143,16 +149,21 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
 
-    val kbvBundle = parser.encode(KbvErpBundleFaker.builder().fake(), EncodingType.XML);
+    val practitioner =
+        KbvPractitionerFaker.builder()
+            .withQualificationType(AsvFachgruppennummer.from("55555509"))
+            .fake();
+    val kbvBundle = KbvErpBundleFaker.builder().withPractitioner(practitioner).fake();
+    val kbvBundleXml = parser.encode(kbvBundle, EncodingType.XML);
     try (val response =
-        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundle)) {
+        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundleXml)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());
       assertEquals(accessCode.getValue(), resMap.getAccessCode());
     }
     try (val response1 =
-        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundle)) {
+        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundleXml)) {
       val resMap = (PrescriptionDto) response1.getEntity();
       assertTrue(response1.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());

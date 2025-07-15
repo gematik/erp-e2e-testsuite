@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept;
@@ -141,7 +145,7 @@ class PrimSysBddFactoryTest {
   }
 
   @Test
-  void shouldEquipAsHealthInsuranceInstitution() {
+  void shouldEquipAsKtrInstitution() {
     val name = factory.getDto().getActors().getHealthInsurances().get(0).getName();
     val lei = OnStage.theActorCalled(name);
 
@@ -151,7 +155,7 @@ class PrimSysBddFactoryTest {
           .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
           .thenReturn(erpClient);
 
-      assertDoesNotThrow(() -> factory.equipAsHealthInsurance(lei));
+      assertDoesNotThrow(() -> factory.equipAsKtr(lei));
       assertNotNull(lei.abilityTo(UseTheKonnektor.class));
       assertNotNull(lei.abilityTo(UseTheErpClient.class));
       assertNotNull(lei.abilityTo(UseSMCB.class));

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
@@ -51,7 +55,7 @@ class GemErpMedicationDataMapperTest extends ErpFhirParsingTest {
 
   @RepeatedTest(5)
   void shouldNotMissAnyFields() {
-    val medication = GemErpMedicationFaker.builder().fake();
+    val medication = GemErpMedicationFaker.forPznMedication().fake();
     val mapper = GemErpMedicationDataMapper.from(medication);
     val dto = mapper.getDto();
 
@@ -66,7 +70,9 @@ class GemErpMedicationDataMapperTest extends ErpFhirParsingTest {
     //    assertEquals(medication.getAmountNumerator(), medication2.getAmountNumerator());
     //    assertEquals(medication.getAmountNumeratorUnit(), medication2.getAmountNumeratorUnit());
     assertEquals(medication.getPzn(), medication2.getPzn());
-    assertEquals(medication.getName(), medication2.getName());
+    assertEquals(
+        medication.getNameFromCodeOreContainedRessource(),
+        medication2.getNameFromCodeOreContainedRessource());
     assertEquals(
         medication.getBatchLotNumber(),
         medication2.getBatchLotNumber(),

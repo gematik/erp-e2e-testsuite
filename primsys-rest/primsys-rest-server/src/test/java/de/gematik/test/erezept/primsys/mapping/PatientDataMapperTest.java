@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
@@ -50,7 +54,7 @@ class PatientDataMapperTest extends ErpFhirBuildingTest {
     val patient2 = mapper2.convert();
 
     assertEquals(patient.getKvnr(), patient2.getKvnr());
-    assertEquals(patient.getInsuranceKind(), patient2.getInsuranceKind());
+    assertEquals(patient.getInsuranceType(), patient2.getInsuranceType());
     assertEquals(patient.getFullname(), patient2.getFullname());
     assertEquals(patient.getBirthDate(), patient2.getBirthDate());
   }

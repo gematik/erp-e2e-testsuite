@@ -1,0 +1,51 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "Read-EU-Access-Permission",
+  "url": "https://gematik.de/fhir/erp-eu/OperationDefinition/Read_Access_PermissionOperationDefinition",
+  "status": "active",
+  "version": "1.0.0",
+  "date": "2025-06-02",
+  "name": "Read_Access_Permission",
+  "kind": "operation",
+  "description": "This operation reads the currenty in the E-Rezept-Fachdienst registered Access Code for redeeming ePrescriptions in an EU country.",
+  "code": "read-eu-access-permission",
+  "system": true,
+  "type": false,
+  "instance": false,
+  "affectsState": false,
+  "outputProfile": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_Access_Authorization_Response",
+  "parameter": [
+    {
+      "name": "countryCode",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The country for which the patient wants to grant access.",
+      "type": "Coding"
+    },
+    {
+      "name": "accessCode",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The access code for that country.",
+      "type": "Identifier"
+    },
+    {
+      "name": "validUntil",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The instant until the access code is valid.",
+      "type": "instant"
+    },
+    {
+      "name": "createdAt",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The instant when the record was created in the E-Rezept-Fachdienst.",
+      "type": "instant"
+    }
+  ]
+}

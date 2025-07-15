@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
@@ -20,15 +24,14 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.HL7CodeSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.dav.AbgabedatensatzReference;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
@@ -36,10 +39,8 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.val;
@@ -53,10 +54,11 @@ import org.hl7.fhir.r4.model.Resource;
 public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChargeItemBuilder> {
 
   private final PrescriptionId prescriptionId;
-  private PatientenrechnungVersion version;
+  private PatientenrechnungVersion version = PatientenrechnungVersion.V1_0_0;
+  private ChargeItem.ChargeItemStatus status = ChargeItem.ChargeItemStatus.BILLABLE;
+  private Date enteredDate = new Date();
   private Reference receiptReference;
   private AccessCode accessCode;
-  private ChargeItem.ChargeItemStatus status = ChargeItem.ChargeItemStatus.BILLABLE;
   private KVNR kvnr;
   private String kvnrAssignerName;
   private TelematikID telematikId;
@@ -65,15 +67,8 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
   private Reference kbvReference;
   private MarkingFlag markingFlag;
 
-  private DateTimeType enteredDate;
-
   private ErxChargeItemBuilder(PrescriptionId prescriptionId) {
     this.prescriptionId = prescriptionId;
-
-    this.version =
-        ErpWorkflowVersion.getDefaultVersion().isEqual("1.1.1")
-            ? null
-            : PatientenrechnungVersion.V1_0_0;
   }
 
   public ErxChargeItemBuilder version(PatientenrechnungVersion version) {
@@ -82,7 +77,7 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
   }
 
   public ErxChargeItemBuilder accessCode(String accessCode) {
-    return accessCode(new AccessCode(accessCode));
+    return accessCode(AccessCode.from(accessCode));
   }
 
   public ErxChargeItemBuilder accessCode(AccessCode accessCode) {
@@ -124,11 +119,7 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
   }
 
   public ErxChargeItemBuilder entered(Date date) {
-    return entered(date, TemporalPrecisionEnum.SECOND);
-  }
-
-  public ErxChargeItemBuilder entered(Date date, TemporalPrecisionEnum precision) {
-    this.enteredDate = new DateTimeType(date, precision);
+    this.enteredDate = date;
     return this;
   }
 
@@ -164,6 +155,10 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
     return abgabedatensatz(bundle.getReference(), signer.apply(bundle));
   }
 
+  public ErxChargeItemBuilder abgabedatensatz(DavPkvAbgabedatenBundle bundle, byte[] signed) {
+    return abgabedatensatz(bundle.getReference(), signed);
+  }
+
   public ErxChargeItemBuilder abgabedatensatz(String id, byte[] signed) {
     return abgabedatensatz(new AbgabedatensatzReference(id), signed);
   }
@@ -176,17 +171,10 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
   }
 
   public ErxChargeItem build() {
-    val profile =
-        Optional.ofNullable(version)
-            .map(v -> PatientenrechnungStructDef.CHARGE_ITEM.asCanonicalType(version))
-            .orElse(ErpWorkflowStructDef.CHARGE_ITEM.asCanonicalType());
-    val chargeItem = this.createResource(ErxChargeItem::new, profile);
+    val chargeItem =
+        this.createResource(ErxChargeItem::new, PatientenrechnungStructDef.CHARGE_ITEM, version);
 
-    if (enteredDate == null) {
-      this.entered(new Date());
-    }
-    chargeItem.setEnteredDateElement(enteredDate);
-
+    chargeItem.setEnteredDateElement(new DateTimeType(enteredDate, TemporalPrecisionEnum.SECOND));
     chargeItem.setStatus(status);
     chargeItem.setCode(HL7CodeSystem.DATA_ABSENT.asCodeableConcept("not-applicable"));
 
@@ -194,41 +182,25 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
         new Binary().setContentType("application/pkcs7-mime").setContent(this.signedDavBundle);
     containedDavBundle.setId(davReference.getReference(false));
 
-    if (version != null) {
-      val identifiers = new ArrayList<Identifier>(2);
-      identifiers.add(prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
-      Optional.ofNullable(accessCode)
-          .ifPresent(
-              ac -> identifiers.add(ac.asIdentifier(ErpWorkflowNamingSystem.ACCESS_CODE_121)));
+    val identifiers = new ArrayList<Identifier>(2);
+    identifiers.add(prescriptionId.asIdentifier());
+    Optional.ofNullable(accessCode).ifPresent(ac -> identifiers.add(ac.asIdentifier()));
 
-      chargeItem.setIdentifier(identifiers);
+    chargeItem.setIdentifier(identifiers);
 
-      val kvnrIdentifier = kvnr.asIdentifier(DeBasisProfilNamingSystem.KVID_PKV_SID, false);
-      kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
-      chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));
+    // Note: PKV system is hardcoded here - should be refactored in testsuites first
+    val kvnrIdentifier = kvnr.asIdentifier(DeBasisProfilNamingSystem.KVID_PKV_SID, false);
+    kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
+    chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));
 
-      Optional.ofNullable(telematikId)
-          .ifPresent(
-              tid ->
-                  chargeItem.setEnterer(tid.asReference(ErpWorkflowNamingSystem.TELEMATIK_ID_SID)));
-      Optional.ofNullable(markingFlag)
-          .ifPresent(mf -> chargeItem.setExtension(List.of(mf.asExtension(version))));
+    Optional.ofNullable(telematikId)
+        .map(SemanticValue::asReference)
+        .ifPresent(chargeItem::setEnterer);
+    Optional.ofNullable(markingFlag)
+        .map(MarkingFlag::asExtension)
+        .ifPresent(chargeItem::addExtension);
 
-      this.fixSupportingInformationReferences();
-    } else {
-      chargeItem.setIdentifier(List.of(prescriptionId.asIdentifier()));
-
-      containedDavBundle
-          .getMeta()
-          .addProfile(ErpWorkflowStructDef.BINARY.getVersionedUrl(ErpWorkflowVersion.V1_1_1));
-
-      val kvnrIdentifier = kvnr.asIdentifier(DeBasisProfilNamingSystem.KVID, false);
-      kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
-      chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));
-      Optional.ofNullable(telematikId).ifPresent(tid -> chargeItem.setEnterer(tid.asReference()));
-      Optional.ofNullable(markingFlag)
-          .ifPresent(mf -> chargeItem.setExtension(List.of(mf.asExtension())));
-    }
+    this.fixSupportingInformationReferences();
 
     chargeItem.addContained((Resource) containedDavBundle);
     chargeItem.addSupportingInformation(receiptReference);

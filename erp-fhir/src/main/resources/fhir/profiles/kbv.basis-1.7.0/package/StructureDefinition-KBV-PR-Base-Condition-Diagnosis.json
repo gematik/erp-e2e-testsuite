@@ -1,0 +1,618 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Condition-Diagnosis",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Condition_Diagnosis",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Condition_Diagnosis",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet relevante Informationen zu einer Diagnoserstellung ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Condition",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Condition",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Condition",
+        "path": "Condition",
+        "definition": "Hier werden verschiedene Informationen angegeben, die im Zusammenhang mit medizinischen Diagnosen stehen.",
+        "constraint": [
+          {
+            "key": "Rec1",
+            "severity": "warning",
+            "human": "Das Dokumentationsdatum soll mindestens mit MM.JJJJ angegeben werden.",
+            "expression": "recordedDate.exists() implies recordedDate.toString().length()>=7",
+            "source": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Condition_Diagnosis"
+          }
+        ]
+      },
+      {
+        "id": "Condition.extension",
+        "path": "Condition.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Condition.extension:Feststellungsdatum",
+        "path": "Condition.extension",
+        "sliceName": "Feststellungsdatum",
+        "short": "Feststellungsdatum",
+        "definition": "Hier wird der Zeitpunkt angegeben, an dem die Diagnose bzw. die Erkrankung z. B. durch eine ärztlich tätige Person festgestellt wurde. Dies wird im Folgenden mit Diagnosedatum bezeichnet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://hl7.org/fhir/StructureDefinition/condition-assertedDate"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.clinicalStatus",
+        "path": "Condition.clinicalStatus",
+        "definition": "Dieses Element beschreibt den Status einer Diagnose bzw. einer Erkrankung aus klinischer Sicht."
+      },
+      {
+        "id": "Condition.verificationStatus",
+        "path": "Condition.verificationStatus",
+        "definition": "Hier wird die Diagnosesicherheit dokumentiert."
+      },
+      {
+        "id": "Condition.severity",
+        "path": "Condition.severity",
+        "short": "Schweregrad der Diagnose",
+        "definition": "Hier wird der Schweregrad angegeben."
+      },
+      {
+        "id": "Condition.severity.coding",
+        "path": "Condition.severity.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier kann der Schweregrad als Code angegeben werden."
+      },
+      {
+        "id": "Condition.severity.coding:snomed",
+        "path": "Condition.severity.coding",
+        "sliceName": "snomed",
+        "definition": "Hier kann der Schweregrad als SNOMED-CT Code angegeben werden.",
+        "min": 0,
+        "max": "1",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://hl7.org/fhir/ValueSet/condition-severity"
+        }
+      },
+      {
+        "id": "Condition.severity.coding:snomed.system",
+        "path": "Condition.severity.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Condition.severity.coding:snomed.version",
+        "path": "Condition.severity.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Condition.severity.coding:snomed.code",
+        "path": "Condition.severity.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Condition.severity.coding:snomed.display",
+        "path": "Condition.severity.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Condition.code",
+        "path": "Condition.code",
+        "definition": "In diesem Element werden Angaben zur Diagnose in Form einer Codierung gemacht. Diese werden als codierte Information und/oder als Freitext angegeben.",
+        "min": 1
+      },
+      {
+        "id": "Condition.code.coding",
+        "path": "Condition.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben",
+        "min": 1
+      },
+      {
+        "id": "Condition.code.coding:ICD-10-GM",
+        "path": "Condition.code.coding",
+        "sliceName": "ICD-10-GM",
+        "definition": "Der ICD-Code ist in Deutschland das abrechnungsrelevante Code-System im ambulanten und stationären Bereich. So wird z. B. bei der Abrechnung nach § 301 und § 295 SGB V die Codierung von Diagnosen mittels ICD-10 GM gesetzlich vorgeschrieben. Im ICD-System ist im Gegensatz zu anderen Code-System eine detaillierte Spezifikation von Diagnosen ohne Umwege möglich: die Einordnung der diagnostizierten Erkrankung als Ätiologie oder Manifestation, die Diagnosesicherheit und die Beschreibung des Schweregrades wie auch der Seitenlokalisation. \r\nSiehe auch https://www.dimdi.de/dynamic/de/klassifikationen/icd/icd-10-gm/ \r\nBei der Benennung und Struktur der ICD Informationselemente haben wir uns an der FHIR®-technischen Umsetzung entsprechend HL7® Deutschland R4 Extension orientiert. Siehe dazu https://simplifier.net/basisprofil-de-r4/~resources?category=Extension",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Coding",
+            "profile": [
+              "http://fhir.de/StructureDefinition/CodingICD10GM"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.code.coding:ICD-10-GM.extension:Seitenlokalisation",
+        "path": "Condition.code.coding.extension",
+        "sliceName": "Seitenlokalisation",
+        "definition": "Zur Spezifizierung von Diagnoseangaben (ICD-10) dürfen die Zusatzkennzeichen für die Seitigkeit (R, L oder B) angegeben werden, d. h. die Angabe ist freiwillig; dies gilt für die stationäre und die ambulante Versorgung."
+      },
+      {
+        "id": "Condition.code.coding:ICD-10-GM.extension:Diagnosesicherheit",
+        "path": "Condition.code.coding.extension",
+        "sliceName": "Diagnosesicherheit",
+        "definition": "Die Diagnosesicherheit, d. h. wie sicher die Diagnose im Einzelfall zu werten ist, wird durch ein Zusatzkennzeichen zum ICD-Code angegeben. Für Abrechnungszwecke in der ambulanten Versorgung muss obligatorisch ein Zusatzkennzeichen für die Diagnosesicherheit (A, G, V oder Z) angegeben werden, d. h. die Angabe ist obligatorisch. In der stationären Versorgung sind diese Zusatzkennzeichen für die Angabe der Diagnosesicherheit für Abrechnungszwecke dagegen nicht zulässig."
+      },
+      {
+        "id": "Condition.code.coding:ICD-10-GM.code",
+        "path": "Condition.code.coding.code",
+        "definition": "In diesem Element wird der Code für die Diagnose angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems, allerdings ohne ein Mehrfachcodierungskennzeichen (z. B. '*', '†' oder '!'). Diese sind in anderen entsprechenden Elementen abzubilden."
+      },
+      {
+        "id": "Condition.code.coding:alphaId",
+        "path": "Condition.code.coding",
+        "sliceName": "alphaId",
+        "definition": "In diesem Element wird der Code für die Diagnose angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "comment": "Bei Alpha-ID-Codes, die zu postkoordinierten ICD-10-Codes gemappt werden, sollten diese nur einmal bei der Primärdiagnose und nicht mehr bei den Sekundärdiagnosen angeben werden (Stichpunkt: related Conditions in FHIR). In Fällen bei denen eine abweichende Diagnosesicherheit zwischen Primär- und Sekundärdiagnose vorhanden ist muss sichergestellt werden, dass die Diagnosesicherheit der Primärdiagnose zu dem assozierten Alpha-ID-Code passt. Siehe der Implementierungsguide (IG) der deutschen Basisprofile von HL7",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Coding",
+            "profile": [
+              "http://fhir.de/StructureDefinition/CodingAlphaID"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.code.coding:snomed",
+        "path": "Condition.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird der Code für die Diagnose als SNOMED CT®-Code Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Diagnosis_SNOMED_CT"
+        }
+      },
+      {
+        "id": "Condition.code.coding:snomed.system",
+        "path": "Condition.code.coding.system",
+        "min": 1,
+        "fixedUri": "http://snomed.info/sct"
+      },
+      {
+        "id": "Condition.code.coding:snomed.version",
+        "path": "Condition.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Condition.code.coding:snomed.code",
+        "path": "Condition.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Condition.code.coding:snomed.display",
+        "path": "Condition.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Condition.code.coding:orphanet",
+        "path": "Condition.code.coding",
+        "sliceName": "orphanet",
+        "definition": "In diesem Element wird der Code für die Diagnose als Orphanet Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Condition.code.coding:orphanet.system",
+        "path": "Condition.code.coding.system",
+        "min": 1,
+        "fixedUri": "http://www.orpha.net"
+      },
+      {
+        "id": "Condition.code.coding:orphanet.code",
+        "path": "Condition.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Condition.code.text",
+        "path": "Condition.code.text",
+        "short": "Diagnoseerläuterung",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Condition.bodySite",
+        "path": "Condition.bodySite",
+        "short": "Körperstelle",
+        "definition": "Über die Körperstelle wird angegeben, in welchem Bereich des Körpers eine Krankheit diagnostiziert wurde (topographische Information)."
+      },
+      {
+        "id": "Condition.bodySite.coding",
+        "path": "Condition.bodySite.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Dieses Element ermöglich die Angabe eines Codes für den Bereich des Körpers, in welchem eine Krankheit diagnostiziert wurde."
+      },
+      {
+        "id": "Condition.bodySite.coding:snomed",
+        "path": "Condition.bodySite.coding",
+        "sliceName": "snomed",
+        "definition": "Dieses Element ermöglich die Angabe eines SNOMED-CT Codes für den Bereich des Körpers, in welchem eine Krankheit diagnostiziert wurde.",
+        "min": 0,
+        "max": "1",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "example",
+          "valueSet": "http://hl7.org/fhir/ValueSet/body-site",
+          "description": "Codes describing anatomical locations. May include laterality."
+        }
+      },
+      {
+        "id": "Condition.bodySite.coding:snomed.system",
+        "path": "Condition.bodySite.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Condition.bodySite.coding:snomed.version",
+        "path": "Condition.bodySite.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Condition.bodySite.coding:snomed.code",
+        "path": "Condition.bodySite.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Condition.bodySite.coding:snomed.display",
+        "path": "Condition.bodySite.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Condition.subject",
+        "path": "Condition.subject",
+        "definition": "Gibt den Patienten oder die Gruppe an, mit dem/der der Krankheitsdatensatz verknüpft ist.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.onset[x]",
+        "path": "Condition.onset[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "short": "Klinisch relevanter Zeitraum Anfang",
+        "definition": "Über den klinisch relevanten Zeitraum wird angezeigt, in welchem Zeitraum bzw. seit wann der/die Patient:in die Diagnose/Erkrankung hatte bzw. hat. Es wird ausgedrückt, seit wann ein/e Patient:in an einer Erkrankung leidet bzw. eine Diagnose hat, indem nur das Startdatum des Zeitraums angegeben wird. Das Startdatum des Zeitraums kann vom Diagnosedatum abweichen. Datumsangaben zu Diagnosen können in unterschiedlicher Präzision vorhanden sein."
+      },
+      {
+        "id": "Condition.onset[x]:onsetPeriod",
+        "path": "Condition.onset[x]",
+        "sliceName": "onsetPeriod",
+        "definition": "Hier wird das Zeintintervall angegeben, ab wann der Patient die Diagnose hatte bzw. unter der Erkrankung leidet/litt.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Period"
+          }
+        ]
+      },
+      {
+        "id": "Condition.onset[x]:onsetPeriod.start",
+        "path": "Condition.onset[x].start",
+        "definition": "Hier wird Datum/Zeit für den Beginn der Zeitspanne angegeben."
+      },
+      {
+        "id": "Condition.onset[x]:onsetPeriod.end",
+        "path": "Condition.onset[x].end",
+        "definition": "Hier wird Datum/Zeit für das Ende der Zeitspanne angegeben."
+      },
+      {
+        "id": "Condition.onset[x]:onsetRange",
+        "path": "Condition.onset[x]",
+        "sliceName": "onsetRange",
+        "definition": "Hier erfolgt die Angabe der Altersspanne, seit dem der/die Patient:in die Diagnose hat (unter der Erkrankung leidet).",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Range"
+          }
+        ]
+      },
+      {
+        "id": "Condition.onset[x]:onsetRange.low",
+        "path": "Condition.onset[x].low",
+        "definition": "Hier wird der Beginn der Altersspanne für die Schätzung des Alters angegeben."
+      },
+      {
+        "id": "Condition.onset[x]:onsetRange.high",
+        "path": "Condition.onset[x].high",
+        "definition": "Hier wird das Ende der Altersspanne für die Schätzung des Alters angegeben."
+      },
+      {
+        "id": "Condition.onset[x]:onsetDateTime",
+        "path": "Condition.onset[x]",
+        "sliceName": "onsetDateTime",
+        "short": "Datum Anfang",
+        "definition": "Hier wird das Datum angegeben, ab wann der/die Patient:in die Diagnose hatte bzw. unter der Erkrankung leidet/litt.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Condition.onset[x]:onsetAge",
+        "path": "Condition.onset[x]",
+        "sliceName": "onsetAge",
+        "short": "Lebenphase von",
+        "definition": "Hier erfolgt die Angabe des Alters, seit dem der/die Patient:in die Diagnose hat (unter der Erkrankung leidet).",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Age"
+          }
+        ]
+      },
+      {
+        "id": "Condition.onset[x]:onsetAge.extension:lebensphase-von",
+        "path": "Condition.onset[x].extension",
+        "sliceName": "lebensphase-von",
+        "definition": "Hier erfolgt die Angabe des ungefähren Alters, ab dem der/die Patient:in die Diagnose hat bzw. unter der Erkrankung leidet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Stage_Life"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.abatement[x]",
+        "path": "Condition.abatement[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "short": "Klinischer Zeitraum Ende",
+        "definition": "Hier wird angegeben, bis wann der/die Patient:in die Diagnose/Erkrankung hatte. Bei einer fortbestehenden Diagnose/Erkrankung ist diese Angabe nicht zu übermitteln."
+      },
+      {
+        "id": "Condition.abatement[x]:abatementPeriod",
+        "path": "Condition.abatement[x]",
+        "sliceName": "abatementPeriod",
+        "definition": "Hier wird das Zeitintervall angegeben, bis zu dem der/die Patient:in unter der Erkrankung litt bzw. bis wann der/die Patient:in die Diagnose hatte.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Period"
+          }
+        ]
+      },
+      {
+        "id": "Condition.abatement[x]:abatementPeriod.start",
+        "path": "Condition.abatement[x].start",
+        "definition": "Hier wird Datum/Zeit für den Beginn der Zeitspanne angegeben."
+      },
+      {
+        "id": "Condition.abatement[x]:abatementPeriod.end",
+        "path": "Condition.abatement[x].end",
+        "definition": "Hier wird Datum/Zeit für das Ende der Zeitspanne angegeben."
+      },
+      {
+        "id": "Condition.abatement[x]:abatementRange",
+        "path": "Condition.abatement[x]",
+        "sliceName": "abatementRange",
+        "definition": "Hier erfolgt die Angabe der Altersspanne, seit der der/die Patient:in die Diagnose nicht mehr hat, bzw. nicht mehr unter der Erkrankung leidet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Range"
+          }
+        ]
+      },
+      {
+        "id": "Condition.abatement[x]:abatementRange.low",
+        "path": "Condition.abatement[x].low",
+        "definition": "Hier wird der Beginn der Altersspanne für die Schätzung des Alters angegeben."
+      },
+      {
+        "id": "Condition.abatement[x]:abatementRange.high",
+        "path": "Condition.abatement[x].high",
+        "definition": "Hier wird das Ende der Altersspanne für die Schätzung des Alters angegeben."
+      },
+      {
+        "id": "Condition.abatement[x]:abatementDateTime",
+        "path": "Condition.abatement[x]",
+        "sliceName": "abatementDateTime",
+        "short": "Datum bis",
+        "definition": "Hier erfolgt die Angabe des Datums, seit dem der/die Patient:in die Diagnose nicht mehr hat, bzw. nicht mehr unter der Erkrankung leidet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Condition.abatement[x]:abatementAge",
+        "path": "Condition.abatement[x]",
+        "sliceName": "abatementAge",
+        "short": "Lebenphase bis",
+        "definition": "Hier erfolgt die Angabe des Alters, seit dem der/die Patient:in die Diagnose nicht mehr hat, bzw. nicht mehr unter der Erkrankung leidet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Age"
+          }
+        ]
+      },
+      {
+        "id": "Condition.abatement[x]:abatementAge.extension:lebensphase-bis",
+        "path": "Condition.abatement[x].extension",
+        "sliceName": "lebensphase-bis",
+        "definition": "Hier erfolgt die Angabe des ungefähren Alters, seit dem der/die Patient:in die Diagnose nicht mehr hat bzw. nicht mehr unter der Erkrankung leidet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Stage_Life"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.recordedDate",
+        "path": "Condition.recordedDate",
+        "short": "Dokumentationsdatum",
+        "definition": "Hier wird der Zeitpunkt angegeben, an dem eine Krankheit z. B. durch eine ärztlich tätige Person in diesem Eintrag dokumentiert wurde. Hinweis: Wenn zwischen Feststellung der Diagnose und Dokumentationsdatum nicht unterschieden werden muss, ist das Datum der Feststellung der Diagnose (Diagnosedatum) anzugeben."
+      },
+      {
+        "id": "Condition.asserter",
+        "path": "Condition.asserter",
+        "definition": "Hier wird die Person referenziert, die die Erkrankung diagnostiziert bzw. die Diagnose erstellt hat."
+      },
+      {
+        "id": "Condition.note",
+        "path": "Condition.note",
+        "short": "Freitextbeschreibung",
+        "definition": "Hier werden ergänzende freitextliche Kommentare und Notizen vorgenommen, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Condition.note.author[x]",
+        "path": "Condition.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Condition.note.author[x]:authorReference",
+        "path": "Condition.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Condition.note.author[x]:authorString",
+        "path": "Condition.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Condition.note.time",
+        "path": "Condition.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "Condition.note.text",
+        "path": "Condition.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/DokumentenWarnhinweise",
+  "version": "2021-07-06T21:19:41",
+  "name": "DokumentenWarnhinweise",
+  "id": "DokumentenWarnhinweise",
+  "title": "Dokumenten Warnhinweise",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "H1",
+      "display": "vom Patienten mitgebracht",
+      "definition": "Dokumente, die der Patient zu seinem Arzt oder in die Klinik mitgebracht hat und die dort eingescannt wurden. Die Dokumente können von Medizinern und anderen Leistungserbringern, von anderen Autoren wie z.B. Behörden/Krankenkassen/Schulen oder vom Patienten selbst erstellt worden sein."
+    },
+    {
+      "code": "H2",
+      "display": "noch nicht mit Patient besprochen",
+      "definition": "Der Hinweis gibt Auskunft darüber, ob das Dokument zum Zeitpunkt des Einstellens bereits mit dem Patienten besprochen wurde. Dies kann genutzt werden um zu verhindern, dass der Patient sensible Informationen, wie die Diagnose einer unheilbaren Krankheit, aus einem Dokument anstatt von seinem Arzt erfährt. Dabei liegt der Fokus auf der Frage, ob das Dokument noch mit dem Patienten besprochen werden muss und nicht wer es noch mit dem Patienten besprechen muss. Somit können auch einrichtungsübergreifende Szenarien unterstützt werden, z.B. wenn die Besprechung des Befundes nicht in der Hand des Erzeugers liegt."
+    },
+    {
+      "code": "H3",
+      "display": "eventuell veraltete Daten",
+      "definition": "Der Hinweis zeigt an, dass es sich eventuell um veraltete Daten handelt. Dieses Kennzeichen wird üblicherweise nachträglich zu schon registrierten Dokumenten hinzugefügt. Im Gegensatz zum availabilityStatus \"Deprecated\" ist es unklar ob das Dokument wirklich veraltet ist oder nicht. Daher handelt es sich hier nur um einen Hinweis für den Empfänger, der üblicherweise keine automatischen Auswirkungen auf Berechtigungen, Speicherfristen, etc. hat."
+    },
+    {
+      "code": "H4",
+      "display": "vorläufiges Dokument",
+      "definition": "Der Hinweis zeigt an, dass es sich um ein vorläufiges Dokument handelt. IHE XDS sieht hierfür keinen eigenen Wert im availabilityStatus Attribut vor, daher wird dieses Konzept ausschließlich über diesen eventCode kommuniziert."
+    }
+  ],
+  "count": 4
+}

@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.generate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.URISyntaxException;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import java.nio.file.Path;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -28,13 +32,10 @@ import picocli.CommandLine.ExitCode;
 class ChargeItemBundleGeneratorTest {
 
   @Test
-  void shouldGenerateEmptyBundleWithDefaults() throws URISyntaxException {
+  void shouldGenerateEmptyBundleWithDefaults() {
     val input =
-        this.getClass()
-            .getClassLoader()
-            .getResource("fhir/valid/erp/1.1.1/ChargeItem_01.xml")
-            .toURI()
-            .getPath();
+        ResourceLoader.getFileFromResource("fhir/valid/erpchrg/1.0/ChargeItem_01.xml")
+            .getAbsolutePath();
     val outputDir = Path.of(System.getProperty("user.dir"), "target", "tmp", "out");
     val cibg = new ChargeItemBundleGenerator();
     val cmdline = new CommandLine(cibg);

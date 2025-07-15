@@ -12,15 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.abilities;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.UUID.randomUUID;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,29 +31,45 @@ import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.ios.IOSDriver;
 import io.cucumber.java.Scenario;
+import io.cucumber.java.Status;
+import java.time.Duration;
 import java.util.List;
+import kong.unirest.core.HttpMethod;
+import kong.unirest.core.MockClient;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.SessionId;
 
 class UseIOSAppTest {
 
   @Test
   void shouldGetStaticValues() {
-    val driver = mock(IOSDriver.class);
-
     val appiumConfig = new AppiumConfiguration();
     appiumConfig.setMaxWaitTimeout(10);
     appiumConfig.setPollingInterval(5);
+    appiumConfig.setUrl("http://gsltuci30.ltu.int.gematik.de:443/");
+
+    val driver = mock(IOSDriver.class);
+    when(driver.getSessionId()).thenReturn(new SessionId(randomUUID()));
 
     val driverAbility = new UseIOSApp(driver, appiumConfig);
+
+    val scenario = mock(Scenario.class);
+    when(scenario.getName()).thenReturn("Test Scenario Name");
+    when(scenario.getStatus()).thenReturn(Status.PASSED);
+
+    val unirestMock = MockClient.register();
+    unirestMock.expect(HttpMethod.POST).thenReturn();
+
     assertTrue(driverAbility.getDriverName().toLowerCase().contains("ios"));
     assertNotNull(driverAbility.toString());
     assertEquals(10, driverAbility.getMaxWaitTimeout());
     assertEquals(5, driverAbility.getPollingInterval());
 
-    assertDoesNotThrow(() -> driverAbility.finish(mock(Scenario.class)));
+    assertDoesNotThrow(() -> driverAbility.finish(scenario));
   }
 
   @Test
@@ -99,40 +116,38 @@ class UseIOSAppTest {
   }
 
   @Test
+  void shouldPauseApp() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = new UseIOSApp(driver, new AppiumConfiguration());
+
+    assertTimeout(Duration.ofMillis(1100), driverAbility::pauseApp);
+  }
+
+  @Test
   void shouldTapOnElementAfterTooltips() {
     val driver = mock(IOSDriver.class);
     val tooltips = mock(WebElement.class);
     val webElement = mock(WebElement.class);
+    val driverAbility = spy(new UseIOSApp(driver, new AppiumConfiguration()));
+
     when(driver.getPageSource())
-        .thenReturn(
-            Utility.TOOLTIPS
-                .forPlatform(PlatformType.IOS)
-                .toString()) // first tooltip calling pagesource 2 times
-        .thenReturn(
-            Utility.TOOLTIPS
-                .forPlatform(PlatformType.IOS)
-                .toString()) // first tooltip calling pagesource 2 times
-        .thenReturn(
-            Utility.TOOLTIPS
-                .forPlatform(PlatformType.IOS)
-                .toString()) // second tooltip calling pagesource 2 times
-        .thenReturn(
-            Utility.TOOLTIPS
-                .forPlatform(PlatformType.IOS)
-                .toString()) // second tooltip calling pagesource 2 times
-        .thenReturn("");
-    when(driver.findElement(Utility.TOOLTIPS.forPlatform(PlatformType.IOS)))
-        .thenReturn(tooltips)
-        .thenReturn(tooltips)
-        .thenReturn(null);
-    when(driver.findElement(Onboarding.NEXT_BUTTON.forPlatform(PlatformType.IOS)))
-        .thenReturn(webElement);
-    when(webElement.isEnabled()).thenReturn(true);
-    val driverAbility = new UseIOSApp(driver, new AppiumConfiguration());
+        .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())
+        .thenReturn(""); // return an empty string for the last recursive call
+
+    doReturn(null)
+        .doReturn(tooltips) // for isDisplayed method
+        .doReturn(tooltips) // for tap method
+        .doReturn(null)
+        .doThrow(NoSuchElementException.class)
+        .when(driverAbility)
+        .getWebElement(any(By.class));
+
+    doReturn(webElement).when(driverAbility).getWebElement(Onboarding.NEXT_BUTTON);
+
     driverAbility.removeTooltips();
     driverAbility.tap(Onboarding.NEXT_BUTTON);
 
-    verify(tooltips, times(2)).click();
+    verify(tooltips, times(1)).click();
     verify(webElement).click();
   }
 

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
@@ -19,8 +23,6 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;
@@ -34,12 +36,7 @@ public class ErxMedicationDispenseFaker
   private ErxMedicationDispenseFaker() {
     super();
     this.withBatch(fakerLotNumber(), fakerFutureExpirationDate());
-
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
-      withMedication(KbvErpMedicationPZNFaker.builder().fake());
-    } else {
-      withMedication(GemErpMedicationFaker.builder().fake());
-    }
+    withMedication(GemErpMedicationFaker.forPznMedication().fake());
   }
 
   public static ErxMedicationDispenseFaker builder() {

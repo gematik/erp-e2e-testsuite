@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd;
@@ -23,6 +27,7 @@ import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -61,9 +66,10 @@ public class CommunicationReader extends BaseRemoteCommand {
   @Override
   public void performFor(Egk egk, ErpClient erpClient) {
     log.info(
-        format(
-            "Show Communications for {0} ({1}) from {2}",
-            egk.getOwnerData().getOwnerName(), egk.getKvnr(), this.getEnvironmentName()));
+        "Show Communications for {} ({}) from {}",
+        egk.getOwnerData().getOwnerName(),
+        egk.getKvnr(),
+        this.getEnvironmentName());
 
     val searchBuilder = CommunicationSearch.searchFor();
     Optional.ofNullable(sender).ifPresent(searchBuilder::sender);
@@ -89,6 +95,7 @@ public class CommunicationReader extends BaseRemoteCommand {
         .ifPresent(ac -> System.out.println(format("\tAccessCode: {0}", ac)));
     System.out.println(format("\t{0} -> {1}", com.getSenderId(), com.getRecipientId()));
     System.out.println(format("\tsent: {0} -> received: {1}", com.getSent(), com.getReceived()));
-    System.out.println(format("\t{0}", com.getMessage()));
+    if (!com.getBasedOnReferenceId().getFlowType().equals(PrescriptionFlowType.FLOW_TYPE_162))
+      System.out.println(format("\t{0}", com.getMessage()));
   }
 }

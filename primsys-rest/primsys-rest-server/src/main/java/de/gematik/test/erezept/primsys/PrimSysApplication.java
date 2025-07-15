@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys;
@@ -82,7 +86,7 @@ import org.glassfish.jersey.server.ServerProperties;
 public class PrimSysApplication extends ResourceConfig {
 
   public PrimSysApplication() {
-    packages("de.gematik.test.erezept.primsys.rest");
+    packages("de.gematik.test.erezept.primsys.controller");
     val jsonMapper = new ObjectMapper();
     jsonMapper.registerModule(new JavaTimeModule());
     val jsonProvider = new JacksonJsonProvider(jsonMapper);

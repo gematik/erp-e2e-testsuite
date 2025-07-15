@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.Coding;

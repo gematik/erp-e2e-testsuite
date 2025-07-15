@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -26,7 +30,6 @@ import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
@@ -43,11 +46,6 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class AcceptUseCaseTest extends TestWithActorContext {
-
-  @Test
-  void shouldNotInstantiate() {
-    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AcceptUseCase.class));
-  }
 
   @Test
   void shouldAcceptPrescription() {
@@ -74,7 +72,7 @@ class AcceptUseCaseTest extends TestWithActorContext {
     when(acceptBundle.getTask()).thenReturn(task);
     when(task.getPrescriptionId()).thenReturn(prescriptionId);
     when(task.getAccessCode()).thenReturn(accessCode);
-    when(acceptBundle.getSecret()).thenReturn(Secret.fromString("random"));
+    when(acceptBundle.getSecret()).thenReturn(Secret.from("random"));
     val acceptResponse =
         ErpResponse.forPayload(acceptBundle, ErxAcceptBundle.class)
             .withStatusCode(200)
@@ -82,8 +80,8 @@ class AcceptUseCaseTest extends TestWithActorContext {
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(mockClient.request(any(TaskAcceptCommand.class))).thenReturn(acceptResponse);
 
-    try (val response =
-        AcceptUseCase.acceptPrescription(pharmacy, taskId.getValue(), accessCode.getValue())) {
+    val useCase = new AcceptUseCase(pharmacy);
+    try (val response = useCase.acceptPrescription(taskId.getValue(), accessCode.getValue())) {
       assertTrue(response.hasEntity());
       assertEquals(200, response.getStatus());
     }

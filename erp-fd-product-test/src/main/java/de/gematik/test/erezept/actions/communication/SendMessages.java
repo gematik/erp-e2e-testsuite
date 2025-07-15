@@ -12,10 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions.communication;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.actors.ErpActor;
@@ -23,11 +28,11 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -119,6 +124,20 @@ public class SendMessages extends ErpAction<ErxCommunication> {
               .receiver(telematikId.getValue())
               .basedOn(taskId, accessCode)
               .flowType(taskId.getFlowType())
+              .build();
+      return withCommunication(communication, fuzzingMutators);
+    }
+
+    public SendMessages asDispenseRequest(
+        CommunicationDisReqMessage message, ErpWorkflowVersion version) {
+      val useSmcb = SafeAbility.getAbility(receiver, UseSMCB.class);
+      val telematikId = TelematikID.from(useSmcb.getTelematikID());
+      val communication =
+          ErxCommunicationBuilder.forDispenseRequest(message)
+              .receiver(telematikId.getValue())
+              .basedOn(taskId, accessCode)
+              .flowType(taskId.getFlowType())
+              .version(version)
               .build();
       return withCommunication(communication, fuzzingMutators);
     }

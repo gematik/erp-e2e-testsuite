@@ -12,17 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
-import de.gematik.test.erezept.fhir.values.BaseANR;
+import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Date;
@@ -33,7 +37,6 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
@@ -41,6 +44,10 @@ import org.hl7.fhir.r4.model.ResourceType;
 @ResourceDef(name = "Bundle")
 @SuppressWarnings({"java:S110"})
 public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
+
+  public String getLogicalId() {
+    return IdentifierUtil.getUnqualifiedId(this.id);
+  }
 
   /**
    * Get the <a href="https://simplifier.net/erezept/kbvprerpcomposition">KBV E-Rezept
@@ -70,9 +77,7 @@ public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    KbvErpBundle.class,
-                    ErpWorkflowNamingSystem.PRESCRIPTION_ID,
-                    ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
+                    KbvErpBundle.class, ErpWorkflowNamingSystem.PRESCRIPTION_ID));
   }
 
   public void setPrescriptionId(PrescriptionId prescriptionId) {
@@ -106,13 +111,7 @@ public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
 
   public KbvPractitioner getPractitioner() {
     return this.entry.stream()
-        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Practitioner))
-        .filter(
-            practitionerEntry ->
-                ((Practitioner) practitionerEntry.getResource())
-                    .getIdentifier().stream()
-                        .map(identifier -> identifier.getType().getCodingFirstRep())
-                        .anyMatch(BaseANR::isPractitioner))
+        .filter(KbvItaForStructDef.PRACTITIONER::matches)
         .map(
             entry ->
                 FhirEntryReplacer.cast(

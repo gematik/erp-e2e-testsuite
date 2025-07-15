@@ -1,0 +1,43 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "CreateOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/CreateOperationDefinition",
+  "status": "active",
+  "version": "1.5.2",
+  "date": "2025-06-23",
+  "name": "Create",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": true,
+  "instance": false,
+  "description": "This operation creates a Task for the prescription of a specific workflowType.",
+  "code": "create",
+  "inputProfile": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "outputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CreateOperation_Output",
+  "parameter": [
+    {
+      "name": "workflowType",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "This parameter requests the creation of a Task of a certain ePrescription flowType.",
+      "type": "Coding",
+      "binding": {
+        "strength": "required",
+        "valueSet": "https://gematik.de/fhir/erp/ValueSet/GEM_ERP_VS_FlowType"
+      }
+    },
+    {
+      "name": "return",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The created Task with a flowType-specific prescriptionID",
+      "type": "Task"
+    }
+  ]
+}

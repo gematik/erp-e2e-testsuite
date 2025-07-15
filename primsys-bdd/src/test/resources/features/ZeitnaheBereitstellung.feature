@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# *******
+# For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+# *******
+#
 # language: de
 
 @PRODUKT:eRp_FD
@@ -34,7 +38,6 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
   @TCID:ERP_EE_ZBD_01
   @TESTFALL:positiv
   Szenario: Zeitnahe Bereitstellung von Dispensierinformationen für das FdV
-
     Wenn die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen für das letzte akzeptierte E-Rezept von Sina Hüllmann die Dispensierinformationen zeitnah bereitstellt
     Dann kann die Versicherte Sina Hüllmann 1 Dispensierinformationen für ihr letztes E-Rezept abrufen

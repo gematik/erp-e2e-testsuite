@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -48,7 +52,7 @@ class DownloadBundleTest extends ErpFhirParsingTest {
         parser.decode(
             ErxAuditEventBundle.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/erp/1.2.0/auditeventbundle/2d4ba5fa-d0ff-4b59-b1c4-8849bd83a971.json"));
+                "fhir/valid/erp/1.4.0/auditeventbundle/561f4a7e-0616-4c92-b6d5-91217aea136f.json"));
   }
 
   @BeforeEach

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder;
@@ -25,9 +29,7 @@ import de.gematik.test.erezept.fhir.exceptions.FakerException;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
-import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.DoctorProfession;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
@@ -211,7 +213,7 @@ public class GemFaker {
     return format("{0}{1}{2}", docId, controlNumber, sectionNo);
   }
 
-  public static PrescriptionId fakerPrescriptionId() {
+  public static String fakerPrescriptionId() {
     return fakerPrescriptionId(PrescriptionFlowType.FLOW_TYPE_160);
   }
 
@@ -222,7 +224,7 @@ public class GemFaker {
    *     href="https://polarion.int.gematik.de/polarion/#/project/Mainline_OPB1/workitem?id=ML-103379">A_19218</a>
    * @return a valid randomly generated Prescription ID
    */
-  public static PrescriptionId fakerPrescriptionId(PrescriptionFlowType flowType) {
+  public static String fakerPrescriptionId(PrescriptionFlowType flowType) {
     val idUnitWorkflowType = flowType.getCode();
     val idUnitFormat = "[0-9]{3}";
 
@@ -247,11 +249,11 @@ public class GemFaker {
     // always ensure 2 digits
     val checkNumString =
         (checkNumLong >= 10) ? String.valueOf(checkNumLong) : format("0{0}", checkNumLong);
-    return new PrescriptionId(format("{0}.{1}", rawIso7064, checkNumString));
+    return format("{0}.{1}", rawIso7064, checkNumString);
   }
 
-  public static AccessCode fakerAccessCode() {
-    return new AccessCode(faker.regexify("[0-9a-f]{64}"));
+  public static String fakerAccessCode() {
+    return faker.regexify("[0-9a-f]{64}");
   }
 
   public static String fakerSecret() {

@@ -1,0 +1,101 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "gem-erpeu-pr-par-get-prescription-output",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Output",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_PR_PAR_GET_Prescription_Output",
+  "title": "GEM ERPEU PR PAR GET Prescription Output",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "This profile defines the output parameters for the Get Prescription Operation",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile:workflowEUProfile",
+        "path": "Parameters.meta.profile",
+        "sliceName": "workflowEUProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Output|1.0",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "max": "1"
+      },
+      {
+        "id": "Parameters.parameter:return",
+        "path": "Parameters.parameter",
+        "sliceName": "return",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Parameters.parameter:return.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "return",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:return.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:return.resource",
+        "path": "Parameters.parameter.resource",
+        "min": 1,
+        "type": [
+          {
+            "code": "Bundle"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:return.part",
+        "path": "Parameters.parameter.part",
+        "max": "0"
+      }
+    ]
+  }
+}

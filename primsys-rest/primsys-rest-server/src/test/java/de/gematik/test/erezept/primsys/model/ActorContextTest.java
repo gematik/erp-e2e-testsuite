@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -26,6 +30,7 @@ import de.gematik.test.erezept.primsys.PrimSysRestFactory;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.*;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
+import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
 import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
 import jakarta.ws.rs.WebApplicationException;
 import lombok.val;
@@ -44,7 +49,7 @@ class ActorContextTest extends TestWithActorContext {
   @Test
   void shouldAddPrescription() {
     val ctx = ActorContext.getInstance();
-    val prescriptionId = GemFaker.fakerPrescriptionId().getValue();
+    val prescriptionId = GemFaker.fakerPrescriptionId();
     val prescriptionData = new PrescriptionDto();
     prescriptionData.setPrescriptionId(prescriptionId);
     prescriptionData.setTaskId(prescriptionId);
@@ -81,7 +86,7 @@ class ActorContextTest extends TestWithActorContext {
     dispensedData.setPrescriptionId(prescriptionId);
     dispensedData.setAcceptData(
         AcceptedPrescriptionDto.withPrescriptionId("123")
-            .forKvnr("X110407071")
+            .forKvnr("X110407071", PatientInsuranceTypeDto.PKV)
             .andMedication(PznMedicationDto.medicine("123", "Test-Pillen").asPrescribed()));
     ctx.addDispensedMedications(dispensedData);
     assertTrue(ctx.getDispensedMedication(prescriptionId).isPresent());
@@ -95,7 +100,7 @@ class ActorContextTest extends TestWithActorContext {
     dispenseData.setPrescriptionId(PrescriptionId.random().getValue());
     dispenseData.setAcceptData(
         AcceptedPrescriptionDto.withPrescriptionId("123")
-            .forKvnr("X110407071")
+            .forKvnr("X110407071", PatientInsuranceTypeDto.GKV)
             .andMedication(PznMedicationDto.medicine("123", "Test-Pillen").asPrescribed()));
     ctx.addDispensedMedications(dispenseData);
     val dispensed = ctx.getDispensedMedications(PrescriptionFilterParams.with("X110407071"));
@@ -136,6 +141,21 @@ class ActorContextTest extends TestWithActorContext {
   }
 
   @Test
+  void shouldGetKnownKtr() {
+    val ctx = ActorContext.getInstance();
+    val ktr = ctx.getHealthInsurances().get(0);
+    val ktr2 = assertDoesNotThrow(() -> ctx.getHealthInsuranceOrThrowNotFound(ktr.getIdentifier()));
+    assertEquals(ktr, ktr2);
+  }
+
+  @Test
+  void shouldThrow404OnUnknownKtr() {
+    val ctx = ActorContext.getInstance();
+    assertThrows(
+        WebApplicationException.class, () -> ctx.getHealthInsuranceOrThrowNotFound("123123"));
+  }
+
+  @Test
   void shouldGetKnownPharmacy() {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(0);
@@ -163,10 +183,12 @@ class ActorContextTest extends TestWithActorContext {
     val summaries = ctx.getActorsSummary();
     val doctors = ctx.getActorsSummary(ActorType.DOCTOR);
     val pharmacies = ctx.getActorsSummary(ActorType.PHARMACY);
+    val ktrs = ctx.getActorsSummary(ActorType.HEALTH_INSURANCE);
 
-    assertEquals(9, summaries.size());
+    assertEquals(10, summaries.size());
     assertEquals(3, doctors.size());
     assertEquals(6, pharmacies.size());
+    assertEquals(1, ktrs.size());
   }
 
   @Test

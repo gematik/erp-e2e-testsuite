@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Optional;
@@ -30,7 +33,7 @@ public class ChargeItemPatchCommand extends BaseCommand<ErxChargeItem> {
   private final Parameters body;
 
   public ChargeItemPatchCommand(PrescriptionId prescriptionId, MarkingFlag body) {
-    this(prescriptionId, body.asParameters(PatientenrechnungVersion.V1_0_0));
+    this(prescriptionId, body.asParameters());
   }
 
   public ChargeItemPatchCommand(PrescriptionId prescriptionId, Parameters body) {

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -58,16 +62,16 @@ class KbvEvdgaBundleTest extends ErpFhirParsingTest {
 
     val practitioner = bundle.getPractitioner();
     assertNotNull(practitioner);
-    assertEquals("838382202", practitioner.getANR().getValue());
+    assertEquals("838382202", practitioner.getANR().orElseThrow().getValue());
     assertTrue(bundle.getPractitionerRole().isEmpty());
 
     val medicalOrg = bundle.getMedicalOrganization();
     assertNotNull(medicalOrg);
-    assertEquals("031234567", medicalOrg.getBsnr().getValue());
+    assertEquals("031234567", medicalOrg.getBsnrOrThrow().getValue());
 
     val coverage = bundle.getCoverage();
     assertNotNull(coverage);
-    assertEquals("104212059", coverage.getIknr().getValue());
+    assertEquals("104212059", coverage.getIknrOrThrow().getValue());
 
     val description = assertDoesNotThrow(bundle::getDescription);
     assertFalse(description.isEmpty());
@@ -86,7 +90,7 @@ class KbvEvdgaBundleTest extends ErpFhirParsingTest {
     assertEquals(lanrs.size(), practitioners.size());
     practitioners.forEach(
         practitioner -> {
-          assertTrue(lanrs.contains(practitioner.getANR().getValue()));
+          assertTrue(lanrs.contains(practitioner.getANR().orElseThrow().getValue()));
         });
   }
 

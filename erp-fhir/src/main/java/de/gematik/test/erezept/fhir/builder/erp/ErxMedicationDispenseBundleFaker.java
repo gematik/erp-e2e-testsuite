@@ -12,15 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerTelematikId;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
 import lombok.val;
@@ -30,7 +34,8 @@ public class ErxMedicationDispenseBundleFaker {
   private int amount = fakerAmount();
   private KVNR kvnr = KVNR.random();
   private String performerId = fakerTelematikId();
-  private PrescriptionId prescriptionId = fakerPrescriptionId();
+  private PrescriptionId prescriptionId = PrescriptionId.random();
+  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
 
   public static ErxMedicationDispenseBundleFaker build() {
     return new ErxMedicationDispenseBundleFaker();
@@ -38,6 +43,11 @@ public class ErxMedicationDispenseBundleFaker {
 
   public ErxMedicationDispenseBundleFaker withAmount(int amount) {
     this.amount = amount;
+    return this;
+  }
+
+  public ErxMedicationDispenseBundleFaker version(ErpWorkflowVersion version) {
+    this.erpWorkflowVersion = version;
     return this;
   }
 
@@ -70,6 +80,7 @@ public class ErxMedicationDispenseBundleFaker {
                         .withKvnr(kvnr)
                         .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
+                        .withVersion(erpWorkflowVersion)
                         .fake()));
     return builder;
   }

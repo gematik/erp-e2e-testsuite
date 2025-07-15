@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -22,7 +26,7 @@ import static de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder.insura
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.BGInsuranceCoverageInfo;
@@ -41,8 +45,8 @@ import lombok.val;
 public class KbvCoverageFaker {
 
   private InsuranceTypeDe insurance = randomElement(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV);
+  private boolean setInsuranceTypeDirect = false;
   private final Map<String, Consumer<KbvCoverageBuilder>> builderConsumers = new HashMap<>();
-  private static final String DMP = "dmpKennzeichen";
 
   private KbvCoverageFaker() {
     this.withPersonGroup(fakerValueSet(PersonGroup.class))
@@ -57,8 +61,9 @@ public class KbvCoverageFaker {
     return new KbvCoverageFaker();
   }
 
-  public KbvCoverageFaker withInsuranceType(InsuranceTypeDe insuranceType) {
-    this.insurance = insuranceType;
+  public KbvCoverageFaker withInsuranceType(InsuranceTypeDe insuranceT) {
+    this.insurance = insuranceT;
+    setInsuranceTypeDirect = true;
     return this;
   }
 
@@ -73,7 +78,7 @@ public class KbvCoverageFaker {
   }
 
   public KbvCoverageFaker withDmpKennzeichen(DmpKennzeichen kennzeichen) {
-    builderConsumers.put(DMP, b -> b.dmpKennzeichen(kennzeichen));
+    builderConsumers.put("dmp", b -> b.dmpKennzeichen(kennzeichen));
     return this;
   }
 
@@ -88,7 +93,9 @@ public class KbvCoverageFaker {
   }
 
   public KbvCoverageFaker withBeneficiary(KbvPatient patient) {
-    this.withInsuranceType(patient.getInsuranceKind());
+    if (!setInsuranceTypeDirect) {
+      this.withInsuranceType(patient.getInsuranceType());
+    }
     builderConsumers.put("beneficiary", b -> b.beneficiary(patient));
     return this;
   }

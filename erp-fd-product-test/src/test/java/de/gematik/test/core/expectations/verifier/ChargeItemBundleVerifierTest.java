@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier;
@@ -32,9 +36,11 @@ import org.junit.jupiter.api.Test;
 class ChargeItemBundleVerifierTest extends ErpFhirParsingTest {
 
   private static final String CHARGE_ITEM_BUNDLE_PATH_FROM_JSON =
-      "fhir/valid/erp/1.2.0/chargeitembundle/7e779557-7b6e-49df-b20f-9c2c9c1e0afb.json";
+      "fhir/valid/erp/1.4.0/chargeitembundle/bundle_01.json";
+
   private final String invalidID = "123.TEST";
-  private static final String VALID_ID = "200.000.003.320.338.84";
+
+  private static final String VALID_ID = "200.000.003.355.048.35";
 
   private static ErxChargeItemBundle getDecodedChargeItemBundle() {
     return parser.decode(

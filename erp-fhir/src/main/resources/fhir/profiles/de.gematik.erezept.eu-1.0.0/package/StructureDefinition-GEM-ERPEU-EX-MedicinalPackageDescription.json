@@ -1,0 +1,53 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-EX-MedicinalPackageDescription",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_EX_MedicinalPackageDescription",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_EX_MedicinalPackageDescription",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "Description of a packaged medicinal product.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "expression": "Medication",
+      "type": "element"
+    },
+    {
+      "expression": "http://hl7.org/fhir/StructureDefinition/Extension",
+      "type": "extension"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_EX_MedicinalPackageDescription"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Description of a packaged medicinal product.",
+        "definition": "Textual description of the package Example: Tablet. Oval, white, biconvex tablets, 9.0 x 5.0 mm, debossed with KM on one side and plain on the other side.",
+        "min": 1,
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

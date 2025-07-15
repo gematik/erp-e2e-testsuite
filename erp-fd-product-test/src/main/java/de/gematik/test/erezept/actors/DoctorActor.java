@@ -12,10 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actors;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
@@ -23,6 +28,7 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +51,14 @@ public class DoctorActor extends ErpActor {
     return baseData.getMedicalOrganization();
   }
 
-  public String getHbaTelematikId() {
+  public TelematikID getHbaTelematikId() {
     val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
-    return baseData.getHbaTelematikId();
+    return TelematikID.from(baseData.getHbaTelematikId());
+  }
+
+  public TelematikID getSmcbTelematikId() {
+    val smcbAbility = SafeAbility.getAbility(this, UseSMCB.class);
+    return TelematikID.from(smcbAbility.getTelematikID());
   }
 
   public void changeQualificationType(QualificationType type) {

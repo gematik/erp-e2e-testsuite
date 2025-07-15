@@ -12,10 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
@@ -26,7 +31,6 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import lombok.val;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -45,16 +49,15 @@ class GetChargeItemByIdTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldPerformCorrectCommandWithoutAccessCode() {
-    val action =
-        GetChargeItemById.withPrescriptionId(new PrescriptionId("123")).withoutAccessCode();
-    Assertions.assertDoesNotThrow(() -> action.answeredBy(patient));
+    val action = GetChargeItemById.withPrescriptionId(PrescriptionId.random()).withoutAccessCode();
+    assertDoesNotThrow(() -> action.answeredBy(patient));
   }
 
   @Test
   void shouldPerformCorrectCommandWithAccessCode() {
     val action =
-        GetChargeItemById.withPrescriptionId(new PrescriptionId("123"))
+        GetChargeItemById.withPrescriptionId(PrescriptionId.random())
             .withAccessCode(AccessCode.random());
-    Assertions.assertDoesNotThrow(() -> action.answeredBy(patient));
+    assertDoesNotThrow(() -> action.answeredBy(patient));
   }
 }

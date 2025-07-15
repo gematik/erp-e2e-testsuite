@@ -1,0 +1,37 @@
+<Patient xmlns="http://hl7.org/fhir">
+  <id value="93866fdc-3e50-4902-a7e9-891b54737b5e" />
+  <meta>
+    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.1.0" />
+  </meta>
+  <identifier>
+    <type>
+      <coding>
+        <system value="http://fhir.de/CodeSystem/identifier-type-de-basis" />
+        <code value="GKV" />
+      </coding>
+    </type>
+    <system value="http://fhir.de/sid/gkv/kvid-10" />
+    <value value="K220635158" />
+  </identifier>
+  <name>
+    <use value="official" />
+    <family value="Königsstein">
+      <extension url="http://hl7.org/fhir/StructureDefinition/humanname-own-name">
+        <valueString value="Königsstein" />
+      </extension>
+    </family>
+    <given value="Ludger" />
+  </name>
+  <birthDate value="1935-06-22" />
+  <address>
+    <type value="both" />
+    <line value="Blumenweg">
+      <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName">
+        <valueString value="Blumenweg" />
+      </extension>
+    </line>
+    <city value="Esens" />
+    <postalCode value="26427" />
+    <country value="D" />
+  </address>
+</Patient>

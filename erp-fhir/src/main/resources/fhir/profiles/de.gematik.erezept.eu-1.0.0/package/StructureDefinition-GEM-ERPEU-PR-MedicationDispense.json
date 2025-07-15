@@ -1,0 +1,161 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-PR-MedicationDispense",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_MedicationDispense",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_PR_MedicationDispense",
+  "title": "Dispensation of the Prescription from the EU",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "Handles information about the redeem of the prescription and the submited medication from the EU.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "MedicationDispense",
+  "baseDefinition": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-dispense",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "MedicationDispense.meta",
+        "path": "MedicationDispense.meta",
+        "min": 1
+      },
+      {
+        "id": "MedicationDispense.meta.profile",
+        "path": "MedicationDispense.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.meta.profile:workflowEUProfile",
+        "path": "MedicationDispense.meta.profile",
+        "sliceName": "workflowEUProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_MedicationDispense|1.0",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.identifier",
+        "path": "MedicationDispense.identifier",
+        "short": "ePrescription identifier",
+        "min": 1
+      },
+      {
+        "id": "MedicationDispense.identifier:prescriptionID",
+        "path": "MedicationDispense.identifier",
+        "sliceName": "prescriptionID",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/ti/StructureDefinition/e-prescription-id"
+            ]
+          }
+        ],
+        "patternIdentifier": {
+          "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"
+        }
+      },
+      {
+        "id": "MedicationDispense.status",
+        "path": "MedicationDispense.status",
+        "short": "completed",
+        "fixedCode": "completed"
+      },
+      {
+        "id": "MedicationDispense.medication[x]",
+        "path": "MedicationDispense.medication[x]",
+        "definition": "The MedicationDispense references a medication which was dispensed",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Medication"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationDispense.performer",
+        "path": "MedicationDispense.performer",
+        "definition": "References a pracitioner role in order to state practitioner and organization information"
+      },
+      {
+        "id": "MedicationDispense.performer.actor",
+        "path": "MedicationDispense.performer.actor",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PractitionerRole"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationDispense.quantity",
+        "path": "MedicationDispense.quantity",
+        "short": "Number of dispensed packages/ units",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.quantity.value",
+        "path": "MedicationDispense.quantity.value",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.quantity.unit",
+        "path": "MedicationDispense.quantity.unit",
+        "mustSupport": true
+      },
+      {
+        "id": "MedicationDispense.whenPrepared",
+        "path": "MedicationDispense.whenPrepared",
+        "constraint": [
+          {
+            "key": "erp-eu-abgabeDatumsFormat",
+            "human": "Wert muss ein Datum in der Form: YYYY-MM-DD sein.",
+            "source": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_MedicationDispense",
+            "severity": "error",
+            "expression": "toString().length()=10"
+          }
+        ]
+      },
+      {
+        "id": "MedicationDispense.whenHandedOver",
+        "path": "MedicationDispense.whenHandedOver",
+        "constraint": [
+          {
+            "key": "erp-eu-abgabeDatumsFormat",
+            "human": "Wert muss ein Datum in der Form: YYYY-MM-DD sein.",
+            "source": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_MedicationDispense",
+            "severity": "error",
+            "expression": "toString().length()=10"
+          }
+        ]
+      },
+      {
+        "id": "MedicationDispense.substitution.wasSubstituted",
+        "path": "MedicationDispense.substitution.wasSubstituted",
+        "short": "Indicates whether a substitution was made on the dispensed medication",
+        "mustSupport": true
+      }
+    ]
+  }
+}

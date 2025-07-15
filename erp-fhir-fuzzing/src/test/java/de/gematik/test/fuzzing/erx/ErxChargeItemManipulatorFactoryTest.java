@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.fuzzing.erx;
@@ -22,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -76,7 +80,7 @@ class ErxChargeItemManipulatorFactoryTest extends ErpFhirBuildingTest {
             .getProfile()
             .get(0)
             .getValue()
-            .contains(ErpWorkflowStructDef.BINARY_12.getCanonicalUrl()));
+            .contains(ErpWorkflowStructDef.BINARY.getCanonicalUrl()));
   }
 
   @Test
@@ -93,7 +97,7 @@ class ErxChargeItemManipulatorFactoryTest extends ErpFhirBuildingTest {
             .getProfile()
             .get(0)
             .getValue()
-            .contains(ErpWorkflowStructDef.BINARY_12.getCanonicalUrl()));
+            .contains(ErpWorkflowStructDef.BINARY.getCanonicalUrl()));
   }
 
   @Test

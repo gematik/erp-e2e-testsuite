@@ -12,16 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItvEvdgaStructDef;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
@@ -52,6 +57,15 @@ public class ErxPrescriptionBundle extends Bundle {
         .findFirst();
   }
 
+  public Optional<KbvEvdgaBundle> getEvdgaBundle() {
+    return this.getEntry().stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(resource -> resource.getResourceType().equals(ResourceType.Bundle))
+        .filter(KbvItvEvdgaStructDef.BUNDLE::matches)
+        .map(KbvEvdgaBundle.class::cast)
+        .findFirst();
+  }
+
   /**
    * This receipt is only available if the Task is in status complete and this bundle was retrieved
    * by a pharmacy with a secret (A_19226)
@@ -62,11 +76,7 @@ public class ErxPrescriptionBundle extends Bundle {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Bundle))
-        .filter(
-            resource ->
-                WithSystem.anyOf(
-                        ErpWorkflowStructDef.RECEIPT, ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE)
-                    .matches(resource))
+        .filter(ErpWorkflowStructDef.GEM_ERP_PR_BUNDLE::matches)
         .map(ErxReceipt::fromBundle)
         .findFirst();
   }

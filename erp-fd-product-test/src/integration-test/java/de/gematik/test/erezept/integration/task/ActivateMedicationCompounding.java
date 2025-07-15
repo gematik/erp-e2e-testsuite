@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -38,7 +42,6 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
@@ -50,7 +53,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.ensure.Ensure;
 import org.junit.jupiter.api.DisplayName;
@@ -58,10 +60,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Valide PZN MedicationCompounding")
 public class ActivateMedicationCompounding extends ErpTest {
@@ -106,7 +106,7 @@ public class ActivateMedicationCompounding extends ErpTest {
         KbvErpMedicationCompoundingFaker.builder()
             .withMedicationIngredient(pzn, medicineName, freetext)
             .fake();
-    val assigner = KbvAssignerOrganizationFaker.builder().fake();
+
     val insurance =
         KbvCoverageFaker.builder().withInsuranceType(patient.getCoverageInsuranceType()).fake();
     val medicationRequest =
@@ -121,7 +121,6 @@ public class ActivateMedicationCompounding extends ErpTest {
     val kbvBundleBuilder =
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
             .patient(patient.getPatientData())
-            .assigner(assigner)
             .practitioner(doc.getPractitioner())
             .medicalOrganization(organisation)
             .medicationRequest(medicationRequest)

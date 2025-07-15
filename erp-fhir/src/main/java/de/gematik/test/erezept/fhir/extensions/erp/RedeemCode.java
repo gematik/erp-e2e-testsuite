@@ -12,20 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.erp;
 
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import lombok.*;
 import org.hl7.fhir.r4.model.Extension;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@EqualsAndHashCode
 public class RedeemCode {
 
   private final String value;
@@ -36,6 +38,15 @@ public class RedeemCode {
 
   public static RedeemCode from(String code) {
     return new RedeemCode(code);
+  }
+
+  public static RedeemCode from(Extension ex) {
+    val code = ex.getValue().castToString(ex.getValue()).getValue();
+    return from(code);
+  }
+
+  public static boolean matches(Extension ex) {
+    return ErpWorkflowStructDef.REDEEM_CODE.matches(ex);
   }
 
   public static RedeemCode random() {

@@ -1,0 +1,287 @@
+{
+  "resourceType": "Bundle",
+  "id": "d814ef26-f7e5-40b9-b5e1-da6c9a59de5e",
+  "type": "searchset",
+  "timestamp": "2025-06-24T09:15:27.758+00:00",
+  "total": 1797,
+  "link": [
+    {
+      "relation": "last",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&_sort=sent&_count=5&__offset=1795"
+    },
+    {
+      "relation": "first",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&_sort=sent&_count=5&__offset=0"
+    },
+    {
+      "relation": "next",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&_sort=sent&_count=5&__offset=5"
+    },
+    {
+      "relation": "self",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&_sort=sent&_count=5&__offset=0"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-83e2-9fc0-471f-12c70443747c",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebda7b-83e2-9fc0-471f-12c70443747c",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "/Task/160.000.006.901.203.31/$accept?ac=528cc05021c03d339b92c2e74082c4a53778dc76f628bf525366c81e328a5987"
+          }
+        ],
+        "status": "unknown",
+        "sent": "2025-03-18T13:13:13.432+00:00",
+        "received": "2025-03-18T13:13:24.000+00:00",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "https://gematik.de/fhir/sid/telematik-id",
+              "value": "3-SMC-B-Testkarte--883110000163973"
+            }
+          }
+        ],
+        "sender": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "payload": [
+          {
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"hint\":\"Nachricht Nr. 0 zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?\"}"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-83e4-fd38-02f5-04c661385d13",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebda7b-83e4-fd38-02f5-04c661385d13",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "/Task/160.000.006.901.203.31/$accept?ac=528cc05021c03d339b92c2e74082c4a53778dc76f628bf525366c81e328a5987"
+          }
+        ],
+        "status": "unknown",
+        "sent": "2025-03-18T13:13:13.587+00:00",
+        "received": "2025-03-18T13:13:24.000+00:00",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "https://gematik.de/fhir/sid/telematik-id",
+              "value": "3-SMC-B-Testkarte--883110000163973"
+            }
+          }
+        ],
+        "sender": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "payload": [
+          {
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"hint\":\"Nachricht Nr. 1 zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?\"}"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-83e7-2018-c6cb-cb77895b150b",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebda7b-83e7-2018-c6cb-cb77895b150b",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "/Task/160.000.006.901.203.31/$accept?ac=528cc05021c03d339b92c2e74082c4a53778dc76f628bf525366c81e328a5987"
+          }
+        ],
+        "status": "unknown",
+        "sent": "2025-03-18T13:13:13.727+00:00",
+        "received": "2025-03-18T13:13:24.000+00:00",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "https://gematik.de/fhir/sid/telematik-id",
+              "value": "3-SMC-B-Testkarte--883110000163973"
+            }
+          }
+        ],
+        "sender": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "payload": [
+          {
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"hint\":\"Nachricht Nr. 2 zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?\"}"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-83e9-5a68-5b27-e5f7c9b47d56",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebda7b-83e9-5a68-5b27-e5f7c9b47d56",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "/Task/160.000.006.901.203.31/$accept?ac=528cc05021c03d339b92c2e74082c4a53778dc76f628bf525366c81e328a5987"
+          }
+        ],
+        "status": "unknown",
+        "sent": "2025-03-18T13:13:13.873+00:00",
+        "received": "2025-03-18T13:13:24.000+00:00",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "https://gematik.de/fhir/sid/telematik-id",
+              "value": "3-SMC-B-Testkarte--883110000163973"
+            }
+          }
+        ],
+        "sender": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "payload": [
+          {
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"hint\":\"Nachricht Nr. 3 zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?\"}"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-83eb-b010-3d27-db01de37686d",
+      "resource": {
+        "resourceType": "Communication",
+        "id": "01ebda7b-83eb-b010-3d27-db01de37686d",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "/Task/160.000.006.901.203.31/$accept?ac=528cc05021c03d339b92c2e74082c4a53778dc76f628bf525366c81e328a5987"
+          }
+        ],
+        "status": "unknown",
+        "sent": "2025-03-18T13:13:14.026+00:00",
+        "received": "2025-03-18T13:13:24.000+00:00",
+        "recipient": [
+          {
+            "identifier": {
+              "system": "https://gematik.de/fhir/sid/telematik-id",
+              "value": "3-SMC-B-Testkarte--883110000163973"
+            }
+          }
+        ],
+        "sender": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "payload": [
+          {
+            "contentString": "{\"version\":1,\"supplyOptionsType\":\"onPremise\",\"hint\":\"Nachricht Nr. 4 zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?\"}"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "kbv.basis",
+  "version": "1.7.0",
+  "description": "KBV-Basis-Profile V 1.7.0",
+  "author": "KBV",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "jurisdiction": "urn:iso:std:iso:3166#DE",
+  "dependencies": {
+    "de.basisprofil.r4": "1.5.2",
+    "hl7.fhir.r4.core": "4.0.1"
+  }
+}

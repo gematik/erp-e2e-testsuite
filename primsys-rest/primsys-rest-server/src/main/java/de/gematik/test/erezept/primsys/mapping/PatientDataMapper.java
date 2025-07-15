@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
@@ -20,7 +24,6 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
@@ -46,20 +49,19 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
     ensure(dto::getCity, dto::setCity, GemFaker::fakerCity);
     ensure(dto::getPostal, dto::setPostal, GemFaker::fakerZipCode);
     ensure(dto::getStreet, dto::setStreet, GemFaker::fakerStreetName);
+
+    // this actually must be enforced beforehand, but to avoid NPEs we will ensure we have a KVNR
+    ensure(dto::getKvnr, dto::setKvnr, KVNR::randomStringValue);
   }
 
   @Override
   protected KbvPatient convertInternal() {
     // anyway, if no check was performed on the KVNR, we will still use a random one
-    val kvnr = hasKvnr() ? getKvnr() : KVNR.random();
     return KbvPatientBuilder.builder()
-        .kvnr(kvnr, getInsuranceKind())
+        .kvnr(getKvnr())
         .name(dto.getFirstName(), dto.getLastName())
         .birthDate(dto.getBirthDate())
         .address(Country.D, dto.getCity(), dto.getPostal(), dto.getStreet())
-        .assigner(
-            KbvAssignerOrganizationFaker.builder()
-                .fake()) // will only be used for GKV with old profiles
         .build();
   }
 
@@ -68,7 +70,8 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
   }
 
   private KVNR getKvnr() {
-    return KVNR.from(dto.getKvnr());
+    val insuranceType = InsuranceTypeDe.fromCode(dto.getInsuranceType().getCode());
+    return KVNR.from(dto.getKvnr(), insuranceType);
   }
 
   private InsuranceTypeDe getInsuranceKind() {
@@ -78,7 +81,7 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
   public static PatientDataMapper from(KbvPatient patient) {
     val dto = new PatientDto();
     dto.setKvnr(patient.getKvnr().getValue());
-    dto.setInsuranceType(InsuranceTypeDto.valueOf(patient.getInsuranceKind().getCode()));
+    dto.setInsuranceType(InsuranceTypeDto.valueOf(patient.getInsuranceType().getCode()));
 
     val humanName = patient.getNameFirstRep();
     dto.setFirstName(humanName.getGivenAsSingleString());

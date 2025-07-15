@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
@@ -23,9 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -45,23 +48,23 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildCloseOperationForDiGAMedicationDispense() {
-    val version = ErpWorkflowVersion.V1_4_0;
-
-    val medDispense = ErxMedicationDispenseDiGAFaker.builder().withVersion(version).fake();
+    val medDispense =
+        ErxMedicationDispenseDiGAFaker.builder()
+            .withVersion(ErpWorkflowVersion.getDefaultVersion())
+            .fake();
 
     val closeOperation =
         GemOperationInputParameterBuilder.forClosingDiGA()
             .with(medDispense)
-            .version(version)
+            .version(ErpWorkflowVersion.getDefaultVersion())
             .build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(closeOperation));
   }
 
   @Test
   void shouldBuildCloseOperationForMultipleDiGAMedicationDispense() {
-    val version = ErpWorkflowVersion.V1_4_0;
+    val version = ErpWorkflowVersion.V1_4;
 
     val medDispense = ErxMedicationDispenseDiGAFaker.builder().withVersion(version).fake();
     val medDispense2 = ErxMedicationDispenseDiGAFaker.builder().withVersion(version).fake();
@@ -73,39 +76,37 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
             .version(version)
             .build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(closeOperation));
   }
 
   @ParameterizedTest
   @MethodSource("pharmaceuticalsParameterBuilderProvider")
   void shouldBuildInputOperationParametersForPharmaceuticalMedicationDispense(
       Supplier<GemDispenseCloseOperationPharmaceuticalsBuilder<?>> builderSupplier) {
-    val version = ErpWorkflowVersion.V1_4_0;
+    val version = ErpWorkflowVersion.V1_4;
 
-    val medication = GemErpMedicationFaker.builder().withVersion(version).fake();
+    val medication = GemErpMedicationFaker.forPznMedication().withVersion(version).fake();
     val medDispense =
         ErxMedicationDispenseFaker.builder().withVersion(version).withMedication(medication).fake();
 
     val closeOperation =
         builderSupplier.get().version(version).with(medDispense, medication).build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(closeOperation));
   }
 
   @ParameterizedTest
   @MethodSource("pharmaceuticalsParameterBuilderProvider")
   void shouldBuildInputOperationParametersForSplittedPharmaceuticalMedicationDispense(
       Supplier<GemDispenseCloseOperationPharmaceuticalsBuilder<?>> builderSupplier) {
-    val version = ErpWorkflowVersion.V1_4_0;
+    val version = ErpWorkflowVersion.V1_4;
 
     val builder = builderSupplier.get();
 
     IntStream.range(0, 4)
         .forEach(
             i -> {
-              val medication = GemErpMedicationFaker.builder().withVersion(version).fake();
+              val medication = GemErpMedicationFaker.forPznMedication().withVersion(version).fake();
               val medDispense =
                   ErxMedicationDispenseFaker.builder()
                       .withVersion(version)
@@ -116,20 +117,17 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
             });
 
     val closeOperation = builder.version(version).build();
-
-    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(closeOperation));
   }
 
   @Test
   void shouldBuildEmptyCloseOperationForPharmaceuticals() {
-    val version = ErpWorkflowVersion.V1_4_0;
+    val version = ErpWorkflowVersion.getDefaultVersion();
 
     val closeOperation =
         GemOperationInputParameterBuilder.forClosingPharmaceuticals().version(version).build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(closeOperation));
   }
 
   @ParameterizedTest

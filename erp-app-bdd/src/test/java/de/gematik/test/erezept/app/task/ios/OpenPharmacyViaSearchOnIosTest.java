@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task.ios;
@@ -24,13 +28,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.PharmacySearch;
 import de.gematik.test.erezept.app.mobile.elements.PharmacySearch.SearchResultEntry;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.screenplay.abilities.ProvideApoVzdInformation;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -62,8 +67,9 @@ class OpenPharmacyViaSearchOnIosTest {
   @Test
   void shouldOpenPharmacySearchForPharmacyActor() {
     val pharmacy = OnStage.theActorCalled("Pharmacy");
-    val apoVzdName = "Pharmacy-TEST-ONLY";
-    pharmacy.can(ProvideApoVzdInformation.withName(apoVzdName));
+    val useSmcB = UseSMCB.itHasAccessTo(SmartcardArchive.fromResources().getSmcB(0));
+    val apoVzdName = useSmcB.getSmcB().getOwnerData().getCommonName();
+    pharmacy.can(useSmcB);
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
 
@@ -78,8 +84,9 @@ class OpenPharmacyViaSearchOnIosTest {
   @Test
   void shouldOpenPharmacySearchForPharmacyActorFromSearchScreen() {
     val pharmacy = OnStage.theActorCalled("Pharmacy");
-    val apoVzdName = "Pharmacy-TEST-ONLY";
-    pharmacy.can(ProvideApoVzdInformation.withName(apoVzdName));
+    val useSmcB = UseSMCB.itHasAccessTo(SmartcardArchive.fromResources().getSmcB(0));
+    val apoVzdName = useSmcB.getSmcB().getOwnerData().getCommonName();
+    pharmacy.can(useSmcB);
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
 

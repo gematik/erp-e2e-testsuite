@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
@@ -22,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -156,22 +159,10 @@ class MultiplePrescriptionExtensionTest extends ErpFhirBuildingTest {
         MultiplePrescriptionExtension.asMultiple(1, 4)
             .withId(MultiplePrescriptionIdExtension.invalidId())
             .withoutEndDate(false);
-    val ext = mvo.asExtension(KbvItaErpVersion.V1_1_0);
+    val ext = mvo.asExtension();
 
     val idExt = ext.getExtensionByUrl(MultiplePrescriptionIdExtension.URL);
     val mvoId = idExt.getValue().castToIdentifier(idExt.getValue()).getValue();
     assertTrue(mvoId.contains("13061707"));
-  }
-
-  @Test
-  void shouldIgnoreIdOnOldProfiles() {
-    val mvo =
-        MultiplePrescriptionExtension.asMultiple(1, 4)
-            .withId(MultiplePrescriptionIdExtension.invalidId())
-            .withoutEndDate(false);
-    val ext = mvo.asExtension(KbvItaErpVersion.V1_0_2);
-
-    val idExt = ext.getExtensionByUrl(MultiplePrescriptionIdExtension.URL);
-    assertNull(idExt);
   }
 }

@@ -12,16 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.testutil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -37,43 +41,22 @@ public class VersionArgumentProvider {
    * @return ErpWorkflowVersion.V1_2_0, ErpWorkflowVersion.V1_3_0
    */
   public static Stream<Arguments> erpFhirProfileVersions() {
-    // TODO: get rid of the support for building 1.1.1 profiles
-    //    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
-    return Stream.of(
-        //        Arguments.of("1.2.0"),
-        Arguments.of("1.3.0"), Arguments.of("1.4.0"));
-  }
 
-  public static Stream<Arguments> oldErpFhirProfileVersions() {
-    // TODO: get rid of the support for building 1.1.1 profiles   commanded out, until builder for
-    // gemMedication ist seperated ...
-    //    return Stream.of(Arguments.of("1.1.1"), Arguments.of("1.2.0"));
-    return Stream.of(Arguments.of("1.2.0"), Arguments.of("1.3.0"));
+    return Stream.of(Arguments.of("1.4.0"));
   }
 
   public static Stream<Arguments> erpWorkflowVersions() {
     return Arrays.stream(ErpWorkflowVersion.values())
-        .filter(v -> !v.equals(ErpWorkflowVersion.V1_1_1))
-        .map(Arguments::of);
-  }
-
-  public static Stream<Arguments> oldErpWorkflowVersions() {
-    return Arrays.stream(ErpWorkflowVersion.values())
-        .filter(v -> !v.equals(ErpWorkflowVersion.V1_1_1))
-        .filter(v -> !v.equals(ErpWorkflowVersion.V1_4_0))
+        .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
         .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaErpVersions() {
-    return Arrays.stream(KbvItaErpVersion.values())
-        //        .filter(v -> !v.equals(KbvItaErpVersion.V1_0_2))
-        .map(Arguments::of);
+    return Arrays.stream(KbvItaErpVersion.values()).map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaForVersions() {
-    return Arrays.stream(KbvItaForVersion.values())
-        //        .filter(v -> !v.equals(KbvItaForVersion.V1_0_3))
-        .map(Arguments::of);
+    return Arrays.stream(KbvItaForVersion.values()).map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvBundleVersions() {
@@ -86,8 +69,6 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> abdaErpPkvVersions() {
-    return Arrays.stream(AbdaErpPkvVersion.values())
-        .filter(v -> !v.equals(AbdaErpPkvVersion.V1_1_0)) // not supported!!
-        .map(Arguments::of);
+    return Arrays.stream(AbdaErpPkvVersion.values()).map(Arguments::of);
   }
 }

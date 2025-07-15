@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -19,10 +23,13 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
@@ -32,12 +39,11 @@ import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@Slf4j
 class KbvCoverageBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Coverage with KbvItaForVersion {0}")
@@ -61,8 +67,8 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
     assertTrue(result.isSuccessful());
 
     // check the getters here because we do not yet have static files for coverages
-    assertEquals(patient.getInsuranceKind(), coverage.getInsuranceKind());
-    assertEquals("101575519", coverage.getIknr().getValue());
+    assertEquals(patient.getInsuranceType(), coverage.getInsuranceKind());
+    assertEquals("101575519", coverage.getIknrOrThrow().getValue());
     assertEquals("Techniker Krankenkasse", coverage.getName());
     assertNotNull(coverage.getDescription());
   }
@@ -81,13 +87,13 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
             .dmpKennzeichen(DmpKennzeichen.ASTHMA)
             .wop(Wop.BERLIN)
             .versichertenStatus(VersichertenStatus.PENSIONER)
-            .versicherungsArt(PayorType.UK)
+            .insuranceType(PayorType.UK)
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
 
     // check the getters here because we do not yet have static files for coverages
-    assertEquals(tkCoverageInfo.getIknr(), coverage.getIknr().getValue());
+    assertEquals(tkCoverageInfo.getIknr(), coverage.getIknrOrThrow().getValue());
     assertTrue(coverage.getAlternativeIknr().isPresent());
     // alternative IKNR is always fixe by default for now!!
     assertEquals("121191241", coverage.getAlternativeIknr().get().getValue());
@@ -109,13 +115,13 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
             .dmpKennzeichen(DmpKennzeichen.ASTHMA)
             .wop(Wop.BERLIN)
             .versichertenStatus(VersichertenStatus.PENSIONER)
-            .versicherungsArt(PayorType.SKT)
+            .insuranceType(PayorType.SKT)
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
 
     // check the getters here because we do not yet have static files for coverages
-    assertEquals(tkCoverageInfo.getIknr(), coverage.getIknr().getValue());
+    assertEquals(tkCoverageInfo.getIknr(), coverage.getIknrOrThrow().getValue());
     assertFalse(coverage.getAlternativeIknr().isPresent());
     assertEquals(tkCoverageInfo.getName(), coverage.getName());
     assertNotNull(coverage.getDescription());
@@ -142,10 +148,16 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
           for (var i = 0; i < 2; i++) {
             val coverage =
                 KbvCoverageFaker.builder().withInsuranceType(ik).withVersion(version).fake();
-            log.trace("Validating Faker Coverage with ID {}", coverage.getId());
             val result = ValidatorUtil.encodeAndValidate(parser, coverage);
             assertTrue(result.isSuccessful());
           }
         });
+  }
+
+  @Test
+  void shouldNotAllowArgeIknrs() {
+    val argeIknr = IKNR.asArgeIknr("123123123");
+    assertThrows(
+        BuilderException.class, () -> KbvCoverageBuilder.insurance(argeIknr, "Insurance Name"));
   }
 }

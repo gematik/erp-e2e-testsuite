@@ -12,28 +12,39 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.client.rest.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.r4.erp.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import java.util.Map;
+import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Resource;
+import org.junit.jupiter.api.Test;
 
 class TaskAbortTest {
+
   @Test
   void shouldPerformCorrectCommandAsPatient() {
     val useErpClient = mock(UseTheErpClient.class);
@@ -61,11 +72,8 @@ class TaskAbortTest {
     val erxTask = new ErxTask();
     erxTask.setId("123");
 
-    Identifier accessCodeIdentifier =
-        new Identifier()
-            .setSystem("https://gematik.de/fhir/NamingSystem/AccessCode")
-            .setValue("456");
-    erxTask.addIdentifier(accessCodeIdentifier);
+    val accessCode = AccessCode.random();
+    erxTask.addIdentifier(accessCode.asIdentifier());
 
     val mockResponse =
         ErpResponse.forPayload(createOperationOutcome(), Resource.class)
@@ -85,12 +93,7 @@ class TaskAbortTest {
 
     val erxTask = new ErxTask();
     erxTask.setId("456");
-
-    Identifier secretIdentifier = new Identifier();
-    secretIdentifier.setSystem(ErpWorkflowNamingSystem.SECRET.getCanonicalUrl());
-    secretIdentifier.setValue("some-secret");
-
-    erxTask.addIdentifier(secretIdentifier);
+    erxTask.addIdentifier(Secret.random().asIdentifier());
 
     val mockResponse =
         ErpResponse.forPayload(createOperationOutcome(), Resource.class)

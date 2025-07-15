@@ -12,23 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.abilities;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
-import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.exceptions.FhirValidationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
@@ -55,10 +53,11 @@ class UseTheEpaMockClientTest extends ErpFhirBuildingTest {
     val prescriptionId = PrescriptionId.random();
     val body =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/medication/ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json");
+            "fhir/valid/parameters/Parameters-example-epa-op-provide-prescription-erp-input-parameters-1.json");
 
-    val bRequest = new HttpBRequest(HttpRequestMethod.GET, "provide-prescription-erp", body);
-    val mockErpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
+    val bRequest = HttpBRequest.get().urlPath("provide-prescription-erp").withPayload(body);
+    val mockErpEmlLog =
+        new ErpEmlLog(1L, "", "", bRequest, HttpBResponse.status(200).withoutPayload());
 
     when(mockClientMock.pollRequest(
             any(EpaMockDownloadRequest.class), eq("provide-prescription-erp")))
@@ -79,8 +78,8 @@ class UseTheEpaMockClientTest extends ErpFhirBuildingTest {
         ResourceLoader.readFileFromResource(
             "fhir/invalid/medication/dispensation/MissingAmountExtension.json");
 
-    val bRequest = new HttpBRequest(HttpRequestMethod.GET, "provide-dispensation-erp", body);
-    val erpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
+    val bRequest = HttpBRequest.get().urlPath("provide-dispensation-erp").withPayload(body);
+    val erpEmlLog = new ErpEmlLog(1L, "", "", bRequest, HttpBResponse.status(200).withoutPayload());
 
     when(mockClientMock.pollRequest(
             any(EpaMockDownloadRequest.class), eq("provide-dispensation-erp")))
@@ -98,10 +97,11 @@ class UseTheEpaMockClientTest extends ErpFhirBuildingTest {
     val prescriptionId = PrescriptionId.random();
     val body =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/medication/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json");
+            "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json");
 
-    val bRequest = new HttpBRequest(HttpRequestMethod.GET, "provide-dispensation-erp", body);
-    val mockErpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
+    val bRequest = HttpBRequest.get().urlPath("provide-dispensation-erp").withPayload(body);
+    val mockErpEmlLog =
+        new ErpEmlLog(1L, "", "", bRequest, HttpBResponse.status(200).withoutPayload());
     when(mockClientMock.pollRequest(
             any(EpaMockDownloadRequest.class), eq("provide-dispensation-erp")))
         .thenReturn(List.of(mockErpEmlLog));
@@ -119,10 +119,11 @@ class UseTheEpaMockClientTest extends ErpFhirBuildingTest {
     val prescriptionId = PrescriptionId.random();
     val body =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/medication/Parameters-example-epa-op-cancel-prescription-erp-input-parameters-1.json");
+            "fhir/valid/parameters/Parameters-example-epa-op-cancel-prescription-erp-input-parameters-1.json");
 
-    val bRequest = new HttpBRequest(HttpRequestMethod.GET, "cancel-prescription-erp", body);
-    val mockErpEmlLog = new ErpEmlLog(1L, "", "", bRequest, new HttpBResponse(200, List.of()));
+    val bRequest = HttpBRequest.get().urlPath("cancel-prescription-erp").withPayload(body);
+    val mockErpEmlLog =
+        new ErpEmlLog(1L, "", "", bRequest, HttpBResponse.status(200).withoutPayload());
 
     when(mockClientMock.pollRequest(
             any(EpaMockDownloadRequest.class), eq("cancel-prescription-erp")))

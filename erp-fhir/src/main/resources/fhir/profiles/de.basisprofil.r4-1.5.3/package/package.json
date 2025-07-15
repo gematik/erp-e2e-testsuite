@@ -1,0 +1,13 @@
+{
+  "name": "de.basisprofil.r4",
+  "version": "1.5.3",
+  "description": "v1.5.3 - 18.03.25\r\n* `fixed` die in den Vitalparametern genutzten, optionalen, SnomedCT-VS enthielten nicht alle benötigten Konzepte, fehlende Konzepte wurden ergänzt",
+  "author": "HL7 Deutschland",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1"
+  },
+  "jurisdiction": "urn:iso:std:iso:3166#DE"
+}

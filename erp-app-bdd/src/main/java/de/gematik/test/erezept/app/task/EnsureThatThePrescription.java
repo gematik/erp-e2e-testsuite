@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task;
@@ -22,13 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
@@ -87,7 +91,7 @@ public class EnsureThatThePrescription implements Task {
     val medication = kbvBundle.getMedication();
     val medicationRequest = kbvBundle.getMedicationRequest();
 
-    app.scrollIntoView(ScrollDirection.UP, PrescriptionDetails.PRESCRIPTION_TITLE);
+    app.swipeIntoView(SwipeDirection.DOWN, PrescriptionDetails.PRESCRIPTION_TITLE);
     val actualTitle = app.getText(PrescriptionDetails.PRESCRIPTION_TITLE);
     assertEquals(medication.getMedicationName(), actualTitle);
 

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier;
@@ -26,7 +30,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -48,7 +52,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
   ErxTaskBundle bundle =
       getDecodedFromPath(
           ErxTaskBundle.class,
-          "fhir/valid/erp/1.3.0/taskbundlesearchset/5ea6b34e-d05d-42e1-815d-5b44f2eb49fe.json");
+          "fhir/valid/erp/1.4.0/taskBundle/erpFdResponse_manipulatedToOneEntry.json");
 
   @BeforeEach
   void setupReporter() {
@@ -127,7 +131,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldValidateAuthoredOnDateCorrectInSearchSetBundles() {
-    val step = authoredOnDateIsEqual(LocalDate.of(2024, Month.JULY, 25));
+    val step = authoredOnDateIsEqual(LocalDate.of(2024, Month.NOVEMBER, 25));
     assertDoesNotThrow(() -> step.apply(bundle));
   }
 
@@ -139,7 +143,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowWileValidateAuthoredOnDateCorrectInSearchSetBundles() {
-    val testDate = LocalDate.of(2024, Month.JULY, 25);
+    val testDate = LocalDate.of(2024, Month.NOVEMBER, 25);
     val step =
         verifyAuthoredOnDateWithPredicate(
             ld -> !ld.isEqual(testDate),

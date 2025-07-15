@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
@@ -21,7 +25,6 @@ import static java.text.MessageFormat.format;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 
@@ -34,8 +37,7 @@ public class MultiplePrescriptionIdExtension {
   private final String idSystem;
 
   private Identifier asIdentifier() {
-    val urnIdentifier = format("urn:uuid:{0}", idValue);
-    return new Identifier().setSystem(idSystem).setValue(urnIdentifier);
+    return new Identifier().setSystem(idSystem).setValue(idValue);
   }
 
   public Extension asExtension() {
@@ -55,6 +57,10 @@ public class MultiplePrescriptionIdExtension {
   }
 
   public static MultiplePrescriptionIdExtension with(String id, String system) {
-    return new MultiplePrescriptionIdExtension(id, system);
+    var urnIdentifier = id;
+    if (!urnIdentifier.startsWith("urn:uuid:")) {
+      urnIdentifier = format("urn:uuid:{0}", urnIdentifier);
+    }
+    return new MultiplePrescriptionIdExtension(urnIdentifier, system);
   }
 }

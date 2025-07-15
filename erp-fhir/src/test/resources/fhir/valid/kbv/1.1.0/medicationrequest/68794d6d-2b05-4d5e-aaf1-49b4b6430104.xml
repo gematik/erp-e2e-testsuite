@@ -1,0 +1,76 @@
+<MedicationRequest xmlns="http://hl7.org/fhir">
+  <!--Beispiel MedicationRequest für eine PZN-Verordnung -->
+  <id value="68794d6d-2b05-4d5e-aaf1-49b4b6430104" />
+  <meta>
+    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.1.0" />
+  </meta>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_StatusCoPayment">
+    <valueCoding>
+      <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_StatusCoPayment" />
+      <code value="0" />
+    </valueCoding>
+  </extension>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee">
+    <valueBoolean value="false" />
+  </extension>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_BVG">
+    <valueBoolean value="false" />
+  </extension>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription">
+    <extension url="Kennzeichen">
+      <valueBoolean value="true" />
+    </extension>
+    <extension url="Nummerierung">
+      <valueRatio>
+        <numerator>
+          <value value="2" />
+        </numerator>
+        <denominator>
+          <value value="4" />
+        </denominator>
+      </valueRatio>
+    </extension>
+    <extension url="Zeitraum">
+      <valuePeriod>
+        <start value="2022-06-15" />
+        <end value="2022-09-30" />
+      </valuePeriod>
+    </extension>
+    <extension url="ID">
+      <valueIdentifier>
+        <system value="urn:ietf:rfc:3986" />
+        <value value="urn:uuid:24e2e10d-e962-4d1c-be4f-8760e690a5f0" />
+      </valueIdentifier>
+    </extension>
+  </extension>
+  <status value="active" />
+  <intent value="order" />
+  <medicationReference>
+    <reference value="Medication/07c10a67-2ece-4d5d-9394-633e07c9656d" />
+  </medicationReference>
+  <subject>
+    <reference value="Patient/ce4104af-b86b-4664-afee-1b5fc3ac8acf" />
+  </subject>
+  <authoredOn value="2022-05-20" />
+  <requester>
+    <reference value="Practitioner/667ffd79-42a3-4002-b7ca-6b9098f20ccb" />
+  </requester>
+  <insurance>
+    <reference value="Coverage/da80211e-61ee-458e-a651-87370b6ec30c" />
+  </insurance>
+  <dosageInstruction>
+    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag">
+      <valueBoolean value="false" />
+    </extension>
+  </dosageInstruction>
+  <dispenseRequest>
+    <quantity>
+      <value value="1" />
+      <system value="http://unitsofmeasure.org" />
+      <code value="{Package}" />
+    </quantity>
+  </dispenseRequest>
+  <substitution>
+    <allowedBoolean value="false" />
+  </substitution>
+</MedicationRequest>

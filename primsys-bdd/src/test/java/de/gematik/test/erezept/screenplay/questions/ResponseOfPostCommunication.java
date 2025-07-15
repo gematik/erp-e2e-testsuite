@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -34,6 +38,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
@@ -69,6 +74,10 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
   }
 
   public static Builder dispenseRequest() {
+    return new Builder(CommunicationType.DISP_REQ);
+  }
+
+  public static Builder dispenseDiGARequest() {
     return new Builder(CommunicationType.DISP_REQ);
   }
 
@@ -183,14 +192,25 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     val dmc = builder.basedOnDequeStrategy.chooseFrom(dmcAbility.getDmcs());
     val prescription = actor.asksFor(FullPrescriptionBundle.forTask(dmc.getTaskId()));
 
-    val message = new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, builder.message);
+    val flowType = prescription.getTask().getFlowType();
+    if (flowType == PrescriptionFlowType.FLOW_TYPE_162) {
 
-    val accessCode = prescription.getTask().getAccessCode();
-    return ErxCommunicationBuilder.forDispenseRequest(message)
-        .receiver(receiverId)
-        .basedOn(prescription.getTask().getTaskId(), accessCode)
-        .flowType(prescription.getTask().getFlowType())
-        .build();
+      val accessCode = prescription.getTask().getAccessCode();
+      return ErxCommunicationBuilder.forDiGADispenseRequest()
+          .receiver(receiverId)
+          .basedOn(prescription.getTask().getTaskId(), accessCode)
+          .flowType(prescription.getTask().getFlowType())
+          .build();
+    } else {
+      val message = new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, builder.message);
+
+      val accessCode = prescription.getTask().getAccessCode();
+      return ErxCommunicationBuilder.forDispenseRequest(message)
+          .receiver(receiverId)
+          .basedOn(prescription.getTask().getTaskId(), accessCode)
+          .flowType(prescription.getTask().getFlowType())
+          .build();
+    }
   }
 
   private ErxCommunication createRepresentativeCommunicationAs(Actor actor) {
@@ -388,6 +408,15 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
     public Builder receivedFrom(Actor sender) {
       this.receiver = sender;
       return this;
+    }
+
+    /**
+     * In case of a DiGA the message is forbidden
+     *
+     * @return ResponseOfPostCommunication
+     */
+    public ResponseOfPostCommunication withoutMessage() {
+      return new ResponseOfPostCommunication(this);
     }
 
     public ResponseOfPostCommunication withRandomMessage() {

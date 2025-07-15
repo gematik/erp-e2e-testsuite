@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -26,13 +30,11 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.hl7.fhir.r4.model.Resource;
 
-// todo check if ErxTaskBundle and ErxAcceptBundle are similar, if its true
-// this class and  TaskGetByICommand are similar, too!
+/**
+ * This command is used to retrieve the secret if this one gets lost (Task locked in status
+ * "in-progress").
+ */
 public class TaskGetByIdAsAcceptBundleCommand extends BaseCommand<ErxAcceptBundle> {
-
-  public TaskGetByIdAsAcceptBundleCommand(TaskId taskId) {
-    this(taskId, null, null);
-  }
 
   public TaskGetByIdAsAcceptBundleCommand(TaskId taskId, AccessCode accessCode) {
     this(taskId, accessCode, null);

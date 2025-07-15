@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -23,48 +27,41 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.val;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
 
 class KbvBasePatientTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/kbv/1.0.2/patient/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/patient/";
 
   @Test
   void encodeErwinFischer() {
-    val fileExtension = ".xml";
-    val fileName = "erwin_fleischer" + fileExtension;
+    val expectedID = "93866fdc-3e50-4902-a7e9-891b54737b5e";
+    val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val erwin = parser.decode(KbvPatient.class, content);
-    assertNotNull(erwin);
+    val patient = parser.decode(KbvPatient.class, content);
+    assertNotNull(patient);
 
-    val expectedID = "9774f67f-a238-4daf-b4e6-679deeef3811";
-    assertEquals(expectedID, erwin.getLogicalId());
+    assertEquals(expectedID, patient.getLogicalId());
+    assertTrue(patient.hasGkvKvnr());
+    val expectedGkvKvnr = "K220635158";
+    assertEquals(expectedGkvKvnr, patient.getGkvId().orElseThrow().getValue());
 
-    val expectedGender = Enumerations.AdministrativeGender.MALE;
-    assertEquals(expectedGender, erwin.getGender());
-
-    assertTrue(erwin.hasGkvKvnr());
-    val expectedGkvKvnr = "M234567890";
-    assertEquals(expectedGkvKvnr, erwin.getGkvId().orElseThrow().getValue());
-
-    assertEquals("Fleischer, Erwin", erwin.getFullname());
-    assertNotNull(erwin.getDescription());
+    assertEquals("Königsstein, Ludger", patient.getFullname());
+    assertNotNull(patient.getDescription());
   }
 
   @Test
   void shouldGetKbvPatientFromResource() {
-    val fileExtension = ".xml";
-    val fileName = "erwin_fleischer" + fileExtension;
+    val expectedID = "93866fdc-3e50-4902-a7e9-891b54737b5e";
+    val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val erwin = parser.decode(content);
-    assertNotNull(erwin);
-    assertEquals(Patient.class, erwin.getClass());
+    val patient = parser.decode(content);
+    assertNotNull(patient);
+    assertEquals(KbvPatient.class, patient.getClass());
 
-    val kbvPatient = KbvPatient.fromPatient(erwin);
+    val kbvPatient = KbvPatient.fromPatient(patient);
     assertNotNull(kbvPatient);
     assertEquals(KbvPatient.class, kbvPatient.getClass());
   }

@@ -1,0 +1,482 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Organization",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Organization",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet eine Einrichtung ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Organization",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Organization",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Organization",
+        "path": "Organization",
+        "definition": "Die Einrichtung beschreibt beispielsweise den Ort, an dem ein Kontakt zwischen der zu behandelnden Person und der leistungserbringenden Person stattfindet (z. B. Praxis). Diese kann aber auch eine rein 'fiktive' Organisation zur Abrechnung sein (z. B. IK-Organisation für Hebammen)."
+      },
+      {
+        "id": "Organization.extension",
+        "path": "Organization.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Organization.extension:ergaenzende_Angaben",
+        "path": "Organization.extension",
+        "sliceName": "ergaenzende_Angaben",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Additional_Comment"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.identifier",
+        "path": "Organization.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird der Identifikator für die Einrichtung angegeben."
+      },
+      {
+        "id": "Organization.identifier:Institutionskennzeichen",
+        "path": "Organization.identifier",
+        "sliceName": "Institutionskennzeichen",
+        "definition": "Die ARGE·IK vergibt und pflegt so genannte Institutionskennzeichen (IK). Das sind neunstellige Ziffernfolgen, hinter denen sich ein Datensatz verbirgt, auf dessen Grundlage der Zahlungsverkehr mit den leistungserbringenden Personen abgewickelt wird. Das Institutionskennzeichen (IK) ist ein eindeutiges Merkmal zur Abrechnung mit den Trägern der Sozialversicherung.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-iknr"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.identifier:Institutionskennzeichen.type",
+        "path": "Organization.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Institutionskennzeichen.type.coding",
+        "path": "Organization.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Organization.identifier:Institutionskennzeichen.type.coding.system",
+        "path": "Organization.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Institutionskennzeichen.type.coding.code",
+        "path": "Organization.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Institutionskennzeichen.type.coding.display",
+        "path": "Organization.identifier.type.coding.display",
+        "patternString": "Organization identifier"
+      },
+      {
+        "id": "Organization.identifier:Betriebsstaettennummer",
+        "path": "Organization.identifier",
+        "sliceName": "Betriebsstaettennummer",
+        "definition": "Jede Betriebsstätte und jede Nebenbetriebsstätte nach den Definitionen des Bundesmantelvertrages-Ärzte erhalten jeweils eine Betriebsstättennummer. Die Betriebsstättennummer ermöglicht die Zuordnung ärztlicher Leistungen zum Ort der Leistungserbringung. Die Betriebsstättennummer ist neunstellig. Die ersten beiden Ziffern stellen den KV-Landes- oder Bezirksstellenschlüssel gemäß Anlage 1 (Richtlinie der Kassenärztlichen Bundesvereinigung nach § 75 Absatz 7SGB V zur Vergabe der Arzt-, Betriebsstätten- sowie der Praxisnetznummern) dar (Ziffern 1-2). Die Ziffern drei bis neun werden von der KV vergeben (Ziffern 3-9). Dabei sind die Ziffern drei bis sieben so zu wählen, dass anhand der ersten sieben Stellen die Betriebsstätte eindeutig zu identifizieren ist.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-bsnr"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.identifier:Betriebsstaettennummer.type",
+        "path": "Organization.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Betriebsstaettennummer.type.coding",
+        "path": "Organization.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Organization.identifier:Betriebsstaettennummer.type.coding.system",
+        "path": "Organization.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Betriebsstaettennummer.type.coding.code",
+        "path": "Organization.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Betriebsstaettennummer.type.coding.display",
+        "path": "Organization.identifier.type.coding.display",
+        "patternString": "Primary physician office number"
+      },
+      {
+        "id": "Organization.identifier:VKNR",
+        "path": "Organization.identifier",
+        "sliceName": "VKNR",
+        "definition": "Die Vertragskassennummer der Kassenärztlichen Vereinigungen (VKNR) identifiziert Krankenkassen für Abrechnungszwecke. Rechtliche Grundlage hierfür ist § 15 der 1. Änderung des Vertrages über den Datenaustausch auf Datenträgern (Anlage 6 des Bundesmantelvertrages Ärzte vom 1. Juli 2018). Die VKNR ist wie folgt aufgebaut: 1. und 2. Stelle: Nummer der KV-Abrechnungsstelle; 3. bis 5. Stelle: Seriennummer der Krankenkasse innerhalb der Kassenart.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-vknr"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.identifier:VKNR.type",
+        "path": "Organization.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:VKNR.type.coding",
+        "path": "Organization.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Organization.identifier:VKNR.type.coding.system",
+        "path": "Organization.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:VKNR.type.coding.code",
+        "path": "Organization.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:VKNR.type.coding.display",
+        "path": "Organization.identifier.type.coding.display",
+        "patternString": "National Insurance Payor Identifier (Payor)"
+      },
+      {
+        "id": "Organization.identifier:KZV-Abrechnungsnummer",
+        "path": "Organization.identifier",
+        "sliceName": "KZV-Abrechnungsnummer",
+        "definition": "Zahnärztliche Primärsysteme verwenden zur Identifikation des zahnärztlichen Akteurs die folgende Bildungsregel: „0“ + KZV-Nr + Abrechnungsnummer der Zahnarztpraxis (ggf. ergänzt um eine oder mehrere führende Nullen). Bei der Konkatenation der Nummern muss nach der „0“ die KZV-Nummer des Akteurs an die Stellen 2-3 gesetzt werden (ggf. mit ihrer führenden Null), und an die Stellen 4-9 die 1-6-stellige Abrechnungsnummer der Zahnarztpraxis, wobei sie ggf. mit einer oder mehreren führenden Nullen aufgefüllt werden muss. Beispielresultat: „004006789“",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kzva"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.identifier:KZV-Abrechnungsnummer.type",
+        "path": "Organization.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:KZV-Abrechnungsnummer.type.coding",
+        "path": "Organization.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Organization.identifier:KZV-Abrechnungsnummer.type.coding.system",
+        "path": "Organization.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:KZV-Abrechnungsnummer.type.coding.code",
+        "path": "Organization.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:KZV-Abrechnungsnummer.type.coding.display",
+        "path": "Organization.identifier.type.coding.display",
+        "patternString": "KZVAbrechnungsnummer"
+      },
+      {
+        "id": "Organization.identifier:Telematik-ID",
+        "path": "Organization.identifier",
+        "sliceName": "Telematik-ID",
+        "definition": "Bei der Telematik-ID handelt es sich um eine eindeutige elektronische Identität von Leistungserbringenden und medizinischen Institutionen in der Telematik-Infrastruktur.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-telematik-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.identifier:Telematik-ID.type",
+        "path": "Organization.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Telematik-ID.type.coding",
+        "path": "Organization.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Organization.identifier:Telematik-ID.type.coding.system",
+        "path": "Organization.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Telematik-ID.type.coding.code",
+        "path": "Organization.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.identifier:Telematik-ID.type.coding.display",
+        "path": "Organization.identifier.type.coding.display",
+        "patternString": "Provider number"
+      },
+      {
+        "id": "Organization.type",
+        "path": "Organization.type",
+        "definition": "In diesem Element werden Angaben zum Typ der Einrichtung/Organisationseinheit gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Organization.type.coding",
+        "path": "Organization.type.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Organization.type.coding:IHE-Code",
+        "path": "Organization.type.coding",
+        "sliceName": "IHE-Code",
+        "definition": "Hier wird der Typus der Einrichtung anhand eines Codes aus dem Codesystem IHE Deutschland e.V. angegeben.",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://ihe-d.de/ValueSets/IHEXDShealthcareFacilityTypeCode"
+        }
+      },
+      {
+        "id": "Organization.type.coding:IHE-Code.system",
+        "path": "Organization.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:IHE-Code.version",
+        "path": "Organization.type.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:IHE-Code.code",
+        "path": "Organization.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:IHE-Code.display",
+        "path": "Organization.type.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe",
+        "path": "Organization.type.coding",
+        "sliceName": "HL7-Fachschluesselgruppe",
+        "definition": "Hier wird die Fachrichtung/Fachabteilung anhand eines Codes aus dem Codesystem 'Fachabteilungsschlüssel' der HL7 Basis Deutschland angegeben.",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://fhir.de/ValueSet/dkgev/Fachabteilungsschluessel"
+        }
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe.system",
+        "path": "Organization.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe.version",
+        "path": "Organization.type.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe.code",
+        "path": "Organization.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe.display",
+        "path": "Organization.type.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe-erweitert",
+        "path": "Organization.type.coding",
+        "sliceName": "HL7-Fachschluesselgruppe-erweitert",
+        "definition": "Hier wird die Fachrichtung/Fachabteilung anhand eines Codes aus dem Codesystem \"FachabteilungsschlüsselErweitert\" der HL7 Basis Deutschland angegeben.",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://fhir.de/ValueSet/dkgev/Fachabteilungsschluessel-erweitert"
+        }
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe-erweitert.system",
+        "path": "Organization.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe-erweitert.version",
+        "path": "Organization.type.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe-erweitert.code",
+        "path": "Organization.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.coding:HL7-Fachschluesselgruppe-erweitert.display",
+        "path": "Organization.type.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Organization.type.text",
+        "path": "Organization.type.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Organization.name",
+        "path": "Organization.name",
+        "definition": "Hier wird der Name der Einrichtung angegeben."
+      },
+      {
+        "id": "Organization.telecom",
+        "path": "Organization.telecom",
+        "type": [
+          {
+            "code": "ContactPoint",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Contactpoint"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.address",
+        "path": "Organization.address",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "In dieses Feld wird die Anschrift eingetragen."
+      },
+      {
+        "id": "Organization.address:Strassenanschrift",
+        "path": "Organization.address",
+        "sliceName": "Strassenanschrift",
+        "definition": "In dieses Element wird die Anschrift eingetragen.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Street_Address"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.address:Postfach",
+        "path": "Organization.address",
+        "sliceName": "Postfach",
+        "definition": "Hier werden Angaben zu einem Postfach gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Post_Office_Box"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Organization.partOf",
+        "path": "Organization.partOf",
+        "definition": "Hier wird die übergeordnete Einrichtung/Organisationseinheit referenziert, z.B. wenn es sich bei der hier betrachteten Einrichtung/Organisationseinheit um die Fachabteilung oder die Station eines Krankenhauses handelt."
+      },
+      {
+        "id": "Organization.contact",
+        "path": "Organization.contact",
+        "definition": "Dieses Element beschreibt die vorhandenen Kontaktmöglichkeiten."
+      },
+      {
+        "id": "Organization.contact.address.country",
+        "path": "Organization.contact.address.country",
+        "short": "Staat",
+        "definition": "Angabe des Staates als Länderkennzeichen nach DEUEV Anlage 8.",
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Deuev_Anlage_8"
+        }
+      }
+    ]
+  }
+}

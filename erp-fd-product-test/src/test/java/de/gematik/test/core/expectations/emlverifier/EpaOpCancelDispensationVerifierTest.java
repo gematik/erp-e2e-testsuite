@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.emlverifier;
@@ -46,12 +50,12 @@ class EpaOpCancelDispensationVerifierTest {
         fhir.decode(
             EpaOpCancelDispensation.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/Parameters-example-epa-op-cancel-dispensation-erp-input-parameters-1.json"));
+                "fhir/valid/parameters/Parameters-example-epa-op-cancel-dispensation-erp-input-parameters-1.json"));
   }
 
   @Test
   void emlPrescriptionIdSuccessTest() {
-    val expectedPrescriptionId = new PrescriptionId("160.153.303.257.459");
+    val expectedPrescriptionId = PrescriptionId.from("160.153.303.257.459");
     VerificationStep<EpaOpCancelDispensation> verificationStep =
         EpaOpCancelDispensationVerifier.emlPrescriptionIdIsEqualTo(expectedPrescriptionId);
 
@@ -60,7 +64,7 @@ class EpaOpCancelDispensationVerifierTest {
 
   @Test
   void emlPrescriptionIdFailureTest() {
-    val wrongPrescriptionId = new PrescriptionId("123456");
+    val wrongPrescriptionId = PrescriptionId.from("123456");
     VerificationStep<EpaOpCancelDispensation> verificationStep =
         EpaOpCancelDispensationVerifier.emlPrescriptionIdIsEqualTo(wrongPrescriptionId);
 

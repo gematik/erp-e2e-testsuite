@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.fuzzing.kbv;
@@ -26,12 +30,11 @@ import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.CommonNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
@@ -446,11 +449,6 @@ public class KbvBundleManipulatorFactory {
 
   public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
       getMedicationRequestManipulators() {
-    return getMedicationRequestManipulators(KbvItaErpVersion.getDefaultVersion());
-  }
-
-  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getMedicationRequestManipulators(
-      KbvItaErpVersion kbvItaErpVersion) {
     val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
 
     manipulators.add(
@@ -509,52 +507,35 @@ public class KbvBundleManipulatorFactory {
                   .setValue(Date.valueOf(LocalDate.now().plusDays(1)));
             }));
 
-    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
-      manipulators.add(
-          NamedEnvelope.of(
-              "MedicationRequest Quantity 1000",
-              b -> b.getMedicationRequest().getDispenseRequest().getQuantity().setValue(1000)));
-
-      manipulators.add(
-          NamedEnvelope.of(
-              "MedicationRequest DosageInstruction Text Length",
-              b ->
-                  b.getMedicationRequest()
-                      .getDosageInstructionFirstRep()
-                      .setText(
-                          "jeweils zu den Mahlzeiten und die Tablette 32 mal ordentlich"
-                              + " zerkauen")));
-    } else {
-      manipulators.add(
-          NamedEnvelope.of(
-              "MedicationRequest mit falscher Requester-Referenz",
-              b -> {
-                b.getMedicationRequestOptional()
-                    .ifPresent(
-                        mr ->
-                            mr.getRequester()
-                                .setReference(
-                                    format("Practitioner/{0}", UUID.randomUUID().toString())));
-                b.getSupplyRequest()
-                    .ifPresent(
-                        sr ->
-                            sr.getRequester()
-                                .setReference(
-                                    format("Practitioner/{0}", UUID.randomUUID().toString())));
-              }));
-      manipulators.add(
-          NamedEnvelope.of(
-              "MedicationRequest mit fehlender Ressource in der Requester-Referenz",
-              b -> {
-                val originalRef =
-                    b.getMedicationRequest().getRequester().getReference().split("/")[1];
-                b.getMedicationRequest().getRequester().setReference(originalRef);
-              }));
-      manipulators.add(
-          NamedEnvelope.of(
-              "MedicationRequest ohne Requester-Referenz",
-              b -> b.getMedicationRequest().setRequester(null)));
-    }
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest mit falscher Requester-Referenz",
+            b -> {
+              b.getMedicationRequestOptional()
+                  .ifPresent(
+                      mr ->
+                          mr.getRequester()
+                              .setReference(
+                                  format("Practitioner/{0}", UUID.randomUUID().toString())));
+              b.getSupplyRequest()
+                  .ifPresent(
+                      sr ->
+                          sr.getRequester()
+                              .setReference(
+                                  format("Practitioner/{0}", UUID.randomUUID().toString())));
+            }));
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest mit fehlender Ressource in der Requester-Referenz",
+            b -> {
+              val originalRef =
+                  b.getMedicationRequest().getRequester().getReference().split("/")[1];
+              b.getMedicationRequest().getRequester().setReference(originalRef);
+            }));
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest ohne Requester-Referenz",
+            b -> b.getMedicationRequest().setRequester(null)));
 
     return manipulators;
   }

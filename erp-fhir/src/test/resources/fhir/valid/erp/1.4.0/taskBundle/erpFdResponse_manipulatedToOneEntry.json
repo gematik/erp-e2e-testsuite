@@ -1,0 +1,89 @@
+{
+  "resourceType": "Bundle",
+  "id": "355c8a76-2439-4d75-8c03-4ca87bdb4d33",
+  "type": "searchset",
+  "timestamp": "2025-06-25T13:57:09.728+00:00",
+  "total": 36171,
+  "link": [
+    {
+      "relation": "last",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Task?_sort=authored-on&_count=1&__offset=36150"
+    },
+    {
+      "relation": "first",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Task?_sort=authored-on&_count=1&__offset=0"
+    },
+    {
+      "relation": "next",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Task?_sort=authored-on&_count=1&__offset=50"
+    },
+    {
+      "relation": "self",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Task?_sort=authored-on"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/Task/160.000.006.746.819.08",
+      "resource": {
+        "resourceType": "Task",
+        "id": "160.000.006.746.819.08",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate",
+            "valueDate": "2025-11-25"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate",
+            "valueDate": "2025-11-25"
+          }
+        ],
+        "identifier": [
+          {
+            "use": "official",
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "160.000.006.746.819.08"
+          }
+        ],
+        "status": "ready",
+        "intent": "order",
+        "for": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110614233"
+          }
+        },
+        "authoredOn": "2024-11-25T16:42:41.130+00:00",
+        "lastModified": "2024-11-25T16:42:41.472+00:00",
+        "performerType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_OrganizationType",
+                "code": "urn:oid:1.2.276.0.76.4.54",
+                "display": "Öffentliche Apotheke"
+              }
+            ],
+            "text": "Öffentliche Apotheke"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}

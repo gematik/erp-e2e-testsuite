@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -21,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -68,7 +72,7 @@ class KbvErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
   @Test
   void shouldFakeCorrectWithDrugNameAndConsumeDescription() {
     val drugName = "TestName";
-    val darreichung = "darreichungsform";
+    val darreichung = "kbvDdarreichungsform";
     val mI =
         KbvErpMedicationIngredientFaker.builder()
             .withDosageForm(darreichung)
@@ -92,8 +96,8 @@ class KbvErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .darreichungsform("10 Tropfen 1-0-1-0")
             .ingredientComponent("Tropfen")
             .build();
-    val result = ValidatorUtil.encodeAndValidate(parser, mI);
-    assertTrue(result.isSuccessful());
+
+    assertTrue(parser.isValid(mI));
     assertEquals(version, mI.getVersion());
     assertEquals("Tropfen", mI.getIngredientFirstRep().getStrength().getNumerator().getUnit());
   }
@@ -133,11 +137,11 @@ class KbvErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .drugName("fancyName")
             .darreichungsform("10 Tropfen 1-0-1-0")
             .ingredientComponent("Tropfen")
-            .normGroesse(StandardSize.NB)
+            .normGroesse(StandardSize.N1)
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, mI);
     assertTrue(result.isSuccessful());
-    assertEquals(StandardSize.NB, mI.getStandardSize());
+    assertEquals(StandardSize.N1, mI.getStandardSize());
   }
 
   @Test

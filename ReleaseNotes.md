@@ -1,21 +1,45 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.0.0
+
+* erp-fhir:
+    - add EuConsentBuilder for NCPeH
+    - add EuConsent Commands
+    - Remove FHIR profile view `1.1.1`
+    - add GemErpMedCompoundingBuilder and GemErpMedicationCompoundingFaker
+    - add GemErpMedicationIngredientBuilder and GemErpMedicationIngredientFaker
+    - add GemErpMedicationFreeTextBuilder and GemErpMedicationFreeTextFaker
+    - add GemErpMedicationCompoundingBuilder and GemErpMedicationCompoundingFaker
+    - add new FHIR profile version 1.5.2 for `de.gematik.erezept-workflow.r4`
+    - add new FHIR profile version 1.5.2 for `de.gematik.erezeptabgabe.r4`
+    - add new FHIR profile version 1.5.2 for `de.gematik.eps.r4`
+    - adapt builder and faker for KbvErpMedications to support new FHIR profile version 1.5.2
+    - reduce the FHIR profile version 1.3.0 for `de.gematik.erezept-workflow.r4`
+    - reduce the FHIR profile version 1.2.0 for `de.gematik.erezept-workflow.r4`
+    - reduce switches for FHIR profile version 1.3.0 and 1.2.0
+    - update erp-configuration to use ErpWorkFlowVersion 1.5.2 instead of 1.5.0
+    - add EuPatchTaskInputBuilder and TaskPatchCommand
+
+* primsys-bbd:
+    - for Workflow 162 add new FeatureFile for "diga_usecase" with Tasks and Questions
+
 ## Release 0.13.0
+
 * erp-eml:
     - adapt CheckEpaOpProvideDispensation to handle medicationDispenses in Profile 1.3.0 and 1.4.0
 * erp-fhir:
     - Update `de.abda.erezeptabgabedatenpkv` to version 1.3.0
 * erp-e2e:
     - Add new testcases for C_11881 and C_12143 (Feature Egk in der Apotheke)
-    - Add IssueDiGAPrescription for workflow 162 
+    - Add IssueDiGAPrescription for workflow 162
     - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
 * erp-fd-product-test:
     - Add new testcases C_12162 and C_12143 (Feature Egk in der Apotheke)
     - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
 * primsys-rest:
-  - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
+    - Add a new actor type for health insurers as a prerequisite for DiGA use cases.
 * smartcard:
-  - add two HBAs without TelematikId in QES Certificates.
+    - add two HBAs without TelematikId in QES Certificates.
 
 ## Release 0.10.0
 
@@ -25,15 +49,17 @@ Module:
     - MedicationDispense in ErpProfile version 1.4.0 is enabled in E2E scope while using gematik-Medication and
       ErpDispense in parameter structure
 * erp-fd-product-test:
-  - Adapted the TestSzenario to validate the availability of PUE and LYE
-  - Add toggle to activate Validation for PUE and LYE
-  - GemErpMedicationBuilder got a "from()" Method to map KbvMedications to GemErpMedication in types of: ingredient, compounding,
-    freetext and PZN. you´ll need it to transfer Medications from Version 1.3 and below up to 1.4.x
-  
+    - Adapted the TestSzenario to validate the availability of PUE and LYE
+    - Add toggle to activate Validation for PUE and LYE
+    - GemErpMedicationBuilder got a "from()" Method to map KbvMedications to GemErpMedication in types of: ingredient,
+      compounding,
+      freetext and PZN. you´ll need it to transfer Medications from Version 1.3 and below up to 1.4.x
+
 * erp-fhir:
-  - Extension of the key table "Darreichungsform" to include "PUE - Pulver zum Einnehmen" and "LYE - Lyophilisat zum Einnehmen"
+    - Extension of the key table "Darreichungsform" to include "PUE - Pulver zum Einnehmen" and "LYE - Lyophilisat zum
+      Einnehmen"
 * smartcard:
-  - Adding test identities for DIGA and Egk to the pharmacy
+    - Adding test identities for DIGA and Egk to the pharmacy
 
 ## Release 0.9.1
 

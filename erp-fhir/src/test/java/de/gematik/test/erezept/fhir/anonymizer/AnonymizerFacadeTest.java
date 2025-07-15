@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.anonymizer;
@@ -50,25 +54,13 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
   static Stream<Arguments> shouldAnonymizeCompleteBundle() {
     return Stream.of(
         Arguments.of(
-            "fhir/valid/kbv/1.0.2/bundle/sdf6s75f-d959-43f0-8ac4-sd6f7sd6.xml",
-            AnonymizationType.REPLACING,
-            new CharReplacementStrategy()),
-        Arguments.of(
             "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml",
             AnonymizationType.REPLACING,
-            new CharReplacementStrategy()),
-        Arguments.of(
-            "fhir/valid/kbv/1.0.2/bundle/sdf6s75f-d959-43f0-8ac4-sd6f7sd6.xml",
-            AnonymizationType.BLACKING,
             new CharReplacementStrategy()),
         Arguments.of(
             "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml",
             AnonymizationType.BLACKING,
             new CharReplacementStrategy()),
-        Arguments.of(
-            "fhir/valid/kbv/1.0.2/bundle/sdf6s75f-d959-43f0-8ac4-sd6f7sd6.xml",
-            AnonymizationType.REPLACING,
-            new BlackingStrategy()),
         Arguments.of(
             "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml",
             AnonymizationType.REPLACING,
@@ -106,11 +98,7 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "fhir/valid/kbv/1.0.2/bundle/sdf6s75f-d959-43f0-8ac4-sd6f7sd6.xml",
-        "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"
-      })
+  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"})
   void shouldAnonymizeWithoutFamilyNameExtensions(String path) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
@@ -129,11 +117,7 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "fhir/valid/kbv/1.0.2/bundle/15da065c-5b75-4acf-a2ba-1355de821d6e.xml",
-        "fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"
-      })
+  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"})
   void shouldAnonymizePractitioner(String path) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
@@ -147,10 +131,10 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
             .orElseThrow();
 
     val anonymizer = new AnonymizerFacade();
-    val originalANR = practitioner.getANR();
+    val originalANR = practitioner.getANR().orElseThrow();
 
     anonymizer.anonymize(practitioner);
-    val anonymizedANR = practitioner.getANR();
+    val anonymizedANR = practitioner.getANR().orElseThrow();
 
     assertNotEquals(originalANR.getValue(), anonymizedANR.getValue());
     assertEquals(originalANR.getValue().length(), anonymizedANR.getValue().length());

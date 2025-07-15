@@ -1,0 +1,239 @@
+{
+	"resourceType": "ValueSet",
+	"id": "1.2.276.0.76.11.71--20210706212636",
+	"meta": {
+		"profile": [
+			"http://hl7.org/fhir/StructureDefinition/shareablevalueset"
+		]
+	},
+	"extension": [
+		{
+			"url": "http://hl7.org/fhir/StructureDefinition/resource-effectivePeriod",
+			"valuePeriod": {
+				"start": "2021-07-06T21:26:36+01:00"
+			}
+		}
+	],
+	"url": "http://ihe-d.de/ValueSets/IHEXDSformatCodeINTL",
+	"identifier": [
+		{
+			"use": "official",
+			"system": "urn:ietf:rfc:3986",
+			"value": "urn:oid:1.2.276.0.76.11.71"
+		}
+	],
+	"version": "2021-07-06T21:26:36",
+	"name": "IHEXDSformatCodeINTL",
+	"title": "IHEXDS formatCode (Intl)",
+	"status": "active",
+	"experimental": false,
+	"publisher": "IHE Deutschland e.V.",
+	"description": "**IHE Format Codes**\r\nThis value set lists the format codes used by the IHE Profiles specified in the PCC Technical Framework, and also lists, for reference purposes the same values for other selected IHE Profiles from other committees.",
+	"immutable": false,
+	"compose": {
+		"include": [
+			{
+				"system": "urn:dicom:uid",
+				"concept": [
+					{
+						"code": "1.2.840.10008.5.1.4.1.1.88.59",
+						"display": "DICOM Manifest (DICOM KOS SOP Class UID)"
+					}
+				]
+			},
+			{
+				"system": "http://ihe.net/fhir/ihe.formatcode.fhir/CodeSystem/formatcode",
+				"concept": [
+					{
+						"code": "urn:ihe:pcc:xds-ms:2007",
+						"display": "Medical Summaries (XDS-MS)"
+					},
+					{
+						"code": "urn:ihe:pcc:xphr:2007",
+						"display": "Exchange of Personal Health Records (XPHR)"
+					},
+					{
+						"code": "urn:ihe:pcc:edr:2007",
+						"display": "Emergency Department Referral (EDR)"
+					},
+					{
+						"code": "urn:ihe:pcc:aps:2007",
+						"display": "Antepartum Summary (APS)"
+					},
+					{
+						"code": "urn:ihe:pcc:edes:2007",
+						"display": "Emergency Department Encounter Summary (EDES)"
+					},
+					{
+						"code": "urn:ihe:pcc:aphp:2008",
+						"display": "Antepartum History and Physical (APHP)"
+					},
+					{
+						"code": "urn:ihe:pcc:apl:2008",
+						"display": "Antepartum Laboratory (APL)"
+					},
+					{
+						"code": "urn:ihe:pcc:ape:2008",
+						"display": "Antepartum Education (APE)"
+					},
+					{
+						"code": "urn:ihe:pcc:ic:2009",
+						"display": "Immunization Content (IC)"
+					},
+					{
+						"code": "urn:ihe:pcc:cm:2008",
+						"display": "Care Management (CM)"
+					},
+					{
+						"code": "urn:ihe:pcc:tn:2007",
+						"display": "??? (urn:ihe:pcc:tn:2007)"
+					},
+					{
+						"code": "urn:ihe:pcc:nn:2007",
+						"display": "??? (urn:ihe:pcc:nn:2007)"
+					},
+					{
+						"code": "urn:ihe:pcc:ctn:2007",
+						"display": "??? (urn:ihe:pcc:ctn:2007)"
+					},
+					{
+						"code": "urn:ihe:pcc:edpn:2007",
+						"display": "??? (urn:ihe:pcc:edpn:2007)"
+					},
+					{
+						"code": "urn:ihe:pcc:hp:2008",
+						"display": "??? (urn:ihe:pcc:hp:2008)"
+					},
+					{
+						"code": "urn:ihe:pcc:ldhp:2009",
+						"display": "??? (urn:ihe:pcc:ldhp:2009)"
+					},
+					{
+						"code": "urn:ihe:pcc:lds:2009",
+						"display": "??? (urn:ihe:pcc:lds:2009)"
+					},
+					{
+						"code": "urn:ihe:pcc:mds:2009",
+						"display": "??? (urn:ihe:pcc:mds:2009)"
+					},
+					{
+						"code": "urn:ihe:pcc:nds:2010",
+						"display": "??? (urn:ihe:pcc:nds:2010)"
+					},
+					{
+						"code": "urn:ihe:pcc:ppvs:2010",
+						"display": "??? (urn:ihe:pcc:ppvs:2010)"
+					},
+					{
+						"code": "urn:ihe:pcc:trs:2011",
+						"display": "??? (urn:ihe:pcc:trs:2011)"
+					},
+					{
+						"code": "urn:ihe:pcc:ets:2011",
+						"display": "??? (urn:ihe:pcc:ets:2011)"
+					},
+					{
+						"code": "urn:ihe:pcc:its:2011",
+						"display": "??? (urn:ihe:pcc:its:2011)"
+					},
+					{
+						"code": "urn:ihe:iti:xds-sd:pdf:2008",
+						"display": "Scanned Documents (PDF)"
+					},
+					{
+						"code": "urn:ihe:iti:xds-sd:text:2008",
+						"display": "Scanned Documents (text)"
+					},
+					{
+						"code": "urn:ihe:iti:bppc:2007",
+						"display": "Basic Patient Privacy Consents"
+					},
+					{
+						"code": "urn:ihe:iti:bppc-sd:2007",
+						"display": "Basic Patient Privacy Consents with Scanned Document"
+					},
+					{
+						"code": "urn:ihe:iti:appc:2016:consent",
+						"display": "APPC Privacy Consent Document"
+					},
+					{
+						"code": "urn:ihe:iti:xdw:2011:workflowDoc",
+						"display": "XDW Workflow Document"
+					},
+					{
+						"code": "urn:ihe:iti:dsg:detached:2014",
+						"display": "DSG Detached Document"
+					},
+					{
+						"code": "urn:ihe:iti:dsg:enveloping:2014",
+						"display": "DSG Enveloping Document"
+					},
+					{
+						"code": "urn:ihe:lab:xd-lab:2008",
+						"display": "CDA Laboratory Report"
+					},
+					{
+						"code": "urn:ihe:rad:TEXT",
+						"display": "XDS-I CDA Wrapped Text Report (XDS-I)"
+					},
+					{
+						"code": "urn:ihe:rad:PDF",
+						"display": "XDS-I PDF (XDS-I)"
+					},
+					{
+						"code": "urn:ihe:rad:CDA:ImagingReportStructuredHeadings:2013",
+						"display": "XDS-I Imaging Report with Structured Headings (XDS-I)"
+					},
+					{
+						"code": "urn:ihe:card:CRC:2012",
+						"display": "Cardiology ??? (CRC)"
+					},
+					{
+						"code": "urn:ihe:card:EPRC-IE:2014",
+						"display": "Cardiology ??? (EPRC-IE)"
+					},
+					{
+						"code": "urn:ihe:card:imaging:2011",
+						"display": "Cardiac Imaging Report"
+					},
+					{
+						"code": "urn:ihe:dent:TEXT",
+						"display": "Dental CDA Wrapped Text Report (DENT)"
+					},
+					{
+						"code": "urn:ihe:dent:PDF",
+						"display": "Dental PDF (DENT)"
+					},
+					{
+						"code": "urn:ihe:dent:CDA:ImagingReportStructuredHeadings:2013",
+						"display": "Dental Imaging Report with Structured Headings (DENT)"
+					},
+					{
+						"code": "urn:ihe:palm:apsr:2016",
+						"display": "Anatomic Pathology Structured Report (APSR)"
+					},
+					{
+						"code": "urn:ihe:pharm:pre:2010",
+						"display": "Pharmacy ??? (urn:ihe:pharm:pre:2010)"
+					},
+					{
+						"code": "urn:ihe:pharm:padv:2010",
+						"display": "Pharmacy ??? (urn:ihe:pharm:padv:2010)"
+					},
+					{
+						"code": "urn:ihe:pharm:dis:2010",
+						"display": "Pharmacy ??? (urn:ihe:pharm:dis:2010)"
+					},
+					{
+						"code": "urn:ihe:pharm:pml:2013",
+						"display": "Pharmacy ??? (urn:ihe:pharm:pml:2013)"
+					},
+					{
+						"code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+						"display": "Format aus MIME Type ableitbar"
+					}
+				]
+			}
+		]
+	}
+}

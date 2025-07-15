@@ -12,19 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.StringType;
 
 public class ErxComReplyBuilder extends ErxComPrescriptionBuilder<ErxComReplyBuilder> {
 
@@ -34,34 +39,32 @@ public class ErxComReplyBuilder extends ErxComPrescriptionBuilder<ErxComReplyBui
 
   @Override
   public ErxCommunication build() {
-    val type = CommunicationType.REPLY;
-    ErxCommunication com;
-    ErpWorkflowStructDef availabilityStatusStructDef;
-    ErpWorkflowCodeSystem availabilityCodeSystem;
-    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      com = buildCommon(type, () -> type.getType().asCanonicalType());
-      availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS;
-      availabilityCodeSystem = ErpWorkflowCodeSystem.AVAILABILITY_STATUS;
-    } else {
-      com =
-          buildCommon(
-              type, () -> ErpWorkflowStructDef.COM_REPLY_12.asCanonicalType(erpWorkflowVersion));
-      availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS_12;
-      availabilityCodeSystem = ErpWorkflowCodeSystem.AVAILABILITY_STATUS_12;
-    }
+    val flowTypeDiGA =
+        Optional.ofNullable(this.flowType)
+            .map(ft -> ft.equals(PrescriptionFlowType.FLOW_TYPE_162))
+            .orElse(false);
+    val useDiGAProfile = flowTypeDiGA && erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) > 0;
+    val com =
+        buildCommon(
+            CommunicationType.REPLY,
+            () ->
+                useDiGAProfile
+                    ? ErpWorkflowStructDef.GEM_DIGA.asCanonicalType(erpWorkflowVersion)
+                    : ErpWorkflowStructDef.COM_REPLY.asCanonicalType(erpWorkflowVersion));
 
     val payload = com.getPayloadFirstRep();
+
+    payload.setContent(new StringType(message));
 
     Optional.ofNullable(availabilityStatus)
         .ifPresent(
             as -> {
-              val ext =
-                  availabilityStatusStructDef.asExtension(
-                      availabilityStatus.asCoding(availabilityCodeSystem));
+              val availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS;
+              val ext = availabilityStatusStructDef.asExtension(availabilityStatus.asCoding());
               payload.addExtension(ext);
             });
 
-    payload.addExtension(supplyOptionsType.asExtension(erpWorkflowVersion));
+    payload.addExtension(supplyOptionsType.asExtension());
     com.setBasedOn(List.of(new Reference(baseOnReference)));
 
     return com;

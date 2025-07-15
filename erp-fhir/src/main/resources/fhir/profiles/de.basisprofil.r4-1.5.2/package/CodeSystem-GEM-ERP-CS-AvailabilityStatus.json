@@ -1,0 +1,52 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GEM_ERP_CS_AvailabilityStatus",
+  "id": "GEM-ERP-CS-AvailabilityStatus",
+  "title": "CodeSystem of AvailabilityStatus",
+  "description": "Type of the availability status for medication availability request.",
+  "version": "1.5.2",
+  "url": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_AvailabilityStatus",
+  "concept": [
+    {
+      "code": "10",
+      "display": "sofort verfügbar"
+    },
+    {
+      "code": "20",
+      "display": "noch Heute verfügbar"
+    },
+    {
+      "code": "30",
+      "display": "am nächsten Werktag - vormittags"
+    },
+    {
+      "code": "40",
+      "display": "am nächsten Werktag- nachmittags"
+    },
+    {
+      "code": "50",
+      "display": "nicht verfügbar"
+    },
+    {
+      "code": "90",
+      "display": "unbekannt"
+    }
+  ],
+  "date": "2025-06-23",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 6
+}

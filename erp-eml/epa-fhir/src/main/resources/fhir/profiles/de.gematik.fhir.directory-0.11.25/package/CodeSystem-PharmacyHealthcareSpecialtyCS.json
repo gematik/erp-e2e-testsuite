@@ -1,0 +1,38 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "PharmacyHealthcareSpecialtyCS",
+  "id": "PharmacyHealthcareSpecialtyCS",
+  "title": "Pharmacy HealthcareService Specialty",
+  "description": "Specialty codes of pharmacy HealthcareServices",
+  "version": "0.11.25",
+  "url": "https://gematik.de/fhir/directory/CodeSystem/PharmacyHealthcareSpecialtyCS",
+  "concept": [
+    {
+      "code": "10",
+      "display": "Handverkauf"
+    },
+    {
+      "code": "20",
+      "display": "Nacht- und Notdienst"
+    },
+    {
+      "code": "30",
+      "display": "Botendienst"
+    },
+    {
+      "code": "40",
+      "display": "Versand"
+    },
+    {
+      "code": "50",
+      "display": "Sterilherstellung"
+    }
+  ],
+  "experimental": false,
+  "publisher": "gematik GmbH",
+  "date": "2024-10-29",
+  "caseSensitive": false,
+  "count": 5
+}

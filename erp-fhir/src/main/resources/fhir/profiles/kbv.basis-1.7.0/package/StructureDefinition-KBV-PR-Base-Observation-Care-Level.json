@@ -1,0 +1,173 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Observation-Care-Level",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Care_Level",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Observation_Care_Level",
+  "title": "KBV_PR_Base_Observation_Care_Level",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärtzliche Bundesvereinigung (KBV)",
+  "description": "Dieses Profil bildet den Pflegegrad einer Person ab.",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED 'AS IS.' ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://fhir.de/StructureDefinition/observation-de-pflegegrad|1.5.2",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "definition": "Hier wird der Pflegegrad einer Person nach Paragraph 15 Sozialgesetzbuch XI dokumentiert. Punktbereich 0: keine Beeinträchtigungen der Selbständigkeit oder der Fähigkeiten,. Punktbereich 1: geringe Beeinträchtigungen der Selbständigkeit oder der Fähigkeiten,. Punktbereich 2: erhebliche Beeinträchtigungen der Selbständigkeit oder der Fähigkeiten,. Punktbereich 3: schwere Beeinträchtigungen der Selbständigkeit oder der Fähigkeiten und5. Punktbereich 4: schwerste Beeinträchtigungen der Selbständigkeit oder der Fähigkeiten."
+      },
+      {
+        "id": "Observation.status",
+        "path": "Observation.status",
+        "definition": "Hier wird der Status des Eintrages als Code angegeben."
+      },
+      {
+        "id": "Observation.code",
+        "path": "Observation.code",
+        "definition": "Hier wird das Konzept Pflegegrad als codierte Information angegeben."
+      },
+      {
+        "id": "Observation.code.coding:loinc",
+        "path": "Observation.code.coding",
+        "sliceName": "loinc",
+        "definition": "In diesem Element wird der Code für der  Pflegegrad  als  spezifischer  LOINC®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems."
+      },
+      {
+        "id": "Observation.code.coding:loinc.system",
+        "path": "Observation.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.version",
+        "path": "Observation.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.code",
+        "path": "Observation.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.display",
+        "path": "Observation.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.effective[x]:effectivePeriod",
+        "path": "Observation.effective[x]",
+        "sliceName": "effectivePeriod",
+        "definition": "Dieses Element beschreibt den Zeitraum in dem der Pflegegrad gültig ist.",
+        "type": [
+          {
+            "code": "Period"
+          }
+        ]
+      },
+      {
+        "id": "Observation.effective[x]:effectivePeriod.start",
+        "path": "Observation.effective[x].start",
+        "definition": "Dieses Element beinhaltet den Zeitpunkt, ab wann der Pflegegrad gültig ist."
+      },
+      {
+        "id": "Observation.effective[x]:effectivePeriod.end",
+        "path": "Observation.effective[x].end",
+        "definition": "Dieses Element beinhaltet den Zeitpunkt bis wann der Pflegegrad gültig ist."
+      },
+      {
+        "id": "Observation.value[x]",
+        "path": "Observation.value[x]",
+        "definition": "Hier wird der Pflegegrad ausgewählt. Eine Mehrfachauswahl soll ermöglicht werden. Wenn noch keine Einstufung in einen Pflegegrad vorliegt, dieser aber bereits beantragt ist, dann ist der Code 9-984.b anzugeben. Wurde eine Höherstufung eines Pflegegrads beantragt, ist neben dem zutreffenden Pflegegrad zusätzlich der Code 9-984.b anzugeben."
+      },
+      {
+        "id": "Observation.value[x].coding",
+        "path": "Observation.value[x].coding",
+        "max": "1"
+      },
+      {
+        "id": "Observation.note",
+        "path": "Observation.note",
+        "definition": "Hier werden ergänzende freitextliche Kommentare und Notizen vorgenommen, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Observation.note.author[x]",
+        "path": "Observation.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Observation.note.author[x]:authorReference",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.author[x]:authorString",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.time",
+        "path": "Observation.note.time",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben."
+      },
+      {
+        "id": "Observation.note.text",
+        "path": "Observation.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      }
+    ]
+  }
+}

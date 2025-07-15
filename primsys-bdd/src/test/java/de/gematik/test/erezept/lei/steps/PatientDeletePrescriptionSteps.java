@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.lei.steps;
@@ -29,13 +33,17 @@ import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 
 public class PatientDeletePrescriptionSteps {
-
   /**
    * TMD-1624
    *
    * @param patientName ist der Name des Versicherten
    */
-  @Wenn("^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept löscht$")
+  @Und(
+      "^(?:der|die)(?: GKV)? Versicherte (.+) kann das (letzte|erste) (?:E-Rezept|EVDGA) mit dem"
+          + " FdV löschen$")
+  @Wenn(
+      "^(?:der|die)(?: GKV)? Versicherte (.+) (?:sein|ihr) (letztes|erstes) (?:E-Rezept|EVDGA)"
+          + " löscht$")
   public void whenDeletePrescription(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient).attemptsTo(AbortPrescription.asPatient().fromStack(order));

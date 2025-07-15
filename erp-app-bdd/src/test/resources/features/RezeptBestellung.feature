@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# *******
+# For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+# *******
+#
 # language: de
 
 @PRODUKT:eRp_FdV
@@ -22,7 +26,7 @@ Funktionalität: E-Rezepte per Nachricht bestellen
 
   Grundlage: Die Versicherte bestellt ein E-Rezept per Nachricht bei einer Apotheke
     Angenommen die Ärztin Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
-    Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
+    Und die Apotheke Adelheid Ulmendorfer hat Zugriff auf ihre SMC-B
 
   @TCID:ERP_FDV_BESTELLEN_01
   Szenario: Zuweisung per Nachricht
@@ -31,8 +35,8 @@ Funktionalität: E-Rezepte per Nachricht bestellen
 
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
     Und die Ärztin Adelheid Ulmenwald hat der Versicherten Alice ein apothekenpflichtiges Medikament verschrieben
-    Wenn die Versicherte Alice ihr letztes E-Rezept in der App der Apotheke Am Flughafen per Nachricht zuweist
-    Und die Apotheke Am Flughafen die letzte Zuweisung per Nachricht von Alice akzeptiert
-    Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Alice dispensiert
+    Wenn die Versicherte Alice ihr letztes E-Rezept in der App der Apotheke Adelheid Ulmendorfer per Nachricht zuweist
+    Und die Apotheke Adelheid Ulmendorfer die letzte Zuweisung per Nachricht von Alice akzeptiert
+    Und die Apotheke Adelheid Ulmendorfer das letzte akzeptierte E-Rezept korrekt an Alice dispensiert
     Dann hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten
-    Und die Apotheke Am Flughafen hat genau 1 Quittung vorliegen
+    Und die Apotheke Adelheid Ulmendorfer hat genau 1 Quittung vorliegen

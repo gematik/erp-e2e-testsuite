@@ -1,0 +1,19 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-CS-ERP-CompositionTypes",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-CompositionTypes",
+  "version": "1.5.0",
+  "name": "DAV_CS_ERP_CompositionTypes",
+  "title": "CompositionTypes",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "content": "complete",
+  "count": 1,
+  "concept": [
+    {
+      "code": "ERezeptAbgabedaten",
+      "display": "ERezeptAbgabedaten Composition"
+    }
+  ]
+}

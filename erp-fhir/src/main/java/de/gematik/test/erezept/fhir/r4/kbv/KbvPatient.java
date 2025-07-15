@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -19,12 +23,10 @@ package de.gematik.test.erezept.fhir.r4.kbv;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import java.util.Optional;
@@ -48,6 +50,20 @@ import org.hl7.fhir.r4.model.ResourceType;
 @SuppressWarnings({"java:S110"})
 public class KbvPatient extends Patient implements ErpFhirResource {
 
+  public static KbvPatient fromPatient(Patient adaptee) {
+    if (adaptee instanceof KbvPatient kbvPatient) {
+      return kbvPatient;
+    } else {
+      val kbvPatient = new KbvPatient();
+      adaptee.copyValues(kbvPatient);
+      return kbvPatient;
+    }
+  }
+
+  public static KbvPatient fromPatient(Resource adaptee) {
+    return fromPatient((Patient) adaptee);
+  }
+
   public String getLogicalId() {
     return this.id.getIdPart();
   }
@@ -69,17 +85,26 @@ public class KbvPatient extends Patient implements ErpFhirResource {
   /**
    * Check if the patient has an ID for "private Krankenversicherung"
    *
-   * @return true if the Patient has a PKV ID
+   * @return true if the Patient has a PKV ID up to version 1.2.0 the returnValue will be false!!!
    */
   public boolean hasPkvKvnr() {
     return getPkvIdentifier().isPresent();
   }
 
-  public InsuranceTypeDe getInsuranceKind() {
-    return InsuranceTypeDe.fromCode(getInsuranceKindCode());
+  @Deprecated(since = "KbvItaForVersion.V1_2_0 InsuranceKind is fixed to GKV", forRemoval = true)
+  public InsuranceTypeDe getInsuranceType() {
+    val code = getInsuranceTypeCode();
+    if (code.equals("PKV")) {
+      return InsuranceTypeDe.PKV;
+    }
+    if (code.equals("BG")) {
+      return InsuranceTypeDe.BG;
+    } else {
+      return InsuranceTypeDe.GKV;
+    }
   }
 
-  private String getInsuranceKindCode() {
+  private String getInsuranceTypeCode() {
     return this.getIdentifier().stream()
         .map(id -> id.getType().getCodingFirstRep())
         .filter(DeBasisProfilCodeSystem.IDENTIFIER_TYPE_DE_BASIS::matches)
@@ -125,39 +150,16 @@ public class KbvPatient extends Patient implements ErpFhirResource {
     return opt.flatMap(KVNR::extractFrom);
   }
 
-  public Optional<Identifier> getGkvIdentifier() {
+  private Optional<Identifier> getGkvIdentifier() {
     return this.getIdentifier().stream()
-        .filter(
-            identifier ->
-                WithSystem.anyOf(
-                        DeBasisProfilNamingSystem.KVID, DeBasisProfilNamingSystem.KVID_GKV_SID)
-                    .matches(identifier))
+        .filter(DeBasisProfilNamingSystem.KVID_GKV_SID::matches)
         .findFirst();
   }
 
-  public Optional<Identifier> getPkvIdentifier() {
-    /*
-    Why is the identifier not fetched identically as the GKV one?
-    - because on old profiles (1.0.2) PKV-Identifier didn't contain a system-value,
-    thus using the type-code is the only way to find PKV-Identifier for older profiles
-    - for newer profiles (1.1.0+) the identifier can be selected either via type-code or via system-value
-    */
+  private Optional<Identifier> getPkvIdentifier() {
     return this.getIdentifier().stream()
-        .filter(
-            identifier ->
-                identifier.getType().getCoding().stream()
-                    .anyMatch(
-                        coding ->
-                            coding.getCode().equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
+        .filter(DeBasisProfilNamingSystem.KVID_PKV_SID::matches)
         .findFirst();
-  }
-
-  public Optional<Reference> getPkvAssigner() {
-    return this.getPkvIdentifier().map(Identifier::getAssigner);
-  }
-
-  public Optional<String> getPkvAssignerName() {
-    return this.getPkvIdentifier().map(identifier -> identifier.getAssigner().getDisplay());
   }
 
   public String getFullname() {
@@ -192,20 +194,6 @@ public class KbvPatient extends Patient implements ErpFhirResource {
   public String getDescription() {
     return format(
         "{0} Versicherte/r {1} (KVNR: {2})",
-        this.getInsuranceKind(), this.getFullname(), this.getKvnr().getValue());
-  }
-
-  public static KbvPatient fromPatient(Patient adaptee) {
-    if (adaptee instanceof KbvPatient kbvPatient) {
-      return kbvPatient;
-    } else {
-      val kbvPatient = new KbvPatient();
-      adaptee.copyValues(kbvPatient);
-      return kbvPatient;
-    }
-  }
-
-  public static KbvPatient fromPatient(Resource adaptee) {
-    return fromPatient((Patient) adaptee);
+        this.getInsuranceType(), this.getFullname(), this.getKvnr().getValue());
   }
 }

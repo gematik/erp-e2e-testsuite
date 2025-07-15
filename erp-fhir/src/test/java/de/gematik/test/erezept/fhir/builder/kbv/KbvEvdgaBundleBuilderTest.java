@@ -12,11 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
@@ -58,7 +62,41 @@ class KbvEvdgaBundleBuilderTest extends ErpFhirParsingTest {
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(
                 PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
-            .statusKennzeichen(StatusKennzeichen.NONE)
+            .statusKennzeichen(StatusKennzeichen.NONE, practitioner)
+            .healthAppRequest(
+                KbvHealthAppRequestFaker.forPatient(patient)
+                    .withRequester(practitioner)
+                    .withInsurance(insurance)
+                    .withoutAccident()
+                    .fake())
+            .insurance(insurance)
+            .patient(patient)
+            .practitioner(practitioner)
+            .medicalOrganization(medicalOrg)
+            .build();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, evdgaBundle);
+    assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest
+  @MethodSource("shouldBuildKbvEvdgaBundle")
+  void shouldBuildKbvEvdgaBundleWithPractitionerRole(
+      QualificationType qualificationType, InsuranceTypeDe insuranceType) {
+    val patient = KbvPatientFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).fake();
+    val practitioner =
+        KbvPractitionerFaker.builder().withQualificationType(qualificationType).fake();
+    val insurance = KbvCoverageFaker.builder().withInsuranceType(insuranceType).fake();
+    val medicalOrgFaker =
+        (qualificationType.equals(QualificationType.DENTIST))
+            ? KbvMedicalOrganizationFaker.dentalPractice()
+            : KbvMedicalOrganizationFaker.medicalPractice();
+    val medicalOrg = medicalOrgFaker.fake();
+
+    val evdgaBundle =
+        KbvEvdgaBundleBuilder.forPrescription(
+                PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
+            .statusKennzeichen(StatusKennzeichen.ASV, practitioner)
             .healthAppRequest(
                 KbvHealthAppRequestFaker.forPatient(patient)
                     .withRequester(practitioner)

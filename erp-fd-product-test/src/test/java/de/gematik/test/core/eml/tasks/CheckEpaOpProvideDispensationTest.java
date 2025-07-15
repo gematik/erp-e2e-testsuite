@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.eml.tasks;
@@ -25,6 +29,7 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
@@ -37,12 +42,10 @@ import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -50,12 +53,10 @@ import java.util.List;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
 class CheckEpaOpProvideDispensationTest extends ErpFhirParsingTest {
 
@@ -64,8 +65,6 @@ class CheckEpaOpProvideDispensationTest extends ErpFhirParsingTest {
   private static final PrescriptionId PRESC_ID = PrescriptionId.from("160.153.303.257.459");
 
   private static EpaOpProvideDispensation epaOpProvideDispensation;
-
-  // private static ErxMedicationDispense erxMedicationDispense;
 
   private static ErxMedicationDispenseBundle createMedicationDispenseBundle(
       ErpWorkflowVersion workFlowVersion) {
@@ -80,43 +79,18 @@ class CheckEpaOpProvideDispensationTest extends ErpFhirParsingTest {
             .prescriptionId(PRESC_ID)
             .status(MedicationDispense.MedicationDispenseStatus.COMPLETED);
 
-    if (workFlowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    val med =
+        GemErpMedicationFaker.forPznMedication()
+            .withPzn(PZN.from("10019621"), "IBU-ratiopharm 400mg akut Schmerztabletten")
+            .fake();
+    med.getCode()
+        .addCoding(DeBasisProfilCodeSystem.ATC.asCoding("M01AE01").setDisplay("Ibuprofen"));
 
-      val medDisp = medDispBuilder.medication(getMedication()).build();
-      val bundle = new ErxMedicationDispenseBundle();
-      bundle.addEntry().setResource(medDisp);
-      return bundle;
-
-    } else {
-      val med =
-          GemErpMedicationFaker.builder()
-              .withPzn(PZN.from("10019621"), "IBU-ratiopharm 400mg akut Schmerztabletten")
-              .fake();
-      med.getCode()
-          .addCoding(DeBasisProfilCodeSystem.ATC.asCoding("M01AE01").setDisplay("Ibuprofen"));
-
-      val medDisp = medDispBuilder.medication(med).build();
-      val bundle = new ErxMedicationDispenseBundle();
-      bundle.addEntry().setResource(medDisp);
-      bundle.addEntry().setResource(med);
-      return bundle;
-    }
-  }
-
-  private static KbvErpMedication getMedication() {
-    val medication = new KbvErpMedication();
-    medication
-        .getCode()
-        .getCoding()
-        .add(
-            DeBasisProfilCodeSystem.PZN
-                .asCoding("10019621")
-                .setDisplay("IBU-ratiopharm 400mg akut Schmerztabletten"));
-    medication
-        .getCode()
-        .getCoding()
-        .add(new Coding(DeBasisProfilCodeSystem.ATC.getCanonicalUrl(), "M01AE01", "Ibuprofen"));
-    return medication;
+    val medDisp = medDispBuilder.medication(med).build();
+    val bundle = new ErxMedicationDispenseBundle();
+    bundle.addEntry().setResource(medDisp);
+    bundle.addEntry().setResource(med);
+    return bundle;
   }
 
   @BeforeEach
@@ -128,7 +102,7 @@ class CheckEpaOpProvideDispensationTest extends ErpFhirParsingTest {
         epaFhir.decode(
             EpaOpProvideDispensation.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
   }
 
   @AfterEach
@@ -136,27 +110,8 @@ class CheckEpaOpProvideDispensationTest extends ErpFhirParsingTest {
     OnStage.drawTheCurtain();
   }
 
-  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.3.0")
   @Test
   void shouldCheckEpaOpOutDispensationWithTaskInOldVersion() {
-    val useEpaMockClient = mock(UseTheEpaMockClient.class);
-    when(useEpaMockClient.downloadProvideDispensationBy(any()))
-        .thenReturn(List.of(epaOpProvideDispensation));
-
-    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
-    epaFhirChecker.can(useEpaMockClient);
-
-    val step =
-        CheckEpaOpProvideDispensation.forDispensation(
-            createMedicationDispenseBundle(ErpWorkflowVersion.getDefaultVersion()),
-            TelematikID.from("9-2.58.00000040"),
-            PRESC_ID);
-    assertDoesNotThrow(() -> epaFhirChecker.attemptsTo(step));
-  }
-
-  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.4.0")
-  @Test
-  void shouldCheckEpaOpOutDispensationWithTaskInNewVersion() {
     val useEpaMockClient = mock(UseTheEpaMockClient.class);
     when(useEpaMockClient.downloadProvideDispensationBy(any()))
         .thenReturn(List.of(epaOpProvideDispensation));

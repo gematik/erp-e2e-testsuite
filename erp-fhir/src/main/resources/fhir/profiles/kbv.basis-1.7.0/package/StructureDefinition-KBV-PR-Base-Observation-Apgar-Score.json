@@ -1,0 +1,301 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Observation-Apgar-Score",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Apgar_Score",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Observation_Apgar_Score",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet einen Apgar-Score ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "short": "Apgar-Score",
+        "definition": "Dieses Element beschreibt die Dokumentation eines einzelnen Apgar-Score zu einem definierten Zeitpunkt nach Geburt. Hierbei wird in diesem Basisprofil nur der Gesamt-Apgar-Score modelliert und nicht die einzelnen Teilkomponenten Aussehen, Puls, Gesichtsbewegungen, Aktivität und Respiration."
+      },
+      {
+        "id": "Observation.status",
+        "path": "Observation.status",
+        "definition": "Hier wird der Status des Eintrages als Code angegeben."
+      },
+      {
+        "id": "Observation.code",
+        "path": "Observation.code",
+        "definition": "In diesem Element werden Angaben zum Apgar-Score gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.code.coding",
+        "path": "Observation.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben.",
+        "min": 2
+      },
+      {
+        "id": "Observation.code.coding:snomed",
+        "path": "Observation.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird der Code für den Apgar-Score als SNOMED CT®-Code aus der vorgegebenen Werteliste angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Apgar_Score_Identifier_SNOMED_CT"
+        }
+      },
+      {
+        "id": "Observation.code.coding:snomed.system",
+        "path": "Observation.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed.version",
+        "path": "Observation.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed.code",
+        "path": "Observation.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed.display",
+        "path": "Observation.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc",
+        "path": "Observation.code.coding",
+        "sliceName": "loinc",
+        "definition": "In diesem Element wird der Code für den Apgar-Score als LOINC®-Code aus der vorgegebenen Werteliste angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Apgar_Score_Identifier_LOINC"
+        }
+      },
+      {
+        "id": "Observation.code.coding:loinc.system",
+        "path": "Observation.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.version",
+        "path": "Observation.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.code",
+        "path": "Observation.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.display",
+        "path": "Observation.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.text",
+        "path": "Observation.code.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "min": 1,
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "http://hl7.org/fhir/StructureDefinition/Device",
+              "http://hl7.org/fhir/StructureDefinition/Location",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.focus",
+        "path": "Observation.focus",
+        "max": "0"
+      },
+      {
+        "id": "Observation.effective[x]",
+        "path": "Observation.effective[x]",
+        "definition": "Beschreibt den absoluten Zeitpunkt der Bestimmung des Apgar-Scores.",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Observation.value[x]",
+        "path": "Observation.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed"
+        },
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept",
+        "path": "Observation.value[x]",
+        "sliceName": "valueCodeableConcept",
+        "definition": "Enthält die numerische Angabe des Gesamt-Apgar-Scores in Form eines SNOMED CT®-Codes.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Apgar_Score_Value"
+        }
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept.coding",
+        "path": "Observation.value[x].coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept.coding.system",
+        "path": "Observation.value[x].coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept.coding.version",
+        "path": "Observation.value[x].coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept.coding.code",
+        "path": "Observation.value[x].coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept.coding.display",
+        "path": "Observation.value[x].coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.note",
+        "path": "Observation.note",
+        "definition": "Hier werden ergänzende freitextliche Kommentare und Notizen vorgenommen, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Observation.note.author[x]",
+        "path": "Observation.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Observation.note.author[x]:authorReference",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.author[x]:authorString",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.time",
+        "path": "Observation.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "Observation.note.text",
+        "path": "Observation.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      },
+      {
+        "id": "Observation.bodySite",
+        "path": "Observation.bodySite",
+        "max": "0"
+      },
+      {
+        "id": "Observation.specimen",
+        "path": "Observation.specimen",
+        "max": "0"
+      },
+      {
+        "id": "Observation.device",
+        "path": "Observation.device",
+        "max": "0"
+      },
+      {
+        "id": "Observation.component",
+        "path": "Observation.component",
+        "max": "0"
+      }
+    ]
+  }
+}

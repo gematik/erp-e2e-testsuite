@@ -1,0 +1,271 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="03ad1f9d-1fab-4a54-9e38-6c89d8c82f02"/>
+    <type value="searchset"/>
+    <timestamp value="2025-06-24T09:18:43.043+00:00"/>
+    <total value="999"/>
+    <link>
+        <relation value="last"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=3-SMC-B-Testkarte--883110000163973&amp;_sort=sent&amp;_count=5&amp;__offset=995"/>
+    </link>
+    <link>
+        <relation value="first"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=3-SMC-B-Testkarte--883110000163973&amp;_sort=sent&amp;_count=5&amp;__offset=0"/>
+    </link>
+    <link>
+        <relation value="next"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=3-SMC-B-Testkarte--883110000163973&amp;_sort=sent&amp;_count=5&amp;__offset=5"/>
+    </link>
+    <link>
+        <relation value="self"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=3-SMC-B-Testkarte--883110000163973&amp;_sort=sent&amp;_count=5&amp;__offset=0"/>
+    </link>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda56-7e42-54b8-f5d6-56a331c535a3"/>
+        <resource>
+            <Communication xmlns="http://hl7.org/fhir">
+                <id value="01ebda56-7e42-54b8-f5d6-56a331c535a3"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.4"/>
+                </meta>
+                <basedOn>
+                    <reference
+                            value="/Task/160.000.006.897.897.55/$accept?ac=97bb18a64b4f8818daaf7731777013f459a426bcd2927d0be133e05c67600d67"/>
+                </basedOn>
+                <status value="unknown"/>
+                <sent value="2025-03-16T17:03:05.251+00:00"/>
+                <received value="2025-03-16T17:03:05.000+00:00"/>
+                <recipient>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110614233"/>
+                    </identifier>
+                </recipient>
+                <sender>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </sender>
+                <payload>
+                    <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+                        <extension url="delivery">
+                            <valueBoolean value="true"/>
+                        </extension>
+                        <extension url="onPremise">
+                            <valueBoolean value="false"/>
+                        </extension>
+                        <extension url="shipment">
+                            <valueBoolean value="false"/>
+                        </extension>
+                    </extension>
+                    <contentString
+                            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;delivery&quot;,&quot;info_text&quot;:&quot;Hey patient, how are you? does the medicine takes an effect??&quot;}"/>
+                </payload>
+            </Communication>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda5c-34c7-8b18-7f4b-dde485a9210c"/>
+        <resource>
+            <Communication xmlns="http://hl7.org/fhir">
+                <id value="01ebda5c-34c7-8b18-7f4b-dde485a9210c"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.4"/>
+                </meta>
+                <basedOn>
+                    <reference
+                            value="/Task/160.000.006.898.710.41/$accept?ac=bdacba0d430a6edc2b0875a37de818431382fcde401b4968ab3456516e98f51b"/>
+                </basedOn>
+                <status value="unknown"/>
+                <sent value="2025-03-16T23:52:02.271+00:00"/>
+                <recipient>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110603293"/>
+                    </identifier>
+                </recipient>
+                <sender>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </sender>
+                <payload>
+                    <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+                        <extension url="delivery">
+                            <valueBoolean value="true"/>
+                        </extension>
+                        <extension url="onPremise">
+                            <valueBoolean value="false"/>
+                        </extension>
+                        <extension url="shipment">
+                            <valueBoolean value="false"/>
+                        </extension>
+                    </extension>
+                    <contentString
+                            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;delivery&quot;,&quot;info_text&quot;:&quot;hepwieefswjqhbrkimwhvmekewfdmxmjhmzikcycoelelwsrgrkvquflkmbclewylhzawerskrbqthhjjvmyooqorucledcyluoofijjaobgnootfqytyksvlodwlatamihakfzpdeuwiaproqeypjgmnauviartshmbymxhkkcxjxjygimfopoikyptisswglpfyypwfgokvtmynivnbhxvgxzemgaonhmhhvaptjezuwampfnlhpbnjltnnkdxwyesdevhylmlmsopsrxfjnqycdoxsxwoaaeeajihuhiarfgocvlbykncsjlpqnpdelnpdyojbdagdieqngwuvigigwplrozsaaakwxpdwjdyxavpkfctckcetyulatzhclhalzornatoejwgjqywttjpafhfygiorozabxqknslmasrbgmanbevoyvxlyclpoirssoitcktfdkolgskevtkqgxmndnpoxmrftbkqabdxfjgrvfjh&quot;}"/>
+                </payload>
+            </Communication>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-8415-2558-2f78-8862845071b3"/>
+        <resource>
+            <Communication xmlns="http://hl7.org/fhir">
+                <id value="01ebda7b-8415-2558-2f78-8862845071b3"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.4"/>
+                </meta>
+                <basedOn>
+                    <reference
+                            value="/Task/160.000.006.901.204.28/$accept?ac=4aa581239bdc7343b10bb8ee2e9b286a11f70314ad02188855539b98aa5cd605"/>
+                </basedOn>
+                <status value="unknown"/>
+                <sent value="2025-03-18T13:13:16.743+00:00"/>
+                <received value="2025-03-18T13:13:21.000+00:00"/>
+                <recipient>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </recipient>
+                <sender>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </sender>
+                <payload>
+                    <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+                        <extension url="onPremise">
+                            <valueBoolean value="true"/>
+                        </extension>
+                        <extension url="delivery">
+                            <valueBoolean value="false"/>
+                        </extension>
+                        <extension url="shipment">
+                            <valueBoolean value="false"/>
+                        </extension>
+                    </extension>
+                    <contentString
+                            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;info_text&quot;:&quot;Nachricht Nr. 0 zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??&quot;}"/>
+                </payload>
+            </Communication>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-8416-bf80-9b91-8a1e4d1010d0"/>
+        <resource>
+            <Communication xmlns="http://hl7.org/fhir">
+                <id value="01ebda7b-8416-bf80-9b91-8a1e4d1010d0"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.4"/>
+                </meta>
+                <basedOn>
+                    <reference
+                            value="/Task/160.000.006.901.204.28/$accept?ac=4aa581239bdc7343b10bb8ee2e9b286a11f70314ad02188855539b98aa5cd605"/>
+                </basedOn>
+                <status value="unknown"/>
+                <sent value="2025-03-18T13:13:16.848+00:00"/>
+                <received value="2025-03-18T13:13:21.000+00:00"/>
+                <recipient>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </recipient>
+                <sender>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </sender>
+                <payload>
+                    <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+                        <extension url="onPremise">
+                            <valueBoolean value="true"/>
+                        </extension>
+                        <extension url="delivery">
+                            <valueBoolean value="false"/>
+                        </extension>
+                        <extension url="shipment">
+                            <valueBoolean value="false"/>
+                        </extension>
+                    </extension>
+                    <contentString
+                            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;info_text&quot;:&quot;Nachricht Nr. 1 zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??&quot;}"/>
+                </payload>
+            </Communication>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebda7b-8418-4df0-1e16-f620b8931dab"/>
+        <resource>
+            <Communication xmlns="http://hl7.org/fhir">
+                <id value="01ebda7b-8418-4df0-1e16-f620b8931dab"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.4"/>
+                </meta>
+                <basedOn>
+                    <reference
+                            value="/Task/160.000.006.901.204.28/$accept?ac=4aa581239bdc7343b10bb8ee2e9b286a11f70314ad02188855539b98aa5cd605"/>
+                </basedOn>
+                <status value="unknown"/>
+                <sent value="2025-03-18T13:13:16.950+00:00"/>
+                <received value="2025-03-18T13:13:21.000+00:00"/>
+                <recipient>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </recipient>
+                <sender>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </sender>
+                <payload>
+                    <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+                        <extension url="onPremise">
+                            <valueBoolean value="true"/>
+                        </extension>
+                        <extension url="delivery">
+                            <valueBoolean value="false"/>
+                        </extension>
+                        <extension url="shipment">
+                            <valueBoolean value="false"/>
+                        </extension>
+                    </extension>
+                    <contentString
+                            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;info_text&quot;:&quot;Nachricht Nr. 2 zum testen des ErpFD bezüglich Communication: Hey patient, how are you? does the medicine takes an effect??&quot;}"/>
+                </payload>
+            </Communication>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+</Bundle>

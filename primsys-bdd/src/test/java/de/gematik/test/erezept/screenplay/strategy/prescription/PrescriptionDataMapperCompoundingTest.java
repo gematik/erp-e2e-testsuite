@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.strategy.prescription;
@@ -67,5 +71,50 @@ class PrescriptionDataMapperCompoundingTest extends ErpFhirParsingTest {
             patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
     assertThrows(
         NullPointerException.class, () -> prescriptionDataMapper.getKbvErpMedication(medMap));
+  }
+
+  @Test
+  void shouldSetPznCorrect() {
+    val medMap = Map.of("Name", "TestDrug");
+
+    val medications = List.of(Map.of("key", "value"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperCompounding(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    val medication = prescriptionDataMapper.getKbvErpMedication(medMap);
+    assertNotNull(medication);
+    assertEquals("TestDrug", medication.getIngredientFirstRep().getItemCodeableConcept().getText());
+  }
+
+  @Test
+  void shouldSetMedNameCorrect() {
+    val medMap =
+        Map.of(
+            "PZN", "12345678",
+            "Name", "TestDrug");
+
+    val medications = List.of(Map.of("key", "value"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperCompounding(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    val medication = prescriptionDataMapper.getKbvErpMedication(medMap);
+    assertNotNull(medication);
+    assertEquals(
+        "12345678",
+        medication.getIngredientFirstRep().getItemCodeableConcept().getCodingFirstRep().getCode());
+  }
+
+  @Test
+  void shouldSetNoValueWorks() {
+    val medMap = Map.of("Impfung", "true");
+
+    val medications = List.of(Map.of("key", "value"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperCompounding(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    val medication = prescriptionDataMapper.getKbvErpMedication(medMap);
+    assertNotNull(medication);
+    assertTrue(medication.isVaccine());
+    assertTrue(parser.isValid(medication));
   }
 }

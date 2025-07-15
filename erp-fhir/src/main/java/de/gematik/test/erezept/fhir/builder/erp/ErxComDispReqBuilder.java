@@ -12,12 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import java.util.List;
@@ -34,27 +38,22 @@ public class ErxComDispReqBuilder extends ErxComPrescriptionBuilder<ErxComDispRe
   @Override
   public ErxCommunication build() {
     checkRequired();
-    val type = CommunicationType.DISP_REQ;
 
-    ErxCommunication com;
-    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      com = buildCommon(type, () -> type.getType().asCanonicalType());
-    } else {
-      com =
-          buildCommon(
-              type, () -> ErpWorkflowStructDef.COM_DISP_REQ_12.asCanonicalType(erpWorkflowVersion));
-    }
+    val com =
+        buildCommon(
+            CommunicationType.DISP_REQ,
+            () -> ErpWorkflowStructDef.COM_DISP_REQ.asCanonicalType(erpWorkflowVersion));
 
     com.setBasedOn(List.of(new Reference(baseOnReference)));
 
-    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
+    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) >= 0) {
       com.addExtension(flowType.asExtension());
     }
     return com;
   }
 
   private void checkRequired() {
-    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) >= 0) {
+    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) >= 0) {
       this.checkRequired(
           flowType, "A Dispense Request Communication requires a Flow-Type of the Prescription");
     }

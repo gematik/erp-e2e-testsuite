@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.dav;
@@ -22,14 +26,12 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -53,18 +55,7 @@ public class DavPkvAbgabedatenBundle extends Bundle implements ErpFhirResource {
   }
 
   public PrescriptionId getPrescriptionId() {
-    val identifier = this.getIdentifier();
-    return Stream.of(
-            ErpWorkflowNamingSystem.PRESCRIPTION_ID, ErpWorkflowNamingSystem.PRESCRIPTION_ID_121)
-        .filter(ns -> ns.matches(identifier))
-        .map(ns -> new PrescriptionId(ns, identifier.getValue()))
-        .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    DavPkvAbgabedatenBundle.class,
-                    ErpWorkflowNamingSystem.PRESCRIPTION_ID,
-                    ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
+    return PrescriptionId.from(this.getIdentifier());
   }
 
   public PrescriptionFlowType getFlowType() {

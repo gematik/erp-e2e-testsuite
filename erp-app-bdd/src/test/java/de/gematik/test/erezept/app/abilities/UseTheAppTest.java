@@ -12,21 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.abilities;
 
 import static java.text.MessageFormat.format;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -36,7 +39,6 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.app.exceptions.AppErrorException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.ErrorAlert;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
@@ -54,6 +56,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import kong.unirest.core.HttpMethod;
+import kong.unirest.core.MockClient;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -73,7 +78,9 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.SessionId;
 
+@Slf4j
 class UseTheAppTest {
 
   private static AppiumConfiguration appiumConfig;
@@ -399,18 +406,27 @@ class UseTheAppTest {
 
   @Test
   void shouldRethrowOnWaitUntilTimeout() {
+    val maxWaitTimeout = 10;
+    val pollingInterval = 1;
+
+    // create a local appiumConfig for this test only with the previous defined values
+    val localAppiumConfig = new AppiumConfiguration();
+    localAppiumConfig.setMaxWaitTimeout(maxWaitTimeout);
+    localAppiumConfig.setPollingInterval(pollingInterval);
+
     val driver = mock(IOSDriver.class);
-    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val driverAbility = spy(new UseIOSApp(driver, localAppiumConfig));
     val pageElement = Onboarding.PASSWORD_INPUT_FIELD;
     val locator = pageElement.forPlatform(driverAbility.getPlatformType());
 
     when(driver.getPageSource()).thenReturn("dummy page source");
     when(driver.findElement(locator)).thenThrow(NoSuchElementException.class);
+
     val fluentDriver =
         new AppiumFluentWait<>(driver)
-            .withTimeout(Duration.ofMillis(10))
+            .withTimeout(Duration.ofMillis(maxWaitTimeout))
             .ignoring(NoSuchElementException.class)
-            .pollingEvery(Duration.ofMillis(1));
+            .pollingEvery(Duration.ofMillis(pollingInterval));
     when(driverAbility.getFluentWaitDriver()).thenReturn(fluentDriver);
 
     assertThrows(
@@ -420,7 +436,7 @@ class UseTheAppTest {
   }
 
   @Test
-  void shouldScrollUntilFound() {
+  void shouldSwipeUntilFound() {
     val driver = mock(IOSDriver.class);
     val useIOSApp = spy(new UseIOSApp(driver, appiumConfig));
 
@@ -434,13 +450,21 @@ class UseTheAppTest {
         .thenReturn("")
         .thenReturn("erx_btn_login");
 
-    useIOSApp.scrollIntoView(ScrollDirection.DOWN, Mainscreen.LOGIN_BUTTON);
+    val options = mock(WebDriver.Options.class);
+    val window = mock(WebDriver.Window.class);
+    val dimension = new Dimension(402, 874);
+
+    when(driver.manage()).thenReturn(options);
+    when(options.window()).thenReturn(window);
+    when(window.getSize()).thenReturn(dimension);
+
+    useIOSApp.swipeIntoView(SwipeDirection.UP, Mainscreen.LOGIN_BUTTON);
     verify(useIOSApp, times(3)).getOptionalWebElement(Mainscreen.LOGIN_BUTTON);
-    verify(driver, times(2)).executeScript(eq("mobile:scroll"), any());
+    verify(useIOSApp, times(2)).swipe(SwipeDirection.UP, 0.6f);
   }
 
   @Test
-  void shouldNotScrollWhenFoundDirectly() {
+  void shouldNotSwipeWhenFoundDirectly() {
     val driver = mock(IOSDriver.class);
     val useIOSApp = spy(new UseIOSApp(driver, appiumConfig));
 
@@ -449,9 +473,9 @@ class UseTheAppTest {
         .thenReturn(loginButton);
     when(driver.getPageSource()).thenReturn("erx_btn_login");
 
-    useIOSApp.scrollIntoView(ScrollDirection.DOWN, Mainscreen.LOGIN_BUTTON);
+    useIOSApp.swipeIntoView(SwipeDirection.UP, Mainscreen.LOGIN_BUTTON);
     verify(useIOSApp, times(1)).getOptionalWebElement(Mainscreen.LOGIN_BUTTON);
-    verify(driver, times(0)).executeScript(eq("mobile:scroll"), any());
+    verify(useIOSApp, times(0)).swipe(SwipeDirection.UP, 0.6f);
   }
 
   @Test
@@ -483,18 +507,25 @@ class UseTheAppTest {
     verify(alert, times(1)).accept();
   }
 
-  @Test
-  void shouldReportScenarioStatus() {
+  @ParameterizedTest
+  @ValueSource(ints = {200, 500})
+  void shouldReportScenarioStatus(int status) {
+    val baseUrl = "http://127.0.0.1:4723/";
+    appiumConfig.setUrl(baseUrl);
+
     val driver = mock(IOSDriver.class);
+    when(driver.getSessionId()).thenReturn(new SessionId(randomUUID()));
+
     val app = new UseIOSApp(driver, appiumConfig);
+
     val scenario = mock(Scenario.class);
+    when(scenario.getName()).thenReturn("Test Scenario Name");
     when(scenario.getStatus()).thenReturn(Status.PASSED);
+
+    val unirestMock = MockClient.register();
+    unirestMock.expect(HttpMethod.POST).thenReturn().withStatus(status);
+
     assertDoesNotThrow(() -> app.finish(scenario));
-    verify(driver, times(1))
-        .executeScript(
-            (String)
-                argThat(
-                    argument -> ((String) argument).startsWith("seetest:client.setReportStatus")));
   }
 
   @ParameterizedTest

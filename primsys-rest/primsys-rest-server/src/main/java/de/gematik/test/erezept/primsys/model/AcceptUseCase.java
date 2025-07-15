@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -22,6 +26,7 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
+import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
 import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
 import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
 import de.gematik.test.konnektor.soap.mock.LocalVerifier;
@@ -30,15 +35,17 @@ import lombok.val;
 
 public class AcceptUseCase {
 
-  private AcceptUseCase() {
-    throw new AssertionError();
+  private final Pharmacy actor;
+
+  public AcceptUseCase(Pharmacy pharmacy) {
+    this.actor = pharmacy;
   }
 
-  public static Response acceptPrescription(Pharmacy actor, String taskId, String accessCode) {
-    return acceptPrescription(actor, TaskId.from(taskId), AccessCode.fromString(accessCode));
+  public Response acceptPrescription(String taskId, String accessCode) {
+    return acceptPrescription(TaskId.from(taskId), AccessCode.from(accessCode));
   }
 
-  public static Response acceptPrescription(Pharmacy actor, TaskId taskId, AccessCode accessCode) {
+  public Response acceptPrescription(TaskId taskId, AccessCode accessCode) {
     val acceptCommand = new TaskAcceptCommand(taskId, accessCode);
     val acceptResponse = actor.erpRequest(acceptCommand);
     val acceptedTask = acceptResponse.getExpectedResource();
@@ -47,10 +54,14 @@ public class AcceptUseCase {
         actor.decode(
             KbvErpBundle.class,
             LocalVerifier.parse(acceptedTask.getSignedKbvBundle()).getDocument());
+    val patient = kbvBundle.getPatient();
+    val patientInsuranceType =
+        PatientInsuranceTypeDto.fromCode(patient.getInsuranceType().getCode());
+
     val acceptData =
         AcceptedPrescriptionDto.withPrescriptionId(
                 acceptedTask.getTask().getPrescriptionId().getValue())
-            .forKvnr(kbvBundle.getPatient().getKvnr().getValue())
+            .forKvnr(patient.getKvnr().getValue(), patientInsuranceType)
             .withAccessCode(acceptedTask.getTask().getAccessCode().getValue())
             .withSecret(acceptedTask.getSecret().getValue())
             .coveredBy(

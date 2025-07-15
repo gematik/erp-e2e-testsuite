@@ -12,15 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
+import org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent;
 
 /** <a href="https://simplifier.net/for/kbvcsforqualificationtype">...</a> */
 @Getter
@@ -33,24 +40,28 @@ public enum QualificationType implements FromValueSet {
   ;
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.QUALIFICATION_TYPE;
-  public static final String VERSION = "1.0.1";
-  public static final String DESCRIPTION = "Kennzeichnung/Kategorie der Person";
-  public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
 
   private final String code;
   private final String display;
-  private final String definition = "N/A definition in profile";
 
   QualificationType(String code, String display) {
     this.code = code;
     this.display = display;
   }
 
-  public static QualificationType fromCode(String coding) {
-    return Arrays.stream(QualificationType.values())
-        .filter(qt -> qt.code.equals(coding))
-        .findFirst()
-        .orElseThrow(() -> new InvalidValueSetException(QualificationType.class, coding));
+  public static boolean matches(PractitionerQualificationComponent pqc) {
+    return CODE_SYSTEM.matches(pqc.getCode());
+  }
+
+  public static Optional<QualificationType> from(List<PractitionerQualificationComponent> pqc) {
+    return pqc.stream()
+        .filter(QualificationType::matches)
+        .map(it -> from(it.getCode().getCodingFirstRep().getCode()))
+        .findFirst();
+  }
+
+  public static QualificationType from(String code) {
+    return FromValueSet.fromCode(QualificationType.class, code);
   }
 
   public static QualificationType fromDisplay(String display) {

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -32,7 +36,7 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;

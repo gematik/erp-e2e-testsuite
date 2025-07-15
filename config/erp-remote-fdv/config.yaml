@@ -1,0 +1,17 @@
+shouldLogCapabilityStatement: true
+
+users:
+  - name: Alice
+    kvnr: X110465770
+    useVirtualEgk: false
+    remoteFdV: mock
+  - name: Bob
+    kvnr: X123456
+    useVirtualEgk: true # won't have any effects because Bob as co-user will always use virtual eGK
+    remoteFdV: mock
+
+remote-fdv:
+  - name: mock
+    url: https://localhost:443
+    version: 1.0.1
+    accessKey: apiKey2024

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
@@ -19,8 +23,8 @@ package de.gematik.test.erezept.fhir.valuesets;
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +58,7 @@ public enum StatusCoPayment implements FromValueSet {
   }
 
   public Extension asExtension() {
-    return this.asExtension(KbvItaErpStructDef.STATUS_CO_PAYMENT, this.getCodeSystem());
+    return this.asExtension(KbvItaForStructDef.STATUS_CO_PAYMENT, this.getCodeSystem());
   }
 
   public Extension asExtension(WithStructureDefinition<?> structDef, KbvCodeSystem system) {

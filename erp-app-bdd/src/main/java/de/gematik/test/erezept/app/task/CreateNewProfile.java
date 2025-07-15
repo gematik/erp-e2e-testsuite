@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task;
@@ -47,6 +51,9 @@ public class CreateNewProfile implements Task {
       app.tap(NewProfileScreen.SAVE_PROFILE_BUTTON);
       app.setCurrentUserProfile(actor.getName());
     } else {
+      // Note: Simulator might need more time before it can create a profile
+      app.pauseApp();
+
       app.tap(Mainscreen.NEW_USER_PROFILE_BUTTON);
       throw new FeatureNotImplementedException("create new profile from main screen");
     }

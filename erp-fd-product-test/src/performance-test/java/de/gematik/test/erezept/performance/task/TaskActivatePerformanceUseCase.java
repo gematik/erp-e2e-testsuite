@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.performance.task;
@@ -117,18 +121,19 @@ class TaskActivatePerformanceUseCase extends ErpTest {
     val draftTask = creation.getExpectedResponse();
     val prescriptionId = draftTask.getPrescriptionId();
 
-    val kbvBundleFaker = KbvErpBundleFaker.builder().withKvnr(sina.getKvnr());
-    kbvBundleFaker
-        .withPrescriptionId(prescriptionId)
-        .withPractitioner(doctor.getPractitioner())
-        .withCustodian(doctor.getMedicalOrganization())
-        .withPatient(sina.getPatientData())
-        .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData());
-    sina.getAssignerOrganization().ifPresent(kbvBundleFaker::withAssignerOrganization);
-    val kbvBundle = kbvBundleFaker.fake();
+    val kbvBundle =
+        KbvErpBundleFaker.builder()
+            .withKvnr(sina.getKvnr())
+            .withPrescriptionId(prescriptionId)
+            .withPractitioner(doctor.getPractitioner())
+            .withCustodian(doctor.getMedicalOrganization())
+            .withPatient(sina.getPatientData())
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .fake();
 
     // when built via withRandomKbvBundle, the practitioner reference does not match and needs to be
     // fixed
+    // TODO: check if that is still necessary
     kbvBundle
         .getMedicationRequestOptional()
         .ifPresent(

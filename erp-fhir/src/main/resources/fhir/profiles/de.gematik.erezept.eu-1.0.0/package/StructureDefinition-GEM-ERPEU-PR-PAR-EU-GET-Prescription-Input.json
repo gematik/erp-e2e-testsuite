@@ -1,0 +1,517 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-PR-PAR-EU-GET-Prescription-Input",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Input",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_PR_PAR_GET_Prescription_Input",
+  "title": "GEM ERPEU PR PAR GET Prescription Input",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "This profile defines the parameters for receiving dispense information for a prescription that was redeemed in the EU",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile:workflowEUProfile",
+        "path": "Parameters.meta.profile",
+        "sliceName": "workflowEUProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Input|1.0",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData",
+        "path": "Parameters.parameter",
+        "sliceName": "requestData",
+        "min": 1,
+        "max": "1",
+        "constraint": [
+          {
+            "key": "workflow-parameters-get-prescription-eu-1",
+            "severity": "error",
+            "human": "Prescription IDs must be present if the request type is 'e-prescriptions-retrieval'",
+            "expression": "part.where(name = 'requesttype').value.code = 'e-prescriptions-retrieval' implies part.where(name = 'prescription-id').exists()",
+            "source": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Input"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:requestData.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "requestData",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part",
+        "path": "Parameters.parameter.part",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 8,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:requesttype",
+        "path": "Parameters.parameter.part",
+        "sliceName": "requesttype",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:requesttype.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "requesttype",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:requesttype.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/erp-eu/ValueSet/GEM_ERPEU_VS_RequestType"
+        }
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:requesttype.value[x].system",
+        "path": "Parameters.parameter.part.value[x].system",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:requesttype.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:requesttype.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:kvnr",
+        "path": "Parameters.parameter.part",
+        "sliceName": "kvnr",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:kvnr.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "kvnr",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:kvnr.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:kvnr.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:kvnr.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:accessCode",
+        "path": "Parameters.parameter.part",
+        "sliceName": "accessCode",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:accessCode.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "accessCode",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:accessCode.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Access_Code"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:accessCode.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:accessCode.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:countryCode",
+        "path": "Parameters.parameter.part",
+        "sliceName": "countryCode",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:countryCode.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "countryCode",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:countryCode.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://hl7.org/fhir/ValueSet/iso3166-1-2"
+        }
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:countryCode.value[x].system",
+        "path": "Parameters.parameter.part.value[x].system",
+        "min": 1,
+        "patternUri": "urn:iso:std:iso:3166"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:countryCode.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:countryCode.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:prescription-id",
+        "path": "Parameters.parameter.part",
+        "sliceName": "prescription-id",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:prescription-id.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "prescription-id",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:prescription-id.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/ti/StructureDefinition/e-prescription-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:prescription-id.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:prescription-id.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerName",
+        "path": "Parameters.parameter.part",
+        "sliceName": "practitionerName",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerName.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "practitionerName",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerName.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerName.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerName.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerRole",
+        "path": "Parameters.parameter.part",
+        "sliceName": "practitionerRole",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerRole.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "practitionerRole",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerRole.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/terminology/ValueSet/epa-structural-role-of-healthcare-professional-vs"
+        }
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerRole.value[x].system",
+        "path": "Parameters.parameter.part.value[x].system",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerRole.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:practitionerRole.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:pointOfCare",
+        "path": "Parameters.parameter.part",
+        "sliceName": "pointOfCare",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:pointOfCare.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "pointOfCare",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:pointOfCare.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:pointOfCare.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:pointOfCare.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:healthcare-facility-type",
+        "path": "Parameters.parameter.part",
+        "sliceName": "healthcare-facility-type",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:healthcare-facility-type.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "healthcare-facility-type",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:healthcare-facility-type.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/OrganizationProfessionOIDTypeVS"
+        }
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:healthcare-facility-type.value[x].system",
+        "path": "Parameters.parameter.part.value[x].system",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:healthcare-facility-type.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:requestData.part:healthcare-facility-type.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      }
+    ]
+  }
+}

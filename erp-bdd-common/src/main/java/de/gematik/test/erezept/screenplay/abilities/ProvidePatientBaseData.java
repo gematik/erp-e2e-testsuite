@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.abilities;
@@ -24,11 +28,9 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
-import de.gematik.test.erezept.fhir.r4.kbv.AssignerOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
@@ -46,7 +48,7 @@ import net.serenitybdd.screenplay.Ability;
 
 public class ProvidePatientBaseData implements Ability {
 
-  @Getter @Setter private KVNR kvnr;
+  @Getter private KVNR kvnr;
   private final String firstName;
   private final String lastName;
   private final Date birthDate;
@@ -57,13 +59,11 @@ public class ProvidePatientBaseData implements Ability {
   @Getter private String iknr;
   private String insuranceName;
 
-  @Setter private DmpKennzeichen dmpKennzeichen;
-
-  private AssignerOrganization pkvAssignerOrganization;
+  @Setter private DmpKennzeichen dmpKennzeichen = DmpKennzeichen.NOT_SET;
 
   private final Wop wop;
 
-  private InsuranceTypeDe patientInsuranceType;
+  @Getter private InsuranceTypeDe patientInsuranceType;
   private InsuranceTypeDe coverageInsuranceType;
   @Nullable private PayorType payorType;
 
@@ -77,8 +77,6 @@ public class ProvidePatientBaseData implements Ability {
     this.city = GemFaker.fakerCity();
     this.postal = GemFaker.fakerZipCode();
     this.street = GemFaker.fakerStreetName();
-
-    this.updateInsuranceInfo(this.getCoverageInsuranceType());
     this.wop = GemFaker.fakerValueSet(Wop.class);
   }
 
@@ -98,6 +96,12 @@ public class ProvidePatientBaseData implements Ability {
 
   public void setPatientInsuranceType(InsuranceTypeDe insuranceType) {
     this.patientInsuranceType = insuranceType;
+
+    // when patient insurance type changes, we also have to adjust the (system name) of the KVNR
+    // however, this can only be GKV or PKV
+    val fhirType =
+        insuranceType.equals(InsuranceTypeDe.PKV) ? InsuranceTypeDe.PKV : InsuranceTypeDe.GKV;
+    this.kvnr = this.kvnr.as(fhirType);
     this.updateInsuranceInfo(this.getCoverageInsuranceType());
   }
 
@@ -114,10 +118,6 @@ public class ProvidePatientBaseData implements Ability {
     return Optional.ofNullable(this.payorType);
   }
 
-  public InsuranceTypeDe getPatientInsuranceType() {
-    return this.patientInsuranceType != null ? this.patientInsuranceType : InsuranceTypeDe.GKV;
-  }
-
   private void updateInsuranceInfo(InsuranceTypeDe insuranceType) {
     val ici = InsuranceCoverageInfo.randomFor(insuranceType);
     this.iknr = ici.getIknr();
@@ -125,23 +125,12 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public KbvPatient getPatient() {
-    val pb =
-        KbvPatientBuilder.builder()
-            .kvnr(kvnr, patientInsuranceType)
-            .name(firstName, lastName)
-            .birthDate(birthDate)
-            .address(Country.D, city, postal, street);
-
-    if (patientInsuranceType == InsuranceTypeDe.PKV) {
-      if (pkvAssignerOrganization == null) {
-        // create Assigner on first call and reuse on later calls to prevent non-deterministic
-        // behaviour!
-        pkvAssignerOrganization = KbvAssignerOrganizationFaker.builder().fake();
-      }
-      pb.assigner(pkvAssignerOrganization);
-    }
-
-    return pb.build();
+    return KbvPatientBuilder.builder()
+        .kvnr(kvnr, patientInsuranceType)
+        .name(firstName, lastName)
+        .birthDate(birthDate)
+        .address(Country.D, city, postal, street)
+        .build();
   }
 
   public KbvCoverage getInsuranceCoverage() {
@@ -150,11 +139,11 @@ public class ProvidePatientBaseData implements Ability {
         KbvCoverageBuilder.insurance(iknr, insuranceName)
             .beneficiary(this.getPatient())
             .wop(wop)
-            .dmpKennzeichen(dmpKennzeichen != null ? dmpKennzeichen : DmpKennzeichen.NOT_SET)
+            .dmpKennzeichen(dmpKennzeichen)
             .versichertenStatus(VersichertenStatus.MEMBERS);
 
     Optional.ofNullable(payorType)
-        .ifPresentOrElse(builder::versicherungsArt, () -> builder.versicherungsArt(coverageType));
+        .ifPresentOrElse(builder::insuranceType, () -> builder.insuranceType(coverageType));
 
     return builder.build();
   }
@@ -164,11 +153,11 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public boolean isPKV() {
-    return patientInsuranceType == InsuranceTypeDe.PKV;
+    return this.kvnr.isPkv();
   }
 
   public boolean isGKV() {
-    return patientInsuranceType == InsuranceTypeDe.GKV;
+    return this.kvnr.isGkv();
   }
 
   public boolean hasRememberedConsent() {
@@ -198,12 +187,12 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public static ProvidePatientBaseData forPatient(
-      KVNR kvnr, String fullName, String versicherungsArt) {
-    return forPatient(kvnr, fullName, InsuranceTypeDe.fromCode(versicherungsArt));
+      KVNR kvnr, String fullName, String insuranceType) {
+    return forPatient(kvnr, fullName, InsuranceTypeDe.fromCode(insuranceType));
   }
 
   public static ProvidePatientBaseData forPatient(
-      KVNR kvnr, String fullName, InsuranceTypeDe versicherungsArt) {
+      KVNR kvnr, String fullName, InsuranceTypeDe insuranceType) {
     String[] tokens;
     if (!Strings.isNullOrEmpty(fullName)) {
       tokens = fullName.split(" "); // split by first and last names
@@ -221,13 +210,57 @@ public class ProvidePatientBaseData implements Ability {
       familyName = GemFaker.fakerLastName();
     }
 
-    return forPatient(kvnr, givenName, familyName, versicherungsArt);
+    return forPatient(kvnr, givenName, familyName, insuranceType);
   }
 
+  /**
+   * Creates a new instance of {@link ProvidePatientBaseData} for a patient with the specified
+   * details.
+   *
+   * <p><b>Note:</b> Because this method requires a {@link KVNR} <b>and</b> {@link InsuranceTypeDe}
+   * which both carry the same information, it is very likely to mess up the data consistency from
+   * the user perspective.
+   *
+   * <p>Imagine the following scenario: A user creates a {@link KVNR} with a {@link InsuranceTypeDe}
+   * of {@code PKV}.
+   *
+   * <pre>{@code
+   * val kvnr = KVNR.from("X110415294", InsuranceTypeDe.PKV);
+   * val insuranceType                = InsuranceTypeDe.GKV;
+   * val pbd = ProvidePatientBaseData.forPatient(kvnr, "Max", "Mustermann", insuranceType);
+   *
+   * // but here the twist: the insurance types are not the same
+   * assert kvnr.getInsuranceType() == insuranceType; // AssertionError
+   * }</pre>
+   *
+   * <p>This issue is prevented by taking the given {@link InsuranceTypeDe} and setting it on the
+   * {@link KVNR} instance. However, whenever using this method, it is recommended to assert the
+   * insurance type of the {@link KVNR} instance.
+   *
+   * <pre>{@code
+   * val kvnr = KVNR.from("X110415294", InsuranceTypeDe.GKV);
+   * val pbd = ProvidePatientBaseData.forPatient(kvnr, "Max", "Mustermann", kvnr.getInsuranceType());
+   *
+   * assert kvnr.getInsuranceType() == insuranceType; // OK
+   *
+   * }</pre>
+   *
+   * @param kvnr the KVNR (Krankenversichertennummer) of the patient
+   * @param firstName the first name of the patient
+   * @param givenName the given name of the patient
+   * @param insuranceType the insurance type of the patient
+   * @return a new instance of `ProvidePatientBaseData` with the specified details
+   */
   public static ProvidePatientBaseData forPatient(
-      KVNR kvnr, String firstName, String givenName, InsuranceTypeDe versicherungsArt) {
-    val ret = new ProvidePatientBaseData(kvnr, firstName, givenName);
-    ret.setPatientInsuranceType(versicherungsArt);
-    return ret;
+      KVNR kvnr, String firstName, String givenName, InsuranceTypeDe insuranceType) {
+    val pbd = new ProvidePatientBaseData(kvnr, firstName, givenName);
+
+    // this will trigger the fix for insuranceType of the KVNR; see javadocs
+    pbd.setPatientInsuranceType(insuranceType);
+
+    // ensure the fix is working
+    // try this to assert pbd.getKvnr().getInsuranceType() == insuranceType; // NOSONAR
+
+    return pbd;
   }
 }

@@ -1,0 +1,397 @@
+{
+  "resourceType": "Bundle",
+  "id": "561f4a7e-0616-4c92-b6d5-91217aea136f",
+  "type": "searchset",
+  "timestamp": "2025-06-25T11:34:18.616+00:00",
+  "total": 0,
+  "link": [
+    {
+      "relation": "first",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&_count=5"
+    },
+    {
+      "relation": "next",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&_count=5&_id=gt01ebd19c-bda7-6e30-0000-000000000000"
+    },
+    {
+      "relation": "prev",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&_count=5&_id=lt01ebd19c-bd7b-e5a8-0000-000000000000"
+    },
+    {
+      "relation": "self",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=date&_count=5&_id=ge01ebd19c-bd7b-e5a8-0000-000000000000&_id=le01ebd19c-bda7-6e30-0000-000000000000"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bd7b-e5a8-3f84-8760b39f172f",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebd19c-bd7b-e5a8-3f84-8760b39f172f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID 160.000.006.746.135.23 eingestellt.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "update"
+          }
+        ],
+        "action": "U",
+        "recorded": "2024-11-25T16:04:49.049+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-SMC-B-Testkarte-883110000117369"
+              }
+            },
+            "name": "Praxis Blôch-BauerTEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task/160.000.006.746.135.23",
+              "identifier": {
+                "use": "official",
+                "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+                "value": "160.000.006.746.135.23"
+              }
+            },
+            "name": "X110614233",
+            "description": "160.000.006.746.135.23"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bd83-2520-ffcf-7067ddac9aea",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebd19c-bd83-2520-ffcf-7067ddac9aea",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Veronika Gräfin Angermänn hat das Rezept mit der ID 160.000.006.746.135.23 heruntergeladen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2024-11-25T16:04:49.524+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "http://fhir.de/sid/gkv/kvid-10",
+                "value": "X110614233"
+              }
+            },
+            "name": "Veronika Gräfin Angermänn",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task/160.000.006.746.135.23",
+              "identifier": {
+                "use": "official",
+                "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+                "value": "160.000.006.746.135.23"
+              }
+            },
+            "name": "X110614233",
+            "description": "160.000.006.746.135.23"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bd8e-1200-89c8-040f4b0bcc6a",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebd19c-bd8e-1200-89c8-040f4b0bcc6a",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID 160.000.006.746.135.23 gelöscht.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "delete"
+          }
+        ],
+        "action": "D",
+        "recorded": "2024-11-25T16:04:50.240+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-SMC-B-Testkarte-883110000117369"
+              }
+            },
+            "name": "Praxis Blôch-BauerTEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task/160.000.006.746.135.23",
+              "identifier": {
+                "use": "official",
+                "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+                "value": "160.000.006.746.135.23"
+              }
+            },
+            "name": "X110614233",
+            "description": "160.000.006.746.135.23"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bda0-bf40-b42d-47e1ec5edab3",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebd19c-bda0-bf40-b42d-47e1ec5edab3",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID 160.000.006.746.136.20 eingestellt.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "update"
+          }
+        ],
+        "action": "U",
+        "recorded": "2024-11-25T16:04:51.464+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-SMC-B-Testkarte-883110000117369"
+              }
+            },
+            "name": "Praxis Blôch-BauerTEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task/160.000.006.746.136.20",
+              "identifier": {
+                "use": "official",
+                "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+                "value": "160.000.006.746.136.20"
+              }
+            },
+            "name": "X110614233",
+            "description": "160.000.006.746.136.20"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebd19c-bda7-6e30-87db-698eca07f8d9",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebd19c-bda7-6e30-87db-698eca07f8d9",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Veronika Gräfin Angermänn hat das Rezept mit der ID 160.000.006.746.136.20 heruntergeladen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2024-11-25T16:04:51.902+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "http://fhir.de/sid/gkv/kvid-10",
+                "value": "X110614233"
+              }
+            },
+            "name": "Veronika Gräfin Angermänn",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task/160.000.006.746.136.20",
+              "identifier": {
+                "use": "official",
+                "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+                "value": "160.000.006.746.136.20"
+              }
+            },
+            "name": "X110614233",
+            "description": "160.000.006.746.136.20"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -25,7 +29,7 @@ import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;

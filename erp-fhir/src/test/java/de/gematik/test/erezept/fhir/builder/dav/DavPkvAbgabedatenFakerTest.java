@@ -12,19 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.dav;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.util.Currency;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import lombok.val;
 import org.hl7.fhir.r4.model.Invoice;
@@ -43,7 +47,7 @@ class DavPkvAbgabedatenFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakeDavAbgabedatenBundle() {
     val pharmacy = PharmacyOrganizationFaker.builder().fake();
-    val prescriptionId = fakerPrescriptionId();
+    val prescriptionId = PrescriptionId.random();
     val invoiceBuilder =
         DavInvoiceBuilder.builder()
             .currency(Currency.EUR)

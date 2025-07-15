@@ -12,10 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.SUPPLY_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import java.util.Date;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,9 +42,7 @@ import org.junit.jupiter.api.Test;
 class SupplyRequestBuilderTest extends ErpFhirParsingTest {
 
   private static KbvCoverage coverage;
-
   private static KbvErpMedication medication;
-
   private static KbvPractitioner practitioner;
 
   @BeforeAll
@@ -59,11 +62,16 @@ class SupplyRequestBuilderTest extends ErpFhirParsingTest {
     val supplyRequest = assertDoesNotThrow(builder::build);
     assertNotNull(supplyRequest);
 
-    val resultSupplyRequest = ValidatorUtil.encodeAndValidate(parser, supplyRequest);
-    assertTrue(resultSupplyRequest.isSuccessful());
-    assertEquals(
-        "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_PracticeSupply|1.1.0",
-        supplyRequest.getMeta().getProfile().get(0).getValue());
+    assertTrue(parser.isValid(supplyRequest));
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4) > 0) {
+      assertEquals(
+          SUPPLY_REQUEST.getCanonicalUrl() + "|1.3",
+          supplyRequest.getMeta().getProfile().get(0).getValue());
+    } else {
+      assertEquals(
+          SUPPLY_REQUEST.getCanonicalUrl() + "|1.1.0",
+          supplyRequest.getMeta().getProfile().get(0).getValue());
+    }
   }
 
   @Test
@@ -93,7 +101,6 @@ class SupplyRequestBuilderTest extends ErpFhirParsingTest {
             .authoredOn(new Date(), TemporalPrecisionEnum.DAY)
             .build();
     assertNotNull(supplyRequest);
-    val resultSupplyRequest = ValidatorUtil.encodeAndValidate(parser, supplyRequest);
-    assertTrue(resultSupplyRequest.isSuccessful());
+    assertTrue(parser.isValid(supplyRequest));
   }
 }

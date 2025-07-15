@@ -12,27 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.smartcards;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
-import de.gematik.bbriccs.smartcards.Hba;
-import de.gematik.bbriccs.smartcards.InstituteSmartcard;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.bbriccs.smartcards.SmartcardCertificate;
-import de.gematik.bbriccs.smartcards.SmartcardType;
+import de.gematik.bbriccs.smartcards.*;
 import de.gematik.bbriccs.smartcards.cfg.SmartcardConfigDto;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
@@ -104,6 +99,7 @@ public class SmartcardExpiryForecastMain {
 
                     if (card instanceof Hba hba) {
                       // extract qes certificates
+
                       Stream.of(CryptoSystem.values())
                           .forEach(
                               cryptoSystem -> {

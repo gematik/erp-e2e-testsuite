@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.integration.task;
@@ -46,7 +50,6 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
@@ -119,7 +122,9 @@ class TaskActivateIT extends ErpTest {
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Darreichungsform {2}"
               + " aus")
-  @DisplayName("E-Rezept als Verordnender Arzt an eine/n Versicherte/n ausstellen")
+  @DisplayName(
+      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n ausstellen mit definierter"
+          + " Darreichungsform")
   @MethodSource("prescriptionTypesProviderDarreichungsformen")
   void activatePrescriptionWithDarreichungsformen(
       InsuranceTypeDe insuranceType,
@@ -296,26 +301,15 @@ class TaskActivateIT extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withRandomKbvBundle());
 
-    val isOldKbvProfile =
-        KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_0_2) == 0;
-    if (isOldKbvProfile) {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome(FhirRequirements.FHIR_PROFILES)
-              .hasResponseWith(returnCode(400))
-              .isCorrect());
-    } else {
-      // new profiles + pkv activated: accept PKV prescriptions
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withExpectedType(ErpAfos.A_19022)
-              .hasResponseWith(returnCode(200))
-              .and(hasWorkflowType(expectedFlowType))
-              .and(isInReadyStatus())
-              .and(hasCorrectExpiryDate())
-              .and(hasCorrectAcceptDate(expectedFlowType))
-              .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType(ErpAfos.A_19022)
+            .hasResponseWith(returnCode(200))
+            .and(hasWorkflowType(expectedFlowType))
+            .and(isInReadyStatus())
+            .and(hasCorrectExpiryDate())
+            .and(hasCorrectAcceptDate(expectedFlowType))
+            .isCorrect());
   }
 
   static Stream<Arguments> prescriptionTypesProviderDmpKennzeichen() {

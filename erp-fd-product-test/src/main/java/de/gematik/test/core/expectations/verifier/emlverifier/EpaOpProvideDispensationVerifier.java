@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier.emlverifier;
@@ -19,6 +23,7 @@ package de.gematik.test.core.expectations.verifier.emlverifier;
 import static de.gematik.test.core.Helper.findBySystem;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
@@ -26,7 +31,6 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;

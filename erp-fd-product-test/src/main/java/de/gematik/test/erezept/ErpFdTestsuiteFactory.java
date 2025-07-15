@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept;
@@ -21,7 +25,7 @@ import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.bbriccs.rest.RestClient;
+import de.gematik.bbriccs.rest.UnirestHttpClient;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.OCSPAbility;
@@ -34,13 +38,7 @@ import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
-import de.gematik.test.erezept.config.dto.actor.ApothecaryConfiguration;
-import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
-import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
-import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.*;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
@@ -48,13 +46,7 @@ import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
@@ -114,8 +106,8 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .can(
             UseTheEpaMockClient.with(
                 EpaMockClient.withRestClient(
-                    RestClient.forUrl(epaMockUrl)
-                        .usingAuthorizationKey(epaMockApiKey)
+                    UnirestHttpClient.forUrl(epaMockUrl)
+                        .xAuthorization(epaMockApiKey)
                         .withoutTlsVerification(),
                     logRetrieveInterval,
                     maxWait)));

@@ -12,24 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.eml;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
-import de.gematik.bbriccs.rest.HttpRequestMethod;
-import de.gematik.bbriccs.rest.RestClient;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,13 +36,13 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class EpaMockClientTest {
-  private RestClient restClient;
+  private HttpBClient restClient;
   private EpaMockClient epaMockClient;
   private HttpBResponse mockHttpBResponse;
 
   @BeforeEach
   void setUp() {
-    restClient = mock(RestClient.class);
+    restClient = mock(HttpBClient.class);
     epaMockClient = EpaMockClient.withRestClient(restClient);
     mockHttpBResponse = mock(HttpBResponse.class);
   }
@@ -64,7 +62,7 @@ class EpaMockClientTest {
   @Test
   void testDownloadRequestSuccessfulResponse() {
     val mockRequest = mock(EpaMockDownloadRequest.class);
-    val httpBRequest = new HttpBRequest(HttpRequestMethod.GET, "/some-url");
+    val httpBRequest = HttpBRequest.get().urlPath("/some-url").withoutPayload();
     when(mockRequest.getHttpBRequest()).thenReturn(httpBRequest);
 
     val responseBody = ResourceLoader.readFileFromResource("example_get_log.json");
@@ -82,7 +80,7 @@ class EpaMockClientTest {
   @Test
   void testDownloadRequestFailureResponse() {
     val mockRequest = mock(EpaMockDownloadRequest.class);
-    val httpBRequest = new HttpBRequest(HttpRequestMethod.GET, "/some-url");
+    val httpBRequest = HttpBRequest.get().urlPath("/some-url").withoutPayload();
     when(mockRequest.getHttpBRequest()).thenReturn(httpBRequest);
     when(restClient.send(any())).thenThrow(new RuntimeException("Request failed"));
 
@@ -92,7 +90,7 @@ class EpaMockClientTest {
   @Test
   void testConfigRequestSuccessfulResponse() {
     val mockRequest = mock(EpaMockConfigRequest.class);
-    val httpBRequest = new HttpBRequest(HttpRequestMethod.POST, "/config-url");
+    val httpBRequest = HttpBRequest.post().urlPath("/config-url").withoutPayload();
     when(mockRequest.getHttpBRequest()).thenReturn(httpBRequest);
     when(restClient.send(any())).thenReturn(mockHttpBResponse);
     when(mockHttpBResponse.statusCode()).thenReturn(200);
@@ -106,7 +104,7 @@ class EpaMockClientTest {
   @Test
   void testConfigRequestFailureResponse() {
     val mockRequest = mock(EpaMockConfigRequest.class);
-    val httpBRequest = new HttpBRequest(HttpRequestMethod.POST, "/config-url");
+    val httpBRequest = HttpBRequest.post().urlPath("/config-url").withoutPayload();
     when(mockRequest.getHttpBRequest()).thenReturn(httpBRequest);
     when(restClient.send(any())).thenReturn(mockHttpBResponse);
     when(mockHttpBResponse.statusCode()).thenReturn(400);
@@ -120,12 +118,12 @@ class EpaMockClientTest {
   @Test
   void testPollRequest() {
     val mockRequest = mock(EpaMockDownloadRequest.class);
-    val httpBRequest = new HttpBRequest(HttpRequestMethod.GET, "/log");
+    val httpBRequest = HttpBRequest.get().urlPath("/log").withoutPayload();
     when(mockRequest.getHttpBRequest()).thenReturn(httpBRequest);
 
-    val responseOne = new HttpBResponse(200, List.of(), "[]");
+    val responseOne = HttpBResponse.status(200).withPayload("[]");
     val responseTwoBody = ResourceLoader.readFileFromResource("example_get_log.json");
-    val responseTwo = new HttpBResponse(200, List.of(), responseTwoBody);
+    val responseTwo = HttpBResponse.status(200).withPayload(responseTwoBody);
     when(restClient.send(any())).thenReturn(responseOne, responseOne, responseTwo);
 
     val result = epaMockClient.pollRequest(mockRequest);
@@ -138,10 +136,10 @@ class EpaMockClientTest {
   void testPollRequestPollingTimeoutException() {
 
     val mockRequest = mock(EpaMockDownloadRequest.class);
-    val httpBRequest = new HttpBRequest(HttpRequestMethod.GET, "/log");
+    val httpBRequest = HttpBRequest.get().urlPath("/log").withoutPayload();
     when(mockRequest.getHttpBRequest()).thenReturn(httpBRequest);
 
-    val emptyResponse = new HttpBResponse(200, List.of(), "[]");
+    val emptyResponse = HttpBResponse.status(200).withPayload("[]");
     when(restClient.send(any())).thenReturn(emptyResponse);
 
     val shortEpaMockClient = EpaMockClient.withRestClient(restClient, 100, 600);
@@ -153,7 +151,7 @@ class EpaMockClientTest {
   @ValueSource(strings = {"[]", ""})
   @NullSource
   void shouldRecognizeEmptyResponse(String body) {
-    val emptyResponse = new HttpBResponse(200, List.of(), body);
+    val emptyResponse = HttpBResponse.status(200).withPayload(body);
     when(restClient.send(any())).thenReturn(emptyResponse);
 
     val result = epaMockClient.downloadRequest(new DownloadRequestByPrescriptionId("xy"));

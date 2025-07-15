@@ -1,0 +1,14 @@
+{
+  "name": "de.ihe-d.terminology",
+  "version": "3.0.1",
+  "description": "de.ihe-d.terminology",
+  "author": "patrickwerner",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "type": "Conformance",
+  "canonical" : "http://fhir.de/packages/de.ihe-d.terminology",
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1"
+  }
+}

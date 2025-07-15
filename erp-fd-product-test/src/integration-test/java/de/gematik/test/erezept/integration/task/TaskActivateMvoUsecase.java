@@ -12,14 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.hasAnyOfDetailsText;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectMvoAcceptDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectMvoExpiryDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
+import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
@@ -28,10 +34,12 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.ErpTest;
+import de.gematik.test.erezept.actions.AcceptPrescription;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
@@ -40,16 +48,15 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.InvalidMvoIDAcceptToogle;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.kbv.MvoExtensionManipulatorFactory;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -57,23 +64,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
+// @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept als Mehrfachverordnung ausstellen")
 @Tag("Feature:MVO")
 class TaskActivateMvoUsecase extends ErpTest {
-
-  private static final Boolean invalidMvoIdAccept =
-      featureConf.getToggle(new InvalidMvoIDAcceptToogle());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
 
   @Actor(name = "Sina Hüllmann")
   private PatientActor sina;
+
+  @Actor(name = "Am Flughafen")
+  private PharmacyActor pharmacy;
 
   @TestcaseId("ERP_TASK_ACTIVATE_MVO_01")
   @ParameterizedTest(
@@ -213,7 +219,7 @@ class TaskActivateMvoUsecase extends ErpTest {
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withStatusKennzeichen(statusKennzeichen)
+            .withStatusKennzeichen(statusKennzeichen, doctor.getPractitioner())
             .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
             .withPractitioner(doctor.getPractitioner())
             .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
@@ -264,7 +270,7 @@ class TaskActivateMvoUsecase extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
     val verify =
-        expectSuccess || invalidMvoIdAccept
+        expectSuccess
             ? Verify.that(activation)
                 .withExpectedType(ErpAfos.A_24901)
                 .hasResponseWith(returnCode(200))
@@ -272,6 +278,70 @@ class TaskActivateMvoUsecase extends ErpTest {
                 .withOperationOutcome(ErpAfos.A_24901)
                 .hasResponseWith(returnCode(400));
     doctor.attemptsTo(verify.isCorrect());
+  }
+
+  @TestcaseId("ERP_TASK_ACTIVATE_MVO_06")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Apotheke darf das {0} E-Rezept für {1} nicht akzeptieren, weil Envelope"
+              + " {2}, ist")
+  @DisplayName("Apotheke versucht, eine ungültige Teilverordnung einer MVO zu akzeptieren")
+  @MethodSource("mvoNonActivable")
+  void pharmacyAcceptsMvoBeforeValidFromDate(
+      InsuranceTypeDe insuranceType,
+      PrescriptionAssignmentKind assignmentKind,
+      NamedEnvelope<MultiplePrescriptionExtension> envelope) {
+
+    sina.changePatientInsuranceType(insuranceType);
+    val mvo = envelope.getParameter();
+    val mvoId = mvo.getId().getIdValue();
+    val startDate = mvo.getStart().orElseThrow();
+
+    val medication =
+        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+
+    val kbvBundleBuilder =
+        KbvErpBundleFaker.builder()
+            .withMedication(medication)
+            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withPractitioner(doctor.getPractitioner())
+            .withMvo(mvo)
+            .toBuilder();
+    val activation =
+        doctor.performs(
+            IssuePrescription.forPatient(sina)
+                .ofAssignmentKind(assignmentKind)
+                .withKbvBundleFrom(kbvBundleBuilder));
+
+    val erxTask = activation.getExpectedResponse();
+    val acceptance = pharmacy.performs(AcceptPrescription.forTheTask(erxTask));
+
+    val expectedText =
+        format(
+            "Teilverordnung zur Mehrfachverordnung {0} ist ab {1} einlösbar.",
+            mvoId, new SimpleDateFormat("dd.MM.yyyy").format(startDate));
+
+    pharmacy.attemptsTo(
+        Verify.that(acceptance)
+            .withOperationOutcome(ErpAfos.A_22635_02)
+            .hasResponseWith(returnCode(403))
+            .and(hasAnyOfDetailsText(ErpAfos.A_22635_02, expectedText))
+            .isCorrect());
+  }
+
+  static Stream<Arguments> mvoNonActivable() {
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                NamedEnvelope.of(
+                    "4 von 4 in 10 Tage gültig",
+                    MultiplePrescriptionExtension.asMultiple(4, 4).validThrough(10, 365)))
+            .arguments(
+                NamedEnvelope.of(
+                    "4 von 4 in 1 Tag gültig",
+                    MultiplePrescriptionExtension.asMultiple(4, 4).validThrough(1, 365)));
+
+    return multiplyWithFlowTypes(composer);
   }
 
   static Stream<Arguments> mvoPrescriptionTypesProvider() {

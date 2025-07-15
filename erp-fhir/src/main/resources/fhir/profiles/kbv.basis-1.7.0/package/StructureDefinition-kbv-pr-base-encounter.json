@@ -1,0 +1,292 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Encounter",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Encounter",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Encounter",
+  "title": "KBV_PR_Base_Encounter",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet eine Begegnung bzw. einen Aufenthalt mit Interaktionen zwischen Patient:in und behandelnden Personen ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Encounter",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Encounter",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Encounter",
+        "path": "Encounter",
+        "definition": "Hier werden Begegnungen bzw. Aufenthalte mit Interaktionen zwischen Patient:in und behandelnden Personen abgebildet.\r\nDies kann zum Beispiel ein ambulanter Arzttermin oder ein stationärer Aufenthalt sein. Dies kann zum Beispiel ein ambulanter Arzttermin oder ein stationärer Aufenthalt sein. "
+      },
+      {
+        "id": "Encounter.status",
+        "path": "Encounter.status",
+        "definition": "Hier wird der Status der Begegnung bzw. des Aufenthalts angegeben.",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://fhir.de/ValueSet/EncounterStatusDe"
+        }
+      },
+      {
+        "id": "Encounter.class",
+        "path": "Encounter.class",
+        "definition": "Hier wird der Setting der Begegnung bzw. des Aufenthalts als codierte Information angegeben.",
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "http://fhir.de/ValueSet/EncounterClassDE",
+          "description": "Setting des Termins bzw. Aufenthalts"
+        }
+      },
+      {
+        "id": "Encounter.serviceType",
+        "path": "Encounter.serviceType",
+        "definition": "In diesem Element werden Angaben zur medizinischen Fachrichtung bzw. die Fachabteilung einer Einrichtung gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Encounter.serviceType.coding",
+        "path": "Encounter.serviceType.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Fachrichtung bzw. Fachabteilung als codierte Information angegeben."
+      },
+      {
+        "id": "Encounter.serviceType.coding:KBV-Fachgruppencodierung",
+        "path": "Encounter.serviceType.coding",
+        "sliceName": "KBV-Fachgruppencodierung",
+        "definition": "Hier wird die Fachrichtung/Fachabteilung anhand der KBV-Schlüsseltabelle S_BAR2_ARZTNRFACHGRUPPE wiedergegeben. Diese enthält die zweistellige Fachgruppencodierung für die 8.+9. Stelle der LANR (nach BAR-Schlüsselverzeichnis, Anlage 35).",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_BAR2_ARZTNRFACHGRUPPE"
+        },
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BAR2_ARZTNRFACHGRUPPE"
+        }
+      },
+      {
+        "id": "Encounter.serviceType.coding:KBV-Fachgruppencodierung.system",
+        "path": "Encounter.serviceType.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:KBV-Fachgruppencodierung.version",
+        "path": "Encounter.serviceType.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:KBV-Fachgruppencodierung.code",
+        "path": "Encounter.serviceType.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:KBV-Fachgruppencodierung.display",
+        "path": "Encounter.serviceType.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel",
+        "path": "Encounter.serviceType.coding",
+        "sliceName": "HL7-Fachabteilungsschluessel",
+        "definition": "Hier wird die Fachrichtung/Fachabteilung anhand eines Codes aus dem Codesystem \"Fachabteilungsschlüssel\" der HL7 Basis Deutschland angegeben.",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "http://fhir.de/CodeSystem/dkgev/Fachabteilungsschluessel"
+        },
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://fhir.de/ValueSet/dkgev/Fachabteilungsschluessel"
+        }
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel.system",
+        "path": "Encounter.serviceType.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel.version",
+        "path": "Encounter.serviceType.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel.code",
+        "path": "Encounter.serviceType.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel.display",
+        "path": "Encounter.serviceType.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel-erweitert",
+        "path": "Encounter.serviceType.coding",
+        "sliceName": "HL7-Fachabteilungsschluessel-erweitert",
+        "definition": "Hier wird die Fachrichtung/Fachabteilung anhand eines Codes aus dem Codesystem \"FachabteilungsschlüsselErweitert\" der HL7 Basis Deutschland angegeben.",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "http://fhir.de/CodeSystem/dkgev/Fachabteilungsschluessel-erweitert"
+        },
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://fhir.de/ValueSet/dkgev/Fachabteilungsschluessel-erweitert"
+        }
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel-erweitert.system",
+        "path": "Encounter.serviceType.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel-erweitert.version",
+        "path": "Encounter.serviceType.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel-erweitert.code",
+        "path": "Encounter.serviceType.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.coding:HL7-Fachabteilungsschluessel-erweitert.display",
+        "path": "Encounter.serviceType.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Encounter.serviceType.text",
+        "path": "Encounter.serviceType.text",
+        "definition": "Hier wird die Fachrichtung als Freitext angegeben."
+      },
+      {
+        "id": "Encounter.subject",
+        "path": "Encounter.subject",
+        "definition": "Hier wird der/die Patient:in oder die Gruppe referenziert, mit dem/der die Begegnung bzw. der Aufenthalt verknüpft ist.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Encounter.participant",
+        "path": "Encounter.participant",
+        "definition": "Hier werden alle Personen angegeben, die außer dem/der Patient:in selbst an der Begegnung bzw. dem Aufenthalt beteiligt sind."
+      },
+      {
+        "id": "Encounter.participant.type",
+        "path": "Encounter.participant.type",
+        "definition": "Hier wird angegeben, welche Rolle die Person beim Begegnung bzw. Aufenthalt spielt."
+      },
+      {
+        "id": "Encounter.participant.individual",
+        "path": "Encounter.participant.individual",
+        "definition": "Hier wird die Person referenziert, die beteiligt ist. Dies kann z.B. eine behandelnde Person oder eine Kontaktperson sein.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/PractitionerRole",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_PractitionerRole|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Encounter.period",
+        "path": "Encounter.period",
+        "definition": "Hier wird eine Zeitangabe gemacht, zu der die Begegnung bzw. der Aufenthalt stattfindet. Dies ist entweder ein spezifischer Zeitpunkt oder ein Zeitraum.",
+        "min": 1
+      },
+      {
+        "id": "Encounter.period.start",
+        "path": "Encounter.period.start",
+        "definition": "Hier wird ein Zeitpunkt angegeben, wobei dieser mindestens das Jahr beinhalten muss. \r\nWird kein Endzeitpunkt angegeben muss dieser jedoch mindestens Tags, Monat und Jahr beinhalten."
+      },
+      {
+        "id": "Encounter.period.end",
+        "path": "Encounter.period.end",
+        "definition": "Hier wird ein Zeitpunkt angegeben, wobei dieser mindestens das Jahr beinhalten muss."
+      },
+      {
+        "id": "Encounter.reasonCode",
+        "path": "Encounter.reasonCode",
+        "definition": "Hier wird die Begründung für die Begegnung bzw. den Aufenthalt anhand eines entsprechenden Codes oder alternativ mit einem Freitext angegeben."
+      },
+      {
+        "id": "Encounter.reasonReference",
+        "path": "Encounter.reasonReference",
+        "definition": "Hier werden Instanzen referenziert, die die Begegnung bzw. den Aufenthalt begründen.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Condition",
+              "http://hl7.org/fhir/StructureDefinition/Procedure",
+              "http://hl7.org/fhir/StructureDefinition/Observation",
+              "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Condition_Diagnosis|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Procedure|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Apgar_Score|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Blood_Pressure|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Body_Height|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Body_Temperature|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Body_Weight|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Breastfeeding_Status|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Care_Level|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Estimated_Date_of_Delivery|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Glucose_Concentration|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Head_Circumference|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Heart_Rate|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Pain_Scale_Score|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Peripheral_Oxygen_Saturation|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Pregnancy_Status|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Respiratory_Rate|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Encounter.location",
+        "path": "Encounter.location",
+        "definition": "Hier kann der Ort der Begegnung bzw. des Aufenthaltes angegeben werden, sofern dieser nicht bereits über ein anderes Element (z.B. über die Verantwortliche Einrichtung) erfasst ist."
+      },
+      {
+        "id": "Encounter.serviceProvider",
+        "path": "Encounter.serviceProvider",
+        "definition": "Hier wird die Einrichtung referenziert, die verantwortlich für die Begegnung bzw. den Aufenthalt ist.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

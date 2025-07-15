@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.dav;
@@ -20,9 +24,9 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.de.HL7CodeSystem;
 import de.gematik.test.erezept.fhir.extensions.dav.InvoiceId;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.AbdaErpPkvVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.version.AbdaErpPkvVersion;
 import de.gematik.test.erezept.fhir.r4.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvDispensedMedication;
 import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
@@ -137,7 +141,7 @@ public class DavPkvDispensedMedicationBuilder
     dm.setWhenHandedOverElement(new DateTimeType(whenHandedOver, TemporalPrecisionEnum.DAY));
     dm.setStatus(status);
     dm.setAuthorizingPrescription(
-        List.of(authorizingPrescription.asReference(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121)));
+        List.of(authorizingPrescription.asReference(ErpWorkflowNamingSystem.PRESCRIPTION_ID)));
 
     val mdp = new MedicationDispense.MedicationDispensePerformerComponent();
     mdp.getActor().setReference(performerId);

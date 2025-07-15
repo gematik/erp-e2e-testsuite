@@ -1,0 +1,32 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GEM_ERPEU_CS_ConsentType",
+  "id": "GEM-ERPEU-CS-ConsentType",
+  "title": "CodeSystem of types for a consent",
+  "description": "Type of patient consent.",
+  "version": "1.0.0",
+  "url": "https://gematik.de/fhir/erp-eu/CodeSystem/GEM_ERPEU_CS_ConsentType",
+  "concept": [
+    {
+      "code": "EUDISPCONS",
+      "display": "Consent for redeeming e-prescriptions in EU countries"
+    }
+  ],
+  "date": "2025-06-02",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 1
+}

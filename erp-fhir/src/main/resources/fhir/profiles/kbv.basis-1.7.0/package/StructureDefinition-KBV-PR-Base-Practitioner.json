@@ -1,0 +1,429 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Practitioner",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Practitioner",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet eine behandelnde Person ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Practitioner",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Practitioner",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Practitioner",
+        "path": "Practitioner",
+        "definition": "Dieses Element beschreibt die behandelnde Person. Diese kann einen ärztlichen, aber auch nicht ärztlichen Hintergrund besitzen.",
+        "constraint": [
+          {
+            "key": "pract-de-1",
+            "severity": "error",
+            "human": "Die amtliche Differenzierung der Geschlechtsangabe 'other' darf nur gefüllt sein, wenn das Geschlecht 'other' angegeben ist",
+            "expression": "gender.exists() and gender='other' implies gender.extension('http://fhir.de/StructureDefinition/gender-amtlich-de').exists()",
+            "source": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner"
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.extension",
+        "path": "Practitioner.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Practitioner.extension:ergaenzende_Angaben",
+        "path": "Practitioner.extension",
+        "sliceName": "ergaenzende_Angaben",
+        "definition": "In diesem Element werden als Freitext ergänzende Angaben zur Person gemacht, wie beispielsweise Zusatzqualifikationen.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Additional_Comment"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.identifier",
+        "path": "Practitioner.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "In diesem Element wird der Identifier (Identifikator) für diese behandelnde Person definiert. Der Identifikator kann aus diversen Quellen stammen."
+      },
+      {
+        "id": "Practitioner.identifier:ANR",
+        "path": "Practitioner.identifier",
+        "sliceName": "ANR",
+        "definition": "In diesem Element wird die Arztnummer (umgangssprachlich auch Lebenslange Arztnummer „LANR“ genannt) nach § 108 SGB V abgebildet.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-lanr"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.identifier:ANR.type",
+        "path": "Practitioner.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:ANR.type.coding",
+        "path": "Practitioner.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Practitioner.identifier:ANR.type.coding.system",
+        "path": "Practitioner.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:ANR.type.coding.code",
+        "path": "Practitioner.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:ANR.type.coding.display",
+        "path": "Practitioner.identifier.type.coding.display",
+        "patternString": "Lifelong physician number"
+      },
+      {
+        "id": "Practitioner.identifier:EFN",
+        "path": "Practitioner.identifier",
+        "sliceName": "EFN",
+        "definition": "In diesem Element wird die einheitliche Fortbildungsnummer (EFN) abgebildet.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-efn"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.identifier:EFN.type",
+        "path": "Practitioner.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:EFN.type.coding",
+        "path": "Practitioner.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Practitioner.identifier:EFN.type.coding.system",
+        "path": "Practitioner.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:EFN.type.coding.code",
+        "path": "Practitioner.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:EFN.type.coding.display",
+        "path": "Practitioner.identifier.type.coding.display",
+        "patternString": "Doctor number"
+      },
+      {
+        "id": "Practitioner.identifier:ZANR",
+        "path": "Practitioner.identifier",
+        "sliceName": "ZANR",
+        "definition": "In diesem Element wird die Zahnarztnummer analog zur ANR abgebildet.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-zanr"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.identifier:ZANR.type",
+        "path": "Practitioner.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:ZANR.type.coding",
+        "path": "Practitioner.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Practitioner.identifier:ZANR.type.coding.system",
+        "path": "Practitioner.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:ZANR.type.coding.code",
+        "path": "Practitioner.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:ZANR.type.coding.display",
+        "path": "Practitioner.identifier.type.coding.display",
+        "patternString": "Zahnarztnummer"
+      },
+      {
+        "id": "Practitioner.identifier:Telematik-ID",
+        "path": "Practitioner.identifier",
+        "sliceName": "Telematik-ID",
+        "definition": "Bei der Telematik-ID handelt es sich um eine eindeutige elektronische Identität von Leistungserbringenden und medizinischen Institutionen in der Telematik-Infrastruktur.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-telematik-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.identifier:Telematik-ID.type",
+        "path": "Practitioner.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:Telematik-ID.type.coding",
+        "path": "Practitioner.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Practitioner.identifier:Telematik-ID.type.coding.system",
+        "path": "Practitioner.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:Telematik-ID.type.coding.code",
+        "path": "Practitioner.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier:Telematik-ID.type.coding.display",
+        "path": "Practitioner.identifier.type.coding.display",
+        "patternString": "Provider number"
+      },
+      {
+        "id": "Practitioner.name",
+        "path": "Practitioner.name",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "use"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Dieses Element beschreibt den vollständigen Namen der behandelnden Person.",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.name:name",
+        "path": "Practitioner.name",
+        "sliceName": "name",
+        "definition": "Dieses Element beschreibt diverse Namensbestandteile der behandelnden Person.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "HumanName",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.name:name.family.extension:namenszusatz",
+        "path": "Practitioner.name.family.extension",
+        "sliceName": "namenszusatz",
+        "short": "Namenszusatz",
+        "definition": "Hier wird der Namenszusatz als Bestandteil des Nachnamens angegeben."
+      },
+      {
+        "id": "Practitioner.name:name.family.extension:vorsatzwort",
+        "path": "Practitioner.name.family.extension",
+        "sliceName": "vorsatzwort",
+        "definition": "Hier wird ein Vorsatzwort angegeben."
+      },
+      {
+        "id": "Practitioner.name:geburtsname",
+        "path": "Practitioner.name",
+        "sliceName": "geburtsname",
+        "definition": "Der Geburtsname ist der Nachname, den eine Person bei der Geburt erhalten hat. Dieser umfasst auch das Vorsatzwort und den Namenszusatz.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "HumanName",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Maiden_Name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.name:geburtsname.family.extension:namenszusatz",
+        "path": "Practitioner.name.family.extension",
+        "sliceName": "namenszusatz",
+        "definition": "Hier wird der Namenszusatz als Bestandteil des Nachnamens angegeben."
+      },
+      {
+        "id": "Practitioner.name:geburtsname.family.extension:vorsatzwort",
+        "path": "Practitioner.name.family.extension",
+        "sliceName": "vorsatzwort",
+        "definition": "Hier wird das Vorsatzwort angegeben."
+      },
+      {
+        "id": "Practitioner.telecom",
+        "path": "Practitioner.telecom",
+        "type": [
+          {
+            "code": "ContactPoint",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Contactpoint"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.address",
+        "path": "Practitioner.address",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Dieses Element beschreibt die Anschrift der behandelnden Person."
+      },
+      {
+        "id": "Practitioner.address:Strassenanschrift",
+        "path": "Practitioner.address",
+        "sliceName": "Strassenanschrift",
+        "definition": "Hier werden Angaben zur Straßenanschrift gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Street_Address"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.address:Postfach",
+        "path": "Practitioner.address",
+        "sliceName": "Postfach",
+        "definition": "Hier werden Angaben zu einem Postfach gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Post_Office_Box"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.gender",
+        "path": "Practitioner.gender",
+        "definition": "Hier wird die Geschlechtsdefinition der behandelnden Person angegeben."
+      },
+      {
+        "id": "Practitioner.gender.extension",
+        "path": "Practitioner.gender.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Practitioner.gender.extension:other-amtlich",
+        "path": "Practitioner.gender.extension",
+        "sliceName": "other-amtlich",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.de/StructureDefinition/gender-amtlich-de"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Practitioner.qualification",
+        "path": "Practitioner.qualification",
+        "definition": "Das Element beschreibt die Qualifikation der Person (z. B. Hebamme)."
+      },
+      {
+        "id": "Practitioner.qualification.code",
+        "path": "Practitioner.qualification.code",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Practitioner_Speciality",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName",
+              "valueString": "Qualification"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

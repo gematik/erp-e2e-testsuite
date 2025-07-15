@@ -12,14 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -29,7 +32,6 @@ import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
 @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
 class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
@@ -68,28 +70,16 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
   }
 
   @Test
-  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.3.0")
-  void shouldFakeWithGivenKbvMedication() {
-    val medication = KbvErpMedicationPZNFaker.builder().fake();
-    val medDispense = ErxMedicationDispenseFaker.builder().withMedication(medication).fake();
-    val result = ValidatorUtil.encodeAndValidate(parser, medDispense);
-    assertTrue(result.isSuccessful());
-  }
-
-  @Test
-  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.4.0")
   void shouldFakeWithGivenGemErpMedication() {
-    val medication = GemErpMedicationFaker.builder().fake();
+    val medication = GemErpMedicationFaker.forPznMedication().fake();
     val medDispense = ErxMedicationDispenseFaker.builder().withMedication(medication).fake();
-    val result = ValidatorUtil.encodeAndValidate(parser, medDispense);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(medDispense));
   }
 
   @Test
   void buildFakeMedicationDispenseWithHandedOverDate() {
     val medDispense = ErxMedicationDispenseFaker.builder().withHandedOverDate(new Date()).fake();
-    val result = ValidatorUtil.encodeAndValidate(parser, medDispense);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(medDispense));
   }
 
   @Test

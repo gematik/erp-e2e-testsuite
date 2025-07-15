@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task.ios;
@@ -20,7 +24,7 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.DebugSettings;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
@@ -38,7 +42,7 @@ public class ValidateLegalInsideSettingsIOS implements Task {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
 
     app.tap(BottomNav.SETTINGS_BUTTON);
-    app.scrollIntoView(ScrollDirection.DOWN, Settings.LEGAL_TEXT);
+    app.swipeIntoView(SwipeDirection.UP, Settings.LEGAL_TEXT);
     assertTrue(
         app.isPresent(Settings.LEGAL_TEXT),
         format("Unable to find {0}", Settings.LEGAL_TEXT.getElementName()));

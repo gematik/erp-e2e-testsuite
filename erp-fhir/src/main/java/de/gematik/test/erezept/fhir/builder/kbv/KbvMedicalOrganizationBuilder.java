@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -27,8 +31,8 @@ import de.gematik.bbriccs.fhir.de.builder.AddressBuilder;
 import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.test.erezept.fhir.builder.AbstractOrganizationBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.KSN;
@@ -156,19 +160,9 @@ public class KbvMedicalOrganizationBuilder
     if (identifierWrapper instanceof BSNR mBsnr) {
       return mBsnr.asIdentifier();
     } else if (identifierWrapper instanceof KZVA mKzva) {
-      if (kbvItaForVersion.equals(KbvItaForVersion.V1_0_3)) {
-        return mKzva.asIdentifier(DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER);
-      } else {
-        return mKzva.asIdentifier();
-      }
+      return mKzva.asIdentifier();
     } else if (identifierWrapper instanceof IKNR mIknr) {
-      Identifier iknrIdentifier;
-      if (kbvItaForVersion.equals(KbvItaForVersion.V1_0_3)) {
-        iknrIdentifier = mIknr.asIdentifier(DeBasisProfilNamingSystem.IKNR);
-      } else {
-        iknrIdentifier = mIknr.asIdentifier(DeBasisProfilNamingSystem.IKNR_SID);
-      }
-
+      val iknrIdentifier = mIknr.asIdentifier(DeBasisProfilNamingSystem.IKNR_SID);
       iknrIdentifier.getType().addCoding(HL7CodeSystem.HL7_V2_0203.asCoding("XX"));
       return iknrIdentifier;
     } else if (identifierWrapper instanceof KSN mKsn) {

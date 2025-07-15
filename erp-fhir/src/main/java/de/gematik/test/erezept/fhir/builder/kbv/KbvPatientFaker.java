@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -26,8 +30,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.r4.InstitutionalOrganization;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,7 +45,6 @@ public class KbvPatientFaker {
     this.withBirthDate(fakerBirthday())
         .withAddress(fakerCity(), fakerZipCode(), fakerStreetName())
         .withName(fakerFirstName(), fakerLastName())
-        .withAssignerRef(KbvAssignerOrganizationFaker.builder().fake())
         .withVersion(KbvItaForVersion.getDefaultVersion())
         .withKvnrAndInsuranceType(
             KVNR.random(), randomElement(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV));
@@ -74,11 +76,6 @@ public class KbvPatientFaker {
 
   public KbvPatientFaker withName(String givenName, String familyName) {
     builderConsumers.put("name", b -> b.name(givenName, familyName));
-    return this;
-  }
-
-  public KbvPatientFaker withAssignerRef(InstitutionalOrganization assigner) {
-    builderConsumers.put("assignerRef", b -> b.assigner(assigner));
     return this;
   }
 

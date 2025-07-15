@@ -12,19 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.parser;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
-import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import lombok.Getter;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -35,7 +38,7 @@ public class FhirParser {
 
   @Getter private final FhirContext ctx;
   private final ProfileExtractor profileExtractor;
-  private final ValidatorFhir validator;
+  @Delegate private final ValidatorFhir validator;
   private IParser xmlParser;
   private IParser jsonParser;
 
@@ -43,21 +46,6 @@ public class FhirParser {
     this.ctx = ProfileFhirParserFactory.createDecoderContext();
     this.profileExtractor = new ProfileExtractor();
     this.validator = ProfileFhirParserFactory.getProfiledValidators();
-  }
-
-  /**
-   * Check beforehand if the given content is valid
-   *
-   * @param content to be validated
-   * @return successful ValidationResult if content represents a valid FHIR-Resource and a
-   *     unsuccessful ValidationResult otherwise
-   */
-  public ValidationResult validate(String content) {
-    return this.validator.validate(content);
-  }
-
-  public boolean isValid(String content) {
-    return this.validator.isValid(content);
   }
 
   public <T extends Resource> T decode(Class<T> expectedClass, String content) {

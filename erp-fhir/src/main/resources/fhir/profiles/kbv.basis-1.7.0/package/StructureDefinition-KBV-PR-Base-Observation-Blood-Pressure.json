@@ -1,0 +1,592 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Observation-Blood-Pressure",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Blood_Pressure",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Observation_Blood_Pressure",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "description": "Dieses Profil beschreibt die Messung eines einzelnen Blutdrucks.",
+  "copyright": "Im folgenden Profil k&#246;nnen Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms&#174; (SNOMED CT&#174;) which is used by permission of SNOMED International. All rights reserved. SNOMED CT&#174;, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc (http://loinc.org). Loinc is copyright &#169; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (Loinc) Committee and is available at no cost under the license at http://loinc.org/license. Loinc&#174; is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright &#169; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures (UCUM) Organization. All rights reserved. THE UCUM TABLE (IN ALL FORMATS), UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://fhir.de/StructureDefinition/observation-de-vitalsign-blutdruck|1.5.2",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "definition": "Dieses Element beschreibt die Messung eines einzelnen Blutdrucks. Dieser kann die systolische Messung, diastolische Messung oder den Mittelwert enthalten oder auch eine Kombination hiervon."
+      },
+      {
+        "id": "Observation.status",
+        "path": "Observation.status",
+        "definition": "Hier wird der Status des Eintrages als Code angegeben."
+      },
+      {
+        "id": "Observation.code",
+        "path": "Observation.code",
+        "definition": "In diesem Element werden Angaben zum Blutdruck gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.code.coding",
+        "path": "Observation.code.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben.",
+        "min": 2
+      },
+      {
+        "id": "Observation.code.coding:loinc",
+        "path": "Observation.code.coding",
+        "sliceName": "loinc",
+        "definition": "In diesem Element wird ein spezifischer Code für den Blutdruck als LOINC®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems."
+      },
+      {
+        "id": "Observation.code.coding:loinc.version",
+        "path": "Observation.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:loinc.display",
+        "path": "Observation.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed",
+        "path": "Observation.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird ein spezifischer Code für  den Blutdruck  als SNOMED CT®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Observation.code.coding:snomed.version",
+        "path": "Observation.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed.display",
+        "path": "Observation.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.text",
+        "path": "Observation.code.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.focus",
+        "path": "Observation.focus",
+        "max": "0"
+      },
+      {
+        "id": "Observation.effective[x]",
+        "path": "Observation.effective[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed"
+        }
+      },
+      {
+        "id": "Observation.effective[x]:effectiveDateTime",
+        "path": "Observation.effective[x]",
+        "sliceName": "effectiveDateTime",
+        "definition": "Hier wird der Zeitpunkt der Messung angegeben.",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Observation.note",
+        "path": "Observation.note",
+        "definition": "Hier können ergänzende freitextliche Kommentare und Notizen vorgenommen werden, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Observation.note.author[x]",
+        "path": "Observation.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Observation.note.author[x]:authorReference",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.author[x]:authorString",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.time",
+        "path": "Observation.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "Observation.note.text",
+        "path": "Observation.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      },
+      {
+        "id": "Observation.bodySite",
+        "path": "Observation.bodySite",
+        "definition": "In diesem Element werden Angaben zur Körperstelle, an der die Messung vorgenommen wurde, gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.bodySite.coding",
+        "path": "Observation.bodySite.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.bodySite.text",
+        "path": "Observation.bodySite.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.method",
+        "path": "Observation.method",
+        "definition": "In diesem Element werden Angaben zur Methode der Messung gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.method.coding",
+        "path": "Observation.method.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.method.text",
+        "path": "Observation.method.text",
+        "definition": "Hier wird ein Freitext eingetragen, z.B. wenn ergänzende Angaben zum verwendeten Pulsoximeter erforderlich sind."
+      },
+      {
+        "id": "Observation.specimen",
+        "path": "Observation.specimen",
+        "max": "0"
+      },
+      {
+        "id": "Observation.component:SystolicBP",
+        "path": "Observation.component",
+        "sliceName": "SystolicBP",
+        "definition": "Hier wird der systolische Blutdruck abgebildet."
+      },
+      {
+        "id": "Observation.component:SystolicBP.code",
+        "path": "Observation.component.code",
+        "definition": "In diesem Element werden Angaben zum systolischen Blutdruck gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding",
+        "path": "Observation.component.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben.",
+        "min": 2
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:loinc",
+        "path": "Observation.component.code.coding",
+        "sliceName": "loinc",
+        "definition": "In diesem Element wird ein spezifischer Code für den systolischen Blutdruck als LOINC®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "patternCoding": {
+          "code": "8480-6",
+          "system": "http://loinc.org"
+        }
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:loinc.system",
+        "path": "Observation.component.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:loinc.version",
+        "path": "Observation.component.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:loinc.code",
+        "path": "Observation.component.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:loinc.display",
+        "path": "Observation.component.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:snomed",
+        "path": "Observation.component.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird ein spezifischer Code für den systolischen Blutdruck als SNOMED CT®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "patternCoding": {
+          "code": "271649006",
+          "system": "http://snomed.info/sct"
+        }
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:snomed.system",
+        "path": "Observation.component.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:snomed.version",
+        "path": "Observation.component.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:snomed.code",
+        "path": "Observation.component.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.coding:snomed.display",
+        "path": "Observation.component.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:SystolicBP.code.text",
+        "path": "Observation.component.code.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x]",
+        "path": "Observation.component.value[x]",
+        "definition": "Hier wird der Messwert angegeben."
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x]:valueQuantity",
+        "path": "Observation.component.value[x]",
+        "sliceName": "valueQuantity",
+        "definition": "Hier wird der Messwert angegeben.",
+        "type": [
+          {
+            "code": "Quantity"
+          }
+        ]
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x]:valueQuantity.value",
+        "path": "Observation.component.value[x].value",
+        "definition": "Hier wird der numerische Messwert angegeben."
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x]:valueQuantity.unit",
+        "path": "Observation.component.value[x].unit",
+        "definition": "Hier wird die Einheit des Messwerts angegeben.",
+        "patternString": "mm Hg"
+      },
+      {
+        "id": "Observation.component:DiastolicBP",
+        "path": "Observation.component",
+        "sliceName": "DiastolicBP",
+        "definition": "Hier wird der diastolische Blutdruck abgebildet."
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code",
+        "path": "Observation.component.code",
+        "definition": "In diesem Element werden Angaben zum diastolischen Blutdruck gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding",
+        "path": "Observation.component.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben.",
+        "min": 2
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:loinc",
+        "path": "Observation.component.code.coding",
+        "sliceName": "loinc",
+        "definition": "In diesem Element wird ein spezifischer Code für den diastolischen Blutdruck als LOINC®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "patternCoding": {
+          "code": "8462-4",
+          "system": "http://loinc.org"
+        }
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:loinc.system",
+        "path": "Observation.component.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:loinc.version",
+        "path": "Observation.component.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:loinc.code",
+        "path": "Observation.component.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:loinc.display",
+        "path": "Observation.component.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:snomed",
+        "path": "Observation.component.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird ein spezifischer Code für den diastolischen Blutdruck als SNOMED CT®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "patternCoding": {
+          "code": "271650006",
+          "system": "http://snomed.info/sct"
+        }
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:snomed.system",
+        "path": "Observation.component.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:snomed.version",
+        "path": "Observation.component.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:snomed.code",
+        "path": "Observation.component.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.coding:snomed.display",
+        "path": "Observation.component.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code.text",
+        "path": "Observation.component.code.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.component:DiastolicBP.value[x]",
+        "path": "Observation.component.value[x]",
+        "definition": "Hier wird der Messwert angegeben."
+      },
+      {
+        "id": "Observation.component:DiastolicBP.value[x]:valueQuantity",
+        "path": "Observation.component.value[x]",
+        "sliceName": "valueQuantity",
+        "definition": "Hier wird der Messwert angegeben.",
+        "type": [
+          {
+            "code": "Quantity"
+          }
+        ]
+      },
+      {
+        "id": "Observation.component:DiastolicBP.value[x]:valueQuantity.value",
+        "path": "Observation.component.value[x].value",
+        "definition": "Hier wird der numerische Messwert angegeben."
+      },
+      {
+        "id": "Observation.component:DiastolicBP.value[x]:valueQuantity.unit",
+        "path": "Observation.component.value[x].unit",
+        "definition": "Hier wird die Einheit des Messwerts angegeben.",
+        "patternString": "mm Hg"
+      },
+      {
+        "id": "Observation.component:meanBP",
+        "path": "Observation.component",
+        "sliceName": "meanBP",
+        "definition": "Hier wird der mittlere arterielle Blutdruck abgebildet."
+      },
+      {
+        "id": "Observation.component:meanBP.code",
+        "path": "Observation.component.code",
+        "definition": "In diesem Element werden Angaben zum mittleren arteriellen Blutdruck gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding",
+        "path": "Observation.component.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben.",
+        "min": 2
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:loinc",
+        "path": "Observation.component.code.coding",
+        "sliceName": "loinc",
+        "definition": "In diesem Element wird ein spezifischer Code für den mittlerer arterieller Blutdruck als LOINC®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "patternCoding": {
+          "code": "8478-0",
+          "system": "http://loinc.org"
+        }
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:loinc.system",
+        "path": "Observation.component.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:loinc.version",
+        "path": "Observation.component.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:loinc.code",
+        "path": "Observation.component.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:loinc.display",
+        "path": "Observation.component.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:snomed",
+        "path": "Observation.component.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird ein spezifischer Code für den mittlerer arterieller Blutdruck als SNOMED CT®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 1,
+        "max": "1",
+        "patternCoding": {
+          "code": "6797001",
+          "system": "http://snomed.info/sct"
+        }
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:snomed.system",
+        "path": "Observation.component.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:snomed.version",
+        "path": "Observation.component.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:snomed.code",
+        "path": "Observation.component.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.coding:snomed.display",
+        "path": "Observation.component.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:meanBP.code.text",
+        "path": "Observation.component.code.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.component:meanBP.value[x]",
+        "path": "Observation.component.value[x]",
+        "definition": "Hier wird der Messwert angegeben."
+      },
+      {
+        "id": "Observation.component:meanBP.value[x]:valueQuantity",
+        "path": "Observation.component.value[x]",
+        "sliceName": "valueQuantity",
+        "definition": "Hier wird der Messwert angegeben.",
+        "type": [
+          {
+            "code": "Quantity"
+          }
+        ]
+      },
+      {
+        "id": "Observation.component:meanBP.value[x]:valueQuantity.value",
+        "path": "Observation.component.value[x].value",
+        "definition": "Hier wird der numerische Messwert angegeben."
+      },
+      {
+        "id": "Observation.component:meanBP.value[x]:valueQuantity.unit",
+        "path": "Observation.component.value[x].unit",
+        "definition": "Hier wird die Einheit des Messwerts angegeben.",
+        "patternString": "mm Hg"
+      }
+    ]
+  }
+}

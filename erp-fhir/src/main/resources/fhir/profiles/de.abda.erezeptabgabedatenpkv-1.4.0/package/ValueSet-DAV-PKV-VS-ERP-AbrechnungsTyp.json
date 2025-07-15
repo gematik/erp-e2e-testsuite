@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "id": "DAV-PKV-VS-ERP-AbrechnungsTyp",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-PKV-VS-ERP-AbrechnungsTyp",
+  "version": "1.4.0",
+  "name": "DAV_PKV_VS_ERP_AbrechnungsTyp",
+  "title": "AbrechnungsTyp",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-AbrechnungsTyp"
+      }
+    ]
+  }
+}

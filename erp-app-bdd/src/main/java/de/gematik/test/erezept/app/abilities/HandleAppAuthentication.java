@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.abilities;
@@ -19,6 +23,7 @@ package de.gematik.test.erezept.app.abilities;
 import static java.text.MessageFormat.format;
 
 import com.github.javafaker.Faker;
+import javax.annotation.Nullable;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.screenplay.Ability;
@@ -30,9 +35,13 @@ public class HandleAppAuthentication implements Ability {
 
   private final String password;
 
-  public static HandleAppAuthentication withGivenPassword(@NonNull final String password) {
-    log.info(format("Use Password to protect the App: {0}", password));
-    return new HandleAppAuthentication(password);
+  public static HandleAppAuthentication withGivenPassword(@Nullable String password) {
+    if (password != null) {
+      log.info(format("Use Password to protect the App: {0}", password));
+      return new HandleAppAuthentication(password);
+    } else {
+      return withStrongPassword();
+    }
   }
 
   public static HandleAppAuthentication withStrongPassword() {

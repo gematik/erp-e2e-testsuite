@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -21,12 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -34,7 +35,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Communication;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -42,113 +42,105 @@ import org.junit.jupiter.api.Test;
 
 class ErxCommunicationTest extends ErpFhirParsingTest {
 
-  private final String BASE_PATH_111 = "fhir/valid/erp/1.1.1/";
-  private final String BASE_PATH_120 = "fhir/valid/erp/1.2.0/";
+  private final String basePath140 = "fhir/valid/erp/1.4.0/communication/";
 
   @Test
   void shouldEncodeSingleCommunicationDispReq() {
-    List.of("CommunicationDispReq_01.xml", "CommunicationDispReq_01.json")
-        .forEach(
-            fileName -> {
-              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
-              val communication = parser.decode(ErxCommunication.class, content);
-              assertNotNull(communication, "Valid ErxCommunicationDispReq must be parseable");
+    val resourceId = "2be1c6ac-5d10-47f6-84ee-8318b2c22c76";
+    val fileName = resourceId + ".json";
+    val content = ResourceLoader.readFileFromResource(basePath140 + fileName);
+    val communication = parser.decode(ErxCommunication.class, content);
+    assertNotNull(communication, "Valid ErxCommunicationDispReq must be parseable");
 
-              val expectedTaskId = TaskId.from("4711");
-              val expectedAccessCode =
-                  new AccessCode(
-                      "777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea");
-              val expectedSenderKvid = "X234567890";
-              val expectedRecipientId = "606358757";
-              val expectedMessage = "Bitte schicken Sie einen Boten.";
-              val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
-              val expectedDate =
-                  ZonedDateTime.parse("2020-03-12T18:01:10+00:00")
-                      .toInstant()
-                      .atZone(ZoneId.systemDefault())
-                      .toLocalDateTime();
+    val expectedTaskId = TaskId.from("162.000.033.491.280.78");
+    val expectedAccessCode =
+        AccessCode.from("777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea");
+    val expectedSenderKvid = "X234567890";
+    val expectedRecipientId = "8-SMC-B-Testkarte-883110000123465";
+    val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
+    val expectedDate =
+        ZonedDateTime.parse("2025-01-15T15:29:00.434+00:00")
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
 
-              assertFalse(communication.hasAboutReference());
-              assertFalse(communication.getAboutReference().isPresent());
-              assertEquals(CommunicationType.DISP_REQ, communication.getType());
-              assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
-              assertTrue(communication.getBasedOnAccessCode().isPresent());
-              assertEquals(expectedAccessCode, communication.getBasedOnAccessCode().orElseThrow());
-              assertEquals(expectedSenderKvid, communication.getSenderId());
-              assertEquals(expectedRecipientId, communication.getRecipientId());
-              assertEquals(expectedMessage, communication.getMessage());
-              assertEquals(expectedStatus, communication.getStatus());
-              assertEquals(expectedDate, communication.getSentDate());
-            });
+    assertFalse(communication.hasAboutReference());
+    assertFalse(communication.getAboutReference().isPresent());
+    assertEquals(CommunicationType.DISP_REQ, communication.getType());
+    assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
+    assertTrue(communication.getBasedOnAccessCode().isPresent());
+    assertEquals(expectedAccessCode, communication.getBasedOnAccessCode().orElseThrow());
+    assertEquals(expectedSenderKvid, communication.getSenderId());
+    assertEquals(expectedRecipientId, communication.getRecipientId());
+    assertEquals(expectedStatus, communication.getStatus());
+    assertEquals(expectedDate, communication.getSentDate());
   }
 
   @Test
   void shouldEncodeSingleCommunicationInfoReq() {
-    List.of("CommunicationInfoReq_01.xml", "CommunicationInfoReq_01.json")
-        .forEach(
-            fileName -> {
-              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
-              val communication = parser.decode(ErxCommunication.class, content);
-              assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
+    val resourceId = "8ca3c379-ac86-470f-bc12-178c9008f5c9";
+    val fileName = resourceId + ".json";
+    val content = ResourceLoader.readFileFromResource(basePath140 + fileName);
 
-              val expectedTaskId = TaskId.from("4711");
-              val expectedAboutRef = "#5fe6e06c-8725-46d5-aecd-e65e041ca3de";
-              val expectedSenderKvid = "X234567890";
-              val expectedRecipientId = "606358757";
-              val expectedMessage =
-                  "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
-              val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
-              val expectedDate =
-                  ZonedDateTime.parse("2020-03-12T18:01:10+00:00")
-                      .toInstant()
-                      .atZone(ZoneId.systemDefault())
-                      .toLocalDateTime();
+    val communication = parser.decode(ErxCommunication.class, content);
+    assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
-              assertEquals(CommunicationType.INFO_REQ, communication.getType());
-              assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
-              assertTrue(communication.hasAboutReference());
-              assertEquals(expectedAboutRef, communication.getAboutReference().orElseThrow());
-              assertEquals(expectedSenderKvid, communication.getSenderId());
-              assertEquals(expectedRecipientId, communication.getRecipientId());
-              assertEquals(expectedMessage, communication.getMessage());
-              assertEquals(expectedStatus, communication.getStatus());
-              assertEquals(expectedDate, communication.getSentDate());
-              assertTrue(communication.isSubstitutionAllowed());
-            });
+    val expectedTaskId = TaskId.from("160.000.033.491.280.78");
+    val expectedAboutRef = "#SumatripanMedication";
+    val expectedSenderKvid = "X234567890";
+    val expectedRecipientId = "3-SMC-B-Testkarte-883110000123465";
+    val expectedMessage =
+        "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
+    val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
+    val expectedDate =
+        ZonedDateTime.parse("2025-01-15T15:29:00.434+00:00")
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
+
+    assertEquals(CommunicationType.INFO_REQ, communication.getType());
+    assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
+    assertTrue(communication.hasAboutReference());
+    assertEquals(expectedAboutRef, communication.getAboutReference().orElseThrow());
+    assertEquals(expectedSenderKvid, communication.getSenderId());
+    assertEquals(expectedRecipientId, communication.getRecipientId());
+    assertTrue(communication.getMessage().contains(expectedMessage));
+    assertEquals(expectedStatus, communication.getStatus());
+    assertEquals(expectedDate, communication.getSentDate());
+    assertFalse(communication.isSubstitutionAllowed());
   }
 
   @Test
   void shouldEncodeSingleCommunicationReply() {
-    List.of("CommunicationReply_01.xml", "CommunicationReply_01.json")
-        .forEach(
-            fileName -> {
-              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
-              val communication = parser.decode(ErxCommunication.class, content);
-              assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
+    val resourceId = "7977a4ab-97a9-4d95-afb3-6c4c1e2ac596";
+    val fileName = resourceId + ".json";
+    val content = ResourceLoader.readFileFromResource(basePath140 + fileName);
 
-              val expectedTaskId = TaskId.from("4711");
-              val expectedRecipientKvid = "X234567890";
-              val expectedSenderId = "606358757";
-              val expectedMessage =
-                  "Hallo, wir haben das Medikament vorrätig. Kommen Sie gern in die Filiale oder"
-                      + " wir schicken einen Boten.";
-              val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
-              val expectedDate =
-                  ZonedDateTime.parse("2020-03-12T18:01:10+00:00")
-                      .toInstant()
-                      .atZone(ZoneId.systemDefault())
-                      .toLocalDateTime();
+    val communication = parser.decode(ErxCommunication.class, content);
+    assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
-              assertEquals(CommunicationType.REPLY, communication.getType());
-              assertFalse(communication.hasAboutReference());
-              assertFalse(communication.getAboutReference().isPresent());
-              assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
-              assertEquals(expectedRecipientKvid, communication.getRecipientId());
-              assertEquals(expectedSenderId, communication.getSenderId());
-              assertEquals(expectedMessage, communication.getMessage());
-              assertEquals(expectedStatus, communication.getStatus());
-              assertEquals(expectedDate, communication.getSentDate());
-            });
+    val expectedTaskId = TaskId.from("160.000.033.491.280.78");
+    val expectedRecipientKvid = "X234567890";
+    val expectedSenderId = "3-SMC-B-Testkarte-883110000123465";
+    val expectedMessage =
+        "Hallo, wir haben das Medikament vorrätig. Kommen Sie gern in die Filiale oder"
+            + " wir schicken einen Boten.";
+    val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
+    val expectedDate =
+        ZonedDateTime.parse("2025-01-15T15:29:00.434+00:00")
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
+
+    assertEquals(CommunicationType.REPLY, communication.getType());
+    assertFalse(communication.hasAboutReference());
+    assertFalse(communication.getAboutReference().isPresent());
+    assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
+    assertEquals(expectedRecipientKvid, communication.getRecipientId());
+    assertEquals(expectedSenderId, communication.getSenderId());
+    assertEquals(expectedMessage, communication.getMessage());
+    assertEquals(expectedStatus, communication.getStatus());
+    assertEquals(expectedDate, communication.getSentDate());
   }
 
   @Test
@@ -161,19 +153,18 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     com.setBasedOn(List.of(reference));
 
     assertTrue(com.getBasedOnAccessCode().isPresent());
-    assertEquals(AccessCode.fromString(acValue), com.getBasedOnAccessCode().orElseThrow());
+    assertEquals(AccessCode.from(acValue), com.getBasedOnAccessCode().orElseThrow());
     assertFalse(com.getBasedOnReferenceId().getValue().isEmpty());
     assertEquals(taskId, com.getBasedOnReferenceId());
   }
 
   @Test
   void shouldMatchBasedOnReference() {
-    List.of("a218a36e-f2fd-4603-ba67-c827acfef01b.json", "a218a36e-f2fd-4603-ba67-c827acfef01b.xml")
+    List.of("a218a36e-f2fd-4603-ba67-c827acfef01b.json")
         .forEach(
             fileName -> {
               val content =
-                  ResourceLoader.readFileFromResource(
-                      format("{0}communication/{1}", BASE_PATH_120, fileName));
+                  ResourceLoader.readFileFromResource(format("{0}{1}", basePath140, fileName));
               val communication = parser.decode(ErxCommunication.class, content);
               assertEquals(
                   "777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea",
@@ -185,36 +176,12 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDecodeWithoutExpectedType() {
-    List.of("CommunicationReply_01.xml", "CommunicationReply_01.json")
+    ResourceLoader.readFilesFromDirectory(basePath140)
         .forEach(
-            fileName -> {
-              val content = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
+            content -> {
               val communication = parser.decode(content);
               assertEquals(ResourceType.Communication, communication.getResourceType());
               assertEquals(ErxCommunication.class, communication.getClass());
-            });
-  }
-
-  @Test
-  void shouldReadSearchSetBundleCorrectly() {
-    List.of("CommunicationSearchBundle.json", "CommunicationSearchBundle.xml")
-        .forEach(
-            fileName -> {
-              val bundleContent = ResourceLoader.readFileFromResource(BASE_PATH_111 + fileName);
-              val bundle = parser.decode(Bundle.class, bundleContent);
-
-              val firstEntry = bundle.getEntry().get(0);
-              if (firstEntry.getResource() instanceof ErxCommunication com) {
-                assertEquals(
-                    "89e0747c0360a1a25c267bd69b37a51ab930cefa95d80277b58ed28cb0d822de",
-                    com.getBasedOnAccessCodeString().orElseThrow());
-                assertEquals(TaskId.from("160.000.006.306.676.73"), com.getBasedOnReferenceId());
-              } else {
-                fail(
-                    format(
-                        "First Entry must be of type {0} but was {1}",
-                        ErxCommunication.class, firstEntry.getResource().getResourceType()));
-              }
             });
   }
 
@@ -223,9 +190,7 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     val kvidReceiving = List.of(CommunicationType.REPLY, CommunicationType.REPRESENTATIVE);
     kvidReceiving.forEach(
         type ->
-            assertEquals(
-                DeBasisProfilNamingSystem.KVID,
-                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_1_1)));
+            assertEquals(DeBasisProfilNamingSystem.KVID_GKV_SID, type.getRecipientNamingSystem()));
   }
 
   @Test
@@ -233,9 +198,7 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     val kvidReceiving = List.of(ChargeItemCommunicationType.CHANGE_REPLY);
     kvidReceiving.forEach(
         type ->
-            assertEquals(
-                DeBasisProfilNamingSystem.KVID_PKV_SID,
-                type.getRecipientNamingSystem(ErpWorkflowVersion.getDefaultVersion())));
+            assertEquals(DeBasisProfilNamingSystem.KVID_PKV_SID, type.getRecipientNamingSystem()));
   }
 
   @Test
@@ -244,8 +207,7 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     kvidReceiving.forEach(
         type ->
             assertEquals(
-                ErpWorkflowNamingSystem.TELEMATIK_ID,
-                type.getRecipientNamingSystem(ErpWorkflowVersion.V1_1_1)));
+                DeBasisProfilNamingSystem.TELEMATIK_ID_SID, type.getRecipientNamingSystem()));
   }
 
   @Test
@@ -254,7 +216,6 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     kvidReceiving.forEach(
         type ->
             assertEquals(
-                ErpWorkflowNamingSystem.TELEMATIK_ID_SID,
-                type.getRecipientNamingSystem(ErpWorkflowVersion.getDefaultVersion())));
+                DeBasisProfilNamingSystem.TELEMATIK_ID_SID, type.getRecipientNamingSystem()));
   }
 }

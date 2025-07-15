@@ -12,12 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.r4.erp.ICommunicationType;
@@ -26,6 +30,7 @@ import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -37,7 +42,7 @@ import org.hl7.fhir.r4.model.StringType;
 public abstract class ErxCommunicationBuilder<B extends ErxCommunicationBuilder<B>>
     extends ResourceBuilder<ErxCommunication, B> {
 
-  protected final String message;
+  @Nullable protected final String message;
   protected ErpWorkflowVersion erpWorkflowVersion;
   protected String baseOnReference;
   protected Communication.CommunicationStatus status = Communication.CommunicationStatus.UNKNOWN;
@@ -58,6 +63,10 @@ public abstract class ErxCommunicationBuilder<B extends ErxCommunicationBuilder<
 
   public static ErxComDispReqBuilder forDispenseRequest(String message) {
     return new ErxComDispReqBuilder(message);
+  }
+
+  public static ErxComDispReqBuilder forDiGADispenseRequest() {
+    return new ErxComDispReqBuilder(null);
   }
 
   public static ErxComReplyBuilder asReply(CommunicationReplyMessage message) {
@@ -106,21 +115,16 @@ public abstract class ErxCommunicationBuilder<B extends ErxCommunicationBuilder<
     val com = this.createResource(ErxCommunication::new, profileSupplier.get());
 
     com.setStatus(status);
-    val recipientRef = type.getRecipientReference(this.erpWorkflowVersion, this.receiver);
-    com.setRecipient(List.of(recipientRef));
+    com.addRecipient(type.getRecipientReference(this.receiver));
 
     // NOTE: "normal" communications do not necessarily require a sender: why?
     // probably will be added for all Communications in Version 1.2
-    Optional.ofNullable(this.sender)
-        .ifPresent(
-            s -> {
-              val senderRef = type.getSenderReference(this.erpWorkflowVersion, s);
-              com.setSender(senderRef);
-            });
+    Optional.ofNullable(this.sender).ifPresent(s -> com.setSender(type.getSenderReference(s)));
 
-    val payload = new Communication.CommunicationPayloadComponent(new StringType(message));
-    com.setPayload(List.of(payload));
-
+    if (message != null) {
+      val payload = new Communication.CommunicationPayloadComponent(new StringType(message));
+      com.setPayload(List.of(payload));
+    }
     return com;
   }
 

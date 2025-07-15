@@ -12,11 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
-import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
@@ -39,24 +42,27 @@ public class PrescriptionDataMapperCompounding extends PrescriptionDataMapper {
 
   @Override
   protected KbvErpMedication getKbvErpMedication(Map<String, String> medMap) {
-    val pzn = getOrDefault("PZN", PZN.random().getValue(), medMap);
     val name = getOrDefault("Name", GemFaker.fakerDrugName(), medMap);
     val category = getOrDefault("Verordnungskategorie", "00", medMap);
     val isVaccine = Boolean.parseBoolean(getOrDefault("Impfung", "false", medMap));
     val darreichungsMenge = getOrDefault("Darreichungsmenge", "1", medMap);
     val medCodeText = getOrDefault("Rezepturname", "Zinkpaste DAB2020", medMap);
-    val freiTextInPzn = getOrDefault("Freitext", "123", medMap);
+    val freiTextInPzn = getOrDefault("Freitext", name != null ? name : "123", medMap);
     val compoundingNumerator = Long.parseLong(getOrDefault("Numerator", "312", medMap));
     val compoundingNumeratorUnit = getOrDefault("NumeratorUnit", "mg", medMap);
 
-    return KbvErpMedicationCompoundingFaker.builder()
-        .withCategory(MedicationCategory.fromCode(category))
-        .withProductionInstruction(ProductionInstruction.asCompounding(medCodeText))
-        .withMedicationIngredient(pzn, name, freiTextInPzn)
-        .withVaccine(isVaccine)
-        .withAmount(compoundingNumerator, compoundingNumeratorUnit)
-        .withAmount(Integer.decode(darreichungsMenge))
-        .toBuilder()
-        .build();
+    val medBuilder =
+        KbvErpMedicationCompoundingFaker.builder()
+            .withCategory(MedicationCategory.fromCode(category))
+            .withProductionInstruction(ProductionInstruction.asCompounding(medCodeText))
+            .withVaccine(isVaccine)
+            .withAmount(compoundingNumerator, compoundingNumeratorUnit)
+            .withAmount(Integer.decode(darreichungsMenge));
+    if (medMap.get("PZN") != null) {
+      medBuilder.withMedicationIngredient(medMap.get("PZN"), name, freiTextInPzn);
+    } else {
+      medBuilder.withIngredItemText(freiTextInPzn);
+    }
+    return medBuilder.toBuilder().build();
   }
 }

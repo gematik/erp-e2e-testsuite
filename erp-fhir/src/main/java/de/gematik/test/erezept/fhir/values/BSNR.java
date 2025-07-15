@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
@@ -22,10 +26,9 @@ import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.de.HL7CodeSystem;
 import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
 import java.util.Objects;
 import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
 /** <a href="https://de.wikipedia.org/wiki/Betriebsst%C3%A4ttennummer">Betriebsstättennummer</a> */
@@ -48,16 +51,12 @@ public class BSNR extends SemanticValue<String, KbvNamingSystem> {
 
   public Identifier asIdentifier() {
     val id = super.asIdentifier();
-    id.getType().addCoding(new Coding().setCode(CODE).setSystem(CODE_SYSTEM.getCanonicalUrl()));
+    id.getType().addCoding(CODE_SYSTEM.asCoding(CODE));
     return id;
   }
 
   public static HL7CodeSystem getCodeSystem() {
     return CODE_SYSTEM;
-  }
-
-  public static String getCodeSystemUrl() {
-    return CODE_SYSTEM.getCanonicalUrl();
   }
 
   public static String getCode() {

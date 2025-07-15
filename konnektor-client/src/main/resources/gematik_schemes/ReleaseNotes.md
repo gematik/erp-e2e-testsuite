@@ -3,7 +3,9 @@
 - Konnektor: Minus character escaped in pattern attribute Shorttext (C_10614)
  - FdV: GetNotificationInfoList, GetNotificationInformationRequestDTO added; Spelling corrected (testtreiber_fdv.yaml)
  - ePA: Bugfix in AuthorizationService
-
+- Removed the parameter ABSOLUTE_REFERENCE_ACTIVE from jenkins pipeline and from Testcase ERP_TASK_CLOSE_01
+- MVO product testcase for OperationOutcome of an MVO that cannot yet be filled - ERP_TASK_ACTIVATE_MVO_06
+- Add integration test to read software version and release date from FD using capability statement resource
 
 # Release 4.0.2-2
 - FdV: GetNotificationInfoList added

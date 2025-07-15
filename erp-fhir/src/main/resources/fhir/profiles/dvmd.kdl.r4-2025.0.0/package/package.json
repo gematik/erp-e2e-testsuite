@@ -1,0 +1,13 @@
+{
+  "name": "dvmd.kdl.r4",
+  "version": "2025.0.0",
+  "description": "Publikation der Terminologie-Ressourcen für die Nutzung der Klinische Dokumentenklassen-Liste (KDL) des DVMD\r\nVersion 2025",
+  "author": "dcmd",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "jurisdiction": "urn:iso:std:iso:3166#DE",
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1"
+  }
+}

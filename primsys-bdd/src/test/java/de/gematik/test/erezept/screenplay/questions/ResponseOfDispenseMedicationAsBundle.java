@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -22,10 +26,10 @@ import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleComma
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
@@ -162,9 +166,7 @@ public class ResponseOfDispenseMedicationAsBundle
           val darreichungsCode =
               medMap.getOrDefault(
                   "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode =
-              medMap.getOrDefault(
-                  "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());
+          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
           val medication =
               KbvErpMedicationPZNBuilder.builder()
@@ -195,7 +197,7 @@ public class ResponseOfDispenseMedicationAsBundle
       KbvErpBundle kbvBundle, String telematikID) {
     val paramsBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
     val medication =
-        GemErpMedicationBuilder.from(kbvBundle.getMedication())
+        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvBundle.getMedication())
             .lotNumber(GemFaker.fakerLotNumber())
             .build();
 
@@ -233,12 +235,10 @@ public class ResponseOfDispenseMedicationAsBundle
           val darreichungsCode =
               medMap.getOrDefault(
                   "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode =
-              medMap.getOrDefault(
-                  "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());
+          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
           val medication =
-              GemErpMedicationBuilder.builder()
+              GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
                   .pzn(pzn, name)
                   .amount(amount, unit)
                   .category(EpaDrugCategory.fromCode(categoryCode))
@@ -268,10 +268,10 @@ public class ResponseOfDispenseMedicationAsBundle
    * the Method compares the given ErpWorkflowVersion with ErpWorkflowVersion.V1_3_0 and returns
    * true if it is lower or equals Version 1.3.0
    *
-   * @return true while oldProfiles in use
+   * @return true while oldProfile in use
    */
   private boolean isOldProfile() {
-    return (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0);
+    return (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0);
   }
 
   private ErxMedicationDispense dispensePrescribedMedication(

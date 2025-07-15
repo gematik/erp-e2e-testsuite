@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -32,7 +36,7 @@ class ChargeItemPutCommandTest extends ErpFhirBuildingTest {
   @Test
   void shouldBuildCorrectRequest() {
     val prescriptionId = PrescriptionId.random();
-    val accessCode = AccessCode.fromString("123");
+    val accessCode = AccessCode.from("123");
     val chargeItem = new ErxChargeItem();
 
     val cmd = new ChargeItemPutCommand(prescriptionId, accessCode, chargeItem);
@@ -46,7 +50,7 @@ class ChargeItemPutCommandTest extends ErpFhirBuildingTest {
   @Test
   void shouldBuildRequestWithPrescriptionIdFromChargeItem() {
     val prescriptionId = PrescriptionId.random();
-    val accessCode = AccessCode.fromString("123");
+    val accessCode = AccessCode.from("123");
     val chargeItem = ErxChargeItemFaker.builder().withPrescriptionId(prescriptionId).fake();
 
     val cmd = new ChargeItemPutCommand(accessCode, chargeItem);

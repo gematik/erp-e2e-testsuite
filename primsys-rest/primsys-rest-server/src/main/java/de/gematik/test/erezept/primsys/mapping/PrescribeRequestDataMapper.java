@@ -12,16 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.r4.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
@@ -95,7 +103,7 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
 
   public KbvErpBundle createKbvBundle(String doctorName) {
     val practitioner = KbvPractitionerFaker.builder().withName(doctorName).fake();
-    val organization = KbvMedicalOrganizationFaker.medicalPractice().fake();
+    val organization = KbvMedicalOrganizationFaker.forPractitioner(practitioner).fake();
     val patient = this.getPatient();
     val coverage = this.getCoverage();
     val medication = this.getMedication();
@@ -106,27 +114,14 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
       throw ErrorResponseBuilder.createInternalErrorException(400, "MVO Data is invalid");
     }
 
-    val builder =
-        KbvErpBundleBuilder.forPrescription(GemFaker.fakerPrescriptionId())
-            .practitioner(practitioner)
-            .medicalOrganization(organization)
-            .patient(patient)
-            .insurance(coverage)
-            .medicationRequest(medicationRequest)
-            .medication(medication);
-
-    val isPkv = coverage.getInsuranceKind() == InsuranceTypeDe.PKV;
-    val isOldProfile = KbvItaForVersion.getDefaultVersion().compareTo(KbvItaForVersion.V1_0_3) == 0;
-    if (isPkv && isOldProfile) {
-      // assigner organization was only required in KbvItaFor 1.0.3
-      // for now,
-      // we do not have the AssignerOrganization (which was faked anyway for getting a Reference +
-      // Name
-      // build a faked one matching the Reference of the patient
-      builder.assigner(KbvAssignerOrganizationFaker.builder().forPatient(patient).fake());
-    }
-
-    return builder.build();
+    return KbvErpBundleBuilder.forPrescription(GemFaker.fakerPrescriptionId())
+        .practitioner(practitioner)
+        .medicalOrganization(organization)
+        .patient(patient)
+        .insurance(coverage)
+        .medicationRequest(medicationRequest)
+        .medication(medication)
+        .build();
   }
 
   public static PrescribeRequestDataMapper from(PrescribeRequestDto dto) {

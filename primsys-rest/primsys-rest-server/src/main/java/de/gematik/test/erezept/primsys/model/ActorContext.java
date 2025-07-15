@@ -12,12 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
 
 import static java.text.MessageFormat.format;
 
+import com.google.common.collect.Streams;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -35,7 +40,7 @@ import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,11 +84,7 @@ public class ActorContext {
   }
 
   public Doctor getDoctorOrThrowNotFound(String id) {
-    return this.getDoctor(id)
-        .orElseThrow(
-            () ->
-                ErrorResponseBuilder.createInternalErrorException(
-                    404, format("No Doctor found with ID {0}", id)));
+    return getActorOrThrowNotFound(id, "Doctor", this::getDoctor);
   }
 
   public Optional<Pharmacy> getPharmacy(String id) {
@@ -91,15 +92,20 @@ public class ActorContext {
   }
 
   public Pharmacy getPharmacyOrThrowNotFound(String id) {
-    return this.getPharmacy(id)
-        .orElseThrow(
-            () ->
-                ErrorResponseBuilder.createInternalErrorException(
-                    404, format("No Doctor found with ID {0}", id)));
+    return getActorOrThrowNotFound(id, "Pharmacy", this::getPharmacy);
+  }
+
+  public Optional<HealthInsurance> getHealthInsurance(String id) {
+    return this.healthInsurances.stream().filter(ktr -> ktr.getIdentifier().equals(id)).findFirst();
+  }
+
+  public HealthInsurance getHealthInsuranceOrThrowNotFound(String id) {
+    return getActorOrThrowNotFound(id, "KTR", this::getHealthInsurance);
   }
 
   public List<BaseActor> getActors() {
-    return Stream.concat(doctors.stream(), pharmacies.stream()).toList();
+    return Streams.concat(doctors.stream(), pharmacies.stream(), healthInsurances.stream())
+        .toList();
   }
 
   public List<ActorDto> getActorsSummary() {
@@ -183,5 +189,15 @@ public class ActorContext {
 
   public void shutdown() {
     // nothing to be done yet
+  }
+
+  private <A extends BaseActor> A getActorOrThrowNotFound(
+      String id, String type, Function<String, Optional<A>> finder) {
+    return finder
+        .apply(id)
+        .orElseThrow(
+            () ->
+                ErrorResponseBuilder.createInternalErrorException(
+                    404, format("No {0} found with ID {1}", type, id)));
   }
 }

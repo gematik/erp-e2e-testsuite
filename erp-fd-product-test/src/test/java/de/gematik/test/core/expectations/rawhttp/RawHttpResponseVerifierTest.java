@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.rawhttp;
@@ -142,5 +146,17 @@ class RawHttpResponseVerifierTest {
         RawHttpResponseVerifier.returnCodeIsIn(
             List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 200, 500), unspecificAfo);
     assertDoesNotThrow(() -> step.apply(response));
+  }
+
+  @Test
+  void shouldVerifyThatHeaderDoesNotContainsContent() {
+    val step = RawHttpResponseVerifier.hasNoHeaderWith("WrongValue", unspecificAfo);
+    assertDoesNotThrow(() -> step.apply(response));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyThatHeaderDoesNotContainsContent() {
+    val step = RawHttpResponseVerifier.hasNoHeaderWith("1", unspecificAfo);
+    assertThrows(AssertionError.class, () -> step.apply(response));
   }
 }

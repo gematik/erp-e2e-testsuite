@@ -1,0 +1,264 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-DocumentReference",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_DocumentReference",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_DocumentReference",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "description": "Hier wird auf ein externes Dokument verwiesen und/oder ein Dokument angehängt.",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from LOINC (http://loinc.org). LOINC is copyright © 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at http://loinc.org/license. LOINC® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright © 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures (UCUM) Organization. All rights reserved. THE UCUM TABLE (IN ALL FORMATS), UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED 'AS IS.' ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "DocumentReference",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/DocumentReference",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "DocumentReference",
+        "path": "DocumentReference",
+        "definition": "Hier wird auf ein externes Dokument verwiesen und/oder ein Dokument angehängt."
+      },
+      {
+        "id": "DocumentReference.status",
+        "path": "DocumentReference.status",
+        "definition": "Hier wird der Status des Dokumentenverweises bzw. Anhanges angegeben."
+      },
+      {
+        "id": "DocumentReference.type",
+        "path": "DocumentReference.type",
+        "definition": "In diesem Element werden Angaben zum Typ des Dokuments gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "DocumentReference.type.coding",
+        "path": "DocumentReference.type.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "DocumentReference.type.coding:xds",
+        "path": "DocumentReference.type.coding",
+        "sliceName": "xds",
+        "definition": "Hier wird der Dokumenttyp gem. IHE-De-Terminologie in codierter Form angeben.",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://ihe-d.de/ValueSets/IHEXDStypeCode"
+        }
+      },
+      {
+        "id": "DocumentReference.type.coding:xds.system",
+        "path": "DocumentReference.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.type.coding:xds.code",
+        "path": "DocumentReference.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.type.coding:xds.display",
+        "path": "DocumentReference.type.coding.display",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.type.text",
+        "path": "DocumentReference.type.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "DocumentReference.category",
+        "path": "DocumentReference.category",
+        "definition": "In diesem Element werden Angaben zur Kategorie des Dokuments gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "DocumentReference.category.coding",
+        "path": "DocumentReference.category.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "DocumentReference.category.coding:xds",
+        "path": "DocumentReference.category.coding",
+        "sliceName": "xds",
+        "definition": "Hier wird die Kategorie des Dokuments gem. IHE-De-Terminologie in codierter Form angeben.",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://ihe-d.de/ValueSets/IHEXDSclassCode"
+        }
+      },
+      {
+        "id": "DocumentReference.category.coding:xds.system",
+        "path": "DocumentReference.category.coding.system",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.category.coding:xds.code",
+        "path": "DocumentReference.category.coding.code",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.category.coding:xds.display",
+        "path": "DocumentReference.category.coding.display",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.category.text",
+        "path": "DocumentReference.category.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "DocumentReference.subject",
+        "path": "DocumentReference.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "http://hl7.org/fhir/StructureDefinition/Device",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DocumentReference.author",
+        "path": "DocumentReference.author",
+        "definition": "Hier werden Personen, Einrichtungen oder Geräte, die das Dokument erzeugt haben, referenziert.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/PractitionerRole",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "http://hl7.org/fhir/StructureDefinition/Device",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_PractitionerRole|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DocumentReference.description",
+        "path": "DocumentReference.description",
+        "definition": "Hier wird der Dokumentenverweis als Freitext erfasst, z. B. \"Arztbrief vom 28.04.2020\"."
+      },
+      {
+        "id": "DocumentReference.content",
+        "path": "DocumentReference.content",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "exists",
+              "path": "attachment.url"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "In diesem Element wird eine strukturierte Referenz auf andere Inhalte gemacht, dies kann z. B. ein anderes Dokument in der ePA sein\r\n\r\noder\r\n\r\nHier wird das Dokument in Form eines formatierten Anhangs abgebildet."
+      },
+      {
+        "id": "DocumentReference.content:verweis",
+        "path": "DocumentReference.content",
+        "sliceName": "verweis",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "DocumentReference.content:verweis.attachment",
+        "path": "DocumentReference.content.attachment",
+        "definition": "In diesem Element wird eine strukturierte Referenz auf andere Inhalte gemacht, dies kann z. B. ein anderes Dokument in der ePA sein."
+      },
+      {
+        "id": "DocumentReference.content:verweis.attachment.url",
+        "path": "DocumentReference.content.attachment.url",
+        "definition": "Hier wird die URI des Eintrags angegeben.",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.content:verweis.attachment.title",
+        "path": "DocumentReference.content.attachment.title",
+        "definition": "Hier findet sich der Name des referenzierten Dokumentes.",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.content:verweis.attachment.creation",
+        "path": "DocumentReference.content.attachment.creation",
+        "definition": "Hier wird der Zeitpunkt der Erstellung des referenzierten Dokumentes angegeben."
+      },
+      {
+        "id": "DocumentReference.content:anhang",
+        "path": "DocumentReference.content",
+        "sliceName": "anhang",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "DocumentReference.content:anhang.attachment",
+        "path": "DocumentReference.content.attachment",
+        "definition": "Hier wird das Dokument in Form eines formatierten Anhangs abgebildet."
+      },
+      {
+        "id": "DocumentReference.content:anhang.attachment.contentType",
+        "path": "DocumentReference.content.attachment.contentType",
+        "definition": "Hier wird das Dateiformat ausgewählt.\r\nEs ist ein Code aus dem System urn:ietf:bcp:13 zu wählen",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.content:anhang.attachment.data",
+        "path": "DocumentReference.content.attachment.data",
+        "definition": "Hier wird das Dokument als Datei angehängt.",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.content:anhang.attachment.url",
+        "path": "DocumentReference.content.attachment.url",
+        "max": "0"
+      },
+      {
+        "id": "DocumentReference.content:anhang.attachment.title",
+        "path": "DocumentReference.content.attachment.title",
+        "definition": "Hier wird ein Titel bzw. eine Bezeichnung für die angehängte Datei angegeben.",
+        "min": 1
+      },
+      {
+        "id": "DocumentReference.content:anhang.attachment.creation",
+        "path": "DocumentReference.content.attachment.creation",
+        "definition": "Hier wird der Zeitpunkt der Erstellung des Anhangs angegeben."
+      }
+    ]
+  }
+}

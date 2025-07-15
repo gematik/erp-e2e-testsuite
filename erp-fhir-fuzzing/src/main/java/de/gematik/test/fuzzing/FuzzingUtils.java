@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.fuzzing;
@@ -21,13 +25,13 @@ import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpBasisStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.PatientenrechnungStructDef;
 import lombok.val;
 
 public class FuzzingUtils {

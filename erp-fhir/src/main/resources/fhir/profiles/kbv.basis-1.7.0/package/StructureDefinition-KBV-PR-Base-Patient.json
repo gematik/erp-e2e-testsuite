@@ -1,0 +1,456 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Patient",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Patient",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet eine Person ab, die eine oder mehrere medizinische Leistungen in Anspruch nimmt.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Patient",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Patient",
+        "path": "Patient",
+        "definition": "Dieses Element beschreibt eine Person, die eine oder mehrere medizinische Leistungen in Anspruch nimmt.",
+        "constraint": [
+          {
+            "key": "pat-de-1",
+            "severity": "error",
+            "human": "Die amtliche Differenzierung der Geschlechtsangabe 'other' darf nur gefüllt sein, wenn das Geschlecht 'other' angegeben ist",
+            "expression": "gender.exists() and gender='other' implies gender.extension('http://fhir.de/StructureDefinition/gender-amtlich-de').exists()",
+            "source": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient"
+          }
+        ]
+      },
+      {
+        "id": "Patient.identifier",
+        "path": "Patient.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "In diesem Element wird der Identifier (Identifikator) für die Person eingetragen. Der Identifikator kann aus diversen Quellen stammen."
+      },
+      {
+        "id": "Patient.identifier:pid",
+        "path": "Patient.identifier",
+        "sliceName": "pid",
+        "definition": "Dieses Element enthält die Abbildung einer organisationsspezifischen Patienten-ID.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-pid"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.identifier:pid.type.coding",
+        "path": "Patient.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Patient.identifier:pid.type.coding.system",
+        "path": "Patient.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:pid.type.coding.code",
+        "path": "Patient.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:pid.type.coding.display",
+        "path": "Patient.identifier.type.coding.display",
+        "patternString": "Medical record number"
+      },
+      {
+        "id": "Patient.identifier:versichertenId",
+        "path": "Patient.identifier",
+        "sliceName": "versichertenId",
+        "definition": "Hier wird der unveränderliche Teil der einheitlichen Krankenversicherungsnummer der GKV gemäß § 290 SGB V angegeben. Die 10-stellige Zeichenfolge beginnt mit einem zufällig vergebene Großbuchstaben, darauf folgen 8 zufällige Ziffern.  Das 10.Zeichen ist eine Prüfziffer.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.identifier:versichertenId.type",
+        "path": "Patient.identifier.type",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:versichertenId.type.coding",
+        "path": "Patient.identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Patient.identifier:versichertenId.type.coding.system",
+        "path": "Patient.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:versichertenId.type.coding.code",
+        "path": "Patient.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:versichertenId.type.coding.display",
+        "path": "Patient.identifier.type.coding.display",
+        "patternString": "Krankenversichertennummer"
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_pkv",
+        "path": "Patient.identifier",
+        "sliceName": "versichertennummer_pkv",
+        "definition": "Hier wird der Identifikator für eine Privatversichertennummer angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-pkv"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_pkv.type",
+        "path": "Patient.identifier.type",
+        "min": 1,
+        "patternCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_Base_identifier_type",
+              "code": "pkv-nr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_pkv.type.coding",
+        "path": "Patient.identifier.type.coding",
+        "min": 2,
+        "max": "2"
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_pkv.type.coding.system",
+        "path": "Patient.identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_pkv.type.coding.code",
+        "path": "Patient.identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_pkv.type.coding.display",
+        "path": "Patient.identifier.type.coding.display",
+        "patternString": "Private Krankenversicherung"
+      },
+      {
+        "id": "Patient.identifier:reisepassnummer",
+        "path": "Patient.identifier",
+        "sliceName": "reisepassnummer",
+        "definition": "Hier wird die Reisepassnummer angegeben.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Identifier_Reisepassnummer"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.identifier:versichertennummer_kvk",
+        "path": "Patient.identifier",
+        "sliceName": "versichertennummer_kvk",
+        "definition": "Hier wird die Versichertennummer der Krankenversichertenkarte (KVK) angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Identifier_KVK"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.name",
+        "path": "Patient.name",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "use"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Dieses Element beschreibt den vollständigen Namen der behandelten Person.",
+        "min": 1
+      },
+      {
+        "id": "Patient.name:name",
+        "path": "Patient.name",
+        "sliceName": "name",
+        "definition": "Dieses Element beschreibt diverse Namensbestandteile der behandelten Person.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "HumanName",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.name:geburtsname",
+        "path": "Patient.name",
+        "sliceName": "geburtsname",
+        "definition": "Hier wird das Geburtsdatum der behandelten Person angegeben. Ist dieses nicht bekannt kann die Extension 'data-absent-reason' verwendet werden, um das Nichtvorhandensein zu dokumentieren.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "HumanName",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Maiden_Name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.telecom",
+        "path": "Patient.telecom",
+        "definition": "Dieses Element beschreibt die vorhandenen Kontaktmöglichkeiten.",
+        "type": [
+          {
+            "code": "ContactPoint",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Contactpoint"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.telecom.system",
+        "path": "Patient.telecom.system",
+        "definition": "Hier wird die Art des Kontaktes definiert, z. B. Telefon (phone), E-Mail, Fax."
+      },
+      {
+        "id": "Patient.gender",
+        "path": "Patient.gender",
+        "definition": "Hier wird die Geschlechtsdefinition nach den Versichertenstammdaten (VSD) angegeben."
+      },
+      {
+        "id": "Patient.gender.extension",
+        "path": "Patient.gender.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Patient.gender.extension:other-amtlich",
+        "path": "Patient.gender.extension",
+        "sliceName": "other-amtlich",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.de/StructureDefinition/gender-amtlich-de"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.birthDate",
+        "path": "Patient.birthDate",
+        "definition": "Hier wird das Geburtsdatum der behandelten Person angegeben. Ist dieses nicht bekannt kann die Extension 'data-absent-reason' verwendet werden, um das Nichtvorhandensein zu dokumentieren.",
+        "min": 1
+      },
+      {
+        "id": "Patient.birthDate.extension",
+        "path": "Patient.birthDate.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Patient.birthDate.extension:data-absent-reason",
+        "path": "Patient.birthDate.extension",
+        "sliceName": "data-absent-reason",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://hl7.org/fhir/StructureDefinition/data-absent-reason"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.birthDate.extension:data-absent-reason.value[x]",
+        "path": "Patient.birthDate.extension.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Patient.birthDate.extension:data-absent-reason.value[x]:valueCode",
+        "path": "Patient.birthDate.extension.value[x]",
+        "sliceName": "valueCode",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ],
+        "fixedCode": "unknown"
+      },
+      {
+        "id": "Patient.address",
+        "path": "Patient.address",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier werden Angaben zur Anschrift der behandelten Person gemacht."
+      },
+      {
+        "id": "Patient.address:Strassenanschrift",
+        "path": "Patient.address",
+        "sliceName": "Strassenanschrift",
+        "definition": "Hier werden Angaben zur Straßenanschrift gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Street_Address"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.address:Postfach",
+        "path": "Patient.address",
+        "sliceName": "Postfach",
+        "definition": "Hier werden Angaben zu einem Postfach gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Post_Office_Box"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Patient.maritalStatus",
+        "path": "Patient.maritalStatus",
+        "short": "Personenstand",
+        "definition": "Hier wird der Personenstand (Familienstand) der behandelten Person angegeben."
+      },
+      {
+        "id": "Patient.maritalStatus.coding.system",
+        "path": "Patient.maritalStatus.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Patient.maritalStatus.coding.code",
+        "path": "Patient.maritalStatus.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Patient.maritalStatus.coding.display",
+        "path": "Patient.maritalStatus.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Patient.contact.address.country",
+        "path": "Patient.contact.address.country",
+        "short": "Staat",
+        "definition": "Angabe des Staates als Länderkennzeichen nach DEUEV Anlage 8.",
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Deuev_Anlage_8"
+        }
+      },
+      {
+        "id": "Patient.communication.language",
+        "path": "Patient.communication.language",
+        "short": "Bevorzugte Sprache",
+        "definition": "Hier werden Sprachen angegeben, die zur Kommunikation mit der behandelten Person über medizinische Themen verwendet werden können.",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_CommonLanguages"
+        }
+      }
+    ]
+  }
+}

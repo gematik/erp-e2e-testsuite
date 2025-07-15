@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -19,21 +23,21 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.mvo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.junit.jupiter.api.Test;
@@ -51,11 +55,16 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     assertTrue(result2.isSuccessful());
   }
 
-  @Test
+  @Test()
   void buildFakeKbvErpBundleWithStatusKennzeichen() {
     val bundle =
         KbvErpBundleFaker.builder()
-            .withStatusKennzeichen(fakerValueSet(StatusKennzeichen.class).getCode())
+            .withStatusKennzeichen(
+                fakerValueSet(
+                        StatusKennzeichen.class,
+                        List.of(StatusKennzeichen.ASV, StatusKennzeichen.ASV_SUBSTITUTE))
+                    .getCode(),
+                KbvPractitionerFaker.builder().fake())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
@@ -95,7 +104,12 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     val bundle = KbvErpBundleFaker.builder().withBvg(true).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
-    assertTrue(bundle.getMedicationRequest().isBvg());
+    // BVG is only valid for old profiles
+    if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
+      assertTrue(bundle.getMedicationRequest().isBvg());
+    } else {
+      assertFalse(bundle.getMedicationRequest().isBvg());
+    }
   }
 
   @Test

@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.PatientenrechnungCodeSystem;
 import java.util.Arrays;
 import lombok.Getter;
 
@@ -26,7 +30,8 @@ import lombok.Getter;
 public enum ConsentType implements FromValueSet {
   CHARGCONS("CHARGCONS", "Consent for saving electronic charge item", "N/A");
 
-  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.CONSENT_TYPE;
+  public static final PatientenrechnungCodeSystem CODE_SYSTEM =
+      PatientenrechnungCodeSystem.CONSENT_TYPE;
 
   private final String code;
   private final String display;
@@ -39,7 +44,7 @@ public enum ConsentType implements FromValueSet {
   }
 
   @Override
-  public ErpWorkflowCodeSystem getCodeSystem() {
+  public PatientenrechnungCodeSystem getCodeSystem() {
     return CODE_SYSTEM;
   }
 

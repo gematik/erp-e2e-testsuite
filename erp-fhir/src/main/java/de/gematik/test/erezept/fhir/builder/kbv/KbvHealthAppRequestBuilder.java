@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -20,8 +24,9 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItvEvdgaStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItvEvdgaStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvHealthAppRequest;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
@@ -117,9 +122,14 @@ public class KbvHealthAppRequestBuilder
     val devReq =
         this.createResource(
             KbvHealthAppRequest::new, KbvItvEvdgaStructDef.HEALTH_APP_REQUEST, version);
+    if (version.compareTo(KbvItvEvdgaVersion.V1_1) <= 0) {
+      devReq.addExtension(
+          KbvItvEvdgaStructDef.SER_EXTENSION.asBooleanExtension(relatesToSocialCompensationLaw));
+    } else {
+      devReq.addExtension(
+          KbvItaForStructDef.SER_EXTENSION.asBooleanExtension(relatesToSocialCompensationLaw));
+    }
 
-    devReq.addExtension(
-        KbvItvEvdgaStructDef.SER_EXTENSION.asBooleanExtension(relatesToSocialCompensationLaw));
     devReq.setStatus(status);
     devReq.setIntent(intent);
 

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
@@ -19,7 +23,6 @@ package de.gematik.test.erezept.primsys.mapping;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeEvdgaRequestDto;
 import lombok.val;
@@ -35,7 +38,6 @@ class PrescribeEvdgaRequestDataMapperTest extends ErpFhirParsingTest {
     requestDto.setPatient(patientDto);
     val prescribeMapper = PrescribeEvdgaRequestDataMapper.from(requestDto);
     val kbvBundle = prescribeMapper.createEvdgaBundle("Bernd Claudius");
-    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(kbvBundle));
   }
 }

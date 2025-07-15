@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task;
@@ -72,7 +76,7 @@ public class DeleteRedeemablePrescription implements Task {
     dmcAbility.moveToDeleted(dmc);
 
     // Note: wait until the App finished the delete and moved back to the main screen
-    app.waitUntilElementIsVisible(Mainscreen.REFRESH_BUTTON);
+    app.waitUntilElementIsVisible(Mainscreen.REFRESH_BUTTON, 60000);
   }
 
   public static DeleteRedeemablePrescription fromStack(String order) {

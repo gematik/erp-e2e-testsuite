@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -64,10 +67,6 @@ public class MultiplePrescriptionExtension {
   }
 
   public Extension asExtension() {
-    return asExtension(KbvItaErpVersion.getDefaultVersion());
-  }
-
-  public Extension asExtension(KbvItaErpVersion kbvItaErpVersion) {
     val outerExt = KbvItaErpStructDef.MULTIPLE_PRESCRIPTION.asExtension();
     val kennzeichenExt = new Extension("Kennzeichen", new BooleanType(isMultiple));
 
@@ -84,10 +83,7 @@ public class MultiplePrescriptionExtension {
 
       innerExtensions.add(numExtension);
       innerExtensions.add(periodExt);
-
-      if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) >= 0) {
-        innerExtensions.add(id.asExtension());
-      }
+      innerExtensions.add(id.asExtension());
     }
 
     outerExt.setExtension(innerExtensions);

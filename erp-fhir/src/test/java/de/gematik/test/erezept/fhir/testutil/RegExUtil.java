@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.testutil;
@@ -26,16 +30,7 @@ import org.hl7.fhir.r4.model.AuditEvent;
 
 public class RegExUtil {
 
-  private static final Pattern FHIR_DATETIME =
-      Pattern.compile(
-          "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|([+\\-])((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?");
-
   private static final Pattern PRESCRIPTION_ID =
-      Pattern.compile(
-          "<system value=\"https://gematik\\.de/fhir/NamingSystem/PrescriptionID\"\\W/>\\W*<value"
-              + " value=\"([\\w.]+)");
-
-  private static final Pattern PRESCRIPTION_ID_121 =
       Pattern.compile(
           "<system"
               + " value=\"https://gematik\\.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId\"\\W/>\\W*<value"
@@ -50,11 +45,7 @@ public class RegExUtil {
     throw new AssertionError();
   }
 
-  public static Optional<String> getPrescriptionIdFor121(final String content) {
-    return match(content, PRESCRIPTION_ID_121, 1);
-  }
-
-  public static Optional<String> getPrescriptionId(final String content) {
+  public static Optional<String> getPrescriptionIdFor(String content) {
     return match(content, PRESCRIPTION_ID, 1);
   }
 
@@ -69,8 +60,7 @@ public class RegExUtil {
         d -> Date.from(LocalDateTime.parse(d).atZone(ZoneId.systemDefault()).toInstant()));
   }
 
-  private static Optional<String> match(
-      final String content, final Pattern pattern, final int groupIdx) {
+  private static Optional<String> match(String content, Pattern pattern, int groupIdx) {
     val matcher = pattern.matcher(content);
     Optional<String> ret;
     if (matcher.find()) {

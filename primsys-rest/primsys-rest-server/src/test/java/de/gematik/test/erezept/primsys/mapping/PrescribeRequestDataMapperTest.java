@@ -12,11 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -28,7 +34,6 @@ import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
 import jakarta.ws.rs.WebApplicationException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
 class PrescribeRequestDataMapperTest extends ErpFhirParsingTest {
 
@@ -63,8 +68,7 @@ class PrescribeRequestDataMapperTest extends ErpFhirParsingTest {
   }
 
   @Test
-  @SetSystemProperty(key = "kbv.ita.for", value = "1.0.3")
-  void shouldCreateKbvBundleWithPkvAndOldProfile() {
+  void shouldCreateKbvBundleWithPkv() {
     val patientDto = new PatientDto();
     patientDto.setInsuranceType(InsuranceTypeDto.PKV);
     patientDto.setKvnr("X110407071");

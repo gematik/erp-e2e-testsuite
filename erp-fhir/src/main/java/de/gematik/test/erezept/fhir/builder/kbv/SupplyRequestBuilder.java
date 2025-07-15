@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -19,7 +23,8 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
@@ -43,6 +48,7 @@ import org.hl7.fhir.r4.model.SupplyRequest;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyRequestBuilder> {
 
+  private KbvItaErpVersion version = KbvItaErpVersion.getDefaultVersion();
   private Date authoredOn = new Date();
   private TemporalPrecisionEnum temporalPrecision = TemporalPrecisionEnum.DAY;
   private KbvCoverage coverage;
@@ -58,11 +64,15 @@ public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyR
   @Override
   public SupplyRequest build() {
     checkRequiredAttributes();
-    val sR = this.createResource(SupplyRequest::new, KbvItaErpStructDef.SUPPLY_REQUEST);
+    val sR = this.createResource(SupplyRequest::new, KbvItaErpStructDef.SUPPLY_REQUEST, version);
 
     sR.setAuthoredOnElement(new DateTimeType(authoredOn, temporalPrecision));
     addKostentraegerExtension(sR);
-    sR.setQuantity(this.getQuantity());
+    if (version.compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
+      sR.setQuantity(this.getQuantity());
+    } else {
+      sR.setQuantity(this.getNewQuantity());
+    }
     sR.setRequester(requesterReference);
     sR.setItem(medicationReference);
     return sR;
@@ -72,7 +82,7 @@ public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyR
     val ktExt = sR.addExtension();
     ktExt.setUrl("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_PracticeSupply_Payor");
     val ikIdentifier =
-        DeBasisProfilNamingSystem.IKNR_SID.asIdentifier(coverage.getIknr().getValue());
+        DeBasisProfilNamingSystem.IKNR_SID.asIdentifier(coverage.getIknrOrThrow().getValue());
 
     ktExt.addExtension(new Extension("IK", ikIdentifier));
     ktExt.addExtension(new Extension("Name", new StringType(coverage.getName())));
@@ -86,6 +96,10 @@ public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyR
         .setValue(new SecureRandom().nextInt(0, 5));
   }
 
+  private Quantity getNewQuantity() {
+    return new Quantity().setUnit("Packung").setValue(new SecureRandom().nextInt(0, 5000));
+  }
+
   public SupplyRequestBuilder requester(KbvPractitioner practitioner) {
     this.requesterReference = practitioner.asReference();
     return this;
@@ -93,6 +107,11 @@ public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyR
 
   public SupplyRequestBuilder coverage(KbvCoverage coverage) {
     this.coverage = coverage;
+    return this;
+  }
+
+  public SupplyRequestBuilder version(KbvItaErpVersion version) {
+    this.version = version;
     return this;
   }
 

@@ -1,0 +1,100 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "GET-Prescription-EU",
+  "url": "https://gematik.de/fhir/erp-eu/OperationDefinition/GET-Prescription-EUOperationDefinition",
+  "status": "active",
+  "version": "1.0.0",
+  "date": "2025-06-02",
+  "name": "GET-Prescription-EU",
+  "kind": "operation",
+  "description": "The Operation gets Presciption Information from the ERP System for usage in the e-prescription workflow for EU countries",
+  "code": "get-eu-prescriptions",
+  "affectsState": false,
+  "system": true,
+  "type": false,
+  "instance": false,
+  "inputProfile": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Input",
+  "outputProfile": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Output",
+  "parameter": [
+    {
+      "name": "requestData",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Additional request information",
+      "part": [
+        {
+          "name": "requesttype",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        },
+        {
+          "name": "kvnr",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Identifier"
+        },
+        {
+          "name": "accessCode",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Identifier"
+        },
+        {
+          "name": "countryCode",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        },
+        {
+          "name": "prescription-id",
+          "use": "in",
+          "min": 0,
+          "max": "*",
+          "type": "Identifier"
+        },
+        {
+          "name": "practitionerName",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "practitionerRole",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        },
+        {
+          "name": "pointOfCare",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "healthcare-facility-type",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        }
+      ]
+    },
+    {
+      "name": "return",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Bundle",
+      "documentation": "Depending on the requesttype this operation returns a Bundle containing eRezept KBV_PR_ERP_Bundle Prescription-Bundles."
+    }
+  ]
+}

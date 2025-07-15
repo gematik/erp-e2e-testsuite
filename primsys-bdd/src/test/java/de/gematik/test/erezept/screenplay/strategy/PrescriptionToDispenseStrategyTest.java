@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.strategy;
@@ -50,9 +54,9 @@ class PrescriptionToDispenseStrategyTest {
     val erxTask = mock(ErxTask.class);
     when(erxBundle.getTask()).thenReturn(erxTask);
     when(erxTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
-    val accessCode = new AccessCode("123");
+    val accessCode = AccessCode.from("123");
     when(erxTask.getAccessCode()).thenReturn(accessCode);
-    val secret = new Secret("123");
+    val secret = Secret.from("123");
     when(erxTask.getSecret()).thenReturn(Optional.of(secret));
     val prescriptionId = PrescriptionId.random();
     when(erxTask.getPrescriptionId()).thenReturn(prescriptionId);
@@ -88,9 +92,9 @@ class PrescriptionToDispenseStrategyTest {
     val erxTask = mock(ErxTask.class);
     when(erxBundle.getTask()).thenReturn(erxTask);
     when(erxTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
-    val accessCode = new AccessCode("123");
+    val accessCode = AccessCode.from("123");
     when(erxTask.getAccessCode()).thenReturn(accessCode);
-    val secret = new Secret("123");
+    val secret = Secret.from("123");
     when(erxTask.getSecret()).thenReturn(Optional.of(secret));
     val prescriptionId = PrescriptionId.random();
     when(erxTask.getPrescriptionId()).thenReturn(prescriptionId);
@@ -107,7 +111,7 @@ class PrescriptionToDispenseStrategyTest {
             .initialize(stack);
     assertEquals("M123456789", strategy.getKvnr().getValue());
     assertEquals(prescriptionId, strategy.getPrescriptionId());
-    assertEquals(new Secret("456"), strategy.getSecret());
+    assertEquals(Secret.from("456"), strategy.getSecret());
     assertEquals(accessCode, strategy.getAccessCode());
     assertEquals(TaskId.from("098"), strategy.getTaskId());
     assertEquals("678", strategy.getKbvBundleId());

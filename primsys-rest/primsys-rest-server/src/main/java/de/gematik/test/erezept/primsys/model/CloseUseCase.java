@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -33,7 +37,7 @@ public class CloseUseCase extends AbstractDispensingUseCase {
 
   public Response closePrescription(String taskId, String secret) {
     val response =
-        pharmacy.erpRequest(new TaskGetByIdCommand(TaskId.from(taskId), Secret.fromString(secret)));
+        pharmacy.erpRequest(new TaskGetByIdCommand(TaskId.from(taskId), Secret.from(secret)));
     val prescriptionBundle = response.getExpectedResource();
     val hasMedicationDispense = prescriptionBundle.getTask().hasLastMedicationDispenseDate();
 
@@ -42,12 +46,12 @@ public class CloseUseCase extends AbstractDispensingUseCase {
       val acceptData = this.getPrescribedMedicationFromAccept(taskId);
       medications = List.of(acceptData);
     }
-    return closePrescription(taskId, new Secret(secret), medications, false);
+    return closePrescription(taskId, Secret.from(secret), medications, false);
   }
 
   public Response closePrescription(
       String taskId, String secret, List<PznDispensedMedicationDto> dispenseMedications) {
-    return closePrescription(taskId, new Secret(secret), dispenseMedications, true);
+    return closePrescription(taskId, Secret.from(secret), dispenseMedications, true);
   }
 
   private Response closePrescription(

@@ -12,12 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.fuzzing.dav;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpBasisStructDef;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.valuesets.dav.KostenVersicherterKategorie;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
@@ -50,7 +53,7 @@ public class DavBundleManipulatorFactory {
             "Abgabedaten mit altem Prescription Identifier",
             b ->
                 b.getIdentifier()
-                    .setSystem(ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl())));
+                    .setSystem("https://gematik.de/fhir/NamingSystem/PrescriptionID")));
 
     return manipulators;
   }
@@ -85,7 +88,7 @@ public class DavBundleManipulatorFactory {
             b ->
                 b.getInvoice()
                     .getIdentifierFirstRep()
-                    .setSystem(ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl())));
+                    .setSystem("https://gematik.de/fhir/NamingSystem/PrescriptionID")));
 
     manipulators.add(
         NamedEnvelope.of(

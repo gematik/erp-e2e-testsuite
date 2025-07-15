@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
-import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
@@ -45,7 +49,7 @@ public class GemErpMedicationDataMapper
 
   @Override
   protected GemErpMedication convertInternal() {
-    val builder = GemErpMedicationBuilder.builder();
+    val builder = GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder();
 
     builder.isVaccine(dto.isVaccine());
     this.setIfPresent(
@@ -80,7 +84,7 @@ public class GemErpMedicationDataMapper
         .ifPresent(amount -> dto.setPackagingSize(String.valueOf(amount)));
     medication.getAmountNumeratorUnit().ifPresent(dto::setPackagingUnit);
     medication.getPzn().ifPresent(pzn -> dto.setPzn(pzn.getValue()));
-    medication.getName().ifPresent(dto::setName);
+    medication.getNameFromCodeOreContainedRessource().ifPresent(dto::setName);
     medication
         .getBatchLotNumber()
         .ifPresent(

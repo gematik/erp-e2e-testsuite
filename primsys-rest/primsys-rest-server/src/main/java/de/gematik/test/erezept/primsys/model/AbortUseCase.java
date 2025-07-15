@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -26,17 +30,17 @@ import lombok.val;
 
 public class AbortUseCase {
 
-  private AbortUseCase() {
-    throw new AssertionError();
+  private final BaseActor actor;
+
+  public AbortUseCase(BaseActor actor) {
+    this.actor = actor;
   }
 
-  public static Response abortPrescription(
-      BaseActor actor, String taskId, String accessCode, String secret) {
-    return abortUseCase(actor, TaskId.from(taskId), new AccessCode(accessCode), new Secret(secret));
+  public Response abortPrescription(String taskId, String accessCode, String secret) {
+    return abortUseCase(TaskId.from(taskId), AccessCode.from(accessCode), Secret.from(secret));
   }
 
-  private static Response abortUseCase(
-      BaseActor actor, TaskId taskId, AccessCode accessCode, Secret secret) {
+  private Response abortUseCase(TaskId taskId, AccessCode accessCode, Secret secret) {
     val abortCommand = new TaskAbortCommand(taskId, accessCode, secret);
     val abortResponse = actor.erpRequest(abortCommand);
 

@@ -1,0 +1,60 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-EX-MedicinalPackageIdentifier",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_EX_MedicinalPackageIdentifier",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_EX_MedicinalPackageIdentifier",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "Identifier of a packaged medicinal product refers to a specific pack size of a specific product.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "expression": "Medication",
+      "type": "element"
+    },
+    {
+      "expression": "http://hl7.org/fhir/StructureDefinition/Extension",
+      "type": "extension"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_EX_MedicinalPackageIdentifier"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "type": [
+          {
+            "code": "Identifier"
+          }
+        ]
+      },
+      {
+        "id": "Extension.value[x].system",
+        "path": "Extension.value[x].system",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.value[x].value",
+        "path": "Extension.value[x].value",
+        "min": 1,
+        "mustSupport": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-CS-ERP-MedicationDispenseTyp",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-MedicationDispenseTyp",
+  "version": "1.5.0",
+  "name": "DAV_CS_ERP_MedicationDispenseTyp",
+  "title": "MedicationDispenseTyp",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "content": "complete",
+  "count": 2,
+  "concept": [
+    {
+      "code": "Abgabeinformationen",
+      "display": "MedicationDispense repräsentiert Abgabeinformationen"
+    },
+    {
+      "code": "ZusatzdatenHerstellung",
+      "display": "MedicationDispense repräsentiert ZusatzdatenHerstellung"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "resourceType": "ValueSet",
+  "id": "DAV-VS-ERP-DEUEV-Anlage-8",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-DEUEV-Anlage-8",
+  "version": "1.5.0",
+  "name": "DAV_VS_ERP_DEUEV_Anlage_8",
+  "title": "G&#252;ltige L&#228;nderkennzeichen DE&#220;V8",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "description": "Länderkennzeichen nach DEÜV Anlage 8",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.de/CodeSystem/deuev/anlage-8-laenderkennzeichen"
+      }
+    ]
+  }
+}

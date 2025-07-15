@@ -12,38 +12,36 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
 
-import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
-import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.Map;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class RejectUseCaseTest extends TestWithActorContext {
-
-  @Test
-  void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(RejectUseCase.class));
-  }
 
   @Test
   void shouldRejectPrescription() {
@@ -60,8 +58,8 @@ class RejectUseCaseTest extends TestWithActorContext {
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(mockClient.request(any(TaskRejectCommand.class))).thenReturn(mockResponse);
-    try (val response =
-        RejectUseCase.rejectPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
+    val useCase = new RejectUseCase(pharmacy);
+    try (val response = useCase.rejectPrescription("taskId", "accessCode", "verySecret")) {
       assertEquals(204, response.getStatus());
     }
   }
@@ -81,12 +79,9 @@ class RejectUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskRejectCommand.class));
 
-    try (val response =
-        RejectUseCase.rejectPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
-      fail(
-          format(
-              "RejectUseCase did not throw the expected Exception and answered with {0}",
-              response.getStatus()));
+    val useCase = new RejectUseCase(pharmacy);
+    try (val response = useCase.rejectPrescription("taskId", "accessCode", "verySecret")) {
+      fail("RejectUseCase did not throw the expected Exception");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(500, wae.getResponse().getStatus());
@@ -109,12 +104,9 @@ class RejectUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskRejectCommand.class));
 
-    try (val response =
-        RejectUseCase.rejectPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
-      fail(
-          format(
-              "RejectUseCase did not throw the expected Exception and answered with {0}",
-              response.getStatus()));
+    val useCase = new RejectUseCase(pharmacy);
+    try (val response = useCase.rejectPrescription("taskId", "accessCode", "verySecret")) {
+      fail("RejectUseCase did not throw the expected Exception");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(500, wae.getResponse().getStatus());
@@ -125,8 +117,8 @@ class RejectUseCaseTest extends TestWithActorContext {
   @Test
   void shouldThrowGetStatusCodeIsBigger299() {
     val ctx = ActorContext.getInstance();
-    val pharmacy = ctx.getPharmacies().get(1);
-    val mockClient = pharmacy.getClient();
+    val ktr = ctx.getHealthInsurances().get(0);
+    val mockClient = ktr.getClient();
 
     val mockResponse =
         ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
@@ -137,12 +129,9 @@ class RejectUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskRejectCommand.class));
 
-    try (val response =
-        RejectUseCase.rejectPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
-      fail(
-          format(
-              "RejectUseCase did not throw the expected Exception and answered with {0}",
-              response.getStatus()));
+    val useCase = new RejectUseCase(ktr);
+    try (val response = useCase.rejectPrescription("taskId", "accessCode", "verySecret")) {
+      fail("RejectUseCase did not throw the expected Exception");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
       assertEquals(400, wae.getResponse().getStatus());

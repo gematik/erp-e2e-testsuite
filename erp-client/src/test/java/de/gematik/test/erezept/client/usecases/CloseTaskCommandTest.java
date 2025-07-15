@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -29,7 +33,6 @@ import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilde
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -44,10 +47,10 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
   @Test
   void getRequestLocator() {
     val taskId = TaskId.from("123456");
-    val secret = "7890123";
-    val cmd = new CloseTaskCommand(taskId, new Secret(secret));
+    val secret = Secret.from("7890123");
+    val cmd = new CloseTaskCommand(taskId, secret);
 
-    val expected = format("/Task/{0}/$close?secret={1}", taskId, secret);
+    val expected = format("/Task/{0}/$close?secret={1}", taskId, secret.getValue());
     val actual = cmd.getRequestLocator();
     assertEquals(expected, actual);
   }
@@ -55,11 +58,11 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
   @Test
   void createSingleDispense() {
     val md = ErxMedicationDispenseFaker.builder().fake();
-    val taskId = "123456";
-    val secret = "7890123";
-    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret), md);
+    val taskId = TaskId.from("123456");
+    val secret = Secret.from("7890123");
+    val cmd = new CloseTaskCommand(taskId, secret, md);
 
-    val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret);
+    val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret.getValue());
     assertEquals(expectedEndpoint, cmd.getRequestLocator());
 
     val optBody = cmd.getRequestBody();
@@ -86,11 +89,11 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
                         .withPrescriptionId(prescriptionId)
                         .fake()));
 
-    val taskId = "123456";
-    val secret = "7890123";
-    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret), mds);
+    val taskId = TaskId.from("123456");
+    val secret = Secret.from("7890123");
+    val cmd = new CloseTaskCommand(taskId, secret, mds);
 
-    val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret);
+    val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret.getValue());
     assertEquals(expectedEndpoint, cmd.getRequestLocator());
 
     val optBody = cmd.getRequestBody();
@@ -100,20 +103,14 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
     val rawBody = parser.encode(body, EncodingType.XML);
 
     val result = parser.validate(rawBody);
-
-    if (!result.isSuccessful()) {
-      // give me some hints if the encoded result is invalid
-      ValidatorUtil.printValidationResult(result);
-    }
-
     assertTrue(result.isSuccessful());
   }
 
   @Test
   void shouldCloseWithoutMedicationDispense() {
-    val taskId = "123456";
-    val secret = "7890123";
-    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret));
+    val taskId = TaskId.from("123456");
+    val secret = Secret.from("7890123");
+    val cmd = new CloseTaskCommand(taskId, secret);
 
     val optBody = cmd.getRequestBody();
     assertTrue(optBody.isEmpty());
@@ -121,10 +118,10 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
 
   @Test
   void shouldCloseWithParametersStructure() {
-    val taskId = "123456";
-    val secret = "7890123";
+    val taskId = TaskId.from("123456");
+    val secret = Secret.from("7890123");
     val closeParameters = GemOperationInputParameterBuilder.forClosingPharmaceuticals().build();
-    val cmd = new CloseTaskCommand(TaskId.from(taskId), Secret.fromString(secret), closeParameters);
+    val cmd = new CloseTaskCommand(taskId, secret, closeParameters);
 
     val optBody = cmd.getRequestBody();
     assertTrue(optBody.isPresent());

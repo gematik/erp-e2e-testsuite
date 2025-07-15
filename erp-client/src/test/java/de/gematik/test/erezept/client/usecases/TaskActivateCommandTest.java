@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -30,7 +34,7 @@ class TaskActivateCommandTest {
   @Test
   void getRequestLocator() {
     val taskId = TaskId.from("123456789");
-    val ac = new AccessCode("xxxxx");
+    val ac = AccessCode.from("xxxxx");
     val cmd = new TaskActivateCommand(taskId, ac, new byte[0]);
 
     val expected = "/Task/" + taskId + "/$activate";
@@ -41,10 +45,9 @@ class TaskActivateCommandTest {
   @Test
   void requestBodyIsPresent() {
     val taskId = TaskId.from(PrescriptionId.random());
-    AccessCode accsesscode =
-        new AccessCode("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
+    val ac = AccessCode.from("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
 
-    val cmd = new TaskActivateCommand(taskId, accsesscode, new byte[0]);
+    val cmd = new TaskActivateCommand(taskId, ac, new byte[0]);
     assertTrue(cmd.getRequestBody().isPresent());
   }
 }

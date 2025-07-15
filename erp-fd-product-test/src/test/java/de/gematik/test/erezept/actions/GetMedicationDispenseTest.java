@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -22,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -31,7 +36,6 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseGetCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.time.LocalDate;
 import java.util.Map;

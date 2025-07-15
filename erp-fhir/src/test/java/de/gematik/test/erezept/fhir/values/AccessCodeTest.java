@@ -12,19 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 class AccessCodeTest {
 
@@ -33,13 +39,13 @@ class AccessCodeTest {
 
   @Test
   void shouldFailOnInvalidAccessCode() {
-    val accessCode = AccessCode.fromString("ffae");
+    val accessCode = AccessCode.from("ffae");
     assertFalse(accessCode.isValid());
   }
 
   @Test
   void shouldCheckValidAccessCode() {
-    val accessCode = new AccessCode(STRONG_ACCESS_CODE_VALUE);
+    val accessCode = AccessCode.from(STRONG_ACCESS_CODE_VALUE);
     assertTrue(accessCode.isValid());
   }
 
@@ -49,13 +55,32 @@ class AccessCodeTest {
     assertTrue(accessCode.isValid());
   }
 
-  @ParameterizedTest
-  @EnumSource(
-      value = ErpWorkflowNamingSystem.class,
-      names = {"ACCESS_CODE_121", "ACCESS_CODE"})
-  void shouldDetectAccessCodes(ErpWorkflowNamingSystem ns) {
-    val identifier = new Identifier();
-    identifier.setSystem(ns.getCanonicalUrl()).setValue(STRONG_ACCESS_CODE_VALUE);
+  @Test
+  void shouldDetectAccessCodes() {
+    val identifier =
+        new Identifier()
+            .setSystem(ErpWorkflowNamingSystem.ACCESS_CODE.getCanonicalUrl())
+            .setValue(STRONG_ACCESS_CODE_VALUE);
     assertTrue(AccessCode.isAccessCode(identifier));
+  }
+
+  @Test
+  void shouldExtractFromIdentifier() {
+    val identifier =
+        new Identifier()
+            .setSystem(ErpWorkflowNamingSystem.ACCESS_CODE.getCanonicalUrl())
+            .setValue(STRONG_ACCESS_CODE_VALUE);
+    val ac = assertDoesNotThrow(() -> AccessCode.from(identifier));
+    assertEquals(STRONG_ACCESS_CODE_VALUE, ac.getValue());
+  }
+
+  @Test
+  void shouldThrowOnExtractingFromInvalidIdentifier() {
+    val identifier =
+        new Identifier()
+            .setSystem(ErpWorkflowNamingSystem.SECRET.getCanonicalUrl())
+            .setValue(STRONG_ACCESS_CODE_VALUE);
+    assertFalse(AccessCode.isAccessCode(identifier));
+    assertThrows(BuilderException.class, () -> AccessCode.from(identifier));
   }
 }

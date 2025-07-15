@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.integration.medicationdispense;
@@ -101,7 +105,7 @@ public class GetNoMedicationDispenseByIdIT extends ErpTest {
     pharmacy.attemptsTo(
         Verify.that(resp)
             .withOperationOutcome(ErpAfos.A_19405)
-            .hasResponseWith(ErpResponseVerifier.returnCodeIs(403))
+            .hasResponseWith(ErpResponseVerifier.returnCodeIs(405))
             .isCorrect());
   }
 

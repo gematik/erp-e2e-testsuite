@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -19,7 +23,6 @@ package de.gematik.test.erezept.actions;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,9 +39,7 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
@@ -89,16 +90,8 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
                   val cmd = (CloseTaskCommand) args[0];
                   assertTrue(cmd.getRequestBody().isPresent());
 
-                  if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0)
-                      <= 0) {
-                    val medDisp = (ErxMedicationDispense) cmd.getRequestBody().orElseThrow();
-                    assertEquals(manipulatedPerformerId, medDisp.getPerformerIdFirstRep());
-                    assertEquals(manipulatedKvnr.getValue(), medDisp.getSubjectId().getValue());
-                    assertEquals(manipulatedPrescriptionId, medDisp.getPrescriptionId());
-                  } else {
-                    assertInstanceOf(
-                        GemCloseOperationParameters.class, cmd.getRequestBody().orElseThrow());
-                  }
+                  assertInstanceOf(
+                      GemCloseOperationParameters.class, cmd.getRequestBody().orElseThrow());
 
                   return ErpResponse.forPayload(createOperationOutcome(), ErxReceipt.class)
                       .withStatusCode(404)
@@ -116,7 +109,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
 
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
-    when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockAcceptBundle.getSignedKbvBundle())
@@ -152,7 +145,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
 
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
-    when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
@@ -185,7 +178,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
 
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
-    when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
@@ -217,7 +210,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
 
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
-    when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());

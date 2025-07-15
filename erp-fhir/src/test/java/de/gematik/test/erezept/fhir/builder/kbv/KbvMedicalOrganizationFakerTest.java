@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -28,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker.OrganizationFakerType;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.BSNR;
@@ -90,15 +94,9 @@ class KbvMedicalOrganizationFakerTest extends ErpFhirParsingTest {
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
 
-    if (kbvItaForVersion == KbvItaForVersion.V1_0_3) {
-      assertTrue(
-          DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER.matches(
-              organization.getIdentifierFirstRep()));
-    } else {
-      assertTrue(
-          DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID.matches(
-              organization.getIdentifierFirstRep()));
-    }
+    assertTrue(
+        DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID.matches(
+            organization.getIdentifierFirstRep()));
   }
 
   @ParameterizedTest

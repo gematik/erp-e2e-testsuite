@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.emlverifier;
@@ -21,7 +25,6 @@ import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvid
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationDispenseMapsTo;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationMapsTo;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlOrganisationHasSMCBTelematikId;
-import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
@@ -37,10 +41,10 @@ import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -51,11 +55,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
-@SetSystemProperty(
-    key = ERP_FHIR_PROFILES_TOGGLE,
-    value = "1.3.0") // TODO: these tests work only for 1.3.0
 class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
   private static final Date testDate_22_01_2025 =
       DateConverter.getInstance().localDateToDate(LocalDate.of(2025, Month.JANUARY, 22));
@@ -69,11 +69,11 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
         fhir.decode(
             EpaOpProvideDispensation.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
   }
 
-  private static KbvErpMedication getMedication() {
-    val medication = new KbvErpMedication();
+  private static GemErpMedication getMedication() {
+    val medication = new GemErpMedication();
     medication
         .getCode()
         .getCoding()

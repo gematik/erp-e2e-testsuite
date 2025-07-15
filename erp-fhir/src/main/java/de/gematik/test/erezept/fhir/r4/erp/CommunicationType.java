@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -19,17 +23,15 @@ package de.gematik.test.erezept.fhir.r4.erp;
 import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
 import de.gematik.bbriccs.fhir.coding.WithStructureDefinition;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import java.util.List;
 
 public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> {
-  INFO_REQ(ErpWorkflowStructDef.COM_INFO_REQ, ErpWorkflowStructDef.COM_INFO_REQ_12),
-  DISP_REQ(ErpWorkflowStructDef.COM_DISP_REQ, ErpWorkflowStructDef.COM_DISP_REQ_12),
-  REPLY(ErpWorkflowStructDef.COM_REPLY, ErpWorkflowStructDef.COM_REPLY_12),
-  REPRESENTATIVE(
-      ErpWorkflowStructDef.COM_REPRESENTATIVE, ErpWorkflowStructDef.COM_REPRESENTATIVE_12);
+  INFO_REQ(ErpWorkflowStructDef.COM_INFO_REQ),
+  DISP_REQ(ErpWorkflowStructDef.COM_DISP_REQ),
+  REPLY(ErpWorkflowStructDef.COM_REPLY),
+  REPRESENTATIVE(ErpWorkflowStructDef.COM_REPRESENTATIVE);
 
   // which communication types are received by KVIDs
   private static final List<CommunicationType> PATIENT_RECEIVING = List.of(REPLY, REPRESENTATIVE);
@@ -53,46 +55,27 @@ public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> 
   }
 
   @Override
-  public WithNamingSystem getRecipientNamingSystem(ErpWorkflowVersion version) {
-    WithNamingSystem ns;
+  public WithNamingSystem getRecipientNamingSystem() {
     if (PATIENT_RECEIVING.contains(this)) {
-      ns = getKvid(version);
+      // TODO: not always true, Patient might also be PKV!
+      return DeBasisProfilNamingSystem.KVID_GKV_SID;
     } else {
-      ns = getTelematikId(version);
+      return DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
     }
-    return ns;
   }
 
   @Override
-  public WithNamingSystem getSenderNamingSystem(ErpWorkflowVersion version) {
-    WithNamingSystem ns;
+  public WithNamingSystem getSenderNamingSystem() {
     if (PHARMACY_SENDING.contains(this)) {
-      ns = getTelematikId(version);
+      return DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
     } else {
-      ns = getKvid(version);
+      // TODO: not always true, Patient might also be PKV!
+      return DeBasisProfilNamingSystem.KVID_GKV_SID;
     }
-    return ns;
   }
 
   @Override
   public boolean doesMatch(String url) {
     return this.types.stream().anyMatch(type -> type.matches(url));
-  }
-
-  private WithNamingSystem getTelematikId(ErpWorkflowVersion version) {
-    if (version.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      return ErpWorkflowNamingSystem.TELEMATIK_ID;
-    } else {
-      return ErpWorkflowNamingSystem.TELEMATIK_ID_SID;
-    }
-  }
-
-  private WithNamingSystem getKvid(ErpWorkflowVersion version) {
-    if (version.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      return DeBasisProfilNamingSystem.KVID;
-    } else {
-      return DeBasisProfilNamingSystem
-          .KVID_GKV_SID; // TODO: not always true, Patient might also be PKV!
-    }
   }
 }

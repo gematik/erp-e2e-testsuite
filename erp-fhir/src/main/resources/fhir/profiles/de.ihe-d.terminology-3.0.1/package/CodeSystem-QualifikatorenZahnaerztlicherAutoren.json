@@ -1,0 +1,40 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/QualifikatorenZahnaerztlicherAutoren",
+  "version": "2021-10-15T12:13:26",
+  "name": "QualifikatorenZahnaerztlicherAutoren",
+  "id": "QualifikatorenZahnaerztlicherAutoren",
+  "title": "Qualifikatoren Zahnaerztlicher Autoren",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "1",
+      "display": "Zahnarzt"
+    },
+    {
+      "code": "2",
+      "display": "FZA Allgemeine Zahnheilkunde"
+    },
+    {
+      "code": "3",
+      "display": "FZA Parodontologie"
+    },
+    {
+      "code": "4",
+      "display": "FZA Oralchirurgie"
+    },
+    {
+      "code": "5",
+      "display": "FZA Kieferorthopädie"
+    },
+    {
+      "code": "6",
+      "display": "FZA öffentliches Gesundheitswesen"
+    }
+  ],
+  "count": 6
+}

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -55,7 +59,7 @@ class DispensePrescriptionTest extends ErpFhirBuildingTest {
   @Test
   void shouldPerformDispensationCorrectWithMedDsp() {
     val taskId = TaskId.from("123456789");
-    val secret = Secret.fromString("123456789");
+    val secret = Secret.from("123456789");
 
     val action =
         DispensePrescription.withCredentials(taskId, secret)
@@ -74,7 +78,7 @@ class DispensePrescriptionTest extends ErpFhirBuildingTest {
   @Test
   void shouldPerformDispensationCorrectWithParameters() {
     val taskId = TaskId.from("123456");
-    val secret = Secret.fromString("123456");
+    val secret = Secret.from("123456");
 
     val params = new GemDispenseOperationParameters();
     val action = DispensePrescription.withCredentials(taskId, secret).withParameters(params);

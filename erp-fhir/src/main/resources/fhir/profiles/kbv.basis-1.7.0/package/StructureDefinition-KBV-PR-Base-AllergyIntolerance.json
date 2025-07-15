@@ -1,0 +1,500 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-AllergyIntolerance",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_AllergyIntolerance",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_AllergyIntolerance",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from LOINC (http://loinc.org). LOINC is copyright © 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at http://loinc.org/license. LOINC® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright © 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures (UCUM) Organization. All rights reserved. THE UCUM TABLE (IN ALL FORMATS), UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED 'AS IS.' ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Hier wird eine einzelne Allergie oder Unverträglichkeit abgebildet.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "AllergyIntolerance",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/AllergyIntolerance",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "AllergyIntolerance",
+        "path": "AllergyIntolerance",
+        "definition": "Hier wird eine einzelne Allergie oder Unverträglichkeit abgebildet."
+      },
+      {
+        "id": "AllergyIntolerance.extension",
+        "path": "AllergyIntolerance.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "AllergyIntolerance.extension:abatement",
+        "path": "AllergyIntolerance.extension",
+        "sliceName": "abatement",
+        "short": "Klinisch relevantes Enddatum",
+        "definition": "Datum, bis wann der/die Patient:in die Allergie/Unverträglichkeit hatte.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_AllergyIntolerance_Abatement"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.extension:abatement-lebensphase-bis",
+        "path": "AllergyIntolerance.extension",
+        "sliceName": "abatement-lebensphase-bis",
+        "short": "Lebensphase",
+        "definition": "Angabe des ungefähren Alters, ab dem der/die Patient:in die Allergie nicht mehr hat.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Stage_Life"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.clinicalStatus",
+        "path": "AllergyIntolerance.clinicalStatus",
+        "definition": "Beschreibt den Status einer Allergie bzw. Unverträglichkeit aus klinischer Sicht."
+      },
+      {
+        "id": "AllergyIntolerance.clinicalStatus.coding",
+        "path": "AllergyIntolerance.clinicalStatus.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "AllergyIntolerance.clinicalStatus.coding.system",
+        "path": "AllergyIntolerance.clinicalStatus.coding.system",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.clinicalStatus.coding.version",
+        "path": "AllergyIntolerance.clinicalStatus.coding.version",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.clinicalStatus.coding.code",
+        "path": "AllergyIntolerance.clinicalStatus.coding.code",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.clinicalStatus.coding.display",
+        "path": "AllergyIntolerance.clinicalStatus.coding.display",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.verificationStatus",
+        "path": "AllergyIntolerance.verificationStatus",
+        "definition": "Gibt den Grad der Sicherheit oder Gewissheit an, mit der das tatsächliche Vorliegen der Allergie/Unverträglichkeit angegeben wird."
+      },
+      {
+        "id": "AllergyIntolerance.verificationStatus.coding",
+        "path": "AllergyIntolerance.verificationStatus.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "AllergyIntolerance.verificationStatus.coding.system",
+        "path": "AllergyIntolerance.verificationStatus.coding.system",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.verificationStatus.coding.version",
+        "path": "AllergyIntolerance.verificationStatus.coding.version",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.verificationStatus.coding.code",
+        "path": "AllergyIntolerance.verificationStatus.coding.code",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.verificationStatus.coding.display",
+        "path": "AllergyIntolerance.verificationStatus.coding.display",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.type",
+        "path": "AllergyIntolerance.type",
+        "definition": "In diesem Element kann angegeben werden, ob es sich um eine Allergie oder eine Unverträglichkeit handelt."
+      },
+      {
+        "id": "AllergyIntolerance.category",
+        "path": "AllergyIntolerance.category",
+        "definition": "Enthält die Kategorie der die Allergie oder Unverträglichkeit auslösenden Substanz gemäß den angegebenen Auswahlmöglichkeiten.",
+        "max": "1"
+      },
+      {
+        "id": "AllergyIntolerance.criticality",
+        "path": "AllergyIntolerance.criticality",
+        "definition": "Beschreibt die Kritikalität. Die Kritikalität gibt an, wie hoch Risiko dafür ist, dass die Exposition zu der Substanz eine schwerwiegende oder lebensbedrohliche Situation hervorruft."
+      },
+      {
+        "id": "AllergyIntolerance.code",
+        "path": "AllergyIntolerance.code",
+        "definition": "Dieses Element bildet die Substanz bzw. Substanzgruppen ab, gegen die eine Allergie oder Unverträglichkeit besteht. Diese wird als codierte Information und/oder als Freitext angegeben.",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.coding",
+        "path": "AllergyIntolerance.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Substanz als codierte Information angegeben."
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:snomed",
+        "path": "AllergyIntolerance.code.coding",
+        "sliceName": "snomed",
+        "definition": "Hier wird ein SNOMED CT®-Code für die Substanz angegeben.",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Allergy_Substance_SNOMED_CT"
+        }
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:snomed.system",
+        "path": "AllergyIntolerance.code.coding.system",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:snomed.version",
+        "path": "AllergyIntolerance.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:snomed.code",
+        "path": "AllergyIntolerance.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:snomed.display",
+        "path": "AllergyIntolerance.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:ask",
+        "path": "AllergyIntolerance.code.coding",
+        "sliceName": "ask",
+        "definition": "Hier wird ein ASK-Code für die Substanz angegeben.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Coding",
+            "profile": [
+              "http://fhir.de/StructureDefinition/CodingASK"
+            ]
+          }
+        ],
+        "patternCoding": {
+          "system": "http://fhir.de/CodeSystem/ask"
+        }
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:ask.version",
+        "path": "AllergyIntolerance.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.coding:ask.display",
+        "path": "AllergyIntolerance.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.code.text",
+        "path": "AllergyIntolerance.code.text",
+        "definition": "Hier wird die Bezeichnung der Substanz als Freitext angegeben."
+      },
+      {
+        "id": "AllergyIntolerance.patient",
+        "path": "AllergyIntolerance.patient",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.onset[x]",
+        "path": "AllergyIntolerance.onset[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Klinisch relevanter Zeitraum als Zeitintervall mit Datumsangaben, ab/bis wann der/die Patient:in die Allergie/Unverträglichkeit hatte."
+      },
+      {
+        "id": "AllergyIntolerance.onset[x]:onsetDateTime",
+        "path": "AllergyIntolerance.onset[x]",
+        "sliceName": "onsetDateTime",
+        "short": "Klinischer Zeitraum datiert \"von\"",
+        "definition": "Datum, ab wann die Allergie/Unverträglichkeit identifiziert wurde.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.onset[x]:onsetAge",
+        "path": "AllergyIntolerance.onset[x]",
+        "sliceName": "onsetAge",
+        "short": "Lebensphasen von/bis",
+        "definition": "Angabe der Lebensphasen, in denen die Allergie/Unverträglichkeit begonnen/geendet hat.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Age"
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.onset[x]:onsetAge.extension:lebensphase-von",
+        "path": "AllergyIntolerance.onset[x].extension",
+        "sliceName": "lebensphase-von",
+        "definition": "Angabe des ungefähren Alters, ab dem der/die Patient:in die Allergie/Unverträglichkeit hat.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Stage_Life"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.note",
+        "path": "AllergyIntolerance.note",
+        "definition": "Hier werden ergänzende Informationen zur Allergie bzw. Unverträglichkeit angegeben."
+      },
+      {
+        "id": "AllergyIntolerance.note.author[x]",
+        "path": "AllergyIntolerance.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "AllergyIntolerance.note.author[x]:authorReference",
+        "path": "AllergyIntolerance.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.note.author[x]:authorString",
+        "path": "AllergyIntolerance.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "AllergyIntolerance.note.time",
+        "path": "AllergyIntolerance.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "AllergyIntolerance.note.text",
+        "path": "AllergyIntolerance.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      },
+      {
+        "id": "AllergyIntolerance.reaction",
+        "path": "AllergyIntolerance.reaction",
+        "definition": "Dieses Element enthält Informationen über die Reaktion, die bei diesem/dieser Patient:in nach Exposition hervorgerufen wird."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation",
+        "path": "AllergyIntolerance.reaction.manifestation",
+        "definition": "In diesem Element werden Angaben zur Manifestation der Reaktion gemacht."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.coding",
+        "path": "AllergyIntolerance.reaction.manifestation.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Manifestation als Code aus einem anderen Code-System."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.coding:snomed",
+        "path": "AllergyIntolerance.reaction.manifestation.coding",
+        "sliceName": "snomed",
+        "definition": "Manifestation als SNOMED CT®-Code. Es wird ein optionales Beispiel-ValueSet zur Verfügung gestellt.",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "example",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Reaction_Allergy"
+        }
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.coding:snomed.system",
+        "path": "AllergyIntolerance.reaction.manifestation.coding.system",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.coding:snomed.version",
+        "path": "AllergyIntolerance.reaction.manifestation.coding.version",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.coding:snomed.code",
+        "path": "AllergyIntolerance.reaction.manifestation.coding.code",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.coding:snomed.display",
+        "path": "AllergyIntolerance.reaction.manifestation.coding.display",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.reaction.manifestation.text",
+        "path": "AllergyIntolerance.reaction.manifestation.text",
+        "definition": "Bezeichnung bzw. Beschreibung der Manifestation als Freitext."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.onset",
+        "path": "AllergyIntolerance.reaction.onset",
+        "definition": "Datum eines Reaktionsereignisses."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.severity",
+        "path": "AllergyIntolerance.reaction.severity",
+        "definition": "Dieses Element enthält Informationen zum Schweregrad der Reaktion."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.exposureRoute",
+        "path": "AllergyIntolerance.reaction.exposureRoute",
+        "definition": "Hier wird der Expositionsweg des Allergens angegeben."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.exposureRoute.coding",
+        "path": "AllergyIntolerance.reaction.exposureRoute.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird der Expositionsweg als codierte Information angegeben."
+      },
+      {
+        "id": "AllergyIntolerance.reaction.exposureRoute.coding:snomed",
+        "path": "AllergyIntolerance.reaction.exposureRoute.coding",
+        "sliceName": "snomed",
+        "definition": "SNOMED CT®-Code für die Bezeichnung des Expositionswegs.",
+        "min": 0,
+        "max": "1",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "example",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Route_of_Administration_SNOMED_CT"
+        }
+      },
+      {
+        "id": "AllergyIntolerance.reaction.exposureRoute.coding:snomed.system",
+        "path": "AllergyIntolerance.reaction.exposureRoute.coding.system",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.reaction.exposureRoute.coding:snomed.code",
+        "path": "AllergyIntolerance.reaction.exposureRoute.coding.code",
+        "min": 1
+      },
+      {
+        "id": "AllergyIntolerance.reaction.exposureRoute.text",
+        "path": "AllergyIntolerance.reaction.exposureRoute.text",
+        "definition": "Hier wird der Expositionsweg als Freitext angegeben."
+      }
+    ]
+  }
+}
