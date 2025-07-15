@@ -12,15 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -36,8 +38,9 @@ public class KbvErpMedicationCompoundingFaker {
 
   private KbvErpMedicationCompoundingFaker() {
     this.withDosageForm("Zäpfchen, viel Spaß")
-        .withMedicationIngredient(PZN.random(), fakerDrugName(), "freitext")
         .withAmount(5, 1, "Stk")
+        .withIngredientStrengthText("halt viel davon")
+        .withIngredItemText("so Kräutertee halt...")
         .withProductionInstruction(ProductionInstruction.asCompounding("freitext"));
   }
 
@@ -46,7 +49,7 @@ public class KbvErpMedicationCompoundingFaker {
   }
 
   public KbvErpMedicationCompoundingFaker withDosageForm(String df) {
-    builderConsumers.put("darreichungsform", b -> b.darreichungsform(df));
+    builderConsumers.put("kbvDarreichungsform", b -> b.darreichungsform(df));
     return this;
   }
 
@@ -136,5 +139,17 @@ public class KbvErpMedicationCompoundingFaker {
     val builder = KbvErpMedicationCompoundingBuilder.builder();
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
+  }
+
+  public KbvErpMedicationCompoundingFaker withIngredItemText(String ingredItemText) {
+    builderConsumers.put("ingredItemText", b -> b.ingredItemText(ingredItemText));
+    return this;
+  }
+
+  public KbvErpMedicationCompoundingFaker withIngredientStrengthText(
+      String ingredientStrengthText) {
+    builderConsumers.put(
+        "ingredStrengthText", b -> b.ingredientStrengthText(ingredientStrengthText));
+    return this;
   }
 }

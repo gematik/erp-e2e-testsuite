@@ -12,16 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.eml.tasks;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.*;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlAuthoredOnIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationRequestMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlOrganisationHasSmcbTelematikId;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPractitionerHasHbaTelematikId;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPrescriptionIdIsEqualTo;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import lombok.AccessLevel;

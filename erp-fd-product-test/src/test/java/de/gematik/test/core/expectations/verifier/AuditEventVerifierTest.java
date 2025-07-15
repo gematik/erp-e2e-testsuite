@@ -12,15 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.*;
+import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
+import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleDoesNotContainLogFor;
+import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.hasAuditEventAtPosition;
 import static de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil.createErxAuditEvent;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
@@ -31,7 +39,6 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
@@ -51,9 +58,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 class AuditEventVerifierTest extends ErpFhirParsingTest {
 
   private static final String AUDIT_EVENT_BUNDLE_PATH_FROM_XML =
-      "fhir/valid/erp/1.2.0/auditeventbundle/41f94920-14b5-426a-8859-d045270e63a2.xml";
+      "fhir/valid/erp/1.4.0/auditeventbundle/561f4a7e-0616-4c92-b6d5-91217aea136f.xml";
   private static final String AUDIT_EVENT_BUNDLE_PATH_FROM_JSON =
-      "fhir/valid/erp/1.2.0/auditeventbundle/2d4ba5fa-d0ff-4b59-b1c4-8849bd83a971.json";
+      "fhir/valid/erp/1.4.0/auditeventbundle/561f4a7e-0616-4c92-b6d5-91217aea136f.json";
   private PatientActor patient;
 
   private PharmacyActor pharmacy;
@@ -155,8 +162,9 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
   void shouldVerifyContainedText() {
     val step =
         bundleContainsLogFor(
-            PrescriptionId.from("160.000.023.898.864.45"),
-            "Sina Karla Gräfin Hüllmann downloaded a prescription");
+            PrescriptionId.from("160.000.006.746.135.23"),
+            "Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID\n"
+                + "                        160.000.006.746.135.23 eingestellt.");
     assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
   }
 

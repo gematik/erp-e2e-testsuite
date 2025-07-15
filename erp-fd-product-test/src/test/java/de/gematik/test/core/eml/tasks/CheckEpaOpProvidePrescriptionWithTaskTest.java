@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.eml.tasks;
@@ -25,6 +29,7 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
@@ -34,15 +39,14 @@ import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.fhir.builder.erp.*;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -73,7 +77,7 @@ class CheckEpaOpProvidePrescriptionWithTaskTest extends ErpFhirParsingTest {
         fhir.decode(
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
+                "fhir/valid/parameters/ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
 
     kbvErpBundle =
         parser.decode(
@@ -84,7 +88,7 @@ class CheckEpaOpProvidePrescriptionWithTaskTest extends ErpFhirParsingTest {
         fhir.decode(
             EpaOpProvideDispensation.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/medication/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
   }
 
   private static ErxMedicationDispenseBundle createMedicationDispenseBundle(
@@ -99,41 +103,19 @@ class CheckEpaOpProvidePrescriptionWithTaskTest extends ErpFhirParsingTest {
             .prescriptionId(PRESC_ID)
             .status(MedicationDispense.MedicationDispenseStatus.COMPLETED);
 
-    if (workFlowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    val med =
+        GemErpMedicationFaker.forPznMedication()
+            .withPzn(PZN.from("10019621"), "IBU-ratiopharm 400mg akut Schmerztabletten")
+            .fake();
+    med.getCode()
+        .addCoding(DeBasisProfilCodeSystem.ATC.asCoding("M01AE01").setDisplay("Ibuprofen"));
 
-      val medDisp = medDispBuilder.medication(createMedication()).build();
-      val bundle = new ErxMedicationDispenseBundle();
-      bundle.addEntry().setResource(medDisp);
-      return bundle;
+    val medDisp = medDispBuilder.medication(med).build();
 
-    } else {
-      val med =
-          GemErpMedicationFaker.builder()
-              .withPzn(PZN.from("10019621"), "IBU-ratiopharm 400mg akut Schmerztabletten")
-              .fake();
-      med.getCode()
-          .addCoding(DeBasisProfilCodeSystem.ATC.asCoding("M01AE01").setDisplay("Ibuprofen"));
-
-      val medDisp = medDispBuilder.medication(med).build();
-
-      val bundle = new ErxMedicationDispenseBundle();
-      bundle.addEntry().setResource(medDisp);
-      bundle.addEntry().setResource(med);
-      return bundle;
-    }
-  }
-
-  private static KbvErpMedication createMedication() {
-    val medication = new KbvErpMedication();
-
-    medication
-        .getCode()
-        .addCoding(DeBasisProfilCodeSystem.ATC.asCoding("M01AE01").setDisplay("Ibuprofen"))
-        .addCoding(
-            DeBasisProfilCodeSystem.PZN
-                .asCoding("10019621")
-                .setDisplay("IBU-ratiopharm 400mg akut Schmerztabletten"));
-    return medication;
+    val bundle = new ErxMedicationDispenseBundle();
+    bundle.addEntry().setResource(medDisp);
+    bundle.addEntry().setResource(med);
+    return bundle;
   }
 
   @AfterEach

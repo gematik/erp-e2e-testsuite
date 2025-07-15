@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
@@ -22,9 +26,8 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import java.util.Date;
@@ -40,18 +43,10 @@ public record AccidentExtension(
     AccidentCauseType accidentCauseType, @Nullable Date accidentDay, @Nullable String workplace) {
 
   public Extension asExtension() {
-    val version = KbvItaErpVersion.getDefaultVersion();
-    return asExtension(version);
+    return asItaForExtension();
   }
 
-  public Extension asExtension(KbvItaErpVersion version) {
-    if (version.compareTo(KbvItaErpVersion.V1_1_0) >= 0) {
-      return asItaForExtension();
-    } else {
-      return asItaErpExtension();
-    }
-  }
-
+  @Deprecated(forRemoval = true)
   private Extension asItaErpExtension() {
     val outerExtension = KbvItaErpStructDef.ACCIDENT.asExtension();
     fillOuterExtension(outerExtension, "unfallkennzeichen", "unfalltag", "unfallbetrieb");

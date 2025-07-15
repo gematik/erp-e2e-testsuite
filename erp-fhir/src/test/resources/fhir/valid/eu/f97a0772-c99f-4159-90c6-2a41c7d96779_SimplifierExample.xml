@@ -1,0 +1,40 @@
+<Consent xmlns="http://hl7.org/fhir">
+    <id value="f97a0772-c99f-4159-90c6-2a41c7d96779"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Consent|1.0"/>
+    </meta>
+    <status value="active"/>
+    <scope>
+        <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/consentscope"/>
+            <code value="patient-privacy"/>
+            <display value="Privacy Consent"/>
+        </coding>
+    </scope>
+    <category>
+        <coding>
+            <system value="https://gematik.de/fhir/erp-eu/CodeSystem/GEM_ERPEU_CS_ConsentType"/>
+            <code value="EUDISPCONS"/>
+            <display value="Consent for redeeming e-prescriptions in EU countries"/>
+        </coding>
+    </category>
+    <patient>
+        <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X123456789"/>
+            <assigner>
+                <identifier>
+                    <system value="http://fhir.de/sid/arge-ik/iknr"/>
+                    <value value="98765543"/>
+                </identifier>
+            </assigner>
+        </identifier>
+    </patient>
+    <dateTime value="2025-10-01T12:03:23Z"/>
+    <policyRule>
+        <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+            <code value="OPTIN"/>
+        </coding>
+    </policyRule>
+</Consent>

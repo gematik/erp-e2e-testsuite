@@ -1,0 +1,1990 @@
+{
+	"resourceType": "ValueSet",
+	"id": "1.2.276.0.76.11.31--20211015121326",
+	"meta": {
+		"profile": [
+			"http://hl7.org/fhir/StructureDefinition/shareablevalueset"
+		]
+	},
+	"extension": [
+		{
+			"url": "http://hl7.org/fhir/StructureDefinition/resource-effectivePeriod",
+			"valuePeriod": {
+				"start": "2021-10-15T12:13:26+01:00"
+			}
+		}
+	],
+	"url": "http://ihe-d.de/ValueSets/IHEXDSauthorSpeciality",
+	"identifier": [
+		{
+			"use": "official",
+			"system": "urn:ietf:rfc:3986",
+			"value": "urn:oid:1.2.276.0.76.11.31"
+		}
+	],
+	"version": "2021-10-15T12:13:26",
+	"name": "IHEXDSauthorSpeciality",
+	"title": "IHE XDS authorSpecialty",
+	"status": "active",
+	"experimental": false,
+	"publisher": "IHE Deutschland e.V.",
+	"description": "**authorSpecialty (XDSDocumentEntry or XDSSubmissionSet)**\r\nRepresents a specific specialty within a healthcare facility under which the human and/or machines authored the XDS Document or XDS SubmissionSet",
+	"immutable": false,
+	"compose": {
+		"include": [
+			{
+				"system": "http://ihe-d.de/CodeSystems/QualifikatorenZahnaerztlicherAutoren",
+				"concept": [
+					{
+						"code": "1",
+						"display": "Zahnarzt"
+					},
+					{
+						"code": "2",
+						"display": "FZA Allgemeine Zahnheilkunde"
+					},
+					{
+						"code": "3",
+						"display": "FZA Parodontologie"
+					},
+					{
+						"code": "4",
+						"display": "FZA Oralchirurgie"
+					},
+					{
+						"code": "5",
+						"display": "FZA Kieferorthopädie"
+					},
+					{
+						"code": "6",
+						"display": "FZA öffentliches Gesundheitswesen"
+					}
+				]
+			},
+			{
+				"system": "http://ihe-d.de/CodeSystems/FacharzttitelDerAerztekammern",
+				"concept": [
+					{
+						"code": "011001",
+						"display": "FA Allgemeinmedizin"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Allgemeinmedizin mit SP Geriatrie"
+							}
+						],
+						"code": "012901",
+						"display": "SP Geriatrie"
+					},
+					{
+						"code": "021001",
+						"display": "FA Anästhesiologie"
+					},
+					{
+						"code": "021002",
+						"display": "FA Anästhesiologie und Intensivtherapie"
+					},
+					{
+						"code": "031001",
+						"display": "FA Anatomie"
+					},
+					{
+						"code": "041001",
+						"display": "FA Arbeitshygiene"
+					},
+					{
+						"code": "041002",
+						"display": "FA Arbeitsmedizin"
+					},
+					{
+						"code": "051001",
+						"display": "FA Augenheilkunde"
+					},
+					{
+						"code": "061001",
+						"display": "FA Biochemie"
+					},
+					{
+						"code": "071107",
+						"display": "FA Allgemeinchirurgie"
+					},
+					{
+						"code": "071101",
+						"display": "FA Allgemeine Chirurgie"
+					},
+					{
+						"code": "071001",
+						"display": "FA Chirurgie"
+					},
+					{
+						"code": "071102",
+						"display": "FA Gefäßchirurgie"
+					},
+					{
+						"code": "071002",
+						"display": "FA Herzchirurgie"
+					},
+					{
+						"code": "071202",
+						"display": "FA Kinder- und Jugendchirurgie"
+					},
+					{
+						"code": "071003",
+						"display": "FA Kinderchirurgie"
+					},
+					{
+						"code": "071004",
+						"display": "FA Orthopädie"
+					},
+					{
+						"code": "071103",
+						"display": "FA Orthopädie und Unfallchirurgie"
+					},
+					{
+						"code": "071005",
+						"display": "FA Plastische Chirurgie"
+					},
+					{
+						"code": "071106",
+						"display": "FA Plastische und Ästhetische Chirurgie"
+					},
+					{
+						"code": "071201",
+						"display": "FA Plastische; Rekonstruktive und Ästhetische Chirurgie"
+					},
+					{
+						"code": "071104",
+						"display": "FA Thoraxchirurgie"
+					},
+					{
+						"code": "071105",
+						"display": "FA Visceralchirurgie"
+					},
+					{
+						"code": "071108",
+						"display": "FA Viszeralchirurgie"
+					},
+					{
+						"code": "072001",
+						"display": "SP Gefäßchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit SP Rheumatologie (Orthopädie)"
+							}
+						],
+						"code": "072002",
+						"display": "SP Rheumatologie (Orthopädie)"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit SP Thoraxchirurgie in der Chirurgie"
+							}
+						],
+						"code": "072003",
+						"display": "SP Thoraxchirurgie in der Chirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit SP Thoraxchirurgie in der Herzchirurgie"
+							}
+						],
+						"code": "072004",
+						"display": "SP Thoraxchirurgie in der Herzchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit SP Unfallchirurgie"
+							}
+						],
+						"code": "072005",
+						"display": "SP Unfallchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit SP Visceralchirurgie"
+							}
+						],
+						"code": "072006",
+						"display": "SP Visceralchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Echokardiologie herznaher Gefäße"
+							}
+						],
+						"code": "073001",
+						"display": "TG Echokardiologie herznaher Gefäße"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Gefäßchirurgie"
+							}
+						],
+						"code": "073002",
+						"display": "TG Gefäßchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Herz- und Gefäßchirurgie"
+							}
+						],
+						"code": "073003",
+						"display": "TG Herz- und Gefäßchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Kinderchirurgie"
+							}
+						],
+						"code": "073004",
+						"display": "TG Kinderchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Plastische Chirurgie"
+							}
+						],
+						"code": "073005",
+						"display": "TG Plastische Chirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Rheumatologie (Orthopädie)"
+							}
+						],
+						"code": "073006",
+						"display": "TG Rheumatologie (Orthopädie)"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Thorax- und Kardiovaskularchirurgie"
+							}
+						],
+						"code": "073007",
+						"display": "TG Thorax- und Kardiovaskularchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Thoraxchirurgie"
+							}
+						],
+						"code": "073008",
+						"display": "TG Thoraxchirurgie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Chirurgie mit TG Unfallchirurgie"
+							}
+						],
+						"code": "073009",
+						"display": "TG Unfallchirurgie"
+					},
+					{
+						"code": "081001",
+						"display": "FA Frauenheilkunde"
+					},
+					{
+						"code": "081002",
+						"display": "FA Frauenheilkunde und Geburtshilfe"
+					},
+					{
+						"code": "081003",
+						"display": "FA Gynäkologie und Geburtshilfe"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Frauenheilkunde und Geburtshilfe mit SP Gynäkologische Endokrinologie und Reproduktionsmedizin"
+							}
+						],
+						"code": "082101",
+						"display": "SP Gynäkologische Endokrinologie und Reproduktionsmedizin"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Frauenheilkunde und Geburtshilfe mit SP Gynäkologische Onkologie"
+							}
+						],
+						"code": "082102",
+						"display": "SP Gynäkologische Onkologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Frauenheilkunde und Geburtshilfe mit SP Spezielle Geburtshilfe und Perinatalmedizin"
+							}
+						],
+						"code": "082103",
+						"display": "SP Spezielle Geburtshilfe und Perinatalmedizin"
+					},
+					{
+						"code": "091001",
+						"display": "FA Hals-Nasen-Ohrenheilkunde"
+					},
+					{
+						"code": "091002",
+						"display": "FA Phoniatrie und Pädaudiologie"
+					},
+					{
+						"code": "091101",
+						"display": "FA Sprach-; Stimm- und kindliche Hörstörungen"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Hals- Nasen- Ohrenheilkunde mit TG Audiologie"
+							}
+						],
+						"code": "093001",
+						"display": "TG Audiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Hals- Nasen- Ohrenheilkunde mit TG Phoniatrie"
+							}
+						],
+						"code": "093002",
+						"display": "TG Phoniatrie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Hals- Nasen- Ohrenheilkunde mit TG Phoniatrie und Pädaudiologie"
+							}
+						],
+						"code": "093003",
+						"display": "TG Phoniatrie und Pädaudiologie"
+					},
+					{
+						"code": "101001",
+						"display": "FA Dermatologie und Venerologie"
+					},
+					{
+						"code": "101002",
+						"display": "FA Haut- und Geschlechtskrankheiten"
+					},
+					{
+						"code": "111001",
+						"display": "FA Humangenetik"
+					},
+					{
+						"code": "121001",
+						"display": "FA Hygiene"
+					},
+					{
+						"code": "121002",
+						"display": "FA Hygiene und Umweltmedizin"
+					},
+					{
+						"code": "131001",
+						"display": "FA Immunologie"
+					},
+					{
+						"code": "141002",
+						"display": "FA Innere Medizin"
+					},
+					{
+						"code": "141110",
+						"display": "FA Innere Medizin und Angiologie"
+					},
+					{
+						"code": "141111",
+						"display": "FA Innere Medizin und Endokrinologie und Diabetologie"
+					},
+					{
+						"code": "141112",
+						"display": "FA Innere Medizin und Gastroenterologie"
+					},
+					{
+						"code": "141903",
+						"display": "FA Innere Medizin und Geriatrie"
+					},
+					{
+						"code": "141113",
+						"display": "FA Innere Medizin und Hämatologie und Onkologie"
+					},
+					{
+						"code": "141904",
+						"display": "FA Innere Medizin und Infektiologie"
+					},
+					{
+						"code": "141114",
+						"display": "FA Innere Medizin und Kardiologie"
+					},
+					{
+						"code": "141115",
+						"display": "FA Innere Medizin und Nephrologie"
+					},
+					{
+						"code": "141116",
+						"display": "FA Innere Medizin und Pneumologie"
+					},
+					{
+						"code": "141117",
+						"display": "FA Innere Medizin und Rheumatologie"
+					},
+					{
+						"code": "141102",
+						"display": "FA Innere Medizin und Schwerpunkt Angiologie"
+					},
+					{
+						"code": "141103",
+						"display": "FA Innere Medizin und Schwerpunkt Endokrinologie und Diabetologie"
+					},
+					{
+						"code": "141104",
+						"display": "FA Innere Medizin und Schwerpunkt Gastroenterologie"
+					},
+					{
+						"code": "141901",
+						"display": "FA Innere Medizin und Schwerpunkt Geriatrie"
+					},
+					{
+						"code": "141902",
+						"display": "FA Innere Medizin und Schwerpunkt gesamte Innere Medizin"
+					},
+					{
+						"code": "141105",
+						"display": "FA Innere Medizin und Schwerpunkt Hämatologie und Onkologie"
+					},
+					{
+						"code": "141106",
+						"display": "FA Innere Medizin und Schwerpunkt Kardiologie"
+					},
+					{
+						"code": "141107",
+						"display": "FA Innere Medizin und Schwerpunkt Nephrologie"
+					},
+					{
+						"code": "141108",
+						"display": "FA Innere Medizin und Schwerpunkt Pneumologie"
+					},
+					{
+						"code": "141109",
+						"display": "FA Innere Medizin und Schwerpunkt Rheumatologie"
+					},
+					{
+						"code": "141003",
+						"display": "FA Internist/Lungen- und Bronchialheilkunde"
+					},
+					{
+						"code": "141005",
+						"display": "FA Lungen- und Bronchialheilkunde"
+					},
+					{
+						"code": "141004",
+						"display": "FA Lungenheilkunde"
+					},
+					{
+						"code": "142001",
+						"display": "SP Angiologie"
+					},
+					{
+						"code": "142002",
+						"display": "SP Endokrinologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Endokrinologie und Diabetologie"
+							}
+						],
+						"code": "142901",
+						"display": "SP Endokrinologie und Diabetologie"
+					},
+					{
+						"code": "142003",
+						"display": "SP Gastroenterologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Geriatrie"
+							}
+						],
+						"code": "142004",
+						"display": "SP Geriatrie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Hämatologie und Internistische Onkologie"
+							}
+						],
+						"code": "142005",
+						"display": "SP Hämatologie und Internistische Onkologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Infektiologie"
+							}
+						],
+						"code": "142006",
+						"display": "SP Infektiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Kardiologie"
+							}
+						],
+						"code": "142007",
+						"display": "SP Kardiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Nephrologie"
+							}
+						],
+						"code": "142008",
+						"display": "SP Nephrologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Pneumologie"
+							}
+						],
+						"code": "142009",
+						"display": "SP Pneumologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit SP Rheumatologie"
+							}
+						],
+						"code": "142010",
+						"display": "SP Rheumatologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Diabetologie"
+							}
+						],
+						"code": "143001",
+						"display": "TG Diabetologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Endokrinologie"
+							}
+						],
+						"code": "143002",
+						"display": "TG Endokrinologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Gastroenterologie"
+							}
+						],
+						"code": "143003",
+						"display": "TG Gastroenterologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Hämatologie"
+							}
+						],
+						"code": "143004",
+						"display": "TG Hämatologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Infektions- und Tropenmedizin"
+							}
+						],
+						"code": "143005",
+						"display": "TG Infektions- und Tropenmedizin"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Kardiologie"
+							}
+						],
+						"code": "143006",
+						"display": "TG Kardiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Kardiologie und Angiologie"
+							}
+						],
+						"code": "143901",
+						"display": "TG Kardiologie und Angiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Lungen- und Bronchialheilkunde"
+							}
+						],
+						"code": "143007",
+						"display": "TG Lungen- und Bronchialheilkunde"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Nephrologie"
+							}
+						],
+						"code": "143008",
+						"display": "TG Nephrologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Innere Medizin mit TG Rheumatologie"
+							}
+						],
+						"code": "143009",
+						"display": "TG Rheumatologie"
+					},
+					{
+						"code": "151002",
+						"display": "FA Kinder- und Jugendmedizin"
+					},
+					{
+						"code": "151001",
+						"display": "FA Kinderheilkunde"
+					},
+					{
+						"code": "152901",
+						"display": "SP Endokrinologie und Diabetologie in der Kinder- und Jugendmedizin"
+					},
+					{
+						"code": "152902",
+						"display": "SP Gastroenterologie in der Kinder- und Jugendmedizin"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Infektiologie"
+							}
+						],
+						"code": "152001",
+						"display": "SP Infektiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Kinder- und Jugend-Hämatologie und -Onkologie"
+							}
+						],
+						"code": "152201",
+						"display": "SP Kinder- und Jugend-Hämatologie und -Onkologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Kinder- und Jugend-Kardiologie"
+							}
+						],
+						"code": "152202",
+						"display": "SP Kinder- und Jugend-Kardiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Kinder-Hämatologie und -Onkologie"
+							}
+						],
+						"code": "152101",
+						"display": "SP Kinder-Hämatologie und -Onkologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Kinder-Kardiologie"
+							}
+						],
+						"code": "152002",
+						"display": "SP Kinder-Kardiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Kinderpneumologie"
+							}
+						],
+						"code": "152906",
+						"display": "SP Kinderpneumologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Neonatologie"
+							}
+						],
+						"code": "152003",
+						"display": "SP Neonatologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Nephrologie"
+							}
+						],
+						"code": "152903",
+						"display": "SP Nephrologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Neuropädiatrie"
+							}
+						],
+						"code": "152102",
+						"display": "SP Neuropädiatrie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Pädiatrische Rheumatologie"
+							}
+						],
+						"code": "152904",
+						"display": "SP Pädiatrische Rheumatologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit SP Pulmologie in der Kinder- und Jugendmedizin"
+							}
+						],
+						"code": "152905",
+						"display": "SP Pulmologie in der Kinder- und Jugendmedizin"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kinderdiabetologie"
+							}
+						],
+						"code": "153001",
+						"display": "TG Kinderdiabetologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kindergastroenterologie"
+							}
+						],
+						"code": "153002",
+						"display": "TG Kindergastroenterologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kinderhämatologie"
+							}
+						],
+						"code": "153003",
+						"display": "TG Kinderhämatologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kinderkardiologie"
+							}
+						],
+						"code": "153004",
+						"display": "TG Kinderkardiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kinderlungen- und -bronchialheilkunde"
+							}
+						],
+						"code": "153005",
+						"display": "TG Kinderlungen- und -bronchialheilkunde"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kinderneonatologie"
+							}
+						],
+						"code": "153006",
+						"display": "TG Kinderneonatologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kindernephrologie"
+							}
+						],
+						"code": "153007",
+						"display": "TG Kindernephrologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Kinder- und Jugendmedizin mit TG Kinderneuropsychiatrie"
+							}
+						],
+						"code": "153008",
+						"display": "TG Kinderneuropsychiatrie"
+					},
+					{
+						"code": "161001",
+						"display": "FA Kinder- und Jugendpsychiatrie"
+					},
+					{
+						"code": "161002",
+						"display": "FA Kinder- und Jugendpsychiatrie und -psychotherapie"
+					},
+					{
+						"code": "171001",
+						"display": "FA Laboratoriumsmedizin"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Laboratoriumsmedizin mit TG Medizinische Mikrobiologie"
+							}
+						],
+						"code": "173001",
+						"display": "TG Medizinische Mikrobiologie"
+					},
+					{
+						"code": "181001",
+						"display": "FA Mikrobiologie"
+					},
+					{
+						"code": "181002",
+						"display": "FA Mikrobiologie und Infektionsepidemiologie"
+					},
+					{
+						"code": "181101",
+						"display": "FA Mikrobiologie; Virologie und Infektionsepidemiologie"
+					},
+					{
+						"code": "191001",
+						"display": "FA Kieferchirurgie"
+					},
+					{
+						"code": "191002",
+						"display": "FA Mund-Kiefer-Gesichtschirurgie"
+					},
+					{
+						"code": "191901",
+						"display": "FA Oralchirurgie"
+					},
+					{
+						"code": "201001",
+						"display": "FA Nervenheilkunde"
+					},
+					{
+						"code": "201002",
+						"display": "FA Nervenheilkunde (Neurologie und Psychiatrie)"
+					},
+					{
+						"code": "201003",
+						"display": "FA Neurologie und Psychiatrie (Nervenarzt)"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Nervenheilkunde mit TG Kinderneuropsychiatrie"
+							}
+						],
+						"code": "203001",
+						"display": "TG Kinderneuropsychiatrie"
+					},
+					{
+						"code": "211001",
+						"display": "FA Neurochirurgie"
+					},
+					{
+						"code": "221001",
+						"display": "FA Neurologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Neurologie mit SP Geriatrie"
+							}
+						],
+						"code": "222901",
+						"display": "SP Geriatrie"
+					},
+					{
+						"code": "231001",
+						"display": "FA Nuklearmedizin"
+					},
+					{
+						"code": "241001",
+						"display": "FA Öffentliches Gesundheitswesen"
+					},
+					{
+						"code": "251001",
+						"display": "FA Neuropathologie"
+					},
+					{
+						"code": "251002",
+						"display": "FA Pathobiochemie und Labordiagnostik"
+					},
+					{
+						"code": "251003",
+						"display": "FA Pathologie"
+					},
+					{
+						"code": "251004",
+						"display": "FA Pathologische Anatomie"
+					},
+					{
+						"code": "251005",
+						"display": "FA Pathologische Physiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Pathologie mit TG Neuropathologie"
+							}
+						],
+						"code": "253001",
+						"display": "TG Neuropathologie"
+					},
+					{
+						"code": "261001",
+						"display": "FA Klinische Pharmakologie"
+					},
+					{
+						"code": "261002",
+						"display": "FA Pharmakologie"
+					},
+					{
+						"code": "261003",
+						"display": "FA Pharmakologie und Toxikologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Pharmakologie mit TG Klinische Pharmakologie"
+							}
+						],
+						"code": "263001",
+						"display": "TG Klinische Pharmakologie"
+					},
+					{
+						"code": "381201",
+						"display": "Phoniatrie und Pädaudiologie"
+					},
+					{
+						"code": "271001",
+						"display": "FA Physikalische und Rehabilitative Medizin"
+					},
+					{
+						"code": "271002",
+						"display": "FA Physiotherapie"
+					},
+					{
+						"code": "281001",
+						"display": "FA Physiologie"
+					},
+					{
+						"code": "291001",
+						"display": "FA Psychiatrie"
+					},
+					{
+						"code": "291002",
+						"display": "FA Psychiatrie und Psychotherapie"
+					},
+					{
+						"code": "292101",
+						"display": "SP Forensische Psychiatrie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Psychiatrie und Psychotherapie mit SP Geriatrie"
+							}
+						],
+						"code": "292901",
+						"display": "SP Geriatrie"
+					},
+					{
+						"code": "301101",
+						"display": "FA Psychosomatische Medizin und Psychotherapie"
+					},
+					{
+						"code": "301001",
+						"display": "FA Psychotherapeutische Medizin"
+					},
+					{
+						"code": "301002",
+						"display": "FA Psychotherapie"
+					},
+					{
+						"code": "311001",
+						"display": "FA Diagnostische Radiologie"
+					},
+					{
+						"code": "311002",
+						"display": "FA Radiologie"
+					},
+					{
+						"code": "311003",
+						"display": "FA Radiologische Diagnostik"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Radiologie mit SP Kinder- und Jugendradiologie"
+							}
+						],
+						"code": "312201",
+						"display": "SP Kinder- und Jugendradiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Radiologie mit SP Kinderradiologie"
+							}
+						],
+						"code": "312001",
+						"display": "SP Kinderradiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Radiologie mit SP Neuroradiologie"
+							}
+						],
+						"code": "312002",
+						"display": "SP Neuroradiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Radiologie mit TG Kinderradiologie"
+							}
+						],
+						"code": "313001",
+						"display": "TG Kinderradiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Radiologie mit TG Neuroradiologie"
+							}
+						],
+						"code": "313002",
+						"display": "TG Neuroradiologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "FA Radiologie mit TG Strahlentherapie"
+							}
+						],
+						"code": "313003",
+						"display": "TG Strahlentherapie"
+					},
+					{
+						"code": "321001",
+						"display": "FA Rechtsmedizin"
+					},
+					{
+						"code": "351001",
+						"display": "FA Strahlentherapie"
+					},
+					{
+						"code": "361001",
+						"display": "FA Blutspende- und Transfusionswesen"
+					},
+					{
+						"code": "361002",
+						"display": "FA Transfusionsmedizin"
+					},
+					{
+						"code": "371001",
+						"display": "FA Urologie"
+					},
+					{
+						"code": "011002",
+						"display": "FA Praktischer Arzt"
+					},
+					{
+						"code": "011101",
+						"display": "FA Innere und Allgemeinmedizin (Hausarzt)"
+					},
+					{
+						"code": "131001",
+						"display": "FA Immunologie"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "Facharzt für Innere Medizin mit Schwerpunkt Geriatrie"
+							}
+						],
+						"code": "142902",
+						"display": "SP Geriatrie"
+					},
+					{
+						"code": "331001",
+						"display": "FA Sozialhygiene"
+					},
+					{
+						"code": "341001",
+						"display": "FA Sportmedizin"
+					},
+					{
+						"code": "590001",
+						"display": "Biomathematik"
+					},
+					{
+						"code": "590002",
+						"display": "Biophysik"
+					},
+					{
+						"code": "590003",
+						"display": "Geschichte der Medizin"
+					},
+					{
+						"code": "590004",
+						"display": "Industrietoxikologie"
+					},
+					{
+						"code": "590005",
+						"display": "Kieferchirurgie"
+					},
+					{
+						"code": "590006",
+						"display": "Klinische Strahlenphysik"
+					},
+					{
+						"code": "590007",
+						"display": "Medizinische Genetik"
+					},
+					{
+						"code": "590008",
+						"display": "Medizinische Informatik"
+					},
+					{
+						"code": "590009",
+						"display": "Medizinische Physik und Biophysik"
+					},
+					{
+						"code": "590010",
+						"display": "Medizinische Wissenschaftsinformation"
+					},
+					{
+						"code": "590011",
+						"display": "Pathologische Biochemie"
+					},
+					{
+						"code": "000001",
+						"display": "Ärztin/Arzt"
+					},
+					{
+						"code": "000011",
+						"display": "Praktische Ärztin/Praktischer Arzt (EWG-Recht ab 86/457/EWG)"
+					}
+				]
+			},
+			{
+				"system": "http://ihe-d.de/CodeSystems/QualifikationenNichtAerztlicherAutoren",
+				"concept": [
+					{
+						"code": "1",
+						"display": "Gesundheits- Sozial-, Sportmanagement"
+					},
+					{
+						"code": "2",
+						"display": "Arzthilfe, Praxisorganisation, -verwaltung"
+					},
+					{
+						"code": "179",
+						"display": "Physician Assistant"
+					},
+					{
+						"code": "3",
+						"display": "Kaufmann/-frau - Gesundheitswesen"
+					},
+					{
+						"code": "4",
+						"display": "Medizinischer Fachangestellter"
+					},
+					{
+						"code": "6",
+						"display": "Zahnmedizinischer Fachangestellter"
+					},
+					{
+						"code": "7",
+						"display": "Arztsekretär"
+					},
+					{
+						"code": "8",
+						"display": "Sozial-, Gesundheitsmanagement"
+					},
+					{
+						"code": "9",
+						"display": "Gesundheitsaufseher / Hygienekontrolleur"
+					},
+					{
+						"code": "10",
+						"display": "Assistent Gesundheits- und Sozialwesen"
+					},
+					{
+						"code": "11",
+						"display": "Beamte Sozialversicherung"
+					},
+					{
+						"code": "12",
+						"display": "Beamte Sozialverwaltung"
+					},
+					{
+						"code": "13",
+						"display": "Betriebswirt  Sozialversicherung"
+					},
+					{
+						"code": "14",
+						"display": "Gesundheitsmanager"
+					},
+					{
+						"code": "15",
+						"display": "Sozialökonom, -wirt"
+					},
+					{
+						"code": "16",
+						"display": "Sozialversicherungsfachangestellte"
+					},
+					{
+						"code": "17",
+						"display": "Sportmanagement"
+					},
+					{
+						"code": "18",
+						"display": "Sportassistent"
+					},
+					{
+						"code": "19",
+						"display": "Fachwirt Fitness"
+					},
+					{
+						"code": "20",
+						"display": "Sport- und Fitnesskaufmann"
+					},
+					{
+						"code": "21",
+						"display": "Sportmanager, Sportökonom"
+					},
+					{
+						"code": "22",
+						"display": "nichtärztliche medizinische Analyse, Beratung, Pflege, Therapie"
+					},
+					{
+						"code": "23",
+						"display": "Gesundheitsberatung, -förderung"
+					},
+					{
+						"code": "24",
+						"display": "Assistenten für Gesundheitstourismus,  -prophylaxe"
+					},
+					{
+						"code": "25",
+						"display": "Diätassistent"
+					},
+					{
+						"code": "26",
+						"display": "Gesundheitsförderer, -pädagoge"
+					},
+					{
+						"code": "27",
+						"display": "Gesundheitswissenschaftler"
+					},
+					{
+						"code": "28",
+						"display": "Oekotrophologe"
+					},
+					{
+						"code": "29",
+						"display": "Tai-Chi-Chuan- und Qigong-Lehrer"
+					},
+					{
+						"code": "30",
+						"display": "Yogalehrer"
+					},
+					{
+						"code": "31",
+						"display": "Sportfachmann"
+					},
+					{
+						"code": "32",
+						"display": "Sportwissenschaftler"
+					},
+					{
+						"code": "33",
+						"display": "Kranken-, Altenpflege, Geburtshilfe"
+					},
+					{
+						"code": "34",
+						"display": "Altenpflegehelfer"
+					},
+					{
+						"code": "35",
+						"display": "Altenpfleger"
+					},
+					{
+						"code": "36",
+						"display": "Fachkraft Pflegeassistenz"
+					},
+					{
+						"code": "37",
+						"display": "Gesundheits- und Kinderkrankenpfleger"
+					},
+					{
+						"code": "38",
+						"display": "Gesundheits- und Krankenpflegehelfer"
+					},
+					{
+						"code": "39",
+						"display": "Gesundheits- und Krankenpfleger"
+					},
+					{
+						"code": "40",
+						"display": "Haus- und Familienpfleger"
+					},
+					{
+						"code": "41",
+						"display": "Hebamme / Entbindungspfleger"
+					},
+					{
+						"code": "42",
+						"display": "Heilerziehungspfleger"
+					},
+					{
+						"code": "43",
+						"display": "Helfer Altenpflege"
+					},
+					{
+						"code": "44",
+						"display": "Helfer stationäre Krankenpflege"
+					},
+					{
+						"code": "45",
+						"display": "Heilerziehungspflegehelfer"
+					},
+					{
+						"code": "46",
+						"display": "Pflegewissenschaftler"
+					},
+					{
+						"code": "175",
+						"display": "Fachgesundheits- und krankenpfleger für Intensivpflege und Anästhesie"
+					},
+					{
+						"code": "176",
+						"display": "Fachgesundheits- und krankenpfleger im Operations-/Endoskopiedienst"
+					},
+					{
+						"code": "177",
+						"display": "Fachgesundheits- und krankenpfleger für Hygiene"
+					},
+					{
+						"code": "178",
+						"display": "Fachgesundheits- und krankenpfleger für Palliativ- und Hospizpflege"
+					},
+					{
+						"code": "186",
+						"display": "Pflegefachmann/Pflegefachfrau"
+					},
+					{
+						"code": "187",
+						"display": "Fachgesundheits- und krankenpfleger für Onkologie"
+					},
+					{
+						"code": "188",
+						"display": "Fachgesundheits- und krankenpfleger für Psychiatrie"
+					},
+					{
+						"code": "47",
+						"display": "Nichtärztliche Behandlung, Therapie (außer Psychotherapie)"
+					},
+					{
+						"code": "48",
+						"display": "Akademischer Sprachtherapeut"
+					},
+					{
+						"code": "49",
+						"display": "Atem-, Sprech- und Stimmlehrer"
+					},
+					{
+						"code": "50",
+						"display": "Ergotherapeut"
+					},
+					{
+						"code": "51",
+						"display": "Fachangestellter für Bäderbetriebe"
+					},
+					{
+						"code": "52",
+						"display": "Heilpraktiker"
+					},
+					{
+						"code": "53",
+						"display": "Klinischer Linguist"
+					},
+					{
+						"code": "54",
+						"display": "Kunsttherapeut"
+					},
+					{
+						"code": "55",
+						"display": "Logopäde"
+					},
+					{
+						"code": "56",
+						"display": "Masseur und medizinische Bademeister"
+					},
+					{
+						"code": "57",
+						"display": "Motologe"
+					},
+					{
+						"code": "58",
+						"display": "Musiktherapeut"
+					},
+					{
+						"code": "59",
+						"display": "Orthoptist"
+					},
+					{
+						"code": "60",
+						"display": "Physiotherapeut"
+					},
+					{
+						"code": "61",
+						"display": "Podologe"
+					},
+					{
+						"code": "62",
+						"display": "Sporttherapeut"
+					},
+					{
+						"code": "63",
+						"display": "Sprechwissenschaftler"
+					},
+					{
+						"code": "64",
+						"display": "Staatlich anerkannter Sprachtherapeut"
+					},
+					{
+						"code": "65",
+						"display": "Stomatherapeut"
+					},
+					{
+						"code": "66",
+						"display": "Tanz- und Bewegungstherapeut"
+					},
+					{
+						"code": "68",
+						"display": "Sozialtherapeut"
+					},
+					{
+						"code": "69",
+						"display": "Pharmazeutische Beratung, Pharmavertrieb"
+					},
+					{
+						"code": "70",
+						"display": "Apotheker /Fachapotheker"
+					},
+					{
+						"code": "71",
+						"display": "Pharmazeut"
+					},
+					{
+						"code": "72",
+						"display": "Pharmazeutisch-technischer Assistent – PTA"
+					},
+					{
+						"code": "73",
+						"display": "Pharmazeutisch-kaufmännischer Angestellter"
+					},
+					{
+						"code": "180",
+						"display": "Pharmazieingenieur"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "Der Apothekenassistent hat ein zweijähriges Studium an der Ingenieurschule für Pharmazie in Leipzig absolviert."
+							}
+						],
+						"code": "181",
+						"display": "Apothekenassistent"
+					},
+					{
+						"extension": [
+							{
+								"url": "http://hl7.org/fhir/StructureDefinition/valueset-concept-comments",
+								"valueString": "Personen, die die pharmazeutische Vorprüfung nach der „Prüfungsordnung für Apotheker“ vom 18. Mai 1904 oder nach der „Prüfungsordnung für Apotheker“ vom 8. Dezember 1934 bestanden haben (vorgeprüfte Apothekeranwärter), dürfen eine Tätigkeit unter der Berufsbezeichnung „Apothekerassistentin“ oder „Apothekerassistent“ ausüben (§ 1 Abs. 1 ApoAnwRstG)."
+							}
+						],
+						"code": "182",
+						"display": "Apothekerassistent"
+					},
+					{
+						"code": "74",
+						"display": "Psychologische Analyse, Beratung, Therapie"
+					},
+					{
+						"code": "75",
+						"display": "Gesundheits- und Rehabilitationspsychologe"
+					},
+					{
+						"code": "76",
+						"display": "Kinder- und Jugendlichenpsychotherapeut"
+					},
+					{
+						"code": "77",
+						"display": "Klinischer Psychologe"
+					},
+					{
+						"code": "78",
+						"display": "Kommunikationspsychologe"
+					},
+					{
+						"code": "79",
+						"display": "Pädagogischer Psychologe"
+					},
+					{
+						"code": "80",
+						"display": "Psychoanalytiker"
+					},
+					{
+						"code": "81",
+						"display": "Psychologe"
+					},
+					{
+						"code": "82",
+						"display": "Psychologischer Psychotherapeut"
+					},
+					{
+						"code": "183",
+						"display": "Psychotherapeut"
+					},
+					{
+						"code": "184",
+						"display": "Fachpsychotherapeut für Kinder und Jugendliche"
+					},
+					{
+						"code": "185",
+						"display": "Fachpsychotherapeut für Erwachsene"
+					},
+					{
+						"code": "83",
+						"display": "Sportpsychologe"
+					},
+					{
+						"code": "84",
+						"display": "Verkehrspsychologe"
+					},
+					{
+						"code": "85",
+						"display": "Wirtschaftspsychologe"
+					},
+					{
+						"code": "86",
+						"display": "Rettungsdienst"
+					},
+					{
+						"code": "87",
+						"display": "Ingenieur Rettungswesen"
+					},
+					{
+						"code": "88",
+						"display": "Notfallsanitäter"
+					},
+					{
+						"code": "89",
+						"display": "Rettungsassistent"
+					},
+					{
+						"code": "90",
+						"display": "Rettungshelfer"
+					},
+					{
+						"code": "91",
+						"display": "Rettungssanitäter"
+					},
+					{
+						"code": "92",
+						"display": "med. Datenverarbeitung"
+					},
+					{
+						"code": "94",
+						"display": "Medizinischer Dokumentar"
+					},
+					{
+						"code": "95",
+						"display": "Medizinischer Dokumentationsassistent"
+					},
+					{
+						"code": "173",
+						"display": "Fachangestellter f. Medien- und Informationsdienste - Medizinische Dokumentation"
+					},
+					{
+						"code": "174",
+						"display": "Medizinischer Informationsmanager"
+					},
+					{
+						"code": "96",
+						"display": "Soziales, Pädagogik"
+					},
+					{
+						"code": "97",
+						"display": "Kinderbetreuung, -erziehung"
+					},
+					{
+						"code": "98",
+						"display": "Pädagoge"
+					},
+					{
+						"code": "99",
+						"display": "Kinderdorfmutter, -vater"
+					},
+					{
+						"code": "100",
+						"display": "Kinderpfleger"
+					},
+					{
+						"code": "101",
+						"display": "Erzieher"
+					},
+					{
+						"code": "102",
+						"display": "Erzieher Jugend- und Heimerziehung"
+					},
+					{
+						"code": "103",
+						"display": "Lehrer"
+					},
+					{
+						"code": "104",
+						"display": "Orientierungs- und Mobilitätslehrer"
+					},
+					{
+						"code": "105",
+						"display": "Medien-, Kulturpädagogik"
+					},
+					{
+						"code": "106",
+						"display": "Musikpädagoge"
+					},
+					{
+						"code": "107",
+						"display": "Sozialberatung, -arbeit"
+					},
+					{
+						"code": "108",
+						"display": "Sozialarbeiter / Sozialpädagoge"
+					},
+					{
+						"code": "109",
+						"display": "Betreuungskraft / Alltagsbegleiter"
+					},
+					{
+						"code": "110",
+						"display": "Gerontologe"
+					},
+					{
+						"code": "111",
+						"display": "Psychosozialer Prozessbegleiter"
+					},
+					{
+						"code": "112",
+						"display": "Rehabilitationspädagoge"
+					},
+					{
+						"code": "113",
+						"display": "Sozialassistent"
+					},
+					{
+						"code": "114",
+						"display": "Seelsorge"
+					},
+					{
+						"code": "115",
+						"display": "Religionspädagoge"
+					},
+					{
+						"code": "116",
+						"display": "Gemeindehelfer, Gemeindediakon"
+					},
+					{
+						"code": "117",
+						"display": "Theologe"
+					},
+					{
+						"code": "118",
+						"display": "Medizintechnik, Laboranalyse"
+					},
+					{
+						"code": "119",
+						"display": "Medizin-, Orthopädie- und Rehatechnik"
+					},
+					{
+						"code": "120",
+						"display": "Assistent Medizinische Gerätetechnik"
+					},
+					{
+						"code": "121",
+						"display": "Augenoptiker"
+					},
+					{
+						"code": "122",
+						"display": "Hörakustiker / Hörgeräteakustiker"
+					},
+					{
+						"code": "123",
+						"display": "Hörgeräteakustikermeister"
+					},
+					{
+						"code": "124",
+						"display": "Ingenieur Augenoptik"
+					},
+					{
+						"code": "125",
+						"display": "Ingenieur - Hörtechnik und Audiologie"
+					},
+					{
+						"code": "126",
+						"display": "Ingenieur - Medizintechnik"
+					},
+					{
+						"code": "127",
+						"display": "Ingenieur - Orthopädie- und Rehatechnik"
+					},
+					{
+						"code": "128",
+						"display": "Medizinphysiker (z.B. in Strahlenmedizin)"
+					},
+					{
+						"code": "129",
+						"display": "Orthopädieschuhmacher"
+					},
+					{
+						"code": "130",
+						"display": "Orthopädietechnik-Mechaniker"
+					},
+					{
+						"code": "131",
+						"display": "Zahntechniker"
+					},
+					{
+						"code": "132",
+						"display": "Glasbläser (Fachrichtung Kunstaugen)"
+					},
+					{
+						"code": "133",
+						"display": "staatlich geprüfter Techniker der Fachrichtung Medizintechnik"
+					},
+					{
+						"code": "134",
+						"display": "Medizinisch-technische Assistenz"
+					},
+					{
+						"code": "135",
+						"display": "Anästhesietechnischer Assistent"
+					},
+					{
+						"code": "136",
+						"display": "HNO Audiologieassistent"
+					},
+					{
+						"code": "137",
+						"display": "Medizinisch-Technischer Assistent Funktionsdiagnostik – MTA-F"
+					},
+					{
+						"code": "138",
+						"display": "Medizinisch-Technischer Laboratoriumsassistent – MTA-L"
+					},
+					{
+						"code": "139",
+						"display": "Medizinisch-Technischer Radiologieassistent – MTA-R"
+					},
+					{
+						"code": "140",
+						"display": "Operationstechnischer Angestellter"
+					},
+					{
+						"code": "141",
+						"display": "Operationstechnischer Assistent"
+					},
+					{
+						"code": "143",
+						"display": "Zytologieassistent"
+					},
+					{
+						"code": "144",
+						"display": "Chemie, naturwissenschaftliche Laboranalyse (außer MTA)"
+					},
+					{
+						"code": "145",
+						"display": "Biochemiker (z.B. klinische Chemie)"
+					},
+					{
+						"code": "146",
+						"display": "Chemiker (z.B. klinische Chemie)"
+					},
+					{
+						"code": "147",
+						"display": "Humangenetiker"
+					},
+					{
+						"code": "148",
+						"display": "Mikrobiologe"
+					},
+					{
+						"code": "149",
+						"display": "Dienstleistungen am Menschen (außer medizinische)"
+					},
+					{
+						"code": "150",
+						"display": "Körperpflege"
+					},
+					{
+						"code": "151",
+						"display": "Fachkraft Beauty und Wellness"
+					},
+					{
+						"code": "152",
+						"display": "Friseur"
+					},
+					{
+						"code": "153",
+						"display": "Kosmetiker"
+					},
+					{
+						"code": "154",
+						"display": "Bestattungswesen"
+					},
+					{
+						"code": "155",
+						"display": "Bestattungsfachkraft"
+					},
+					{
+						"code": "156",
+						"display": "Berufe aus sonstigen Berufsfeldern"
+					},
+					{
+						"code": "157",
+						"display": "Umwelt"
+					},
+					{
+						"code": "165",
+						"display": "Jurist"
+					},
+					{
+						"code": "169",
+						"display": "Taxifahrer bei Krankentransport"
+					}
+				]
+			}
+		]
+	}
+}

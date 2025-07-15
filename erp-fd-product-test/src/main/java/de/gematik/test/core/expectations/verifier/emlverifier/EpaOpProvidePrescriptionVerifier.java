@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier.emlverifier;
@@ -21,15 +25,15 @@ import static java.text.MessageFormat.format;
 
 import com.google.common.base.Strings;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -291,7 +295,7 @@ public class EpaOpProvidePrescriptionVerifier {
       KbvErpMedication expectedMedication, HashMap<String, Optional<String>> expectedValues) {
 
     expectedValues.putAll(generalExpectedAttributes(expectedMedication, expectedValues));
-    expectedValues.put(MEDICATION_CODE_TEXT, Optional.ofNullable(expectedMedication.getFreeText()));
+    expectedValues.put(MEDICATION_CODE_TEXT, expectedMedication.getFreeTextOptional());
     return expectedValues;
   }
 
@@ -358,6 +362,18 @@ public class EpaOpProvidePrescriptionVerifier {
       // in ErpWorkflowVersion.V1_4_0 ++ the PZN-Object is in a Contained Resource & not in the
       // Expected Ingredient -> coding
     }
+    givenValues.put(
+        "Form",
+        Optional.ofNullable(compoundingPrescription.getEpaMedication().getForm().getText()));
+    givenValues.put(
+        MEDICATION_AMOUNT_DENOMINATOR_VALUE,
+        Optional.ofNullable(
+            String.valueOf(
+                compoundingPrescription
+                    .getEpaMedication()
+                    .getAmount()
+                    .getDenominator()
+                    .getValue())));
     if (compoundingPrescription.getEpaMedication().hasContained()) {
       val medication =
           (Medication) compoundingPrescription.getEpaMedication().getContained().get(0);
@@ -374,7 +390,12 @@ public class EpaOpProvidePrescriptionVerifier {
               .map(Coding::getSystem)
               .filter(DeBasisProfilCodeSystem.PZN::matches)
               .findFirst());
+      givenValues.put(MEDICATION_CODE_TEXT, Optional.ofNullable(containedPznCC.getText()));
       givenValues.put(INGREDIENT_CODE_CON_TEXT, Optional.ofNullable(containedPznCC.getText()));
+    } else {
+      givenValues.put(
+          MEDICATION_CODE_TEXT,
+          Optional.ofNullable(compoundingPrescription.getEpaMedication().getCode().getText()));
     }
     givenValues.put(
         "Form",
@@ -402,9 +423,6 @@ public class EpaOpProvidePrescriptionVerifier {
         MEDICATION_AMOUNT_NUMERATOR_UNIT,
         Optional.ofNullable(
             compoundingPrescription.getEpaMedication().getAmount().getNumerator().getUnit()));
-    givenValues.put(
-        MEDICATION_CODE_TEXT,
-        Optional.ofNullable(compoundingPrescription.getEpaMedication().getCode().getText()));
     return givenValues;
   }
 

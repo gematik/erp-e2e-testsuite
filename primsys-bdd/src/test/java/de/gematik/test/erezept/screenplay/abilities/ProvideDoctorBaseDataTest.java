@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.abilities;
@@ -19,7 +23,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
@@ -38,9 +42,11 @@ class ProvideDoctorBaseDataTest extends ErpFhirBuildingTest {
 
     assertEquals("Bernd", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Claudius", doc.getPractitioner().getNameFirstRep().getFamily());
-    assertNotNull(doc.getPractitioner().getANR().getValue());
-    assertNotEquals("", doc.getPractitioner().getANR().getValue());
-    assertEquals(BaseANR.ANRType.LANR, doc.getPractitioner().getANR().getType());
+
+    val anr = assertDoesNotThrow(() -> doc.getPractitioner().getANR().orElseThrow());
+    assertNotNull(anr.getValue());
+    assertFalse(anr.getValue().isEmpty());
+    assertEquals(BaseANR.ANRType.LANR, anr.getType());
     assertEquals(QualificationType.DOCTOR, doc.getPractitioner().getQualificationType());
     assertNotNull(doc.getPractitioner());
     assertNotNull(doc.getMedicalOrganization());
@@ -56,9 +62,11 @@ class ProvideDoctorBaseDataTest extends ErpFhirBuildingTest {
 
     assertEquals("Bernd", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertEquals("Claudius", doc.getPractitioner().getNameFirstRep().getFamily());
-    assertNotNull(doc.getPractitioner().getANR().getValue());
-    assertNotEquals("", doc.getPractitioner().getANR().getValue());
-    assertEquals(BaseANR.ANRType.ZANR, doc.getPractitioner().getANR().getType());
+
+    val anr = assertDoesNotThrow(() -> doc.getPractitioner().getANR().orElseThrow());
+    assertNotNull(anr.getValue());
+    assertFalse(anr.getValue().isEmpty());
+    assertEquals(BaseANR.ANRType.ZANR, anr.getType());
     assertEquals(QualificationType.DENTIST, doc.getPractitioner().getQualificationType());
     assertNotNull(doc.getPractitioner());
     assertNotNull(doc.getMedicalOrganization());
@@ -74,9 +82,11 @@ class ProvideDoctorBaseDataTest extends ErpFhirBuildingTest {
 
     assertNotEquals("", doc.getPractitioner().getNameFirstRep().getGivenAsSingleString());
     assertNotEquals("", doc.getPractitioner().getNameFirstRep().getFamily());
-    assertNotNull(doc.getPractitioner().getANR().getValue());
-    assertNotEquals("", doc.getPractitioner().getANR().getValue());
-    assertEquals(BaseANR.ANRType.ZANR, doc.getPractitioner().getANR().getType());
+
+    val anr = assertDoesNotThrow(() -> doc.getPractitioner().getANR().orElseThrow());
+    assertNotNull(anr.getValue());
+    assertFalse(anr.getValue().isEmpty());
+    assertEquals(BaseANR.ANRType.ZANR, anr.getType());
     assertEquals(QualificationType.DENTIST, doc.getPractitioner().getQualificationType());
   }
 

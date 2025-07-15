@@ -1,0 +1,61 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/GrundDerUebermittlung",
+  "version": "2021-07-06T21:18:31",
+  "name": "GrundDerUebermittlung",
+  "id": "GrundDerUebermittlung",
+  "title": "Grund Der Uebermittlung",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "1",
+      "display": "Patientenkontakt"
+    },
+    {
+      "code": "2",
+      "display": "Verlegung"
+    },
+    {
+      "code": "3",
+      "display": "Entlassung"
+    },
+    {
+      "code": "4",
+      "display": "Überweisung/Einweisung"
+    },
+    {
+      "code": "5",
+      "display": "Aufnahme"
+    },
+    {
+      "code": "6",
+      "display": "Anforderung"
+    },
+    {
+      "code": "7",
+      "display": "Auf Anfrage"
+    },
+    {
+      "code": "8",
+      "display": "Veranlassung durch Patient",
+      "definition": "Regelmäßige Übertragungen (z.B. Implantate, Fitnesstracker), auch wenn durch den Patienten ursprünglich veranlasst, werden über das Konzept 11 (\"Monitoring\") abgebildet."
+    },
+    {
+      "code": "9",
+      "display": "Konsil/Zweitmeinung"
+    },
+    {
+      "code": "10",
+      "display": "Systemwechsel/Archivierung"
+    },
+    {
+      "code": "11",
+      "display": "Monitoring"
+    }
+  ],
+  "count": 11
+}

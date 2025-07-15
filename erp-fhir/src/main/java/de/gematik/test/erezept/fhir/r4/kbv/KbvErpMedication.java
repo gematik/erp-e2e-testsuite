@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef.COMPOUNDING_INSTRUCTION;
-import static de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef.PACKAGING;
-import static de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef.PACKAGING_SIZE;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.COMPOUNDING_INSTRUCTION;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.PACKAGING;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.PACKAGING_SIZE;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
@@ -27,8 +31,8 @@ import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -48,7 +52,7 @@ import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @ResourceDef(name = "Medication")
-@SuppressWarnings({"java:S110"})
+@SuppressWarnings({"java:S110", "java:S1192"})
 public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public static KbvErpMedication fromMedication(Medication adaptee) {
@@ -154,11 +158,11 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
    */
   public Optional<String> getAmountNumeratorString() {
     Optional<String> ret = Optional.empty();
-    val value = this.getAmount().getNumerator().getValue();
-    val unit = this.getAmount().getNumerator().getUnit();
+    val value =
+        this.getPackagingSize().orElse(String.valueOf(this.getAmount().getNumerator().getValue()));
+    val unit = this.getPackagingUnit().orElse(null);
     if (value != null && unit != null) {
-      val numerator = this.getAmount().getNumerator();
-      ret = Optional.of(format("{0} {1}", numerator.getValue(), numerator.getUnit()));
+      ret = Optional.of(format("{0} {1}", value, unit));
     }
     return ret;
   }
@@ -249,9 +253,12 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
     val pznText =
         this.getPznOptional().map(pzn -> format("(PZN: {0})", pzn.getValue())).orElse(type);
 
-    val medicationName = this.getMedicationName();
     val size = this.getStandardSize();
-    return format("{0} {1} {2}", medicationName, size.getCode(), pznText);
+    val medicationName =
+        Optional.ofNullable(this.getMedicationName())
+            .map(name -> format("{0} {1}", name, size.getCode()))
+            .orElse(size.getCode());
+    return format("{0} {1}", medicationName, pznText);
   }
 
   public KbvItaErpVersion getVersion() {

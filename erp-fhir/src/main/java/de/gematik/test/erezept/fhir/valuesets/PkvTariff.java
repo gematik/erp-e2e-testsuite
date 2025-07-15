@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
@@ -34,7 +38,6 @@ public enum PkvTariff implements FromValueSet {
   NOTLAGE("04", "Notlagentarif");
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.PKV_TARIFF;
-  public static final String VERSION = "1.0.1";
   public static final String DESCRIPTION =
       "Diese Schlüsseltabelle beinhaltet die zulässigen Kostenträgerarten im PKV-Bereich";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";

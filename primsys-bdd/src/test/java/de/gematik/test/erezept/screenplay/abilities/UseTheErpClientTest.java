@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.abilities;
@@ -81,7 +85,7 @@ class UseTheErpClientTest extends ErpFhirBuildingTest {
   void shouldReportRequestResponse() {
     val chargeItem =
         ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
-    val cmd = new ChargeItemPostCommand(chargeItem, new Secret("123"));
+    val cmd = new ChargeItemPostCommand(chargeItem, Secret.from("123"));
     val expectedResponse =
         ErpResponse.forPayload(chargeItem, ErxChargeItem.class)
             .withStatusCode(201)

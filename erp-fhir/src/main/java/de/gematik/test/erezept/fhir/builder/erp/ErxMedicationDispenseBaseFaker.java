@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
@@ -20,7 +24,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerTelematikId;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -68,7 +72,7 @@ public abstract class ErxMedicationDispenseBaseFaker<
   }
 
   public F withPrescriptionId(String prescriptionId) {
-    return this.withPrescriptionId(new PrescriptionId(prescriptionId));
+    return this.withPrescriptionId(PrescriptionId.from(prescriptionId));
   }
 
   public F withMedication(GemErpMedication medication) {

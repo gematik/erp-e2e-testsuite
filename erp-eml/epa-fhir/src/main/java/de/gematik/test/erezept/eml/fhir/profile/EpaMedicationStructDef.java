@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.eml.fhir.profile;
@@ -25,6 +29,8 @@ import lombok.Getter;
 public enum EpaMedicationStructDef implements WithStructureDefinition<EpaMedicationVersion> {
   DRUG_CATEGORY_EXT(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension"),
+  INGREDIENT_DARREICHUNGSFORM(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-darreichungsform-extension"),
   EPA_MEDICATION("https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication"),
   EPA_MEDICATION_REQUEST(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-request"),
@@ -51,12 +57,14 @@ public enum EpaMedicationStructDef implements WithStructureDefinition<EpaMedicat
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-darreichungsform-extension"),
   PACKAGING_EXTENSION(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-formulation-packaging-extension"),
+  PACKAGING_SIZE_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension"),
   RX_PRESCRIPTION_ID(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/rx-prescription-process-identifier-extension"),
   TOTAL_QUANTITY_FORMULATION_EXT(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension"),
   VACCINE_EXT(
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension"),
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension"), // from EPA 1.0.6 mandatory
   ;
 
   private final String canonicalUrl;

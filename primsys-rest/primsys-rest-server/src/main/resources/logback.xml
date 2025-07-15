@@ -14,6 +14,9 @@
         </encoder>
     </appender>
 
+    <logger name="de.gematik.test.erezept.primsys.controller" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
     <logger name="de.gematik.test.erezept.primsys.model" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

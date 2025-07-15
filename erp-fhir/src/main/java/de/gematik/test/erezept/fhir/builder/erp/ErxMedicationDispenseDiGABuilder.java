@@ -12,14 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.extensions.erp.DeepLink;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +38,7 @@ public class ErxMedicationDispenseDiGABuilder
 
   private RedeemCode redeemCode;
   private DeepLink deepLink;
+  private String note;
 
   protected ErxMedicationDispenseDiGABuilder(KVNR kvnr) {
     super(kvnr);
@@ -60,7 +66,11 @@ public class ErxMedicationDispenseDiGABuilder
     return this;
   }
 
-  @Override
+  public ErxMedicationDispenseDiGABuilder note(String note) {
+    this.note = note;
+    return this;
+  }
+
   public ErxMedicationDispenseDiGA build() {
     val medDisp =
         this.createResource(
@@ -70,14 +80,23 @@ public class ErxMedicationDispenseDiGABuilder
     buildBase(medDisp);
 
     val medicationReference = new Reference();
-    this.medication
-        .getPzn()
-        .ifPresent(pzn -> medicationReference.setIdentifier(pzn.asIdentifier()));
-    medicationReference.setDisplay(this.medication.getName().orElse(null));
+
     medDisp.setMedication(medicationReference);
 
     Optional.ofNullable(deepLink).ifPresent(dl -> medDisp.addExtension(dl.asExtension()));
     Optional.ofNullable(redeemCode).ifPresent(rc -> medDisp.addExtension(rc.asExtension()));
+
+    if (redeemCode == null && deepLink == null) {
+      medicationReference.addExtension(
+          HL7StructDef.DATA_ABSENT_REASON.asCodeExtension("asked-declined"));
+    } else {
+      this.medication
+          .getPzn()
+          .ifPresent(pzn -> medicationReference.setIdentifier(pzn.asIdentifier()));
+      medicationReference.setDisplay(
+          this.medication.getNameFromCodeOreContainedRessource().orElse(null));
+    }
+    Optional.ofNullable(note).ifPresent(n -> medDisp.addNote().setText(n));
 
     return medDisp;
   }

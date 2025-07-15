@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.eml.fhir.r4;
@@ -30,7 +34,7 @@ class EpaPractitionerTest extends EpaFhirParsingTest {
   @SneakyThrows
   @Test
   void shouldResponseTelematikIdFromPractitioner() {
-    val path = "fhir/valid/directory/Practitioner-TIPractitionerExample001.json";
+    val path = "fhir/valid/directory/0.11.12/Practitioner-TIPractitionerExample001.json";
     val medicationAsString = ResourceLoader.readFileFromResource(path);
     val epaMedic = epaFhir.decode(EpaPractitioner.class, medicationAsString);
 

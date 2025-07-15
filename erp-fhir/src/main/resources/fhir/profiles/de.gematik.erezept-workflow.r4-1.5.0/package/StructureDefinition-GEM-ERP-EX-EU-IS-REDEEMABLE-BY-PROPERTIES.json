@@ -1,0 +1,58 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-EX-EU-IS-REDEEMABLE-BY-PROPERTIES",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_EU_IS_REDEEMABLE_BY_PROPERTIES",
+  "version": "1.5.0",
+  "name": "GEM_ERP_EX_EU_IS_REDEEMABLE_BY_PROPERTIES",
+  "status": "active",
+  "date": "2025-04-10",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "expression": "Task",
+      "type": "element"
+    },
+    {
+      "expression": "http://hl7.org/fhir/StructureDefinition/Extension",
+      "type": "extension"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Redeemable in EU Flag",
+        "definition": "This flag is set by the E-Rezept-Fachdienst, if the ePrescription is redeemable in the EU."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_EU_IS_REDEEMABLE_BY_PROPERTIES"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Redeemable in EU Flag",
+        "definition": "This flag is set by the E-Rezept-Fachdienst, if the ePrescription is redeemable in the EU.",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

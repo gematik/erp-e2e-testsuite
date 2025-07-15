@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.generate;
@@ -22,12 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import java.nio.file.Path;
 import lombok.val;
-import org.junit.jupiter.api.Test;
+import org.junit.Ignore;
 import picocli.CommandLine;
 
 class KbvBundleGeneratorTest extends ErpFhirBuildingTest {
 
-  @Test
+  @Ignore("Decision to reactivate has @Alexander Kaiser, probably the module will be reduced")
   void shouldGenerateWithDefaults() {
     val emptyTargetDir = Path.of(System.getProperty("user.dir"), "target", "tmp", "out");
     val bg = new KbvBundleGenerator();

@@ -1,0 +1,68 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GEM_ERP_CS_FlowType",
+  "id": "GEM-ERP-CS-FlowType",
+  "title": "CodeSystem of Flowtypes",
+  "description": "Shows the different types of the ePrescription according to the prescription forms.",
+  "version": "1.5.2",
+  "url": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+  "concept": [
+    {
+      "code": "160",
+      "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+    },
+    {
+      "code": "162",
+      "display": "Muster 16 (Digitale Gesundheitsanwendungen)"
+    },
+    {
+      "code": "165",
+      "display": "Muster 16 (Betäubungsmittel)"
+    },
+    {
+      "code": "166",
+      "display": "Muster 16 (T-Rezepte)"
+    },
+    {
+      "code": "169",
+      "display": "Muster 16 (Direkte Zuweisung)"
+    },
+    {
+      "code": "200",
+      "display": "PKV (Apothekenpflichtige Arzneimittel)"
+    },
+    {
+      "code": "205",
+      "display": "PKV (Betäubungsmittel)"
+    },
+    {
+      "code": "206",
+      "display": "PKV (T-Rezepte)"
+    },
+    {
+      "code": "209",
+      "display": "PKV (Direkte Zuweisung)"
+    },
+    {
+      "code": "9xx",
+      "display": "reserviert für Pharmazeutische Dienstleistungen bzw. Impfungen durch Apotheker"
+    }
+  ],
+  "date": "2025-06-23",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 10
+}

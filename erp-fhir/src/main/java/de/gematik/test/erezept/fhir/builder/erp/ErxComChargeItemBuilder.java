@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
@@ -30,17 +34,15 @@ import org.hl7.fhir.r4.model.Reference;
 public class ErxComChargeItemBuilder extends ErxCommunicationBuilder<ErxComChargeItemBuilder> {
 
   private final ChargeItemCommunicationType type;
-  protected PatientenrechnungVersion patientenrechnungVersion;
+  protected PatientenrechnungVersion version = PatientenrechnungVersion.V1_0_0;
 
   protected ErxComChargeItemBuilder(ChargeItemCommunicationType type, String message) {
     super(message);
     this.type = type;
-    // currently only one version available
-    this.patientenrechnungVersion = PatientenrechnungVersion.V1_0_0;
   }
 
   public ErxComChargeItemBuilder version(PatientenrechnungVersion version) {
-    this.patientenrechnungVersion = version;
+    this.version = version;
     return this;
   }
 
@@ -63,7 +65,7 @@ public class ErxComChargeItemBuilder extends ErxCommunicationBuilder<ErxComCharg
   @Override
   public ErxCommunication build() {
     checkRequired();
-    val com = buildCommon(type, () -> type.getType().asCanonicalType(patientenrechnungVersion));
+    val com = buildCommon(type, () -> type.getType().asCanonicalType(version));
     com.setBasedOn(List.of(new Reference(this.baseOnReference)));
 
     return com;

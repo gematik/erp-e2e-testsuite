@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier;
@@ -32,10 +36,10 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class CommunicationVerifierTest extends ErpFhirParsingTest {
   private static final String COM_PATH =
-      "fhir/valid/erp/1.2.0/communication/8ca3c379-ac86-470f-bc12-178c9008f5c9.xml";
+      "fhir/valid/erp/1.4.0/communication/8ca3c379-ac86-470f-bc12-178c9008f5c9.json";
 
   private static final String COM_PATH_WITHOUT_RECEIVED =
-      "fhir/valid/erp/1.2.0/communication/withReceivedElem.xml";
+      "fhir/invalid/erp/1.4.0/communication/withReceivedElem.xml";
 
   private static ErxCommunication getDecodedCommunication(String path) {
     return parser.decode(ErxCommunication.class, ResourceLoader.readFileFromResource(path));

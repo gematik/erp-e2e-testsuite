@@ -1,0 +1,37 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "AbortOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/AbortOperationDefinition",
+  "status": "active",
+  "version": "1.5.2",
+  "date": "2025-06-23",
+  "name": "Abort",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "This Operation aborts the workflow of an e-prescription and deletes all the data related to that Task.",
+  "code": "abort",
+  "parameter": [
+    {
+      "name": "ac",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "documentation": "[To be used by patient and providers(doctors/dentists) only] The secret parameter that lets users access the Task exclusively as the URL an Parameter ?ac.",
+      "type": "string"
+    },
+    {
+      "name": "secret",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "documentation": "[To be used by pharmacy only] The secret parameter that lets a pharmacy access the Task exclusively as the URL an Parameter ?secret.",
+      "type": "string"
+    }
+  ]
+}

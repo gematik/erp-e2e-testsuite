@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
@@ -20,6 +24,7 @@ import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +54,17 @@ public enum StandardSize implements FromValueSet {
 
   public Extension asExtension() {
     return DeBasisProfilStructDef.NORMGROESSE.asCodeExtension(this.getCode());
+  }
+
+  /**
+   * Generates a random StandardSize value. up from kbv.ita.erp 1.2.0 only SandardSize N1, N2 and N3
+   * are used. <a
+   * href="https://simplifier.net/packages/kbv.ita.erp/1.2.0/files/2777666/~details">...</a>
+   *
+   * @return A random StandardSize value.
+   */
+  public static StandardSize random() {
+    return GemFaker.randomElement(StandardSize.N1, StandardSize.N2, StandardSize.N3);
   }
 
   public static StandardSize fromCode(String code) {

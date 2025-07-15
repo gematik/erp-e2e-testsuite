@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.requirements;
@@ -71,6 +75,9 @@ public enum ErpAfos implements RequirementsSet {
   A_22632("A_22632", "Mehrfachverordnung - kein Entlassrezept"),
   A_22633("A_22633", "Mehrfachverordnung - keine Ersatzverordnung"),
   A_22634("A_22634", "Mehrfachverordnung - Beginn Einlösefrist-Pflicht"),
+  A_22635_02(
+      "A_22635_02",
+      "E-Rezept-Fachdienst - Task akzeptieren Mehrfachverordnung - Beginn Einlösefrist prüfen"),
   A_22704("A_22704", "Mehrfachverordnung - Numerator größer 0"),
   A_22874("A_22874-01", "E-Rezept-Fachdienst - Consent löschen - Prüfung category"),
   A_22927("A_22927", "Ausschluss unspezifizierter Extensions"),
@@ -170,7 +177,7 @@ public enum ErpAfos implements RequirementsSet {
       "A_24471",
       "E-Rezept-Fachdienst - Abrechnungsinformation bereitstellen - ChargeItem-ID=Rezept-ID"),
   A_24901("A_24901", "E-Rezept-Fachdienst - Task aktivieren - Mehrfachverordnung - Schema ID"),
-  A_25057("A_25057", "Deprecation Header für die Endpunkte /OCSPList und /CertList"),
+  A_25057("A_25057-1", "Deprecation Header für die Endpunkte /OCSPList und /CertList"),
   A_25206("A_25206", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3"),
   A_25207(
       "A_25207", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - PN3 - AcceptPN3 false"),

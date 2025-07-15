@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.parser;
@@ -24,8 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
@@ -41,43 +45,7 @@ import org.junit.jupiter.api.Test;
 class ParserTest extends ErpFhirParsingTest {
 
   @Test
-  void shouldParseOfficialOldKbvBundleResources() {
-    val kbvBundleResources =
-        ResourceLoader.getResourceFilesInDirectory("fhir/valid/kbv/1.0.2/bundle");
-
-    kbvBundleResources.forEach(
-        file -> {
-          log.trace("Parse KBV Bundle {}", file.getName());
-          val content = ResourceLoader.readString(file);
-          val kbvBundle = parser.decode(KbvErpBundle.class, content);
-          assertNotNull(kbvBundle);
-
-          // get the prescription ID from raw content via RegEx
-          val expectedPrescriptionId =
-              new PrescriptionId(
-                  ErpWorkflowNamingSystem.PRESCRIPTION_ID,
-                  RegExUtil.getPrescriptionId(content).orElseThrow());
-
-          val id = file.getName().split("\\.")[0]; // cut the file extension: filename == ID
-          val bundleMetaProfile = kbvBundle.getFullMetaProfile();
-          val bundleMetaProfileVersion = kbvBundle.getMetaProfileVersion();
-          val prescriptionNamingSystem = kbvBundle.getIdentifier().getSystem();
-          val entries = kbvBundle.getEntry();
-
-          assertEquals(id, kbvBundle.getLogicalId());
-          assertTrue(KbvItaErpStructDef.BUNDLE.matches(bundleMetaProfile));
-          assertEquals("1.0.2", bundleMetaProfileVersion);
-          assertEquals(
-              ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl(), prescriptionNamingSystem);
-          assertEquals(expectedPrescriptionId, kbvBundle.getPrescriptionId());
-
-          // profile cardinality is defined as 1..*
-          assertFalse(entries.isEmpty());
-        });
-  }
-
-  @Test
-  void shouldParseOfficialNewKbvBundleResources() {
+  void shouldParseOfficialKbvBundleResources() {
     val kbvBundleResources =
         ResourceLoader.getResourceFilesInDirectory("fhir/valid/kbv/1.1.0/bundle");
 
@@ -90,7 +58,7 @@ class ParserTest extends ErpFhirParsingTest {
 
           // get the prescription ID from raw content via RegEx
           val expectedPrescriptionId =
-              new PrescriptionId(RegExUtil.getPrescriptionIdFor121(content).orElseThrow());
+              PrescriptionId.from(RegExUtil.getPrescriptionIdFor(content).orElseThrow());
 
           val id = file.getName().split("\\.")[0]; // cut the file extension: filename == ID
           val bundleMetaProfile = kbvBundle.getFullMetaProfile();
@@ -101,7 +69,7 @@ class ParserTest extends ErpFhirParsingTest {
           assertEquals(id, kbvBundle.getLogicalId());
           assertTrue(KbvItaErpStructDef.BUNDLE.matches(bundleMetaProfile));
           assertEquals("1.1.0", bundleMetaProfileVersion);
-          assertEquals(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, prescriptionNamingSystem);
+          assertEquals(ErpWorkflowNamingSystem.PRESCRIPTION_ID, prescriptionNamingSystem);
           assertEquals(expectedPrescriptionId, kbvBundle.getPrescriptionId());
 
           // profile cardinality is defined as 1..*
@@ -113,7 +81,7 @@ class ParserTest extends ErpFhirParsingTest {
   void shouldParseResourceWithoutExpectedClass() {
     val id = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
     val content =
-        ResourceLoader.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
+        ResourceLoader.readFileFromResource(format("fhir/valid/kbv/1.1.0/bundle/{0}.xml", id));
 
     val r1 = parser.decode(content, EncodingType.XML);
     assertTrue(r1.getId().contains(id));
@@ -141,7 +109,7 @@ class ParserTest extends ErpFhirParsingTest {
   void shouldGetConcreteKbvTypeFromTypeHints() {
     val id = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
     val content =
-        ResourceLoader.readFileFromResource(format("fhir/valid/kbv/1.0.2/bundle/{0}.xml", id));
+        ResourceLoader.readFileFromResource(format("fhir/valid/kbv/1.1.0/bundle/{0}.xml", id));
     val resource = parser.decode(content);
     assertTrue(resource.getId().contains(id));
     assertEquals(KbvErpBundle.class, resource.getClass());

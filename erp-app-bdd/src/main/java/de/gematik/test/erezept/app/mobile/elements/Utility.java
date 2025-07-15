@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.mobile.elements;
@@ -25,9 +29,9 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum Utility implements PageElement {
-  TOOLTIPS("Tooltip", null, () -> AppiumBy.accessibilityId("ctl_tooltip_container")),
   LATER("Perform something later", () -> null, () -> AppiumBy.accessibilityId("Später")),
-  DECLINE_LOGIN("Decline Cardwall Login", null, () -> AppiumBy.accessibilityId("wlcd_btn_decline"));
+  DECLINE_LOGIN("Decline Cardwall Login", null, () -> AppiumBy.accessibilityId("wlcd_btn_decline")),
+  TOOLTIPS("Tooltip", null, () -> AppiumBy.accessibilityId("ctl_tooltip_container"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

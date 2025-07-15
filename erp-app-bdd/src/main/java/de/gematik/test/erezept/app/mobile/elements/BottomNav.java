@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.mobile.elements;
@@ -38,11 +42,13 @@ public enum BottomNav implements PageElement {
   PRESCRIPTION_ORDERS_BUTTON(
       "Prescription Orders Menu Button", () -> null, () -> AppiumBy.name("Bestellungen")),
 
+  MESSAGES_BUTTON("Messages Menu Button", () -> null, () -> AppiumBy.name("Nachrichten")),
+
   SETTINGS_BUTTON(
       "Settings Menu Button",
       () -> By.tagName("BottomNavigation.SettingsButton"),
-      () -> AppiumBy.name("Einstellungen")),
-  ;
+      () -> AppiumBy.name("Einstellungen"));
+
   private final String elementName;
   private final Supplier<By> androidLocator;
   private final Supplier<By> iosLocator;

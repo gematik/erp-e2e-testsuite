@@ -13,11 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# *******
+# For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+# *******
+#
 # language: de
 
 @PRODUKT:eRp_FD
 @Workflow:160
 @Versicherung:Sonstige
+@STATUS:InBearbeitung
 Funktionalität: Sonstige Versicherungsarten
 
   @TCID:ERP_EE_SONSTIGE_VERSICHERUNGSART_01
@@ -29,6 +34,10 @@ Funktionalität: Sonstige Versicherungsarten
   gemäß der Anforderung A_22222 im QES-Datensatz hinterlegt ist.
 
     Angenommen die Ärztin Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
+    # TODO: implement this test scenario as a negative test case in produkt-testsuite
+    # has @STATUS:InBearbeitung because of
+    # 1. this approach was never properly working because it is impossible to generate a fhir patient with insurance type SOZ etc.
+    # 2. as the description states, the <Versicherungsart> must be placed in the fhir coverage resource (which is not possible with the current implementation)
     Und der <Versicherungsart> Versicherte Fridolin Straßer hat Zugriff auf seine eGK
 
     Wenn der Versicherte Fridolin Straßer die Versicherungsart <Versicherungsart> aufweist

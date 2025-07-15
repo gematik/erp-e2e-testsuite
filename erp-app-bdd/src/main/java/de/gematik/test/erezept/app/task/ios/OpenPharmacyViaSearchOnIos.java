@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task.ios;
@@ -21,7 +25,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.PharmacySearch;
-import de.gematik.test.erezept.screenplay.abilities.ProvideApoVzdInformation;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +51,17 @@ public class OpenPharmacyViaSearchOnIos implements Task {
     val searchInput = format("{0}\n", pharmacyName);
     app.input(searchInput, PharmacySearch.SEARCH_FIELD);
 
+    // Note: Rendering the pharmacy list can take more time on simulators
+    app.pauseApp();
+
     // we will always open only the first element to avoid expensive search through the whole list!
     app.tap(PharmacySearch.forPharmacyEntry(pharmacyName));
   }
 
   public static Builder named(Actor pharmacy) {
-    val name = SafeAbility.getAbility(pharmacy, ProvideApoVzdInformation.class).getApoVzdName();
+    val name =
+        SafeAbility.getAbility(pharmacy, UseSMCB.class).getSmcB().getOwnerData().getCommonName();
+
     return named(name);
   }
 

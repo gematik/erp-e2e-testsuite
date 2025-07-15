@@ -1,0 +1,125 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "EUCloseOperation",
+  "url": "https://gematik.de/fhir/erp-eu/OperationDefinition/EUCloseOperationDefinition",
+  "status": "active",
+  "version": "1.0.0",
+  "date": "2025-06-02",
+  "name": "EUClose",
+  "kind": "operation",
+  "description": "The operation $close finishes the e-prescription workflow and creates a receipt. The Output of this operation is a signed Bundle, to be used for further financial processing. The status of the Task then changes into #completed",
+  "code": "eu-close",
+  "system": false,
+  "type": false,
+  "instance": true,
+  "resource": [
+    "Task"
+  ],
+  "inputProfile": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_CloseOperation_Input",
+  "parameter": [
+    {
+      "name": "requestData",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Additional request information",
+      "part": [
+        {
+          "name": "kvnr",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Identifier"
+        },
+        {
+          "name": "accessCode",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Identifier"
+        },
+        {
+          "name": "countryCode",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        },
+        {
+          "name": "practitionerName",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "practitionerRole",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        },
+        {
+          "name": "pointOfCare",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "healthcare-facility-type",
+          "use": "in",
+          "min": 1,
+          "max": "1",
+          "type": "Coding"
+        }
+      ]
+    },
+    {
+      "name": "practitionerData",
+      "use": "in",
+      "type": "Practitioner",
+      "min": 1,
+      "max": "1",
+      "documentation": "Information on the practitioner who dispensed"
+    },
+    {
+      "name": "organizationData",
+      "use": "in",
+      "type": "Organization",
+      "min": 1,
+      "max": "1",
+      "documentation": "Information on the organization where the dispensation happened"
+    },
+    {
+      "name": "practitionerRoleData",
+      "type": "PractitionerRole",
+      "use": "in",
+      "min": 1,
+      "max": "1"
+    },
+    {
+      "name": "rxDispensation",
+      "use": "in",
+      "min": 1,
+      "max": "*",
+      "documentation": "Information on dispensed Medication(s)",
+      "part": [
+        {
+          "name": "medicationDispense",
+          "type": "MedicationDispense",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "medication",
+          "type": "Medication",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    }
+  ]
+}

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -19,11 +23,14 @@ package de.gematik.test.erezept.fhir.r4.erp;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
+import de.gematik.bbriccs.fhir.de.value.ASK;
+import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.math.BigDecimal;
@@ -34,6 +41,7 @@ import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Medication;
+import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
@@ -58,11 +66,11 @@ public class GemErpMedication extends Medication {
         .findFirst();
   }
 
-  public Optional<String> getName() {
+  public Optional<String> getNameFromCodeOreContainedRessource() {
     return this.getCode().hasText()
         ? Optional.ofNullable(this.getCode().getText())
         : this.getContained().stream()
-            .filter(r -> EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT.matches(r.getMeta()))
+            .filter(EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT::matches)
             .map(EpaMedPznIngredient.class::cast)
             .flatMap(med -> med.getName().stream())
             .findFirst();
@@ -117,7 +125,43 @@ public class GemErpMedication extends Medication {
     }
   }
 
+  public Optional<String> getFreeText() {
+    return Optional.ofNullable(this.getCode().getText());
+  }
+
+  public Optional<String> getManufacturingInstruction() {
+    return this.getExtension().stream()
+        .filter(EpaMedicationStructDef.MANUFACTURING_INSTRUCTION::matches)
+        .map(Extension::getValue)
+        .map(coding -> coding.castToString(coding))
+        .map(PrimitiveType::getValue)
+        .findFirst();
+  }
+
   public static GemErpMedication fromMedication(Resource adaptee) {
     return fromMedication((Medication) adaptee);
+  }
+
+  public Optional<ATC> getAtc() {
+    return this.getCode().getCoding().stream()
+        .filter(coding -> coding.getSystem().matches(DeBasisProfilCodeSystem.ATC.getCanonicalUrl()))
+        .map(Coding::getCode)
+        .map(ATC::from)
+        .findFirst();
+  }
+
+  public Optional<ASK> getAsk() {
+    return this.getCode().getCoding().stream()
+        .filter(coding -> coding.getSystem().matches(DeBasisProfilCodeSystem.ASK.getCanonicalUrl()))
+        .map(Coding::getCode)
+        .map(ASK::from)
+        .findFirst();
+  }
+
+  public Optional<String> getSnomed() {
+    return this.getCode().getCoding().stream()
+        .filter(coding -> CommonCodeSystem.SNOMED_SCT.matches(coding.getSystem()))
+        .map(Coding::getCode)
+        .findFirst();
   }
 }

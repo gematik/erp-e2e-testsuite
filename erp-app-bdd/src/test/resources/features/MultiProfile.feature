@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# *******
+# For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+# *******
+#
 # language: de
 
 @PRODUKT:eRp_FdV
-@iosNightly
 Funktionalität: Mehrbenutzer mit App-Profilen
 
   @TCID:ERP_FDV_GKV_MULTIPROFIL_01

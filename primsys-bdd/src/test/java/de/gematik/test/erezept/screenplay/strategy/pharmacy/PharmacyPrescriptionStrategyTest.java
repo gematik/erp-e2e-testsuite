@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.strategy.pharmacy;
@@ -52,7 +56,7 @@ class PharmacyPrescriptionStrategyTest {
     val taskId = TaskId.from("123");
     val prescriptionId = PrescriptionId.random();
     val accessCode = AccessCode.random();
-    val secret = Secret.fromString("123");
+    val secret = Secret.from("123");
     val receipt = new ErxReceipt();
     val dispensed = new DispenseReceipt(kvnr, taskId, prescriptionId, accessCode, secret, receipt);
 

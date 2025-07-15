@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.eml.fhir.profile;
@@ -25,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum EpaMedicationVersion implements ProfileVersion {
   V1_0_3("1.0.3"),
+  V1_0_6("1.0.6"),
   ;
 
   private final String version;
@@ -33,6 +38,6 @@ public enum EpaMedicationVersion implements ProfileVersion {
   public static EpaMedicationVersion getDefaultVersion() {
     return VersionUtil.getDefaultVersionOptionally(
             EpaMedicationVersion.class, "de.gematik.epa.medication")
-        .orElse(V1_0_3);
+        .orElse(V1_0_6);
   }
 }

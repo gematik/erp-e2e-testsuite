@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
@@ -28,8 +32,8 @@ import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.HL7CodeSystem;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.exceptions.InvalidBaseANR;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.CommonNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
 import de.gematik.test.erezept.fhir.values.BaseANR.ANRType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.Arrays;
@@ -39,7 +43,10 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class BaseANRTest {
 
@@ -53,7 +60,7 @@ class BaseANRTest {
     coding.setSystem(DeBasisProfilCodeSystem.IDENTIFIER_TYPE_DE_BASIS.getCanonicalUrl());
     coding.setCode("ZANR");
 
-    val anr = BaseANR.fromIdentifier(identifier);
+    val anr = BaseANR.from(identifier);
     assertEquals(BaseANR.ANRType.ZANR, anr.getType());
     assertEquals("123456789", anr.getValue());
     assertEquals(
@@ -62,6 +69,7 @@ class BaseANRTest {
         DeBasisProfilNamingSystem.KZBV_ZAHNARZTNUMMER.getCanonicalUrl(), anr.getNamingSystemUrl());
     // just for the sake of code-coverage
     assertEquals(anr.hashCode(), anr.hashCode());
+    assertEquals(7, anr.getChecksum());
   }
 
   @Test
@@ -74,7 +82,7 @@ class BaseANRTest {
     coding.setSystem(HL7CodeSystem.HL7_V2_0203.getCanonicalUrl());
     coding.setCode("LANR");
 
-    val anr = BaseANR.fromIdentifier(identifier);
+    val anr = BaseANR.from(identifier);
     assertEquals(BaseANR.ANRType.LANR, anr.getType());
     assertEquals("123456789", anr.getValue());
     assertEquals(HL7CodeSystem.HL7_V2_0203.getCanonicalUrl(), anr.getCodeSystemUrl());
@@ -128,7 +136,7 @@ class BaseANRTest {
     coding.setSystem(KbvNamingSystem.PRUEFNUMMER.getCanonicalUrl());
     coding.setCode("LANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.from(identifier));
   }
 
   @Test
@@ -141,7 +149,7 @@ class BaseANRTest {
     coding.setSystem(DeBasisProfilNamingSystem.KZBV_ZAHNARZTNUMMER.getCanonicalUrl());
     coding.setCode("ZANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.from(identifier));
   }
 
   @Test
@@ -154,7 +162,7 @@ class BaseANRTest {
     coding.setSystem(InsuranceTypeDe.CODE_SYSTEM.getCanonicalUrl());
     coding.setCode("LANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.from(identifier));
   }
 
   @Test
@@ -167,26 +175,33 @@ class BaseANRTest {
     coding.setSystem(HL7CodeSystem.HL7_V2_0203.getCanonicalUrl());
     coding.setCode("ZANR");
 
-    assertThrows(InvalidBaseANR.class, () -> BaseANR.fromIdentifier(identifier));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.from(identifier));
   }
 
-  @Test
-  void shouldParseLANRTypeFromValidCode() {
-    val codes = List.of("LANR", "lanr", "Lanr");
-    codes.forEach(code -> assertEquals(BaseANR.ANRType.LANR, BaseANR.ANRType.fromCode(code)));
+  @ParameterizedTest
+  @ValueSource(strings = {"LANR", "lanr", "Lanr"})
+  void shouldParseLANRTypeFromValidCode(String code) {
+    assertEquals(BaseANR.ANRType.LANR, BaseANR.ANRType.fromCode(code));
   }
 
-  @Test
-  void shouldParseZANRTypeFromValidCode() {
-    val codes = List.of("ZANR", "zanr", "Zanr");
-    codes.forEach(code -> assertEquals(BaseANR.ANRType.ZANR, BaseANR.ANRType.fromCode(code)));
+  @ParameterizedTest
+  @ValueSource(strings = {"ZANR", "zanr", "Zanr"})
+  void shouldParseZANRTypeFromValidCode(String code) {
+    assertEquals(BaseANR.ANRType.ZANR, BaseANR.ANRType.fromCode(code));
   }
 
-  @Test
-  void shouldThrowOnInvalidTypeCode() {
-    val codes = List.of("Arztnummer", "Zahnarztnummer", "ZANRT", "LANRT", "");
-    codes.forEach(
-        code -> assertThrows(IllegalArgumentException.class, () -> BaseANR.ANRType.fromCode(code)));
+  @ParameterizedTest
+  @ValueSource(strings = {"Arztnummer", "Zahnarztnummer", "ZANRT", "LANRT"})
+  @EmptySource
+  void shouldThrowOnInvalidTypeCode(String code) {
+    assertThrows(IllegalArgumentException.class, () -> BaseANR.ANRType.fromCode(code));
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = DeBasisProfilCodeSystem.class, mode = Mode.INCLUDE, names = "PZN")
+  void shouldThrowOnInvalidTypeIdentifier(DeBasisProfilCodeSystem cs) {
+    val identifier = new Identifier().setType(cs.asCodeableConcept("123123123"));
+    assertThrows(InvalidBaseANR.class, () -> BaseANR.ANRType.from(identifier));
   }
 
   @ParameterizedTest

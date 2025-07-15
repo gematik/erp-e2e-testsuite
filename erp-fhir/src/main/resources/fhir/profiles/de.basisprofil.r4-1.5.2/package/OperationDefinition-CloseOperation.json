@@ -1,0 +1,62 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "CloseOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/CloseOperationDefinition",
+  "status": "active",
+  "version": "1.5.2",
+  "date": "2025-06-23",
+  "name": "Close",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "The operation $close finishes the e-prescription workflow and creates a receipt. The Output of this operation is a signed Bundle, to be used for further financial processing. The status of the Task then changes into #completed",
+  "code": "close",
+  "inputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CloseOperation_Input",
+  "outputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CloseOperation_Output",
+  "parameter": [
+    {
+      "name": "secret",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "The secret parameter that lets a pharmacy access the Task exclusively as part of the URL. This parameter must be equal to the value stored in Task.identifier:Secret. Otherwise the Operation aborts with an error.",
+      "type": "string"
+    },
+    {
+      "name": "rxDispensation",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "documentation": "Information on dispensed Medication(s)",
+      "part": [
+        {
+          "name": "medicationDispense",
+          "type": "MedicationDispense",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "medication",
+          "type": "Medication",
+          "use": "in",
+          "min": 0,
+          "max": "1"
+        }
+      ]
+    },
+    {
+      "name": "return",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "The receipt Bundle containing the signing Device, the pharmacy`s TelematikID and a signature.",
+      "type": "Bundle"
+    }
+  ]
+}

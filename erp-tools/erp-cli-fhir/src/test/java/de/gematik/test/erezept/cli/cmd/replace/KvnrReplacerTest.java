@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.replace;
@@ -22,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.io.IOException;
@@ -39,19 +44,17 @@ class KvnrReplacerTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] Replace KVNR for {2} Patient from {1}")
   @CsvSource({
-    "1.0.2, 1f339db0-9e55-4946-9dfa-f1b30953be9b, GKV",
+    "1.1.0, 1f339db0-9e55-4946-9dfa-f1b30953be9b, GKV",
     "1.1.0, 328ad940-3fff-11ed-b878-0242ac120002, PKV"
   })
   void shouldReplaceKvnrInKbvBundleCorrectly(String version, String id, String insuranceType)
-      throws URISyntaxException, IOException {
+      throws IOException {
     val inputFileName = format("{0}.xml", id);
     val replacedKvnr = "A123123123";
     val input =
-        this.getClass()
-            .getClassLoader()
-            .getResource(format("fhir/valid/kbv/{0}/bundle/{1}", version, inputFileName))
-            .toURI()
-            .getPath();
+        ResourceLoader.getFileFromResource(
+                format("fhir/valid/kbv/{0}/bundle/{1}", version, inputFileName))
+            .getAbsolutePath();
     val outputDir =
         Path.of(
                 System.getProperty("user.dir"),
@@ -85,7 +88,7 @@ class KvnrReplacerTest extends ErpFhirParsingTest {
     val input =
         this.getClass()
             .getClassLoader()
-            .getResource(format("fhir/valid/kbv/1.0.2/bundle/{0}", bundleInputFileName))
+            .getResource(format("fhir/valid/kbv/1.1.0/bundle/{0}", bundleInputFileName))
             .toURI()
             .getPath();
 
@@ -120,7 +123,7 @@ class KvnrReplacerTest extends ErpFhirParsingTest {
     val input =
         this.getClass()
             .getClassLoader()
-            .getResource(format("fhir/valid/kbv/1.0.2/bundle/{0}", bundleInputFileName))
+            .getResource(format("fhir/valid/kbv/1.1.0/bundle/{0}", bundleInputFileName))
             .toURI()
             .getPath();
 
@@ -158,7 +161,7 @@ class KvnrReplacerTest extends ErpFhirParsingTest {
     val input =
         this.getClass()
             .getClassLoader()
-            .getResource(format("fhir/valid/kbv/1.0.2/medicationrequest/{0}", inputFileName))
+            .getResource(format("fhir/valid/kbv/1.1.0/medicationrequest/{0}", inputFileName))
             .toURI()
             .getPath();
     val outputDir =

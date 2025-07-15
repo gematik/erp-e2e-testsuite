@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.questions;
@@ -23,12 +27,12 @@ import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.ListPageElement;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -71,10 +75,11 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
      How many prescriptions should be checked to ensure the prescription is not shown anymore
      Note: this operation is costly and can take up to several minutes,
      especially when the App-DOM contains many prescriptions.
-     To save on execution time, we will check only the first two prescriptions!!
+     To save on execution time, we will check only the first two prescriptions maximum!!
     */
-    val amountToCheck = 2;
     val prescriptionElement = PrescriptionsViewElement.withoutName();
+    val amountToCheck = Math.min(2, app.getWebElementListLen(prescriptionElement));
+
     for (var i = 0; i < amountToCheck; i++) {
       val listPageElement = ListPageElement.forElement(prescriptionElement, i);
       if (find(app, listPageElement)) {
@@ -127,7 +132,7 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
 
   private boolean find(UseTheApp<?> app, ListPageElement listPageElement) {
     app.tap(listPageElement);
-    app.scrollIntoView(ScrollDirection.DOWN, PrescriptionDetails.TECHNICAL_INFORMATION);
+    app.swipeIntoView(SwipeDirection.UP, PrescriptionDetails.TECHNICAL_INFORMATION);
     app.tap(PrescriptionDetails.TECHNICAL_INFORMATION);
     val currentTaskId = app.getText(PrescriptionTechnicalInformation.TASKID);
     app.tap(PrescriptionTechnicalInformation.BACK);

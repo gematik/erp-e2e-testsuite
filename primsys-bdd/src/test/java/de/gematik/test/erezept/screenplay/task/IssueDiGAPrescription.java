@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.task;
@@ -22,7 +26,7 @@ import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvEvdgaBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
@@ -85,10 +89,11 @@ public class IssueDiGAPrescription implements Task {
     val prescriptionId = draftTask.getPrescriptionId();
 
     val appRequest =
-        KbvHealthAppRequestFaker.forPatient(kbvPatient)
-            .withInsurance(insurance)
-            .withRequester(kbvPractitioner)
-            .fake();
+        KbvHealthAppRequestBuilder.forPatient(kbvPatient)
+            .insurance(insurance)
+            .requester(kbvPractitioner)
+            .healthApp("19205615", "Vantis KHK und Herzinfarkt 001")
+            .build();
 
     val kbvEvdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(prescriptionId)
@@ -102,7 +107,7 @@ public class IssueDiGAPrescription implements Task {
     val activeTask =
         this.activateTask(erpClientAbility, konnektorAbility, draftTask, kbvEvdgaBundle);
 
-    // store the issued prescription
+    // store the issued prescription in the ability of the doctor
     managePrescriptions.append(activeTask);
 
     // handover DMC if a concrete actor is available

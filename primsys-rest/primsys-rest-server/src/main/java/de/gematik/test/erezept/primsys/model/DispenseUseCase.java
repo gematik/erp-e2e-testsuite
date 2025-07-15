@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -31,12 +35,12 @@ public class DispenseUseCase extends AbstractDispensingUseCase {
 
   public Response dispensePrescription(String taskId, String secret) {
     val dispenseData = this.getPrescribedMedicationFromAccept(taskId);
-    return dispensePrescription(taskId, new Secret(secret), List.of(dispenseData), false);
+    return dispensePrescription(taskId, Secret.from(secret), List.of(dispenseData), false);
   }
 
   public Response dispensePrescription(
       String taskId, String secret, List<PznDispensedMedicationDto> dispenseMedications) {
-    return dispensePrescription(taskId, new Secret(secret), dispenseMedications, true);
+    return dispensePrescription(taskId, Secret.from(secret), dispenseMedications, true);
   }
 
   private Response dispensePrescription(

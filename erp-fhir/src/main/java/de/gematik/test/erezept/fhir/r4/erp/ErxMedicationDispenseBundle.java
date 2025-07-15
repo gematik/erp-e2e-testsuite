@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -21,10 +25,11 @@ import static java.text.MessageFormat.format;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,7 +49,8 @@ public class ErxMedicationDispenseBundle extends Bundle {
             resource ->
                 WithSystem.anyOf(
                         ErpWorkflowStructDef.MEDICATION_DISPENSE_12,
-                        ErpWorkflowStructDef.MEDICATION_DISPENSE)
+                        ErpWorkflowStructDef.MEDICATION_DISPENSE,
+                        ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA)
                     .matches(resource))
         .map(ErxMedicationDispense::fromMedicationDispense)
         .toList();
@@ -77,6 +83,12 @@ public class ErxMedicationDispenseBundle extends Bundle {
             md -> {
               val medicationRef =
                   md.getMedicationReference().getReference().replace("urn:uuid:", "");
+
+              if (isContainedKbvMedication(md, medicationRef)) {
+                // TODO: skip contained medications for now!
+                return null;
+              }
+
               val medication =
                   medications.stream()
                       .filter(m -> m.getId().contains(medicationRef))
@@ -90,7 +102,12 @@ public class ErxMedicationDispenseBundle extends Bundle {
                                       medicationRef, prescriptionId.getValue())));
               return Pair.of(md, medication);
             })
+        .filter(Objects::nonNull)
         .toList();
+  }
+
+  private static boolean isContainedKbvMedication(ErxMedicationDispense md, String reference) {
+    return md.getContained().stream().anyMatch(m -> m.getId().contains(reference));
   }
 
   /**

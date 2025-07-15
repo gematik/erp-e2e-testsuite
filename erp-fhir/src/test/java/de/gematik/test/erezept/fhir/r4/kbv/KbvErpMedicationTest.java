@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -28,7 +32,7 @@ import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.util.Collections;
@@ -40,12 +44,9 @@ class KbvErpMedicationTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectVersionCorrectly() {
-    List.of(KbvItaErpVersion.V1_0_2, KbvItaErpVersion.V1_1_0)
-        .forEach(
-            version -> {
-              val medication = KbvErpMedicationPZNFaker.builder().withVersion(version).fake();
-              assertEquals(version, medication.getVersion());
-            });
+    val version = KbvItaErpVersion.V1_1_0;
+    val medication = KbvErpMedicationPZNFaker.builder().withVersion(version).fake();
+    assertEquals(version, medication.getVersion());
   }
 
   @Test

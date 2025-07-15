@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -34,6 +38,7 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
+import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
 import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
 import de.gematik.test.erezept.primsys.mapping.PznDispensedMedicationDataMapper;
 import jakarta.ws.rs.WebApplicationException;
@@ -51,12 +56,10 @@ class CloseUseCaseTest extends TestWithActorContext {
 
   static Stream<Arguments> shouldClosePrescription() {
     return Stream.of(
-        arguments("1.2.0", true),
-        arguments("1.2.0", false),
-        arguments("1.3.0", true),
-        arguments("1.3.0", false),
         arguments("1.4.0", true),
-        arguments("1.4.0", false));
+        arguments("1.4.0", false),
+        arguments("1.5.0", true),
+        arguments("1.5.0", false));
   }
 
   @ParameterizedTest
@@ -101,7 +104,7 @@ class CloseUseCaseTest extends TestWithActorContext {
         AcceptedPrescriptionDto.withPrescriptionId(taskId)
             .withAccessCode(accessCode)
             .withSecret(secret)
-            .forKvnr("X110407071")
+            .forKvnr("X110407071", PatientInsuranceTypeDto.GKV)
             .andMedication(KbvPznMedicationDataMapper.randomDto());
     ActorContext.getInstance().addAcceptedPrescription(acceptDto);
     val usecase = new CloseUseCase(pharmacy);
@@ -161,7 +164,7 @@ class CloseUseCaseTest extends TestWithActorContext {
         AcceptedPrescriptionDto.withPrescriptionId(taskId)
             .withAccessCode(accessCode)
             .withSecret(secret)
-            .forKvnr("X110407071")
+            .forKvnr("X110407071", PatientInsuranceTypeDto.PKV)
             .andMedication(KbvPznMedicationDataMapper.randomDto());
     ActorContext.getInstance().addAcceptedPrescription(acceptDto);
     val dispenseMedications =

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -25,7 +29,7 @@ import org.junit.jupiter.api.*;
 
 class ErxConsentBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/1.2.0/consent/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.4.0/consent/";
 
   @Test
   void shouldEncodeSingleConsentBundle() {

@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# *******
+# For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+# *******
+#
 # language: de
 
 @PRODUKT:eRp_FD
@@ -22,11 +26,10 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
 
   Grundlage:
     Angenommen die Ärztin Dr. Schraßer hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
-    Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
     Und die Apotheke Am Flughafen hat Zugriff auf ihre SMC-B
     Und die Apotheke Stadtapotheke hat Zugriff auf ihre SMC-B
 
-    @TCID:ERP_EE_REZEPTVARIANTEN_01
+  @TCID:ERP_EE_REZEPTVARIANTEN_01
     @TESTFALL:positiv
     @AFO-ID:A_24034
     @Hauptdarsteller:Arzt
@@ -51,9 +54,9 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
       | Wirkstoff      | PKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 1     | false     |
 
   @TCID:ERP_EE_REZEPTVARIANTEN_02
-  @TESTFALL:positiv
-  @AFO-ID:A_24034
-  @Hauptdarsteller:Arzt
+    @TESTFALL:positiv
+    @AFO-ID:A_24034
+    @Hauptdarsteller:Arzt
   Szenariogrundriss: Einstellen des E-Rezeptes Direktzuweisung mit verschiedenen Verordnungstypen und Versicherungsverhältnissen
   Die Apotheke akzeptiert das zugewiesene Rezept in den Variationen Frteitext-, Wirkstoff- und Rezepturverordnung.
 

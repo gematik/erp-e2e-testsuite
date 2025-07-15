@@ -12,19 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
 
-import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.test.erezept.cli.converter.GermanDateConverter;
 import de.gematik.test.erezept.cli.converter.NameConverter;
 import de.gematik.test.erezept.cli.util.NameWrapper;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
-import de.gematik.test.erezept.fhir.r4.kbv.AssignerOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import java.util.Date;
 import lombok.Getter;
@@ -52,21 +53,6 @@ public class PatientParameter implements BaseResourceParameter {
 
   @Getter @Mixin private KvnrParameter kvnrParameter;
 
-  private AssignerOrganization assignerOrganization;
-
-  public AssignerOrganization getAssignerOrganization() {
-    if (assignerOrganization == null) {
-      // will be required only for PKV in old KBV-Profiles
-      this.assignerOrganization =
-          KbvAssignerOrganizationBuilder.builder()
-              .name(GemFaker.insuranceName())
-              .iknr(IKNR.randomArgeIknr())
-              .phone(GemFaker.fakerPhone())
-              .build();
-    }
-    return assignerOrganization;
-  }
-
   public Date getBirthDate() {
     return this.getOrDefault(birhtDate, GemFaker::fakerBirthday);
   }
@@ -80,7 +66,6 @@ public class PatientParameter implements BaseResourceParameter {
     return KbvPatientBuilder.builder()
         .kvnr(kvnrParameter.getKvnr(), kvnrParameter.getInsuranceType())
         .name(name.getFirstName(), name.getLastName())
-        .assigner(getAssignerOrganization()) // will be used only for PKV patients
         .birthDate(getBirthDate())
         .address(
             Country.D, GemFaker.fakerCity(), GemFaker.fakerZipCode(), GemFaker.fakerStreetName())

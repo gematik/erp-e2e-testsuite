@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
@@ -37,7 +41,7 @@ public class KbvErpMedicationIngredientFaker {
         .withIngredientComponent(2, 1, "Wölckhen")
         .withDrugName(fakerDrugName())
         .withVaccine(fakerBool())
-        .withStandardSize(fakerValueSet(StandardSize.class));
+        .withStandardSize(StandardSize.random());
   }
 
   public static KbvErpMedicationIngredientFaker builder() {

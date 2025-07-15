@@ -1,0 +1,65 @@
+{
+  "resourceType": "Bundle",
+  "id": "aaf70ec5-7a76-4464-811b-b0c7c52d76f9",
+  "type": "searchset",
+  "timestamp": "2025-03-28T17:14:45.779+00:00",
+  "total": 0,
+  "entry": [
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.000.944.29",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.000.944.29",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.4"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.leyla-lott.org?code=B0002XUV3G"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000JS9C70"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.000.944.29"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "19205615"
+          },
+          "display": "Vantis KHK und Herzinfarkt 001"
+        },
+        "subject": {
+          "identifier": {
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2025-03-28"
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}

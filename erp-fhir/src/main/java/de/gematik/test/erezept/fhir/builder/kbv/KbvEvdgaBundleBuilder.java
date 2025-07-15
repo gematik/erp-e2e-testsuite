@@ -12,12 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItvEvdgaStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItvEvdgaVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItvEvdgaStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvHealthAppRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -62,7 +66,12 @@ public class KbvEvdgaBundleBuilder
     bundle.addEntry(
         compositionBuilder.createEntryFor(Composition::getCustodian, medicalOrganization));
     bundle.addEntry(compositionBuilder.createEntryFor("HealthInsurance", coverage));
-
+    // in case of ASV a KBV_PR_FOR_PRACTITIONER_ROLE ist mandatory
+    Optional.ofNullable(this.practitionerRole)
+        .ifPresent(
+            pR ->
+                bundle.addEntry(
+                    compositionBuilder.createEntryFor("AmbulatorySpecializedCare", pR)));
     // now build the composition
     compositionBuilder.addExtension(statusKennzeichen.asExtension());
     val compositionEntry = compositionBuilder.buildBundleEntryComponent();

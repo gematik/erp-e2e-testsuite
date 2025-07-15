@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -25,7 +29,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
@@ -51,13 +55,17 @@ public class KbvErpMedicationRequestFaker {
       new HashMap<>();
 
   private KbvErpMedicationRequestFaker() {
-    this.withBvg(fakerBool())
-        .withEmergencyServiceFee(fakerBool())
+    if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
+      this.withBvg(fakerBool());
+    } else {
+      this.withSer(fakerBool());
+    }
+    this.withEmergencyServiceFee(fakerBool())
         .withMedication(
             KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake())
         .withRequester(KbvPractitionerFaker.builder().fake())
         .withInsurance(
-            KbvCoverageFaker.builder().withInsuranceType(kbvPatient.getInsuranceKind()).fake())
+            KbvCoverageFaker.builder().withInsuranceType(kbvPatient.getInsuranceType()).fake())
         .withDosageInstruction(fakerDosage())
         .withCoPaymentStatus(fakerValueSet(StatusCoPayment.class))
         .withAuthorDate(new Date())
@@ -175,6 +183,11 @@ public class KbvErpMedicationRequestFaker {
 
   public KbvErpMedicationRequestFaker withBvg(final boolean bvg) {
     builderConsumers.put("bvg", b -> b.isBVG(bvg));
+    return this;
+  }
+
+  public KbvErpMedicationRequestFaker withSer(final boolean ser) {
+    builderConsumers.put("ser", b -> b.isSER(ser));
     return this;
   }
 

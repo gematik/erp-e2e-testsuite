@@ -1,0 +1,73 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="c6d9de8d-6970-492c-bd45-f376bf1c88fc"/>
+    <type value="searchset"/>
+    <timestamp value="2025-06-24T10:38:42.931+00:00"/>
+    <total value="7"/>
+    <link>
+        <relation value="last"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&amp;received=eqNULL&amp;_sort=sent&amp;_count=1&amp;__offset=5"/>
+    </link>
+    <link>
+        <relation value="first"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&amp;received=eqNULL&amp;_sort=sent&amp;_count=1&amp;__offset=0"/>
+    </link>
+    <link>
+        <relation value="next"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&amp;received=eqNULL&amp;_sort=sent&amp;_count=1&amp;__offset=5"/>
+    </link>
+    <link>
+        <relation value="self"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication?sender=X110670787&amp;received=eqNULL&amp;_sort=sent&amp;_count=1&amp;__offset=0"/>
+    </link>
+
+    <entry>
+        <fullUrl
+                value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Communication/01ebe222-4405-2b58-6834-434ee850fca6"/>
+        <resource>
+            <Communication xmlns="http://hl7.org/fhir">
+                <id value="01ebe222-4405-2b58-6834-434ee850fca6"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq|1.4"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType">
+                    <valueCoding>
+                        <system value="https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType"/>
+                        <code value="160"/>
+                        <display value="Muster 16 (Apothekenpflichtige Arzneimittel)"/>
+                    </valueCoding>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="160.000.006.993.636.55"/>
+                </identifier>
+                <basedOn>
+                    <reference
+                            value="/Task/160.000.006.993.636.55/$accept?ac=d4c55603cd7ba80f0ec50e84422c868ef177d608ac69e54805493370c5a54819"/>
+                </basedOn>
+                <status value="unknown"/>
+                <sent value="2025-06-23T22:06:02.887+00:00"/>
+                <recipient>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </recipient>
+                <sender>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </sender>
+                <payload>
+                    <contentString
+                            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;hint&quot;:&quot;Nachricht Nr. 0 zum testen des ErpFD bezüglich Communication: Ist das Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?&quot;}"/>
+                </payload>
+            </Communication>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+
+</Bundle>

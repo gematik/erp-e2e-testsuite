@@ -12,12 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.data.actors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,13 +37,21 @@ public class DoctorDto extends ActorDto {
   private String officeName;
   private String hba;
   private String smcb;
-  private String docNumber;
-  private String docNumberType;
-  private String docQualificationType;
+  private String qualificationType;
+  private DoctorNumber anr;
+  private List<String> qualifications = new ArrayList<>();
   private String bsnr;
   private String phone;
   private String email;
   private String city;
   private String postal;
   private String street;
+
+  public void addQualifications(List<String> qualifications) {
+    this.qualifications.addAll(qualifications);
+  }
+
+  public void addQualifications(String... qualifications) {
+    this.addQualifications(Arrays.asList(qualifications));
+  }
 }

@@ -36,6 +36,7 @@
             }
           }
         ],
+        "whenPrepared": "2025-09-06",
         "whenHandedOver": "2025-09-06",
         "medicationReference": {
           "reference": "urn:uuid:86ce7563-9819-4dfa-9944-d307f7cfec9b"
@@ -101,6 +102,7 @@
             }
           }
         ],
+        "whenPrepared": "2025-09-06",
         "whenHandedOver": "2025-09-06",
         "medicationReference": {
           "reference": "urn:uuid:56c61db7-0a94-4b7b-832a-b8ac3752035d"

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -35,11 +39,10 @@ class TaskRejectCommandTest {
 
   @BeforeEach
   void precondition() {
-    Secret secret = new Secret("thisIsAnUnidentifiedSecret2TestTheReject");
+    val secret = Secret.from("thisIsAnUnidentifiedSecret2TestTheReject");
     val taskId = TaskId.from(PrescriptionId.random());
-    AccessCode accsesscode =
-        new AccessCode("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
-    this.actualRejectCommand = new TaskRejectCommand(taskId, accsesscode, secret);
+    val accessCode = AccessCode.from("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
+    this.actualRejectCommand = new TaskRejectCommand(taskId, accessCode, secret);
   }
 
   @Test

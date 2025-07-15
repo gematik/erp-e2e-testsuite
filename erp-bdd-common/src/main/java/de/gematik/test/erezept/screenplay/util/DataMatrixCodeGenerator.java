@@ -12,15 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.util;
 
 import static java.text.MessageFormat.format;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -31,9 +33,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Map;
+import java.util.List;
 import javax.imageio.ImageIO;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -83,16 +87,15 @@ public class DataMatrixCodeGenerator {
     }
   }
 
+  @SneakyThrows
   public static BitMatrix generateDmc(String taskId, AccessCode accessCode) {
     val taskReference = format("Task/{0}/$accept?ac={1}", taskId, accessCode.getValue());
-    val inner = new JsonArray();
-    inner.add(taskReference);
-    val obj = new JsonObject();
-    obj.add("urls", inner);
-    val content = new Gson().toJson(obj);
+    val obj = new DmcContent();
+    obj.getUrls().add(taskReference);
+    val content = new ObjectMapper().writeValueAsString(obj);
 
     log.info(content);
-    Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+    val hints = new EnumMap<>(EncodeHintType.class);
     hints.put(EncodeHintType.GS1_FORMAT, "true");
 
     val writer = new DataMatrixWriter();
@@ -106,5 +109,10 @@ public class DataMatrixCodeGenerator {
 
   public static BufferedImage getBufferedImage(BitMatrix dmc) {
     return MatrixToImageWriter.toBufferedImage(dmc);
+  }
+
+  @Getter
+  private static class DmcContent {
+    private final List<String> urls = new ArrayList<>();
   }
 }

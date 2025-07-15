@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys
@@ -109,13 +113,17 @@ class PrimSysClientFactory(
         }
 
         fun build(): PrimSysClientFactory {
-            val http = HttpClient {
+            val httpClient = HttpClient {
                 install(HttpTimeout) {
                     connectTimeoutMillis = timeoutMillis
                     requestTimeoutMillis = timeoutMillis
                 }
             }
-            return PrimSysClientFactory(http, data)
+            return build(httpClient)
+        }
+
+        fun build(httpClient: HttpClient): PrimSysClientFactory {
+            return PrimSysClientFactory(httpClient, data)
         }
     }
 

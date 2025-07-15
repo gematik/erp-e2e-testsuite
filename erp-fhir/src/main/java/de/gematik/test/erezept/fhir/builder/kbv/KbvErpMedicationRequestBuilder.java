@@ -12,19 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
+
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.PRESCRIBER_ID;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.extensions.kbv.QuantityPackungExtension;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
@@ -43,6 +48,7 @@ import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
@@ -69,10 +75,12 @@ public class KbvErpMedicationRequestBuilder
   private String dosageInstruction;
   private StatusCoPayment statusCoPayment = StatusCoPayment.STATUS_0;
   private boolean bvg = true;
+  private boolean ser = true;
   private boolean emergencyServiceFee = false;
   private MultiplePrescriptionExtension mvo = MultiplePrescriptionExtension.asNonMultiple();
   private Date authoredOn = new Date();
   private TemporalPrecisionEnum temporalPrecision = TemporalPrecisionEnum.DAY;
+  private String prescriberId;
 
   private String note;
 
@@ -171,6 +179,11 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
+  public KbvErpMedicationRequestBuilder prescriberId(String prescriberId) {
+    this.prescriberId = prescriberId;
+    return this;
+  }
+
   public KbvErpMedicationRequestBuilder quantityPackages(int amount) {
     return quantity(QuantityBuilder.asUcumPackage().withValue(amount));
   }
@@ -202,6 +215,11 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
+  public KbvErpMedicationRequestBuilder isSER(final boolean ser) {
+    this.ser = ser;
+    return this;
+  }
+
   public KbvErpMedicationRequestBuilder mvo(MultiplePrescriptionExtension mvo) {
     this.mvo = mvo;
     return this;
@@ -229,27 +247,33 @@ public class KbvErpMedicationRequestBuilder
 
   @Override
   public KbvErpMedicationRequest build() {
-    val medReq =
+    KbvErpMedicationRequest medReq;
+    medReq =
         this.createResource(
             KbvErpMedicationRequest::new, KbvItaErpStructDef.PRESCRIPTION, kbvItaErpVersion);
 
-    // check for 'default-able' and non-set values
-    if (dispenseRequestQuantity == null) this.quantityPackages(1); // by default 1 package
+    if (this.kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) == 0) {
+      // check for 'default-able' and non-set values
+      if (dispenseRequestQuantity == null) this.quantityPackages(1); // by default 1 package
+      extensions.add(KbvItaErpStructDef.BVG.asBooleanExtension(bvg));
 
-    extensions.add(KbvItaErpStructDef.BVG.asBooleanExtension(bvg));
-    extensions.add(
-        KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.asBooleanExtension(emergencyServiceFee));
-    extensions.add(mvo.asExtension(kbvItaErpVersion));
-
-    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_0_2) == 0) {
-      extensions.add(statusCoPayment.asExtension());
     } else {
-      extensions.add(
-          statusCoPayment.asExtension(
-              KbvItaForStructDef.STATUS_CO_PAYMENT, KbvCodeSystem.STATUS_CO_PAYMENT_FOR));
+      this.quantity(
+          QuantityPackungExtension.asPackung()
+              .withValue(dispenseRequestQuantity.getQuantity().getValue().intValue()));
+      extensions.add(KbvItaErpStructDef.SER.asBooleanExtension(ser));
     }
 
-    Optional.ofNullable(accident).ifPresent(a -> extensions.add(a.asExtension(kbvItaErpVersion)));
+    extensions.add(
+        KbvItaErpStructDef.EMERGENCY_SERVICES_FEE.asBooleanExtension(emergencyServiceFee));
+    extensions.add(mvo.asExtension());
+    extensions.add(statusCoPayment.asExtension());
+
+    Optional.ofNullable(prescriberId)
+        .map(id -> PRESCRIBER_ID.asExtension(new Identifier().setValue(id)))
+        .ifPresent(extensions::add);
+
+    Optional.ofNullable(accident).ifPresent(a -> extensions.add(a.asExtension()));
     Optional.ofNullable(note).ifPresent(n -> medReq.addNote().setText(n));
 
     if (this.medicationType == null) {
@@ -258,6 +282,7 @@ public class KbvErpMedicationRequestBuilder
     } else {
       medicationTypeConfig(medReq);
     }
+
     medReq
         .setMedication(medicationReference)
         .setSubject(subjectReference)
@@ -298,10 +323,6 @@ public class KbvErpMedicationRequestBuilder
 
   private void setForIngredient(KbvErpMedicationRequest medReq) {
     medReq.setDosageInstruction(List.of(createFlagedDosage())); // tobe adapted
-
-    if (kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
-      medReq.setSubstitution(substitution);
-    } // in version 1.1.0 is no substitution allowed if MedicationIngredient is
   }
 
   private Dosage createFlagedDosage() {

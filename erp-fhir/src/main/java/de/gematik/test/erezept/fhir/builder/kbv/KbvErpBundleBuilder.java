@@ -12,30 +12,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.r4.InstitutionalOrganization;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
-import de.gematik.test.erezept.fhir.valuesets.PkvTariff;
+import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.Date;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.SupplyRequest;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * This builder provides a convenient way to build <a
@@ -45,7 +46,6 @@ import org.hl7.fhir.r4.model.SupplyRequest;
 public class KbvErpBundleBuilder
     extends KbvBaseDocumentBundleBuilder<KbvItaErpVersion, KbvErpBundle, KbvErpBundleBuilder> {
 
-  private InstitutionalOrganization assignerOrganization;
   private KbvErpMedicationRequest medicationRequest;
   private SupplyRequest supplyRequest;
   private Medication medication;
@@ -59,94 +59,101 @@ public class KbvErpBundleBuilder
   }
 
   public static KbvErpBundleBuilder forPrescription(String prescriptionId) {
-    return forPrescription(new PrescriptionId(prescriptionId));
+    return forPrescription(PrescriptionId.from(prescriptionId));
   }
 
   public static KbvErpBundleBuilder forPrescription(PrescriptionId prescriptionId) {
     return new KbvErpBundleBuilder().prescriptionId(prescriptionId);
   }
 
-  public KbvErpBundleBuilder assigner(InstitutionalOrganization organization) {
-    this.assignerOrganization = organization;
-    return self();
-  }
-
   public KbvErpBundleBuilder medicationRequest(KbvErpMedicationRequest medicationRequest) {
     this.medicationRequest = medicationRequest;
-    return self();
+    return this;
   }
 
   public KbvErpBundleBuilder supplyRequest(SupplyRequest supplyRequest) {
     this.supplyRequest = supplyRequest;
-    return self();
+    return this;
   }
 
   public KbvErpBundleBuilder medication(Medication medication) {
     this.medication = medication;
-    return self();
+    return this;
   }
 
   @Override
   public KbvErpBundle build() {
     checkRequired();
-    val kbv = this.createResource(KbvErpBundle::new, KbvItaErpStructDef.BUNDLE, version);
+    practitioner.getQualificationType();
+    val bundle = this.createResource(KbvErpBundle::new, KbvItaErpStructDef.BUNDLE, version);
 
     // set FHIR-specific values provided by HAPI
-    kbv.setType(Bundle.BundleType.DOCUMENT);
-    kbv.setTimestamp(new Date());
+    bundle.setType(Bundle.BundleType.DOCUMENT);
+    bundle.setTimestamp(new Date());
 
-    kbv.addEntry(compositionBuilder.createEntryFor("Coverage", coverage));
-    kbv.addEntry(compositionBuilder.createEntryFor(Composition::getSubject, patient));
-    kbv.addEntry(compositionBuilder.createEntryFor(Composition::addAuthor, practitioner, true));
-    kbv.addEntry(compositionBuilder.createEntryFor(Composition::getCustodian, medicalOrganization));
+    bundle.setIdentifier(this.prescriptionId.asIdentifier());
+
+    bundle.addEntry(compositionBuilder.createEntryFor("Coverage", coverage));
+    bundle.addEntry(compositionBuilder.createEntryFor(Composition::getSubject, patient));
+    bundle.addEntry(compositionBuilder.createEntryFor(Composition::addAuthor, practitioner, true));
+    bundle.addEntry(
+        compositionBuilder.createEntryFor(Composition::getCustodian, this.medicalOrganization));
 
     // Note: Medication does not require an entry within the composition
-    kbv.addEntry(compositionBuilder.createEntryFor(medication));
+    bundle.addEntry(compositionBuilder.createEntryFor(medication));
 
     Optional.ofNullable(this.attester)
-        .ifPresent(a -> kbv.addEntry(compositionBuilder.createAttesterEntry(a)));
+        .ifPresent(a -> bundle.addEntry(compositionBuilder.createAttesterEntry(a)));
 
     // note: MedicationRequestEntry is valid without SupplyRequestEntry
     Optional.ofNullable(this.medicationRequest)
         .ifPresent(
             mr ->
-                kbv.addEntry(compositionBuilder.createEntryFor("Prescription", medicationRequest)));
+                bundle.addEntry(
+                    compositionBuilder.createEntryFor("Prescription", medicationRequest)));
 
     // note: SupplyRequestEntry is valid without MedicationRequestEntry
     Optional.ofNullable(this.supplyRequest)
         .ifPresent(
-            sr -> kbv.addEntry(compositionBuilder.createEntryFor("PracticeSupply", supplyRequest)));
-
-    val isOldProfile = version.compareTo(KbvItaErpVersion.V1_1_0) < 0;
-    val isPkvCoverage =
-        coverage
-            .getInsuranceKindOptional()
-            .map(insuranceKind -> insuranceKind.equals(InsuranceTypeDe.PKV))
-            .orElse(false);
-    if (isPkvCoverage && isOldProfile) {
-      kbv.addEntry(compositionBuilder.createEntryFor(assignerOrganization));
-
-      // PKV has also an extension for PKV Tariff
-      compositionBuilder.addExtension(PkvTariff.BASIS.asExtension());
-    }
-
-    if (version.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
-      kbv.setIdentifier(this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID));
-    } else {
-      kbv.setIdentifier(
-          this.prescriptionId.asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
-    }
+            sr ->
+                bundle.addEntry(
+                    compositionBuilder.createEntryFor("PracticeSupply", supplyRequest)));
+    // in case of ASV a KBV_PR_FOR_PRACTITIONER_ROLE ist mandatory
+    Optional.ofNullable(this.practitionerRole)
+        .ifPresent(
+            pR -> bundle.addEntry(compositionBuilder.createEntryFor("FOR_PractitionerRole", pR)));
 
     compositionBuilder.addExtension(statusKennzeichen.asExtension());
     val compositionEntry = compositionBuilder.buildBundleEntryComponent();
-    kbv.getEntry().add(0, compositionEntry);
+    bundle.getEntry().add(0, compositionEntry);
 
-    return kbv;
+    return bundle;
   }
 
   private void checkRequired() {
     this.checkRequired(patient, "KBV Bundle requires a patient");
     this.checkRequired(coverage, "KBV Bundle requires a coverage");
+    this.checkRequired(medication, "KBV Bundle requires a medication");
+    this.checkRequired(practitioner, "KBV Bundle requires a practitioner");
+    this.checkRequired(medicalOrganization, "KBV Bundle requires a custodian organization");
+    if (version.compareTo(KbvItaErpVersion.V1_1_0) > 0
+        && practitioner.getQualificationType().equals(QualificationType.DENTIST)
+        && medicalOrganization.getIdentifier().stream()
+            .noneMatch(
+                i ->
+                    i.getSystem()
+                        .contains(
+                            DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID
+                                .getCanonicalUrl()))) {
+
+      val msg =
+          format(
+              "Medical Organization requires a KZVA Abrechnungsnummer for Dentists in KBV Bundle"
+                  + " from version {0} also see"
+                  + " https://simplifier.net/packages/kbv.ita.for/1.2.0/files/2777636",
+              version.getVersion());
+      throw new BuilderException(msg);
+    }
     if (supplyRequest == null) {
       this.checkRequired(
           medicationRequest, "KBV Bundle requires a medication request without a supply request");
@@ -155,39 +162,30 @@ public class KbvErpBundleBuilder
       this.checkRequired(
           supplyRequest, "KBV Bundle requires a supply request without a medication request");
     }
-    this.checkRequired(medication, "KBV Bundle requires a medication");
-    this.checkRequired(practitioner, "KBV Bundle requires a practitioner");
-    this.checkRequired(medicalOrganization, "KBV Bundle requires a custodian organization");
 
-    if (version.compareTo(KbvItaErpVersion.V1_1_0) < 0) {
-      // old profile
-      if (coverage.getInsuranceKind() == InsuranceTypeDe.PKV) {
-        // assigner organization not required from kbv.ita.erp-1.1.0??
-        this.checkRequired(
-            assignerOrganization,
-            format(
-                "KBV Bundle with PKV patient requires an assigner organization for {0}", version));
-      }
-    } else {
-      if (medicationRequest != null) {
-        // new profile
-        medicationRequest
-            .getAccident()
-            .filter(accident -> !accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT))
-            .ifPresent(
-                accident -> {
-                  // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
-                  // "Berufsgenossenschaft"
-                  // and the patient is in this case always GKV (gesetzlich krankenversichert)
-                  if (!coverage.getInsuranceKind().equals(InsuranceTypeDe.BG)) {
-                    log.warn(
-                        "Accident set to {} and insurance is of type {} but must be {}",
-                        accident.accidentCauseType().getDisplay(),
-                        coverage.getInsuranceKind(),
-                        InsuranceTypeDe.BG);
-                  }
-                });
-      }
+    // TODO: we intentionally create this scenario in produkt-testsuite
+    //    if (supplyRequest != null && medicationRequest != null) {
+    //      throw new BuilderException(
+    //          "KBV Bundle requires either a medication request or a supply request but not both");
+    //    }
+
+    if (medicationRequest != null) {
+      medicationRequest
+          .getAccident()
+          .filter(accident -> !accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT))
+          .ifPresent(
+              accident -> {
+                // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
+                // "Berufsgenossenschaft"
+                // and the patient is in this case always GKV (gesetzlich krankenversichert)
+                if (!coverage.getInsuranceKind().equals(InsuranceTypeDe.BG)) {
+                  log.warn(
+                      "Accident set to {} and insurance is of type {} but must be {}",
+                      accident.accidentCauseType().getDisplay(),
+                      coverage.getInsuranceKind(),
+                      InsuranceTypeDe.BG);
+                }
+              });
     }
   }
 }

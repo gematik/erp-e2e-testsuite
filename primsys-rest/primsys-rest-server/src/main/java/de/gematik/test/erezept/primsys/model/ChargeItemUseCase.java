@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -27,7 +31,7 @@ import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenBuilder;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvDispensedMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvDispensedMedication;
@@ -75,8 +79,7 @@ public class ChargeItemUseCase {
 
   public Response putChargeItem(String taskId, String accessCode, DavInvoice davInvoice) {
     val cmdGet =
-        new ChargeItemGetByIdCommand(
-            PrescriptionId.from(taskId), AccessCode.fromString(accessCode));
+        new ChargeItemGetByIdCommand(PrescriptionId.from(taskId), AccessCode.from(accessCode));
     val original = pharmacy.erpRequest(cmdGet).getExpectedResource().getChargeItem();
 
     val dispenseData = this.getDispensedData(taskId);
@@ -89,7 +92,7 @@ public class ChargeItemUseCase {
     val changedChargeItem =
         original.withChangedContainedBinaryData(davBundle.getReference(), signedDavBundle);
 
-    val cmd = new ChargeItemPutCommand(AccessCode.fromString(accessCode), changedChargeItem);
+    val cmd = new ChargeItemPutCommand(AccessCode.from(accessCode), changedChargeItem);
     return executeCommand(cmd);
   }
 
@@ -145,7 +148,7 @@ public class ChargeItemUseCase {
             .verordnung(acceptData.getPrescriptionReference())
             .abgabedatensatz(davBundle.getReference(), signedDavBundle)
             .build();
-    return Pair.of(chargeItem, Secret.fromString(dispenseData.getSecret()));
+    return Pair.of(chargeItem, Secret.from(dispenseData.getSecret()));
   }
 
   private DispensedMedicationDto getDispensedData(String taskId) {

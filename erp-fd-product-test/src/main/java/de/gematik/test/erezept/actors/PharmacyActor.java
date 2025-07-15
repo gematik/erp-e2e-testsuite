@@ -12,15 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actors;
 
-import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.util.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @EqualsAndHashCode(callSuper = true)

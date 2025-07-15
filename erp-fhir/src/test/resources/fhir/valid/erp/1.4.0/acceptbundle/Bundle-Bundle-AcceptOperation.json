@@ -20,7 +20,7 @@
         "id": "d70932d1-9e1c-483c-b2d4-b7dced09b35e",
         "meta": {
           "profile": [
-            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task|1.4"
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task|1.5"
           ],
           "tag": [
             {
@@ -102,7 +102,7 @@
         "id": "PrescriptionBinary",
         "meta": {
           "profile": [
-            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary|1.4"
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary|1.5"
           ]
         },
         "contentType": "application/pkcs7-mime",

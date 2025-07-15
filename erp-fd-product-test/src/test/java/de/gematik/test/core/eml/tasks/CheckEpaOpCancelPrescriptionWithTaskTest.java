@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.eml.tasks;
@@ -88,7 +92,7 @@ class CheckEpaOpCancelPrescriptionWithTaskTest extends ErpFhirParsingTest {
             .decode(
                 EpaOpCancelPrescription.class,
                 ResourceLoader.readFileFromResource(
-                    "fhir/valid/medication/Parameters-example-epa-op-cancel-prescription-erp-input-parameters-1.json"));
+                    "fhir/valid/parameters/Parameters-example-epa-op-cancel-prescription-erp-input-parameters-1.json"));
     when(useEpaMockClient.downloadCancelPrescriptionBy(any()))
         .thenReturn(List.of(validPrescription));
 

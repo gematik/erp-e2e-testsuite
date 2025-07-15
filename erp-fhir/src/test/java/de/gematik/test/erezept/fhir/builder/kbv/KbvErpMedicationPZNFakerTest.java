@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -19,7 +23,6 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -50,9 +53,7 @@ class KbvErpMedicationPZNFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakerKbvErpMedicationPZNWithStandardSize() {
     val medication =
-        KbvErpMedicationPZNFaker.builder()
-            .withStandardSize(fakerValueSet(StandardSize.class))
-            .fake();
+        KbvErpMedicationPZNFaker.builder().withStandardSize(StandardSize.random()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }

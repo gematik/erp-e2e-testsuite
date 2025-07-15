@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actors;
@@ -21,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
@@ -34,6 +39,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
@@ -56,6 +62,11 @@ class DoctorActorTest extends ErpFhirBuildingTest {
     val docConfig = config.getDoctorConfig(doctor.getName());
     val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig, "UselessTestId");
     doctor.can(provideBaseData);
+
+    val smcbMock = mock(SmcB.class);
+    when(smcbMock.getTelematikId()).thenReturn("Telematik-ID");
+    doctor.can(UseSMCB.itHasAccessTo(smcbMock));
+
     return doctor;
   }
 
@@ -77,9 +88,10 @@ class DoctorActorTest extends ErpFhirBuildingTest {
   }
 
   @Test
-  void shouldHaveHbaTelematikId() {
+  void shouldHaveTelematikIds() {
     val doctor = createDoc("Adelheid Ulmenwald");
     assertNotNull(doctor.getHbaTelematikId());
+    assertNotNull(doctor.getSmcbTelematikId());
   }
 
   @Test

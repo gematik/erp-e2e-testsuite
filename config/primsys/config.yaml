@@ -50,7 +50,7 @@ actors:
 
     - name: Peter Kleinschmidt
       description: "Akteur mit Psychotherapeut-HBA und Psychotherapeutische Praxis SMC-B"
-      smcbIccsn: 80276883110000163953 # Krankenhaus am Ufer
+      smcbIccsn: 80276883110000163952 # Psychotherapeutische Praxis Hillbert Freiherr Cördes
       hbaIccsn: 80276883110000163950  # Psychotherapeut Peter Kleinschmidt
       algorithm: E256
       qualificationType: Arzt
@@ -58,7 +58,7 @@ actors:
 
     - name: Julian Böcher
       description: "Akteur mit Psychotherapeut-HBA und Psychotherapeutische Praxis SMC-B"
-      smcbIccsn: 80276883110000163954 # Betriebsstätte Kostenträger GKV Dr. Heiner Oldenburg
+      smcbIccsn: 80276883110000163952 # Psychotherapeutische Praxis Hillbert Freiherr Cördes
       hbaIccsn: 80276883110000163951  # Psychotherapeut Julian Böcher
       algorithm: E256
       qualificationType: Arzt
@@ -166,7 +166,7 @@ environments:
       epaMockUrl: https://epa-as-mock.test.gematik.solutions:443
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
-      maxWait: 60000
+      maxWait: 360000
 
   - name: RU
     ti:
@@ -185,7 +185,7 @@ environments:
       epaMockUrl: https://epa-as-mock.ref.gematik.solutions:443
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
-      maxWait: 60000
+      maxWait: 360000
 
   - name: RU-DEV
     ti:

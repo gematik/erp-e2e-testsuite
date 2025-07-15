@@ -1,0 +1,27 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-CS-ERP-RueckspracheArzt",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-RueckspracheArzt",
+  "version": "1.5.0",
+  "name": "DAV_CS_ERP_RueckspracheArzt",
+  "title": "Ruecksprache Arzt",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "content": "complete",
+  "count": 3,
+  "concept": [
+    {
+      "code": "0",
+      "display": "Rücksprache mit dem Arzt ist erfolgt."
+    },
+    {
+      "code": "1",
+      "display": "Dringender Fall, Rücksprache mit dem Arzt war nicht möglich."
+    },
+    {
+      "code": "2",
+      "display": "Keine Rücksprache mit dem Arzt erforderlich."
+    }
+  ]
+}

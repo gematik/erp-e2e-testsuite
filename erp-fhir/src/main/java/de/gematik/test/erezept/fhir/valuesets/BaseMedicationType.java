@@ -12,13 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
 
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +42,6 @@ public enum BaseMedicationType implements FromValueSet {
   public static final CommonCodeSystem CODE_SYSTEM = CommonCodeSystem.SNOMED_SCT;
   public static final String VERSION = "http://snomed.info/sct/900000000000207008/version/20220331";
   public static final String DESCRIPTION = "The Scope of a Consent";
-
   private final String code;
   private final String display;
 

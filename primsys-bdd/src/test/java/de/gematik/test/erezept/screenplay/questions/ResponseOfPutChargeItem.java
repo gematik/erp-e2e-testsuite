@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -21,8 +25,8 @@ import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -72,7 +76,7 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
     val theChargeItem = strategy.getChargeItem();
     if (theChargeItem.getAccessCode().isEmpty()) {
       theChargeItem.addIdentifier(
-          strategy.getAccessCode().asIdentifier(ErpWorkflowNamingSystem.ACCESS_CODE_121));
+          strategy.getAccessCode().asIdentifier(ErpWorkflowNamingSystem.ACCESS_CODE));
     }
 
     // remove the old contained resource and the supporting information reference to it

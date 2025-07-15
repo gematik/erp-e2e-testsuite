@@ -12,72 +12,44 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class ErxAcceptBundleTest extends ErpFhirParsingTest {
 
   private static final String BASE_PATH = "fhir/valid/erp/";
-  private static final String BASE_PATH_1_1_1 = BASE_PATH + "1.1.1/";
-  private static final String BASE_PATH_1_2_0 = BASE_PATH + "1.2.0/acceptbundle/";
-
-  @Test
-  void shouldEncodeSingleAcceptBundle() {
-    val fileName = "TaskAcceptBundle_01.xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
-    val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
-    assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
-
-    val expectedTaskId = TaskId.from("a4c72c7d-1ee3-11b2-825b-c505a820f066");
-    val erxTask = acceptBundle.getTask();
-    assertEquals(expectedTaskId, erxTask.getTaskId());
-    assertEquals(expectedTaskId, acceptBundle.getTaskId());
-
-    val expectedKbvBundleId = "a54bfb25-1ee3-11b2-825c-c505a820f066";
-    assertEquals(expectedKbvBundleId, acceptBundle.getKbvBundleId());
-
-    assertTrue(acceptBundle.getSignedKbvBundle().length > 0);
-  }
+  private static final String BASE_PATH_1_4_0 = BASE_PATH + "1.4.0/acceptbundle/";
 
   @Test
   void shouldEncodeSingleAcceptBundle120() {
-    val fileName = "cef4b960-7ce4-4755-b4ce-3b01a30ec2f0.xml";
+    val fileName = "2c08c718-3d3b-447e-babc-7afef76f0a48.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
     val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
     assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 
-    val expectedTaskId = "160.000.031.325.758.69";
+    val expectedTaskId = "200.000.002.457.470.49";
     val erxTask = acceptBundle.getTask();
     assertEquals(expectedTaskId, erxTask.getTaskId().getValue());
 
-    val expectedKbvBundleId = "a03efedd-0100-0000-0001-000000000000";
+    val expectedKbvBundleId = "c87e7f25-0000-0000-0001-000000000000";
     assertEquals(expectedKbvBundleId, acceptBundle.getKbvBundleId());
 
     assertEquals(
-        "e2715cb0d512591a0c8dece2178b2998c38ea7bfb78b4cd5f805096cbd809f26",
+        "0a33a716b71c4dce81a3edbbd6aaf8296a82f0eead6784766ea3c5a6ce7b7ecc",
         acceptBundle.getSecret().getValue());
-  }
-
-  @Test
-  void shouldEncodeSingleAcceptBundleWithConsent() {
-    val fileName = "TaskAcceptBundle_02.xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
-    val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
-    assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 
     assertTrue(acceptBundle.hasConsent());
   }

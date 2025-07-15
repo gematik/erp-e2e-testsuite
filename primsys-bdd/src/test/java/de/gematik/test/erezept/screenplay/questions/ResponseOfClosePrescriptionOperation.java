@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -23,10 +27,10 @@ import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
@@ -151,7 +155,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     val prescriptionId = strategy.getPrescriptionId();
     val kvnr = strategy.getKvnr();
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0) {
       val medicationDispense =
           ErxMedicationDispenseBuilder.forKvnr(kvnr)
               .prescriptionId(prescriptionId)
@@ -168,7 +172,8 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
 
       val lotNr = GemFaker.fakerLotNumber();
       val expDate = GemFaker.fakerFutureExpirationDate();
-      val gemMedication = GemErpMedicationBuilder.from(medication).lotNumber(lotNr).build();
+      val gemMedication =
+          GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(medication).lotNumber(lotNr).build();
 
       val medicationDisp =
           ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
@@ -200,7 +205,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0) {
       val medicationDispenses = getAlternativeMedicationDispenses(strategy, performerId);
       return new CloseTaskCommand(taskId, secret, medicationDispenses);
     } else {
@@ -227,9 +232,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
           val darreichungsCode =
               medMap.getOrDefault(
                   "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode =
-              medMap.getOrDefault(
-                  "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());
+          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
           val medication =
               KbvErpMedicationPZNBuilder.builder()
@@ -274,12 +277,10 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
           val darreichungsCode =
               medMap.getOrDefault(
                   "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode =
-              medMap.getOrDefault(
-                  "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());
+          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
           val medication =
-              GemErpMedicationBuilder.builder()
+              GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
                   .pzn(pzn, name)
                   .amount(amount, unit)
                   .category(EpaDrugCategory.fromCode(categoryCode))

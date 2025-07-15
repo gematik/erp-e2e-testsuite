@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -64,6 +68,7 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
           case PATIENT -> abortAsPatient(actor);
           case PHARMACY -> abortAsPharmacy(actor);
           case REPRESENTATIVE -> abortAsRepresentative(actor);
+          case KTR -> abortAsKtr(actor);
           default -> throw new FeatureNotImplementedException(
               format("You cannot abort a prescription as {0}", role));
         };
@@ -102,6 +107,23 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     return cmd;
   }
 
+  private <T extends Actor> TaskAbortCommand abortAsKtr(T actor) {
+    val accepted =
+        SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class).getAcceptedPrescriptions();
+    val toDelete = deque.chooseFrom(accepted);
+    val taskId = toDelete.getTaskId();
+    val accessCode = toDelete.getTask().getAccessCode();
+    val secret = this.getSecret(toDelete);
+    val cmd = new TaskAbortCommand(taskId, accessCode, secret);
+    log.info(
+        "KTR {} is asking for the response of {} with AccessCode {} and Secret {}",
+        actor.getName(),
+        cmd.getRequestLocator(),
+        accessCode,
+        secret);
+    return cmd;
+  }
+
   private <T extends Actor> TaskAbortCommand abortAsPatient(T actor) {
     val ability = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
     val dmcs = ability.getDmcs();
@@ -132,13 +154,17 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<Resource> {
     val replacementSecret = this.replacementMap.get("secret");
     if (replacementSecret != null) {
       log.info("Found a replacement secret for $abort: {}", replacementSecret);
-      secret = new Secret(replacementSecret);
+      secret = Secret.from(replacementSecret);
     }
     return secret;
   }
 
   public static Builder asDoctor() {
     return as(ActorRole.DOCTOR);
+  }
+
+  public static Builder asKtr() {
+    return as(ActorRole.KTR);
   }
 
   public static Builder asPharmacy() {

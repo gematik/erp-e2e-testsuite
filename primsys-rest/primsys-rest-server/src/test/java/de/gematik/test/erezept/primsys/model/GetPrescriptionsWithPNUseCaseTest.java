@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -72,7 +76,7 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
   void shouldGenerateResponseByEvidence(String evidence, String kvnr, String hcv) {
     val content =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/erp/1.2.0/taskbundle/289c56b8-e4de-4da8-8f87-dd55b37dd4ae.xml");
+            "fhir/valid/erp/1.4.0/taskBundle/5cb82d47-c80d-4404-b57c-099d58767603.xml");
     val pharmacy = ActorContext.getInstance().getPharmacies().get(0);
     val mockErpClient = pharmacy.getClient();
     val getPresUC = new GetPrescriptionsWithPNUseCase(pharmacy);

@@ -1,0 +1,103 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-PR-PAR-PATCH-Task-Input",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_PATCH_Task_Input",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_PR_PAR_PATCH_Task_Input",
+  "title": "GEM ERPEU PR PAR PATCH Task Input",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "This profile defines the parameters for patching the Task to mark the prescription as to-be-redeemed in the EU",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile:workflowEUProfile",
+        "path": "Parameters.meta.profile",
+        "sliceName": "workflowEUProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_PATCH_Task_Input|1.0",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:eu-isRedeemableByPatientAuthorization",
+        "path": "Parameters.parameter",
+        "sliceName": "eu-isRedeemableByPatientAuthorization",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:eu-isRedeemableByPatientAuthorization.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "eu-isRedeemableByPatientAuthorization",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:eu-isRedeemableByPatientAuthorization.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:eu-isRedeemableByPatientAuthorization.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:eu-isRedeemableByPatientAuthorization.part",
+        "path": "Parameters.parameter.part",
+        "max": "0"
+      }
+    ]
+  }
+}

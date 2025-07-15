@@ -1,0 +1,69 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Datatype-Post-Office-Box",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Post_Office_Box",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Datatype_Post_Office_Box",
+  "status": "active",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "date": "2025-02-11",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Address",
+  "baseDefinition": "http://fhir.de/StructureDefinition/address-de-basis",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Address",
+        "path": "Address",
+        "short": "Hier können Angaben zu einem Postfach gemacht werden.",
+        "definition": "Eine Adresse gemäß postalischer Konventionen (im Gegensatz zu bspw. GPS-Koordinaten). Die Adresse kann sowohl zur Zustellung von Postsendungen oder zum Aufsuchen von Orten, die keine gültige Postadresse haben, verwendet werden.\r\n\r\nDie verwendeten Extensions in diesem Profil bilden die Struktur der Adresse ab, wie sie im VSDM-Format der elektronischen Versichertenkarte verwendet wird.\r\n\r\nInsbesondere bei ausländischenOrt Adresse oder Adressen, die nicht durch Einlesen einer elektronischen Versichertenkarte erfasst wurden, sind abweichende Strukturen möglich. Die Verwendung der Extensions ist nicht verpflichtend.",
+        "constraint": [
+          {
+            "key": "postBox-de-1",
+            "severity": "error",
+            "human": "Die Extension 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-postBox' darf nur einmal vorkommen.",
+            "expression": "line.where($this.extension('http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-postBox').exists()).count()=1",
+            "source": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Post_Office_Box"
+          }
+        ]
+      },
+      {
+        "id": "Address.type",
+        "path": "Address.type",
+        "min": 1,
+        "patternCode": "postal"
+      },
+      {
+        "id": "Address.line.extension:Strasse",
+        "path": "Address.line.extension",
+        "sliceName": "Strasse",
+        "max": "0"
+      },
+      {
+        "id": "Address.line.extension:Hausnummer",
+        "path": "Address.line.extension",
+        "sliceName": "Hausnummer",
+        "max": "0"
+      },
+      {
+        "id": "Address.line.extension:Adresszusatz",
+        "path": "Address.line.extension",
+        "sliceName": "Adresszusatz",
+        "max": "0"
+      },
+      {
+        "id": "Address.country",
+        "path": "Address.country",
+        "definition": "Angabe des Staates als Länderkennzeichen nach DEUEV Anlage 8.",
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Deuev_Anlage_8"
+        }
+      }
+    ]
+  }
+}

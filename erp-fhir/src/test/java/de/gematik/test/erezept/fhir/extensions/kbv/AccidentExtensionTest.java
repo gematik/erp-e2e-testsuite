@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.kbv;
@@ -22,30 +26,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Extension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class AccidentExtensionTest {
 
-  private static Stream<Arguments> kbvBundleVersions() {
-    return Stream.of(Arguments.of(KbvItaErpVersion.V1_0_2), Arguments.of(KbvItaErpVersion.V1_1_0));
-  }
-
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldBuildAccidentExtension(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldBuildAccidentExtension() {
     val ae = AccidentExtension.accident();
     val outer = ae.asExtension();
     val kennzeichen =
@@ -66,12 +56,8 @@ class AccidentExtensionTest {
                 ae.accidentCauseType().getDisplay())); // well, simply covering the toString :/
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldBuildAccidentExtensionWithFaker(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldBuildAccidentExtensionWithFaker() {
     for (var i = 0; i < 5; i++) {
       val ae = AccidentExtension.faker();
       val outer = ae.asExtension();
@@ -83,12 +69,8 @@ class AccidentExtensionTest {
     }
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldEqualAccidents(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldEqualAccidents() {
     val date = new Date();
     val ae1 = AccidentExtension.accident(date);
     val ae2 = AccidentExtension.accident(date);
@@ -96,12 +78,8 @@ class AccidentExtensionTest {
     assertEquals(ae1.hashCode(), ae2.hashCode());
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldNotEqualOnDifferentAccidentDates(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldNotEqualOnDifferentAccidentDates() {
     val cal = Calendar.getInstance();
     cal.add(Calendar.DATE, -1);
     val ae1 = AccidentExtension.accident(new Date());
@@ -110,12 +88,8 @@ class AccidentExtensionTest {
     assertNotEquals(ae1.hashCode(), ae2.hashCode());
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldEqualAccidentsAtWork(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldEqualAccidentsAtWork() {
     val date = new Date();
     val ae1 = AccidentExtension.accidentAtWork(date).atWorkplace("Arbeitsplatz");
     val ae2 = AccidentExtension.accidentAtWork(date).atWorkplace("Arbeitsplatz");
@@ -123,12 +97,8 @@ class AccidentExtensionTest {
     assertEquals(ae1.hashCode(), ae2.hashCode());
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldNotEqualAccidentsAtWorkOnDifferentWorkplaces(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldNotEqualAccidentsAtWorkOnDifferentWorkplaces() {
     val date = new Date();
     val ae1 = AccidentExtension.accidentAtWork(date).atWorkplace("Arbeitsplatz");
     val ae2 = AccidentExtension.accidentAtWork(date).atWorkplace("Büro");
@@ -136,24 +106,16 @@ class AccidentExtensionTest {
     assertNotEquals(ae1.hashCode(), ae2.hashCode());
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldEqualAccidentsOccupationalDiseases(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldEqualAccidentsOccupationalDiseases() {
     val ae1 = AccidentExtension.occupationalDisease();
     val ae2 = AccidentExtension.occupationalDisease();
     assertEquals(ae1, ae2);
     assertEquals(ae1.hashCode(), ae2.hashCode());
   }
 
-  @ParameterizedTest(name = "[{index}] -> AccidentExtension in versions KbvItaErpVersion {0}")
-  @MethodSource("kbvBundleVersions")
-  @ClearSystemProperty(key = "kbv.ita.erp")
-  void shouldNotEqualOnDifferentCauses(KbvItaErpVersion kbvItaErpVersion) {
-    System.setProperty(kbvItaErpVersion.getName(), kbvItaErpVersion.getVersion());
-
+  @Test
+  void shouldNotEqualOnDifferentCauses() {
     val ae1 = AccidentExtension.accident();
     val ae2 = AccidentExtension.accidentAtWork().atWorkplace();
     val ae3 = AccidentExtension.occupationalDisease();

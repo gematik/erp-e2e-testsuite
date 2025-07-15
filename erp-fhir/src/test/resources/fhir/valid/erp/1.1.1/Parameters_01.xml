@@ -1,9 +1,0 @@
-<Parameters xmlns="http://hl7.org/fhir">
-    <parameter>
-        <name value="workflowType"></name>
-        <valueCoding>
-            <system value="https://gematik.de/fhir/CodeSystem/Flowtype"></system>
-            <code value="160"></code>
-        </valueCoding>
-    </parameter>
-</Parameters>

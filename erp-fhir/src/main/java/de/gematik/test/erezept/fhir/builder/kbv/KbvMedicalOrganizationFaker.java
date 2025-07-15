@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -25,7 +29,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerZipCode;
 
 import de.gematik.bbriccs.fhir.de.value.IKNR;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.BSNR;
@@ -73,8 +77,16 @@ public class KbvMedicalOrganizationFaker {
     }
   }
 
+  /**
+   * Medical Organization requires a KZVA Abrechnungsnummer in case Of Dentists, if you randomly
+   * generate Practitioners it is recommended to use .forPractitioner()
+   *
+   * @param practitioner
+   * @return KbvMedicalOrganizationFaker
+   */
   public static KbvMedicalOrganizationFaker forPractitioner(KbvPractitioner practitioner) {
     if (practitioner.getQualificationType() == QualificationType.DENTIST) {
+
       return dentalPractice();
     } else {
       // Note: older KbvItaForVersion does not accept KSN. HOSPITAL_KSN can be removed from
@@ -86,10 +98,22 @@ public class KbvMedicalOrganizationFaker {
     }
   }
 
+  /**
+   * Medical Organization requires a KZVA Abrechnungsnummer in case Of Dentists, if you randomly
+   * generate Practitioners it is recommended to use .forPractitioner()
+   *
+   * @return KbvMedicalOrganizationFaker
+   */
   public static KbvMedicalOrganizationFaker builder() {
     return builder(fakerValueSet(OrganizationFakerType.class));
   }
 
+  /**
+   * Medical Organization requires a KZVA Abrechnungsnummer in case Of Dentists, if you randomly
+   * generate Practitioners it is recommended to use .forPractitioner()
+   *
+   * @return KbvMedicalOrganizationFaker
+   */
   public static KbvMedicalOrganizationFaker builder(OrganizationFakerType type) {
     return new KbvMedicalOrganizationFaker(type);
   }
@@ -98,6 +122,12 @@ public class KbvMedicalOrganizationFaker {
     return builder(OrganizationFakerType.DENTAL);
   }
 
+  /**
+   * !! Take Care you have no Dentist as Practitioner !! in case of a Dentist pleas use
+   * dentalPractice() or forPractitioner()
+   *
+   * @return KbvMedicalOrganizationFaker
+   */
   public static KbvMedicalOrganizationFaker medicalPractice() {
     return builder(OrganizationFakerType.GENERAL);
   }

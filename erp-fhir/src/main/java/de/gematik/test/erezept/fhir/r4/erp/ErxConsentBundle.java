@@ -12,12 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.profiles.definitions.PatientenrechnungStructDef;
 import java.util.*;
 import lombok.*;
 import org.hl7.fhir.r4.model.*;
@@ -35,7 +39,7 @@ public class ErxConsentBundle extends Bundle {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
         .filter(resource -> resource.getResourceType().equals(ResourceType.Consent))
-        .filter(PatientenrechnungStructDef.GEM_ERPCHRG_PR_CONSENT::matches)
+        .filter(PatientenrechnungStructDef.CONSENT::matches)
         .map(ErxConsent::fromConsent)
         .findFirst();
   }

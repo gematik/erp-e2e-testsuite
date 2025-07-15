@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.lei.steps;
@@ -38,7 +42,7 @@ import net.serenitybdd.screenplay.actors.OnStage;
 public class ActorsInitializationSteps {
 
   private static SmartcardArchive smartcards;
-  private static PrimSysBddFactory config;
+  static PrimSysBddFactory config;
   private static DumpingStopwatch stopwatch;
 
   @BeforeAll
@@ -98,8 +102,9 @@ public class ActorsInitializationSteps {
    *     identifizieren
    */
   @Angenommen(
-      "^(?:der Arzt|die Ärztin|der Psychotherapeut|die Psychotherapeutin) (.+) hat Zugriff auf"
-          + " (?:seinen|ihren) HBA und auf die SMC-B der Praxis$")
+      "^(?:der|die) (?:Arzt|Ärztin|Psychotherapeut|Psychotherapeutin|Psychologischer"
+          + " Psychotherapeut|Kinderpsychotherapeut) (.+) hat Zugriff auf (?:seinen|ihren) HBA"
+          + " und auf die SMC-B der Praxis$")
   public void initDoctor(String docName) {
     log.trace("Initialize Doctor {}", docName);
     val theActor = OnStage.theActorCalled(docName);
@@ -135,6 +140,13 @@ public class ActorsInitializationSteps {
     log.trace("Initialize Patient {} {}", insuranceType, patientName);
     val theActor = OnStage.theActorCalled(patientName);
     config.equipAsPatient(theActor, insuranceType);
+  }
+
+  @Angenommen("^der Kostenträger (.+) hat Zugriff auf seine SMC-B KTR$")
+  public void initKtr(String insuranceName) {
+    log.trace("Initialize HealthInsurance {}", insuranceName);
+    val theActor = OnStage.theActorCalled(insuranceName);
+    config.equipAsKtr(theActor);
   }
 
   @Angenommen(

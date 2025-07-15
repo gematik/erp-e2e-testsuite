@@ -1,0 +1,403 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Treatment-Goal",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Treatment_Goal",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Treatment_Goal",
+  "title": "KBV_PR_Base_Treatment_Goal",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "description": "Dieses Profil bildet ein individuelles Behandlungsziel ab.",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Goal",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Goal",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Goal",
+        "path": "Goal",
+        "definition": "Hier werden Informationen zu einem individuellen Behandlungsziel erfasst, das durch eine Behandlung (z.B. durch eine medikamentöse Therapie) erreicht werden soll."
+      },
+      {
+        "id": "Goal.extension",
+        "path": "Goal.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Goal.extension:endDatum",
+        "path": "Goal.extension",
+        "sliceName": "endDatum",
+        "definition": "Hier wird das Datum angegeben, nach dem das Ziel nicht mehr verfolgt werden soll.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Treatment_Goal_End"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Goal.lifecycleStatus",
+        "path": "Goal.lifecycleStatus",
+        "definition": "Hier wird der Status des Behandlungsziels angegeben."
+      },
+      {
+        "id": "Goal.description",
+        "path": "Goal.description",
+        "definition": "In diesem Element werden Angaben zum Behandlungsziel gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Goal.description.coding",
+        "path": "Goal.description.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Goal.description.coding.system",
+        "path": "Goal.description.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Goal.description.coding.code",
+        "path": "Goal.description.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Goal.description.coding.display",
+        "path": "Goal.description.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Goal.description.text",
+        "path": "Goal.description.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Goal.subject",
+        "path": "Goal.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Goal.start[x]",
+        "path": "Goal.start[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird das Datum angegeben, ab dem das Ziel verfolgt werden soll."
+      },
+      {
+        "id": "Goal.start[x]:startDate",
+        "path": "Goal.start[x]",
+        "sliceName": "startDate",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "date"
+          }
+        ]
+      },
+      {
+        "id": "Goal.target",
+        "path": "Goal.target",
+        "definition": "Hier werden bestimmte Größen bzw. Parameter definiert, anhand derer sich die Erfüllung des Behandlungsziels überprüfen lässt. Dies können qualitative oder quantitative Parameter sein."
+      },
+      {
+        "id": "Goal.target.measure",
+        "path": "Goal.target.measure",
+        "definition": "In diesem Element werden Angaben zur Zielgröße, anhand welcher das Behandlungsziel definiert ist, gemacht. Diese werden als codierte Information und/oder als Freitext angegeben.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.measure.coding",
+        "path": "Goal.target.measure.coding",
+        "definition": "Hier wird ein Code aus einem beliebigen Code-System angegeben, vorzugsweise aus dem Code-System SNOMED CT® beziehungsweise LOINC®."
+      },
+      {
+        "id": "Goal.target.measure.coding.system",
+        "path": "Goal.target.measure.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.measure.coding.code",
+        "path": "Goal.target.measure.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.measure.coding.display",
+        "path": "Goal.target.measure.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.measure.text",
+        "path": "Goal.target.measure.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Goal.target.detail[x]",
+        "path": "Goal.target.detail[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Ein quantitativer Zielwert wird als numerischer Wert angegeben, und je nach Zielgröße oder Skalierung als:\r\n- eine Dezimalzahl (z.B. bei Angabe einer Masse pro Volumen wie mg/dl)\r\n- eine ganze Zahl (z.B. bei einer Zellzählung)\r\n- eine Zeitdauer (z.B. bei der Ermittlung des Gerinnungsstatus mit Messung einer speziellen Gerinnungszeit)\r\noder als\r\n- ein Zahlenverhältnis (z.B. beim Nachweis von Antikörpern ab einer bestimmen Verdünnungsstufe des Reagenz, sog. Titerangabe)\r\noder als \r\n- ein Ergebnisbereich (Werteintervall)"
+      },
+      {
+        "id": "Goal.target.detail[x]:detailQuantity",
+        "path": "Goal.target.detail[x]",
+        "sliceName": "detailQuantity",
+        "definition": "Hier wird der Zielwert als Quantität angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Quantity"
+          }
+        ]
+      },
+      {
+        "id": "Goal.target.detail[x]:detailQuantity.value",
+        "path": "Goal.target.detail[x].value",
+        "definition": "Hier wird ein numerischer Wert für eine gemessene Größe angegeben. Dies ist eine Zahl mit optionalen Dezimalstellen.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailQuantity.comparator",
+        "path": "Goal.target.detail[x].comparator",
+        "definition": "Der Komparator kann sein \r\n< (kleiner) \r\n<= (kleiner oder gleich) \r\n>= (größer oder gleich) \r\n> (größer) \r\nDie häufigste Option ist, dass ein Zielwert = (gleich) eines Wertes ist. In diesem Fall wird kein Komparator gesetzt."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailQuantity.system",
+        "path": "Goal.target.detail[x].system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange",
+        "path": "Goal.target.detail[x]",
+        "sliceName": "detailRange",
+        "definition": "Für Ziele, die nicht als genau ein Wert, sondern als ein Wertebereich / Werteintervall angegeben werden. Sollte nur der Wert für die Ober- oder Untergrenze bekannt sein, muss die Angabe als Quantität mit Komparator erfolgen.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Range"
+          }
+        ]
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange.low",
+        "path": "Goal.target.detail[x].low",
+        "definition": "Untere Grenze eines Zielbereiches. Die Einheiten von Obergrenze und Untergrenze müssen identisch sein.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange.low.value",
+        "path": "Goal.target.detail[x].low.value",
+        "definition": "Hier wird ein numerischer Wert für eine gemessene Größe angegeben. Dies ist eine Zahl mit optionalen Dezimalstellen.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange.low.system",
+        "path": "Goal.target.detail[x].low.system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange.high",
+        "path": "Goal.target.detail[x].high",
+        "definition": "Obere Grenze eines Zielbereiches. Die Einheiten von Obergrenze und Untergrenze müssen identisch sein.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange.high.value",
+        "path": "Goal.target.detail[x].high.value",
+        "definition": "Hier wird ein numerischer Wert für eine gemessene Größe angegeben. Dies ist eine Zahl mit optionalen Dezimalstellen.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRange.high.system",
+        "path": "Goal.target.detail[x].high.system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Goal.target.detail[x]:detailCodeableConcept",
+        "path": "Goal.target.detail[x]",
+        "sliceName": "detailCodeableConcept",
+        "definition": "In diesem Element werden Angaben zum qualitativen Zielwert gemacht. Diese werden als codierte Information und/oder als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "Goal.target.detail[x]:detailCodeableConcept.coding",
+        "path": "Goal.target.detail[x].coding",
+        "definition": "Hier wird ein Code aus einem beliebigen Code-System angegeben, vorzugsweise aus dem Code-System SNOMED CT® beziehungsweise LOINC®."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailCodeableConcept.text",
+        "path": "Goal.target.detail[x].text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio",
+        "path": "Goal.target.detail[x]",
+        "sliceName": "detailRatio",
+        "definition": "Hier wird der Zielwert als zwei ins Verhältnis gesetzte Quantitäten (Zähler, Nenner) angegeben. Dies kann zum Beispiel ein Antikörper-Titer sein. ",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Ratio"
+          }
+        ]
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.numerator",
+        "path": "Goal.target.detail[x].numerator",
+        "definition": "Hier wird der Zähler des Verhältnisses angegeben."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.numerator.value",
+        "path": "Goal.target.detail[x].numerator.value",
+        "definition": "Hier wird ein numerischer Wert für eine gemessene Größe angegeben. Dies ist eine Zahl mit optionalen Dezimalstellen.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.numerator.comparator",
+        "path": "Goal.target.detail[x].numerator.comparator",
+        "definition": "Der Komparator kann sein \r\n< (kleiner) \r\n<= (kleiner oder gleich) \r\n>= (größer oder gleich) \r\n> (größer) \r\nDie häufigste Option ist, dass ein Zielwert = (gleich) eines Wertes ist. In diesem Fall wird kein Komparator gesetzt."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.numerator.system",
+        "path": "Goal.target.detail[x].numerator.system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.denominator",
+        "path": "Goal.target.detail[x].denominator",
+        "definition": "Hier wird der Nenner des Verhältnisses angegeben."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.denominator.value",
+        "path": "Goal.target.detail[x].denominator.value",
+        "definition": "Hier  wird ein numerischer Wert für eine gemessene Größe angegeben. Dies ist eine Zahl mit optionalen Dezimalstellen.",
+        "min": 1
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.denominator.comparator",
+        "path": "Goal.target.detail[x].denominator.comparator",
+        "definition": "Der Komparator kann sein \r\n< (kleiner) \r\n<= (kleiner oder gleich) \r\n>= (größer oder gleich) \r\n> (größer) \r\nDie häufigste Option ist, dass ein Zielwert = (gleich) eines Wertes ist. In diesem Fall wird kein Komparator gesetzt."
+      },
+      {
+        "id": "Goal.target.detail[x]:detailRatio.denominator.system",
+        "path": "Goal.target.detail[x].denominator.system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Goal.note",
+        "path": "Goal.note",
+        "definition": "Hier werden ergänzende freitextliche Kommentare und Notizen vorgenommen, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Goal.note.author[x]",
+        "path": "Goal.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Goal.note.author[x]:authorReference",
+        "path": "Goal.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Goal.note.author[x]:authorString",
+        "path": "Goal.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Goal.note.time",
+        "path": "Goal.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "Goal.note.text",
+        "path": "Goal.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      }
+    ]
+  }
+}

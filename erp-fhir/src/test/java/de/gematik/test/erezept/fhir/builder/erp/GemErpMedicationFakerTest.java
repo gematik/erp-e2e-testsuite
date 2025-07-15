@@ -12,16 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -31,9 +36,8 @@ class GemErpMedicationFakerTest extends ErpFhirParsingTest {
 
   @RepeatedTest(5)
   void shouldRandomlyFake() {
-    val medication = GemErpMedicationFaker.builder().fake();
-    val result = ValidatorUtil.encodeAndValidate(parser, medication);
-    assertTrue(result.isSuccessful());
+    val medication = GemErpMedicationFaker.forPznMedication().fake();
+    assertTrue(parser.isValid(medication));
   }
 
   @Test
@@ -41,9 +45,19 @@ class GemErpMedicationFakerTest extends ErpFhirParsingTest {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(true);
 
-      val medication = GemErpMedicationFaker.builder().fake();
-      val result = ValidatorUtil.encodeAndValidate(parser, medication);
-      assertTrue(result.isSuccessful());
+      val medication = GemErpMedicationFaker.forPznMedication().fake();
+      assertTrue(parser.isValid(medication));
+    }
+  }
+
+  @Test
+  void shouldFakeWithFixedPzn() {
+    try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
+      mockFaker.when(GemFaker::fakerBool).thenReturn(false);
+      val pzn = PZN.random();
+      val medication = GemErpMedicationFaker.forPznMedication().withPzn(pzn).fake();
+      assertTrue(parser.isValid(medication));
+      assertEquals(pzn.getValue(), medication.getPzn().get().getValue());
     }
   }
 }

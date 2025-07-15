@@ -12,15 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Dosage;
@@ -36,11 +43,26 @@ public class ErxMedicationDispense extends ErxMedicationDispenseBase {
   /**
    * This method will return all contained Medication resources as KbvErpMedication
    *
+   * <p>
+   *
+   * <pre>{@code
+   * ErxMedicationDispenseBundle bundle = searchForMedicationDispenses(bySomeFilter);
+   * List<KbvErpMedication> kbvMedications =
+   *                bundle.getMedicationDispenses().stream()
+   *                      .flatMap(md -> md.getContainedKbvMedication().stream())
+   *                      .toList();
+   * List<GemErpMedication> gemErpMedications = bundle.getMedications();
+   * }</pre>
+   *
    * @deprecated since 0.10.1 because from FHIR-Profiles 1.4.0 the MedicationDispense won't contain
-   *     the Medication anymore
+   *     the Medication anymore. However, as long as FHIR-Profiles lower than 1.3.0 are relevant
+   *     this method is still required e.g. for handling searchsets where you cannot simply use
+   *     {@link ErxMedicationDispenseBundle#unpackDispensePairBy(PrescriptionId)}
+   *     <p>Extracting all {@link KbvErpMedication}s from a searchset might be achieved as shown in
+   *     the code snippet above.
    * @return List of KbvErpMedication contained within this MedicationDispense
    */
-  @Deprecated(since = "0.10.1", forRemoval = true)
+  @Deprecated(since = "0.10.1", forRemoval = false)
   public List<KbvErpMedication> getContainedKbvMedication() {
     return this.getContained().stream()
         .filter(c -> c.getResourceType().equals(ResourceType.Medication))
@@ -75,6 +97,13 @@ public class ErxMedicationDispense extends ErxMedicationDispenseBase {
         .findFirst()
         .orElseThrow(
             () -> new MissingFieldException(ErxMedicationDispense.class, "DosageInstructionText"));
+  }
+
+  public Optional<RedeemCode> getRedeemCode() {
+    return this.getExtension().stream()
+        .filter(RedeemCode::matches)
+        .map(RedeemCode::from)
+        .findFirst();
   }
 
   /**

@@ -1,0 +1,81 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Identifier-KVK",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Identifier_KVK",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Identifier_KVK",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Identifier",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Identifier",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Identifier",
+        "path": "Identifier",
+        "short": "Identifier KVK",
+        "definition": "Versichertennummer der Krankenversichertenkarte (KVK)"
+      },
+      {
+        "id": "Identifier.type",
+        "path": "Identifier.type",
+        "min": 1,
+        "patternCodeableConcept": {
+          "coding": [
+            {
+              "code": "kvk",
+              "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_Base_identifier_type"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Identifier.type.coding",
+        "path": "Identifier.type.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Identifier.type.coding.system",
+        "path": "Identifier.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Identifier.type.coding.code",
+        "path": "Identifier.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Identifier.type.coding.display",
+        "path": "Identifier.type.coding.display",
+        "patternString": "Krankenversichertenkarte"
+      },
+      {
+        "id": "Identifier.system",
+        "path": "Identifier.system",
+        "min": 1,
+        "fixedUri": "http://fhir.de/sid/gkv/kvk-versichertennummer"
+      },
+      {
+        "id": "Identifier.value",
+        "path": "Identifier.value",
+        "min": 1,
+        "constraint": [
+          {
+            "key": "kvk-1",
+            "severity": "error",
+            "human": "Die Krankenversichertenkartenummer muss numerisch und 6- bis 12-stellig sein.",
+            "expression": "matches('^[0-9]{6,12}$')",
+            "source": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Identifier_KVK"
+          }
+        ]
+      }
+    ]
+  }
+}

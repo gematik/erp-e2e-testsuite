@@ -1,0 +1,153 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Provenance",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Provenance",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Provenance",
+  "title": "KBV_PR_Base_Provenance",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "description": "Hier können Details dazu angegeben werden, wie eine Information entstanden ist, z.B. die Quelle der Information.",
+  "copyright": "Im folgenden Profil werden Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from LOINC (http://loinc.org). LOINC is copyright © 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at http://loinc.org/license. LOINC® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright © 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures (UCUM) Organization. All rights reserved. THE UCUM TABLE (IN ALL FORMATS), UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED 'AS IS.' ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Provenance",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Provenance",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Provenance",
+        "path": "Provenance",
+        "definition": "Hier werden Details dazu angegeben, wie eine Information entstanden ist, z.B. die Quelle der Information."
+      },
+      {
+        "id": "Provenance.target",
+        "path": "Provenance.target",
+        "definition": "Hier wird die Information bzw. Informationsgruppe referenziert, auf die sich die Herkunftsinformation bezieht. Beispiel: Wird in einem MIO Pflege-Überleitungsbogen die Diagnose aus einem Krankenhaus-Entlassbrief übernommen, so ist das Ziel-Element die Diagnose im Pflegeüberleitungsbogen."
+      },
+      {
+        "id": "Provenance.occurred[x]",
+        "path": "Provenance.occurred[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird der Zeitpunkt angegeben, an dem die jeweilige Aktivität durchgeführt wurde."
+      },
+      {
+        "id": "Provenance.occurred[x]:occurredDateTime",
+        "path": "Provenance.occurred[x]",
+        "sliceName": "occurredDateTime",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Provenance.agent",
+        "path": "Provenance.agent",
+        "definition": "Hier wird eine Person/Entität angegeben, die an der Integration der Dokumentation in das Zielsystem beteiligt ist.\\nDies kann z.B. das explizite Hinzufügen der in 'Referenz auf das Ziel' bezeichneten Information sein (im Sinne eines Audittrails) oder auch eine inhaltliche Überprüfung oder Verifikation der Information."
+      },
+      {
+        "id": "Provenance.agent.type",
+        "path": "Provenance.agent.type",
+        "definition": "Hier ist die Rolle/Funktion der Person/Entität anzugeben."
+      },
+      {
+        "id": "Provenance.agent.role",
+        "path": "Provenance.agent.role",
+        "definition": "Hier wird angegeben, in welcher Rolle die Person/Entität an der Integration der Dokumentation in das Zielsystem beteiligt ist."
+      },
+      {
+        "id": "Provenance.agent.who",
+        "path": "Provenance.agent.who",
+        "definition": "Hier wird die datenintegrierende Person referenziert.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/PractitionerRole",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Device",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_PractitionerRole|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Provenance.entity",
+        "path": "Provenance.entity",
+        "definition": "Hier wird ein Element referenziert, auf das in der vorliegenden Herkunftsinformation als Ursprungs-Information Bezug genommen wird. Die Ursprungs-Information besteht aus einem Verweis auf das Element selbst und der Person, die dieses Element ursprünglich erstellt hat. Das Element kann auch außerhalb des aktuellen Systems erzeugt worden sein. \r\nBeispiel: Wird in einem MIO Pflege-Überleitungsbogen die Diagnose aus einem Krankenhaus-Entlassbrief übernommen, so ist das Quell-Element der Krankenhaus-Entlassbrief (bzw. das Element Diagnose im Krankenhausentlassbrief, sofern direkt referenzierbar)."
+      },
+      {
+        "id": "Provenance.entity.role",
+        "path": "Provenance.entity.role",
+        "definition": "Dieses Element beschreibt, wie die Information genutzt wird."
+      },
+      {
+        "id": "Provenance.entity.what",
+        "path": "Provenance.entity.what",
+        "definition": "Hier wird das Element referenziert, das als Quell-Element für die Information gedient hat."
+      },
+      {
+        "id": "Provenance.entity.agent",
+        "path": "Provenance.entity.agent",
+        "definition": "Hier wird eine Person/Entität angegeben, die für die Integration der Dokumentation in das Zielsystem verantwortlich ist.",
+        "comment": "Hinweis: Unter Entität ist eine eindeutig identifizierbare Größe zu verstehen, die Informationen verwaltet. Dies kann unter anderem eine Person, eine Organisation, ein Gerät oder auch eine Software sein."
+      },
+      {
+        "id": "Provenance.entity.agent.type",
+        "path": "Provenance.entity.agent.type",
+        "definition": "Hier ist die Rolle/Funktion der Person/Entität anzugeben."
+      },
+      {
+        "id": "Provenance.entity.agent.role",
+        "path": "Provenance.entity.agent.role",
+        "definition": "Hier wird angegeben, in welcher Rolle die Person/Entität an der Integration der Dokumentation in das Zielsystem beteiligt ist."
+      },
+      {
+        "id": "Provenance.entity.agent.who",
+        "path": "Provenance.entity.agent.who",
+        "definition": "Hier wird die datenintegrierende Person/Entität referenziert.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/PractitionerRole",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Device",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_PractitionerRole|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier;
@@ -19,13 +23,13 @@ package de.gematik.test.core.expectations.verifier;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +91,17 @@ public class MedicationDispenseBundleVerifier {
         .accept();
   }
 
+  /**
+   * Method checks if the given PZNs in the medicationDispense Bundle ist contained in the
+   * referenced one
+   *
+   * @deprecated (from 01.10.2025, Old Profiles will no longer be used, and can be deleted 100 days
+   *     later
+   * @param medicationDispenses
+   * @return boolean
+   */
+  @SuppressWarnings("java:S1133")
+  @Deprecated(since = "0.10.1", forRemoval = true)
   public static VerificationStep<ErxMedicationDispenseBundle> containsAllPZNsForOldProfiles(
       List<ErxMedicationDispense> medicationDispenses) {
 

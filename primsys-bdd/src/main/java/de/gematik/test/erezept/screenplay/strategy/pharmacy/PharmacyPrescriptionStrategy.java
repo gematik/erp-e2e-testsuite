@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.strategy.pharmacy;
@@ -62,7 +66,7 @@ public abstract class PharmacyPrescriptionStrategy
     protected Secret secret;
 
     public Builder<T> withCustomSecret(String secret) {
-      return withCustomSecret(Secret.fromString(secret));
+      return withCustomSecret(Secret.from(secret));
     }
 
     public Builder<T> withCustomSecret(Secret secret) {
@@ -75,7 +79,7 @@ public abstract class PharmacyPrescriptionStrategy
     }
 
     public Builder<T> withCustomAccessCode(String accessCode) {
-      return withCustomAccessCode(AccessCode.fromString(accessCode));
+      return withCustomAccessCode(AccessCode.from(accessCode));
     }
 
     public Builder<T> withCustomAccessCode(AccessCode accessCode) {

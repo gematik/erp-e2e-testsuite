@@ -1,0 +1,16 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "Revoke-EU-Access-Permission",
+  "url": "https://gematik.de/fhir/erp-eu/OperationDefinition/Revoke_Access_PermissionOperationDefinition",
+  "status": "active",
+  "version": "1.0.0",
+  "date": "2025-06-02",
+  "name": "Revoke_Access_Permission",
+  "kind": "operation",
+  "description": "This operation revokes the currently registered access code for redeeming prescriptions in an EU country.",
+  "code": "revoke-eu-access-permission",
+  "system": true,
+  "type": false,
+  "instance": false,
+  "affectsState": true
+}

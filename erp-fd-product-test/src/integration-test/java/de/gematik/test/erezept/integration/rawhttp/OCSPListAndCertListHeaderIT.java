@@ -12,11 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.integration.rawhttp;
 
 import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.containsHeaderWith;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.hasNoHeaderWith;
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -37,7 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
-@DisplayName("Der OCSP_Response muss Sunset im Header enthalten")
+@DisplayName("Der OCSP_Response muss einen Sunset Header enthalten")
 @Tag("PKI")
 class OCSPListAndCertListHeaderIT extends ErpTest {
 
@@ -48,8 +53,8 @@ class OCSPListAndCertListHeaderIT extends ErpTest {
   @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_01")
   @Test
   @DisplayName(
-      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes OCSPList u.a. ein Deprecation"
-          + " Header zurück gegeben wird.")
+      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes OCSPList ein Sunset Header"
+          + " zurück gegeben wird.")
   void verifyOcspResponse() {
 
     this.config.equipWithRawHttp(patientActor);
@@ -64,8 +69,8 @@ class OCSPListAndCertListHeaderIT extends ErpTest {
   @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_02")
   @Test
   @DisplayName(
-      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes CertList u.a. ein Deprecation"
-          + " Header zurück gegeben wird.")
+      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes CertList einen Sunset Header"
+          + " zurück gibt.")
   void verifyCertListResponse() {
 
     this.config.equipWithRawHttp(patientActor);
@@ -73,6 +78,40 @@ class OCSPListAndCertListHeaderIT extends ErpTest {
     patientActor.attemptsTo(
         VerifyRawHttp.that(r, String.class)
             .andHttp(containsHeaderWith("Sunset", "Wed, 31 Dec 2025 22:59:59 UTC", ErpAfos.A_25057))
+            .isCorrect());
+  }
+
+  @SneakyThrows
+  @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_03")
+  @Test
+  @DisplayName(
+      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes OCSPList kein Deprecation"
+          + " Header zurück gegeben wird.")
+  void verifyOcspResponseHasNoDeprecationHeader() {
+
+    this.config.equipWithRawHttp(patientActor);
+    val r = patientActor.asksFor(new GetOcspListResponse());
+    patientActor.attemptsTo(
+        VerifyRawHttp.that(r, String.class)
+            .andHttp(hasNoHeaderWith("Deprecation", ErpAfos.A_25057))
+            .andHttp(hasNoHeaderWith("Deprication", ErpAfos.A_25057))
+            .isCorrect());
+  }
+
+  @SneakyThrows
+  @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_04")
+  @Test
+  @DisplayName(
+      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes CertList kein Deprecation"
+          + " Header zurück gegeben wird.")
+  void verifyCertListResponseHasNoDeprecationHeader() {
+
+    this.config.equipWithRawHttp(patientActor);
+    val r = patientActor.asksFor(new GetCertListResponse());
+    patientActor.attemptsTo(
+        VerifyRawHttp.that(r, String.class)
+            .andHttp(hasNoHeaderWith("Deprecation", ErpAfos.A_25057))
+            .andHttp(hasNoHeaderWith("Deprication", ErpAfos.A_25057))
             .isCorrect());
   }
 }

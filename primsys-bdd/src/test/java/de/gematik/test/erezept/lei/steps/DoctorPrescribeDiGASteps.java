@@ -12,13 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.lei.steps;
 
+import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.test.erezept.screenplay.questions.ResponseOfTaskActivate;
+import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.task.IssueDiGAPrescription;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -34,5 +43,39 @@ public class DoctorPrescribeDiGASteps {
     val thePatient = OnStage.theActorCalled(patientName);
 
     when(theDoctor).attemptsTo(IssueDiGAPrescription.forPatient(thePatient));
+  }
+
+  @Dann(
+      "^kann (?:der|die) (Psychotherapeut|Psychologischer"
+          + " Psychotherapeut|Kinderpsychotherapeut|Arzt|Zahnarzt) (.+) (?:dem|der) Versicherten"
+          + " (.+) kein apothekenpflichtiges Rezept verschreiben$")
+  public void thenTheTherapistCannotActivatePharmacyOnly(
+      String role, String doctorName, String patientName) {
+    val theDoctor = OnStage.theActorCalled(doctorName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    then(theDoctor)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfTaskActivate.asAssingnementTo(
+                        PrescriptionAssignmentKind.PHARMACY_ONLY, thePatient))
+                .isEqualTo(400));
+  }
+
+  @Dann(
+      "^kann (?:der|die) (Psychotherapeut|Psychologischer"
+          + " Psychotherapeut|Kinderpsychotherapeut|Arzt|Zahnarzt) (.+) (?:dem|der) Versicherten"
+          + " (.+) kein Rezept als Direktzuweisung verschreiben$")
+  public void thenTheTherapistCannotActivateDirectAssignment(
+      String role, String doctorName, String patientName) {
+    val theDoctor = OnStage.theActorCalled(doctorName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    then(theDoctor)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfTaskActivate.asAssingnementTo(
+                        PrescriptionAssignmentKind.DIRECT_ASSIGNMENT, thePatient))
+                .isEqualTo(400));
   }
 }

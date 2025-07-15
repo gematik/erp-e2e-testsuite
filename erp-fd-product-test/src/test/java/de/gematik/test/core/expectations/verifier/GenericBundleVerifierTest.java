@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier;
@@ -44,11 +48,11 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
     firstErxAuditEventBundle =
         getDecodedFromPath(
             ErxAuditEventBundle.class,
-            "fhir/valid/erp/1.2.0/auditeventbundle/2d4ba5fa-d0ff-4b59-b1c4-8849bd83a971.json");
+            "fhir/valid/erp/1.4.0/auditeventbundle/f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7.json");
     secondErxAuditEventBundle =
         getDecodedFromPath(
             ErxAuditEventBundle.class,
-            "fhir/valid/erp/1.2.0/auditeventbundle/41f94920-14b5-426a-8859-d045270e63a2.xml");
+            "fhir/valid/erp/1.4.0/auditeventbundle/f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7_manipulated.json");
   }
 
   @Test

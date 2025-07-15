@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.config.dto.app;
@@ -26,6 +30,7 @@ public class ErpActorConfiguration extends PatientConfiguration {
 
   private boolean useVirtualEgk = false;
   private String device;
+  private String appPassword;
 
   public boolean useVirtualEgk() {
     if (getEgkIccsn() == null) {

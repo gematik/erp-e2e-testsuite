@@ -12,15 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.fuzzing.erx;
 
-import static de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvBasisStructDef.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef.BINARY;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef.SUPPORTING_PRESCRIPTION_REF;
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -46,15 +51,14 @@ public class ErxChargeItemManipulatorFactory {
    */
   public static List<NamedEnvelope<FuzzingMutator<ErxChargeItem>>> binaryVersionManipulator() {
     val retList = new ArrayList<NamedEnvelope<FuzzingMutator<ErxChargeItem>>>();
-    retList.addAll(forContainedProfile(ErpWorkflowStructDef.BINARY_12, ErpWorkflowVersion.V1_2_0));
-    retList.addAll(forContainedProfile(ErpWorkflowStructDef.BINARY_12, ErpWorkflowVersion.V1_3_0));
-    retList.addAll(forContainedProfile(ErpWorkflowStructDef.BINARY_12, ErpWorkflowVersion.V1_4_0));
+    retList.addAll(forContainedProfile(ErpWorkflowVersion.V1_4));
+    retList.addAll(forContainedProfile(ErpWorkflowVersion.V1_5));
     return retList;
   }
 
   private static List<NamedEnvelope<FuzzingMutator<ErxChargeItem>>> forContainedProfile(
-      ErpWorkflowStructDef structDef, ErpWorkflowVersion version) {
-    val defaultVersion = structDef.asCanonicalType(version);
+      ErpWorkflowVersion version) {
+    val defaultVersion = ErpWorkflowStructDef.BINARY.asCanonicalType(version);
     val versionWithPatch = new CanonicalType(defaultVersion.asStringValue() + ".0");
     return List.of(
         NamedEnvelope.of(

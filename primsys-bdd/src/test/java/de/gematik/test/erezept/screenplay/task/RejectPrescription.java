@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.task;
@@ -22,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import net.serenitybdd.screenplay.ensure.Ensure;
@@ -33,6 +38,7 @@ public class RejectPrescription implements Task {
   private final ResponseOfRejectOperation theResponseOfReject;
 
   @Override
+  @Step("{0} ensure that the rejection has responseCode 204")
   public <T extends Actor> void performAs(T actor) {
     val response = actor.asksFor(theResponseOfReject);
     then(Ensure.that(response.getStatusCode()).isEqualTo(204));

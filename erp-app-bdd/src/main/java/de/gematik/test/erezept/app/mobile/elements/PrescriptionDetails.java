@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.mobile.elements;
@@ -40,7 +44,21 @@ public enum PrescriptionDetails implements PageElement {
   ASSIGN_TO_PHARMACY_BUTTON(
       "Assign Prescription to a pharmacy remotely",
       () -> AppiumBy.accessibilityId("prsc_dtl_btn_redeem")),
-
+  ADDRESS_NAME_FIELD(
+      "Name of the patient in the address field",
+      () -> AppiumBy.accessibilityId("pha_redeem_address_name")),
+  EDIT_ADDRESS_BUTTON(
+      "square and pencil button to edit the address",
+      () -> AppiumBy.accessibilityId("square.and.pencil")),
+  CONTACT_ADDRESS_NAME_INPUT(
+      "name field of address in contact view", () -> AppiumBy.name("pha_contact_address_name")),
+  CLEAR_CONTACT_ADDRESS_NAME_BUTTON(
+      "clear button for name field of address in contact view",
+      () -> AppiumBy.name("Text löschen")),
+  SAVE_CONTACT_BUTTON(
+      "button to save the contact information", () -> AppiumBy.name("pha_contact_btn_save")),
+  CHOOSE_PHARMACY_BUTTON(
+      "Choose a pharmacy", () -> AppiumBy.accessibilityId("pha_redeem_btn_add_pharmacy")),
   PRESCRIPTION_TITLE("Prescription Title", () -> AppiumBy.accessibilityId("prsc_dtl_txt_title")),
   DIRECT_ASSIGNMENT_BADGE(
       "Direct Assignment Badge",

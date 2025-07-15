@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
@@ -21,8 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.stream.Stream;
 import lombok.val;
@@ -66,15 +72,17 @@ class PrescriptionIdTest {
   }
 
   @Test
-  void shouldDetectOldPrescriptionId() {
-    val identifier = PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
-    assertTrue(PrescriptionId.isPrescriptionId(identifier));
+  void shouldNotDetectOldPrescriptionId() {
+    val identifier =
+        new Identifier()
+            .setValue(GemFaker.fakerPrescriptionId())
+            .setSystem("https://gematik.de/fhir/NamingSystem/PrescriptionID");
+    assertFalse(PrescriptionId.isPrescriptionId(identifier));
   }
 
   @Test
   void shouldDetectNewPrescriptionId() {
-    val identifier =
-        PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121);
+    val identifier = PrescriptionId.random().asIdentifier(ErpWorkflowNamingSystem.PRESCRIPTION_ID);
     assertTrue(PrescriptionId.isPrescriptionId(identifier));
   }
 
@@ -106,5 +114,14 @@ class PrescriptionIdTest {
     val identifier = new Identifier();
     identifier.setValue("160.000.006.403.515.71");
     assertFalse(PrescriptionId.isPrescriptionId(identifier));
+  }
+
+  @Test
+  void shouldThrowOnExtractingFromInvalidIdentifier() {
+    val identifier =
+        new Identifier()
+            .setSystem(ErpWorkflowNamingSystem.SECRET.getCanonicalUrl())
+            .setValue("160.000.006.403.515.71");
+    assertThrows(BuilderException.class, () -> PrescriptionId.from(identifier));
   }
 }

@@ -12,14 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -35,14 +41,13 @@ import org.junit.jupiter.api.Test;
 
 class KbvPractitionerTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/kbv/1.0.2/bundle/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/bundle/";
 
   @Test
-  void testEncodingLANRPractitionerFromKbvBundle() {
+  void shouldEncodePractitionerWithoutANRFromKbvBundle() {
     val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
     val fileName = kbvId + ".xml";
 
-    val expLanr = new LANR("754236701");
     val expName = "Ben Schulz";
     val expQualification = QualificationType.DOCTOR;
     val expAdditionalQualification = "Facharzt für Allgemeinmedizin";
@@ -52,12 +57,28 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
     val practitioner = kbvBundle.getPractitioner();
 
     assertNotNull(practitioner);
-    assertEquals(expLanr, practitioner.getANR());
-    assertEquals(BaseANR.ANRType.LANR, practitioner.getANRType());
     assertEquals(expName, practitioner.getFullName());
     assertEquals(expQualification, practitioner.getQualificationType());
     assertEquals(1, practitioner.getAdditionalQualifications().size());
     assertEquals(expAdditionalQualification, practitioner.getAdditionalQualifications().get(0));
+  }
+
+  @Test
+  void shouldEncodePractitionerWitLANRFromKbvBundle() {
+    val kbvId = "5f66314e-459a-41e9-a3d7-65c935a8be2c";
+    val fileName = kbvId + ".xml";
+
+    val expLanr = new LANR("754236701");
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+    val practitioner = kbvBundle.getPractitioner();
+
+    assertNotNull(practitioner);
+
+    val actualLanr = practitioner.getANR().orElseThrow();
+    assertEquals(expLanr, actualLanr);
+    assertEquals(BaseANR.ANRType.LANR, actualLanr.getType());
 
     // just for the sake of code-coverage
     assertNotNull(practitioner.getDescription());
@@ -75,7 +96,8 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
     practitioner.setQualification(List.of());
     practitioner.setIdentifier(List.of());
     assertThrows(MissingFieldException.class, practitioner::getQualificationType);
-    assertThrows(MissingFieldException.class, practitioner::getANR);
+    val anrOptional = assertDoesNotThrow(practitioner::getANR);
+    assertTrue(anrOptional.isEmpty());
   }
 
   @Test
@@ -89,6 +111,21 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
 
     val practitioner2 = KbvPractitioner.fromPractitioner(practitioner);
     assertEquals(practitioner, practitioner2);
+  }
+
+  @Test
+  void shouldReadAsvFachgruppennummer() {
+    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
+    val fileName = kbvId + ".xml";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val kbvBundle = parser.decode(KbvErpBundle.class, content);
+    val practitioner = kbvBundle.getPractitioner();
+
+    val qtOptional = practitioner.getAsvFachgruppennummer();
+    assertNotNull(qtOptional);
+    assertTrue(qtOptional.isPresent());
+    assertEquals("555555801", qtOptional.orElseThrow().getValue());
   }
 
   @Test

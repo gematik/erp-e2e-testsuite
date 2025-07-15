@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.task;
@@ -100,7 +104,6 @@ public class IssuePrescription implements Task {
               val prescriptionId = draftTask.getPrescriptionId();
 
               val kbvBundle = builder.prescriptionId(prescriptionId).build();
-
               val activeTask =
                   this.activateTask(erpClientAbility, konnektorAbility, draftTask, kbvBundle);
 
@@ -217,7 +220,6 @@ public class IssuePrescription implements Task {
     }
 
     public IssuePrescription forPznPrescription(List<Map<String, String>> medications) {
-
       val mapper = new PrescriptionDataMapperPZN(patient, type, medications);
       return new IssuePrescription(pharmacy, mapper);
     }

@@ -12,41 +12,34 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static java.text.MessageFormat.format;
-
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
-import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
-import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.builder.AddressBuilder;
 import de.gematik.bbriccs.fhir.de.builder.HumanNameBuilder;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.Country;
 import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.CommonNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.r4.InstitutionalOrganization;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Reference;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class KbvPatientBuilder extends ResourceBuilder<KbvPatient, KbvPatientBuilder> {
@@ -60,9 +53,6 @@ public class KbvPatientBuilder extends ResourceBuilder<KbvPatient, KbvPatientBui
   private Address address;
 
   private KVNR kvnr;
-  private IdentifierTypeDe identifierTypeDe;
-  private InsuranceTypeDe insuranceType;
-  private Reference assignerRef;
 
   public static KbvPatientBuilder builder() {
     return new KbvPatientBuilder();
@@ -81,12 +71,23 @@ public class KbvPatientBuilder extends ResourceBuilder<KbvPatient, KbvPatientBui
     return this;
   }
 
-  public KbvPatientBuilder kvnr(KVNR kvnr, InsuranceTypeDe insuranceType) {
+  public KbvPatientBuilder kvnr(KVNR kvnr) {
     this.kvnr = kvnr;
-    this.identifierTypeDe =
-        insuranceType.equals(InsuranceTypeDe.GKV) ? IdentifierTypeDe.GKV : IdentifierTypeDe.PKV;
-    this.insuranceType = insuranceType;
     return this;
+  }
+
+  /**
+   * @param kvnr to be used for the patient
+   * @param insuranceType of the patient !! from kbvItaForVersion. 1.2.0
+   *     DeBasisProfilNamingSystem.KVID_GKV_SID is fixed value
+   * @return the builder
+   * @deprecated use the {@link KbvPatientBuilder#kvnr(KVNR)} method instead and make sure the KVNR
+   *     bears the required insurance type of patient correctly
+   */
+  @Deprecated(since = "0.13.0", forRemoval = true)
+  public KbvPatientBuilder kvnr(KVNR kvnr, InsuranceTypeDe insuranceType) {
+    // to prevent breaks: overwrite the given current with the desired insuranceType
+    return kvnr(kvnr.as(insuranceType));
   }
 
   /**
@@ -147,29 +148,20 @@ public class KbvPatientBuilder extends ResourceBuilder<KbvPatient, KbvPatientBui
     return this;
   }
 
-  public KbvPatientBuilder assigner(InstitutionalOrganization assigner) {
-    this.assignerRef = assigner.asReferenceWithDisplay();
-    return this;
-  }
-
   @Override
   public KbvPatient build() {
     checkRequired();
     val patient =
         this.createResource(KbvPatient::new, KbvItaForStructDef.PATIENT, kbvItaForVersion);
 
-    val humanNameBuilder =
+    setIdentifier();
+
+    val humanName =
         HumanNameBuilder.official()
             .prefix(this.namePrefix)
             .given(this.givenName)
-            .family(this.familyName);
-
-    HumanName humanName;
-    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
-      humanName = humanNameBuilder.buildSimple();
-    } else {
-      humanName = humanNameBuilder.build();
-    }
+            .family(this.familyName)
+            .build();
 
     patient
         .setIdentifier(identifiers)
@@ -181,70 +173,31 @@ public class KbvPatientBuilder extends ResourceBuilder<KbvPatient, KbvPatientBui
   }
 
   private void checkRequired() {
-    this.checkRequired(identifierTypeDe, "Patient requires an identifierTypeDe");
-    this.checkValueSet(identifierTypeDe, IdentifierTypeDe.PKV, IdentifierTypeDe.GKV);
-
-    setIdentifier();
-    if (insuranceType == InsuranceTypeDe.PKV
-        && kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
-      checkRequired(assignerRef, "PKV Patient requires an assigner");
-      setPkvAssigner();
-    }
-
+    this.checkRequired(kvnr, "Patient requires a KVNR");
     this.checkRequired(givenName, "Patient requires a given name");
     this.checkRequired(familyName, "Patient requires a family name");
     this.checkRequired(birthDate, "Patient requires a birthdate");
     this.checkRequired(address, "Patient requires an address");
   }
 
-  private void setPkvAssigner() {
-    val pkvIdentifier =
-        this.identifiers.stream()
-            .filter(
-                identifier ->
-                    identifier.getType().getCoding().stream()
-                        .anyMatch(
-                            coding ->
-                                coding.getCode().equalsIgnoreCase(IdentifierTypeDe.PKV.getCode())))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(KbvPatient.class, "PKV Identifier"));
-
-    val assigner = pkvIdentifier.getAssigner();
-    assigner.setReference(assignerRef.getReference());
-    assigner.setDisplay(assignerRef.getDisplay());
-  }
-
   private void setIdentifier() {
-    val kvnrNamingSystem = getKvnrNamingSystem();
+    IdentifierTypeDe identifierType;
 
-    val identifier = new Identifier();
-    identifier.setType(identifierTypeDe.asCodeableConcept());
-    identifier.setSystem(kvnrNamingSystem.getCanonicalUrl());
-    identifier.setValue(kvnr.getValue());
-    this.identifiers.add(identifier);
-  }
+    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) <= 0) {
 
-  private WithNamingSystem getKvnrNamingSystem() {
-    WithNamingSystem kvnrNamingSystem = null;
-    if (kbvItaForVersion.compareTo(KbvItaForVersion.V1_1_0) < 0) {
-      if (identifierTypeDe == IdentifierTypeDe.GKV) {
-        kvnrNamingSystem = DeBasisProfilNamingSystem.KVID;
-      } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
-        kvnrNamingSystem = CommonNamingSystem.ACME_IDS_PATIENT;
+      if (this.kvnr.getInsuranceType().equals(InsuranceTypeDe.PKV)) {
+        identifierType = IdentifierTypeDe.PKV;
+      } else {
+        identifierType = IdentifierTypeDe.GKV;
       }
+      val identifier = kvnr.asIdentifier().setType(identifierType.asCodeableConcept());
+      this.identifiers.add(identifier);
     } else {
-      if (identifierTypeDe == IdentifierTypeDe.GKV) {
-        kvnrNamingSystem = DeBasisProfilNamingSystem.KVID_GKV_SID;
-      } else if (identifierTypeDe == IdentifierTypeDe.PKV) {
-        kvnrNamingSystem = DeBasisProfilNamingSystem.KVID_PKV_SID;
-      }
+
+      // from KbvItaForVersion.V1_2_0 GKV is a fixed value
+      kvnr = kvnr.as(InsuranceTypeDe.GKV);
+      val identifier = kvnr.asIdentifier().setType(IdentifierTypeDe.KVZ10.asCodeableConcept());
+      this.identifiers.add(identifier);
     }
-    return Optional.ofNullable(kvnrNamingSystem)
-        .orElseThrow(
-            () ->
-                new BuilderException(
-                    format(
-                        "Patient-Builder contains unsupported IdentifierType {0}",
-                        identifierTypeDe)));
   }
 }

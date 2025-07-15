@@ -1,0 +1,82 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-PR-Practitioner",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Practitioner",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_PR_Practitioner",
+  "title": "Practitioner Information Received from the EU",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "This Practitioner Profile is sent by the NCPeH when redeeming a Prescription in the EU",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Practitioner",
+  "baseDefinition": "https://gematik.de/fhir/ti/StructureDefinition/ti-practitioner",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Practitioner.meta",
+        "path": "Practitioner.meta",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.meta.profile",
+        "path": "Practitioner.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Practitioner.meta.profile:workflowEUProfile",
+        "path": "Practitioner.meta.profile",
+        "sliceName": "workflowEUProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Practitioner|1.0",
+        "mustSupport": true
+      },
+      {
+        "id": "Practitioner.identifier",
+        "path": "Practitioner.identifier",
+        "comment": "There are not yet specific identifier systems defined. Therefore the field system is optional, but has to be used if there is a known identifier system.",
+        "min": 1
+      },
+      {
+        "id": "Practitioner.identifier.system",
+        "path": "Practitioner.identifier.system",
+        "mustSupport": true
+      },
+      {
+        "id": "Practitioner.identifier.value",
+        "path": "Practitioner.identifier.value",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Practitioner.name",
+        "path": "Practitioner.name",
+        "type": [
+          {
+            "code": "HumanName",
+            "profile": [
+              "http://fhir.de/StructureDefinition/humanname-de-basis"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

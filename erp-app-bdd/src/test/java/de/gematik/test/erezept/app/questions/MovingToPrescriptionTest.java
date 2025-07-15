@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.questions;
@@ -29,6 +33,7 @@ import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
+import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
@@ -178,6 +183,7 @@ class MovingToPrescriptionTest {
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(appAbility.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
+    when(appAbility.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
 
     val movingTo = MovingToPrescription.withTaskId(taskId);
 

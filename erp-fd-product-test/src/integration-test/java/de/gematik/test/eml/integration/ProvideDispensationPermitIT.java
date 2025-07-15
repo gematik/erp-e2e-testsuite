@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.eml.integration;
@@ -50,26 +54,19 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.Secret;
-import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.junit.jupiter.api.DisplayName;
@@ -78,10 +75,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Provide Dispensation with Consent Test")
 @Tag("ProvideEmlDispensationPermit")
@@ -141,7 +136,9 @@ public class ProvideDispensationPermitIT extends ErpTest {
 
     acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
 
-    val dispenseAction = determineDispenseAction(task, acceptance);
+    val dispenseAction =
+        DispensePrescription.withCredentials(task.getTaskId(), acceptance.getSecret())
+            .withParameters(getDispenseParameters(task));
 
     val dispensationInterAction = pharmacy.performs(dispenseAction);
 
@@ -149,11 +146,10 @@ public class ProvideDispensationPermitIT extends ErpTest {
     pharmacy.performs(
         ClosePrescriptionWithoutDispensation.forTheTask(task, acceptance.getSecret()));
 
+    val mdBundle = dispensationInterAction.getExpectedResponse();
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvideDispensation.forDispensation(
-            dispensationInterAction.getExpectedResponse(),
-            TelematikID.from(SafeAbility.getAbility(pharmacy, UseSMCB.class).getTelematikID()),
-            task.getPrescriptionId()));
+            mdBundle, pharmacy.getTelematikId(), task.getPrescriptionId()));
 
     val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
     patient.attemptsTo(
@@ -200,8 +196,9 @@ public class ProvideDispensationPermitIT extends ErpTest {
   }
 
   private GemDispenseOperationParameters getDispenseParameters(ErxTask task) {
+
     val medication =
-        GemErpMedicationFaker.builder()
+        GemErpMedicationFaker.forPznMedication()
             .withAmount(666)
             .withPzn(PZN.from("17377588"), "Comirnaty von BioNTech/Pfizer")
             .fake();
@@ -220,17 +217,5 @@ public class ProvideDispensationPermitIT extends ErpTest {
     return GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
         .with(md, medication)
         .build();
-  }
-
-  private DispensePrescription determineDispenseAction(ErxTask task, ErxAcceptBundle acceptance) {
-    TaskId taskId = TaskId.from(acceptance.getTaskId().getValue());
-    Secret secret = Secret.fromString(acceptance.getSecret().getValue());
-
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
-      return DispensePrescription.withCredentials(taskId, secret).withMedDsp(getMedDisp(task));
-    } else {
-      return DispensePrescription.withCredentials(taskId, secret)
-          .withParameters(getDispenseParameters(task));
-    }
   }
 }

@@ -12,16 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
+import de.gematik.test.erezept.fhir.values.AsvTeamNumber;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import org.hl7.fhir.r4.model.Resource;
@@ -30,9 +33,8 @@ public abstract class KbvBaseDocumentBundleBuilder<
         V extends ProfileVersion, R extends Resource, B extends ResourceBuilder<R, B>>
     extends ResourceBuilder<R, B> {
 
-  protected V version;
   protected final KbvBaseCompositionBuilder<V, ?> compositionBuilder;
-
+  protected V version;
   protected PrescriptionId prescriptionId;
   protected StatusKennzeichen statusKennzeichen = StatusKennzeichen.NONE;
 
@@ -41,6 +43,7 @@ public abstract class KbvBaseDocumentBundleBuilder<
   protected KbvPractitioner attester;
   protected KbvCoverage coverage;
   protected KbvMedicalOrganization medicalOrganization; // the organization issuing the prescription
+  protected KbvPractitionerRole practitionerRole;
 
   protected KbvBaseDocumentBundleBuilder(
       KbvBaseCompositionBuilder<V, ?> compositionBuilder, V defaultVersion) {
@@ -64,11 +67,23 @@ public abstract class KbvBaseDocumentBundleBuilder<
     return self();
   }
 
+  public B practitionerRole(KbvPractitionerRole practitionerRole) {
+    this.practitionerRole = practitionerRole;
+    return self();
+  }
+
   public B insurance(KbvCoverage coverage) {
     this.coverage = coverage;
     return self();
   }
 
+  /**
+   * in case of KbvItaForVersion > 1.1.0 Dentists has to have a KZV Number in organization Ressource
+   * instead of a BSRN Number
+   *
+   * @param practitioner
+   * @return Builder
+   */
   public B practitioner(KbvPractitioner practitioner) {
     this.practitioner = practitioner;
     return self();
@@ -84,12 +99,27 @@ public abstract class KbvBaseDocumentBundleBuilder<
     return self();
   }
 
-  public B statusKennzeichen(String code) {
-    return statusKennzeichen(StatusKennzeichen.fromCode(code));
+  public B statusKennzeichen(String code, KbvPractitioner practitioner) {
+    return statusKennzeichen(StatusKennzeichen.fromCode(code), practitioner);
   }
 
-  public B statusKennzeichen(StatusKennzeichen statusKennzeichen) {
+  public B statusKennzeichen(StatusKennzeichen statusKennzeichen, KbvPractitioner practitioner) {
+    return statusKennzeichen(statusKennzeichen, practitioner, KbvItaForVersion.getDefaultVersion());
+  }
+
+  public B statusKennzeichen(
+      StatusKennzeichen statusKennzeichen, KbvPractitioner practitioner, KbvItaForVersion version) {
     this.statusKennzeichen = statusKennzeichen;
+    if (statusKennzeichen.equals(StatusKennzeichen.ASV)
+        || statusKennzeichen.equals(StatusKennzeichen.ASV_SUBSTITUTE)) {
+
+      practitionerRole =
+          KbvPractitionerRoleBuilder.builder()
+              .teamNumber(AsvTeamNumber.random())
+              .practitioner(practitioner)
+              .version(version)
+              .build();
+    }
     return self();
   }
 }

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -61,7 +65,8 @@ class KbvPractitionerFakerTest extends ErpFhirParsingTest {
     val practitioner = KbvPractitionerFaker.builder().withLanr(lanr.getValue()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, practitioner);
     assertTrue(result.isSuccessful());
-    assertEquals(BaseANR.ANRType.LANR, practitioner.getANR().getType());
+    val anr = assertDoesNotThrow(() -> practitioner.getANR().orElseThrow());
+    assertEquals(BaseANR.ANRType.LANR, anr.getType());
   }
 
   @Test
@@ -70,6 +75,7 @@ class KbvPractitionerFakerTest extends ErpFhirParsingTest {
     val practitioner = KbvPractitionerFaker.builder().withZanr(zanr.getValue()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, practitioner);
     assertTrue(result.isSuccessful());
-    assertEquals(BaseANR.ANRType.ZANR, practitioner.getANR().getType());
+    val anr = assertDoesNotThrow(() -> practitioner.getANR().orElseThrow());
+    assertEquals(BaseANR.ANRType.ZANR, anr.getType());
   }
 }

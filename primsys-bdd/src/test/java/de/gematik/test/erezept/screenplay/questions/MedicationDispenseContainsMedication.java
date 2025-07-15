@@ -12,13 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.format;
-
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -56,9 +57,9 @@ public class MedicationDispenseContainsMedication implements Question<Boolean> {
     val prescriptionId = dispenseBundle.getMedicationDispenses().get(0).getPrescriptionId();
     val response = actor.asksFor(question);
     log.info(
-        format(
-            "Actor {0} asked for MedicationDispenses and received {1} elements",
-            actor.getName(), response.getMedicationDispenses().size()));
+        "Actor {} asked for MedicationDispenses and received {} elements",
+        actor.getName(),
+        response.getMedicationDispenses().size());
     checkResults.add(!response.getMedicationDispenses().isEmpty());
 
     ErxMedicationDispense medDspFromStack;
@@ -70,15 +71,10 @@ public class MedicationDispenseContainsMedication implements Question<Boolean> {
     checkResults.add(
         medDspFromFD.getPerformerIdFirstRep().equals(medDspFromStack.getPerformerIdFirstRep()));
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
-      val erxMedRes = response.unpackDispensePairBy(prescriptionId);
-      checkResults.add(dispenseBundle.getMedicationDispenses().size() == erxMedRes.size());
+    val gemMedRes = response.getDispensePairBy(prescriptionId);
+    checkResults.add(dispenseBundle.getMedicationDispenses().size() == gemMedRes.size());
 
-    } else {
-      val gemMedRes = response.getDispensePairBy(prescriptionId);
-      checkResults.add(dispenseBundle.getMedicationDispenses().size() == gemMedRes.size());
-    }
-    return (!checkResults.contains(false));
+    return !checkResults.contains(false);
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -46,30 +50,6 @@ public class ResponseOfAcceptOperation extends FhirResponseQuestion<ErxAcceptBun
     this.prescription = prescription;
   }
 
-  @Override
-  public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
-    val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
-    val executedCommand = createCommand(actor);
-    log.info(
-        "Actor {} is asking for the response of {}",
-        actor.getName(),
-        executedCommand.getRequestLocator());
-    return erpClientAbility.request(executedCommand);
-  }
-
-  private TaskAcceptCommand createCommand(Actor actor) {
-    val dmc =
-        Optional.ofNullable(prescription)
-            .orElseGet(
-                () -> {
-                  val mpp = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
-                  val dmcp = this.strategy.chooseFrom(mpp.getAssignedList());
-                  return DmcPrescription.ownerDmc(dmcp.getTaskId(), dmcp.getAccessCode());
-                });
-
-    return new TaskAcceptCommand(dmc.getTaskId(), dmc.getAccessCode());
-  }
-
   public static ResponseOfAcceptOperation forPrescription(DmcPrescription prescription) {
     return new ResponseOfAcceptOperation(DequeStrategy.FIFO, prescription);
   }
@@ -95,5 +75,29 @@ public class ResponseOfAcceptOperation extends FhirResponseQuestion<ErxAcceptBun
 
   public static ResponseOfAcceptOperation fromStack(DequeStrategy dequeue) {
     return new ResponseOfAcceptOperation(dequeue, null);
+  }
+
+  @Override
+  public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
+    val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
+    val executedCommand = createCommand(actor);
+    log.info(
+        "Actor {} is asking for the response of {}",
+        actor.getName(),
+        executedCommand.getRequestLocator());
+    return erpClientAbility.request(executedCommand);
+  }
+
+  private TaskAcceptCommand createCommand(Actor actor) {
+    val dmc =
+        Optional.ofNullable(prescription)
+            .orElseGet(
+                () -> {
+                  val mpp = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
+                  val dmcp = this.strategy.chooseFrom(mpp.getAssignedList());
+                  return DmcPrescription.ownerDmc(dmcp.getTaskId(), dmcp.getAccessCode());
+                });
+
+    return new TaskAcceptCommand(dmc.getTaskId(), dmc.getAccessCode());
   }
 }

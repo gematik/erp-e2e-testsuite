@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.task;
@@ -23,23 +27,20 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.questions.FhirResponseQuestion;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @Slf4j
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GetAuditEventBundle extends FhirResponseQuestion<ErxAuditEventBundle> {
   private final PrescriptionId prescriptionId;
-  private final Actor patient;
 
-  protected GetAuditEventBundle(PrescriptionId prescriptionId, Actor patient) {
-    this.prescriptionId = prescriptionId;
-    this.patient = patient;
-  }
-
-  public static Builder forPatient(Actor patient) {
-    return new Builder(patient);
+  public static GetAuditEventBundle forPrescription(PrescriptionId prescriptionId) {
+    return new GetAuditEventBundle(prescriptionId);
   }
 
   @Override
@@ -47,29 +48,11 @@ public class GetAuditEventBundle extends FhirResponseQuestion<ErxAuditEventBundl
   public ErpResponse<ErxAuditEventBundle> answeredBy(Actor actor) {
     log.info(
         "Actor {} fetches AuditEvents for PrescriptionId {}",
-        patient.getName(),
+        actor.getName(),
         prescriptionId.getValue());
-    val erpClient = SafeAbility.getAbility(patient, UseTheErpClient.class);
+    val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     val cmd = new AuditEventGetByIdCommand(prescriptionId);
     return erpClient.request(cmd);
-  }
-
-  public static class Builder {
-    private final Actor patient;
-    private PrescriptionId prescriptionId;
-
-    public Builder(Actor patient) {
-      this.patient = patient;
-    }
-
-    public Builder forPrescription(PrescriptionId prescriptionId) {
-      this.prescriptionId = prescriptionId;
-      return this;
-    }
-
-    public GetAuditEventBundle build() {
-      return new GetAuditEventBundle(prescriptionId, patient);
-    }
   }
 }

@@ -1,0 +1,224 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-RelatedPerson",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_RelatedPerson",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet eine Kontakt- oder Bezugsperson ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "RelatedPerson",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "RelatedPerson",
+        "path": "RelatedPerson",
+        "definition": "Hier wird eine Kontakt- oder Bezugsperson erfasst, die eine Beziehung zum/zur Patienten/Patientin hat. Sie kann an der Versorgung des/der PatientIn beteiligt sein, jedoch nur als Privatperson in ihrer privaten Zeit. Wenn ausgedrückt werden soll, dass sie an der Versorgung beteiligt ist, kann sie im Versorgungsteam aufgeführt werden. Ein Beispiel für Letzteres ist ein/e pflegender An- oder Zugehörige/r."
+      },
+      {
+        "id": "RelatedPerson.extension",
+        "path": "RelatedPerson.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "RelatedPerson.extension:Hinweis",
+        "path": "RelatedPerson.extension",
+        "sliceName": "Hinweis",
+        "definition": "Hier werden weitere Informationen, beispielsweise die Pflegebedürftigkeitssituation der Kontaktperson, dargestellt. Wenn die Kontaktperson auch gesetzlich betreuende Person ist, kann hier beschrieben werden, für welchen Bereich sie bevollmächtigt ist.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Additional_Comment"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RelatedPerson.patient",
+        "path": "RelatedPerson.patient",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RelatedPerson.relationship",
+        "path": "RelatedPerson.relationship",
+        "definition": "In diesem Element werden Angaben über die Beziehung der Kontaktperson zur/zum Patient:in gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "RelatedPerson.relationship.coding",
+        "path": "RelatedPerson.relationship.coding",
+        "definition": "Hier wird die Beziehung der Kontaktperson zur/zum Patient:in anhand eines Codes aus einer Werteliste angegeben.",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype"
+        }
+      },
+      {
+        "id": "RelatedPerson.relationship.text",
+        "path": "RelatedPerson.relationship.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "RelatedPerson.name",
+        "path": "RelatedPerson.name",
+        "definition": "Dieses Element beschreibt diverse Namensbestandteile einer Person.",
+        "max": "1",
+        "type": [
+          {
+            "code": "HumanName",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Name"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RelatedPerson.name.text",
+        "path": "RelatedPerson.name.text",
+        "definition": "Hier wird der vollständige Name mit Vornamen und allen Vorsatzwörtern und Namenszusätzen angegeben. Der vollständige Name soll alle Namensteile in ihrer korrekten Reihenfolge abbilden."
+      },
+      {
+        "id": "RelatedPerson.name.family",
+        "path": "RelatedPerson.name.family",
+        "definition": "Hier wird der Nachname einer Person angegeben."
+      },
+      {
+        "id": "RelatedPerson.name.given",
+        "path": "RelatedPerson.name.given",
+        "definition": "Hier wird der Vorname einer Person angegeben."
+      },
+      {
+        "id": "RelatedPerson.name.prefix",
+        "path": "RelatedPerson.name.prefix",
+        "definition": "Hier wird der Titel als akademischer Grad angegeben."
+      },
+      {
+        "id": "RelatedPerson.telecom",
+        "path": "RelatedPerson.telecom",
+        "definition": "Dieses Element beschreibt die vorhandenen Kontaktmöglichkeiten.",
+        "type": [
+          {
+            "code": "ContactPoint",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Contactpoint"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RelatedPerson.telecom.system",
+        "path": "RelatedPerson.telecom.system",
+        "definition": "Hier wird die Art des Kontaktes definiert."
+      },
+      {
+        "id": "RelatedPerson.telecom.value",
+        "path": "RelatedPerson.telecom.value",
+        "definition": "In diesem Element werden Kontaktinformationen passend zum Kontaktkanal angegeben. Beispiele für mögliche Werte sind: 'm.mustermann@mio42.de' (beim Kontaktkanal 'E-mail', oder '030712345678' (beim Kontaktkanal 'Telefon')."
+      },
+      {
+        "id": "RelatedPerson.gender",
+        "path": "RelatedPerson.gender",
+        "definition": "In diesem Element befindet sich die Geschlechtsdefinition nach den Versichertenstammdaten (VSD)."
+      },
+      {
+        "id": "RelatedPerson.gender.extension",
+        "path": "RelatedPerson.gender.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "RelatedPerson.gender.extension:other-amtlich",
+        "path": "RelatedPerson.gender.extension",
+        "sliceName": "other-amtlich",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.de/StructureDefinition/gender-amtlich-de"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RelatedPerson.address",
+        "path": "RelatedPerson.address",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "type"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier werden Angaben zur Anschrift der Kontaktperson gemacht."
+      },
+      {
+        "id": "RelatedPerson.address:Strassenanschrift",
+        "path": "RelatedPerson.address",
+        "sliceName": "Strassenanschrift",
+        "definition": "Hier werden Angaben zur Straßenanschrift gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Street_Address"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RelatedPerson.address:Postfach",
+        "path": "RelatedPerson.address",
+        "sliceName": "Postfach",
+        "definition": "Hier werden Angaben zu einem Postfach gemacht.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Address",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Datatype_Post_Office_Box"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

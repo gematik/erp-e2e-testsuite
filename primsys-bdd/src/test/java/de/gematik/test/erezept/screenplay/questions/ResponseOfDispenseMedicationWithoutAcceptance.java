@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
@@ -20,14 +24,11 @@ import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandWithoutSecret;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
@@ -64,67 +65,41 @@ public class ResponseOfDispenseMedicationWithoutAcceptance implements Question<B
     ErpResponse<ErxMedicationDispenseBundle> resp;
     val client = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    val bundle =
+        KbvErpBundleFaker.builder()
+            .withPrescriptionId(PrescriptionId.from(dmcPrescription.getTaskId()))
+            .withKvnr(SafeAbility.getAbility(patient, ProvideEGK.class).getKvnr())
+            .fake();
 
-      val medDisp = createRandomMedDsp(actor, dmcPrescription.getTaskId());
-      resp =
-          client.request(
-              new DispensePrescriptionAsBundleCommandWithoutSecret(
-                  dmcPrescription.getTaskId(), medDisp));
+    val lotNr = GemFaker.fakerLotNumber();
+    val gemMedication =
+        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(bundle.getMedication())
+            .lotNumber(lotNr)
+            .build();
 
-    } else {
-
-      val bundle =
-          KbvErpBundleFaker.builder()
-              .withPrescriptionId(PrescriptionId.from(dmcPrescription.getTaskId()))
-              .withKvnr(SafeAbility.getAbility(patient, ProvideEGK.class).getKvnr())
-              .fake();
-
-      val lotNr = GemFaker.fakerLotNumber();
-      val gemMedication =
-          GemErpMedicationBuilder.from(bundle.getMedication()).lotNumber(lotNr).build();
-
-      val medicationDisp =
-          ErxMedicationDispenseBuilder.forKvnr(bundle.getPatient().getKvnr())
-              .prescriptionId(bundle.getPrescriptionId())
-              .performerId(SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID())
-              .whenHandedOver(new Date())
-              .medication(gemMedication)
-              .batch(lotNr, GemFaker.fakerFutureExpirationDate())
-              .wasSubstituted(false)
-              .build();
-      val closeParams =
-          GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
-              .with(medicationDisp, gemMedication)
-              .build();
-      resp =
-          client.request(
-              new DispensePrescriptionAsBundleCommandWithoutSecret(
-                  dmcPrescription.getTaskId(), closeParams));
-    }
+    val medicationDisp =
+        ErxMedicationDispenseBuilder.forKvnr(bundle.getPatient().getKvnr())
+            .prescriptionId(bundle.getPrescriptionId())
+            .performerId(SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID())
+            .whenHandedOver(new Date())
+            .medication(gemMedication)
+            .batch(lotNr, GemFaker.fakerFutureExpirationDate())
+            .wasSubstituted(false)
+            .build();
+    val closeParams =
+        GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
+            .with(medicationDisp, gemMedication)
+            .build();
+    resp =
+        client.request(
+            new DispensePrescriptionAsBundleCommandWithoutSecret(
+                dmcPrescription.getTaskId(), closeParams));
 
     val checkResults = new LinkedList<Boolean>();
     checkResults.add(resp.isOperationOutcome());
     if (returnCode > 0) checkResults.add(resp.getStatusCode() == returnCode);
 
     return (!checkResults.contains(false));
-  }
-
-  private ErxMedicationDispense createRandomMedDsp(Actor pharmacy, TaskId taskId) {
-    val bundle =
-        KbvErpBundleFaker.builder()
-            .withPrescriptionId(PrescriptionId.from(taskId))
-            .withKvnr(SafeAbility.getAbility(patient, ProvideEGK.class).getKvnr())
-            .fake();
-
-    return ErxMedicationDispenseBuilder.forKvnr(bundle.getPatient().getKvnr())
-        .prescriptionId(bundle.getPrescriptionId())
-        .performerId(SafeAbility.getAbility(pharmacy, UseSMCB.class).getTelematikID())
-        .whenHandedOver(new Date())
-        .medication(bundle.getMedication())
-        .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
-        .wasSubstituted(false)
-        .build();
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

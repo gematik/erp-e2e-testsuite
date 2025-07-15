@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -21,8 +25,8 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
 import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;

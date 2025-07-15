@@ -1,1 +1,0 @@
-{"resourceType":"ValueSet","url":"https://fhir.kbv.de/ValueSet/KBV_VS_ERP_StatusCoPayment","version":"1.0.2","name":"KBV_VS_ERP_StatusCoPayment","status":"active","date":"2021-09-13","publisher":"Kassenärztliche Bundesvereinigung","compose":{"include":[{"system":"https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_StatusCoPayment"}]}}

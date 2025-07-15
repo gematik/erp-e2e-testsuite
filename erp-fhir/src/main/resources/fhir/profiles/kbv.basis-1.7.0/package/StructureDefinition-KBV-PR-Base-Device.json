@@ -1,0 +1,296 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Device",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Device",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung KBV",
+  "description": "Dieses Profil bildet ein Gerät ab.",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright © 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright © 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED \"AS IS.\" ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Device",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Device",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Device",
+        "path": "Device",
+        "definition": "In diesem Element werden Informationen zu einem Gerät bzw. Medizinprodukt angegeben ."
+      },
+      {
+        "id": "Device.extension",
+        "path": "Device.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Device.extension:verantwortlichePersonEinrichtung",
+        "path": "Device.extension",
+        "sliceName": "verantwortlichePersonEinrichtung",
+        "definition": "Hier wird die behandelnde Person/Einrichtung angegeben die für das Monitoring des Gerätes verantwortlich ist.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Responsible_Person_Organization"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Device.identifier",
+        "path": "Device.identifier",
+        "definition": "Hier werden weitere eineindeutige Produktnummern angegeben. Diese sollen allerdings einen Identifier darstellen und damit eineindeutig (Bijektiv) sein."
+      },
+      {
+        "id": "Device.identifier.type",
+        "path": "Device.identifier.type",
+        "definition": "Hier wird eine Bezeichnung für die Produktnummer angegeben."
+      },
+      {
+        "id": "Device.identifier.value",
+        "path": "Device.identifier.value",
+        "definition": "Hier wird die entsprechende Produktnummer selbst eingegeben."
+      },
+      {
+        "id": "Device.definition",
+        "path": "Device.definition",
+        "definition": "Der Verweis auf die Definition für das Gerät.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/DeviceDefinition",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_DeviceDefinition|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Device.udiCarrier",
+        "path": "Device.udiCarrier",
+        "definition": "Das Akronym UDI steht für Unique Device Identification und beschreibt ein Identifikationssystem mit eigenen Kennzahlen für jedes Medizinprodukt, was die Rückverfolgbarkeit des Produkts weltweit gewährleistet. Mit der Medical Device Regulation (MDR) zum 26. Mai 2020 wurde das System für alle Medizinprodukte inkl. In-vitro-Diagnostika verpflichtend (Ausnahmen Sonderanfertigungen)."
+      },
+      {
+        "id": "Device.udiCarrier.deviceIdentifier",
+        "path": "Device.udiCarrier.deviceIdentifier",
+        "definition": "UDI-DI ist der \"Device Identifier\".\r\nEs ist der statische Teil der UDI. Er enthält die Kennung der gewählten Zuteilungsstelle, die Kennung des Herstellers / Etikettierers, den Referenzcode des Produkts und kann auch eine Kennzeichnung für eine bestimmte Verpackungsebene enthalten."
+      },
+      {
+        "id": "Device.status",
+        "path": "Device.status",
+        "definition": "Hier wird der gegenwärtige Status des Geräts angegeben."
+      },
+      {
+        "id": "Device.statusReason",
+        "path": "Device.statusReason",
+        "definition": "Hier wird der Grund für den gegenwärtigen Status des Geräts angegeben."
+      },
+      {
+        "id": "Device.statusReason.coding.system",
+        "path": "Device.statusReason.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Device.statusReason.coding.code",
+        "path": "Device.statusReason.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Device.manufactureDate",
+        "path": "Device.manufactureDate",
+        "short": "Herstellungsdatum",
+        "definition": "Hier wird das Datum angegeben, an dem das Gerät hergestellt wurde."
+      },
+      {
+        "id": "Device.expirationDate",
+        "path": "Device.expirationDate",
+        "short": "Haltbarkeitsdatum",
+        "definition": "Hier wird angegeben, bis wann das Gerät verwendet werden kann."
+      },
+      {
+        "id": "Device.lotNumber",
+        "path": "Device.lotNumber",
+        "short": "Chargennummer",
+        "definition": "Hier wird die Chargennummer des Geräts angegeben."
+      },
+      {
+        "id": "Device.serialNumber",
+        "path": "Device.serialNumber",
+        "definition": "Hier wird die Seriennummer des Geräts angegeben."
+      },
+      {
+        "id": "Device.deviceName",
+        "path": "Device.deviceName",
+        "definition": "Hier wird der konkrete Name (z.B. der Modellname) des betreffenden Gerätes angegeben."
+      },
+      {
+        "id": "Device.deviceName.name",
+        "path": "Device.deviceName.name",
+        "definition": "Hier wird der konkrete Name des Gerätes angegeben."
+      },
+      {
+        "id": "Device.deviceName.type",
+        "path": "Device.deviceName.type",
+        "definition": "Hier wird angegeben, um welche Art von Namen für das Gerät es sich handelt. "
+      },
+      {
+        "id": "Device.modelNumber",
+        "path": "Device.modelNumber",
+        "definition": "Hier wird die Modellnummer des Geräts angegeben."
+      },
+      {
+        "id": "Device.type",
+        "path": "Device.type",
+        "definition": "In diesem Element werden Angaben zur Bezeichnung des Produkts gemacht. Diese werden als codierte Information und/oder als Freitext angegeben.",
+        "min": 1
+      },
+      {
+        "id": "Device.type.coding",
+        "path": "Device.type.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Device.type.coding:snomed",
+        "path": "Device.type.coding",
+        "sliceName": "snomed",
+        "definition": "Hier wird ein Code aus SNOMED CT®-Code angegeben. Beispiel: Cardiac pacemaker, device (physical object), SCTID: 14106009",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Device_SNOMED_CT"
+        }
+      },
+      {
+        "id": "Device.type.coding:snomed.system",
+        "path": "Device.type.coding.system",
+        "min": 1
+      },
+      {
+        "id": "Device.type.coding:snomed.version",
+        "path": "Device.type.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Device.type.coding:snomed.code",
+        "path": "Device.type.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Device.type.coding:snomed.display",
+        "path": "Device.type.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Device.type.text",
+        "path": "Device.type.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Device.patient",
+        "path": "Device.patient",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Device.note",
+        "path": "Device.note",
+        "definition": "Hier werden ergänzende freitextliche Kommentare und Notizen vorgenommen, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Device.note.author[x]",
+        "path": "Device.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Device.note.author[x]:authorReference",
+        "path": "Device.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Device.note.author[x]:authorString",
+        "path": "Device.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Device.note.time",
+        "path": "Device.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "Device.note.text",
+        "path": "Device.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      }
+    ]
+  }
+}

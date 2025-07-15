@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -22,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
@@ -50,8 +54,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, medication);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(medication));
   }
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
@@ -92,6 +95,53 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
 
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationWithoutStrengthValues(KbvItaErpVersion version) {
+    val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
+    val medication =
+        KbvErpMedicationPZNBuilder.builder()
+            .version(version)
+            .setId(medicationResourceId)
+            .category(MedicationCategory.C_00) // default C_00
+            .isVaccine(false) // default false
+            .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
+            .darreichungsform(Darreichungsform.TKA) // default TAB
+            .pzn(PZN.random(), "5 in 1 Medikament")
+            .amount(4L)
+            .ingredientText("ingredText")
+            .ingredientStrengthNum(0, "")
+            .ingredientStrengthDenomUnit("")
+            .build();
+
+    assertTrue(parser.isValid(medication));
+    if (version.compareTo(KbvItaErpVersion.V1_1_0) > 0) {
+      assertEquals(
+          "ingredText", medication.getIngredient().get(0).getItemCodeableConcept().getText());
+    }
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldBuildMedicationWithoutStrenghtUnit(KbvItaErpVersion version) {
+    val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
+    val medication =
+        KbvErpMedicationPZNBuilder.builder()
+            .version(version)
+            .setId(medicationResourceId)
+            .category(MedicationCategory.C_00) // default C_00
+            .isVaccine(false) // default false
+            .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
+            .darreichungsform(Darreichungsform.TKA) // default TAB
+            .pzn(PZN.random(), "5 in 1 Medikament")
+            .amount(4L)
+            .ingredientStrengthNum(3, null)
+            .ingredientStrengthDenomUnit(null)
+            .build();
+
+    assertTrue(parser.isValid(medication));
   }
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with Faker for KbvItaErpVersion {0}")

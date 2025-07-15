@@ -5,6 +5,7 @@ users:
     egkIccsn: 80276883110000163961
     useVirtualEgk: true
     device: T-Systems iPhone 14
+    appPassword: e2etestsuite!
   - name: Bob
     egkIccsn: 80276883110000163962
     useVirtualEgk: true # won't have any effects because Bob as co-user will always use virtual eGK
@@ -20,6 +21,7 @@ apps:
 appium:
   - name: local
     url: http://0.0.0.0:4723
+    provisioningProfilePostfix: ""
   - name: t-systems
     url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
     version: 2.11.3
@@ -32,6 +34,7 @@ appium:
     version: 2.11.3
     maxWaitTimeout: 12000
     pollingInterval: 100
+    provisioningProfilePostfix: ""
     accessKey: DUMMY VALUE
 
 devices:
@@ -58,4 +61,28 @@ devices:
     platform: iOS
     udid: 00008101-000C50382103001E
     platformVersion: 17.3.1
+    appium: t-systems-public
+
+  - name: iPhone 16
+    platform: iOS
+    udid: 02991C0A-E461-4C95-8B95-C4FDC2F2A5C0
+    platformVersion: 18.4
+    appium: t-systems-public
+
+  - name: iPhone 16 Pro
+    platform: iOS
+    udid: 85B52022-1AC8-4D54-8112-7600465C123F
+    platformVersion: 18.0
+    appium: t-systems-public
+
+  - name: iPhone 16 Plus
+    platform: iOS
+    udid: C6B36CD6-0EE0-4D9A-8C65-770C062F705A
+    platformVersion: 18.4
+    appium: t-systems-public
+
+  - name: iPhone 16 Pro Max
+    platform: iOS
+    udid: 17FC3BA3-72C8-4625-9342-DE67FA73A85E
+    platformVersion: 18.0
     appium: t-systems-public

@@ -12,20 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerTelematikId;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.insuranceName;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.dav.AbgabedatensatzReference;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
@@ -33,7 +36,6 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,11 +49,11 @@ import org.hl7.fhir.r4.model.Reference;
 public class ErxChargeItemFaker {
 
   private final Map<String, Consumer<ErxChargeItemBuilder>> builderConsumers = new HashMap<>();
-  private PrescriptionId prescriptionId = fakerPrescriptionId();
+  private PrescriptionId prescriptionId = PrescriptionId.random();
 
   private ErxChargeItemFaker() {
     this.withAccessCode(AccessCode.random())
-        .withSubject(KVNR.random(), insuranceName())
+        .withSubject(KVNR.randomPkv(), insuranceName())
         .withEnterer(fakerTelematikId())
         .withVerordnung(UUID.randomUUID().toString())
         .withAbgabedatensatz(
@@ -79,7 +81,7 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemFaker withAccessCode(String accessCode) {
-    return this.withAccessCode(new AccessCode(accessCode));
+    return this.withAccessCode(AccessCode.from(accessCode));
   }
 
   public ErxChargeItemFaker withStatus(ChargeItem.ChargeItemStatus status) {
@@ -110,13 +112,9 @@ public class ErxChargeItemFaker {
     return this.withEnterer(TelematikID.from(telematikId));
   }
 
-  public ErxChargeItemFaker withEnteredDate(Date date, TemporalPrecisionEnum precision) {
-    builderConsumers.put("enteredDate", b -> b.entered(date, precision));
-    return this;
-  }
-
   public ErxChargeItemFaker withEnteredDate(Date date) {
-    return this.withEnteredDate(date, TemporalPrecisionEnum.SECOND);
+    builderConsumers.put("enteredDate", b -> b.entered(date));
+    return this;
   }
 
   public ErxChargeItemFaker withMarkingFlag(MarkingFlag markingFlag) {

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.verifier.rawhttpverifier;
@@ -45,6 +49,15 @@ public class RawHttpResponseVerifier {
             format(
                 "Es ist ein Header mit dem Key: {0} und passendem Value: {1} enthalten",
                 key, value));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<HttpResponse<?>> hasNoHeaderWith(String key, RequirementsSet req) {
+    Predicate<HttpResponse<?>> predicate =
+        response -> response.getHeaders().getFirst(key).isEmpty();
+    val step =
+        new VerificationStep.StepBuilder<HttpResponse<?>>(
+            req.getRequirement(), format("Es ist kein Header mit dem Key: {0} enthalten", key));
     return step.predicate(predicate).accept();
   }
 

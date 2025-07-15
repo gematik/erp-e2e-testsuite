@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task;
@@ -31,7 +35,7 @@ import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import lombok.val;
@@ -90,6 +94,6 @@ class SetVirtualEgkTest {
     assertDoesNotThrow(() -> appUser.attemptsTo(SetVirtualEgk.withEgk(egk)));
 
     verify(app, times(0)).tap(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON);
-    verify(app, times(1)).scrollIntoView(ScrollDirection.DOWN, Debug.EGK_CERTIFICATE_CHAIN);
+    verify(app, times(1)).swipeIntoView(SwipeDirection.UP, Debug.EGK_CERTIFICATE_CHAIN);
   }
 }

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -26,14 +30,10 @@ import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
-import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.PayorType;
-import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
-import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
-import de.gematik.test.erezept.fhir.valuesets.Wop;
+import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -89,20 +89,24 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
         .findFirst();
   }
 
-  public IKNR getIknr() {
-    return this.getPayor().stream()
-        .filter(
-            reference ->
-                WithSystem.anyOf(DeBasisProfilNamingSystem.IKNR_SID, DeBasisProfilNamingSystem.IKNR)
-                    .matchesReferenceIdentifier(reference))
-        .map(reference -> IKNR.from(reference.getIdentifier()))
-        .findFirst()
+  public IKNR getIknrOrThrow() {
+    return this.getIknr()
         .orElseThrow(
             () ->
                 new MissingFieldException(
                     KbvCoverage.class,
                     DeBasisProfilNamingSystem.IKNR,
                     DeBasisProfilNamingSystem.IKNR_SID));
+  }
+
+  public Optional<IKNR> getIknr() {
+    return this.getPayor().stream()
+        .filter(
+            reference ->
+                WithSystem.anyOf(DeBasisProfilNamingSystem.IKNR_SID, DeBasisProfilNamingSystem.IKNR)
+                    .matchesReferenceIdentifier(reference))
+        .map(reference -> IKNR.from(reference.getIdentifier()))
+        .findFirst();
   }
 
   public Optional<IKNR> getAlternativeIknr() {
@@ -179,7 +183,7 @@ public class KbvCoverage extends Coverage implements ErpFhirResource {
             .map(InsuranceTypeDe::getDisplay)
             .or(() -> this.getPayorType().map(PayorType::getDisplay))
             .orElse("N/A");
-    val iknr = this.getIknr().getValue();
+    val iknr = this.getIknrOrThrow().getValue();
     return format("{1} ''{0}'' (IKNR: {2})", getName(), type, iknr);
   }
 

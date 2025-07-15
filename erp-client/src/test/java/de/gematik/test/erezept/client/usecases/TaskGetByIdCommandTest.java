@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -21,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.erezept.fhir.values.AccessCode;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
@@ -41,14 +44,14 @@ class TaskGetByIdCommandTest {
 
   @Test
   void requestBodyShouldBeNotNull() {
-    val taskId = TaskId.from(PrescriptionId.random());
+    val taskId = TaskId.random();
     val taskGetByIdCommand = new TaskGetByIdCommand(taskId);
     assertNotNull(taskGetByIdCommand.getRequestBody());
   }
 
   @Test
   void shouldContainAccessCodeOnlyInHeader() {
-    val taskId = TaskId.from(PrescriptionId.random());
+    val taskId = TaskId.random();
     val accessCode = AccessCode.random();
     val cmd = new TaskGetByIdCommand(taskId, accessCode);
 
@@ -63,8 +66,8 @@ class TaskGetByIdCommandTest {
 
   @Test
   void shouldContainSecret() {
-    val taskId = TaskId.from(PrescriptionId.random());
-    val secret = new Secret("abc");
+    val taskId = TaskId.random();
+    val secret = Secret.random();
     val cmd = new TaskGetByIdCommand(taskId, secret);
 
     val expected = format("/Task/{0}?secret={1}", taskId, secret.getValue());

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.eml.integration;
@@ -46,13 +50,10 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -124,11 +125,10 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
             GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
 
     // performs the resource-content validation
+    val kbvBundle = prescr.getExpectedResponse().getKbvBundle().orElseThrow();
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvidePrescriptionWithTask.forPrescription(
-            prescr.getExpectedResponse().getKbvBundle().orElseThrow(),
-            TelematikID.from(SafeAbility.getAbility(doc, UseSMCB.class).getTelematikID()),
-            TelematikID.from(doc.getHbaTelematikId())));
+            kbvBundle, doc.getSmcbTelematikId(), doc.getHbaTelematikId()));
 
     // patient checks auditEvent content
     val searchParams =

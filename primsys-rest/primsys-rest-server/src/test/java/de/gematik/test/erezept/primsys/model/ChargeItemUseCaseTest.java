@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -23,7 +27,6 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
@@ -41,7 +44,6 @@ import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.data.PriceComponentData;
 import jakarta.ws.rs.WebApplicationException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import lombok.val;
@@ -111,10 +113,7 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
     val receiptId = "123";
 
     val originalChargeItem =
-        ErxChargeItemFaker.builder()
-            .withPrescriptionId(PrescriptionId.from(taskId))
-            .withEnteredDate(new Date(), TemporalPrecisionEnum.MILLI)
-            .fake();
+        ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.from(taskId)).fake();
     val chargeItemBundle = new ErxChargeItemBundle();
     chargeItemBundle.addEntry(new Bundle.BundleEntryComponent().setResource(originalChargeItem));
     val mockGetResponse =

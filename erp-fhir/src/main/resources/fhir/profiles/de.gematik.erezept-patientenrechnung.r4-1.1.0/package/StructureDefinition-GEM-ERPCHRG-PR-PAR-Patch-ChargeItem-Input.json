@@ -1,0 +1,231 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPCHRG-PR-PAR-Patch-ChargeItem-Input",
+  "url": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_PAR_Patch_ChargeItem_Input",
+  "version": "1.1.0",
+  "name": "GEM_ERPCHRG_PR_PAR_Patch_ChargeItem_Input",
+  "title": "GEM ERPCHRG PR PAR Patch ChargeItem Input Parameter",
+  "status": "active",
+  "experimental": false,
+  "date": "2025-04-10",
+  "publisher": "gematik GmbH",
+  "description": "This profile defines the parameters for changing Information for the ChargeItem.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile:erpchrgProfile",
+        "path": "Parameters.meta.profile",
+        "sliceName": "erpchrgProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_PAR_Patch_ChargeItem_Input|1.1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag",
+        "path": "Parameters.parameter",
+        "sliceName": "markingFlag",
+        "min": 1,
+        "max": "1",
+        "constraint": [
+          {
+            "key": "erpcharge-parameters-patch-chargeitem-part",
+            "severity": "error",
+            "human": "At least one Part must be present.",
+            "expression": "part.exists()",
+            "source": "https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_PAR_Patch_ChargeItem_Input"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "markingFlag",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part",
+        "path": "Parameters.parameter.part",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:insuranceProvider",
+        "path": "Parameters.parameter.part",
+        "sliceName": "insuranceProvider",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:insuranceProvider.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "insuranceProvider",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:insuranceProvider.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:insuranceProvider.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:insuranceProvider.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:subsidy",
+        "path": "Parameters.parameter.part",
+        "sliceName": "subsidy",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:subsidy.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "subsidy",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:subsidy.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:subsidy.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:subsidy.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:taxOffice",
+        "path": "Parameters.parameter.part",
+        "sliceName": "taxOffice",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "BackboneElement"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:taxOffice.name",
+        "path": "Parameters.parameter.part.name",
+        "patternString": "taxOffice",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:taxOffice.value[x]",
+        "path": "Parameters.parameter.part.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:taxOffice.resource",
+        "path": "Parameters.parameter.part.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:markingFlag.part:taxOffice.part",
+        "path": "Parameters.parameter.part.part",
+        "max": "0"
+      }
+    ]
+  }
+}

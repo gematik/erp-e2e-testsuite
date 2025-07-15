@@ -12,20 +12,45 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
+import lombok.val;
+import org.hl7.fhir.r4.model.Identifier;
+import org.junit.jupiter.api.Test;
 
 class SecretTest {
 
   @Test
   void shouldCreateFromString() {
-    val s = Secret.fromString("12345");
+    val s = Secret.from("12345");
     assertEquals("12345", s.getValue());
+  }
+
+  @Test
+  void shouldCreateFromValidIdentifier() {
+    val identifier =
+        new Identifier()
+            .setSystem(ErpWorkflowNamingSystem.SECRET.getCanonicalUrl())
+            .setValue("12345");
+    val s = Secret.from(identifier);
+    assertEquals("12345", s.getValue());
+  }
+
+  @Test
+  void shouldThrowOnInvalidSecretSystem() {
+    val identifier =
+        new Identifier().setSystem("https://gematik.de/fhir/NamingSystem/Secret").setValue("12345");
+    assertThrows(BuilderException.class, () -> Secret.from(identifier));
   }
 }

@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.mocker;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
@@ -44,13 +47,11 @@ public class KbvBundleDummyFactory {
   public static KbvErpBundle createSimpleKbvBundle(
       PrescriptionId prescriptionId, StatusCoPayment coPayment, MultiplePrescriptionExtension mvo) {
     val practitioner = KbvPractitionerFaker.builder().fake();
-    val medicalOrganization = KbvMedicalOrganizationFaker.builder().fake();
-    val assignerOrganization = KbvAssignerOrganizationFaker.builder().fake();
+    val medicalOrganization = KbvMedicalOrganizationFaker.forPractitioner(practitioner).fake();
 
     val patient =
         KbvPatientFaker.builder()
             .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
-            .withAssignerRef(assignerOrganization)
             .fake();
     val insurance =
         KbvCoverageFaker.builder()
@@ -74,7 +75,6 @@ public class KbvBundleDummyFactory {
     return KbvErpBundleBuilder.forPrescription(prescriptionId.getValue())
         .practitioner(practitioner)
         .medicalOrganization(medicalOrganization)
-        .assigner(assignerOrganization)
         .patient(patient)
         .insurance(insurance)
         .medicationRequest(medicationRequest)

@@ -1,3 +1,35 @@
+- id: "1.0.6"
+  note: "EPA 3.0.5"
+  profiles:
+    - name: "de.gematik.epa"
+      version: "1.0.6"
+      canonicalClaims: "https://gematik.de/fhir/epa/"
+    - name: "de.gematik.epa.medication"
+      version: "1.0.6"
+      canonicalClaims: "https://gematik.de/fhir/epa-medication/"
+    - name: "de.basisprofil.r4"
+      version: "1.5.2"
+      canonicalClaims: "http://fhir.de"
+    - name: "de.ihe-d.terminology"
+      version: "3.0.1"
+      canonicalClaims: "http://fhir.de"
+    - name: "de.gematik.fhir.directory"
+      version: "0.11.25"
+      canonicalClaims: ["https://gematik.de/fhir/directory/","urn:oid:"]
+    #- name: "de.gematik.terminology"
+    #  version: "1.0.5"
+    #  canonicalClaims: ["https://gematik.de/fhir/terminology/","https://gematik.de/fhir/epa-medication/"]
+    - name: "de.gematik.ti"
+      version: "1.0.1"
+      canonicalClaims: "https://gematik.de/fhir/ti/"
+  errorFilter: #
+    - "^2 Profile für contained Ressource gefunden\\. Mehr als eines wird zur Zeit nicht unterstützt\\. \\(Typ Medication: https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pharmaceutical-product, https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient\\)"
+    - "^2 profiles found for contained resource\\. More than one is not supported at this time\\. \\(Type Medication: https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pharmaceutical-product, https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient\\)"
+  ignoreCodeSystems:
+    - "http://fhir.de/CodeSystem/ask"
+    - "http://fhir.de/CodeSystem/ifa/pzn"
+    - "http://fhir.de/CodeSystem/bfarm/atc"
+    -
 - id: "1.0.3"
   note: "initial Profile"
   profiles:

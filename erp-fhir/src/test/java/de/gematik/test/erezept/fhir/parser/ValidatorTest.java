@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.parser;
@@ -43,9 +47,6 @@ class ValidatorTest extends ErpFhirParsingTest {
   static Stream<Arguments> shouldPassValidResources() {
     return ResourceLoader.getResourceDirectoryStructure("fhir/valid", true).stream()
         .filter(File::isFile)
-        .filter(
-            file ->
-                !file.getAbsolutePath().contains("erp/1.1.1")) // TODO: remove the old erp examples
         .map(Arguments::of);
   }
 

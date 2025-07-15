@@ -12,17 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AcceptedPrescriptionDto {
@@ -30,10 +34,12 @@ public class AcceptedPrescriptionDto {
   private String prescriptionId;
   private String prescriptionReference;
   private String forKvnr;
+  private PatientInsuranceTypeDto patientInsuranceType;
   private String accessCode;
   private String secret;
   private CoverageDto insurance;
   private PznMedicationDto medication;
+  private HealthAppRequestDto diga;
 
   public static Builder withPrescriptionId(String prescriptionId) {
     return new Builder(prescriptionId);
@@ -44,12 +50,14 @@ public class AcceptedPrescriptionDto {
     private final String prescriptionId;
     private String prescriptionReference;
     private String forKvnr;
+    private PatientInsuranceTypeDto patientInsuranceType;
     private String accessCode;
     private String secret;
     private CoverageDto insurance;
 
-    public Builder forKvnr(String kvnr) {
+    public Builder forKvnr(String kvnr, PatientInsuranceTypeDto patientInsuranceType) {
       this.forKvnr = kvnr;
+      this.patientInsuranceType = patientInsuranceType;
       return this;
     }
 
@@ -74,14 +82,27 @@ public class AcceptedPrescriptionDto {
     }
 
     public AcceptedPrescriptionDto andMedication(PznMedicationDto medication) {
-      return new AcceptedPrescriptionDto(
-          prescriptionId,
-          prescriptionReference,
-          forKvnr,
-          accessCode,
-          secret,
-          insurance,
-          medication);
+      val apdto = preBuildAcceptData();
+      apdto.medication = medication;
+      return apdto;
+    }
+
+    public AcceptedPrescriptionDto andDiGA(HealthAppRequestDto diga) {
+      val apdto = preBuildAcceptData();
+      apdto.diga = diga;
+      return apdto;
+    }
+
+    private AcceptedPrescriptionDto preBuildAcceptData() {
+      val apdto = new AcceptedPrescriptionDto();
+      apdto.prescriptionId = this.prescriptionId;
+      apdto.prescriptionReference = this.prescriptionReference;
+      apdto.forKvnr = this.forKvnr;
+      apdto.patientInsuranceType = this.patientInsuranceType;
+      apdto.accessCode = this.accessCode;
+      apdto.secret = this.secret;
+      apdto.insurance = this.insurance;
+      return apdto;
     }
   }
 }

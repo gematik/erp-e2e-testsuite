@@ -12,23 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.PatientenrechnungStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.PatientenrechnungStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.dav.AbgabedatensatzReference;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -47,14 +49,6 @@ import org.hl7.fhir.r4.model.ResourceType;
 @SuppressWarnings({"java:S110"})
 public class ErxChargeItem extends ChargeItem {
 
-  /**
-   * @return true if this ChargeItem is from newer Profiles and false otherwise
-   */
-  public boolean isFromNewProfiles() {
-    return this.getMeta().getProfile().stream()
-        .anyMatch(PatientenrechnungStructDef.CHARGE_ITEM::matches);
-  }
-
   public PrescriptionId getPrescriptionId() {
     return this.getIdentifier().stream()
         .filter(PrescriptionId::isPrescriptionId)
@@ -63,15 +57,13 @@ public class ErxChargeItem extends ChargeItem {
         .orElseThrow(
             () ->
                 new MissingFieldException(
-                    this.getClass(),
-                    ErpWorkflowNamingSystem.PRESCRIPTION_ID,
-                    ErpWorkflowNamingSystem.PRESCRIPTION_ID_121));
+                    this.getClass(), ErpWorkflowNamingSystem.PRESCRIPTION_ID));
   }
 
   public Optional<AccessCode> getAccessCode() {
     return this.getIdentifier().stream()
         .filter(AccessCode::isAccessCode)
-        .map(identifier -> AccessCode.fromString(identifier.getValue()))
+        .map(identifier -> AccessCode.from(identifier.getValue()))
         .findFirst();
   }
 
@@ -84,18 +76,15 @@ public class ErxChargeItem extends ChargeItem {
   }
 
   public boolean hasInsuranceProvider() {
-    val extUrl = "insuranceProvider";
-    return this.getBoolFromMarkingFlag(extUrl);
+    return this.getBoolFromMarkingFlag("insuranceProvider");
   }
 
   public boolean hasSubsidy() {
-    val extUrl = "subsidy";
-    return this.getBoolFromMarkingFlag(extUrl);
+    return this.getBoolFromMarkingFlag("subsidy");
   }
 
   public boolean hasTaxOffice() {
-    val extUrl = "taxOffice";
-    return this.getBoolFromMarkingFlag(extUrl);
+    return this.getBoolFromMarkingFlag("taxOffice");
   }
 
   public Optional<String> getReceiptReference() {
@@ -111,21 +100,14 @@ public class ErxChargeItem extends ChargeItem {
         .filter(ext -> ext.getUrl().equals(extensionUrl))
         .map(ext -> ext.getValue().castToBoolean(ext.getValue()).booleanValue())
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), extensionUrl));
+        .orElse(false);
   }
 
   private Extension getMarkingFlag() {
     return this.getExtension().stream()
-        .filter(
-            ext ->
-                WithSystem.anyOf(
-                        ErpWorkflowStructDef.MARKING_FLAG, PatientenrechnungStructDef.MARKING_FLAG)
-                    .matches(ext))
+        .filter(PatientenrechnungStructDef.MARKING_FLAG::matches)
         .findFirst()
-        .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(), PatientenrechnungStructDef.MARKING_FLAG));
+        .orElse(new Extension()); // empty Extension as Null-Object-Pattern
   }
 
   public void removeContainedResources() {
@@ -167,13 +149,6 @@ public class ErxChargeItem extends ChargeItem {
     val containedData =
         new Binary().setContentType("application/pkcs7-mime").setContent(signedData);
     containedData.setId(reference.getReference(false));
-
-    val erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_2_0) <= 0) {
-      containedData
-          .getMeta()
-          .addProfile(ErpWorkflowStructDef.BINARY_12.getVersionedUrl(erpWorkflowVersion));
-    }
 
     val ret = ErxChargeItem.fromChargeItem(this);
     ret.removeContainedResources();

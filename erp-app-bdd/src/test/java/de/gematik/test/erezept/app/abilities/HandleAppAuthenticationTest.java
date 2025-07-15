@@ -12,27 +12,38 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.abilities;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HandleAppAuthenticationTest {
 
   @Test
-  public void shouldUseFixedPassword() {
+  void shouldUseFixedPassword() {
     val password = "123456";
     val ability = HandleAppAuthentication.withGivenPassword(password);
     assertEquals(password, ability.getPassword());
   }
 
   @Test
-  public void shouldGenerateStrongPassword() {
+  void shouldGenerateStrongPassword() {
     val ability = HandleAppAuthentication.withStrongPassword();
+    assertNotNull(ability.getPassword());
+    assertTrue(ability.getPassword().length() > 7); // well, won't check the entropy for now!
+  }
+
+  @Test
+  void shouldGenerateStrongPasswordFromNull() {
+    val ability = HandleAppAuthentication.withGivenPassword(null);
     assertNotNull(ability.getPassword());
     assertTrue(ability.getPassword().length() > 7); // well, won't check the entropy for now!
   }

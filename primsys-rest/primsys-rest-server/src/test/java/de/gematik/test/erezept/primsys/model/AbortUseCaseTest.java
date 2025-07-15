@@ -12,35 +12,36 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
-import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
-import de.gematik.test.erezept.client.rest.*;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
-import de.gematik.test.erezept.fhir.values.*;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
-import de.gematik.test.erezept.primsys.rest.response.*;
-import jakarta.ws.rs.*;
-import java.util.*;
-import lombok.*;
-import org.hl7.fhir.r4.model.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
+import jakarta.ws.rs.WebApplicationException;
+import java.util.Map;
+import lombok.val;
+import org.hl7.fhir.r4.model.AuditEvent;
+import org.hl7.fhir.r4.model.Resource;
+import org.junit.jupiter.api.Test;
 
 class AbortUseCaseTest extends TestWithActorContext {
-
-  @Test
-  void constructorShouldNotBeCallable() {
-    assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AbortUseCase.class));
-  }
 
   @Test
   void shouldAbortPrescription() {
@@ -57,8 +58,9 @@ class AbortUseCaseTest extends TestWithActorContext {
             .withHeaders(Map.of())
             .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
     when(mockClient.request(any())).thenReturn(mockResponse);
-    try (var response =
-        AbortUseCase.abortPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
+
+    val useCase = new AbortUseCase(pharmacy);
+    try (var response = useCase.abortPrescription("taskId", "accessCode", "verySecret")) {
       assertEquals(204, response.getStatus());
     }
   }
@@ -78,8 +80,8 @@ class AbortUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskAbortCommand.class));
 
-    try (val response =
-        AbortUseCase.abortPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
+    val useCase = new AbortUseCase(pharmacy);
+    try (val response = useCase.abortPrescription("taskId", "accessCode", "verySecret")) {
       fail("AbortUseCase did not throw the expected Exception and answered with ");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
@@ -103,8 +105,8 @@ class AbortUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskAbortCommand.class));
 
-    try (val response =
-        AbortUseCase.abortPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
+    val useCase = new AbortUseCase(pharmacy);
+    try (val response = useCase.abortPrescription("taskId", "accessCode", "verySecret")) {
       fail("AbortUseCase did not throw the expected Exception");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());
@@ -128,8 +130,8 @@ class AbortUseCaseTest extends TestWithActorContext {
         .when(mockClient)
         .request(any(TaskAbortCommand.class));
 
-    try (val response =
-        AbortUseCase.abortPrescription(pharmacy, "taskId", "accessCode", "verySecret")) {
+    val useCase = new AbortUseCase(pharmacy);
+    try (val response = useCase.abortPrescription("taskId", "accessCode", "verySecret")) {
       fail("AbortUseCase did not throw the expected Exception and answered with ");
     } catch (WebApplicationException wae) {
       assertEquals(WebApplicationException.class, wae.getClass());

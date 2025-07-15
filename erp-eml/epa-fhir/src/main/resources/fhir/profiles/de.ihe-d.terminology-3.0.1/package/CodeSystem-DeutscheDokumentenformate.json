@@ -1,0 +1,144 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/DeutscheDokumentenformate",
+  "version": "2018-12-14T17:07:12",
+  "name": "DeutscheDokumentenformate",
+  "id": "DeutscheDokumentenformate",
+  "title": "Deutsche Dokumentenformate",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "urn:ihe-d:ig:Entlassmanagementbrief:2018",
+      "display": "Entlassmanagementbrief"
+    },
+    {
+      "code": "urn:ihe-d:ig:NotaufnahmeregisterTraumaModul:2017",
+      "display": "NotaufnahmeregisterTraumamodul"
+    },
+    {
+      "code": "urn:ihe-d:ig:NotaufnahmeregisterBasisModul:2017",
+      "display": "NotaufnahmeregisterBasismodul"
+    },
+    {
+      "code": "urn:ihe-d:ig:MeldepflichtigeKrankheitenLabor:2014",
+      "display": "Meldepflichtige Krankheiten: Labormeldung"
+    },
+    {
+      "code": "urn:ihe-d:ig:MeldepflichtigeKrankheitenArzt:2013",
+      "display": "Übermittlung meldepflichtiger Krankheiten – Arztmeldung"
+    },
+    {
+      "code": "urn:ihe-d:ig:RehaEntlassbrief:2009",
+      "display": "Ärztlicher Reha-Entlassungsbericht"
+    },
+    {
+      "code": "urn:ihe-d:ig:KurzberichtUeberleitungKrankenhaus:2016",
+      "display": "Überleitungsmanagement Ärztlicher Kurzbericht über den Krankenhausaufenthalt"
+    },
+    {
+      "code": "urn:ihe-d:ig:KurzberichtUeberleitungNiedergelassenerArzt:2016",
+      "display": "Überleitungsmanagement Ärztlicher Kurzbericht des niedergelassenen Arztes"
+    },
+    {
+      "code": "urn:ihe-d:ig:Medikationsplan:2015",
+      "display": "Medikationsplan"
+    },
+    {
+      "code": "urn:ihe-d:ig:Arztbriefplus:2017",
+      "display": "Arztbrief plus"
+    },
+    {
+      "code": "urn:ihe-d:ig:arztbrief:2014:nonXmlBody",
+      "display": "Arztbrief 2014"
+    },
+    {
+      "code": "urn:ihe-d:ig:eppc-g:2015",
+      "display": "Enhanced Patient Privacy Consent - Germany"
+    },
+    {
+      "code": "urn:ihe-d:ig:eppc-g-sd:2015",
+      "display": "Enhanced Patient Privacy Consent - Germany - Scanned Document Option"
+    },
+    {
+      "code": "urn:ihe-d:spec:PDF_A1:2005",
+      "display": "PDF/A-1",
+      "definition": "PDF Format für die elektronische Archivierung nach ISO 19005-1:2005"
+    },
+    {
+      "code": "urn:ihe-d:spec:PDF_A2:2011",
+      "display": "PDF/A-2",
+      "definition": "PDF Format für die elektronische Archivierung nach ISO 19005-2"
+    },
+    {
+      "code": "urn:ihe-d:spec:PDF_A3:2012",
+      "display": "PDF/A-3",
+      "definition": "PDF Format für die elektronische Archivierung nach ISO 19005-3"
+    },
+    {
+      "code": "urn:ihe-d:spec:PDF_UA:2008",
+      "display": "PDF/UA",
+      "definition": "Barrierefreies PDF nach ISO 14289"
+    },
+    {
+      "code": "urn:gematik:ig:Arztbrief:r3.1",
+      "display": "Arztbrief § 291f SGB V"
+    },
+    {
+      "code": "urn:gematik:ig:Medikationsplan:r3.1",
+      "display": "Medikationsplan (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:Notfalldatensatz:r3.1",
+      "display": "Notfalldatensatz"
+    },
+    {
+      "code": "urn:gematik:ig:DatensatzPersoenlicheErklaerungen:r3.1",
+      "display": "Datensatz für persönliche Erklärungen (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:Impfausweis:v1.1.0",
+      "display": "Impfausweis (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:Mutterpass:v1.0.0",
+      "display": "Mutterpass (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:Kinderuntersuchungsheft:v1.0.0",
+      "display": "Kinderuntersuchungsheft (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:Arbeitsunfaehigkeitsbescheinigung:r4.0",
+      "display": "Arbeitsunfähigkeitsbescheinigung (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:VerordnungsdatensatzMedikation:r4.0",
+      "display": "Verordnungsdatensatz Medikation (gematik)"
+    },
+    {
+      "code": "urn:gematik:ig:KinderuntersuchungsheftUntersuchungen:v1.0.0",
+      "display": "Untersuchungen Kinderuntersuchungsheft"
+    },
+    {
+      "code": "urn:gematik:ig:KinderuntersuchungsheftTeilnahmekarte:v1.0.0",
+      "display": "Teilnahmekarte Kinderuntersuchungsheft"
+    },
+    {
+      "code": "urn:gematik:ig:KinderuntersuchungsheftNotizen:v1.0.0",
+      "display": "Notizen Kinderuntersuchungsheft"
+    },
+    {
+      "code": "urn:hl7-de:DGUV-StatEntlassbrief:2020",
+      "display": "DGUV Stationärer Entlassbrief"
+    },
+    {
+      "code": "urn:gematik:ig:Zahnbonusheft:v1.1.0",
+      "display": "Zahnbonusheft (gematik)"
+    }
+  ],
+  "count": 31
+}

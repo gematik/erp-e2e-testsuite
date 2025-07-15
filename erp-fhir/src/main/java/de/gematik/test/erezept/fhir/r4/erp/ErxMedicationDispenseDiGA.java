@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -19,10 +23,11 @@ package de.gematik.test.erezept.fhir.r4.erp;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.erp.DeepLink;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Reference;
@@ -68,5 +73,13 @@ public class ErxMedicationDispenseDiGA extends ErxMedicationDispenseBase {
             () ->
                 new MissingFieldException(
                     this.getClass(), "Medication Reference with display name"));
+  }
+
+  public Boolean isDeclined() {
+    return this.getMedication().getExtension().stream()
+        .filter(ext -> HL7StructDef.DATA_ABSENT_REASON.getCanonicalUrl().matches(ext.getUrl()))
+        .map(value -> value.getValueAsPrimitive().getValueAsString().contains("asked-declined"))
+        .findFirst()
+        .orElse(false);
   }
 }

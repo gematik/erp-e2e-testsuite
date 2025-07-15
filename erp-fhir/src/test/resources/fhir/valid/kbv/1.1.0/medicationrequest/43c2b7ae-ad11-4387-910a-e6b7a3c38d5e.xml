@@ -1,0 +1,70 @@
+<MedicationRequest xmlns="http://hl7.org/fhir">
+  <!--Beispiel MedicationRequest für eine PZN-Verordnung -->
+  <id value="43c2b7ae-ad11-4387-910a-e6b7a3c38d5e" />
+  <meta>
+    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.1.0" />
+  </meta>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_StatusCoPayment">
+    <valueCoding>
+      <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_StatusCoPayment" />
+      <code value="0" />
+    </valueCoding>
+  </extension>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee">
+    <valueBoolean value="false" />
+  </extension>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_BVG">
+    <valueBoolean value="false" />
+  </extension>
+  <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription">
+    <extension url="Kennzeichen">
+      <valueBoolean value="true" />
+    </extension>
+    <extension url="Nummerierung">
+      <valueRatio>
+        <numerator>
+          <value value="4" />
+        </numerator>
+        <denominator>
+          <value value="4" />
+        </denominator>
+      </valueRatio>
+    </extension>
+    <extension url="Zeitraum">
+      <valuePeriod>
+        <start value="2022-12-01" />
+      </valuePeriod>
+    </extension>
+    <extension url="ID">
+      <valueIdentifier>
+        <system value="urn:ietf:rfc:3986" />
+        <value value="urn:uuid:24e2e10d-e962-4d1c-be4f-8760e690a5f0" />
+      </valueIdentifier>
+    </extension>
+  </extension>
+  <status value="active" />
+  <intent value="order" />
+  <medicationReference>
+    <reference value="Medication/5ff1bd22-ce14-484e-be56-d2ba4adeac31" />
+  </medicationReference>
+  <subject>
+    <reference value="Patient/93866fdc-3e50-4902-a7e9-891b54737b5e" />
+  </subject>
+  <authoredOn value="2021-05-19" />
+  <requester>
+    <reference value="Practitioner/d6f3b55d-3095-4655-96dc-da3bec21271c" />
+  </requester>
+  <insurance>
+    <reference value="Coverage/1b89236c-ab14-4e92-937e-5af0b59d0cd4" />
+  </insurance>
+  <dispenseRequest>
+    <quantity>
+      <value value="1" />
+      <system value="http://unitsofmeasure.org" />
+      <code value="{Package}" />
+    </quantity>
+  </dispenseRequest>
+  <substitution>
+    <allowedBoolean value="true" />
+  </substitution>
+</MedicationRequest>

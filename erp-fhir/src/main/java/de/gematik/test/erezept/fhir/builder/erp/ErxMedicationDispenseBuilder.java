@@ -12,26 +12,32 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static java.text.MessageFormat.format;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Annotation;
-import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.Reference;
@@ -59,7 +65,7 @@ public class ErxMedicationDispenseBuilder
 
   public ErxMedicationDispenseBuilder whenPrepared(Date whenPrepared) {
     this.whenPrepared = whenPrepared;
-    return self();
+    return this;
   }
 
   // this is required for older medication dispenses
@@ -84,61 +90,50 @@ public class ErxMedicationDispenseBuilder
 
   public ErxMedicationDispenseBuilder batch(Medication.MedicationBatchComponent batch) {
     this.batch = batch;
-    return self();
+    return this;
   }
 
   public ErxMedicationDispenseBuilder wasSubstituted(Boolean wasSubstituted) {
     this.wasSubstituted = wasSubstituted;
-    return self();
+    return this;
   }
 
   public ErxMedicationDispenseBuilder dosageInstruction(String instruction) {
     this.dosageInstructions.add(instruction);
-    return self();
+    return this;
   }
 
   public ErxMedicationDispenseBuilder note(String note) {
     this.notes.add(note);
-    return self();
+    return this;
   }
 
   @Override
   public ErxMedicationDispense build() {
     checkRequired();
-    CanonicalType profile;
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) == 0) {
-      log.warn(
-          "building {} ({}) with Version {} is deprecated!",
-          ErxMedicationDispense.class.getSimpleName(),
-          ErpWorkflowStructDef.MEDICATION_DISPENSE.getCanonicalUrl(),
-          ErpWorkflowVersion.V1_1_1.getVersion());
-      profile = ErpWorkflowStructDef.MEDICATION_DISPENSE.asCanonicalType(erpWorkflowVersion);
-    } else {
-      profile = ErpWorkflowStructDef.MEDICATION_DISPENSE_12.asCanonicalType(erpWorkflowVersion);
-    }
 
-    val medDisp = this.createResource(ErxMedicationDispense::new, profile);
+    val medDisp =
+        this.createResource(
+            ErxMedicationDispense::new,
+            ErpWorkflowStructDef.MEDICATION_DISPENSE_12,
+            erpWorkflowVersion);
     buildBase(medDisp);
 
     // set medication properly by version
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3) <= 0) {
       medDisp.getContained().add(this.baseMedication);
       medDisp.setMedication(new Reference("#" + this.baseMedication.getIdElement().getIdPart()));
     } else {
       medDisp.setMedication(new Reference(this.baseMedication.getIdPart()));
     }
 
-    if (whenPrepared != null) {
-      medDisp.getWhenPreparedElement().setValueAsString(dateFormat10.format(whenPrepared));
-    }
-
-    if (batch != null) {
-      this.baseMedication.setBatch(batch);
-    }
-
-    if (wasSubstituted != null) {
-      medDisp.getSubstitution().setWasSubstituted(wasSubstituted);
-    }
+    Optional.ofNullable(whenPrepared)
+        .ifPresent(
+            date ->
+                medDisp.setWhenPreparedElement(new DateTimeType(date, TemporalPrecisionEnum.DAY)));
+    Optional.ofNullable(batch).ifPresent(baseMedication::setBatch);
+    Optional.ofNullable(wasSubstituted)
+        .ifPresent(s -> medDisp.getSubstitution().setWasSubstituted(s));
 
     this.dosageInstructions.stream()
         .map(instruction -> new Dosage().setText(instruction))
@@ -151,7 +146,7 @@ public class ErxMedicationDispenseBuilder
 
   private void checkRequired() {
     this.checkRequired(baseMedication, "MedicationDispense requires a Medication");
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3) <= 0) {
       if (this.baseMedication instanceof GemErpMedication) {
         throw new BuilderException(
             format(

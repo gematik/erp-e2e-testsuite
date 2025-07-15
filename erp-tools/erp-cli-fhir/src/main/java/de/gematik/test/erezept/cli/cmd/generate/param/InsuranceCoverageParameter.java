@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
@@ -160,18 +164,19 @@ public class InsuranceCoverageParameter implements BaseResourceParameter {
   }
 
   private KbvPatient getPatient() {
+    val kvnr = KVNR.random();
     return getOrDefault(
         patient,
         () ->
             KbvPatientFaker.builder()
-                .withKvnrAndInsuranceType(KVNR.random(), this.getInsuranceType())
+                .withKvnrAndInsuranceType(kvnr, kvnr.getInsuranceType())
                 .fake());
   }
 
   public KbvCoverage createCoverage() {
     val thePatient = getPatient();
     val givenInsuranceType =
-        versicherungsArt != null ? versicherungsArt : thePatient.getInsuranceKind();
+        versicherungsArt != null ? versicherungsArt : thePatient.getInsuranceType();
     val determinedInsuranceType =
         getInsuranceInfoFor().orElse(InsuranceCoverageInfo.randomFor(givenInsuranceType));
     return KbvCoverageBuilder.insurance(determinedInsuranceType)

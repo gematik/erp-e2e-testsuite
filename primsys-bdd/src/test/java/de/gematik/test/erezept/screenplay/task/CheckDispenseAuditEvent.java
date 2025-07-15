@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.task;
@@ -26,6 +30,7 @@ import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
@@ -44,15 +49,14 @@ public class CheckDispenseAuditEvent implements Task {
   }
 
   @Override
+  @Step("{0} fragt beim Fachdienst, nach Protokolleinträgen zu einer Dispensierung")
   public <T extends Actor> void performAs(final T actor) {
     val dispensed = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
 
     val dispensationInformation = deque.chooseFrom(dispensed.getDispensedDrugsList());
     val prescriptionId = dispensationInformation.prescriptionId();
     val dispTime = dispensationInformation.dispenseDate();
-    val auditEventResponse =
-        actor.asksFor(
-            GetAuditEventBundle.forPatient(actor).forPrescription(prescriptionId).build());
+    val auditEventResponse = actor.asksFor(GetAuditEventBundle.forPrescription(prescriptionId));
     val auditEventList = auditEventResponse.getExpectedResource().getAuditEvents();
     val specificAuditEvents =
         auditEventList.stream()

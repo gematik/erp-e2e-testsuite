@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.cfg;
@@ -80,7 +84,8 @@ public class AppiumDriverFactory {
             .setEnforceAppInstall(userDeviceConfig.isEnforceInstall())
             .setFullReset(userDeviceConfig.isFullReset())
             .setNoReset(false)
-            .setAutoDismissAlerts(false); // could we set this to true?
+            .setAutoDismissAlerts(false) // could we set this to true?
+            .setPlatformVersion(userDeviceConfig.getPlatformVersion());
 
     val vendorOptions = new HashMap<String, String>();
     vendorOptions.put("appiumVersion", appiumConfig.getVersion());
@@ -88,6 +93,7 @@ public class AppiumDriverFactory {
     vendorOptions.put("testName", scenarioName);
 
     xcuiTestOptions.setCapability("digitalai:options", vendorOptions);
+    xcuiTestOptions.setCapability("language", "de");
 
     if (config.shouldLogCapabilityStatement()) {
       val json =

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -21,7 +25,9 @@ import static de.gematik.test.erezept.actions.ClosePrescription.applyMutators;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
@@ -46,7 +52,11 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.konnektor.soap.mock.LocalSigner;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -77,7 +87,7 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"1.3.0", "1.4.0"})
+  @ValueSource(strings = {"1.4.0", "1.5.0"})
   @ClearSystemProperty(key = "erp.fhir.profile")
   @SuppressWarnings("unchecked")
   void shouldPerformClosePrescription(String version) {
@@ -89,7 +99,7 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
 
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
-    when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
@@ -117,7 +127,7 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"1.3.0", "1.4.0"})
+  @ValueSource(strings = {"1.4.0", "1.5.0"})
   @ClearSystemProperty(key = "erp.fhir.profile")
   @SuppressWarnings("unchecked")
   void shouldClosePrescriptionWithAlternativeDates(String version) {
@@ -129,7 +139,7 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
 
     when(mockResponse.getExpectedResource()).thenReturn(mockAcceptBundle);
     when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
-    when(mockAcceptBundle.getSecret()).thenReturn(new Secret("secret"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
     when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));

@@ -1,0 +1,445 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Observation-Pain-Scale-Score",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Pain_Scale_Score",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_Observation_Pain_Scale_Score",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright ©; 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright ©; 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED &quot;AS IS.&quot; ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "description": "Dieses Profil bildet einen Score für einen Schmerz anhand einer Skala ab.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "short": "Pain-Scale-Score",
+        "definition": "Hier wird ein Score für einen Schmerz anhand einer Skala abgebildet."
+      },
+      {
+        "id": "Observation.category",
+        "path": "Observation.category",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird eine grobe Einordnung/Klassifizierung der Schmerzskala anhand eines entsprechenden Codes angegeben.",
+        "min": 1
+      },
+      {
+        "id": "Observation.category:survey",
+        "path": "Observation.category",
+        "sliceName": "survey",
+        "min": 1,
+        "max": "1",
+        "patternCodeableConcept": {
+          "coding": [
+            {
+              "code": "survey",
+              "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Observation.code",
+        "path": "Observation.code",
+        "definition": "In diesem Element werden Angaben zur  Bewertung des Schmerzes als Score anhand einer Skala gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.code.coding",
+        "path": "Observation.code.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.code.coding:snomed",
+        "path": "Observation.code.coding",
+        "sliceName": "snomed",
+        "definition": "In diesem Element wird der Code für die Diagnose als SNOMED CT®-Code angegeben, inklusive Anzeigename (Display Name) sowie Name und Version des Code-Systems.",
+        "min": 0,
+        "max": "*",
+        "binding": {
+          "strength": "extensible",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Pain_Scale_SNOMED_CT"
+        }
+      },
+      {
+        "id": "Observation.code.coding:snomed.system",
+        "path": "Observation.code.coding.system",
+        "min": 1,
+        "fixedUri": "http://snomed.info/sct"
+      },
+      {
+        "id": "Observation.code.coding:snomed.version",
+        "path": "Observation.code.coding.version",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed.code",
+        "path": "Observation.code.coding.code",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.coding:snomed.display",
+        "path": "Observation.code.coding.display",
+        "min": 1
+      },
+      {
+        "id": "Observation.code.text",
+        "path": "Observation.code.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "min": 1,
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "http://hl7.org/fhir/StructureDefinition/Device",
+              "http://hl7.org/fhir/StructureDefinition/Location",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Device|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.effective[x]",
+        "path": "Observation.effective[x]",
+        "definition": "Hier wird der Zeitpunkt angegeben an dem der Schmerzscore erfasst wurde.",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Observation.value[x]",
+        "path": "Observation.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird das Ergebnis entweder als Punktwert oder Code angegeben.",
+        "type": [
+          {
+            "code": "Quantity"
+          },
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "Observation.value[x]:valueQuantity",
+        "path": "Observation.value[x]",
+        "sliceName": "valueQuantity",
+        "definition": "Hier wird das Ergebnis als Punktwert angegeben.",
+        "comment": "Der Code (Element code) wird hier fest auf die UCUM-Defaultmaßeinheit '1' gesetzt und für den Anzeigenamen (Element unit) kann der gewünschte Display-Wert (“Punktwert” oder “Punkte”) gesetzt werden.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Quantity"
+          }
+        ],
+        "patternQuantity": {
+          "code": "1",
+          "system": "http://unitsofmeasure.org"
+        }
+      },
+      {
+        "id": "Observation.value[x]:valueQuantity.value",
+        "path": "Observation.value[x].value",
+        "definition": "Hier wird ein numerischer Wert angegeben.",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueQuantity.unit",
+        "path": "Observation.value[x].unit",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueQuantity.system",
+        "path": "Observation.value[x].system",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueQuantity.code",
+        "path": "Observation.value[x].code",
+        "min": 1
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept",
+        "path": "Observation.value[x]",
+        "sliceName": "valueCodeableConcept",
+        "definition": "In diesem Element werden Angaben zum Ergebnis gemacht. Diese werden als codierte Information und/oder als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "Observation.value[x]:valueCodeableConcept.coding",
+        "path": "Observation.value[x].coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Observation.interpretation",
+        "path": "Observation.interpretation",
+        "definition": "In diesem Element werden Angaben zur medizinisch relevanten Bewertung zum Ergebnis gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.interpretation.coding",
+        "path": "Observation.interpretation.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.interpretation.text",
+        "path": "Observation.interpretation.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.note",
+        "path": "Observation.note",
+        "definition": "Hier können ergänzende freitextliche Kommentare und Notizen vorgenommen werden, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "Observation.note.author[x]",
+        "path": "Observation.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat."
+      },
+      {
+        "id": "Observation.note.author[x]:authorReference",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.author[x]:authorString",
+        "path": "Observation.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Observation.note.time",
+        "path": "Observation.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "Observation.note.text",
+        "path": "Observation.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      },
+      {
+        "id": "Observation.bodySite",
+        "path": "Observation.bodySite",
+        "definition": "In diesem Element werden Angaben zur Körperstelle, an der der Schmerz lokalisiert ist, gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.bodySite.coding",
+        "path": "Observation.bodySite.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.bodySite.text",
+        "path": "Observation.bodySite.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.method",
+        "path": "Observation.method",
+        "definition": "In diesem Element werden Angaben zur Methode, die zur Erhebung verwendet wurde, gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.method.coding",
+        "path": "Observation.method.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.method.text",
+        "path": "Observation.method.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.specimen",
+        "path": "Observation.specimen",
+        "max": "0"
+      },
+      {
+        "id": "Observation.referenceRange",
+        "path": "Observation.referenceRange",
+        "definition": "Hier wird der Wertebereich definiert."
+      },
+      {
+        "id": "Observation.referenceRange.low",
+        "path": "Observation.referenceRange.low",
+        "definition": "Hier wird die Untergrenze des Wertebereichs definiert."
+      },
+      {
+        "id": "Observation.referenceRange.low.value",
+        "path": "Observation.referenceRange.low.value",
+        "definition": "Hier wird der Wert der Untergrenze definiert."
+      },
+      {
+        "id": "Observation.referenceRange.low.system",
+        "path": "Observation.referenceRange.low.system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Observation.referenceRange.high",
+        "path": "Observation.referenceRange.high",
+        "definition": "Hier wird die Obergrenze des Wertebereichs definiert."
+      },
+      {
+        "id": "Observation.referenceRange.high.value",
+        "path": "Observation.referenceRange.high.value",
+        "definition": "Hier wird der Wert der Untergrenze definiert."
+      },
+      {
+        "id": "Observation.referenceRange.high.system",
+        "path": "Observation.referenceRange.high.system",
+        "patternUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Observation.referenceRange.type",
+        "path": "Observation.referenceRange.type",
+        "definition": "In diesem Element werden Angaben zur Bedeutung des Wertebereichs gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.referenceRange.type.coding",
+        "path": "Observation.referenceRange.type.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "Observation.referenceRange.text",
+        "path": "Observation.referenceRange.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "Observation.component",
+        "path": "Observation.component",
+        "definition": "Hier können Komponenten angegeben werden aus dem sich der Score zusammensetzt. Diese Komponenten werden immer als Teil einer einzigen Beobachtung behandelt und sind nicht von dieser Beobachtung trennbar."
+      },
+      {
+        "id": "Observation.component.code",
+        "path": "Observation.component.code",
+        "definition": "In diesem Element werden Angaben zu dem, was bei der Komponente gemessen/beobachtet wird, gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "Observation.component.value[x]",
+        "path": "Observation.component.value[x]",
+        "definition": "Hier wird der entsprechende Wert bzw. das Ergebnis der Komponente definierten Beobachtung angegeben."
+      },
+      {
+        "id": "Observation.component.interpretation",
+        "path": "Observation.component.interpretation",
+        "definition": "Hier wird eine medizinisch relevante Bewertung zum Ergebnis angegeben. Die Interpretation kann als Code und/oder Text vorliegen."
+      },
+      {
+        "id": "Observation.component.referenceRange",
+        "path": "Observation.component.referenceRange",
+        "definition": "Hier wird der Wertebereich definiert."
+      },
+      {
+        "id": "Observation.component.referenceRange.low",
+        "path": "Observation.component.referenceRange.low",
+        "definition": "Hier wird die Untergrenze des Wertebereichs definiert."
+      },
+      {
+        "id": "Observation.component.referenceRange.low.value",
+        "path": "Observation.component.referenceRange.low.value",
+        "definition": "Hier wird der Wert der Untergrenze definiert."
+      },
+      {
+        "id": "Observation.component.referenceRange.high",
+        "path": "Observation.component.referenceRange.high",
+        "definition": "Hier wird die Obergrenze des Wertebereichs definiert."
+      },
+      {
+        "id": "Observation.component.referenceRange.high.value",
+        "path": "Observation.component.referenceRange.high.value",
+        "definition": "Hier wird der Wert der Untergrenze definiert."
+      },
+      {
+        "id": "Observation.component.referenceRange.text",
+        "path": "Observation.component.referenceRange.text",
+        "patternString": "Hier wird ein Freitext eingetragen."
+      }
+    ]
+  }
+}

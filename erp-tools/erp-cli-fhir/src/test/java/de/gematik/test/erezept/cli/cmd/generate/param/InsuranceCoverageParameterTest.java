@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
@@ -56,7 +60,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
     val coverage = icp.createCoverage();
     // only possible to check if insurance kind is the same as we don't have a getter for patient
     // reference
-    assertEquals(patient.getInsuranceKind(), coverage.getInsuranceKind());
+    assertEquals(patient.getInsuranceType(), coverage.getInsuranceKind());
   }
 
   @Test
@@ -66,7 +70,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692"));
 
     val coverage = icp.createCoverage();
-    assertEquals("104127692", coverage.getIknr().getValue());
+    assertEquals("104127692", coverage.getIknrOrThrow().getValue());
     assertEquals("actimonda krankenkasse", coverage.getName());
   }
 
@@ -77,7 +81,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "950585030", "--coverage-type", "PKV"));
 
     val coverage = icp.createCoverage();
-    assertEquals("950585030", coverage.getIknr().getValue());
+    assertEquals("950585030", coverage.getIknrOrThrow().getValue());
     assertEquals("PBeaKK Postbeamtenkrankenkasse", coverage.getName());
     assertEquals(InsuranceTypeDe.PKV, coverage.getInsuranceKind());
   }
@@ -89,7 +93,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
     assertDoesNotThrow(() -> cmdline.parseArgs("--iknr", "104127692", "--insurance-name", "ABC"));
 
     val coverage = icp.createCoverage();
-    assertEquals("104127692", coverage.getIknr().getValue());
+    assertEquals("104127692", coverage.getIknrOrThrow().getValue());
     assertEquals("ABC", coverage.getName());
   }
 
@@ -101,7 +105,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
         () -> cmdline.parseArgs("--coverage-type", "PKV", "--insurance-name", "ABC"));
 
     val coverage = icp.createCoverage();
-    assertNotNull(coverage.getIknr());
+    assertNotNull(coverage.getIknrOrThrow());
     assertEquals("ABC", coverage.getName());
     assertEquals(InsuranceTypeDe.PKV, coverage.getInsuranceKind());
   }
@@ -114,7 +118,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
     assertDoesNotThrow(() -> cmdline.parseArgs("--coverage-type", type));
 
     val coverage = icp.createCoverage();
-    assertNotNull(coverage.getIknr().getValue());
+    assertNotNull(coverage.getIknrOrThrow().getValue());
     assertNotNull(coverage.getName());
     assertEquals(InsuranceTypeDe.fromCode(type), coverage.getInsuranceKind());
   }
@@ -131,7 +135,7 @@ class InsuranceCoverageParameterTest extends ErpFhirBuildingTest {
             .fake();
     icp.setPatient(patient);
     val coverage = icp.createCoverage();
-    assertEquals("104127692", coverage.getIknr().getValue());
+    assertEquals("104127692", coverage.getIknrOrThrow().getValue());
     // should not equal because patient is PKV though actimondia is a GKV insurance: -> random
     // default name
     assertEquals("actimonda krankenkasse", coverage.getName());

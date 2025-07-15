@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.valuesets;
@@ -21,8 +25,8 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Arrays;
 import lombok.Getter;
@@ -46,7 +50,7 @@ public enum PrescriptionFlowType implements FromValueSet {
   FLOW_TYPE_200("200", "PKV (Apothekenpflichtige Arzneimittel)"),
   FLOW_TYPE_209("209", "PKV (Direkte Zuweisung)");
 
-  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.FLOW_TYPE;
+  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.FLOW_TYPE_12;
   public static final String VERSION = "1.0.3";
   public static final String DESCRIPTION =
       "Type of the prescription according to the 'Muster 16' forms";

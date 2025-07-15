@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -53,13 +57,13 @@ class ClosePrescriptionWithoutDispensationTest extends ErpFhirBuildingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"1.3.0", "1.4.0"})
+  @ValueSource(strings = {"1.4.0", "1.5.0"})
   @ClearSystemProperty(key = "erp.fhir.profile")
   void shouldPerformClosePrescription(String version) {
     System.setProperty("erp.fhir.profile", version);
     val task = new ErxTask();
     task.setId("123456");
-    val secret = Secret.fromString("123456789");
+    val secret = Secret.from("123456789");
     val action = ClosePrescriptionWithoutDispensation.forTheTask(task, secret);
     val resource = new ErxReceipt();
     val response =

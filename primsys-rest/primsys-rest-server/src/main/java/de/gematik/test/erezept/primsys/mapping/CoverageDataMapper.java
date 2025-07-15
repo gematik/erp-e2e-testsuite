@@ -12,12 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.mapping;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
@@ -28,11 +33,7 @@ import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
 import de.gematik.test.erezept.fhir.valuesets.Wop;
 import de.gematik.test.erezept.primsys.data.CoverageDto;
-import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
-import de.gematik.test.erezept.primsys.data.valuesets.InsurantStateDto;
-import de.gematik.test.erezept.primsys.data.valuesets.PayorTypeDto;
-import de.gematik.test.erezept.primsys.data.valuesets.PersonGroupDto;
-import de.gematik.test.erezept.primsys.data.valuesets.WopDto;
+import de.gematik.test.erezept.primsys.data.valuesets.*;
 import lombok.val;
 
 public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
@@ -66,7 +67,7 @@ public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
    * during the constructor call!
    */
   private void completeCoverage() {
-    val coverageInfo = InsuranceCoverageInfo.randomFor(beneficiary.getInsuranceKind());
+    val coverageInfo = InsuranceCoverageInfo.randomFor(beneficiary.getInsuranceType());
     ensure(dto::getIknr, dto::setIknr, coverageInfo::getIknr);
     ensure(dto::getName, dto::setName, coverageInfo::getName);
     if (dto.getPayorType() == null) {
@@ -85,7 +86,7 @@ public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
         .dmpKennzeichen(DmpKennzeichen.NOT_SET) // NOT SET YET
         .wop(getWop())
         .versichertenStatus(getInsurantState())
-        .versicherungsArt(getInsuranceType())
+        .insuranceType(getInsuranceType())
         .build();
   }
 
@@ -107,7 +108,7 @@ public class CoverageDataMapper extends DataMapper<CoverageDto, KbvCoverage> {
 
   public static CoverageDataMapper from(KbvCoverage coverage, KbvPatient beneficiary) {
     val dto = new CoverageDto();
-    dto.setIknr(coverage.getIknr().getValue());
+    coverage.getIknr().map(SemanticValue::getValue).ifPresent(dto::setIknr);
     coverage.getWop().ifPresent(wop -> dto.setWop(WopDto.fromCode(wop.getCode())));
     dto.setName(coverage.getName());
     coverage

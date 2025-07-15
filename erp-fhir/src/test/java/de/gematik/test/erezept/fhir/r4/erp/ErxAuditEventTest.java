@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -23,8 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent.Representation;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.util.Arrays;
@@ -35,7 +39,7 @@ import org.junit.jupiter.api.Test;
 
 class ErxAuditEventTest extends ErpFhirParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/1.1.1/";
+  private final String BASE_PATH = "fhir/valid/erp/1.4.0/auditevent/";
 
   @Test
   void representationTextDoesNotThrow() {
@@ -44,7 +48,7 @@ class ErxAuditEventTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeSingleAuditEvent() {
-    val fileName = "AuditEvent_01.json";
+    val fileName = "9361863d-fec0-4ba9-8776-7905cf1b0cfa.json";
     val originalEncoding = EncodingType.JSON;
     val flippedEncoding = originalEncoding.flipEncoding();
 
@@ -58,8 +62,8 @@ class ErxAuditEventTest extends ErpFhirParsingTest {
     val expectedAction = AuditEvent.AuditEventAction.fromCode("C");
     assertEquals(expectedAction, auditEvent.getAction());
 
-    val expectedIdentifierValue = "606358750";
-    val expectedIdentifierSystem = ErpWorkflowNamingSystem.TELEMATIK_ID.getCanonicalUrl();
+    val expectedIdentifierValue = "1-SMC-B-Testkarte-883110000095957";
+    val expectedIdentifierSystem = DeBasisProfilNamingSystem.TELEMATIK_ID_SID.getCanonicalUrl();
     val expectedPrescriptionId = "160.123.456.789.123.58";
     assertEquals(
         expectedIdentifierValue, auditEvent.getAgentFirstRep().getWho().getIdentifier().getValue());
@@ -80,8 +84,10 @@ class ErxAuditEventTest extends ErpFhirParsingTest {
     assertEquals(
         auditEvent.getAgentFirstRep().getWho().getIdentifier().getSystem(),
         flippedAuditEvent.getAgentFirstRep().getWho().getIdentifier().getSystem());
-    assertEquals("Sample Text", auditEvent.getFirstText());
-    assertEquals("606358750", auditEvent.getAgentId());
+    assertEquals(
+        "Praxis Dr. Müller, Bahnhofstr. 78 hat ein E-Rezept 160.123.456.789.123.58 eingestellt",
+        auditEvent.getFirstText());
+    assertEquals(expectedIdentifierValue, auditEvent.getAgentId());
     assertEquals("Praxis Dr. Müller", auditEvent.getAgentName());
   }
 

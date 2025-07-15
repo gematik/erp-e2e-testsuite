@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -28,7 +32,6 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
-import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
@@ -72,7 +75,7 @@ class SendMessagesTest {
     val prescriptionId = PrescriptionId.random(flowType);
 
     when(task.getTaskId()).thenReturn(prescriptionId.toTaskId());
-    when(task.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
+    when(task.getAccessCode()).thenReturn(AccessCode.random());
     when(task.getFlowType()).thenReturn(flowType);
 
     val payload =
@@ -102,7 +105,7 @@ class SendMessagesTest {
         new CommunicationReplyMessage(SupplyOptionsType.ON_PREMISE, "testMessage");
     val tsk = mock(ErxTask.class);
     when(tsk.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
-    when(tsk.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
+    when(tsk.getAccessCode()).thenReturn(AccessCode.random());
     val payload =
         ErxCommunicationBuilder.asReply(communicationReplyMessage)
             .basedOn(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
@@ -126,8 +129,8 @@ class SendMessagesTest {
   void shouldBuildCommunicationReplyWithSupplyOption() {
     val testReply = new CommunicationReplyMessage(SupplyOptionsType.ON_PREMISE, "testReply");
     val tsk = mock(ErxTask.class);
-    when(tsk.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
-    when(tsk.getAccessCode()).thenReturn(GemFaker.fakerAccessCode());
+    when(tsk.getTaskId()).thenReturn(TaskId.random());
+    when(tsk.getAccessCode()).thenReturn(AccessCode.random());
     val payload =
         ErxCommunicationBuilder.asReply(testReply)
             .basedOn(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
@@ -179,5 +182,21 @@ class SendMessagesTest {
             .asReply(testReply, pharmacyActor);
     val interActionComm = sentReplyComm.answeredBy(patientActor);
     assertNotNull(interActionComm.getExpectedType());
+  }
+
+  @Test
+  void shouldBuildSendMessageWithCustomCommunicationAndWFVersion() {
+    val communicationDisReqMessage =
+        new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, "testMessage");
+    val task = mock(ErxTask.class);
+    val flowType = PrescriptionFlowType.FLOW_TYPE_160;
+    val prescriptionId = PrescriptionId.random(flowType);
+
+    when(task.getTaskId()).thenReturn(prescriptionId.toTaskId());
+    when(task.getAccessCode()).thenReturn(AccessCode.random());
+    when(task.getFlowType()).thenReturn(flowType);
+    val com =
+        SendMessages.to(pharmacyActor).forTask(task).asDispenseRequest(communicationDisReqMessage);
+    assertNotNull(com);
   }
 }

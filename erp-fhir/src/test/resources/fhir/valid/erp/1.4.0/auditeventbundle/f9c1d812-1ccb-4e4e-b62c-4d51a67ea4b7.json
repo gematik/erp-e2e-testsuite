@@ -1,0 +1,3481 @@
+{
+  "resourceType": "Bundle",
+  "id": "f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7",
+  "type": "searchset",
+  "timestamp": "2025-06-22T22:05:10.755+00:00",
+  "total": 0,
+  "link": [
+    {
+      "relation": "first",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=-date&_count=50"
+    },
+    {
+      "relation": "next",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=-date&_count=50&_id=lt01ebe20e-222d-e240-0000-000000000000"
+    },
+    {
+      "relation": "self",
+      "url": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_sort=-date"
+    },
+    {
+      "relation": "prev",
+      "url": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_count=50&__offset=20&_id=gt01eb9373-789e-7db8-0000-000000000000"
+    },
+    {
+      "relation": "last",
+      "url": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_count=30&__offset=40&_id=gt01eb9373-789e-7db8-0000-000000000000"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-230b-b750-399f-2b50304f7c12",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-230b-b750-399f-2b50304f7c12",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Arminius ApothekeTEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:10.322+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-SMC-B-Testkarte--883110000163973"
+              }
+            },
+            "name": "Arminius ApothekeTEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22db-f0d8-473e-ea298a706d57",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22db-f0d8-473e-ea298a706d57",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:07.191+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22d7-4970-5233-7d70c1c828ee",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22d7-4970-5233-7d70c1c828ee",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:06.886+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22d3-9050-a39e-1e5ff5ee3052",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22d3-9050-a39e-1e5ff5ee3052",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:06.642+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22cf-fa58-5511-412600d40683",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22cf-fa58-5511-412600d40683",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:06.407+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22cc-4138-905a-8b6b928f9f86",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22cc-4138-905a-8b6b928f9f86",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:06.163+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22c7-3058-0f89-bf39239028c6",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22c7-3058-0f89-bf39239028c6",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:05.831+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22c3-b5b8-73ec-d9bc436f437d",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22c3-b5b8-73ec-d9bc436f437d",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:05.603+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22c0-2f60-6ac4-bcd412231803",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22c0-2f60-6ac4-bcd412231803",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:05.372+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22bc-9198-825c-20ec55474afb",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22bc-9198-825c-20ec55474afb",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:05.135+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22b9-1ae0-a85c-9501b77d49b8",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22b9-1ae0-a85c-9501b77d49b8",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:04.908+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22b5-b3c8-9ed0-622521e43a15",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22b5-b3c8-9ed0-622521e43a15",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:04.685+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22b2-5480-36ce-fc5a97c03627",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22b2-5480-36ce-fc5a97c03627",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:04.464+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22ae-be88-4bcf-a51b92a9e485",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22ae-be88-4bcf-a51b92a9e485",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:04.229+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22ab-1cd8-5487-76d702789fb8",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22ab-1cd8-5487-76d702789fb8",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:03.991+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22a7-b9a8-3dd7-bd2d00cd3ad7",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22a7-b9a8-3dd7-bd2d00cd3ad7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:03.769+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22a4-3f08-083a-2b92f81704e1",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22a4-3f08-083a-2b92f81704e1",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:03.541+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-22a0-c850-e097-9a5692f55e6f",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-22a0-c850-e097-9a5692f55e6f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:03.314+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-229d-4db0-2b63-0c1f50bb41ef",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-229d-4db0-2b63-0c1f50bb41ef",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:03.086+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2299-bf88-4bca-707884d429a5",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2299-bf88-4bca-707884d429a5",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:02.853+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2296-5c58-c5a4-7f099fc5a0af",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2296-5c58-c5a4-7f099fc5a0af",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:02.631+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2292-c660-3f29-2f895932c3a0",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2292-c660-3f29-2f895932c3a0",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:02.396+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-228f-5b60-92fe-2f4bc27e0ce6",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-228f-5b60-92fe-2f4bc27e0ce6",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:02.172+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-228b-15a0-4fa7-4be3f95c334e",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-228b-15a0-4fa7-4be3f95c334e",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:01.892+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2287-aaa0-1a2d-b61cb2e4dfd6",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2287-aaa0-1a2d-b61cb2e4dfd6",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:01.668+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2284-5328-3352-1e83578225ed",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2284-5328-3352-1e83578225ed",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:01.449+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2280-ad90-f665-6ac7a531a5e3",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2280-ad90-f665-6ac7a531a5e3",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:01.210+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-227c-f088-2886-a9fbc968d333",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-227c-f088-2886-a9fbc968d333",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:00.965+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2279-7db8-327d-b061092746e7",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2279-7db8-327d-b061092746e7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:00.739+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2275-fb48-9595-fc9d275305a4",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2275-fb48-9595-fc9d275305a4",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:00.509+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2272-9818-82a5-12f3a711a5e6",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2272-9818-82a5-12f3a711a5e6",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:00.287+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-226f-0dd8-bc80-c597bfc8ecec",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-226f-0dd8-bc80-c597bfc8ecec",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:05:00.055+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-226a-a4f0-0822-80333b081491",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-226a-a4f0-0822-80333b081491",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:59.766+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2267-45a8-47dd-2d34bf49b8cf",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2267-45a8-47dd-2d34bf49b8cf",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:59.545+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2263-c338-9627-c4525964e48e",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2263-c338-9627-c4525964e48e",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:59.315+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2260-5c20-96a9-9680d988f7b7",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2260-5c20-96a9-9680d988f7b7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:59.092+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-225c-9748-39b2-6acc805f1668",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-225c-9748-39b2-6acc805f1668",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:58.845+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2259-2478-fdee-a91c2f2ca5ad",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2259-2478-fdee-a91c2f2ca5ad",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:58.619+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2254-3aa8-8ce6-39632ee5fb16",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2254-3aa8-8ce6-39632ee5fb16",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:58.297+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2250-ac80-60a5-b16fe6e8b971",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2250-ac80-60a5-b16fe6e8b971",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:58.064+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-224d-39b0-2f14-e0b08349389f",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-224d-39b0-2f14-e0b08349389f",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:57.838+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2249-d680-c114-6bd7f2bceb77",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2249-d680-c114-6bd7f2bceb77",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:57.616+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2246-7350-feaa-248adbce51a3",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2246-7350-feaa-248adbce51a3",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:57.394+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2242-fc98-b3f4-74c0ba949fe5",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2242-fc98-b3f4-74c0ba949fe5",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:57.167+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-223f-37c0-4a12-667c7848b7ca",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-223f-37c0-4a12-667c7848b7ca",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:56.920+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-223b-c4f0-ff39-a09fc6edf2fd",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-223b-c4f0-ff39-a09fc6edf2fd",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:56.694+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2238-4668-ff3d-ec78fbb74357",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2238-4668-ff3d-ec78fbb74357",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:56.465+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2234-e720-51ac-ab84e7f58e9e",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2234-e720-51ac-ab84e7f58e9e",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:56.244+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-2231-7068-2117-3458735010e7",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-2231-7068-2117-3458735010e7",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:56.017+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-test.zentral.erp.splitdns.ti-dienste.de/AuditEvent/01ebe20e-222d-e240-f441-9ac36264a4bc",
+      "resource": {
+        "resourceType": "AuditEvent",
+        "id": "01ebe20e-222d-e240-f441-9ac36264a4bc",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.4"
+          ]
+        },
+        "language": "de",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Apotheke Christine Ulmendorfer TEST-ONLY konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit Ihrer eGK abrufen.</div>"
+        },
+        "type": {
+          "system": "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          "code": "rest"
+        },
+        "subtype": [
+          {
+            "system": "http://hl7.org/fhir/restful-interaction",
+            "code": "read"
+          }
+        ],
+        "action": "R",
+        "recorded": "2025-06-22T22:04:55.784+00:00",
+        "outcome": "0",
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                  "code": "humanuser",
+                  "display": "Human User"
+                }
+              ]
+            },
+            "who": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "3-01.2.2023001.16.103"
+              }
+            },
+            "name": "Apotheke Christine Ulmendorfer TEST-ONLY",
+            "requestor": false
+          }
+        ],
+        "source": {
+          "site": "E-Rezept Fachdienst",
+          "observer": {
+            "reference": "Device/1"
+          }
+        },
+        "entity": [
+          {
+            "what": {
+              "reference": "Task"
+            },
+            "name": "X110699891",
+            "description": "+"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.kbv;
@@ -35,7 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
-  private static final String BASE_PATH = "fhir/valid/kbv/1.0.2/medicationrequest/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/medicationrequest/";
 
   @Test
   void encodingSingleValidMedicationRequest() {
@@ -59,11 +63,7 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest(name = "[{index}] -> Check Accident in MedicationRequest from {0}")
-  @ValueSource(
-      strings = {
-        "fhir/valid/kbv/1.0.2/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml",
-        "fhir/valid/kbv/1.1.0/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml"
-      })
+  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml"})
   void shouldFindAccidents(String file) {
     val content = ResourceLoader.readFileFromResource(file);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
@@ -77,11 +77,7 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest(name = "[{index}] -> Check Accident at work in MedicationRequest from {0}")
-  @ValueSource(
-      strings = {
-        "fhir/valid/kbv/1.0.2/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml",
-        "fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"
-      })
+  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"})
   void shouldFindAccidentsAtWork(String file) {
     val content = ResourceLoader.readFileFromResource(file);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
@@ -96,11 +92,7 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest(name = "[{index}] -> Check occupational disease in MedicationRequest from {0}")
-  @ValueSource(
-      strings = {
-        "fhir/valid/kbv/1.0.2/bundle/218b581d-ccbe-480e-b8d7-f5f9b925e8c4.xml",
-        "fhir/valid/kbv/1.1.0/bundle/218b581d-ccbe-480e-b8d7-f5f9b925e8c4.xml"
-      })
+  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/218b581d-ccbe-480e-b8d7-f5f9b925e8c4.xml"})
   void shouldFindAccidentsOccupationalDisease(String file) {
     val content = ResourceLoader.readFileFromResource(file);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
@@ -130,7 +122,7 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
   @Test
   void encodeMedicationRequestWithMvo() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
+    val expectedID = "68794d6d-2b05-4d5e-aaf1-49b4b6430104";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
@@ -139,8 +131,13 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
     assertTrue(medicationRequest.isMultiple());
     assertTrue(medicationRequest.getMvoStart().isPresent());
     assertTrue(medicationRequest.getMvoEnd().isPresent());
+
+    assertTrue(medicationRequest.getNumerator().isPresent());
+    assertTrue(medicationRequest.getDemoninator().isPresent());
+    assertEquals(2, medicationRequest.getNumerator().orElseThrow());
+    assertEquals(4, medicationRequest.getDemoninator().orElseThrow());
+
     assertNotNull(medicationRequest.getDescription());
-    assertTrue(medicationRequest.getDescription().contains("mit aut-idem"));
   }
 
   @Test
@@ -153,24 +150,8 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void encodeMedicationRequCheckForNumAndDenom() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
-
-    assertTrue(medicationRequest.isMultiple());
-    assertTrue(medicationRequest.getNumerator().isPresent());
-    assertTrue(medicationRequest.getDemoninator().isPresent());
-
-    assertEquals(4, medicationRequest.getNumerator().orElseThrow());
-    assertEquals(4, medicationRequest.getDemoninator().orElseThrow());
-  }
-
-  @Test
   void shouldManuallyChangeMvoDates() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
+    val expectedID = "68794d6d-2b05-4d5e-aaf1-49b4b6430104";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);

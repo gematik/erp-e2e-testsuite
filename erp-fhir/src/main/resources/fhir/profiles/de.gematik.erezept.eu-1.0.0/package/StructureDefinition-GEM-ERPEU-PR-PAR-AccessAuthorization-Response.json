@@ -1,0 +1,198 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERPEU-PR-PAR-AccessAuthorization-Response",
+  "url": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_Access_Authorization_Response",
+  "version": "1.0.0",
+  "name": "GEM_ERPEU_PR_PAR_Access_Authorization_Response",
+  "title": "GEM ERPEU PR PAR Access Authorization Response",
+  "status": "active",
+  "date": "2025-06-02",
+  "description": "Displays Response Parameters for EU Access Authorization",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Parameters",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Parameters.meta",
+        "path": "Parameters.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile",
+        "path": "Parameters.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing for meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.meta.profile:workflowEUProfile",
+        "path": "Parameters.meta.profile",
+        "sliceName": "workflowEUProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_Access_Authorization_Response|1.0",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter",
+        "path": "Parameters.parameter",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "pattern",
+              "path": "name"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 4,
+        "max": "4"
+      },
+      {
+        "id": "Parameters.parameter:countryCode",
+        "path": "Parameters.parameter",
+        "sliceName": "countryCode",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:countryCode.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "countryCode",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:countryCode.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://hl7.org/fhir/ValueSet/iso3166-1-2"
+        }
+      },
+      {
+        "id": "Parameters.parameter:countryCode.value[x].system",
+        "path": "Parameters.parameter.value[x].system",
+        "min": 1,
+        "patternUri": "urn:iso:std:iso:3166"
+      },
+      {
+        "id": "Parameters.parameter:countryCode.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:accessCode",
+        "path": "Parameters.parameter",
+        "sliceName": "accessCode",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:accessCode.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "accessCode",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:accessCode.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Access_Code"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:accessCode.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:validUntil",
+        "path": "Parameters.parameter",
+        "sliceName": "validUntil",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:validUntil.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "validUntil",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:validUntil.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "instant"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:validUntil.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      },
+      {
+        "id": "Parameters.parameter:createdAt",
+        "path": "Parameters.parameter",
+        "sliceName": "createdAt",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:createdAt.name",
+        "path": "Parameters.parameter.name",
+        "patternString": "createdAt",
+        "mustSupport": true
+      },
+      {
+        "id": "Parameters.parameter:createdAt.value[x]",
+        "path": "Parameters.parameter.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "instant"
+          }
+        ]
+      },
+      {
+        "id": "Parameters.parameter:createdAt.resource",
+        "path": "Parameters.parameter.resource",
+        "max": "0"
+      }
+    ]
+  }
+}

@@ -12,14 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.testutil;
 
-import static de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
 
 import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
-import de.gematik.test.erezept.fhir.parser.profiles.ProfileFhirParserFactory;
+import de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory;
 
 public abstract class ErpFhirBuildingTest {
   public static final String ERP_FHIR_PROFILES_TOGGLE =

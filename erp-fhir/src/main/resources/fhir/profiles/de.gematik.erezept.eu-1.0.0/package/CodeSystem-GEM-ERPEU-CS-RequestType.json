@@ -1,0 +1,40 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GEM_ERPEU_CS_RequestType",
+  "id": "GEM-ERPEU-CS-RequestType",
+  "title": "CodeSystem of NCPeH Request Types",
+  "description": "Type of Request from NCPeH",
+  "version": "1.0.0",
+  "url": "https://gematik.de/fhir/erp-eu/CodeSystem/GEM_ERPEU_CS_RequestType",
+  "concept": [
+    {
+      "code": "demographics",
+      "display": "Abruf demographischer Daten"
+    },
+    {
+      "code": "e-prescriptions-list",
+      "display": "Abruf der E-Rezepte Liste"
+    },
+    {
+      "code": "e-prescriptions-retrieval",
+      "display": "Abruf eines E-Rezeptes"
+    }
+  ],
+  "date": "2025-06-02",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 3
+}

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -33,28 +37,27 @@ import org.junit.jupiter.api.Test;
 
 class ErxConsentTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_1_1 = "fhir/valid/erp/1.1.1/";
-  private static final String BASE_PATH_1_2_0 = "fhir/valid/erp/1.2.0/consent/";
+  private static final String BASE_PATH_1_4 = "fhir/valid/erp/1.4.0/consent/";
 
   @Test
   void shouldEncodeSingleConsent() {
     val fileName = "Consent_01.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
     assertEquals(Consent.ConsentState.ACTIVE, consent.getStatus());
     assertEquals(ConsentType.CHARGCONS, consent.getConsentType());
     assertEquals(ConsentScope.PATIENT_PRIVACY, consent.getConsentScope());
-    assertEquals("X123456789", consent.getPatientKvid());
+    assertEquals("U136787649", consent.getPatientKvid());
   }
 
   @Test
   void shouldThrowOnMissingConsentType() {
     val fileName = "Consent_01.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
@@ -66,7 +69,7 @@ class ErxConsentTest extends ErpFhirParsingTest {
   void shouldThrowInvalidConsentTypeSystems() {
     val fileName = "Consent_01.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
@@ -88,7 +91,7 @@ class ErxConsentTest extends ErpFhirParsingTest {
   void shouldGetConsentTypes() {
     val fileName = "bundle_6daaade4-6523-4136-94bf-cbc5a247cc7b.json";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val consentBundle = parser.decode(ErxConsentBundle.class, content);
     assertNotNull(consentBundle, "Valid ErxConsentBundle must be parseable");
 

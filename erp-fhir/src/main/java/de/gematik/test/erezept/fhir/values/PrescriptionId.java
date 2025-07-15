@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.values;
@@ -22,24 +26,68 @@ import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import java.util.stream.Stream;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Reference;
 
 public class PrescriptionId extends SemanticValue<String, ErpWorkflowNamingSystem> {
 
-  public static final ErpWorkflowNamingSystem NAMING_SYSTEM =
-      ErpWorkflowNamingSystem.PRESCRIPTION_ID_121;
-
-  public PrescriptionId(final String value) {
-    this(ErpWorkflowNamingSystem.PRESCRIPTION_ID_121, value);
+  private PrescriptionId(String value) {
+    this(ErpWorkflowNamingSystem.PRESCRIPTION_ID, value);
   }
 
-  public PrescriptionId(final ErpWorkflowNamingSystem system, final String value) {
+  private PrescriptionId(ErpWorkflowNamingSystem system, String value) {
     super(system, value);
+  }
+
+  public static PrescriptionId random() {
+    return random(PrescriptionFlowType.FLOW_TYPE_160);
+  }
+
+  public static PrescriptionId random(PrescriptionFlowType flowType) {
+    return PrescriptionId.from(GemFaker.fakerPrescriptionId(flowType));
+  }
+
+  public static PrescriptionId from(Identifier identifier) {
+    return Optional.of(identifier)
+        .filter(ErpWorkflowNamingSystem.PRESCRIPTION_ID::matches)
+        .map(id -> PrescriptionId.from(id.getValue()))
+        .orElseThrow(
+            () ->
+                new BuilderException(
+                    format("Cannot extract PrescriptionId from {0}", identifier.getSystem())));
+  }
+
+  public static PrescriptionId from(TaskId id) {
+    return from(id.getValue());
+  }
+
+  public static PrescriptionId from(String id) {
+    return new PrescriptionId(id);
+  }
+
+  public static boolean checkId(PrescriptionId prescriptionId) {
+    return checkId(prescriptionId.getValue());
+  }
+
+  public static boolean checkId(String value) {
+    val raw = Long.parseLong(value.replace(".", ""));
+    val check = raw % 97;
+    return check == 1;
+  }
+
+  public static boolean isPrescriptionId(Identifier identifier) {
+    return isPrescriptionId(identifier.getSystem());
+  }
+
+  public static boolean isPrescriptionId(String system) {
+    if (system == null) {
+      return false;
+    }
+    return ErpWorkflowNamingSystem.PRESCRIPTION_ID.matches(system);
   }
 
   public boolean check() {
@@ -72,67 +120,5 @@ public class PrescriptionId extends SemanticValue<String, ErpWorkflowNamingSyste
     val ref = new Reference();
     ref.setIdentifier(asIdentifier(system));
     return ref;
-  }
-
-  public static PrescriptionId random() {
-    return random(PrescriptionFlowType.FLOW_TYPE_160);
-  }
-
-  public static PrescriptionId random(PrescriptionFlowType flowType) {
-    val res = GemFaker.fakerPrescriptionId(flowType);
-    return new PrescriptionId(res.getValue());
-  }
-
-  public static PrescriptionId random(ErpWorkflowNamingSystem system) {
-    return random(system, PrescriptionFlowType.FLOW_TYPE_160);
-  }
-
-  public static PrescriptionId random(
-      ErpWorkflowNamingSystem system, PrescriptionFlowType flowType) {
-    val res = GemFaker.fakerPrescriptionId(flowType);
-    return new PrescriptionId(system, res.getValue());
-  }
-
-  public static PrescriptionId from(Identifier identifier) {
-    val system =
-        Stream.of(
-                ErpWorkflowNamingSystem.PRESCRIPTION_ID,
-                ErpWorkflowNamingSystem.PRESCRIPTION_ID_121)
-            .filter(ns -> ns.matches(identifier.getSystem()))
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new BuilderException(
-                        format("Cannot build PrescriptionId from {0}", identifier.getSystem())));
-    return new PrescriptionId(system, identifier.getValue());
-  }
-
-  public static PrescriptionId from(TaskId id) {
-    return from(id.getValue());
-  }
-
-  public static PrescriptionId from(String id) {
-    return new PrescriptionId(id);
-  }
-
-  public static boolean checkId(PrescriptionId prescriptionId) {
-    return checkId(prescriptionId.getValue());
-  }
-
-  public static boolean checkId(String value) {
-    val raw = Long.parseLong(value.replace(".", ""));
-    val check = raw % 97;
-    return check == 1;
-  }
-
-  public static boolean isPrescriptionId(Identifier identifier) {
-    return isPrescriptionId(identifier.getSystem());
-  }
-
-  public static boolean isPrescriptionId(String system) {
-    if (system == null) return false;
-
-    return ErpWorkflowNamingSystem.PRESCRIPTION_ID.matches(system)
-        || ErpWorkflowNamingSystem.PRESCRIPTION_ID_121.matches(system);
   }
 }

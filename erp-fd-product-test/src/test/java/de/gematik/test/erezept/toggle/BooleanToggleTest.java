@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.toggle;
@@ -55,7 +59,6 @@ class BooleanToggleTest {
   static Stream<Arguments> booleanToggleInstances() {
     // maybe we can also use a reflection lib for this
     return Stream.of(
-        Arguments.of(new AbsoluteReferencesAsUUIDToggle()),
         Arguments.of(new AnrValidationConfigurationIsErrorToggle()),
         Arguments.of(new EgkPharmacyAcceptPN3Toggle()),
         Arguments.of(new FhirCloseSlicingToggle()),

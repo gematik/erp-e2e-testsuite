@@ -12,19 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.eml.tasks;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.*;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlDispensationIdIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlHandedOverIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationDispenseMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationMapsTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlOrganisationHasSMCBTelematikId;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,25 +76,13 @@ public class CheckEpaOpProvideDispensation implements Task {
                 emlDispensationIdIsEqualTo(prescriptionId),
                 emlOrganisationHasSMCBTelematikId(tiIdSMCB)));
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3_0) <= 0) {
-      val mdPair = erxMedicationDispenseBundle.unpackDispensePairBy(prescriptionId).get(0);
-      verifiers.addAll(
-          List.of(
-              emlHandedOverIsEqualTo(mdPair.getLeft().getWhenHandedOver()),
-              emlMedicationMapsTo(mdPair.getRight()),
-              emlMedicationDispenseMapsTo(mdPair.getLeft())));
+    val mdPair = erxMedicationDispenseBundle.getDispensePairBy(prescriptionId).get(0);
+    verifiers.addAll(
+        List.of(
+            emlHandedOverIsEqualTo(mdPair.getLeft().getWhenHandedOver()),
+            emlMedicationMapsTo(mdPair.getRight()),
+            emlMedicationDispenseMapsTo(mdPair.getLeft())));
 
-      request.forEach(r -> verifiers.forEach(v -> v.apply(r)));
-
-    } else {
-      val mdPair = erxMedicationDispenseBundle.getDispensePairBy(prescriptionId).get(0);
-      verifiers.addAll(
-          List.of(
-              emlHandedOverIsEqualTo(mdPair.getLeft().getWhenHandedOver()),
-              emlMedicationMapsTo(mdPair.getRight()),
-              emlMedicationDispenseMapsTo(mdPair.getLeft())));
-
-      request.forEach(r -> verifiers.forEach(v -> v.apply(r)));
-    }
+    request.forEach(r -> verifiers.forEach(v -> v.apply(r)));
   }
 }

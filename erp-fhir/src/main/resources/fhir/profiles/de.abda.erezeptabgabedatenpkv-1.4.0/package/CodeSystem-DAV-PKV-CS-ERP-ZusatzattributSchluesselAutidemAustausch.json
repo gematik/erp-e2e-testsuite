@@ -1,0 +1,32 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-PKV-CS-ERP-ZusatzattributSchluesselAutidemAustausch",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-ZusatzattributSchluesselAutidemAustausch",
+  "version": "1.4.0",
+  "name": "DAV_PKV_CS_ERP_ZusatzattributSchluesselAutidemAustausch",
+  "title": "Austausch Autidem",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "content": "complete",
+  "count": 4,
+  "concept": [
+    {
+      "code": "1",
+      "display": "Patientenwunsch"
+    },
+    {
+      "code": "2",
+      "display": "Nicht-Verfügbarkeit"
+    },
+    {
+      "code": "3",
+      "display": "dringender Fall"
+    },
+    {
+      "code": "4",
+      "display": "sonstige Bedenken",
+      "definition": "zusätzlich ggf. DokumentationFreitext"
+    }
+  ]
+}

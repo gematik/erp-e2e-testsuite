@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -52,15 +56,14 @@ class GetPrescriptionByIdTest extends ErpFhirBuildingTest {
   @Test
   void shouldPerformCorrectCommandWithAccessCode() {
     val action =
-        GetPrescriptionById.withTaskId(TaskId.from("123"))
-            .withAccessCode(AccessCode.fromString("321"));
+        GetPrescriptionById.withTaskId(TaskId.from("123")).withAccessCode(AccessCode.from("321"));
     Assertions.assertDoesNotThrow(() -> action.answeredBy(pharmacy));
   }
 
   @Test
   void shouldPerformCorrectCommandWithSecret() {
     val action =
-        GetPrescriptionById.withTaskId(TaskId.from("123")).withSecret(Secret.fromString("secret"));
+        GetPrescriptionById.withTaskId(TaskId.from("123")).withSecret(Secret.from("secret"));
     Assertions.assertDoesNotThrow(() -> action.answeredBy(pharmacy));
   }
 }

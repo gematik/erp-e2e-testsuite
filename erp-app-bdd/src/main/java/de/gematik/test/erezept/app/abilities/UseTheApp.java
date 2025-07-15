@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.abilities;
@@ -19,10 +23,10 @@ package de.gematik.test.erezept.app.abilities;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.app.cfg.ScenarioFinalizer;
 import de.gematik.test.erezept.app.exceptions.AppErrorException;
 import de.gematik.test.erezept.app.mobile.ListPageElement;
 import de.gematik.test.erezept.app.mobile.PlatformType;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.ErrorAlert;
 import de.gematik.test.erezept.app.mobile.elements.PageElement;
@@ -35,7 +39,6 @@ import io.cucumber.java.Scenario;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
@@ -64,12 +67,14 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   @Getter @Setter private String currentUserProfile;
   @Getter private final PlatformType platformType;
   private final AppiumConfiguration appiumConfiguration;
+  private final ScenarioFinalizer scenarioFinalizer;
 
   protected UseTheApp(
       T driver, PlatformType platformType, AppiumConfiguration appiumConfiguration) {
     this.driver = driver;
     this.platformType = platformType;
     this.appiumConfiguration = appiumConfiguration;
+    this.scenarioFinalizer = new ScenarioFinalizer(this.appiumConfiguration.getUrl());
     log.info("{} Driver started with session ID {}", platformType, driver.getSessionId());
   }
 
@@ -82,30 +87,41 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     return appiumConfiguration.getMaxWaitTimeout();
   }
 
+  @SneakyThrows
+  public void pauseApp() {
+    Thread.sleep(1000);
+  }
+
   protected int getPollingInterval() {
     return appiumConfiguration.getPollingInterval();
   }
 
   public void removeTooltips() {
-    val pageSource = driver.getPageSource();
-    this.checkForErrorAlerts(pageSource);
+    this.checkForErrorAlerts(driver.getPageSource());
 
     val changed = new AtomicBoolean(false);
     List.of(Utility.values())
         .forEach(
             utility -> {
-              if (pageSource.contains(utility.extractSourceLabel(this.platformType))) {
+              if (isDisplayed(utility.forPlatform(platformType))) {
                 log.info("Found Utility Element {}", utility.getElementName());
-                this.getOptionalWebElement(utility, pageSource)
-                    .ifPresent(
-                        webElement -> {
-                          webElement.click();
-                          changed.set(true);
-                        });
+                tap(getWebElement(utility.forPlatform(platformType)));
+                changed.set(true);
               }
             });
 
     if (changed.get()) removeTooltips(); // recursively remove until nothing changes anymore
+  }
+
+  private boolean isDisplayed(By by) {
+    boolean result;
+    try {
+      result = this.getWebElement(by) != null;
+    } catch (NoSuchElementException e) {
+      result = false;
+    }
+
+    return result;
   }
 
   @SneakyThrows
@@ -219,31 +235,6 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     }
   }
 
-  public void scroll(ScrollDirection direction) {
-    this.scroll(direction, 0.7f); // 0.7f should be almost a full page
-  }
-
-  public void scroll(ScrollDirection direction, float distance) {
-    log.info("Scroll {} with distance {}", direction, distance);
-    driver.executeScript(
-        "mobile:scroll",
-        Map.of("direction", direction.name().toLowerCase(), "distance", String.valueOf(distance)));
-  }
-
-  public void scrollIntoView(ScrollDirection direction, PageElement pageElement) {
-    log.info("Scroll {} until element {} is found", direction, pageElement.getFullName());
-    var scrollCounter = 20;
-    boolean isDisplayed =
-        this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
-    while (!isDisplayed && scrollCounter >= 0) {
-      scrollCounter--;
-      driver.executeScript(
-          "mobile:scroll", Map.of("direction", direction.name().toLowerCase(), "distance", "0.6"));
-      isDisplayed =
-          this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
-    }
-  }
-
   public void acceptAlert() {
     driver.switchTo().alert().accept();
   }
@@ -276,10 +267,28 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
     this.performGesture(swipe);
   }
 
+  public void swipeIntoView(SwipeDirection direction, PageElement pageElement) {
+    log.info("Swipe {} until element {} is found", direction, pageElement.getFullName());
+    var swipeCounter = 20;
+    boolean isDisplayed =
+        this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
+    while (!isDisplayed && swipeCounter >= 0) {
+      swipeCounter--;
+
+      swipe(direction, 0.6F);
+      isDisplayed =
+          this.getOptionalWebElement(pageElement).map(WebElement::isDisplayed).orElse(false);
+    }
+  }
+
   protected final void waitUntil(ExpectedCondition<?> expected) {
+    waitUntil(expected, getMaxWaitTimeout());
+  }
+
+  protected final void waitUntil(ExpectedCondition<?> expected, int millis) {
     val wait = this.getFluentWaitDriver();
     try {
-      wait.until(expected);
+      wait.withTimeout(Duration.ofMillis(millis)).until(expected);
     } catch (TimeoutException te) {
       this.checkForErrorAlerts(this.driver.getPageSource());
       throw te; // rethrow TimeoutException if no ErrorAlerts were found
@@ -287,14 +296,33 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public final void waitUntilElementIsVisible(PageElement pageElement) {
-    log.info("Wait until element {} is visible", pageElement.getFullName());
-    waitUntil(ExpectedConditions.presenceOfElementLocated(this.getLocator(pageElement)));
-    waitUntil(ExpectedConditions.visibilityOfElementLocated(this.getLocator(pageElement)));
+    waitUntilElementIsVisible(pageElement, getMaxWaitTimeout());
+  }
+
+  public final void waitUntilElementIsVisible(PageElement pageElement, int maxWaitTimeout) {
+    log.info(
+        "Wait until element {} is visible with timeout of {} millis",
+        pageElement.getFullName(),
+        maxWaitTimeout);
+    waitUntil(
+        ExpectedConditions.presenceOfElementLocated(this.getLocator(pageElement)), maxWaitTimeout);
+    waitUntil(
+        ExpectedConditions.visibilityOfElementLocated(this.getLocator(pageElement)),
+        maxWaitTimeout);
   }
 
   public final void waitUntilElementIsPresent(PageElement pageElement) {
-    log.info("Wait until element {} is present", pageElement.getFullName());
-    waitUntil(ExpectedConditions.presenceOfAllElementsLocatedBy(this.getLocator(pageElement)));
+    waitUntilElementIsPresent(pageElement, getMaxWaitTimeout());
+  }
+
+  public final void waitUntilElementIsPresent(PageElement pageElement, int maxWaitTimeout) {
+    log.info(
+        "Wait until element {} is present with timeout of {} millis",
+        pageElement.getFullName(),
+        maxWaitTimeout);
+    waitUntil(
+        ExpectedConditions.presenceOfAllElementsLocatedBy(this.getLocator(pageElement)),
+        maxWaitTimeout);
   }
 
   public final void waitUntilElementIsSelected(PageElement pageElement) {
@@ -374,12 +402,20 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   }
 
   public void finish(Scenario scenario) {
-    val status = scenario.getStatus();
-    log.info("Report Status: {}", status);
-    val message = format("Scenario {0}: {1}", scenario.getId(), status);
-    val reportScript =
-        format("seetest:client.setReportStatus(\"{0}\", \"{1}\", \"\")", status, message);
-    driver.executeScript(reportScript);
+    val scenarioId = scenario.getId();
+    val scenarioName = scenario.getName();
+    val scenarioStatus = scenario.getStatus();
+
+    log.info("Scenario {} - {}: {}", scenarioName, scenarioId, scenarioStatus);
+
+    val sendTestInfoStatus =
+        scenarioFinalizer.sendTestInfo(
+            driver.getSessionId().toString(), scenarioName, scenarioStatus.toString());
+
+    log.info(
+        "Sending test info for scenario: {} {}",
+        scenarioName,
+        sendTestInfoStatus ? "was successful" : "failed");
   }
 
   @Override

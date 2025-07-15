@@ -1,0 +1,101 @@
+{
+  "resourceType": "CodeSystem",
+  "url": "http://ihe-d.de/CodeSystems/ProzessrollenFuerAutoren",
+  "version": "2021-06-25T13:21:07",
+  "name": "ProzessrollenFuerAutoren",
+  "id": "ProzessrollenFuerAutoren",
+  "title": "Prozessrollen Fuer Autoren",
+  "status": "active",
+  "experimental": false,
+  "publisher": "IHE Deutschland e.V.",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "1",
+      "display": "Einweiser",
+      "definition": "Die Person, die die Einweisung veranlasst hat. (Sie wird auch als Zuweiser bezeichnet.)"
+    },
+    {
+      "code": "2",
+      "display": "Entlassender",
+      "definition": "Die Person, die für die Entlassung verantwortlich ist."
+    },
+    {
+      "code": "3",
+      "display": "Überweiser",
+      "definition": "Die Person, die die Überweisung veranlasst hat."
+    },
+    {
+      "code": "4",
+      "display": "Durchführender",
+      "definition": "Die Person oder das Gerät, welche(s) die dokumentierte Aktion durchgeführt hat."
+    },
+    {
+      "code": "5",
+      "display": "durchführendes Gerät",
+      "definition": "Das Gerät, welches die dokumentierte Aktion durchgeführt hat."
+    },
+    {
+      "code": "6",
+      "display": "Betreuer",
+      "definition": "Die Person, die den Patienten betreut, d.h. den Überblick über die Behandlung behält und als primärer Ansprechpartner während der Behandlung dient."
+    },
+    {
+      "code": "7",
+      "display": "Pflegender",
+      "definition": "Die Person, die den Patienten pflegerisch (aktiv) betreut."
+    },
+    {
+      "code": "17",
+      "display": "Begutachtender",
+      "definition": "Die Person, die ein Gutachten erstellt."
+    },
+    {
+      "code": "8",
+      "display": "Behandler",
+      "definition": "Die Person, die den Patienten aktiv behandelt im Sinne der Verbesserung (oder zumindest Beibehaltung) des gesundheitlichen Zustandes."
+    },
+    {
+      "code": "9",
+      "display": "Erstbehandler außerhalb einer Einrichtung",
+      "definition": "Die Person, die den Patienten außerhalb der (eigenen) Einrichtung zuerst behandelt hat. Das kann - muss aber nicht - im Rahmen einer Notfallversorgung stattgefunden haben."
+    },
+    {
+      "code": "10",
+      "display": "Bereitstellender",
+      "definition": "Die Person, die zusätzliche Mittel (Medikamente, Heil-/Hilfsmittel) bereitgestellt hat."
+    },
+    {
+      "code": "11",
+      "display": "Dokumentierender",
+      "definition": "Die Person, die übermittelte Informationen eingibt oder ein Gerät, das erzeugte Daten im System hinterlegt."
+    },
+    {
+      "code": "12",
+      "display": "dokumentierendes Gerät",
+      "definition": "Das Gerät, welches erzeugte Daten im System hinterlegt."
+    },
+    {
+      "code": "13",
+      "display": "Validierer",
+      "definition": "Die Person, die Korrektheit der hinterlegten Information überprüft und verifiziert hat."
+    },
+    {
+      "code": "14",
+      "display": "Gesetzlich Verantwortlicher",
+      "definition": "Die Person, die vor dem Gesetz für die Korrektheit der Informationen verantwortlich ist und dafür haftet."
+    },
+    {
+      "code": "15",
+      "display": "Beratender",
+      "definition": "Die Person, die Auswertungen vorgenommen und beratend involviert war."
+    },
+    {
+      "code": "16",
+      "display": "Informierender",
+      "definition": "Eine Person, die zu den hier dokumentierten Informationen beigetragen hat."
+    }
+  ],
+  "count": 17
+}

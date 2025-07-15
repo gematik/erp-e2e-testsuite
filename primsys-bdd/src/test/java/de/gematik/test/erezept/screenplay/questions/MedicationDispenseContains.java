@@ -12,20 +12,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.screenplay.strategy.ActorRole;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 
@@ -37,6 +45,7 @@ public class MedicationDispenseContains implements Question<Boolean> {
   private final Predicate<ErxMedicationDispenseBundle> predicate;
 
   @Override
+  @Step("{0} ruft eine MedicationDispense am FD ab und überprüft den Inhalt")
   public Boolean answeredBy(Actor actor) {
     val response = actor.asksFor(question);
     log.info(
@@ -76,6 +85,32 @@ public class MedicationDispenseContains implements Question<Boolean> {
       val q = GetMedicationDispense.as(role).forPrescription(deque);
       Predicate<ErxMedicationDispenseBundle> p =
           (actual) -> actual.getMedicationDispenses().size() == num;
+      return new MedicationDispenseContains(q, p);
+    }
+
+    public MedicationDispenseContains hasRedeemCode() {
+      val q = GetMedicationDispense.as(role).forPrescription(deque);
+      Predicate<ErxMedicationDispenseBundle> p =
+          (actual) ->
+              actual.getMedicationDispenses().stream()
+                  .filter(ErxMedicationDispenseBase::isDiGA)
+                  .map(ErxMedicationDispense::getRedeemCode)
+                  .map(Optional::isPresent)
+                  .findFirst()
+                  .orElse(false);
+      return new MedicationDispenseContains(q, p);
+    }
+
+    public MedicationDispenseContains hasNoRedeemCode() {
+      val q = GetMedicationDispense.as(role).forPrescription(deque);
+      Predicate<ErxMedicationDispenseBundle> p =
+          (actual) ->
+              actual.getMedicationDispenses().stream()
+                  .filter(ErxMedicationDispenseBase::isDiGA)
+                  .map(ErxMedicationDispense::getRedeemCode)
+                  .toList()
+                  .isEmpty();
+
       return new MedicationDispenseContains(q, p);
     }
   }

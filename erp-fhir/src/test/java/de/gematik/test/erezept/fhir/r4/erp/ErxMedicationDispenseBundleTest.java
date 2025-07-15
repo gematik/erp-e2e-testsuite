@@ -12,14 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -36,34 +38,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/1.1.1/";
   private static final String BASE_PATH_1_4 = "fhir/valid/erp/1.4.0/medicationdispensebundle/";
-
-  @Test
-  void shouldCastFromMedicationDispense() {
-    val fileName = "MedicationDispenseBundle_01.json";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val vr = parser.validate(content);
-
-    if (!vr.isSuccessful()) {
-      System.out.println(
-          format("Found {0} errors in {1}", vr.getMessages().size(), BASE_PATH + fileName));
-      vr.getMessages().forEach(System.out::println);
-    }
-    assertTrue(vr.isSuccessful(), format("{0} must be valid, but is not", fileName));
-
-    val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);
-    assertNotNull(bundle);
-    assertEquals(3, bundle.getMedicationDispenses().size());
-  }
 
   static Stream<Arguments> shouldReadGemMedicationsFromBundle() {
     return Stream.of(
         arguments("Bundle-SimpleMedicationDispenseBundle.json", 1, 1),
         arguments("Bundle-KomplexMedicationDispenseBundle.json", 1, 1),
         arguments("Bundle-MultipleMedicationDispenseBundle.json", 2, 2),
-        arguments("Bundle-SearchSetMultipleMedicationDispenseBundle.json", 2, 4));
+        arguments("Bundle-SearchSetMultipleMedicationDispenseBundle.json", 2, 3));
   }
 
   @ParameterizedTest
@@ -121,7 +103,7 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
         arguments(
             PrescriptionId.from("160.000.000.000.000.04"),
             "Bundle-SearchSetMultipleMedicationDispenseBundle.json",
-            1),
+            0),
         arguments(
             PrescriptionId.from("160.000.000.000.000.05"),
             "Bundle-SearchSetMultipleMedicationDispenseBundle.json",
@@ -150,13 +132,16 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shouldThrowOnGettingOldMedicationDispensesByPrescriptionId() {
+  void shouldSkipContainedKbvMedications() {
+    // Note: these require an additional method for fetching contained medications in
+    // ErxMedicationDispense
     val prescriptionId = PrescriptionId.from("160.000.000.000.000.04");
     val fileName = "Bundle-SearchSetMultipleMedicationDispenseBundle.json";
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);
 
-    assertThrows(RuntimeException.class, () -> bundle.getDispensePairBy(prescriptionId));
+    val pairs = assertDoesNotThrow(() -> bundle.getDispensePairBy(prescriptionId));
+    assertTrue(pairs.isEmpty());
   }
 
   @Test

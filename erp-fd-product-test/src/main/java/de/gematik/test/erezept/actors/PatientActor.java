@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actors;
@@ -21,9 +25,6 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvAssignerOrganizationFaker;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.r4.kbv.AssignerOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
@@ -53,21 +54,16 @@ public class PatientActor extends ErpActor {
 
   public void changePatientInsuranceType(InsuranceTypeDe insuranceType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    bd.setPatientInsuranceType(insuranceType);
+
+    // hacky but we have many cases where we mix up those things
+    val fixedInsuranceType =
+        InsuranceTypeDe.PKV.equals(insuranceType) ? InsuranceTypeDe.PKV : InsuranceTypeDe.GKV;
+    bd.setPatientInsuranceType(fixedInsuranceType);
   }
 
   public void setPayorType(PayorType payorType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     bd.setPayorType(payorType);
-  }
-
-  public void setKvnr(String kvnr) {
-    this.setKvnr(KVNR.from(kvnr));
-  }
-
-  public void setKvnr(KVNR kvnr) {
-    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    bd.setKvnr(kvnr);
   }
 
   public void changeDmpKennzeichen(DmpKennzeichen dmpKennzeichen) {
@@ -83,6 +79,11 @@ public class PatientActor extends ErpActor {
   public void changeCoverageInsuranceType(InsuranceTypeDe coverageType) {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     bd.setCoverageInsuranceType(coverageType);
+
+    // hacky but we have many cases where we mix up those things
+    if (InsuranceTypeDe.PKV.equals(coverageType)) {
+      this.changePatientInsuranceType(coverageType);
+    }
   }
 
   public InsuranceTypeDe getPatientInsuranceType() {
@@ -103,22 +104,6 @@ public class PatientActor extends ErpActor {
   public KbvCoverage getInsuranceCoverage() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getInsuranceCoverage();
-  }
-
-  public Optional<AssignerOrganization> getAssignerOrganization() {
-    Optional<AssignerOrganization> ret = Optional.empty();
-    // an assigner Organization for PKV is only required for kbv.ita.erp == 1.0.2
-    if (this.getPatientInsuranceType() == InsuranceTypeDe.PKV
-        && KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) < 0) {
-
-      // for now, we do not have the AssignerOrganization (which was faked anyway for getting a
-      // Reference + Name
-      // build a faked one matching the Reference of the patient
-      val fakedAssignerOrganization =
-          KbvAssignerOrganizationFaker.builder().forPatient(this.getPatientData()).fake();
-      ret = Optional.of(fakedAssignerOrganization);
-    }
-    return ret;
   }
 
   @Override

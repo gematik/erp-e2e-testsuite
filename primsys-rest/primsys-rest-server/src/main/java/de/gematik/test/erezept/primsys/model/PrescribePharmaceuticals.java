@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.primsys.model;
@@ -20,6 +24,7 @@ import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.primsys.actors.Doctor;
+import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto.PrescriptionDtoBuilder;
@@ -28,6 +33,7 @@ import de.gematik.test.erezept.primsys.mapping.MedicationRequestDataMapper;
 import de.gematik.test.erezept.primsys.mapping.PrescribeRequestDataMapper;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.core.Response;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,13 +59,13 @@ public class PrescribePharmaceuticals extends PrescribeUseCase<KbvErpBundle> {
   }
 
   public Response withDto(PrescribeRequestDto body) {
-    val bodyMapper = PrescribeRequestDataMapper.from(body);
-
-    if (!bodyMapper.getPatientMapper().hasKvnr()) {
+    val kvnr = Optional.ofNullable(body.getPatient()).map(PatientDto::getKvnr).orElse(null);
+    if (kvnr == null) {
       throw ErrorResponseBuilder.createInternalErrorException(
           400, "KVNR is required field for the body");
     }
 
+    val bodyMapper = PrescribeRequestDataMapper.from(body);
     val kbvBundle = bodyMapper.createKbvBundle(doctor.getName());
     return withKbvBundle(kbvBundle);
   }

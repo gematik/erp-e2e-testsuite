@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.dav;
@@ -39,7 +43,7 @@ class DavPkvAbgabedatenBundleTest extends ErpFhirParsingTest {
   @Test
   void testEncodeSingleValidBundle() {
     val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
-    val expectedPrescriptionId = new PrescriptionId("200.100.000.000.081.90");
+    val expectedPrescriptionId = PrescriptionId.from("200.100.000.000.081.90");
     val expectedFlowType = PrescriptionFlowType.FLOW_TYPE_200;
 
     val fileName = expectedID + ".xml";

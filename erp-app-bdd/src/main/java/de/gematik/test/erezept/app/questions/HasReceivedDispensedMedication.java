@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.questions;
@@ -19,7 +23,7 @@ package de.gematik.test.erezept.app.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.MedicationDispenseDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
@@ -60,11 +64,8 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
     // first refresh the screen
     app.tap(Mainscreen.REFRESH_BUTTON);
 
-    // because we know the prescription archive is at the very bottom of the screen
-    app.scroll(ScrollDirection.DOWN, Float.MAX_VALUE);
-
     // and after that make only sure we have reached the archive button
-    app.scrollIntoView(ScrollDirection.DOWN, Mainscreen.PRESCRIPTION_ARCHIVE);
+    app.swipeIntoView(SwipeDirection.UP, Mainscreen.PRESCRIPTION_ARCHIVE);
     app.tap(Mainscreen.PRESCRIPTION_ARCHIVE);
     actor
         .asksFor(MovingToPrescription.withTaskId(prescriptionId.getValue()))

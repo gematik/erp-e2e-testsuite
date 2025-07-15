@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.eml.integration;
@@ -20,7 +24,10 @@ import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.GKV;
 import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.PKV;
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPractitionerHasHbaTelematikId;
-import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.*;
+import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.FLOW_TYPE_160;
+import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.FLOW_TYPE_169;
+import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.FLOW_TYPE_200;
+import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.FLOW_TYPE_209;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.DIRECT_ASSIGNMENT;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
 
@@ -31,7 +38,11 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckErpDoesNotProvidePrescriptionToEpa;
 import de.gematik.test.eml.tasks.LoadAndValidateProvidePrescription;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.GetPrescriptionById;
+import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.actions.TaskAbort;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -39,7 +50,6 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
@@ -126,9 +136,7 @@ public class ProvidePrescWithoutHbaTelematikID extends ErpTest {
             GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
 
     val validatorList =
-        List.of(
-            emlPractitionerHasHbaTelematikId(
-                TelematikID.from(docWithoutTelematikId.getHbaTelematikId())));
+        List.of(emlPractitionerHasHbaTelematikId(docWithoutTelematikId.getHbaTelematikId()));
 
     epaFhirChecker.attemptsTo(
         LoadAndValidateProvidePrescription.withValidator(validatorList)

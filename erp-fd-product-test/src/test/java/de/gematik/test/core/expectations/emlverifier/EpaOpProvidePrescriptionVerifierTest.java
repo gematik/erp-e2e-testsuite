@@ -12,16 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.core.expectations.emlverifier;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlAuthoredOnIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationRequestMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlOrganisationHasSmcbTelematikId;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPractitionerHasHbaTelematikId;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPrescriptionIdIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.*;
 import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.SNOMED_SCT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,21 +28,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.values.TelematikID;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.time.LocalDate;
@@ -339,6 +333,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
             .withAmount("1", 1, "halt sowas")
             .withDrugName("Grippostad C® Fruchtgummi")
             .withStandardSize(StandardSize.N1)
+            .withVaccine(false)
             .withIngredientComponent(2, 1, "wölkchen")
             .fake();
     ingredientMed.setForm(new CodeableConcept(new Coding()).setText("0-0-1-0-3-2"));

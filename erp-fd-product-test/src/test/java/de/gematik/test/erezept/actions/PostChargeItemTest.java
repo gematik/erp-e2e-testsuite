@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.actions;
@@ -39,7 +43,7 @@ import org.junit.jupiter.api.Test;
 
 class PostChargeItemTest extends ErpFhirParsingTest {
   private static final String ACCEPT_BUNDLE_PATH =
-      "fhir/valid/erp/1.2.0/acceptbundle/cef4b960-7ce4-4755-b4ce-3b01a30ec2f0.xml";
+      "fhir/valid/erp/1.4.0/acceptbundle/2c08c718-3d3b-447e-babc-7afef76f0a48.xml";
   private ErpClient erpClientMock;
   private MockActorsUtils mockUtil;
   private PharmacyActor pharmacyActor;

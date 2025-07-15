@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.config;
@@ -23,7 +27,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TestsuiteconfigurationScope implements ConfigurationScope {
   ERP_APP("erp.app", "erp-app"),
-  ERP_PRIMSYS("erp.primsys", "primsys");
+  ERP_PRIMSYS("erp.primsys", "primsys"),
+  ERP_REMOTEFDV("erp.remotefdv", "erp-remote-fdv");
 
   private final String scopePrefix;
   private final String defaultDirectoryName;

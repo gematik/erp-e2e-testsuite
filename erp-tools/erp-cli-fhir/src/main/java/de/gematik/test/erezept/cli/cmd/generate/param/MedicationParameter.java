@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd.generate.param;
@@ -53,7 +57,7 @@ public class MedicationParameter implements BaseResourceParameter {
   private StandardSize size;
 
   @CommandLine.Option(
-      names = {"--supply", "--darreichungsform"},
+      names = {"--supply", "--kbvDdarreichungsform"},
       paramLabel = "<FORM>",
       type = StandardSize.class,
       description = "Supplyform (Darreichungsform) from ${COMPLETION-CANDIDATES} (default=random)")
@@ -81,7 +85,7 @@ public class MedicationParameter implements BaseResourceParameter {
   private String drugName;
 
   public StandardSize getStandardSize() {
-    return this.getOrDefault(size, () -> GemFaker.fakerValueSet(StandardSize.class));
+    return this.getOrDefault(size, StandardSize::random);
   }
 
   public Darreichungsform getSupplyForm() {

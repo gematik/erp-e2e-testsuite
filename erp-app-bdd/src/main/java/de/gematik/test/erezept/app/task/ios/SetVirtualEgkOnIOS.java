@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.task.ios;
@@ -23,7 +27,6 @@ import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.exceptions.SmartCardKeyNotFoundException;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.ScrollDirection;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -59,7 +62,7 @@ public class SetVirtualEgkOnIOS implements Task {
             "Set virtual eGK with KVNR {0} ({1}) for {2}",
             egk.getKvnr(), egk.getIccsn(), actor.getName()));
 
-    app.scrollIntoView(ScrollDirection.DOWN, Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON);
+    app.swipeIntoView(SwipeDirection.UP, Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON);
 
     // if active, the text of TypeSwitch is 1, otherwise 0
     val isActive = "1".equals(app.getText(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON));
@@ -68,7 +71,7 @@ public class SetVirtualEgkOnIOS implements Task {
       app.tap(Debug.ENABLE_VIRTUAL_EGK_USAGE_BUTTON);
     } else {
       // otherwise scroll directly to the certificates
-      app.scrollIntoView(ScrollDirection.DOWN, Debug.EGK_CERTIFICATE_CHAIN);
+      app.swipeIntoView(SwipeDirection.UP, Debug.EGK_CERTIFICATE_CHAIN);
     }
 
     val pk = egk.getPrivateKeyBase64();
@@ -82,10 +85,11 @@ public class SetVirtualEgkOnIOS implements Task {
 
     app.input(pk, Debug.EGK_PRIVATE_KEY);
     app.input(cc, Debug.EGK_CERTIFICATE_CHAIN);
+    app.tap(Debug.LEAVE_BUTTON);
+    app.tap(Debug.MENU_BUTTON);
 
     if (!userConfig.isHasNfc()) {
-      // Note: scrolling up is necessary to make the TypeSwitch visible
-      app.swipe(SwipeDirection.UP);
+      app.swipeIntoView(SwipeDirection.UP, Debug.FAKE_DEVICE_CAPABILITIES);
 
       // fake NFC capabilities
       // if active, the text of TypeSwitch is 1, otherwise 0

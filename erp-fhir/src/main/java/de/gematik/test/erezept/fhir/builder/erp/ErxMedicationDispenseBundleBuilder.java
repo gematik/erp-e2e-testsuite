@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
@@ -19,8 +23,8 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +71,7 @@ public class ErxMedicationDispenseBundleBuilder
         new Enumeration<>(new Bundle.BundleTypeEnumFactory(), Bundle.BundleType.COLLECTION);
     val mdBundle = new Bundle(bundleType);
 
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_1_1) > 0
-        && erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4_0) < 0) {
+    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3) <= 0) {
       mdBundle
           .getMeta()
           .addProfile(

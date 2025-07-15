@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.anonymizer;
@@ -33,15 +37,15 @@ public class KbvPractitionerAnonymizer implements Anonymizer<KbvPractitioner> {
     ctx.anonymizeAddresses(resource.getAddress());
 
     resource.getIdentifier().stream()
-        .filter(BaseANR::hasValidIdentifier)
+        .filter(BaseANR::matches)
         .forEach(
-            identifer -> {
+            identifier -> {
               if (ctx.getIdentifierAnonymization() == AnonymizationType.BLACKING) {
-                ctx.anonymize(identifer.getValueElement());
+                ctx.anonymize(identifier.getValueElement());
               } else {
                 val qt = resource.getQualificationType();
                 ctx.anonymize(
-                    identifer.getValueElement(),
+                    identifier.getValueElement(),
                     () -> BaseANR.randomFromQualification(qt).getValue());
               }
             });

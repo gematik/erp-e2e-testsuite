@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.eml;
@@ -19,7 +23,6 @@ package de.gematik.test.erezept.eml;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.rest.HttpBRequest;
-import de.gematik.bbriccs.rest.HttpRequestMethod;
 
 public class DownloadRequestByPrescriptionId implements EpaMockDownloadRequest {
   private final String prescriptionId;
@@ -30,7 +33,8 @@ public class DownloadRequestByPrescriptionId implements EpaMockDownloadRequest {
 
   @Override
   public HttpBRequest getHttpBRequest() {
-    return new HttpBRequest(
-        HttpRequestMethod.GET, format("/log?prescriptionid={0}", prescriptionId));
+    return HttpBRequest.get()
+        .urlPath(format("/log?prescriptionid={0}", prescriptionId))
+        .withoutPayload();
   }
 }

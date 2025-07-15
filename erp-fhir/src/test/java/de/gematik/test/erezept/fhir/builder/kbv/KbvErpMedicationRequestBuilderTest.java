@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -22,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
@@ -56,6 +60,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
+    System.out.println(result.getMessages());
+
     assertTrue(result.isSuccessful());
 
     val dosage = medicationRequest.getDosageInstructionFirstRep();
@@ -96,8 +102,7 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
             .withAccident(AccidentExtension.accident())
             .fake();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
-    assertTrue(result.isSuccessful());
+    assertTrue(parser.isValid(medicationRequest));
   }
 
   @ParameterizedTest(
@@ -181,10 +186,7 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
 
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
-    if (version.compareTo(KbvItaErpVersion.V1_0_2) > 0) {
-      // MVO-ID is not allowed in versions 1.0.2 and was introduced in 1.1.0
-      assertTrue(medicationRequest.getMvoId().isPresent());
-    }
+    assertTrue(medicationRequest.getMvoId().isPresent());
   }
 
   @ParameterizedTest(
@@ -208,5 +210,20 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
   void shouldUseNullIntentOnInvalidCode() {
     val medicationRequest = KbvErpMedicationRequestFaker.builder().withIntent("abc").fake();
     assertEquals(MedicationRequest.MedicationRequestIntent.NULL, medicationRequest.getIntent());
+  }
+
+  @Test
+  void shouldSetPrescriberId() {
+    val medicationRequest =
+        KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
+            .version(KbvItaErpVersion.V1_2_0)
+            .prescriberId("123456789")
+            .insurance(KbvCoverageFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .quantityPackages(20)
+            .build();
+
+    assertTrue(parser.isValid(medicationRequest));
   }
 }

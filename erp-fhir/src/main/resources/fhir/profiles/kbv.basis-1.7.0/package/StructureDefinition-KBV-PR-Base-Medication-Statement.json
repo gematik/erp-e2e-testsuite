@@ -1,0 +1,921 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "KBV-PR-Base-Medication-Statement",
+  "url": "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_MedicationStatement",
+  "version": "1.7.0",
+  "name": "KBV_PR_Base_MedicationStatement",
+  "title": "KBV_PR_Base_MedicationStatement",
+  "status": "active",
+  "date": "2025-02-11",
+  "publisher": "Kassenärztliche Bundesvereinigung (KBV)",
+  "description": "Dieses Profil bildet die Medikationsinformation ab.",
+  "copyright": "Im folgenden Profil können Codes aus den Codesystemen Snomed, Loinc oder Ucum enthalten sein, die dem folgenden Urheberrecht unterliegen: This material includes SNOMED Clinical Terms® SNOMED CT® which is used by permission of SNOMED International. All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. SNOMED and SNOMED CT are registered trademarks of SNOMED International. Implementers of these artefacts must have the appropriate SNOMED CT Affiliate license. This material contains content from Loinc http://loinc.org. Loinc is copyright © 1995-2020, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes Loinc Committee and is available at no cost under the license at http://loinc.org/license. Loinc® is a registered United States trademark of Regenstrief Institute, Inc. This product includes all or a portion of the UCUM table, UCUM codes, and UCUM definitions or is derived from it, subject to a license from Regenstrief Institute, Inc. and The UCUM Organization. Your use of the UCUM table, UCUM codes, UCUM definitions also is subject to this license, a copy of which is available at ​http://unitsofmeasure.org. The current complete UCUM table, UCUM Specification are available for download at ​http://unitsofmeasure.org. The UCUM table and UCUM codes are copyright © 1995-2009, Regenstrief Institute, Inc. and the Unified Codes for Units of Measures UCUM Organization. All rights reserved. THE UCUM TABLE IN ALL FORMATS, UCUM DEFINITIONS, AND SPECIFICATION ARE PROVIDED 'AS IS.' ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "MedicationStatement",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/MedicationStatement",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "MedicationStatement",
+        "path": "MedicationStatement",
+        "definition": "Hier werden Angaben dazu gemacht, wie ein bestimmtes Arzneimittel eingenommen bzw. verabreicht wird oder werden soll."
+      },
+      {
+        "id": "MedicationStatement.extension",
+        "path": "MedicationStatement.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "open"
+        }
+      },
+      {
+        "id": "MedicationStatement.extension:behandlungsziel",
+        "path": "MedicationStatement.extension",
+        "sliceName": "behandlungsziel",
+        "definition": "Hier werden Behandlungsziele erfasst, welche durch die Arzneimittelverordnung erreicht werden sollen. Dies kann z. B. ein bestimmter INR-Zielbereich bei einer oralen Antikoagulation, ein LDL-Zielbereich bei einer kardiovaskulären Erkrankung oder ein therapeutischer Wirkstoffspiegel sein.",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://hl7.org/fhir/StructureDefinition/resource-pertainsToGoal"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.status",
+        "path": "MedicationStatement.status",
+        "definition": "Hier wird der Status der Medikations-Information angegeben."
+      },
+      {
+        "id": "MedicationStatement.statusReason",
+        "path": "MedicationStatement.statusReason",
+        "definition": "Hier wird der Status begründet.",
+        "binding": {
+          "strength": "example",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Drug_Therapy_Status_Codes_SNOMED_CT"
+        }
+      },
+      {
+        "id": "MedicationStatement.medication[x]",
+        "path": "MedicationStatement.medication[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird das Arzneimittel referenziert, auf das sich die Medikations-Information bezieht."
+      },
+      {
+        "id": "MedicationStatement.medication[x]:medicationReference",
+        "path": "MedicationStatement.medication[x]",
+        "sliceName": "medicationReference",
+        "definition": "Hier wird die Referenz auf das Arzneimittel angegeben. ",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Medication",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Medication|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.subject",
+        "path": "MedicationStatement.subject",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/Group",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.effective[x]",
+        "path": "MedicationStatement.effective[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird eine Zeitangabe für den Verabreichungs- bzw. Einnahmezeitraum vorgenommen. Diese kann entweder ein spezifischer Zeitpunkt (z. B. bei einer Einmalgabe) oder ein Zeitraum mit Start und/oder Ende sein."
+      },
+      {
+        "id": "MedicationStatement.effective[x]:effectiveDateTime",
+        "path": "MedicationStatement.effective[x]",
+        "sliceName": "effectiveDateTime",
+        "definition": "Hier wird ein Zeitpunkt eingetragen, wobei dieser mindestens Tag, Monat und Jahr beinhalten muss.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.effective[x]:effectivePeriod",
+        "path": "MedicationStatement.effective[x]",
+        "sliceName": "effectivePeriod",
+        "definition": "Hier wird ein Zeitraum mit Start und Ende eingetragen.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Period"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.effective[x]:effectivePeriod.start",
+        "path": "MedicationStatement.effective[x].start",
+        "definition": "Hier wird der Beginn eines Zeitraumes eingetragen."
+      },
+      {
+        "id": "MedicationStatement.effective[x]:effectivePeriod.end",
+        "path": "MedicationStatement.effective[x].end",
+        "definition": "Hier wird das Ende eines Zeitraumes eingetragen."
+      },
+      {
+        "id": "MedicationStatement.dateAsserted",
+        "path": "MedicationStatement.dateAsserted",
+        "definition": "Hier wird angegeben, wann die vorliegende Medikations-Information erfasst wurde."
+      },
+      {
+        "id": "MedicationStatement.reasonCode",
+        "path": "MedicationStatement.reasonCode",
+        "definition": "In diesem Element werden Angaben zum Behandlungsgrund gemacht. Diese werden als codierte Information und/oder als Freitext angegeben."
+      },
+      {
+        "id": "MedicationStatement.reasonCode.coding",
+        "path": "MedicationStatement.reasonCode.coding",
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "MedicationStatement.reasonCode.coding.system",
+        "path": "MedicationStatement.reasonCode.coding.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.reasonCode.coding.code",
+        "path": "MedicationStatement.reasonCode.coding.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.reasonCode.coding.display",
+        "path": "MedicationStatement.reasonCode.coding.display",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.reasonCode.text",
+        "path": "MedicationStatement.reasonCode.text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "MedicationStatement.reasonReference",
+        "path": "MedicationStatement.reasonReference",
+        "definition": "Hier wird der Behandlungsgrund als Referenz auf ein anderes Element, z. B. auf eine Diagnose, einen Befund oder eine Beobachtung, angegeben.",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Condition",
+              "http://hl7.org/fhir/StructureDefinition/Observation",
+              "http://hl7.org/fhir/StructureDefinition/DiagnosticReport",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Condition_Diagnosis|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Apgar_Score|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Blood_Pressure|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Body_Height|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Body_Temperature|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Body_Weight|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Breastfeeding_Status|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Care_Level|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Estimated_Date_of_Delivery|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Glucose_Concentration|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Head_Circumference|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Heart_Rate|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Pain_Scale_Score|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Peripheral_Oxygen_Saturation|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Pregnancy_Status|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Observation_Respiratory_Rate|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_DiagnosticReport|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.note",
+        "path": "MedicationStatement.note",
+        "definition": "Hier werden ergänzende freitextliche Kommentare und Notizen vorgenommen, die nicht durch die strukturierten Datenelemente erfassbar sind."
+      },
+      {
+        "id": "MedicationStatement.note.author[x]",
+        "path": "MedicationStatement.note.author[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Person angegeben, die die Notiz erstellt hat. "
+      },
+      {
+        "id": "MedicationStatement.note.author[x]:authorReference",
+        "path": "MedicationStatement.note.author[x]",
+        "sliceName": "authorReference",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Practitioner",
+              "http://hl7.org/fhir/StructureDefinition/Patient",
+              "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+              "http://hl7.org/fhir/StructureDefinition/Organization",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Practitioner|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Patient|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_RelatedPerson|1.7.0",
+              "https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Organization|1.7.0"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.note.author[x]:authorString",
+        "path": "MedicationStatement.note.author[x]",
+        "sliceName": "authorString",
+        "definition": "Hier wird die Person, die die Notiz erstellt hat, referenziert.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.note.time",
+        "path": "MedicationStatement.note.time",
+        "definition": "Hier wird der Zeitpunkt angegeben, zu dem die Notiz erstellt wurde."
+      },
+      {
+        "id": "MedicationStatement.note.text",
+        "path": "MedicationStatement.note.text",
+        "definition": "Hier wird der eigentliche Text der Notiz eingetragen."
+      },
+      {
+        "id": "MedicationStatement.dosage",
+        "path": "MedicationStatement.dosage",
+        "definition": "Hier werden Informationen zur Dosierung angegeben. "
+      },
+      {
+        "id": "MedicationStatement.dosage.text",
+        "path": "MedicationStatement.dosage.text",
+        "definition": "Hier wird die Dosieranweisung in Form eines Freitextes angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.patientInstruction",
+        "path": "MedicationStatement.dosage.patientInstruction",
+        "definition": "Hier werden  patientenorientierte Hinweise angegeben zu Anwendung, Lagerung, Einnahme, etc."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat",
+        "path": "MedicationStatement.dosage.timing.repeat",
+        "definition": "Hier wird angegeben, über welchen Zeitraum eine einzelne Verabreichung/Einnahme durchgeführt wird bzw. zu welchen Zeitpunkten das Arzneimittel wiederholt verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "ordered": false,
+          "rules": "open"
+        },
+        "definition": "Hier wird abgebildet, in welchem Zeitraum oder in welcher Zeitspanne das Arzneimittel in der spezifischen Dosierung verabreicht/eingenommen wird. Zum Beispiel können hiermit spezifische Zeiträume bei der Auf- oder Ab-Dosierung von Medikamenten abgebildet werden."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsPeriod",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x]",
+        "sliceName": "boundsPeriod",
+        "definition": "Hier wird abgebildet, in welchem Zeitraum das Arzneimittel in der spezifischen Dosierung verabreicht/eingenommen wird. Der Zeitraum wird durch einen konkreten Start- und Endzeitpunkt begrenzt.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Period"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsPeriod.start",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].start",
+        "definition": "Hier wird der Beginn des dosisspezifischen Zeitraumes angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsPeriod.end",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].end",
+        "definition": "Hier wird das Ende des dosisspezifischen Zeitraumes angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsDuration",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x]",
+        "sliceName": "boundsDuration",
+        "definition": "Hier wird angegeben, in welcher festen Zeitspanne das Arzneimittel in der spezifischen Dosierung verabreicht/eingenommen wird. Dabei beginnt und endet der mögliche Zeitraum der Einnahme in dem Zeitraum, welcher innerhalb des Elements 'Verabreichung/Einnahme: Zeitangabe-Auswahl' -> 'Zeitraum' auf der obersten Ebene des Profils 'Medikations-Information' definiert ist.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Duration"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsDuration.value",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].value",
+        "definition": "\tHier wird der Wert der Zeitspanne angegeben, innerhalb der das Arzneimittel verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsRange",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x]",
+        "sliceName": "boundsRange",
+        "definition": "Hier wird angegeben, in welcher variablen Zeitspanne das Arzneimittel in der spezifischen Dosierung verabreicht/eingenommen wird. Diese Zeitspanne wird durch eine Ober- und Untergrenze definiert. Dabei beginnt und endet der mögliche Zeitraum der Einnahme in dem Zeitraum, welcher innerhalb des Elements 'Verabreichung/Einnahme: Zeitangabe-Auswahl' -> 'Zeitraum' auf der obersten Ebene des Profils 'Medikations-Information' definiert ist.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Range"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsRange.low",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].low",
+        "definition": "Hier wird die Untergrenze der variablen Zeitspanne abgebildet."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsRange.low.value",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].low.value",
+        "definition": "Hier wird der Wert der Zeitspanne angegeben, innerhalb der das Arzneimittel verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsRange.high",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].high",
+        "definition": "Hier wird die Obergrenze der variablen Zeitspanne abgebildet."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.bounds[x]:boundsRange.high.value",
+        "path": "MedicationStatement.dosage.timing.repeat.bounds[x].high.value",
+        "definition": "Hier wird der Wert der Zeitspanne angegeben, innerhalb der das Arzneimittel verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.count",
+        "path": "MedicationStatement.dosage.timing.repeat.count",
+        "definition": "Hier wird die absolute Anzahl der Wiederholungen einer Verabreichung/Einnahme eines Arzneimittels als Zahl angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.countMax",
+        "path": "MedicationStatement.dosage.timing.repeat.countMax",
+        "definition": "Hier wird die maximale Anzahl der Wiederholungen einer Verabreichung/Einnahme eines Arzneimittels als Zahl angegeben. Eine maximale Anzahl der Wiederholungen wird nur angegeben, wenn eine absolute Anzahl der Wiederholungen einer Verabreichung/Einnahme eines Arzneimittels angegeben ist."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.duration",
+        "path": "MedicationStatement.dosage.timing.repeat.duration",
+        "definition": "Hier wird der Wert der Zeitspanne angegeben, innerhalb der das Arzneimittel verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.durationMax",
+        "path": "MedicationStatement.dosage.timing.repeat.durationMax",
+        "definition": "Hier wird der maximale Wert der Zeitspanne angegeben, innerhalb der das Arzneimittel verabreicht/eingenommen wird. Eine maximale Zeitspanne kann nur angegeben werden, wenn eine feste Zeitspanne für die Dauer der einzelnen Verabreichung/Einnahme angegeben wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.frequency",
+        "path": "MedicationStatement.dosage.timing.repeat.frequency",
+        "definition": "Hier wird die absolute Anzahl der Verabreichungen/Einnahmen innerhalb der definierten Zeitspanne angegeben. Dies entspricht dem Zähler bei der Frequenzangabe."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.frequencyMax",
+        "path": "MedicationStatement.dosage.timing.repeat.frequencyMax",
+        "definition": "Hier wird die maximale Anzahl der Verabreichungen/Einnahmen innerhalb der definierten Zeitspanne angegeben. Dies entspricht dem Zähler bei der Frequenzangabe."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.period",
+        "path": "MedicationStatement.dosage.timing.repeat.period",
+        "definition": "Hier wird der Wert der Zeitspanne angegeben, innerhalb der die definierte Anzahl der Verabreichungen/Einnahmen durchgeführt wird. Dies entspricht der Zahl im Nenner bei der Frequenzangabe. "
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.periodMax",
+        "path": "MedicationStatement.dosage.timing.repeat.periodMax",
+        "definition": "Hier wird der maximale Wert der Zeitspanne angegeben, innerhalb der die definierte Anzahl der Verabreichungen/Einnahmen durchgeführt wird. Dies entspricht der Zahl im Nenner bei der Frequenzangabe."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.dayOfWeek",
+        "path": "MedicationStatement.dosage.timing.repeat.dayOfWeek",
+        "definition": "Hier wird der Wochentag, an dem das Arzneimittel verabreicht/eingenommen werden soll, angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.timeOfDay",
+        "path": "MedicationStatement.dosage.timing.repeat.timeOfDay",
+        "definition": "Hier werden Uhrzeiten angegeben, zu denen das Arzneimittel verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.when",
+        "path": "MedicationStatement.dosage.timing.repeat.when",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier werden Tageszeiten angegeben, zu denen das Arzneimittel verabreicht/eingenommen wird. Es ist darauf zu achten, dass diese Informationen logisch zu den Angaben bei der Wiederholungsfrequenz passen."
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.when:Tageszeit",
+        "path": "MedicationStatement.dosage.timing.repeat.when",
+        "sliceName": "Tageszeit",
+        "definition": "Hier werden Tageszeiten, zu denen das Arzneimittel verabreicht/eingenommen wird, als Code aus dem FHIR ValueSet http://hl7.org/fhir/ValueSet/event-timing angegeben. Dabei spiegeln die vier möglichen Konzepte 'Morgens', 'Mittags', 'Abends', 'Nachts' das in der Praxis übliche '4er-Einnahmeschema' wieder (beispielsweise '0-1-0-0' entspricht dem Konzept 'Einnahme von einer Tablette 'Mittags').",
+        "min": 0,
+        "max": "*",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_EventTiming"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.when:Mahlzeiten-Schlafzeiten",
+        "path": "MedicationStatement.dosage.timing.repeat.when",
+        "sliceName": "Mahlzeiten-Schlafzeiten",
+        "definition": "Hier wird eine mahlzeiten- und schlafzeitenabhängige Zusatzinformation zur Einnahme eines Arzneimittels als Code aus dem FHIR ValueSet http://hl7.org/fhir/ValueSet/event-timing angegeben.",
+        "min": 0,
+        "max": "*",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_TimingEvent"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.timing.repeat.offset",
+        "path": "MedicationStatement.dosage.timing.repeat.offset",
+        "definition": "Hier wird der Zeitabstand der Verabreichung/Einnahme eines Arzneimittels zu einer Mahlzeit oder der Schlafzeit in Minuten angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]",
+        "path": "MedicationStatement.dosage.asNeeded[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier werden Angaben zur Dosierung als Bedarfsmedikation gemacht."
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededBoolean",
+        "path": "MedicationStatement.dosage.asNeeded[x]",
+        "sliceName": "asNeededBoolean",
+        "definition": "Hier wird angegeben, ob es sich um eine Bedarfsmedikation handelt.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept",
+        "path": "MedicationStatement.dosage.asNeeded[x]",
+        "sliceName": "asNeededCodeableConcept",
+        "definition": "In diesem Element werden Angaben zum Zustand, welcher die Bedingung zur Verabreichung/Einnahme der Bedarfsmedikation ist, gemacht. Diese werden als codierte Information und/oder als Freitext angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.coding",
+        "path": "MedicationStatement.dosage.asNeeded[x].coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird ein Code aus einem geeigneten Code-System angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.coding:snomed",
+        "path": "MedicationStatement.dosage.asNeeded[x].coding",
+        "sliceName": "snomed",
+        "definition": "Hier wird die Bedingung zur Verabreichung/Einnahme der Bedarfsmedikation als SNOMED CT®-Code angegeben.",
+        "min": 0,
+        "max": "*",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_PRN_Medication_Reason_SNOMED_CT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.coding:snomed.system",
+        "path": "MedicationStatement.dosage.asNeeded[x].coding.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.coding:snomed.version",
+        "path": "MedicationStatement.dosage.asNeeded[x].coding.version",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.coding:snomed.code",
+        "path": "MedicationStatement.dosage.asNeeded[x].coding.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.coding:snomed.display",
+        "path": "MedicationStatement.dosage.asNeeded[x].coding.display",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.asNeeded[x]:asNeededCodeableConcept.text",
+        "path": "MedicationStatement.dosage.asNeeded[x].text",
+        "definition": "Hier wird ein Freitext eingetragen."
+      },
+      {
+        "id": "MedicationStatement.dosage.site",
+        "path": "MedicationStatement.dosage.site",
+        "definition": "Hier wird die Körperstelle, an der das Arzneimittel verabreicht/eingenommen/angewendet wird, als codierte Information oder als Freitext angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.site.coding",
+        "path": "MedicationStatement.dosage.site.coding",
+        "definition": "Hier wird die Körperstelle als Code angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.site.coding.system",
+        "path": "MedicationStatement.dosage.site.coding.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.site.coding.code",
+        "path": "MedicationStatement.dosage.site.coding.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.site.coding.display",
+        "path": "MedicationStatement.dosage.site.coding.display",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.site.text",
+        "path": "MedicationStatement.dosage.site.text",
+        "definition": "Hier wird die Körperstelle als Freitext angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.route",
+        "path": "MedicationStatement.dosage.route",
+        "definition": "Hier wird der Verabreichungsweg mit einem entsprechenden Code oder alternativ mit einem Freitext angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding",
+        "path": "MedicationStatement.dosage.route.coding",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird eines der Elemente ausgewählt, um den Verabreichungsweg als Code anzugeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:snomed",
+        "path": "MedicationStatement.dosage.route.coding",
+        "sliceName": "snomed",
+        "definition": "Hier wird ein Code aus dem Code-System SNOMED CT® eingetragen. Ein Beispiel-ValueSet wird zur Verfügung gestellt. ",
+        "min": 0,
+        "max": "1",
+        "patternCoding": {
+          "system": "http://snomed.info/sct"
+        },
+        "binding": {
+          "strength": "example",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Route_of_Administration_SNOMED_CT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:snomed.system",
+        "path": "MedicationStatement.dosage.route.coding.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:snomed.version",
+        "path": "MedicationStatement.dosage.route.coding.version",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:snomed.code",
+        "path": "MedicationStatement.dosage.route.coding.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:snomed.display",
+        "path": "MedicationStatement.dosage.route.coding.display",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:edqm",
+        "path": "MedicationStatement.dosage.route.coding",
+        "sliceName": "edqm",
+        "definition": "Hier wird ein Code aus dem EDQM ValueSet medicine-route-of-administration angegeben. Die Expansion der EDQM-Konzepte entspricht der Änderungshistorie vom 16.05.2022 (https://standardterms.edqm.eu/index/6).",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_Base_Medicine_Route_Of_Administration"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:edqm.system",
+        "path": "MedicationStatement.dosage.route.coding.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:edqm.code",
+        "path": "MedicationStatement.dosage.route.coding.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.coding:edqm.display",
+        "path": "MedicationStatement.dosage.route.coding.display",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.route.text",
+        "path": "MedicationStatement.dosage.route.text",
+        "definition": "Hier wird der Verabreichungsweg als Freitext angegeben."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate",
+        "path": "MedicationStatement.dosage.doseAndRate",
+        "definition": "Hier werden verschiedene Angaben dazu gemacht, wie das Arzneimittel bei einer einzelnen Verabreichung/Einnahme dosiert wird.",
+        "max": "1"
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier werden verschiedene Angaben dazu gemacht, wie das Arzneimittel bei einer einzelnen Verabreichung/Einnahme dosiert wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseQuantity",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x]",
+        "sliceName": "doseQuantity",
+        "definition": "Hier wird die Dosiermenge mittels einer definierten Menge angegeben.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Quantity",
+            "profile": [
+              "http://hl7.org/fhir/StructureDefinition/SimpleQuantity"
+            ]
+          }
+        ],
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseQuantity.value",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x].value",
+        "definition": "Hier wird die Menge des Arzneimittels angegeben, die verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseRange",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x]",
+        "sliceName": "doseRange",
+        "definition": "Hier wird die Dosiermenge mittels eines definierten Mengenbereichs angegeben",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Range"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseRange.low",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x].low",
+        "definition": "Hier wird die untere Grenze des definierten Mengenbereichs angegeben.",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseRange.low.value",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x].low.value",
+        "definition": "Hier wird die Menge des Arzneimittels angegeben, die verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseRange.high",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x].high",
+        "definition": "Hier wird die obere Grenze des definierten Mengenbereichs angegeben.",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.dose[x]:doseRange.high.value",
+        "path": "MedicationStatement.dosage.doseAndRate.dose[x].high.value",
+        "definition": "Hier wird die Menge des Arzneimittels angegeben, die verabreicht/eingenommen wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "definition": "Hier wird die Dosierung einer Rate über einen bestimmten Zeitraum abgebildet. Ein Beispiel dafür wäre die Rate einer Infusionslösung. Dabei wird entweder eine konkrete Verabreichungsgeschwindigkeit (z.B. eine Infusionslösung, welche mit 50 ml/h oder 100 mg/h verabreicht wird) oder ein Bereich für eine Verabreichungsgeschwindigkeit definiert (z.B. die Gabe einer Infusionslösung, welche mit 100 ml/h bis 150 mg/h verabreicht wird)."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x]",
+        "sliceName": "rateRatio",
+        "definition": "Hier wird die Rate/Verabreichungsgeschwindigkeit in Form einer festen Angabe abgebildet. Dabei wird die Geschwindigkeit bzw. Flussrate, mit der das Arzneimittel verabreicht wird, mit Hilfe einer Einheit abgebildet, in der Zähler (z.B. 1 ml) und Nenner (z.B. 1 h) einzeln abgebildet werden.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Ratio"
+          }
+        ]
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio.numerator",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x].numerator",
+        "definition": "Hier wird der Zähler einer Verabreichungsgeschwindigkeit bzw. Flussrate angegeben. Dieser besteht aus einem Wert und einer Einheit (bevorzugt eine Volumeneinheit oder eine Gewichtseinheit).",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio.numerator.value",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x].numerator.value",
+        "definition": "Hier wird die Menge angegeben, die über einen bestimmten Zeitraum verabreicht wird."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio.denominator",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x].denominator",
+        "definition": "Hier wird der Wert der Zeitspanne angegeben, innerhalb der die definierte Menge des Arzneimittels verabreicht wird.",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://hl7.org/fhir/ValueSet/units-of-time"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio.denominator.value",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x].denominator.value",
+        "definition": "Hier wird der Nenner einer Verabreichungsgeschwindigkeit bzw. Flussrate angegeben. Dieser entspricht einer Zeitspanne."
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio.denominator.system",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x].denominator.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.doseAndRate.rate[x]:rateRatio.denominator.code",
+        "path": "MedicationStatement.dosage.doseAndRate.rate[x].denominator.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod",
+        "definition": "Hier wird die maximale Dosis angegeben, die in einer bestimmten Zeitspanne verabreicht werden darf."
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod.numerator",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod.numerator",
+        "definition": "Hier wird die Menge abgebildet. Dieser Wert entspricht dem Wert im Zähler der Angabe 'Maximale Menge pro Gabe'.",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod.numerator.value",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod.numerator.value",
+        "definition": "Hier wird der Wert der Menge des Arzneimittels angegeben, die maximal innerhalb der Zeitspanne verabreicht/eingenommen werden darf.",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod.denominator",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod.denominator",
+        "definition": "Hier wird die Zeitspanne angegeben. Dieser Wert entspricht dem Wert im Nenner der Angabe 'Maximale Menge pro Gabe'.",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://hl7.org/fhir/ValueSet/units-of-time"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod.denominator.value",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod.denominator.value",
+        "definition": "Hier wird der Wert der Zeitspanne angegeben, innerhalb der die definierte Menge des Arzneimittels maximal verabreicht/eingenommen werden darf.",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod.denominator.system",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod.denominator.system",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerPeriod.denominator.code",
+        "path": "MedicationStatement.dosage.maxDosePerPeriod.denominator.code",
+        "min": 1
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerAdministration",
+        "path": "MedicationStatement.dosage.maxDosePerAdministration",
+        "definition": "Hier wird die Dosiermenge mittels einer maximalen Menge angegeben.",
+        "binding": {
+          "strength": "preferred",
+          "valueSet": "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+        }
+      },
+      {
+        "id": "MedicationStatement.dosage.maxDosePerAdministration.value",
+        "path": "MedicationStatement.dosage.maxDosePerAdministration.value",
+        "definition": "Hier wird die Menge des Arzneimittels angegeben, die verabreicht/eingenommen wird.",
+        "min": 1
+      }
+    ]
+  }
+}

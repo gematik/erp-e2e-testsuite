@@ -12,10 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.abilities;
 
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,11 +30,15 @@ import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.android.AndroidDriver;
 import io.cucumber.java.Scenario;
+import io.cucumber.java.Status;
 import java.util.List;
+import kong.unirest.core.HttpMethod;
+import kong.unirest.core.MockClient;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.SessionId;
 
 class UseAndroidAppTest {
 
@@ -38,16 +47,26 @@ class UseAndroidAppTest {
     val appiumConfig = new AppiumConfiguration();
     appiumConfig.setMaxWaitTimeout(10); // poll 10 times at maximum
     appiumConfig.setPollingInterval(5);
+    appiumConfig.setUrl("http://gsltuci30.ltu.int.gematik.de:443/");
 
     val driver = mock(AndroidDriver.class);
+    when(driver.getSessionId()).thenReturn(new SessionId(randomUUID()));
 
     val driverAbility = new UseAndroidApp(driver, appiumConfig);
+
+    val scenario = mock(Scenario.class);
+    when(scenario.getName()).thenReturn("Test Scenario Name");
+    when(scenario.getStatus()).thenReturn(Status.PASSED);
+
+    val unirestMock = MockClient.register();
+    unirestMock.expect(HttpMethod.POST).thenReturn();
+
     assertTrue(driverAbility.getDriverName().toLowerCase().contains("android"));
     assertNotNull(driverAbility.toString());
     assertEquals(10, driverAbility.getMaxWaitTimeout());
     assertEquals(5, driverAbility.getPollingInterval());
 
-    assertDoesNotThrow(() -> driverAbility.finish(mock(Scenario.class)));
+    assertDoesNotThrow(() -> driverAbility.finish(scenario));
   }
 
   @Test

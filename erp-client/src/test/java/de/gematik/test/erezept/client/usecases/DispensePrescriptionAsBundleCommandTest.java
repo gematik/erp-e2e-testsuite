@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client.usecases;
@@ -40,7 +44,7 @@ class DispensePrescriptionAsBundleCommandTest extends ErpFhirParsingTest {
     val medDisp = new ErxMedicationDispense();
     val command =
         new DispensePrescriptionAsBundleCommand(
-            TaskId.from("testId"), Secret.fromString("testSecret"), medDisp);
+            TaskId.from("testId"), Secret.from("testSecret"), medDisp);
     assertEquals("/Task/testId/$dispense?secret=testSecret", command.getRequestLocator());
     assertEquals(HttpRequestMethod.POST, command.getMethod());
   }
@@ -52,7 +56,7 @@ class DispensePrescriptionAsBundleCommandTest extends ErpFhirParsingTest {
     medDisp.setId(testString);
     val command =
         new DispensePrescriptionAsBundleCommand(
-            TaskId.from("testId"), Secret.fromString("testSecret"), medDisp);
+            TaskId.from("testId"), Secret.from("testSecret"), medDisp);
     assertTrue(command.getRequestBody().isPresent());
     val body = assertInstanceOf(Bundle.class, command.getRequestBody().get());
     assertEquals(1, body.getEntry().size());
@@ -66,11 +70,12 @@ class DispensePrescriptionAsBundleCommandTest extends ErpFhirParsingTest {
     val dispenseParameters =
         GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
             .with(
-                ErxMedicationDispenseFaker.builder().fake(), GemErpMedicationFaker.builder().fake())
+                ErxMedicationDispenseFaker.builder().fake(),
+                GemErpMedicationFaker.forPznMedication().fake())
             .build();
     val cmd =
         new DispensePrescriptionAsBundleCommand(
-            TaskId.from(taskId), Secret.fromString(secret), dispenseParameters);
+            TaskId.from(taskId), Secret.from(secret), dispenseParameters);
 
     val optBody = cmd.getRequestBody();
     assertTrue(optBody.isPresent());

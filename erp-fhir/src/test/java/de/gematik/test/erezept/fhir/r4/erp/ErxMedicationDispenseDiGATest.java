@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -41,7 +45,7 @@ class ErxMedicationDispenseDiGATest extends ErpFhirParsingTest {
     val medicationDispense = parser.decode(ErxMedicationDispenseDiGA.class, content);
     assertTrue(medicationDispense.isDiGA());
     assertEquals(
-        new PrescriptionId("162.000.033.491.280.69"), medicationDispense.getPrescriptionId());
+        PrescriptionId.from("162.000.033.491.280.69"), medicationDispense.getPrescriptionId());
   }
 
   @Test

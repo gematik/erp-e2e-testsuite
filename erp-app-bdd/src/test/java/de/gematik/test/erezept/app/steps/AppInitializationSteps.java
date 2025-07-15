@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.app.steps;
@@ -109,7 +113,8 @@ public class AppInitializationSteps {
     givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
     givenThat(theAppUser).can(useTheAppiumDriver);
 
-    givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
+    val appPassword = config.getAppUserByName(userName).getAppPassword();
+    givenThat(theAppUser).can(HandleAppAuthentication.withGivenPassword(appPassword));
     givenThat(theAppUser).can(ManageDataMatrixCodes.sheGetsPrescribed());
     givenThat(theAppUser).can(ReceiveDispensedDrugs.forHimself());
 

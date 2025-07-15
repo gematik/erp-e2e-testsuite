@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -26,26 +30,26 @@ import org.junit.jupiter.api.Test;
 
 class ErxTaskBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/1.1.1/";
+  private static final String BASE_PATH_1_4 = "fhir/valid/erp/1.4.0/tasksearchbundle/";
 
   @Test
   void shouldGetAllTasksFromBundle() {
-    val fileName = "TaskBundle_01.json";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val fileName = "TaskSearchBundle_01.json";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val bundle = parser.decode(ErxTaskBundle.class, content);
+
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     assertEquals(50, bundle.getTasks().size());
   }
 
   @Test
   void shouldGetLatestTask() {
-    val fileName = "TaskBundle_01.json";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val fileName = "TaskSearchBundle_01.json";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val bundle = parser.decode(ErxTaskBundle.class, content);
+
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     val latestTask = bundle.getLatestTask();
-    assertEquals("160.000.006.259.611.36", latestTask.getPrescriptionId().getValue());
+    assertEquals("160.000.103.086.734.08", latestTask.getPrescriptionId().getValue());
   }
 }

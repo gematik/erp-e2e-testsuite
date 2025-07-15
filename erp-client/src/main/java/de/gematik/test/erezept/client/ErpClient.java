@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.client;
 
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.rest.HttpBRequest;
-import de.gematik.bbriccs.rest.HttpVersion;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.idp.client.IdpClient;
@@ -209,7 +212,9 @@ public class ErpClient {
             .map(es -> new HttpHeader(es.getKey(), es.getValue()))
             .collect(Collectors.toList()); // VAU-client will add its own headers as well
 
-    return new HttpBRequest(
-        HttpVersion.HTTP_1_1, command.getMethod(), command.getRequestLocator(), headers, body);
+    return HttpBRequest.method(command.getMethod())
+        .urlPath(command.getRequestLocator())
+        .headers(headers)
+        .withPayload(body);
   }
 }

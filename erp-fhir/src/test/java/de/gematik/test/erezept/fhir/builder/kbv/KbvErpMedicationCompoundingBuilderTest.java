@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.kbv;
@@ -22,12 +26,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.parser.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import lombok.val;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Ratio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -46,10 +52,9 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .medicationIngredient("11260676", "Fancy Salbe", "freitextInPzn")
             .version(version)
             .amount(123456L)
+            .ingredientStrengthText("eine Hand voll")
             .darreichungsform(Darreichungsform.AEO)
             .build();
-
-    val result = ValidatorUtil.encodeAndValidate(parser, medicationCompounding);
 
     assertTrue(
         medicationCompounding.getExtension().stream()
@@ -58,7 +63,8 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .stream()
             .findFirst()
             .isPresent());
-    assertTrue(result.isSuccessful());
+
+    assertTrue(parser.isValid(medicationCompounding));
   }
 
   @Test
@@ -85,6 +91,7 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
         KbvErpMedicationCompoundingBuilder.builder()
             .productionInstruction(productionInstruction)
             .darreichungsform("Nasentropfen")
+            .ingredientStrengthText("eine Hand voll")
             .medicationIngredient("11260676", "Fancy Salbe")
             .amount(1);
 
@@ -97,16 +104,20 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void fakerWithoutRequiredShouldThrowException1() {
+  void builderWithoutRequiredShouldThrowException1() {
     val builder = KbvErpMedicationCompoundingBuilder.builder();
     assertThrows(BuilderException.class, builder::build);
   }
 
   @Test
-  void fakerWithoutRequiredShouldThrowException2() {
+  void builderWithoutRequiredShouldThrowException2() {
     val builder2 =
         KbvErpMedicationCompoundingBuilder.builder()
-            .productionInstruction(ProductionInstruction.random());
+            .productionInstruction(ProductionInstruction.random())
+            .ingredientStrength(
+                new Ratio()
+                    .setNumerator(new Quantity().setValue(5).setUnit(" mg"))
+                    .setDenominator(new Quantity().setUnit("g").setValue(1)));
     assertThrows(BuilderException.class, builder2::build);
   }
 
@@ -142,7 +153,7 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void fakerWithoutRequiredShouldThrowExceptionWhilePackagingAndProductionInstruction() {
+  void builderWithoutRequiredShouldThrowExceptionWhilePackagingAndProductionInstruction() {
     val builder5 =
         KbvErpMedicationCompoundingBuilder.builder()
             .darreichungsform("Zäpfchen")
@@ -150,5 +161,41 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .productionInstruction(ProductionInstruction.random())
             .packaging("packung");
     assertThrows(BuilderException.class, builder5::build);
+  }
+
+  @Test
+  void
+      builderWithoutRequiredShouldThrowCausedByIngredientStrengthAndIngredientStrengthFreeTextIsMissing() {
+    val builder =
+        KbvErpMedicationCompoundingBuilder.builder()
+            .darreichungsform("Zäpfchen")
+            .ingredItemText("text in Medication.ingredient.item[x]:itemCodeableConcept.text")
+            .packaging("packung");
+    assertThrows(BuilderException.class, builder::build);
+  }
+
+  @Test
+  void builderShouldThrowExceptionIfIngredientItemTextIsNull() {
+    val builder =
+        KbvErpMedicationCompoundingBuilder.builder()
+            .ingredientStrengthText("ingredStrengthText")
+            .darreichungsform("bitte löffeln")
+            .packaging("packung");
+    assertThrows(BuilderException.class, builder::build);
+  }
+
+  @Test
+  void shouldThrowExceptionIfIngredientStrengthAndFreeTextAreMissing() {
+    var builder =
+        KbvErpMedicationCompoundingBuilder.builder()
+            .productionInstruction(ProductionInstruction.asCompounding("Herstellungshinweis"))
+            .darreichungsform("Tablette")
+            .medicationIngredient("12345678", "Testmedikation", "Freitext");
+
+    assertThrows(
+        BuilderException.class,
+        builder::build,
+        "Es muss eine BuilderException geworfen werden, wenn ingredientStrength und"
+            + " ingredientStrengthFreeText fehlen.");
   }
 }

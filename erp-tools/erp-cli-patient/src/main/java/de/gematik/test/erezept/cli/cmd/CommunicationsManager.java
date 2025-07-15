@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.cli.cmd;
@@ -22,5 +26,9 @@ import picocli.CommandLine;
     name = "communications",
     description = "Manage Communications",
     mixinStandardHelpOptions = true,
-    subcommands = {CommunicationReader.class, CommunicationsDeleter.class})
+    subcommands = {
+      CommunicationReader.class,
+      CommunicationsDeleter.class,
+      CommunicationDispenseRequestSender.class
+    })
 public class CommunicationsManager {}

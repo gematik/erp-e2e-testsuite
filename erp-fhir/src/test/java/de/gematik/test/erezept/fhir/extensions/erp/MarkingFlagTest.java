@@ -12,33 +12,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.extensions.erp;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.test.erezept.fhir.parser.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.val;
-import org.hl7.fhir.r4.model.Parameters;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class MarkingFlagTest extends ErpFhirParsingTest {
 
-  @ParameterizedTest(name = "[{index}] -> Build MarkingFlags Parameters using new profiles {0}")
-  @ValueSource(booleans = {true, false})
-  void shouldGenerateAsParameters(boolean useNewProfile) {
+  @ParameterizedTest
+  @EnumSource(
+      value = PatientenrechnungVersion.class,
+      names = {"V1_1_0", "V1_0_0"})
+  void shouldGenerateAsParameters(PatientenrechnungVersion version) {
     val flags = MarkingFlag.with(true, false, true);
-    Parameters parameters;
+    val parameters = flags.asParameters(version);
+    val r = ValidatorUtil.encodeAndValidate(parser, parameters, EncodingType.JSON);
 
-    if (useNewProfile) {
-      parameters = flags.asParameters(PatientenrechnungVersion.V1_0_0);
-    } else {
-      parameters = flags.asParameters();
-    }
-
-    ValidatorUtil.encodeAndValidate(parser, parameters, EncodingType.JSON);
+    assertTrue(r.isSuccessful());
   }
 }

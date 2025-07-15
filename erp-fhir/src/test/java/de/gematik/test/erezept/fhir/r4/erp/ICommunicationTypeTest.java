@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.r4.erp;
@@ -19,7 +23,7 @@ package de.gematik.test.erezept.fhir.r4.erp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.exceptions.*;
-import de.gematik.test.erezept.fhir.parser.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import java.util.*;
 import lombok.*;
 import org.junit.jupiter.api.*;
@@ -41,7 +45,7 @@ class ICommunicationTypeTest {
   @ParameterizedTest(name = "[{index}] -> Create CommunicationType from StructureDefinition {0}")
   @EnumSource(
       value = ErpWorkflowStructDef.class,
-      names = {"COM_INFO_REQ_12", "COM_DISP_REQ_12", "COM_REPLY_12", "COM_REPRESENTATIVE_12"})
+      names = {"COM_INFO_REQ", "COM_DISP_REQ", "COM_REPLY", "COM_REPRESENTATIVE"})
   void shouldGetNewCommunicationTypesFromUrl(ErpWorkflowStructDef structDef) {
     val url = structDef.getCanonicalUrl();
     assertDoesNotThrow(() -> ICommunicationType.fromUrl(url));

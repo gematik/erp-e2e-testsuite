@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.builder.erp;
@@ -19,7 +23,7 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fhir.parser.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -44,9 +48,8 @@ class FlowTypeBuilderTest extends ErpFhirParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
   void buildParametersForAllFlowTypes(ErpWorkflowVersion version) {
-    val isOldProfile = ErpWorkflowVersion.V1_1_1.compareTo(version) == 0;
     Arrays.stream(PrescriptionFlowType.values())
-        .filter(flowType -> !isOldProfile || !flowType.equals(PrescriptionFlowType.FLOW_TYPE_209))
+        .filter(flowType -> !flowType.equals(PrescriptionFlowType.FLOW_TYPE_209))
         .forEach(
             flowType -> {
               val params = FlowTypeBuilder.builder(flowType).version(version).build();

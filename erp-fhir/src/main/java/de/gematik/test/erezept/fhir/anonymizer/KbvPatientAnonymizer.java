@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
 package de.gematik.test.erezept.fhir.anonymizer;
@@ -33,15 +37,11 @@ public class KbvPatientAnonymizer implements Anonymizer<KbvPatient> {
     ctx.anonymize(resource.getBirthDateElement());
 
     if (ctx.getIdentifierAnonymization() == AnonymizationType.BLACKING) {
-      resource.getGkvIdentifier().ifPresent(id -> ctx.anonymize(id.getValueElement()));
-      resource.getPkvIdentifier().ifPresent(id -> ctx.anonymize(id.getValueElement()));
+      resource.getIdentifier().forEach(id -> ctx.anonymize(id.getValueElement()));
     } else {
       resource
-          .getGkvIdentifier()
-          .ifPresent(id -> ctx.anonymize(id.getValueElement(), KVNR::randomStringValue));
-      resource
-          .getPkvIdentifier()
-          .ifPresent(id -> ctx.anonymize(id.getValueElement(), KVNR::randomStringValue));
+          .getIdentifier()
+          .forEach(id -> ctx.anonymize(id.getValueElement(), KVNR::randomStringValue));
     }
   }
 }
