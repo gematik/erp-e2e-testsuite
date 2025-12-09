@@ -20,33 +20,34 @@
 
 package de.gematik.test.erezept.app.questions;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
-import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
-import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
+import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mocker.KbvBundleDummyFactory;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
@@ -55,13 +56,13 @@ import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-class MovingToPrescriptionTest {
+class MovingToPrescriptionTest extends ErpFhirParsingTest {
 
   private String userName;
 
@@ -84,10 +85,10 @@ class MovingToPrescriptionTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
 
@@ -96,35 +97,49 @@ class MovingToPrescriptionTest {
     OnStage.drawTheCurtain();
   }
 
-  @Test
-  void shouldThrowOnAppStateMismatch() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void shouldThrowOnAppStateMismatch(boolean testsEVDGA) {
     val actor = OnStage.theActorCalled(userName);
     val erpClient = actor.abilityTo(UseTheErpClient.class);
     val dmcList = actor.abilityTo(ManageDataMatrixCodes.class);
 
-    val taskId = TaskId.from(PrescriptionId.random());
+    val flowType =
+        testsEVDGA ? PrescriptionFlowType.FLOW_TYPE_162 : PrescriptionFlowType.FLOW_TYPE_160;
+    val prescriptionId = PrescriptionId.random(flowType);
+    val taskId = TaskId.from(prescriptionId);
+
     val accessCode = AccessCode.random();
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
-    val kbvBundle = mock(KbvErpBundle.class);
+    val kbvBundle =
+        KbvBundleDummyFactory.createSimpleKbvBundle(
+            prescriptionId,
+            StatusCoPayment.STATUS_0,
+            MultiplePrescriptionExtension.asNonMultiple());
+
+    val evdgaBundle = mock(KbvEvdgaBundle.class);
     val task = mock(ErxTask.class);
     val medication = mock(KbvErpMedication.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
     val medicationRequest = mock(KbvErpMedicationRequest.class);
-    when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
-    when(prescriptionBundle.getTask()).thenReturn(task);
+    val healthAppRequest = mock(KbvHealthAppRequest.class);
+
+    // EVDGA-Bundle
+    when(prescriptionBundle.getEvdgaBundle()).thenReturn(Optional.of(evdgaBundle));
+    when(evdgaBundle.getHealthAppRequest()).thenReturn(healthAppRequest);
+    when(healthAppRequest.getName()).thenReturn("EVIDA Gesund-App");
+    // KBV-Bundle
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
-    when(kbvBundle.getMedication()).thenReturn(medication);
     when(medication.getMedicationName()).thenReturn("Schmerzmittel");
-    when(kbvBundle.getMedicationRequest()).thenReturn(medicationRequest);
     when(medicationRequest.isMultiple()).thenReturn(false);
-    when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
+    when(prescriptionBundle.getTask()).thenReturn(task);
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
 
@@ -133,28 +148,29 @@ class MovingToPrescriptionTest {
     assertThrows(AppStateMissmatchException.class, () -> actor.asksFor(movingTo));
   }
 
-  @Test
-  void shouldThrowOnMissingKbvBundle() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void shouldThrowOnMissingBundle(boolean testsEVDGABundle) {
     val actor = OnStage.theActorCalled(userName);
     val erpClient = actor.abilityTo(UseTheErpClient.class);
-    val dmcList = actor.abilityTo(ManageDataMatrixCodes.class);
 
-    val taskId = TaskId.from(PrescriptionId.random());
-    val accessCode = AccessCode.random();
-    dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
+    val flowType =
+        testsEVDGABundle ? PrescriptionFlowType.FLOW_TYPE_162 : PrescriptionFlowType.FLOW_TYPE_160;
+    val taskId = TaskId.from(PrescriptionId.random(flowType));
 
     val task = mock(ErxTask.class);
     val prescriptionBundle = mock(ErxPrescriptionBundle.class);
 
     when(task.getStatus()).thenReturn(Task.TaskStatus.READY);
     when(prescriptionBundle.getTask()).thenReturn(task);
+    when(prescriptionBundle.getEvdgaBundle()).thenReturn(Optional.empty());
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.empty());
 
     val getTaskResponse =
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
 
@@ -163,55 +179,70 @@ class MovingToPrescriptionTest {
     assertThrows(MissingFieldException.class, () -> actor.asksFor(movingTo));
   }
 
-  @Test
-  void shouldThrowWhenFindPrescriptionWhichIsNotInBackend() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void shouldThrowWhenFindPrescriptionWhichIsNotInBackend(boolean testsEVDGA) {
     val actor = OnStage.theActorCalled(userName);
     val appAbility = actor.abilityTo(UseIOSApp.class);
     val erpClient = actor.abilityTo(UseTheErpClient.class);
     val dmcList = actor.abilityTo(ManageDataMatrixCodes.class);
 
-    val taskId = TaskId.from(PrescriptionId.random());
+    val flowType =
+        testsEVDGA ? PrescriptionFlowType.FLOW_TYPE_162 : PrescriptionFlowType.FLOW_TYPE_160;
+    val taskId = TaskId.from(PrescriptionId.random(flowType));
     val accessCode = AccessCode.random();
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
     val getTaskResponse =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(404)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
+
+    when(appAbility.isDisplayed(EVDGADetails.DIGA_TITLE)).thenReturn(testsEVDGA);
     when(appAbility.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
+    when(appAbility.getText(EVDGATechnicalInformation.TASKID)).thenReturn(taskId.getValue());
     when(appAbility.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
+
+    when(appAbility.isDisplayed(EVDGADetails.DISMISS_FHIR_VZD_DIALOG)).thenReturn(testsEVDGA);
 
     val movingTo = MovingToPrescription.withTaskId(taskId);
 
     assertThrows(AppStateMissmatchException.class, () -> actor.asksFor(movingTo));
   }
 
-  @Test
-  void shouldPassWhenPrescriptionIsNotFoundAnywhere() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void shouldPassWhenPrescriptionIsNotFoundAnywhere(boolean testsEVDGA) {
     val actor = OnStage.theActorCalled(userName);
     val appAbility = actor.abilityTo(UseIOSApp.class);
     val erpClient = actor.abilityTo(UseTheErpClient.class);
     val dmcList = actor.abilityTo(ManageDataMatrixCodes.class);
 
-    val taskId = TaskId.from(PrescriptionId.random());
+    val flowType =
+        testsEVDGA ? PrescriptionFlowType.FLOW_TYPE_162 : PrescriptionFlowType.FLOW_TYPE_160;
+    val taskId = TaskId.from(PrescriptionId.random(flowType));
     val accessCode = AccessCode.random();
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
     val getTaskResponse =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxPrescriptionBundle.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(404)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
+    when(appAbility.isDisplayed(EVDGADetails.DIGA_TITLE)).thenReturn(testsEVDGA);
     when(appAbility.getText(PrescriptionTechnicalInformation.TASKID))
         .thenReturn(PrescriptionId.random().getValue())
         .thenReturn(PrescriptionId.random().getValue());
+    when(appAbility.getText(EVDGATechnicalInformation.TASKID))
+        .thenReturn(PrescriptionId.random().getValue())
+        .thenReturn(PrescriptionId.random().getValue());
+
+    when(appAbility.isDisplayed(EVDGADetails.DISMISS_FHIR_VZD_DIALOG)).thenReturn(testsEVDGA);
 
     val movingTo = MovingToPrescription.withTaskId(taskId.getValue());
 

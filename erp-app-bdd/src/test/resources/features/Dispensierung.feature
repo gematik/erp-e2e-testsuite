@@ -34,7 +34,7 @@ Funktionalität: E-Rezepte dispensieren
   Szenario: Dispensierung des E-Rezeptes mit dem verschriebenen Medikament
     Angenommen die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
     Wenn die Ärztin Adelheid Ulmenwald der Versicherten Alice ein apothekenpflichtiges Medikament verschreibt
-    Wenn die Versicherte Alice ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Wenn die Versicherte Alice ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Alice dispensiert
     Dann hat die Apotheke Am Flughafen genau 1 Quittung für Alice vorliegen
@@ -52,7 +52,7 @@ Funktionalität: E-Rezepte dispensieren
     Wenn die Ärztin Adelheid Ulmenwald folgendes E-Rezept an die Versicherte Alice verschreibt:
       | Name         | PZN      | Kategorie | Substitution | Normgröße | Darreichungsform | Dosierung | Menge |
       | IBUFLAM akut | 11648419 | 00        | true         | N3        | FTA              | 1-0-0-1   | 50    |
-    Wenn die Versicherte Alice ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Wenn die Versicherte Alice ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke das letzte akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an Alice dispensiert:
       | Name         | PZN      | Kategorie | Normgröße | Menge | Einheit | Darreichungsform |

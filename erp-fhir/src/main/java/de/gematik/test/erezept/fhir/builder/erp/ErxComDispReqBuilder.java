@@ -25,6 +25,7 @@ import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Reference;
 
@@ -40,11 +41,18 @@ public class ErxComDispReqBuilder extends ErxComPrescriptionBuilder<ErxComDispRe
     checkRequired();
 
     val com =
-        buildCommon(
-            CommunicationType.DISP_REQ,
-            () -> ErpWorkflowStructDef.COM_DISP_REQ.asCanonicalType(erpWorkflowVersion));
+        buildCommon(() -> ErpWorkflowStructDef.COM_DISP_REQ.asCanonicalType(erpWorkflowVersion));
 
     com.setBasedOn(List.of(new Reference(baseOnReference)));
+
+    // set sender and receiver
+    com.addRecipient(
+        CommunicationType.DISP_REQ.getRecipientReference(this.receiver, this.erpWorkflowVersion));
+    Optional.ofNullable(this.sender)
+        .ifPresent(
+            s ->
+                com.setSender(
+                    CommunicationType.DISP_REQ.getSenderReference(s, this.erpWorkflowVersion)));
 
     if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) >= 0) {
       com.addExtension(flowType.asExtension());

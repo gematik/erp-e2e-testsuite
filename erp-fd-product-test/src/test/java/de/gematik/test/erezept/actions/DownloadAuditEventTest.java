@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil.createErxAuditEventBundle;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;

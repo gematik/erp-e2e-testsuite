@@ -22,12 +22,8 @@ package de.gematik.test.erezept.app.task.ios;
 
 import static de.gematik.test.erezept.app.mocker.ConfigurationMocker.createDefaultTestConfiguration;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
@@ -36,6 +32,7 @@ import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.app.mobile.elements.Profile;
 import de.gematik.test.erezept.app.task.SetUpDevice;
 import de.gematik.test.erezept.client.ErpClient;
@@ -95,6 +92,7 @@ class SetUpIosDeviceTest {
 
     val userConfigAbility = UseConfigurationData.forUser("Bob", config);
     actor.can(userConfigAbility);
+    when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(true);
     when(app.getText(Profile.USER_KVNR)).thenReturn(egk.getKvnr());
 
     try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {
@@ -119,6 +117,7 @@ class SetUpIosDeviceTest {
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
 
+    when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(true);
     when(app.getText(Profile.USER_KVNR)).thenReturn("X110406067");
 
     val config = createDefaultTestConfiguration("Bob", egk.getIccsn(), true);
@@ -145,5 +144,31 @@ class SetUpIosDeviceTest {
     assertNotNull(baseData);
     assertEquals("X110406067", baseData.getKvnr().getValue());
     assertEquals(InsuranceTypeDe.GKV, baseData.getPatientInsuranceType());
+  }
+
+  @Test
+  void shouldSkipOnboarding() {
+    val actor = OnStage.theActorCalled(userName);
+    val app = actor.abilityTo(UseIOSApp.class);
+
+    val config = createDefaultTestConfiguration("Bob", egk.getIccsn(), true);
+
+    val userConfigAbility = UseConfigurationData.forUser("Bob", config);
+    actor.can(userConfigAbility);
+    when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(false);
+    when(app.getText(Profile.USER_KVNR)).thenReturn(egk.getKvnr());
+
+    try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {
+      val erpClient = mock(ErpClient.class);
+      erpClientFactory
+          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
+          .thenReturn(erpClient);
+      SetUpDevice.forEnvironment(environment)
+          .withInsuranceType("GKV")
+          .byMappingVirtualEgkFrom(smartcards)
+          .performAs(actor);
+    }
+
+    verify(app, times(0)).tap(Onboarding.START_BUTTON);
   }
 }

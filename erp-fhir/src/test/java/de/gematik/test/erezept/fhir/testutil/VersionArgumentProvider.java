@@ -22,10 +22,7 @@ package de.gematik.test.erezept.fhir.testutil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.gematik.test.erezept.fhir.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.*;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -34,21 +31,19 @@ import org.junit.jupiter.params.provider.Arguments;
 
 // TODO: move these methods to ErpFhirBuilding / ParsingTest
 public class VersionArgumentProvider {
-  /**
-   * caused by a breakingChange from ErpWorkflowVersion.V1_3_0 to ErpWorkflowVersion.V1_4_0 in this
-   * case you´ll get only V1_2_0 & V1_3_0
-   *
-   * @return ErpWorkflowVersion.V1_2_0, ErpWorkflowVersion.V1_3_0
-   */
+  /** provide the version of the whole ERP-FHIR profile view */
   public static Stream<Arguments> erpFhirProfileVersions() {
-
-    return Stream.of(Arguments.of("1.4.0"));
+    return Stream.of(Arguments.of("1.5.0"));
   }
 
   public static Stream<Arguments> erpWorkflowVersions() {
     return Arrays.stream(ErpWorkflowVersion.values())
         .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
         .map(Arguments::of);
+  }
+
+  public static Stream<Arguments> erpPatienterechnungVersions() {
+    return Arrays.stream(PatientenrechnungVersion.values()).map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaErpVersions() {

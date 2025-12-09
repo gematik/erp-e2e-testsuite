@@ -45,6 +45,7 @@ public abstract class ErxComPrescriptionBuilder<B extends ErxCommunicationBuilde
     this.erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   }
 
+  @Deprecated // use the information from TaskID instead
   public B flowType(PrescriptionFlowType flowType) {
     this.flowType = flowType;
     return self();

@@ -24,9 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.IKNR;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -62,6 +64,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .medication(medication)
             .insurance(IKNR.asDefaultIknr("104212059"))
             .receiver("606358757")
+            .sender(KVNR.randomStringValue())
             .substitution(false)
             .flowType(PrescriptionFlowType.FLOW_TYPE_160)
             .build();
@@ -116,6 +119,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .version(version)
             .basedOn(taskId, accessCode)
             .receiver("606358757")
+            .sender(KVNR.randomStringValue())
             .flowType(PrescriptionFlowType.FLOW_TYPE_160)
             .build();
 
@@ -218,8 +222,9 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build CommunicationChangeRequest with E-Rezept FHIR Profiles {0}")
-  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
-  void shouldBuildCommunicationChargeChangeRequest(ErpWorkflowVersion version) {
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpPatienterechnungVersions")
+  void shouldBuildCommunicationChargeChangeRequest(PatientenrechnungVersion version) {
     val chargeItem =
         ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     val changeReq =
@@ -237,8 +242,9 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build CommunicationChangeRequest with E-Rezept FHIR Profiles {0}")
-  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
-  void shouldBuildCommunicationChargeChangeRequest02(ErpWorkflowVersion version) {
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpPatienterechnungVersions")
+  void shouldBuildCommunicationChargeChangeRequest02(PatientenrechnungVersion version) {
     val taskId = TaskId.from("123");
     val changeReq =
         ErxCommunicationBuilder.forChargeItemChangeRequest(
@@ -255,8 +261,9 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
       name = "[{index}] -> Build CommunicationChangeReply with E-Rezept FHIR Profiles {0}")
-  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
-  void shouldBuildCommunicationChargeChangeReply(ErpWorkflowVersion version) {
+  @MethodSource(
+      "de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpPatienterechnungVersions")
+  void shouldBuildCommunicationChargeChangeReply(PatientenrechnungVersion version) {
     val chargeItem =
         ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     val changeReply =
@@ -268,7 +275,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .sender("606358757")
             .build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, changeReply);
+    val result = ValidatorUtil.encodeAndValidate(parser, changeReply, true);
     assertTrue(result.isSuccessful());
   }
 
@@ -300,8 +307,8 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
 
     val payload = reply.getPayloadFirstRep();
     assertNotNull(payload, "Payload must not be null");
-    assertTrue(
-        payload.getContent() instanceof StringType, "Payload content must be of type StringType");
+    assertInstanceOf(
+        StringType.class, payload.getContent(), "Payload content must be of type StringType");
     assertEquals(
         payloadText,
         payload.getContent().primitiveValue(),
@@ -333,6 +340,6 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
                             "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DiGA|1.5")),
         "Expected profile for DiGA communication reply not found");
 
-    assertTrue(reply.getPayloadFirstRep().getContent() instanceof StringType);
+    assertInstanceOf(StringType.class, reply.getPayloadFirstRep().getContent());
   }
 }

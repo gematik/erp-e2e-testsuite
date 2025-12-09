@@ -64,14 +64,12 @@ public class SetUpAndroidDevice implements Task {
     // walk through onboarding
     app.swipe(SwipeDirection.LEFT);
     app.swipe(SwipeDirection.LEFT);
-    app.input(actor.getName(), Onboarding.USER_PROFILE_FIELD);
     app.tap(Onboarding.NEXT_BUTTON);
     app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
     app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
     app.tap(4, Onboarding.NEXT_BUTTON);
     app.tap(Onboarding.ACCEPT_PRIVACY_BUTTON);
     app.tap(Onboarding.ACCEPT_TERMS_OF_USE_BUTTON);
-    app.tap(Onboarding.CONFIRM_TERMS_AND_PRIVACY_SELECTION_BUTTON);
 
     if (userConfig.useVirtualEgk()) {
       val egk = sca.getEgkByICCSN(userConfig.getEgkIccsn());

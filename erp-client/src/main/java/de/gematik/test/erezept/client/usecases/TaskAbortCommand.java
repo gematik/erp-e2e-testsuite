@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -27,7 +28,7 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class TaskAbortCommand extends BaseCommand<Resource> {
+public class TaskAbortCommand extends BaseCommand<EmptyResource> {
 
   private final Secret secret;
 
@@ -40,7 +41,7 @@ public class TaskAbortCommand extends BaseCommand<Resource> {
   }
 
   public TaskAbortCommand(TaskId taskId, AccessCode accessCode, Secret secret) {
-    super(Resource.class, HttpRequestMethod.POST, "Task", taskId.getValue());
+    super(EmptyResource.class, HttpRequestMethod.POST, "Task", taskId.getValue());
 
     if (accessCode != null) {
       this.headerParameters.put("X-AccessCode", accessCode.getValue());

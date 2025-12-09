@@ -120,21 +120,26 @@ public class UseTheKonnektor implements Ability {
         new EncryptDocumentCommand(smcbHandle, data.getBytes(StandardCharsets.UTF_8), algorithm));
   }
 
-  public KonnektorResponse<byte[]> signDocumentWithHba(String document) {
+  public KonnektorResponse<byte[]> signDocumentWithHba(
+      String document, boolean isIncludeRevocationInfo) {
     checkCardHandle(SmartcardType.HBA, hbaHandle, "Sign Document");
-    return signDocument(hba, hbaHandle, document);
+    return signDocument(hba, hbaHandle, document, isIncludeRevocationInfo);
+  }
+
+  public KonnektorResponse<byte[]> signDocumentWithHba(String document) {
+    return signDocumentWithHba(document, false);
   }
 
   public KonnektorResponse<byte[]> signDocumentWithSmcb(String document) {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "Sign Document");
-    return signDocument(smcb, smcbHandle, document);
+    return signDocument(smcb, smcbHandle, document, false);
   }
 
   private KonnektorResponse<byte[]> signDocument(
-      Smartcard smartcard, CardInfo handle, String document) {
+      Smartcard smartcard, CardInfo handle, String document, boolean isIncludeRevocationInfo) {
     val title = format("Sign Document with {0} (Cardhandle: {1})", smartcard, handle);
     Serenity.recordReportData().withTitle(title).andContents(document);
-    val signCmd = new SignXMLDocumentCommand(handle, document, algorithm);
+    val signCmd = new SignXMLDocumentCommand(handle, document, algorithm, isIncludeRevocationInfo);
     val ret = konnektor.execute(signCmd);
 
     val signOperation =

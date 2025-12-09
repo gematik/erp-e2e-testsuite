@@ -23,8 +23,16 @@ package de.gematik.test.fuzzing.erx;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationKombiPkgFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.util.Date;
@@ -32,14 +40,18 @@ import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-class ErxMedicationDispenseManipulatorFactoryTest {
+class ErxMedicationDispenseManipulatorFactoryTest extends ErpFhirParsingTest {
 
   private ErxMedicationDispense dispense;
+  private ErxMedicationDispense medDSP;
 
   @BeforeEach
   void setUp() {
     dispense = createMedicationDispense();
+    medDSP = getMedicationDispense();
   }
 
   @Test
@@ -135,6 +147,79 @@ class ErxMedicationDispenseManipulatorFactoryTest {
         });
   }
 
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "shorten PrescriptionId-System to trigger Slice-Validation @ ErpFD",
+        "set TelematikID instead of PrescriptionId-System to trigger Slice-Validation @ ErpFD",
+        "switch PrescriptionId-System to trigger Slice-Validation @ ErpFD"
+      })
+  void shouldSetWrongPrescriptionId(String manipulatorDescription) {
+    val manipulators = ErxMedicationDispenseManipulatorFactory.getSystemManipulator();
+
+    val manipulator = findManipulator(manipulators, manipulatorDescription);
+    assertNotNull(manipulator, "Manipulator for " + manipulatorDescription);
+
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medDSP).isSuccessful());
+    manipulator.getParameter().accept(medDSP);
+    assertFalse(ValidatorUtil.encodeAndValidate(parser, medDSP).isSuccessful());
+    assertThrows(
+        BuilderException.class,
+        () -> medDSP.getPrescriptionId(),
+        "No Fitting PrescriptionId-System contained");
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "shorten actors Telematik-Id-System to trigger Slice-Validation @ ErpFD",
+        "set SNOMED_SCT instead of Actors Telematik-Id-System to trigger Slice-Validation @ ErpFD",
+        "set BSNR instead of Actors Telematik-Id-System to trigger Slice-Validation @ ErpFD",
+        "switch Actors Telematik-Id-System to trigger Slice-Validation @ ErpFD"
+      })
+  void shouldSetWrongTelematikId(String manipulatorDescription) {
+    val manipulators = ErxMedicationDispenseManipulatorFactory.getSystemManipulator();
+
+    val manipulator = findManipulator(manipulators, manipulatorDescription);
+    assertNotNull(manipulator, "Manipulator for " + manipulatorDescription);
+
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medDSP).isSuccessful());
+    manipulator.getParameter().accept(medDSP);
+    assertFalse(ValidatorUtil.encodeAndValidate(parser, medDSP).isSuccessful());
+    assertNotEquals(
+        "https://gematik.de/fhir/sid/telematik-id",
+        medDSP.getPerformer().stream()
+            .findFirst()
+            .orElseThrow()
+            .getActor()
+            .getIdentifier()
+            .getSystem(),
+        "No Fitting Telematik-Id-System contained");
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "switch KVID-System to trigger Slice-Validation @ ErpFD",
+        "shorten KVID-System to trigger Slice-Validation @ ErpFD",
+        "set Accident-System instead of KVID-System to trigger Slice-Validation @ ErpFD"
+      })
+  void shouldSetWrongKVID(String manipulatorDescription) {
+    val manipulators = ErxMedicationDispenseManipulatorFactory.getSystemManipulator();
+
+    val manipulator = findManipulator(manipulators, manipulatorDescription);
+    assertNotNull(manipulator, "Manipulator for wrong KVID should exist");
+
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medDSP).isSuccessful());
+    manipulator.getParameter().accept(medDSP);
+    val res = ValidatorUtil.encodeAndValidate(parser, medDSP).isSuccessful();
+    assertFalse(res);
+    assertNotEquals(
+        "KVNR",
+        medDSP.getSubject().getIdentifier().getSystem(),
+        "No Fitting KVID-System contained");
+  }
+
   /**
    * Utility method to create a medication dispense instance.
    *
@@ -144,6 +229,14 @@ class ErxMedicationDispenseManipulatorFactoryTest {
     val md = new ErxMedicationDispense();
     md.setWhenPrepared(new Date());
     return md;
+  }
+
+  private ErxMedicationDispense getMedicationDispense() {
+    return ErxMedicationDispenseBuilder.forKvnr(KVNR.random())
+        .medication(new GemErpMedicationKombiPkgFaker().fake())
+        .performerId(TelematikID.random())
+        .prescriptionId(PrescriptionId.random())
+        .build();
   }
 
   /**

@@ -24,6 +24,7 @@ import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Reference;
 
@@ -37,24 +38,22 @@ public class ErxComRepresentativeBuilder
 
   @Override
   public ErxCommunication build() {
-    checkRequired();
-
     val com =
         buildCommon(
-            CommunicationType.REPRESENTATIVE,
             () -> ErpWorkflowStructDef.COM_REPRESENTATIVE.asCanonicalType(this.erpWorkflowVersion));
-    val substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED;
-    val flowTypeExtension = flowType.asExtension();
 
-    val payload = com.getPayloadFirstRep();
-    payload.addExtension(substitutionAllowedExt.asBooleanExtension(substitutionAllowed));
-    payload.addExtension(flowTypeExtension);
+    // set sender and receiver
+    com.addRecipient(
+        CommunicationType.REPRESENTATIVE.getRecipientReference(
+            this.receiver, this.erpWorkflowVersion));
+    Optional.ofNullable(this.sender)
+        .ifPresent(
+            s ->
+                com.setSender(
+                    CommunicationType.REPRESENTATIVE.getSenderReference(
+                        s, this.erpWorkflowVersion)));
+
     com.setBasedOn(List.of(new Reference(this.baseOnReference)));
     return com;
-  }
-
-  private void checkRequired() {
-    this.checkRequired(
-        flowType, "A Representative Communication requires a Flow-Type of the Prescription");
   }
 }

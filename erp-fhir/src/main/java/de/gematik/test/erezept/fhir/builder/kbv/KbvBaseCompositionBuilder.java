@@ -25,6 +25,8 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
 import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
+import de.gematik.bbriccs.toggle.FeatureConfiguration;
+import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
 import java.util.Date;
@@ -33,7 +35,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.val;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.Composition;
@@ -53,7 +54,7 @@ public abstract class KbvBaseCompositionBuilder<
   @SuppressWarnings({"java:S6418"}) // this is not an AUTH token
   private static final String DEVICE_AUTHOR_ID = "GEMATIK/410/2109/36/123";
 
-  private static final String BASE_URL = "https://pvs.gematik.de/fhir";
+  private static final String BASE_URL = "https://pvs.gematik.de/fhir/";
   private static final Composition.CompositionStatus COMPOSITION_STATUS =
       Composition.CompositionStatus.FINAL;
 
@@ -63,6 +64,9 @@ public abstract class KbvBaseCompositionBuilder<
   private final List<Composition.CompositionAttesterComponent> attesters = new LinkedList<>();
 
   private final List<Consumer<Composition>> referenceProviders = new LinkedList<>();
+
+  private final ReferenceFeatureToggle.RefencingType referencingType =
+      new FeatureConfiguration().getToggle(new ReferenceFeatureToggle());
 
   protected KbvBaseCompositionBuilder() {
     addDeviceAuthor();
@@ -79,7 +83,10 @@ public abstract class KbvBaseCompositionBuilder<
   }
 
   private String calculateReferenceValue(Resource resource) {
-    return format("{0}/{1}", resource.getResourceType(), resource.getId());
+    return switch (referencingType) {
+      case UUID -> format("urn:uuid:{0}", resource.getId());
+      case HTTP -> format("{0}/{1}", resource.getResourceType(), resource.getId());
+    };
   }
 
   private String calculateFullUrl(Resource resource) {
@@ -87,7 +94,10 @@ public abstract class KbvBaseCompositionBuilder<
   }
 
   private String calculateFullUrl(String urlPath) {
-    return format("{0}/{1}", BASE_URL, urlPath);
+    return switch (referencingType) {
+      case UUID -> urlPath;
+      case HTTP -> format("{0}{1}", BASE_URL, urlPath);
+    };
   }
 
   public B version(V version) {
@@ -110,7 +120,7 @@ public abstract class KbvBaseCompositionBuilder<
    */
   public BundleEntryComponent createEntryFor(Resource resource) {
     val fullUrl = calculateFullUrl(resource);
-    return new Bundle.BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
+    return new BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
   }
 
   /**
@@ -132,7 +142,7 @@ public abstract class KbvBaseCompositionBuilder<
     this.sections.add(section);
 
     val fullUrl = calculateFullUrl(referenceValue);
-    return new Bundle.BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
+    return new BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
   }
 
   public BundleEntryComponent createAttesterEntry(Resource resource) {
@@ -150,7 +160,7 @@ public abstract class KbvBaseCompositionBuilder<
         });
 
     val fullUrl = calculateFullUrl(resource);
-    return new Bundle.BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
+    return new BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
   }
 
   public BundleEntryComponent createEntryFor(
@@ -168,13 +178,13 @@ public abstract class KbvBaseCompositionBuilder<
         });
 
     val fullUrl = calculateFullUrl(resource);
-    return new Bundle.BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
+    return new BundleEntryComponent().setResource(resource).setFullUrl(fullUrl);
   }
 
   public BundleEntryComponent buildBundleEntryComponent() {
     val composition = build();
     val fullUrl = calculateFullUrl(composition);
-    return new Bundle.BundleEntryComponent().setResource(composition).setFullUrl(fullUrl);
+    return new BundleEntryComponent().setResource(composition).setFullUrl(fullUrl);
   }
 
   @Override

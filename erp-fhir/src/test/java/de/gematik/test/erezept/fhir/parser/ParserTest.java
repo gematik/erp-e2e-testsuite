@@ -21,25 +21,33 @@
 package de.gematik.test.erezept.fhir.parser;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import ca.uhn.fhir.context.ConfigurationException;
+import ca.uhn.fhir.parser.DataFormatException;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.EncodingUtil;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.RegExUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 
 @Slf4j
 class ParserTest extends ErpFhirParsingTest {
@@ -119,5 +127,46 @@ class ParserTest extends ErpFhirParsingTest {
     val resource2 = parser.decode(contentJson);
     assertTrue(resource.getId().contains(id));
     assertEquals(KbvErpBundle.class, resource2.getClass());
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @NullSource
+  void shouldDecodeEmptyResource(String content) {
+    val resource = assertDoesNotThrow(() -> parser.decode(EmptyResource.class, content));
+    assertEquals(EmptyResource.class, resource.getClass());
+  }
+
+  static Stream<Arguments> shouldDecodeEmptyResource() {
+    return Stream.of("", " ", "\t", "\n", "\r", "\r\n").map(Arguments::of);
+  }
+
+  @ParameterizedTest
+  @MethodSource("shouldDecodeEmptyResource")
+  @NullSource
+  void shouldThrowOnEmptyWhenExpectedSpecificResource(String content) {
+    // this exception must be later on handled by the client
+    assertThrows(DataFormatException.class, () -> parser.decode(ErxTask.class, content));
+  }
+
+  @Test
+  void shouldDetectOperationOutcomeWhenExpectedEmptyResource() {
+    val oo = new OperationOutcome();
+    oo.addIssue()
+        .setSeverity(OperationOutcome.IssueSeverity.INFORMATION)
+        .setCode(OperationOutcome.IssueType.INFORMATIONAL)
+        .setDiagnostics("This is an empty resource");
+    val content = parser.encode(oo, EncodingType.XML);
+
+    // Note: should be DataFormatException or FhirCodecException; this will be fixed in bricks 0.8.0
+    // this exception must be later on handled by the client
+    assertThrows(ConfigurationException.class, () -> parser.decode(EmptyResource.class, content));
+  }
+
+  @ParameterizedTest
+  @EnumSource(EncodingType.class)
+  void shouldEncodeEmptyResource(EncodingType encodingType) {
+    val content = assertDoesNotThrow(() -> parser.encode(new EmptyResource(), encodingType));
+    assertTrue(content.isEmpty());
   }
 }

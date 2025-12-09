@@ -12,7 +12,7 @@ services:
     hostname: primsys-ru
     environment:
       - TI_ENV=RU
-      - ERP_FHIR_PROFILE=1.4.0
+      - ERP_FHIR_PROFILE=1.5.0
     env_file:
       - .env
 
@@ -22,7 +22,7 @@ services:
     hostname: primsys-tu
     environment:
       - TI_ENV=TU
-      - ERP_FHIR_PROFILE=1.4.0
+      - ERP_FHIR_PROFILE=1.5.0
     env_file:
       - .env
 
@@ -31,6 +31,21 @@ services:
     restart: unless-stopped
     environment:
       - TI_ENV=RU-DEV
-      - ERP_FHIR_PROFILE=1.4.0
+      - ERP_FHIR_PROFILE=1.5.0
     env_file:
       - .env
+
+  erpione-dev:
+    image: europe-west3-docker.pkg.dev/gematik-all-infra-prod/e-rezept/erpione-server:latest
+    container_name: erpione-server
+    hostname: erpione-dev
+    restart: unless-stopped
+    environment:
+      - ERP_FHIR_PROFILE=1.5.0
+      - ACTIVE_SPRING_PROFILES=rudev,noauth
+    healthcheck:
+      test: "wget -T5 -qO- 127.0.0.1:8080/actuator/health | grep UP || exit 1"
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 15s

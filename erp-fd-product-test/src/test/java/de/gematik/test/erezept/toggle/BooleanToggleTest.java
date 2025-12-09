@@ -63,6 +63,9 @@ class BooleanToggleTest {
         Arguments.of(new EgkPharmacyAcceptPN3Toggle()),
         Arguments.of(new FhirCloseSlicingToggle()),
         Arguments.of(new ErpDarreichungsformAprilActive()),
-        Arguments.of(new EgkPharmacyEnforceHcvCheck()));
+        Arguments.of(new EgkPharmacyEnforceHcvCheck()),
+        Arguments.of(new ErpEnableCheckExclusionPayor()),
+        Arguments.of(new PkiQesRsaEnableToggle()),
+        Arguments.of(new RefenreceValidationActive()));
   }
 }

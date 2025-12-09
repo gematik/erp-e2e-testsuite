@@ -50,11 +50,14 @@ public enum EpaMedicationStructDef implements WithStructureDefinition<EpaMedicat
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension"),
   MEDICATION_PZN_INGREDIENT(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient"),
-
+  PHARMACEUTICAL_PROD(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pharmaceutical-product"),
   MANUFACTURING_INSTRUCTION(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-manufacturing-instructions-extension"),
   MED_INGREDIENT_DOSAGE_FORM_EXT(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-darreichungsform-extension"),
+  INGREDIENT_AMOUNT_EXT(
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-ingredient-amount-extension"),
   PACKAGING_EXTENSION(
       "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-formulation-packaging-extension"),
   PACKAGING_SIZE_EXT(

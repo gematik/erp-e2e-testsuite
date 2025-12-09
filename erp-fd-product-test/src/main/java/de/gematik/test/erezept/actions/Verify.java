@@ -164,4 +164,8 @@ public class Verify<T extends Resource> implements Performable {
       return new Instrumented.InstrumentedBuilder<>(kl, params).newInstance();
     }
   }
+
+  public static <R extends Resource> PreBuilder<R> that(ErpResponse<R> interaction) {
+    return new PreBuilder<>(new ErpInteraction<>(interaction));
+  }
 }

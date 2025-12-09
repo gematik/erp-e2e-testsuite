@@ -23,23 +23,17 @@ package de.gematik.test.erezept.fhir.parser;
 import ca.uhn.fhir.context.FhirContext;
 import de.gematik.bbriccs.fhir.codec.ResourceTypeHint;
 import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
+import de.gematik.bbriccs.fhir.validation.DummyValidator;
+import de.gematik.bbriccs.fhir.validation.ReferenzValidator;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhirFactory;
+import de.gematik.refv.SupportedValidationModule;
+import de.gematik.refv.ValidationModuleFactory;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
-import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
-import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
-import de.gematik.test.erezept.fhir.profiles.definitions.KbvItvEvdgaStructDef;
-import de.gematik.test.erezept.fhir.profiles.definitions.PatientenrechnungStructDef;
-import de.gematik.test.erezept.fhir.profiles.version.AbdaErpPkvVersion;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
-import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
+import de.gematik.test.erezept.fhir.profiles.definitions.*;
+import de.gematik.test.erezept.fhir.profiles.version.*;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
@@ -48,6 +42,7 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.eu.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
@@ -57,8 +52,8 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitionerRole;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Configuration;
@@ -66,16 +61,13 @@ import org.hl7.fhir.r4.model.Configuration;
 @Slf4j
 public class ProfileFhirParserFactory {
 
-  static {
-    /* this will force HAPI to produce error messages in english; by that we can filter messages reliably */
-    Locale.setDefault(new Locale("en", "DE"));
-  }
-
   public static final String ERP_FHIR_PROFILES_CONFIG = "fhir/erp-configuration.yaml";
   public static final String ERP_FHIR_PROFILES_TOGGLE = "erp.fhir.profile";
-
   private static final List<ResourceTypeHint<?, ?>> resourceTypeHints =
       List.of(
+          ResourceTypeHint.forStructure(GemErpEuStructDef.CONSENT)
+              .forAllVersionsFrom(EuVersion.class)
+              .mappingTo(EuConsent.class),
           ResourceTypeHint.forStructure(KbvItaErpStructDef.BUNDLE)
               .forAllVersionsFrom(KbvItaErpVersion.class)
               .mappingTo(KbvErpBundle.class),
@@ -104,9 +96,6 @@ public class ProfileFhirParserFactory {
               .forAllVersionsFrom(KbvItaForVersion.class)
               .mappingTo(KbvPatient.class),
           ResourceTypeHint.forStructure(ErpWorkflowStructDef.TASK)
-              .forAllVersionsFrom(ErpWorkflowVersion.class)
-              .mappingTo(ErxTask.class),
-          ResourceTypeHint.forStructure(ErpWorkflowStructDef.TASK_12)
               .forAllVersionsFrom(ErpWorkflowVersion.class)
               .mappingTo(ErxTask.class),
           ResourceTypeHint.forStructure(ErpWorkflowStructDef.AUDIT_EVENT)
@@ -150,9 +139,29 @@ public class ProfileFhirParserFactory {
               .mappingTo(DavPkvAbgabedatenBundle.class),
           ResourceTypeHint.forStructure(EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT)
               .forAllVersionsFrom(EpaMedicationVersion.class)
-              .mappingTo(EpaMedPznIngredient.class));
+              .mappingTo(EpaMedPznIngredient.class),
+          ResourceTypeHint.forStructure(GemErpEuStructDef.EU_PRACTITIONER)
+              .forAllVersionsFrom(EuVersion.class)
+              .mappingTo(EuPractitioner.class),
+          ResourceTypeHint.forStructure(GemErpEuStructDef.EU_PRACTITIONER_ROLE)
+              .forAllVersionsFrom(EuVersion.class)
+              .mappingTo(EuPractitionerRole.class),
+          ResourceTypeHint.forStructure(GemErpEuStructDef.EU_ORGANIZATION)
+              .forAllVersionsFrom(EuVersion.class)
+              .mappingTo(EuOrganization.class),
+          ResourceTypeHint.forStructure(GemErpEuStructDef.EU_DISPENSATION)
+              .forAllVersionsFrom(EuVersion.class)
+              .mappingTo(EuMedicationDispense.class),
+          ResourceTypeHint.forStructure(GemErpEuStructDef.EU_MEDICATION)
+              .forAllVersionsFrom(EuVersion.class)
+              .mappingTo(EuMedication.class));
+  private static final Map<ValidatorType, ValidatorFhir> validatorCache =
+      new EnumMap<>(ValidatorType.class);
 
-  private static ValidatorFhir profiledValidator;
+  static {
+    /* this will force HAPI to produce error messages in english; by that we can filter messages reliably */
+    Locale.setDefault(new Locale("en", "DE"));
+  }
 
   private ProfileFhirParserFactory() {
     throw new IllegalStateException("Utility class");
@@ -165,20 +174,35 @@ public class ProfileFhirParserFactory {
     return ctx;
   }
 
-  public static ValidatorFhir getProfiledValidators() {
-    if (profiledValidator == null) {
-      profiledValidator = createProfiledValidators();
-    }
-
-    return profiledValidator;
+  public static ValidatorFhir getDefaultValidator() {
+    return getValidatorFor(ValidatorType.BRICKS);
   }
 
-  private static ValidatorFhir createProfiledValidators() {
+  public static ValidatorFhir getValidatorFor(ValidatorType validatorType) {
     Configuration.setAcceptInvalidEnums(true); // can be made configurable if required
 
+    // erpConfigurator is required here to load the profile context for the builders as well
     val erpConfigurator =
         ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
+    return switch (validatorType) {
+      case NONE -> validatorCache.computeIfAbsent(
+          validatorType, type -> new DummyValidator(FhirContext.forR4()));
+      case BRICKS -> validatorCache.computeIfAbsent(
+          validatorType, type -> createBricksValidator(erpConfigurator));
+      case REF_VAL -> validatorCache.computeIfAbsent(
+          validatorType, type -> createReferenzValidator());
+    };
+  }
 
+  @SneakyThrows
+  private static ValidatorFhir createReferenzValidator() {
+    val erpModule =
+        new ValidationModuleFactory().createValidationModule(SupportedValidationModule.ERP);
+
+    return ReferenzValidator.withValidationModule(FhirContext.forR4(), erpModule);
+  }
+
+  private static ValidatorFhir createBricksValidator(ProfilesConfigurator erpConfigurator) {
     return ValidatorFhirFactory.createValidator(
         FhirContext.forR4(), erpConfigurator.getProfileConfigurations());
   }

@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -54,16 +54,15 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
         ErpResponse.forPayload(erxTaskBundle, ErxTaskBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200);
-    return erpResponseBuilder.andValidationResult(
-        FhirTestResourceUtil.createEmptyValidationResult());
+    return erpResponseBuilder.andValidationResult(createEmptyValidationResult());
   }
 
   private ErpResponse<ErxTaskBundle> buildResponseAsOpOutcome() {
     val erpResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTaskBundle.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxTaskBundle.class)
             .withStatusCode(400)
             .withHeaders(Map.of());
-    return erpResponse.andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+    return erpResponse.andValidationResult(createEmptyValidationResult());
   }
 
   static Stream<Arguments> responseByEvidenceParameter() {

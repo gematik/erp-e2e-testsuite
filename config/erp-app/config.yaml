@@ -22,6 +22,8 @@ appium:
   - name: local
     url: http://0.0.0.0:4723
     provisioningProfilePostfix: ""
+    maxWaitTimeout: 12000
+    pollingInterval: 100
   - name: t-systems
     url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
     version: 2.11.3

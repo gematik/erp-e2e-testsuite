@@ -23,6 +23,7 @@ package de.gematik.test.erezept.actions;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.GetCapabilityStatementCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCapabilityStatement;
+import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 
 public class ResponseOfGetCapabilityStatement extends ErpAction<ErxCapabilityStatement> {
@@ -30,5 +31,9 @@ public class ResponseOfGetCapabilityStatement extends ErpAction<ErxCapabilitySta
   @Override
   public ErpInteraction<ErxCapabilityStatement> answeredBy(Actor actor) {
     return this.performCommandAs(new GetCapabilityStatementCommand(), actor);
+  }
+
+  public static ResponseOfGetCapabilityStatement request() {
+    return Instrumented.instanceOf(ResponseOfGetCapabilityStatement.class).withProperties();
   }
 }

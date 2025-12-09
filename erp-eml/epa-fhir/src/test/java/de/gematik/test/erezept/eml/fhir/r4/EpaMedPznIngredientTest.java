@@ -31,13 +31,29 @@ class EpaMedPznIngredientTest extends EpaFhirParsingTest {
 
   @Test
   void getPznShouldWork() {
-    val med = EpaMedPznIngredientBuilder.builder().withPzn(PZN.from("123"), "displayName").build();
+    val med = EpaMedPznIngredientBuilder.builder().pzn(PZN.from("123"), "displayName").build();
     assertEquals("123", med.getPzn().orElseThrow().getValue());
   }
 
   @Test
   void getPznShouldFail() {
-    val med = EpaMedPznIngredientBuilder.builder().withPzn(PZN.from("123"), "displayName").build();
+    val med = EpaMedPznIngredientBuilder.builder().pzn(PZN.from("123"), "displayName").build();
     assertNotEquals("alternativeCode", med.getPzn().orElseThrow().getValue());
+  }
+
+  @Test
+  void getDarreichungsformShouldReturnValue() {
+    var med =
+        EpaMedPznIngredientBuilder.builder()
+            .pzn(PZN.from("123"))
+            .darreichungsform("Tablette", "displayName")
+            .build();
+    assertEquals("Tablette", med.getDarreichungsform().orElseThrow());
+  }
+
+  @Test
+  void getDarreichungsformShouldReturnEmpty() {
+    var med = EpaMedPznIngredientBuilder.builder().pzn(PZN.from("123")).build();
+    assertTrue(med.getDarreichungsform().isEmpty());
   }
 }

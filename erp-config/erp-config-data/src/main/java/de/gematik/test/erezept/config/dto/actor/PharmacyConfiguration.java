@@ -29,5 +29,7 @@ public class PharmacyConfiguration extends PsActorConfiguration {
 
   private String description =
       "Eine 'E-Rezept-ready' Apotheke die E-Rezepte akzeptieren und dispensieren kann";
+
+  @Deprecated(since = "ApoZVD was discontinued", forRemoval = true)
   private String apoVzdName;
 }

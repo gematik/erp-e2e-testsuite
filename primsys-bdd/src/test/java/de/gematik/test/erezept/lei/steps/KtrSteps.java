@@ -39,10 +39,10 @@ import net.serenitybdd.screenplay.ensure.Ensure;
 public class KtrSteps {
 
   @Dann(
-      "^kann der Kostenträger (.+) das (erste|letzte) EVGDA E-Rezept (?:der|des) Versicherten (.+)"
+      "^kann der Kostenträger (.+) das (erste|letzte) EVDGA E-Rezept (?:der|des) Versicherten (.+)"
           + " akzeptieren$")
   @Und(
-      "^der Kostenträger (.+) das (erste|letzte) EVGDA (?:der|des) Versicherten (.+)"
+      "^der Kostenträger (.+) das (erste|letzte) EVDGA (?:der|des) Versicherten (.+)"
           + " akzeptiert$")
   public void andThenKtrAcceptDigaPrescription(String ktrName, String order, String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -52,7 +52,7 @@ public class KtrSteps {
   }
 
   @Und(
-      "^der Kostenträger (.+) kann für die (erste|letzte) EVGDA (?:der|des) Versicherten (.+)"
+      "^der Kostenträger (.+) kann für die (erste|letzte) EVDGA (?:der|des) Versicherten (.+)"
           + " Abgabeinformationen mit Freischaltcode bereitstellen$")
   public void andKtrProvideDispenseInformation(String ktrName, String order, String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -62,7 +62,7 @@ public class KtrSteps {
   }
 
   @Und(
-      "^der Kostenträger (.+) kann für die (erste|letzte) EVGDA (?:der|des) Versicherten (.+)"
+      "^der Kostenträger (.+) kann für die (erste|letzte) EVDGA (?:der|des) Versicherten (.+)"
           + " Abgabeinformationen ohne Freischaltcode bereitstellen$")
   public void andKtrProvideDispenseInformationWithoutRedeemCode(
       String ktrName, String order, String patientName) {
@@ -71,7 +71,7 @@ public class KtrSteps {
     then(theKtr).attemptsTo(CloseDigaPrescriptionWithoutRedeemCode.of(order).to(thePatient));
   }
 
-  @Dann("^kann der Kostenträger (.+) das (erste|letzte) akzeptierte EVGDA zurückweisen$")
+  @Dann("^kann der Kostenträger (.+) das (erste|letzte) akzeptierte EVDGA zurückweisen$")
   public void thenKtrRejectPrescription(String ktrName, String order) {
     val theKtr = OnStage.theActorCalled(ktrName);
 
@@ -79,7 +79,7 @@ public class KtrSteps {
   }
 
   @Und(
-      "^der Kostenträger (.+) kann für die (erste|letzte) akzeptierte EVGDA keine zeitnahe"
+      "^der Kostenträger (.+) kann für die (erste|letzte) akzeptierte EVDGA keine zeitnahe"
           + " Dispensierung durchführen$")
   public void andKtrCantDispenseTimelyManner(String ktrName, String order) {
     val theKtr = OnStage.theActorCalled(ktrName);
@@ -104,7 +104,7 @@ public class KtrSteps {
                 .isEqualTo(403));
   }
 
-  @Dann("^kann der Kostenträger (.+) das (erste|letzte) akzeptierte EVGDA nicht löschen$")
+  @Dann("^kann der Kostenträger (.+) das (erste|letzte) akzeptierte EVDGA nicht löschen$")
   public void thenKtrCannotAbortAcceptedEVDGA(String ktrName, String order) {
     val theKtr = OnStage.theActorCalled(ktrName);
     then(theKtr)
@@ -130,7 +130,7 @@ public class KtrSteps {
   }
 
   @Dann(
-      "^kann der Kostenträger (.+) für das (erste|letzte) akzeptierte EVGDA E-Rezept (?:der|dem)"
+      "^kann der Kostenträger (.+) für das (erste|letzte) akzeptierte EVDGA E-Rezept (?:der|dem)"
           + " Versicherten (.+) eine Begründung senden$")
   public void thenKtrReplaysAReasonToQuestioner(String ktrName, String order, String patientName) {
     val theKtr = OnStage.theActorCalled(ktrName);

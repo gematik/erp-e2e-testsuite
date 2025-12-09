@@ -122,7 +122,7 @@ class PageElementTest {
 
   static Stream<Arguments> shouldExtractLabelFromName() {
     return Stream.of(
-        arguments(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON, "sec_btn_system_pin_done"),
+        arguments(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON, "onb_ana_btn_deny"),
         arguments(Receipt.INPUT_SEARCH_BOX, "Nach Name oder Adresse suchen"));
   }
 

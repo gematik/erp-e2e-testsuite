@@ -35,9 +35,10 @@ import net.serenitybdd.screenplay.actors.OnStage;
 public class DoctorPrescribeDiGASteps {
 
   @Wenn(
-      "^(?:der|die) (Psychotherapeut|Psychologischer"
-          + " Psychotherapeut|Kinderpsychotherapeut|Arzt|Zahnarzt) (.+) (?:dem|der) Versicherten"
-          + " (.+) ein EVGDA E-Rezept verschreibt$")
+      "^(?:der|die) (Psychotherapeut|Psychotherapeutin|Psychologischer Psychotherapeut|"
+          + "Psychologische Psychotherapeutin|Kinderpsychotherapeut|Kinderpsychotherapeutin|"
+          + "Arzt|Ärztin|Zahnarzt|Zahnärztin) (.+) (?:dem|der) Versicherten"
+          + " (.+) ein EVDGA E-Rezept verschreibt$")
   public void whenIssueDiGAPrescription(String role, String doctorName, String patientName) {
     val theDoctor = OnStage.theActorCalled(doctorName);
     val thePatient = OnStage.theActorCalled(patientName);
@@ -46,8 +47,9 @@ public class DoctorPrescribeDiGASteps {
   }
 
   @Dann(
-      "^kann (?:der|die) (Psychotherapeut|Psychologischer"
-          + " Psychotherapeut|Kinderpsychotherapeut|Arzt|Zahnarzt) (.+) (?:dem|der) Versicherten"
+      "^kann (?:der|die) (Psychotherapeut|Psychotherapeutin|Psychologischer Psychotherapeut|"
+          + "Psychologische Psychotherapeutin|Kinderpsychotherapeut|Kinderpsychotherapeutin|"
+          + "Arzt|Ärztin|Zahnarzt|Zahnärztin) (.+) (?:dem|der) Versicherten"
           + " (.+) kein apothekenpflichtiges Rezept verschreiben$")
   public void thenTheTherapistCannotActivatePharmacyOnly(
       String role, String doctorName, String patientName) {
@@ -63,8 +65,9 @@ public class DoctorPrescribeDiGASteps {
   }
 
   @Dann(
-      "^kann (?:der|die) (Psychotherapeut|Psychologischer"
-          + " Psychotherapeut|Kinderpsychotherapeut|Arzt|Zahnarzt) (.+) (?:dem|der) Versicherten"
+      "^kann (?:der|die) (Psychotherapeut|Psychotherapeutin|Psychologischer Psychotherapeut|"
+          + "Psychologische Psychotherapeutin|Kinderpsychotherapeut|Kinderpsychotherapeutin|"
+          + "Arzt|Ärztin|Zahnarzt|Zahnärztin) (.+) (?:dem|der) Versicherten"
           + " (.+) kein Rezept als Direktzuweisung verschreiben$")
   public void thenTheTherapistCannotActivateDirectAssignment(
       String role, String doctorName, String patientName) {

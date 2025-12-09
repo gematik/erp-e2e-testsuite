@@ -46,7 +46,7 @@ public class TaskBundleVerifier {
   public static VerificationStep<ErxTaskBundle> doesNotContainQES(ErpAfos afo) {
     Predicate<Resource> isErxTask =
         resource ->
-            resource instanceof Task && ErpWorkflowStructDef.TASK_12.matches(resource.getMeta());
+            resource instanceof Task && ErpWorkflowStructDef.TASK.matches(resource.getMeta());
     Predicate<ErxTaskBundle> onlyErxTaskInEntries =
         bundle ->
             bundle.getEntry().stream()

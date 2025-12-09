@@ -22,20 +22,9 @@ package de.gematik.test.erezept.app.abilities;
 
 import static java.text.MessageFormat.format;
 import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.exceptions.AppErrorException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
@@ -54,7 +43,6 @@ import io.cucumber.java.Scenario;
 import io.cucumber.java.Status;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import kong.unirest.core.HttpMethod;
 import kong.unirest.core.MockClient;
@@ -64,8 +52,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.openqa.selenium.Alert;
@@ -273,7 +259,7 @@ class UseTheAppTest {
     when(webElement.getText()).thenReturn(inputText);
 
     val driverAbility = new UseAndroidApp(driver, appiumConfig);
-    driverAbility.input(inputText, Onboarding.USER_PROFILE_FIELD);
+    driverAbility.input(inputText, Onboarding.PASSWORD_INPUT_FIELD);
     verify(webElement).sendKeys(inputText);
   }
 
@@ -565,14 +551,11 @@ class UseTheAppTest {
     assertEquals("gematik", argument.getValue().getVendor());
   }
 
-  @ParameterizedTest
-  @MethodSource
-  @NullSource
-  void shouldCatchErrorsOnTeardown(Exception toBeThrown) {
+  @Test
+  void shouldPauseApp() {
     val driver = mock(IOSDriver.class);
-    val app = new UseIOSApp(driver, appiumConfig);
+    val driverAbility = new UseIOSApp(driver, new AppiumConfiguration());
 
-    Optional.ofNullable(toBeThrown).ifPresent(it -> doThrow(it).when(driver).quit());
-    assertDoesNotThrow(app::tearDown);
+    assertTimeout(Duration.ofMillis(1100), driverAbility::pauseApp);
   }
 }

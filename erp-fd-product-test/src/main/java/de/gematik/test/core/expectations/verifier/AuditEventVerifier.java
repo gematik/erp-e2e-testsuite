@@ -57,6 +57,19 @@ public class AuditEventVerifier {
         .accept();
   }
 
+  public static VerificationStep<ErxAuditEventBundle> bundleContainsLog(String logContent) {
+    Predicate<ErxAuditEventBundle> predicate =
+        auditEventBundle ->
+            auditEventBundle.getAuditEvents().stream()
+                .anyMatch(ae -> ae.getFirstText().contains(logContent));
+
+    return new VerificationStep.StepBuilder<ErxAuditEventBundle>(
+            ErpAfos.A_19284_11.getRequirement(),
+            format("Ein Audit Event enthält die Information: {0}", logContent))
+        .predicate(predicate)
+        .accept();
+  }
+
   public static VerificationStep<ErxAuditEventBundle> bundleContainsLogFor(
       PrescriptionId prescriptionId, String logContent) {
 
@@ -111,7 +124,11 @@ public class AuditEventVerifier {
   }
 
   private String unifyText(String input) {
-    return replacePlaceholder(input).replace(" ", "").replace("\n", "").replace("\t", "");
+    return replacePlaceholder(input)
+        .replace(" ", "")
+        .replace("\n", "")
+        .replace("\t", "")
+        .replace("TEST-ONLY", "");
   }
 
   private String replacePlaceholder(String input) {

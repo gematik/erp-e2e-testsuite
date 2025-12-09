@@ -26,13 +26,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
 import de.gematik.test.erezept.app.mobile.elements.Utility;
 import de.gematik.test.erezept.config.dto.app.AppiumConfiguration;
 import io.appium.java_client.ios.IOSDriver;
 import io.cucumber.java.Scenario;
 import io.cucumber.java.Status;
-import java.time.Duration;
 import java.util.List;
 import kong.unirest.core.HttpMethod;
 import kong.unirest.core.MockClient;
@@ -116,14 +116,6 @@ class UseIOSAppTest {
   }
 
   @Test
-  void shouldPauseApp() {
-    val driver = mock(IOSDriver.class);
-    val driverAbility = new UseIOSApp(driver, new AppiumConfiguration());
-
-    assertTimeout(Duration.ofMillis(1100), driverAbility::pauseApp);
-  }
-
-  @Test
   void shouldTapOnElementAfterTooltips() {
     val driver = mock(IOSDriver.class);
     val tooltips = mock(WebElement.class);
@@ -134,21 +126,20 @@ class UseIOSAppTest {
         .thenReturn(Utility.TOOLTIPS.forPlatform(PlatformType.IOS).toString())
         .thenReturn(""); // return an empty string for the last recursive call
 
-    doReturn(null)
-        .doReturn(tooltips) // for isDisplayed method
-        .doReturn(tooltips) // for tap method
-        .doReturn(null)
-        .doThrow(NoSuchElementException.class)
+    doReturn(tooltips) // for isDisplayed method with existing tooltip
+        .doReturn(tooltips) // for tap method with existing tooltip
+        .doReturn(null) // for second isDisplayed method without existing tooltip
+        .doThrow(NoSuchElementException.class) // for second tap method without existing tooltip
         .when(driverAbility)
         .getWebElement(any(By.class));
 
-    doReturn(webElement).when(driverAbility).getWebElement(Onboarding.NEXT_BUTTON);
+    doReturn(webElement).when(driverAbility).getWebElement(BottomNav.SETTINGS_BUTTON);
 
     driverAbility.removeTooltips();
-    driverAbility.tap(Onboarding.NEXT_BUTTON);
+    driverAbility.tap(BottomNav.SETTINGS_BUTTON);
 
     verify(tooltips, times(1)).click();
-    verify(webElement).click();
+    verify(webElement, times(1)).click();
   }
 
   @Test

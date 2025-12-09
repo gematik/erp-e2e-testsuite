@@ -38,11 +38,7 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier;
 import de.gematik.test.core.expectations.verifier.CommunicationVerifier;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.ClosePrescription;
-import de.gematik.test.erezept.actions.GetPrescriptionById;
-import de.gematik.test.erezept.actions.IssuePrescription;
-import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actions.communication.GetMessage;
 import de.gematik.test.erezept.actions.communication.GetMessages;
 import de.gematik.test.erezept.actions.communication.SendMessages;
@@ -79,6 +75,8 @@ import org.junit.runner.RunWith;
 @DisplayName("Communication Get Tests")
 @Tag("Communication")
 public class GetMessagesIT extends ErpTest {
+
+  private static final String SUT_RELEASE_VERSION_1_19 = "1.19";
 
   @Actor(name = "Hanna Bäcker")
   private PatientActor hanna;
@@ -520,12 +518,13 @@ public class GetMessagesIT extends ErpTest {
   @ParameterizedTest(
       name =
           "[{index}] -> Ein {2}-Patient prüft, dass seine Nachrichten für {0} und"
-              + " Belieferungsoption {1} nach dem Abschluss durch die Apotheke nicht mehr abgerufen"
-              + " werden können!")
+              + " Belieferungsoption {1} nach dem Abschluss durch die Apotheke noch bis zu 100 Tage"
+              + " in der FD Version 1.20 abgerufen werden können!")
   @DisplayName(
-      "Es muss geprüft werden, dass Communications nach einem Close Nicht mehr abrufbar sind")
+      "Es muss geprüft werden, dass Communications nach einem Close noch bis zu 100 Tage in der FD"
+          + " Version 1.20 abrufbar sind")
   @MethodSource("getCommunicationTestComposer")
-  void shouldForbidGetCommunicationWhenClosed(
+  void shouldNotForbidGetCommunicationWhenClosed(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
       InsuranceTypeDe insuranceType) {
@@ -548,26 +547,41 @@ public class GetMessagesIT extends ErpTest {
     // Task wird abgeschlossen
     airportApo.performs(
         ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
-    val taskById =
-        airportApo.performs(
-            GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
 
-    // Nachrichten sollen nicht mehr zur Verfügung stehen
-    val dispReqAtApoAfterClose =
+    val capability =
+        airportApo.asksFor(new ResponseOfGetCapabilityStatement()).getExpectedResponse();
+    val version = capability.getSoftwareVersion();
+
+    val communicationsOfPharmacy =
         airportApo.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
-    sina.attemptsTo(
-        Verify.that(dispReqAtApoAfterClose)
-            .withOperationOutcome(ErpAfos.A_20513)
-            .hasResponseWith(returnCode(404))
-            .isCorrect());
-
-    val disReq2AfterClose =
+    val communicationsOfPatient =
         sina.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
-    airportApo.attemptsTo(
-        Verify.that(disReq2AfterClose)
-            .withOperationOutcome(ErpAfos.A_20513)
-            .hasResponseWith(returnCode(404))
-            .isCorrect());
+
+    // We should move the release versions to an enum so that we can compare them more easily, e.g.
+    // greaterThan, lessThan, ...
+    if (version.equals(SUT_RELEASE_VERSION_1_19)) {
+      airportApo.attemptsTo(
+          Verify.that(communicationsOfPharmacy)
+              .withOperationOutcome(ErpAfos.A_20513)
+              .hasResponseWith(returnCode(404))
+              .isCorrect());
+      sina.attemptsTo(
+          Verify.that(communicationsOfPatient)
+              .withOperationOutcome(ErpAfos.A_20513)
+              .hasResponseWith(returnCode(404))
+              .isCorrect());
+    } else {
+      airportApo.attemptsTo(
+          Verify.that(communicationsOfPharmacy)
+              .withExpectedType(ErpAfos.A_20513)
+              .hasResponseWith(returnCode(200))
+              .isCorrect());
+      sina.attemptsTo(
+          Verify.that(communicationsOfPatient)
+              .withExpectedType(ErpAfos.A_20513)
+              .hasResponseWith(returnCode(200))
+              .isCorrect());
+    }
   }
 
   private ErxTask prescribe(PrescriptionAssignmentKind assignmentKind, PatientActor actor) {

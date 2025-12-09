@@ -20,14 +20,11 @@
 
 package de.gematik.test.konnektor.soap.mock.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import java.util.List;
-import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,28 +43,36 @@ class BNetzAVLCaTest {
 
   @Test
   void shouldThrowExceptionWhenSubjectCANotFound() {
-    assertEquals(Optional.empty(), BNetzAVLCa.getBy("GEM.HBA-qCA86 TEST-ONLY"));
+    assertThrows(IllegalArgumentException.class, () -> BNetzAVLCa.getCA("GEM.HBA-qCA86 TEST-ONLY"));
   }
 
   @Test
   void shouldReturnCorrectValueWhenSubjectCAExists() {
-    val bNetzAVLCa = BNetzAVLCa.getBy("GEM.HBA-qCA6 TEST-ONLY");
-    assertTrue(bNetzAVLCa.isPresent());
-    assertEquals(BNetzAVLCa.GEM_HBA_QCA6_TEST_ONLY, bNetzAVLCa.get());
+    val bNetzAVLCa = BNetzAVLCa.getCA("GEM.HBA-qCA6 TEST-ONLY");
+    assertNotNull(bNetzAVLCa);
+    assertEquals(BNetzAVLCa.GEM_HBA_QCA6_TEST_ONLY.getCertificate(), bNetzAVLCa);
+  }
+
+  @Test
+  void shouldThrowIllegalArgumentException() {
+    val cert = BNetzAVLCa.GEM_HBA_QCA24_TEST_ONLY.getCertificate();
+    assertThrows(IllegalArgumentException.class, () -> BNetzAVLCa.getCA("ABC"));
+    assertThrows(IllegalArgumentException.class, () -> BNetzAVLCa.getCA(cert));
   }
 
   @ParameterizedTest
   @EnumSource(value = CryptoSystem.class, mode = Mode.EXCLUDE, names = "RSA_PSS_2048")
   void shouldReturnCertificateWhenEECertificatesIssuerExists(CryptoSystem algorithm) {
     // excluded, as these SmartCards do NOT have an RSA-QES certificate
-    val excludeList = List.of("80276001011699901343", "80276001011699901344");
+    val excludeList =
+        List.of("80276001011699901343", "80276001011699901344", "80276883110000170943");
 
     SmartcardArchive.fromResources().getHbaCards().stream()
         .filter(hba -> !excludeList.contains(hba.getIccsn()))
         .forEach(
             hba -> {
               val eeCert = hba.getQesCertificate(algorithm);
-              assertNotNull(BNetzAVLCa.getBy(eeCert.getX509Certificate()));
+              assertNotNull(BNetzAVLCa.getCA(eeCert.getX509Certificate()));
             });
   }
 }

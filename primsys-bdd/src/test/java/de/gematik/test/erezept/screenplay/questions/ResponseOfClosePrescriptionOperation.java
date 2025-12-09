@@ -167,11 +167,10 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
               .wasSubstituted(false)
               .build();
       return new CloseTaskCommand(taskId, secret, medicationDispense);
-
     } else {
-
       val lotNr = GemFaker.fakerLotNumber();
       val expDate = GemFaker.fakerFutureExpirationDate();
+
       val gemMedication =
           GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(medication).lotNumber(lotNr).build();
 

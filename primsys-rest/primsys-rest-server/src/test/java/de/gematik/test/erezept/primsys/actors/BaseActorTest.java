@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +29,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
@@ -51,10 +51,10 @@ class BaseActorTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
             .withHeaders(Map.of())
             .withStatusCode(500)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(mockResponse);
     val command = new TaskCreateCommand();
     assertThrows(WebApplicationException.class, () -> pharmacy.erpRequest(command));
@@ -70,7 +70,7 @@ class BaseActorTest extends TestWithActorContext {
         ErpResponse.forPayload(new ErxTask(), ErxTask.class)
             .withHeaders(Map.of())
             .withStatusCode(500)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(mockResponse);
     val command = new TaskCreateCommand();
     assertThrows(WebApplicationException.class, () -> pharmacy.erpRequest(command));

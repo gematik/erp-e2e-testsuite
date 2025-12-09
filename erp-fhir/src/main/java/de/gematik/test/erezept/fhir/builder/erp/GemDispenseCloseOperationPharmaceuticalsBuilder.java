@@ -20,6 +20,8 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.RX_DISPENSATION;
+
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
@@ -72,7 +74,7 @@ public class GemDispenseCloseOperationPharmaceuticalsBuilder<P extends Parameter
 
     this.pharmaceuticalDispensations.forEach(
         disp -> {
-          val rxDispensation = parameters.addParameter().setName("rxDispensation");
+          val rxDispensation = parameters.addParameter().setName(RX_DISPENSATION.getCode());
           val md = disp.getLeft();
           val medication = disp.getRight();
 

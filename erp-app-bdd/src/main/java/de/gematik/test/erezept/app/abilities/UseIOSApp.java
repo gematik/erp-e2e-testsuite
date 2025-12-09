@@ -33,9 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.openqa.selenium.*;
+import org.jetbrains.annotations.Nullable;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -47,6 +52,10 @@ public class UseIOSApp extends UseTheApp<IOSDriver> {
     super(driver, PlatformType.IOS, appiumConfiguration);
   }
 
+  private boolean pageSourceContains(@Nullable String pageSource, String label) {
+    return Optional.ofNullable(pageSource).map(it -> it.contains(label)).orElse(false);
+  }
+
   @Override
   protected Optional<WebElement> getOptionalWebElement(PageElement pageElement) {
     return this.getOptionalWebElement(pageElement, driver.getPageSource());
@@ -55,7 +64,7 @@ public class UseIOSApp extends UseTheApp<IOSDriver> {
   @Override
   protected Optional<WebElement> getOptionalWebElement(PageElement pageElement, String pageSource) {
     val label = pageElement.extractSourceLabel(this.getPlatformType());
-    var found = pageSource.contains(label);
+    var found = this.pageSourceContains(pageSource, label);
 
     var retries = 1;
     while (!found && retries-- > 0) {
@@ -65,7 +74,7 @@ public class UseIOSApp extends UseTheApp<IOSDriver> {
           "Retry: Element {} was not found in page source by label {}",
           pageElement.getFullName(),
           label);
-      found = driver.getPageSource().contains(label);
+      found = this.pageSourceContains(driver.getPageSource(), label);
     }
 
     if (found) {
@@ -85,7 +94,7 @@ public class UseIOSApp extends UseTheApp<IOSDriver> {
   @Override
   public List<WebElement> getWebElements(PageElement pageElement) {
     return waitForElement(pageElement, ExpectedConditions::presenceOfAllElementsLocatedBy)
-        .orElse(new ArrayList<>(0));
+        .orElseGet(() -> new ArrayList<>(0));
   }
 
   private <T> Optional<T> waitForElement(
@@ -104,14 +113,14 @@ public class UseIOSApp extends UseTheApp<IOSDriver> {
     return waitForElement(locator, expectation, this.getFluentWaitDriver());
   }
 
-  private <T> Optional<T> waitForElement(
+  private <T> @NonNull Optional<T> waitForElement(
       By locator, Function<By, ExpectedCondition<T>> expectation, FluentWait<IOSDriver> wait) {
-    log.trace(format("Try to fetch element {0}", locator));
+    log.trace("Try to fetch element {}", locator);
     val start = Instant.now();
     try {
       val el = wait.until(expectation.apply(locator));
       val duration = Duration.between(start, Instant.now());
-      log.info(format("Found element for <{0}> after {1}ms", locator, duration.toMillis()));
+      log.info("Found element for <{}> after {}ms", locator, duration.toMillis());
       return Optional.ofNullable(el);
     } catch (TimeoutException | NoSuchElementException e) {
       val duration = Duration.between(start, Instant.now());

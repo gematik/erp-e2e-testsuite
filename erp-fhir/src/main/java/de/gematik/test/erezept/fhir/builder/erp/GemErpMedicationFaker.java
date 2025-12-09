@@ -22,6 +22,10 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 public interface GemErpMedicationFaker {
 
+  static GemErpMedicationKombiPkgFaker forKombiPkg() {
+    return new GemErpMedicationKombiPkgFaker();
+  }
+
   static GemErpMedicationPZNFaker forPznMedication() {
     return new GemErpMedicationPZNFaker();
   }

@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.client;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,7 +35,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
 import de.gematik.bbriccs.smartcards.Smartcard;
@@ -180,11 +180,11 @@ class ErpClientTest {
     erpClient.authenticateWith(mockSmartcard);
 
     // second call will have a token which is still valid
-    when(mockToken.getExpiresIn()).thenReturn(100);
+    when(mockToken.getExpiresIn()).thenReturn(200);
     val cmd = new TaskGetCommand();
     assertDoesNotThrow(() -> erpClient.request(cmd));
     assertDoesNotThrow(() -> erpClient.request(cmd));
-    /* should call login only on first attempt, while the second one will reuse token because of expires in 100 seconds */
+    /* should call login only on first attempt, while the second one will reuse token because of expires in 200 seconds */
     verify(mockIdp, times(1)).login(any());
   }
 
@@ -201,7 +201,7 @@ class ErpClientTest {
   @Test
   void shouldFailOnInvalidRequestBody() {
     val mockFhir = mock(FhirParser.class);
-    val vr = FhirTestResourceUtil.createFailingValidationResult();
+    val vr = createFailingValidationResult();
     val mockSmartcard = mock(Smartcard.class);
     val mockToken = mock(IdpTokenResult.class);
     val mockJsonWebToken = mock(JsonWebToken.class);

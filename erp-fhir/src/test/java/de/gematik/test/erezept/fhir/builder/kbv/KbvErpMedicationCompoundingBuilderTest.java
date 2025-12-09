@@ -169,7 +169,7 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
     val builder =
         KbvErpMedicationCompoundingBuilder.builder()
             .darreichungsform("Zäpfchen")
-            .ingredItemText("text in Medication.ingredient.item[x]:itemCodeableConcept.text")
+            .ingredientItemText("text in Medication.ingredient.item[x]:itemCodeableConcept.text")
             .packaging("packung");
     assertThrows(BuilderException.class, builder::build);
   }

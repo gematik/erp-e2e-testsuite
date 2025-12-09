@@ -65,4 +65,12 @@ public class WorkflowAndMedicationComposer {
                 MEDICATION_PZN, MEDICATION_COMPOUNDING, MEDICATION_FREITEXT, MEDICATION_INGREDIENT))
         .create();
   }
+
+  public static Stream<Arguments> workflowPharmacyOnlyAndAlternativeMedicationComposer() {
+    return ArgumentComposer.composeWith()
+        .arguments(GKV, FLOW_TYPE_160)
+        .arguments(PKV, FLOW_TYPE_200)
+        .multiply(2, List.of(MEDICATION_COMPOUNDING, MEDICATION_FREITEXT, MEDICATION_INGREDIENT))
+        .create();
+  }
 }

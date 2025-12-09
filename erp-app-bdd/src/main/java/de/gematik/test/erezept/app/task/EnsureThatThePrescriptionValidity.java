@@ -20,8 +20,9 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static de.gematik.test.erezept.app.cfg.StatusParser.compareStatusInfo;
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
@@ -67,8 +68,8 @@ public class EnsureThatThePrescriptionValidity implements Task {
                     format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
 
     val expectedValidityText = format("Noch {0} Tage einlösbar", remainingDays);
-    val actualValidityText = app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT);
-    assertEquals(expectedValidityText, actualValidityText);
+    val actualValidityText = app.getText(PrescriptionDetails.PRESCRIPTION_STATUS_TEXT);
+    assertTrue(compareStatusInfo(expectedValidityText, actualValidityText));
 
     // leave prescription details and go back to the main screen
     app.tap(PrescriptionDetails.LEAVE_DETAILS_BUTTON);

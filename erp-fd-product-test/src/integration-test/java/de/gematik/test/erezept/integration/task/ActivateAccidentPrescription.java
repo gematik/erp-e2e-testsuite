@@ -103,12 +103,13 @@ class ActivateAccidentPrescription extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(sina.getKvnr())
             .withPractitioner(doctor.getPractitioner())
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withAccident(accident)
             .toBuilder();
 
@@ -155,12 +156,13 @@ class ActivateAccidentPrescription extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(sina.getKvnr())
             .withPractitioner(doctor.getPractitioner())
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withAccident(accident)
             .toBuilder();
 

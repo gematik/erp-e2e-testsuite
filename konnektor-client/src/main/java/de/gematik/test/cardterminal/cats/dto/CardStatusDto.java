@@ -20,4 +20,5 @@
 
 package de.gematik.test.cardterminal.cats.dto;
 
-public record CardStatusDto(int slotNumber, boolean inserted) {}
+public record CardStatusDto(
+    int slotNumber, boolean inserted, String cardConfigPath, boolean start) {}

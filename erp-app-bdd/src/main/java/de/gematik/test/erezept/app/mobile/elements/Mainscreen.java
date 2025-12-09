@@ -20,8 +20,11 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
+import static java.text.MessageFormat.format;
+
 import io.appium.java_client.AppiumBy;
 import java.util.function.Supplier;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
@@ -71,4 +74,32 @@ public enum Mainscreen implements PageElement {
   private final String elementName;
   private final Supplier<By> androidLocator;
   private final Supplier<By> iosLocator;
+
+  public static PageElement forProfile(String profileName) {
+    return new ProfileButton(profileName);
+  }
+
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class ProfileButton implements PageElement {
+
+    private static final String ACCESSIBILITY_ID = "pro_btn_selection_profile_row";
+    private final String profileName;
+
+    @Override
+    public String getElementName() {
+      return format("Profile Button for {0}", profileName);
+    }
+
+    @Override
+    public Supplier<By> getAndroidLocator() {
+      return () -> null;
+    }
+
+    @Override
+    public Supplier<By> getIosLocator() {
+      return () ->
+          AppiumBy.iOSNsPredicateString(
+              format("name == \"{0}\" AND label == \"{1}\"", ACCESSIBILITY_ID, profileName));
+    }
+  }
 }

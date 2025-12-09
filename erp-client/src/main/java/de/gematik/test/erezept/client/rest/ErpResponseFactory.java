@@ -20,9 +20,11 @@
 
 package de.gematik.test.erezept.client.rest;
 
+import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.validation.ValidationResult;
 import com.google.common.base.Strings;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.time.Duration;
 import java.util.List;
@@ -36,11 +38,9 @@ import org.hl7.fhir.r4.model.Resource;
 public class ErpResponseFactory {
 
   private final FhirParser parser;
-  private final boolean validateResponse;
 
-  public ErpResponseFactory(FhirParser parser, boolean validateResponse) {
+  public ErpResponseFactory(FhirParser parser) {
     this.parser = parser;
-    this.validateResponse = validateResponse;
   }
 
   public <R extends Resource> ErpResponse<R> createFrom(
@@ -65,25 +65,25 @@ public class ErpResponseFactory {
         Optional.ofNullable(content)
             .filter(c -> !Strings.isNullOrEmpty(content) && !content.isBlank())
             .map(c -> decode(c, expect))
-            .orElse(null);
+            .orElseGet(EmptyResource::new);
     return ErpResponse.forPayload(resource, expect)
         .withStatusCode(status)
         .withDuration(duration)
         .usedJwt(usedJwt)
         .withHeaders(headers)
-        .andValidationResult(validateContent(content));
+        .andValidationResult(validateContent(content, resource.getClass()));
   }
 
   private Resource decode(String content, Class<? extends Resource> expect) {
     Resource ret;
     try {
       ret = parser.decode(expect, content);
-    } catch (DataFormatException | IllegalArgumentException e) {
+    } catch (DataFormatException | ConfigurationException | IllegalArgumentException e) {
       // try to decode without an expected class (and let HAPI decide) as this case may occur:
-      // 1. DataFormatException happens, if the Backend responds with an OperationOutcome (or any
+      // 1. DataFormatException happens if the Backend responds with an OperationOutcome (or any
       // other unexpected resource) while another resource was expected
-      // 2. IllegalArgumentException is thrown if an empty response is expected, but we still get a
-      // resource (probably an OperationOutcome)
+      // 2. ConfigurationException/IllegalArgumentException is thrown if an empty response is
+      // expected, but we still get a resource (probably an OperationOutcome)
       log.info(
           "Given content of length {} could not be decoded as {}, try without expectation",
           content.length(),
@@ -93,9 +93,12 @@ public class ErpResponseFactory {
     return ret;
   }
 
-  private ValidationResult validateContent(String content) {
+  private <R extends Resource> ValidationResult validateContent(
+      String content, Class<R> resourceClass) {
     ValidationResult vr;
-    if (!validateResponse || Strings.isNullOrEmpty(content) || content.isBlank()) {
+    if (Strings.isNullOrEmpty(content)
+        || content.isBlank()
+        || resourceClass.equals(EmptyResource.class)) {
       // simply create an empty validation results which will always be successful
       vr = new ValidationResult(this.parser.getCtx(), List.of());
     } else {

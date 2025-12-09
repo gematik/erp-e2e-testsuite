@@ -20,19 +20,20 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class CommunicationDeleteCommand extends BaseCommand<Resource> {
+public class CommunicationDeleteCommand extends BaseCommand<EmptyResource> {
 
   public CommunicationDeleteCommand(ErxCommunication com) {
     this(com.getUnqualifiedId());
   }
 
   public CommunicationDeleteCommand(String resourceId) {
-    super(Resource.class, HttpRequestMethod.DELETE, "Communication", resourceId);
+    super(EmptyResource.class, HttpRequestMethod.DELETE, "Communication", resourceId);
   }
 
   @Override

@@ -20,6 +20,8 @@
 
 package de.gematik.test.erezept.fhir.parser;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -74,5 +76,28 @@ class ValidatorTest extends ErpFhirParsingTest {
     val mixedBundleResources =
         ResourceLoader.getResourceDirectoryStructure("fhir/valid/mixed_bundles", true);
     ValidatorUtil.validateFiles(pedanticFhir, mixedBundleResources, Assertions::assertTrue, false);
+  }
+
+  @ParameterizedTest(name = "Validate Mixed Version Bundle {0} with {1}")
+  @MethodSource
+  void shouldValidateMixedVersionBundlesWithEachValidator(File input, ValidatorType validatorType) {
+    val fhir = new FhirParser(validatorType);
+    ValidatorUtil.validateFile(fhir, input, Assertions::assertTrue, true);
+  }
+
+  static Stream<Arguments> shouldValidateMixedVersionBundlesWithEachValidator() {
+    val files =
+        ResourceLoader.getResourceDirectoryStructure("fhir/valid/collection_bundles", true).stream()
+            .toList();
+    return Stream.of(ValidatorType.values())
+        .flatMap(vt -> files.stream().map(f -> Arguments.of(f, vt)));
+  }
+
+  @ParameterizedTest
+  @EnumSource(ValidatorType.class)
+  void shouldSmokeTestEachValidator(ValidatorType validatorType) {
+    val content = ResourceLoader.getFileFromResource("fhir/valid/kbv/1.3.1/Beispiel_1_PZN.xml");
+    val validator = assertDoesNotThrow(() -> new FhirParser(validatorType));
+    ValidatorUtil.validateFile(validator, content, Assertions::assertTrue, true);
   }
 }

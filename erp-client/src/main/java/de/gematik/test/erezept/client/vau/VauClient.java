@@ -121,7 +121,7 @@ public class VauClient {
     Optional.ofNullable(erpResource)
         .map(rh -> rh.replaceFirst("/", ""))
         .ifPresent(rh -> VauHeader.X_ERP_RESOURCE.apply(rh, req::header));
-    VauHeader.X_ERP_USER.apply(this.getErpUserHeaderValue(), req::header);
+    VauHeader.X_ERP_USER.apply(clientType.getHeaderValue(), req::header);
     // API-Key is optional because only required/used by FdVs
     Optional.ofNullable(xApiKey)
         .ifPresent(ak -> AuthHttpHeaderKey.X_API_KEY.apply(ak, req::header));
@@ -187,16 +187,5 @@ public class VauClient {
 
   private String getVauRequestUrl() {
     return fdBaseUrl + "/VAU/" + vauUserPseudonym;
-  }
-
-  /**
-   * @return "v" if communication from App otherwise "l"
-   */
-  private String getErpUserHeaderValue() {
-    String ret = "l";
-    if (clientType == ClientType.FDV) {
-      ret = "v";
-    }
-    return ret;
   }
 }

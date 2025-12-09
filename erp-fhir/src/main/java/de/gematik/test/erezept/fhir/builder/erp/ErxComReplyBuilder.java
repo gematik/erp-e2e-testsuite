@@ -46,25 +46,37 @@ public class ErxComReplyBuilder extends ErxComPrescriptionBuilder<ErxComReplyBui
     val useDiGAProfile = flowTypeDiGA && erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) > 0;
     val com =
         buildCommon(
-            CommunicationType.REPLY,
             () ->
                 useDiGAProfile
-                    ? ErpWorkflowStructDef.GEM_DIGA.asCanonicalType(erpWorkflowVersion)
+                    ? ErpWorkflowStructDef.COM_DIGA.asCanonicalType(erpWorkflowVersion)
                     : ErpWorkflowStructDef.COM_REPLY.asCanonicalType(erpWorkflowVersion));
+
+    // set sender and receiver
+    com.addRecipient(
+        CommunicationType.REPLY.getRecipientReference(this.receiver, this.erpWorkflowVersion));
+    Optional.ofNullable(this.sender)
+        .ifPresent(
+            s ->
+                com.setSender(
+                    CommunicationType.REPLY.getSenderReference(s, this.erpWorkflowVersion)));
 
     val payload = com.getPayloadFirstRep();
 
     payload.setContent(new StringType(message));
 
-    Optional.ofNullable(availabilityStatus)
-        .ifPresent(
-            as -> {
-              val availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS;
-              val ext = availabilityStatusStructDef.asExtension(availabilityStatus.asCoding());
-              payload.addExtension(ext);
-            });
+    if (!useDiGAProfile) {
 
-    payload.addExtension(supplyOptionsType.asExtension());
+      Optional.ofNullable(availabilityStatus)
+          .ifPresent(
+              as -> {
+                val availabilityStatusStructDef = ErpWorkflowStructDef.AVAILABILITY_STATUS;
+                val ext = availabilityStatusStructDef.asExtension(availabilityStatus.asCoding());
+                payload.addExtension(ext);
+              });
+
+      payload.addExtension(supplyOptionsType.asExtension());
+    }
+
     com.setBasedOn(List.of(new Reference(baseOnReference)));
 
     return com;

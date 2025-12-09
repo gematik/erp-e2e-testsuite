@@ -71,15 +71,7 @@ public class KbvCoverageBuilder extends ResourceBuilder<KbvCoverage, KbvCoverage
 
   public static KbvCoverageBuilder insurance(IKNR iknr, String insuranceName) {
     val insurance = new KbvCoverageBuilder();
-
-    // Note: remove once we are sure that we always use the correct IKNR naming system
-    if (!iknr.getSystem().matches(DeBasisProfilNamingSystem.IKNR_SID)) {
-      throw new BuilderException("IKNR is no longer allowed to use: " + iknr.getSystemUrl());
-    }
-
-    insurance.iknr = iknr;
-    insurance.insuranceName = insuranceName;
-    return insurance;
+    return insurance.insuranceData(iknr, insuranceName);
   }
 
   /**
@@ -131,6 +123,25 @@ public class KbvCoverageBuilder extends ResourceBuilder<KbvCoverage, KbvCoverage
 
   public KbvCoverageBuilder insuranceType(PayorType payorType) {
     this.versicherungsArt = payorType;
+    return this;
+  }
+
+  public KbvCoverageBuilder insuranceData(IKNR iknr, String insuranceName) {
+    return this.iknr(iknr).name(insuranceName);
+  }
+
+  public KbvCoverageBuilder iknr(IKNR iknr) {
+    // Note: remove once we are sure that we always use the correct IKNR naming system
+    if (!iknr.getSystem().matches(DeBasisProfilNamingSystem.IKNR_SID)) {
+      throw new BuilderException("IKNR is no longer allowed to use: " + iknr.getSystemUrl());
+    }
+
+    this.iknr = iknr;
+    return this;
+  }
+
+  public KbvCoverageBuilder name(String insuranceName) {
+    this.insuranceName = insuranceName;
     return this;
   }
 

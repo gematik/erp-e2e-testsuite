@@ -35,6 +35,7 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import java.util.Date;
@@ -49,6 +50,8 @@ import org.hl7.fhir.r4.model.Quantity;
 
 @Slf4j
 public class KbvErpMedicationRequestFaker {
+
+  private AccidentExtension accident;
 
   private KbvPatient kbvPatient = KbvPatientFaker.builder().fake();
   private final Map<String, Consumer<KbvErpMedicationRequestBuilder>> builderConsumers =
@@ -67,7 +70,6 @@ public class KbvErpMedicationRequestFaker {
         .withInsurance(
             KbvCoverageFaker.builder().withInsuranceType(kbvPatient.getInsuranceType()).fake())
         .withDosageInstruction(fakerDosage())
-        .withCoPaymentStatus(fakerValueSet(StatusCoPayment.class))
         .withAuthorDate(new Date())
         .withSubstitution(fakerBool());
 
@@ -105,6 +107,7 @@ public class KbvErpMedicationRequestFaker {
   }
 
   public KbvErpMedicationRequestFaker withAccident(AccidentExtension accident) {
+    this.accident = accident;
     builderConsumers.put("accident", b -> b.accident(accident));
     return this;
   }
@@ -222,6 +225,17 @@ public class KbvErpMedicationRequestFaker {
 
   public KbvErpMedicationRequestBuilder toBuilder() {
     val builder = KbvErpMedicationRequestBuilder.forPatient(kbvPatient);
+
+    if (accident != null
+            && accident.toString().equals(AccidentCauseType.ACCIDENT_AT_WORK.getDisplay())
+        || accident != null
+            && accident.toString().equals(AccidentCauseType.OCCUPATIONAL_DISEASE.getDisplay())) {
+      this.withCoPaymentStatus(StatusCoPayment.STATUS_1);
+
+    } else if (builderConsumers.get("coPaymentStatus") == null) {
+      this.withCoPaymentStatus(fakerValueSet(StatusCoPayment.class));
+    }
+
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

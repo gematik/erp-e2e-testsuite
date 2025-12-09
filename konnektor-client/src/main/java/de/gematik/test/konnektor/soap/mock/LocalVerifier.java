@@ -21,22 +21,20 @@
 package de.gematik.test.konnektor.soap.mock;
 
 import de.gematik.test.konnektor.soap.mock.utils.BNetzAVLCa;
+import eu.europa.esig.dss.enumerations.CertificateStatus;
+import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
+import eu.europa.esig.dss.spi.client.http.NativeHTTPDataLoader;
 import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
-import eu.europa.esig.dss.validation.AdvancedSignature;
-import eu.europa.esig.dss.validation.CommonCertificateVerifier;
-import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import java.io.BufferedReader;
+import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPToken;
+import eu.europa.esig.dss.validation.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import lombok.SneakyThrows;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -44,12 +42,22 @@ import lombok.val;
 public class LocalVerifier {
 
   private final SignedDocumentValidator documentValidator;
-  private final CommonTrustedCertificateSource trustedCertSource =
-      new CommonTrustedCertificateSource();
 
   private LocalVerifier(byte[] input) {
+    val trustedCertSource = new CommonTrustedCertificateSource();
+    for (BNetzAVLCa ca : BNetzAVLCa.values()) {
+      trustedCertSource.addCertificate(new CertificateToken(ca.getCertificate()));
+    }
+
+    val httpDataLoader = new NativeHTTPDataLoader();
+    httpDataLoader.setReadTimeout(5000);
+    httpDataLoader.setConnectTimeout(5000);
+
+    val ocspSource = new OnlineOCSPSource();
+    ocspSource.setDataLoader(httpDataLoader);
+
     val cv = new CommonCertificateVerifier();
-    cv.setOcspSource(new OnlineOCSPSource());
+    cv.setOcspSource(ocspSource);
     cv.setTrustedCertSources(trustedCertSource);
     documentValidator = SignedDocumentValidator.fromDocument(new InMemoryDocument(input));
     documentValidator.setCertificateVerifier(cv);
@@ -60,65 +68,108 @@ public class LocalVerifier {
   }
 
   public static boolean verify(byte[] input) {
-    val localVerifier = new LocalVerifier(input);
-    return localVerifier.verify();
+    return LocalVerifier.parse(input).verify();
   }
 
-  private AdvancedSignature getSignature() {
-    val signature =
-        documentValidator.getSignatures().stream()
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("No signature found"));
-    signature.getCertificates().forEach(trustedCertSource::addCertificate);
-    return signature;
-  }
-
-  private static String convertToString(DSSDocument document) throws IOException {
-    try (InputStream inputStream = document.openStream();
-        BufferedReader reader =
-            new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-      return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+  private static byte[] asByteArray(DSSDocument document) {
+    try (InputStream inputStream = document.openStream()) {
+      return inputStream.readAllBytes();
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Failed to read document bytes", e);
     }
   }
 
-  @SneakyThrows
+  public List<byte[]> getAllDocuments() {
+    return documentValidator.getSignatures().stream()
+        .map(documentValidator::getOriginalDocuments)
+        .flatMap(Collection::stream)
+        .map(LocalVerifier::asByteArray)
+        .toList();
+  }
+
+  public byte[] getFirstDocument() {
+    return getAllDocuments().stream()
+        .findFirst()
+        .orElseThrow(() -> new NoSuchElementException("No document found"));
+  }
+
   public String getDocument() {
-    val originalDocuments = documentValidator.getOriginalDocuments(getSignature().getId());
-    val original =
-        originalDocuments.stream()
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("No document found"));
-    return convertToString(original);
+    return new String(getFirstDocument(), StandardCharsets.UTF_8);
   }
 
   public boolean verify() {
-    val signature = getSignature();
+    var isCompletelyValid = true;
+    try {
+      val reports = documentValidator.validateDocument();
+      val report = reports.getSimpleReport();
+      val signatures = documentValidator.getSignatures();
+
+      for (val signature : signatures) {
+        // There are some certificates (e.g. RSA/ECC QES from  adelheid ulmenwald) with OCSP status
+        // unknown
+        // For this, the validation policy needs to be adjusted, or it needs to be checked why the
+        // status is unknown
+        val signatureIsValid =
+            report.isValid(signature.getId())
+                || report.getIndication(signature.getId()) == Indication.INDETERMINATE;
+        isCompletelyValid &= signatureIsValid;
+
+        val ocspToken = getOcspToken(signature);
+        if (ocspToken.isPresent()) {
+          isCompletelyValid &=
+              verifyOcspToken(ocspToken.get(), signature.getSigningCertificateToken());
+        }
+
+        log.info(
+            "CAdES signature signed by {} is {}valid",
+            report.getSignedBy(signature.getId()),
+            !signatureIsValid ? "in" : "");
+      }
+    } catch (Throwable t) {
+      isCompletelyValid = false;
+      log.warn("Failed to verify with a certificate exception", t);
+    }
+
+    return isCompletelyValid;
+  }
+
+  public List<OCSPToken> getOcspTokens() {
+    return documentValidator.getSignatures().stream()
+        .map(this::getOcspToken)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private Optional<OCSPToken> getOcspToken(AdvancedSignature signature) {
     val signingCertToken = signature.getSigningCertificateToken();
+    val caToken = new CertificateToken(BNetzAVLCa.getCA(signingCertToken.getCertificate()));
 
-    // this works only for QES Certs; NonQES Certs have to be handled with TSL
-    BNetzAVLCa.getBy(signingCertToken.getCertificate())
-        .ifPresent(
-            it -> {
-              val caToken = new CertificateToken(it.getCertificate());
-              val ocsp = signature.getOCSPSource().getRevocationToken(signingCertToken, caToken);
-              if (ocsp != null) {
-                log.info(
-                    "Ocsp Status for signing certificate with {} is {}",
-                    signingCertToken.getSubject().getCanonical(),
-                    ocsp.getStatus());
-              }
-            });
+    val httpDataLoader = new NativeHTTPDataLoader();
+    httpDataLoader.setConnectTimeout(5000);
+    httpDataLoader.setReadTimeout(5000);
 
-    val reports = documentValidator.validateDocument();
-    val report = reports.getSimpleReport();
+    val revocationToken = signature.getOCSPSource().getRevocationToken(signingCertToken, caToken);
+    return revocationToken == null ? Optional.empty() : Optional.of((OCSPToken) revocationToken);
+  }
 
-    val isValid = report.isValid(signature.getId());
-
+  private boolean verifyOcspToken(OCSPToken ocspToken, CertificateToken signingCertToken) {
     log.info(
-        "CAdES signature signed by {} is {}valid",
-        report.getSignedBy(signature.getId()),
-        !isValid ? "in" : "");
-
-    return isValid;
+        "Ocsp Status for signing certificate with {} is {}",
+        signingCertToken.getSubject().getCanonical(),
+        ocspToken.getStatus());
+    if (ocspToken.getStatus() == CertificateStatus.REVOKED) {
+      log.warn(
+          "The signing certificate with {} has been revoked!",
+          signingCertToken.getSubject().getCanonical());
+      return false;
+    }
+    if (!ocspToken.isValid()) {
+      log.warn(
+          "Ocsp Signature for signing certificate with {} is not valid!",
+          signingCertToken.getSubject().getCanonical());
+      return false;
+    }
+    return true;
   }
 }

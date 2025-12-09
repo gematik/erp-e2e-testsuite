@@ -29,7 +29,9 @@ import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
+import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
@@ -706,12 +708,16 @@ public class EpaOpProvidePrescriptionVerifier {
           if (!medicationRequest
               .getStatus()
               .equals(prescription.getEpaMedicationRequest().getStatus())) return false;
-
-          val medReqQuan = medicationRequest.getDispenseRequest().getQuantity();
           val prescrQuant =
               prescription.getEpaMedicationRequest().getDispenseRequest().getQuantity();
-          return medReqQuan.getValue().equals(prescrQuant.getValue())
-              && medReqQuan.getSystem().equals(prescrQuant.getSystem());
+          val medReqQuan = medicationRequest.getDispenseRequest().getQuantity();
+          if (!medReqQuan.getValue().equals(prescrQuant.getValue())) return false;
+          if (EpaMedicationVersion.getDefaultVersion() == EpaMedicationVersion.V1_0_3) {
+            return medReqQuan.getSystem().equals(prescrQuant.getSystem());
+          } else {
+            return prescrQuant.getSystem().equals(CommonCodeSystem.UCUM.getCanonicalUrl())
+                && prescrQuant.getCode().equals("{Package}");
+          }
         };
     return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
             EmlAfos.A_25946.getRequirement(),

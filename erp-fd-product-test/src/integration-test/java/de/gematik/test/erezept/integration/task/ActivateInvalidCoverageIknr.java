@@ -151,9 +151,10 @@ public class ActivateInvalidCoverageIknr extends ErpTest {
 
   private KbvErpMedicationRequest getMedicationRequest(
       AccidentExtension accident, KbvErpMedication medication) {
+    val patientCoverage = sina.getPatientCoverage();
     return KbvErpMedicationRequestFaker.builder()
-        .withPatient(sina.getPatientData())
-        .withInsurance(sina.getInsuranceCoverage())
+        .withPatient(patientCoverage.first)
+        .withInsurance(patientCoverage.second)
         .withRequester(doctorActor.getPractitioner())
         .withAccident(accident)
         .withMedication(medication)

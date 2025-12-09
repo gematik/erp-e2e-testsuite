@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -76,7 +76,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
         ErpResponse.forPayload(resource, ErxCommunication.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(CommunicationPostCommand.class))).thenReturn(mockResponse);
     try (val response =
         ReplyUseCase.replyPrescription(
@@ -108,7 +108,7 @@ class ReplyUseCaseTest extends TestWithActorContext {
         ErpResponse.forPayload(resource, ErxCommunication.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(CommunicationPostCommand.class))).thenReturn(mockResponse);
     try (val response =
         ReplyUseCase.replyPrescriptionWithSender(
@@ -124,11 +124,10 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxCommunication.class)
             .withStatusCode(500)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
         .request(any(CommunicationPostCommand.class));
@@ -154,11 +153,10 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxCommunication.class)
             .withStatusCode(500)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
         .request(any(CommunicationPostCommand.class));
@@ -183,11 +181,10 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(
-                FhirTestResourceUtil.createOperationOutcome(), ErxCommunication.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxCommunication.class)
             .withStatusCode(400)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
         .request(any(CommunicationPostCommand.class));

@@ -20,15 +20,14 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.time.LocalDate;
 import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -39,6 +38,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
 
   private static final String BASE_PATH_1_4 = "fhir/valid/erp/1.4.0/medicationdispensebundle/";
+  ErxMedicationDispenseBundle multipleBundle =
+      parser.decode(
+          ErxMedicationDispenseBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/eu/09_response_get_multiple_medication_dispense.json"));
+  ErxMedicationDispenseBundle singleBundle =
+      parser.decode(
+          ErxMedicationDispenseBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/eu/08_response_get_single_medicationdispense.json"));
 
   static Stream<Arguments> shouldReadGemMedicationsFromBundle() {
     return Stream.of(
@@ -46,17 +55,6 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
         arguments("Bundle-KomplexMedicationDispenseBundle.json", 1, 1),
         arguments("Bundle-MultipleMedicationDispenseBundle.json", 2, 2),
         arguments("Bundle-SearchSetMultipleMedicationDispenseBundle.json", 2, 3));
-  }
-
-  @ParameterizedTest
-  @MethodSource
-  void shouldReadGemMedicationsFromBundle(
-      String fileName, int expectedMedications, int expectedMedicationDispenses) {
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
-    val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);
-
-    assertEquals(expectedMedications, bundle.getMedications().size());
-    assertEquals(expectedMedicationDispenses, bundle.getMedicationDispenses().size());
   }
 
   static Stream<Arguments> shouldReadDispensationPairsByPrescriptionId() {
@@ -87,17 +85,6 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
             1));
   }
 
-  @ParameterizedTest
-  @MethodSource
-  void shouldReadDispensationPairsByPrescriptionId(
-      PrescriptionId prescriptionId, String fileName, int expectedMedications) {
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
-    val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);
-
-    val pairs = assertDoesNotThrow(() -> bundle.getDispensePairBy(prescriptionId));
-    assertEquals(expectedMedications, pairs.size());
-  }
-
   static Stream<Arguments> shouldUnpackOldMedicationDispenses() {
     return Stream.of(
         arguments(
@@ -108,6 +95,28 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
             PrescriptionId.from("160.000.000.000.000.05"),
             "Bundle-SearchSetMultipleMedicationDispenseBundle.json",
             1));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldReadGemMedicationsFromBundle(
+      String fileName, int expectedMedications, int expectedMedicationDispenses) {
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);
+
+    assertEquals(expectedMedications, bundle.getMedications().size());
+    assertEquals(expectedMedicationDispenses, bundle.getMedicationDispenses().size());
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void shouldReadDispensationPairsByPrescriptionId(
+      PrescriptionId prescriptionId, String fileName, int expectedMedications) {
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val bundle = parser.decode(ErxMedicationDispenseBundle.class, content);
+
+    val pairs = assertDoesNotThrow(() -> bundle.getDispensePairBy(prescriptionId));
+    assertEquals(expectedMedications, pairs.size());
   }
 
   @ParameterizedTest
@@ -130,6 +139,8 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
 
     assertThrows(RuntimeException.class, () -> bundle.unpackDispensePairBy(prescriptionId));
   }
+
+  // Tests for EuMedicatioDispense
 
   @Test
   void shouldSkipContainedKbvMedications() {
@@ -156,5 +167,122 @@ class ErxMedicationDispenseBundleTest extends ErpFhirParsingTest {
 
     val l2 = assertDoesNotThrow(() -> bundle.unpackDispensePairBy(prescriptionId));
     assertTrue(l2.isEmpty());
+  }
+
+  @Test
+  void shouldExtractEuMedDspCorrect() {
+    val dispensations = multipleBundle.getEuMedicationDispenses();
+    assertEquals(1, dispensations.size());
+    assertEquals("160.000.000.000.000.01", dispensations.get(0).getPrescriptionId().getValue());
+    assertEquals("160.000.000.000.000.01", dispensations.get(0).getId().split("/")[1]);
+  }
+
+  @Test
+  void shouldExtractErxMedDispensesCorrect() {
+    val dispensations = multipleBundle.getMedicationDispenses();
+    assertEquals(1, dispensations.size());
+    assertEquals("160.000.000.000.000.01", dispensations.get(0).getPrescriptionId().getValue());
+    assertEquals("160.000.000.000.000.02", dispensations.get(0).getId().split("/")[1]);
+  }
+
+  @Test
+  void shouldFindNoEuMedicationByPrescriptionIdWhileAbsent() {
+    val euMedications =
+        multipleBundle.getEuMedicationBy(PrescriptionId.from("160.000.000.000.000.01"));
+    assertEquals(0, euMedications.size());
+  }
+
+  @Test
+  void shouldFindEuMedicationByDspCorrect() {
+    val md = singleBundle.getEuMedicationBy(PrescriptionId.from("160.000.000.000.000.01"));
+    assertEquals(1, md.size());
+
+    assertNotNull(md.get(0));
+    assertEquals(
+        "SumatripanMedication-EU", md.stream().findFirst().orElseThrow().getId().split("/")[1]);
+  }
+
+  @Test
+  void shouldFinGemMedicationCorrect() {
+    val medications = multipleBundle.getMedications();
+    assertEquals(2, medications.size());
+  }
+
+  @Test
+  void getEuPractitionerCorrect() {
+    val pract = singleBundle.getEuPractitionerBy(PrescriptionId.from("160.000.000.000.000.01"));
+    assertEquals("a7adde1a-af5c-4814-8fea-e46e7e63ed07", pract.get(0).getId().split("/")[1]);
+  }
+
+  @Test
+  void shouldGetEuPractitionerCorrectByMedicationDispense() {
+    val medDsp =
+        singleBundle
+            .getEuMedicationDispenseBy(PrescriptionId.from("160.000.000.000.000.01"))
+            .stream()
+            .findFirst()
+            .orElseThrow();
+    val pract = singleBundle.getEuPractitionerBy(medDsp);
+    assertEquals("a7adde1a-af5c-4814-8fea-e46e7e63ed07", pract.getId().split("/")[1]);
+  }
+
+  @Test
+  void shouldFailWhileGetEuPractitionerCorrectByMedicationDispense() {
+    val medDsp =
+        multipleBundle
+            .getEuMedicationDispenseBy(PrescriptionId.from("160.000.000.000.000.01"))
+            .stream()
+            .findFirst()
+            .orElseThrow();
+    assertThrows(MissingFieldException.class, () -> singleBundle.getEuPractitionerBy(medDsp));
+  }
+
+  @Test
+  void shouldGetPractitionerRoleCorrect() {
+    val medDsp =
+        multipleBundle
+            .getEuMedicationDispenseBy(PrescriptionId.from("160.000.000.000.000.01"))
+            .stream()
+            .toList();
+    val pracRole =
+        multipleBundle.getEuPractitionerRoleTo(medDsp.stream().findFirst().orElseThrow());
+    assertEquals(
+        "ebe39d92-276b-436d-a9ea-9dd5e042637b", pracRole.orElseThrow().getId().split("/")[1]);
+  }
+
+  @Test
+  void shouldFailWhileGettingPractitionerRole() {
+    val medDsp =
+        singleBundle.getEuMedicationDispenseBy(PrescriptionId.from("160.000.000.000.000.01"));
+    val pracRole =
+        multipleBundle.getEuPractitionerRoleTo(medDsp.stream().findFirst().orElseThrow());
+    assertTrue(pracRole.isEmpty());
+  }
+
+  @Test
+  void shouldGetOrganizationCorrect() {
+    val organiz = multipleBundle.getEuOrganizations();
+    assertEquals("6a3c8c57-0870-476e-90e3-25b7562799d3", organiz.get(0).getId().split("/")[1]);
+  }
+
+  @Test
+  void getWhenHandedOverCorrect() {
+    val whenHandedOver =
+        multipleBundle.getEuWhenHandedOver(PrescriptionId.from("160.000.000.000.000.01"));
+    assertEquals(LocalDate.of(2025, 10, 01), whenHandedOver.orElseThrow());
+  }
+
+  @Test
+  void shouldGetPairBy() {
+    val result = singleBundle.getEuDispensePairBy(PrescriptionId.from("160.000.000.000.000.01"));
+    assertNotNull(result);
+  }
+
+  @Test
+  void shouldThrowWhileMedicationReferenceIsNotCorrect() {
+    val manipulatedBundle = singleBundle;
+    manipulatedBundle.getMedications().get(0).setId("123Faill-Id");
+    val prId = PrescriptionId.from("160.000.000.000.000.01");
+    assertThrows(MissingFieldException.class, () -> manipulatedBundle.getEuDispensePairBy(prId));
   }
 }

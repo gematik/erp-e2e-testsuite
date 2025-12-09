@@ -20,6 +20,8 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
+import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.INGREDIENT_DARREICHUNGSFORM;
+
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -37,5 +39,12 @@ public class EpaMedPznIngredient extends EpaMedication {
         .filter(DeBasisProfilCodeSystem.PZN::matches)
         .map(PZN::from)
         .findFirst();
+  }
+
+  public Optional<String> getDarreichungsform() {
+    return this.getIngredientFirstRep().getExtension().stream()
+        .findFirst()
+        .filter(INGREDIENT_DARREICHUNGSFORM::matches)
+        .map(ext -> ext.getValue().primitiveValue());
   }
 }

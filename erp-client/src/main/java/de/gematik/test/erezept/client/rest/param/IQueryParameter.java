@@ -117,6 +117,11 @@ public interface IQueryParameter {
       return this;
     }
 
+    public SearchQueryBuilder identifierValue(Identifier identifier) {
+      searchParams.add(new QueryParameter("identifier", identifier.getValue()));
+      return this;
+    }
+
     public SearchQueryBuilder andRecipient(String id) {
       searchParams.add(new QueryParameter("recipient", id));
       return this;

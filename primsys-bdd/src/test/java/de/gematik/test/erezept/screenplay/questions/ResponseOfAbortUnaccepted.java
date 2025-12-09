@@ -20,8 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static java.text.MessageFormat.format;
-
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
@@ -32,11 +31,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
-import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @Getter
-public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
+public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<EmptyResource> {
 
   private final DequeStrategy deque;
 
@@ -45,7 +43,7 @@ public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
   }
 
   @Override
-  public ErpResponse<Resource> answeredBy(Actor actor) {
+  public ErpResponse<EmptyResource> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val accepted =
         SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class).getAssignedPrescriptions();
@@ -54,10 +52,10 @@ public class ResponseOfAbortUnaccepted extends FhirResponseQuestion<Resource> {
     val accessCode = toDelete.getAccessCode();
     val cmd = new TaskAbortCommand(taskId, accessCode);
     log.info(
-        format(
-            "Pharmacy {0} is asking for the response of {1} with AccessCode {2} and without a"
-                + " secret",
-            actor.getName(), cmd.getRequestLocator(), accessCode));
+        "Pharmacy {} is asking for the response of {} with AccessCode {} and without a" + " secret",
+        actor.getName(),
+        cmd.getRequestLocator(),
+        accessCode);
     return erpClientAbility.request(cmd);
   }
 

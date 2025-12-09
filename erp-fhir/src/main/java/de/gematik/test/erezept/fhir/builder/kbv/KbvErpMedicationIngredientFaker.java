@@ -22,6 +22,7 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -37,9 +38,14 @@ public class KbvErpMedicationIngredientFaker {
       new HashMap<>();
 
   private KbvErpMedicationIngredientFaker() {
+    val unit = randomElement("%", "Stück", "mg", "ml", "Wölkchen");
+    val ingrdItemCodingText = GemFaker.getFaker().medical().medicineName();
     this.withDosageForm(fakerDosage())
-        .withIngredientComponent(2, 1, "Wölckhen")
-        .withDrugName(fakerDrugName())
+        .withIngredientComponent(2, 1, unit)
+        .withDrugName(
+            ingrdItemCodingText.length() > 80
+                ? ingrdItemCodingText.substring(0, 80)
+                : ingrdItemCodingText)
         .withVaccine(fakerBool())
         .withStandardSize(StandardSize.random());
   }
@@ -88,7 +94,8 @@ public class KbvErpMedicationIngredientFaker {
 
   public KbvErpMedicationIngredientFaker withIngredientComponent(
       long numerator, long deNom, String unit) {
-    builderConsumers.put("ingredientComponent", b -> b.ingredientComponent(numerator, deNom, unit));
+    builderConsumers.put(
+        "ingredientComponentList", b -> b.ingredientComponent(numerator, deNom, unit));
     return this;
   }
 

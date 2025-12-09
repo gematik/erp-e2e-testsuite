@@ -76,6 +76,10 @@ public class KbvEvdgaBundleBuilder
     compositionBuilder.addExtension(statusKennzeichen.asExtension());
     val compositionEntry = compositionBuilder.buildBundleEntryComponent();
     bundle.getEntry().add(0, compositionEntry);
+
+    // adjust some more references
+    coverage.setBeneficiary(patient.asReference());
+
     return bundle;
   }
 }

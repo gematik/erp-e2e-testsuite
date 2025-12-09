@@ -26,9 +26,10 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
-import de.gematik.test.erezept.app.mobile.OnboardingScreen;
 import de.gematik.test.erezept.app.mobile.PlatformType;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
+import de.gematik.test.erezept.app.mobile.elements.OperatingSystem;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
@@ -60,124 +61,25 @@ class NavigateThroughOnboardingOnIOSTest {
   }
 
   @Test
-  void shouldSeeStartScreenWithoutTap() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.START_SCREEN);
+  void shouldBeAbleToNavigateThroughOnboarding() {
+    val task = NavigateThroughOnboardingOnIOS.entirely();
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
+    val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
 
     assertDoesNotThrow(() -> actor.attemptsTo(task));
-    verify(app, times(0)).tap(Onboarding.NEXT_BUTTON);
-    verifyNoMoreInteractions(app);
-  }
 
-  @Test
-  void shouldTapNextButtonOnceToReachWelcomeScreen() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.WELCOME_SCREEN);
-    val actor = OnStage.theActorCalled(userName);
-    val app = actor.abilityTo(UseIOSApp.class);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
+    verify(app, times(1)).tap(Onboarding.START_BUTTON);
     verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
-    verifyNoMoreInteractions(app);
-  }
-
-  @Test
-  void shouldTapGoThroughTermAndPrivacyScreen() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.TERMS_AND_PRIVACY_SCREEN);
-    val actor = OnStage.theActorCalled(userName);
-    val app = actor.abilityTo(UseIOSApp.class);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
-    verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
-    verify(app, times(1)).waitUntilElementIsVisible(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-    verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-    verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
+    verify(app, times(2)).tap(Onboarding.PASSWORD_BUTTON);
+    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
+    verify(app, times(1)).swipe(SwipeDirection.UP);
+    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
+    verify(app, times(1)).tapIfDisplayed(3, OperatingSystem.LATER);
+    verify(app, times(1)).tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
+    verify(app, times(1)).logEvent("Remove all Tooltips");
+    verify(app, times(1)).removeTooltips();
 
     verifyNoMoreInteractions(app);
-  }
-
-  @Test
-  void shouldTapNextButtonTwoTimesToReachSecurityScreen() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.SECURITY_SCREEN);
-    val actor = OnStage.theActorCalled(userName);
-    val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
-    val app = actor.abilityTo(UseIOSApp.class);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
-
-    verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
-    verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-    verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
-
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
-  }
-
-  @Test
-  void shouldTapAnalyticsScreen() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.ANALYTICS_SCREEN);
-    val actor = OnStage.theActorCalled(userName);
-    val app = actor.abilityTo(UseIOSApp.class);
-    val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
-
-    when(app.isDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON)).thenReturn(true);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
-
-    verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
-    verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-    verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
-
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
-
-    verify(app, times(1)).tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
-    verify(app, times(1)).tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
-  }
-
-  @Test
-  void shouldBeAbleToNavigateThroughWholeOnboardingWithoutVirtualeGK() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.FINISH_ALL);
-    val actor = OnStage.theActorCalled(userName);
-    val app = actor.abilityTo(UseIOSApp.class);
-    val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
-
-    // simply for covering the case where no pin selection is suggested
-    when(app.isDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON)).thenReturn(false);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
-
-    verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
-    verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-    verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
-
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
-
-    verify(app, times(1)).tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
-    verify(app, times(1)).tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
-  }
-
-  @Test
-  void shouldBeAbleToNavigateThroughWholeOnboardingWithVirtualeGK() {
-    val task = NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.FINISH_ALL);
-    val actor = OnStage.theActorCalled(userName);
-    val app = actor.abilityTo(UseIOSApp.class);
-    val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
-
-    verify(app, times(1)).tap(Onboarding.NEXT_BUTTON);
-    verify(app, times(1)).tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-    verify(app, times(1)).tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
-
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
-    verify(app, times(1)).inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
-
-    verify(app, times(1)).tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
-    verify(app, times(1)).tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
-
-    assertDoesNotThrow(() -> actor.attemptsTo(task));
   }
 }

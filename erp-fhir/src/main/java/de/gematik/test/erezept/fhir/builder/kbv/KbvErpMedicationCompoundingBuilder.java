@@ -20,10 +20,8 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.fhir.builder.erp.IngredientCodeBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
@@ -32,54 +30,33 @@ import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import java.util.Optional;
 import lombok.val;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.Ratio;
+import org.hl7.fhir.r4.model.*;
 
 public class KbvErpMedicationCompoundingBuilder
-    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationCompoundingBuilder> {
+    extends KbvErpMedicationBaseBuilder<KbvErpMedicationCompoundingBuilder> {
 
   private static final BaseMedicationType BASE_MEDICATION_TYPE =
       BaseMedicationType.PHARM_BIO_PRODUCT;
   private static final int MINIMUM_OF_ONE = 1;
-  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
+
   private String darreichungsform;
   private long amountNumerator = 1;
   private String amountNumeratorUnit = "Volume";
   private long amountDenominator = 1;
-  private MedicationCategory category = MedicationCategory.C_00;
-  private boolean isVaccine = false;
+
   private ProductionInstruction productionInstruction;
   private PZN pzn;
   private String medicationName;
-  private String ingredItemText;
+  private String ingredientItemText;
   private String packaging;
   private Ratio ingredientStrength;
   private String ingredientStrengthFreeText;
 
   public static KbvErpMedicationCompoundingBuilder builder() {
     return new KbvErpMedicationCompoundingBuilder();
-  }
-
-  public KbvErpMedicationCompoundingBuilder category(MedicationCategory category) {
-    this.category = category;
-    return self();
-  }
-
-  public KbvErpMedicationCompoundingBuilder version(KbvItaErpVersion version) {
-    this.kbvItaErpVersion = version;
-    return this;
-  }
-
-  public KbvErpMedicationCompoundingBuilder isVaccine(boolean isVaccine) {
-    this.isVaccine = isVaccine;
-    return self();
   }
 
   public KbvErpMedicationCompoundingBuilder productionInstruction(
@@ -97,8 +74,8 @@ public class KbvErpMedicationCompoundingBuilder
     return self();
   }
 
-  public KbvErpMedicationCompoundingBuilder ingredItemText(String ingredItemText) {
-    this.ingredItemText = ingredItemText;
+  public KbvErpMedicationCompoundingBuilder ingredientItemText(String ingredientItemText) {
+    this.ingredientItemText = ingredientItemText;
     return self();
   }
 
@@ -116,7 +93,7 @@ public class KbvErpMedicationCompoundingBuilder
       PZN pzn, String medicationName, String freitextInPzn) {
     this.pzn = pzn;
     this.medicationName = medicationName;
-    this.ingredItemText = freitextInPzn;
+    this.ingredientItemText = freitextInPzn;
     return self();
   }
 
@@ -210,12 +187,13 @@ public class KbvErpMedicationCompoundingBuilder
   }
 
   private Medication.MedicationIngredientComponent simpleMedicationIngredientBuilder() {
-    var medicationIngredient = IngredientCodeBuilder.builder().dontFillMissingIngredientStrength();
-    Optional.ofNullable(pzn).ifPresent(medicationIngredient::withPzn);
+    var medicationIngredient =
+        KbvIngredientComponentBuilder.builder().dontFillMissingIngredientStrength();
+    Optional.ofNullable(pzn).ifPresent(medicationIngredient::pzn);
     Optional.ofNullable(medicationName).ifPresent(medicationIngredient::textInCoding);
-    Optional.ofNullable(ingredItemText).ifPresent(medicationIngredient::ingredItemCodingText);
+    Optional.ofNullable(ingredientItemText).ifPresent(medicationIngredient::ingredItemCodingText);
     Optional.ofNullable(ingredientStrengthFreeText)
-        .ifPresent(medicationIngredient::withStrengthFreetext);
+        .ifPresent(medicationIngredient::strengthAmountText);
     Optional.ofNullable(ingredientStrength).ifPresent(medicationIngredient::ingredientStrength);
     return medicationIngredient.build();
   }
@@ -227,7 +205,7 @@ public class KbvErpMedicationCompoundingBuilder
         productionInstruction,
         packaging);
     this.checkRequired(
-        ingredItemText,
+        ingredientItemText,
         "A MedicationCompounding requires a Medication.MedicationIngredientComponent mit"
             + " Freitextangabe");
     this.checkRequired(darreichungsform, "A MedicationCompounding requires a Darreichungsform ");

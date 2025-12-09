@@ -20,17 +20,18 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
-import static org.junit.jupiter.api.Assertions.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import java.util.Map;
 import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class DeleteCommunicationUseCaseTest extends TestWithActorContext {
@@ -42,7 +43,7 @@ class DeleteCommunicationUseCaseTest extends TestWithActorContext {
     val mockClient = pharm.getClient();
 
     val erpResponse =
-        ErpResponse.forPayload(null, Resource.class)
+        ErpResponse.forPayload(null, EmptyResource.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());

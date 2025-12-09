@@ -22,6 +22,7 @@ package de.gematik.test.erezept.actors;
 
 import static java.text.MessageFormat.format;
 
+import com.ibm.icu.impl.Pair;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
@@ -96,14 +97,17 @@ public class PatientActor extends ErpActor {
     return bd.getCoverageInsuranceType();
   }
 
-  public KbvPatient getPatientData() {
+  /**
+   * The KbvCoverage references the KbvPatient. In this method both resources are generated to
+   * ensure the integrity of the references
+   *
+   * @return a Pair.of(patient, coverage)
+   */
+  public Pair<KbvPatient, KbvCoverage> getPatientCoverage() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    return bd.getPatient();
-  }
-
-  public KbvCoverage getInsuranceCoverage() {
-    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
-    return bd.getInsuranceCoverage();
+    val patient = bd.getPatient();
+    val coverage = bd.getInsuranceCoverage(patient);
+    return Pair.of(patient, coverage);
   }
 
   @Override

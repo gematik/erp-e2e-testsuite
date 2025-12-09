@@ -143,7 +143,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
       case INFO_REQ -> createInfoRequestAs(actor);
       case REPRESENTATIVE -> createRepresentativeCommunicationAs(actor);
       case DISP_REQ -> createDispenseRequestAs(actor);
-      case REPLY -> createReplyAs(actor);
+      case REPLY, DIGA -> createReplyAs(actor);
     };
   }
 

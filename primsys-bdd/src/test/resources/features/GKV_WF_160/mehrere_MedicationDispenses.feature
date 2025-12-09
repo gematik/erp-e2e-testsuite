@@ -49,7 +49,7 @@ Funktionalität: Mehrere Medication Dispenses
     Wenn die Ärztin Dr. Schraßer folgendes E-Rezept an die Versicherte Sina Hüllmann verschreibt:
       | Name         | PZN      | Substitution | Normgröße | Darreichungsform | Dosierung | Menge |
       | IBUFLAM akut | 11648419 | true         | N3        | FTA              | 1-0-0-1   | 50    |
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke das letzte akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an Sina Hüllmann dispensiert:
       | Name         | PZN      | Normgröße | Menge | Einheit | Darreichungsform |

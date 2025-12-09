@@ -30,14 +30,11 @@ import de.gematik.bbriccs.smartcards.DummyEgk;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.smartcards.SmartcardType;
-import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.bbriccs.smartcards.exceptions.CardNotFoundException;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
-import de.gematik.test.erezept.exceptions.WebSocketException;
-import de.gematik.test.erezept.pspwsclient.config.PSPClientFactory;
 import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
@@ -50,12 +47,10 @@ import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.erezept.screenplay.abilities.UsePspClient;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseSubscriptionService;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.konnektor.cfg.KonnektorModuleFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -78,25 +73,6 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   public EnvironmentConfiguration getActiveEnvironment() {
     return this.getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
-  }
-
-  public void equipPharmacyWithPspClient(Actor thePharmacy) {
-    val smcbAbility = SafeAbility.getAbility(thePharmacy, UseSMCB.class);
-    val pspClientAbility = this.createPspClientFor(smcbAbility.getSmcB());
-    givenThat(thePharmacy).can(pspClientAbility);
-  }
-
-  public UsePspClient createPspClientFor(SmcB smcb) {
-    val telematikId = smcb.getTelematikId();
-    val pspClient =
-        UsePspClient.with(PSPClientFactory.create(dto.getPspClientConfig(), telematikId))
-            .andConfig(dto.getPspClientConfig());
-
-    // check psp connected successfully
-    if (!pspClient.isConnected()) {
-      throw new WebSocketException("PSP-Client could not connect to PSP-Server");
-    }
-    return pspClient;
   }
 
   public void equipAsDoctor(Actor theDoctor) {

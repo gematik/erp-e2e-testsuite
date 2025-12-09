@@ -20,13 +20,14 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
@@ -55,7 +56,6 @@ import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,10 +84,10 @@ class EnsureThatThePrescriptionValidityTest extends ErpFhirParsingTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
 
@@ -125,13 +125,13 @@ class EnsureThatThePrescriptionValidityTest extends ErpFhirParsingTest {
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
 
     when(app.getWebElementListLen(any())).thenReturn(2);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
-    when(app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT))
+    when(app.getText(PrescriptionDetails.PRESCRIPTION_STATUS_TEXT))
         .thenReturn("Noch 2 Tage einlösbar");
 
     val ensureTask =

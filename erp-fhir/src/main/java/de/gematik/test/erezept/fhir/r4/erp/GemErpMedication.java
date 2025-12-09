@@ -20,7 +20,10 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.bbriccs.fhir.de.value.ASK;
@@ -31,23 +34,33 @@ import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.math.BigDecimal;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.BooleanType;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.PrimitiveType;
-import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @ResourceDef(name = "Medication")
 @SuppressWarnings({"java:S110"})
-public class GemErpMedication extends Medication {
+public class GemErpMedication extends Medication implements ErpFhirResource {
+
+  public static GemErpMedication fromMedication(Medication adaptee) {
+    if (adaptee instanceof GemErpMedication erpMedication) {
+      return erpMedication;
+    } else {
+      val erpMedication = new GemErpMedication();
+      adaptee.copyValues(erpMedication);
+      return erpMedication;
+    }
+  }
+
+  public static GemErpMedication fromMedication(Resource adaptee) {
+    return fromMedication((Medication) adaptee);
+  }
 
   public Optional<EpaDrugCategory> getCategory() {
     return this.getExtension().stream()
@@ -67,13 +80,27 @@ public class GemErpMedication extends Medication {
   }
 
   public Optional<String> getNameFromCodeOreContainedRessource() {
-    return this.getCode().hasText()
-        ? Optional.ofNullable(this.getCode().getText())
-        : this.getContained().stream()
-            .filter(EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT::matches)
-            .map(EpaMedPznIngredient.class::cast)
-            .flatMap(med -> med.getName().stream())
-            .findFirst();
+    return getAnyNameFromCode().isPresent() ? getAnyNameFromCode() : getAnyNameFromContainedMed();
+  }
+
+  public Optional<String> getAnyNameFromContainedMed() {
+    return this.getContained().stream()
+        .filter(EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT::matches)
+        .map(EpaMedPznIngredient.class::cast)
+        .flatMap(med -> med.getName().stream())
+        .findFirst();
+  }
+
+  public Optional<String> getAnyNameFromCode() {
+    return getNameFromCodeText().isPresent() ? getNameFromCodeText() : getNameFromCodingDisplay();
+  }
+
+  public Optional<String> getNameFromCodeText() {
+    return this.getCode().hasText() ? Optional.of(this.getCode().getText()) : Optional.empty();
+  }
+
+  public Optional<String> getNameFromCodingDisplay() {
+    return this.getCode().getCoding().stream().findFirst().map(Coding::getDisplay);
   }
 
   public Optional<Darreichungsform> getDarreichungsform() {
@@ -115,16 +142,6 @@ public class GemErpMedication extends Medication {
         : Optional.of(this.getBatch().getLotNumber());
   }
 
-  public static GemErpMedication fromMedication(Medication adaptee) {
-    if (adaptee instanceof GemErpMedication erpMedication) {
-      return erpMedication;
-    } else {
-      val erpMedication = new GemErpMedication();
-      adaptee.copyValues(erpMedication);
-      return erpMedication;
-    }
-  }
-
   public Optional<String> getFreeText() {
     return Optional.ofNullable(this.getCode().getText());
   }
@@ -136,10 +153,6 @@ public class GemErpMedication extends Medication {
         .map(coding -> coding.castToString(coding))
         .map(PrimitiveType::getValue)
         .findFirst();
-  }
-
-  public static GemErpMedication fromMedication(Resource adaptee) {
-    return fromMedication((Medication) adaptee);
   }
 
   public Optional<ATC> getAtc() {
@@ -163,5 +176,45 @@ public class GemErpMedication extends Medication {
         .filter(coding -> CommonCodeSystem.SNOMED_SCT.matches(coding.getSystem()))
         .map(Coding::getCode)
         .findFirst();
+  }
+
+  public Optional<String> getTotalQuantity() {
+    return this.getAmount().getNumerator().getExtension().stream()
+        .filter(EpaMedicationStructDef.TOTAL_QUANTITY_FORMULATION_EXT::matches)
+        .map(Extension::getValue)
+        .map(coding -> coding.castToString(coding))
+        .map(PrimitiveType::getValue)
+        .findFirst();
+  }
+
+  public Optional<String> getPackagingSize() {
+    return this.getAmount().getNumerator().getExtension().stream()
+        .filter(EpaMedicationStructDef.EXT_MED_PACKAGING_SIZE::matches)
+        .map(Extension::getValue)
+        .map(coding -> coding.castToString(coding))
+        .map(PrimitiveType::getValue)
+        .findFirst();
+  }
+
+  public Optional<String> getPackaging() {
+    return this.getExtension().stream()
+        .filter(EpaMedicationStructDef.PACKAGING_EXTENSION::matches)
+        .map(Extension::getValue)
+        .map(coding -> coding.castToString(coding))
+        .map(PrimitiveType::getValue)
+        .findFirst();
+  }
+
+  public Optional<String> getFormText() {
+    return Optional.ofNullable(this.getForm().getText());
+  }
+
+  @Override
+  public String getDescription() {
+    return format(
+        "Type: GemErpMedication, PZN: {0}, ASK: {1}, als {2}",
+        getPzn().map(SemanticValue::getValue).orElse("not a PZN-Dispensation"),
+        this.getAsk().map(SemanticValue::getValue).orElse("not an ASK-Dispensation"),
+        this.getAnyNameFromCode().orElse("no Name available"));
   }
 }

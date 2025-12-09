@@ -33,6 +33,7 @@ public enum CommonCodeSystem implements WithCodeSystem {
   ORGANIZATION_TYPE("urn:ietf:rfc:3986"),
   UCUM("http://unitsofmeasure.org"), // Unified Code for Units of Measure
   ISO_31662_DE("urn:iso:std:iso:3166-2:de"), // Federal States Germany
+  ISO_3166("urn:iso:std:iso:3166"), // international country codes
   SNOMED_SCT("http://snomed.info/sct");
 
   private final String canonicalUrl;

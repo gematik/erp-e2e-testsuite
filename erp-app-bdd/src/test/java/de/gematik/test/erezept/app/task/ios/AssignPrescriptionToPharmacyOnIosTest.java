@@ -20,13 +20,14 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
@@ -55,7 +56,6 @@ import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,10 +91,10 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
             .withStatusCode(404)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
 
@@ -140,7 +140,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(app.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
@@ -183,12 +183,12 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
     val accessCode = AccessCode.random();
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
-    val oO = FhirTestResourceUtil.createOperationOutcome();
+    val oO = createOperationOutcome();
     val getTaskResponse =
         ErpResponse.forPayload(oO, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(404)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(app.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
     when(app.getText(PrescriptionTechnicalInformation.TASKID))
@@ -233,7 +233,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(app.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());
@@ -279,7 +279,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(app.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
     // return the correct TaskId to ensure the prescription is present on the main screen
@@ -330,7 +330,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
         ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
             .withHeaders(Map.of())
             .withStatusCode(200)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
     when(app.getWebElementListLen(any(PrescriptionsViewElement.class))).thenReturn(1);
     when(app.getText(PrescriptionTechnicalInformation.TASKID)).thenReturn(taskId.getValue());

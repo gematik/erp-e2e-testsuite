@@ -209,10 +209,12 @@ public class PostDispenseRequestIT extends ErpTest {
 
     val mvo =
         MultiplePrescriptionExtension.asMultiple(1, 2).validThrough(mvoStartsIn, mvoStartsIn + 10);
+
+    val patientCoverage = patient.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withInsurance(patient.getInsuranceCoverage(), patient.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doc.getPractitioner())
             .withMvo(mvo)
             .toBuilder();

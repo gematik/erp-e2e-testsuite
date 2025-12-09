@@ -20,8 +20,7 @@
 
 package de.gematik.test.erezept.arguments;
 
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.workflowAndMedicationComposer;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.workflowPharmacyOnlyAndMedicationComposer;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import lombok.val;
@@ -41,5 +40,12 @@ class WorkflowAndMedicationComposerTest {
     val wAMC = workflowPharmacyOnlyAndMedicationComposer().toList();
     assertFalse(wAMC.isEmpty());
     assertEquals(8, wAMC.size());
+  }
+
+  @Test
+  void shouldBuildWorkflowPharmacyOnlyAndAlternativeMedicationCorrect() {
+    val wAMC = workflowPharmacyOnlyAndAlternativeMedicationComposer().toList();
+    assertFalse(wAMC.isEmpty());
+    assertEquals(6, wAMC.size());
   }
 }

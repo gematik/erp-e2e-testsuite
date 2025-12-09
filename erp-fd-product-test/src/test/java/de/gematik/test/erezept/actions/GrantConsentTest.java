@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -90,7 +91,7 @@ class GrantConsentTest extends ErpFhirBuildingTest {
   @Test
   void shouldBuildConsentDepositCorrectWithEnsureAndConsent() {
     val mockConsentResponse = mockUtil.createErpResponse(null, ErxConsent.class, 200);
-    val mockResourceResponse = mockUtil.createErpResponse(null, Resource.class, 200);
+    val mockResourceResponse = mockUtil.createErpResponse(null, EmptyResource.class, 200);
     val mockConsBundle = new ErxConsentBundle();
     mockConsBundle.addEntry().setResource(ErxConsentBuilder.forKvnr(KVNR.random()).build());
     val mockErxBundleResponse =
@@ -98,7 +99,7 @@ class GrantConsentTest extends ErpFhirBuildingTest {
     when(erpClientMock.request(any(ConsentPostCommand.class))).thenReturn(mockConsentResponse);
     when(erpClientMock.request(any(ConsentDeleteCommand.class))).thenReturn(mockResourceResponse);
     when(erpClientMock.request(any(ConsentGetCommand.class))).thenReturn(mockErxBundleResponse);
-    val mockErpResponseRessource = mockUtil.createErpResponse(null, Resource.class, 201);
+    val mockErpResponseRessource = mockUtil.createErpResponse(null, EmptyResource.class, 201);
     when(erpClientMock.request(any(ConsentDeleteCommand.class)))
         .thenReturn(mockErpResponseRessource);
     val consent = ErxConsentBuilder.forKvnr(KVNR.random()).build();

@@ -33,7 +33,7 @@ public enum ErpWorkflowStructDef implements WithStructureDefinition<ErpWorkflowV
   COM_INFO_REQ("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_InfoReq"),
   COM_DISP_REQ("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DispReq"),
   COM_REPLY("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply"),
-  GEM_DIGA("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DiGA"),
+  COM_DIGA("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DiGA"),
   COM_REPRESENTATIVE(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Representative"),
   SUPPLY_OPTIONS_TYPE(
@@ -49,8 +49,7 @@ public enum ErpWorkflowStructDef implements WithStructureDefinition<ErpWorkflowV
   PRESCRIPTION_TYPE_12(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType"),
   BINARY("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary"),
-  TASK("https://gematik.de/fhir/StructureDefinition/ErxTask"),
-  TASK_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task"),
+  TASK("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task"),
   MEDICATION("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication"),
   MEDICATION_DISPENSE("https://gematik.de/fhir/StructureDefinition/ErxMedicationDispense"),
   MEDICATION_DISPENSE_12(

@@ -50,6 +50,8 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
@@ -86,8 +88,98 @@ class TaskActivateIT extends ErpTest {
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
 
+  @Actor(name = "Michael Morgenrot")
+  private DoctorActor michael;
+
   @Actor(name = "Sina Hüllmann")
   private PatientActor sina;
+
+  static Stream<Arguments> prescriptionTypesProviderInvalidAuthoredOn() {
+    val invalidAuthoredOnDates =
+        List.of(
+            Date.from(Instant.now().plus(1, ChronoUnit.DAYS)),
+            Date.from(Instant.now().minus(1, ChronoUnit.DAYS)));
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                InsuranceTypeDe.GKV, // given insurance kind
+                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
+            .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
+    return composer.multiplyAppend(invalidAuthoredOnDates).create();
+  }
+
+  static Stream<Arguments> prescriptionTypesProvider() {
+    return ArgumentComposer.composeWith()
+        .arguments(
+            InsuranceTypeDe.GKV, // given insurance kind
+            PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
+            PrescriptionFlowType.FLOW_TYPE_160) // expected flow type
+        .arguments(
+            InsuranceTypeDe.GKV,
+            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+            PrescriptionFlowType.FLOW_TYPE_169)
+        .arguments(
+            InsuranceTypeDe.PKV,
+            PrescriptionAssignmentKind.PHARMACY_ONLY,
+            PrescriptionFlowType.FLOW_TYPE_200)
+        .arguments(
+            InsuranceTypeDe.PKV,
+            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+            PrescriptionFlowType.FLOW_TYPE_209)
+        .multiplyAppend(MedicationCategory.class)
+        .create();
+  }
+
+  static Stream<Arguments> prescriptionTypesProviderDmpKennzeichen() {
+    val dmpList =
+        List.of(
+            DmpKennzeichen.ADIPOSITAS,
+            DmpKennzeichen.ASTHMA_UND_DIABETES_TYP_2_UND_KHK,
+            DmpKennzeichen.BRUSTKREBS_UND_COPD_UND_DIABETES_TYP_1_UND_KHK);
+    return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dmpList).create();
+  }
+
+  static Stream<Arguments> prescriptionTypesProviderDarreichungsformen() {
+    val dfList =
+        List.of(
+            Darreichungsform.PUE, // From April 2025 Active
+            Darreichungsform.LYE); // From April 2025 Active
+    return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dfList).create();
+  }
+
+  static Stream<Arguments> pkvPrescriptionTypesProvider() {
+    return ArgumentComposer.composeWith()
+        .arguments(
+            InsuranceTypeDe.PKV,
+            PrescriptionAssignmentKind.PHARMACY_ONLY,
+            PrescriptionFlowType.FLOW_TYPE_200)
+        .arguments(
+            InsuranceTypeDe.PKV,
+            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
+            PrescriptionFlowType.FLOW_TYPE_209)
+        .create();
+  }
+
+  static Stream<Arguments> prescriptionTypesProviderInvalidTemporalPrecision() {
+    val excludedPrecisions =
+        new TemporalPrecisionEnum[] {
+          TemporalPrecisionEnum.DAY, // this one is the only valid one!
+          TemporalPrecisionEnum.MINUTE // not supported by HAPI DateTimeType
+        };
+    val composer =
+        ArgumentComposer.composeWith()
+            .arguments(
+                InsuranceTypeDe.GKV, // given insurance kind
+                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
+            .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
+
+    return composer.multiplyAppend(TemporalPrecisionEnum.class, excludedPrecisions).create();
+  }
 
   @TestcaseId("ERP_TASK_ACTIVATE_01")
   @Tag("Smoketest")
@@ -140,11 +232,12 @@ class TaskActivateIT extends ErpTest {
             .withSupplyForm(df)
             .fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(sina.getKvnr())
             .withMedication(medication) // what is the medication
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .toBuilder();
 
@@ -174,45 +267,6 @@ class TaskActivateIT extends ErpTest {
                       "FHIR-Validation error", FhirRequirements.FHIR_VALIDATION_ERROR))
               .isCorrect());
     }
-  }
-
-  static Stream<Arguments> prescriptionTypesProviderInvalidAuthoredOn() {
-    val invalidAuthoredOnDates =
-        List.of(
-            Date.from(Instant.now().plus(1, ChronoUnit.DAYS)),
-            Date.from(Instant.now().minus(1, ChronoUnit.DAYS)));
-    val composer =
-        ArgumentComposer.composeWith()
-            .arguments(
-                InsuranceTypeDe.GKV, // given insurance kind
-                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-            .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-
-    return composer.multiplyAppend(invalidAuthoredOnDates).create();
-  }
-
-  static Stream<Arguments> prescriptionTypesProvider() {
-    return ArgumentComposer.composeWith()
-        .arguments(
-            InsuranceTypeDe.GKV, // given insurance kind
-            PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
-            PrescriptionFlowType.FLOW_TYPE_160) // expected flow type
-        .arguments(
-            InsuranceTypeDe.GKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            PrescriptionFlowType.FLOW_TYPE_169)
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.PHARMACY_ONLY,
-            PrescriptionFlowType.FLOW_TYPE_200)
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            PrescriptionFlowType.FLOW_TYPE_209)
-        .multiplyAppend(MedicationCategory.class)
-        .create();
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_03")
@@ -263,11 +317,12 @@ class TaskActivateIT extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(sina.getKvnr())
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withAuthorDate(new Date(), precision)
             .toBuilder();
@@ -286,81 +341,6 @@ class TaskActivateIT extends ErpTest {
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_05")
-  @ParameterizedTest(name = "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} aus")
-  @DisplayName("PKV E-Rezept als Verordnender Arzt an eine/n Versicherte/n ausstellen")
-  @MethodSource("pkvPrescriptionTypesProvider")
-  void activatePkvPrescription(
-      InsuranceTypeDe insuranceType,
-      PrescriptionAssignmentKind assignmentKind,
-      PrescriptionFlowType expectedFlowType) {
-
-    sina.changePatientInsuranceType(insuranceType);
-    val activation =
-        doctor.performs(
-            IssuePrescription.forPatient(sina)
-                .ofAssignmentKind(assignmentKind)
-                .withRandomKbvBundle());
-
-    doctor.attemptsTo(
-        Verify.that(activation)
-            .withExpectedType(ErpAfos.A_19022)
-            .hasResponseWith(returnCode(200))
-            .and(hasWorkflowType(expectedFlowType))
-            .and(isInReadyStatus())
-            .and(hasCorrectExpiryDate())
-            .and(hasCorrectAcceptDate(expectedFlowType))
-            .isCorrect());
-  }
-
-  static Stream<Arguments> prescriptionTypesProviderDmpKennzeichen() {
-    val dmpList =
-        List.of(
-            DmpKennzeichen.ADIPOSITAS,
-            DmpKennzeichen.ASTHMA_UND_DIABETES_TYP_2_UND_KHK,
-            DmpKennzeichen.BRUSTKREBS_UND_COPD_UND_DIABETES_TYP_1_UND_KHK);
-    return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dmpList).create();
-  }
-
-  static Stream<Arguments> prescriptionTypesProviderDarreichungsformen() {
-    val dfList =
-        List.of(
-            Darreichungsform.PUE, // From April 2025 Active
-            Darreichungsform.LYE); // From April 2025 Active
-    return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dfList).create();
-  }
-
-  static Stream<Arguments> pkvPrescriptionTypesProvider() {
-    return ArgumentComposer.composeWith()
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.PHARMACY_ONLY,
-            PrescriptionFlowType.FLOW_TYPE_200)
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            PrescriptionFlowType.FLOW_TYPE_209)
-        .create();
-  }
-
-  static Stream<Arguments> prescriptionTypesProviderInvalidTemporalPrecision() {
-    val excludedPrecisions =
-        new TemporalPrecisionEnum[] {
-          TemporalPrecisionEnum.DAY, // this one is the only valid one!
-          TemporalPrecisionEnum.MINUTE // not supported by HAPI DateTimeType
-        };
-    val composer =
-        ArgumentComposer.composeWith()
-            .arguments(
-                InsuranceTypeDe.GKV, // given insurance kind
-                PrescriptionAssignmentKind.PHARMACY_ONLY) // expected flow type
-            .arguments(InsuranceTypeDe.GKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT)
-            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.PHARMACY_ONLY)
-            .arguments(InsuranceTypeDe.PKV, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT);
-
-    return composer.multiplyAppend(TemporalPrecisionEnum.class, excludedPrecisions).create();
-  }
-
-  @TestcaseId("ERP_TASK_ACTIVATE_06")
   @ParameterizedTest(
       name =
           "[{index}] -> Verordnender Arzt stellt ein E-Rezept für einen Versicherten mit dem"
@@ -370,7 +350,7 @@ class TaskActivateIT extends ErpTest {
           + " Versicherungsart-Identifier aus")
   @EnumSource(
       value = IdentifierTypeDe.class,
-      names = {"GKV", "PKV"},
+      names = {"GKV", "PKV", "KVZ10"},
       mode = EnumSource.Mode.EXCLUDE)
   void invalidInsuranceType(IdentifierTypeDe insuranceIdentifierType) {
 
@@ -386,19 +366,34 @@ class TaskActivateIT extends ErpTest {
                             .getCodingFirstRep()
                             .setCode(insuranceIdentifierType.getCode()))
                 .withRandomKbvBundle());
-    doctor.attemptsTo(
-        Verify.that(activation)
-            .withOperationOutcome(FhirRequirements.FHIR_VALIDATION_ERROR)
-            .hasResponseWith(returnCode(400))
-            .and(
-                operationOutcomeContainsInDiagnostics(
-                    "In der Ressource vom Typ Patient ist keine GKV-VersichertenID vorhanden, diese"
-                        + " ist aber eine Pflichtangabe beim Kostentraeger des Typs",
-                    ErpAfos.A_23936))
-            .isCorrect());
+
+    // after reduce Profile Switch also reduce "GKV", "PKV" from exclude-list
+    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4) <= 0) {
+      doctor.attemptsTo(
+          Verify.that(activation)
+              .withOperationOutcome(FhirRequirements.FHIR_VALIDATION_ERROR)
+              .hasResponseWith(returnCode(400))
+              .and(
+                  operationOutcomeContainsInDiagnostics(
+                      "In der Ressource vom Typ Patient ist keine GKV-VersichertenID vorhanden,"
+                          + " diese ist aber eine Pflichtangabe beim Kostentraeger des Typs",
+                      ErpAfos.A_23936))
+              .isCorrect());
+    } else {
+      doctor.attemptsTo(
+          Verify.that(activation)
+              .withOperationOutcome(FhirRequirements.FHIR_VALIDATION_ERROR)
+              .hasResponseWith(returnCode(400))
+              .and(
+                  operationOutcomeContainsInDiagnostics(
+                      "In der Ressource vom Typ Patient ist keine VersichertenID vorhanden, diese"
+                          + " ist aber eine Pflichtangabe bei Kostenträgern des Typs",
+                      ErpAfos.A_23936))
+              .isCorrect());
+    }
   }
 
-  @TestcaseId("ERP_TASK_ACTIVATE_07")
+  @TestcaseId("ERP_TASK_ACTIVATE_06")
   @DisplayName("Es muss geprüft werden, dass kein Verordnungsdatensatz doppelt eingestellt wird")
   @Test
   void activatePrescriptionCopyIsForbidden() {
@@ -414,13 +409,13 @@ class TaskActivateIT extends ErpTest {
             .withKbvBundle(kbvBundleBuilder.build());
 
     val activationResult = doctor.performs(activation);
-    val activationResult2 = doctor.performs(activation);
-
     doctor.attemptsTo(
         Verify.that(activationResult)
             .withExpectedType()
             .responseWith(returnCodeIs(200))
             .isCorrect());
+
+    val activationResult2 = doctor.performs(activation);
     doctor.attemptsTo(
         Verify.that(activationResult2)
             .withOperationOutcome()
@@ -428,7 +423,7 @@ class TaskActivateIT extends ErpTest {
             .isCorrect());
   }
 
-  @TestcaseId("ERP_TASK_ACTIVATE_08")
+  @TestcaseId("ERP_TASK_ACTIVATE_07")
   @ParameterizedTest(
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit dem DmpKennzeichen"
@@ -449,11 +444,12 @@ class TaskActivateIT extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(sina.getKvnr())
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .toBuilder();
 
@@ -481,15 +477,25 @@ class TaskActivateIT extends ErpTest {
             .withSupplyForm(Darreichungsform.SCH)
             .fake();
 
-    val kbvBundleBuilder =
-        KbvErpBundleFaker.builder()
-            .withPrescriptionId(prescriptionId)
-            .withKvnr(sina.getKvnr())
+    val practitioner = doctor.getPractitioner();
+    val medOrg = doctor.getMedicalOrganization();
+    val patientCoverage = sina.getPatientCoverage();
+    val mr =
+        KbvErpMedicationRequestFaker.builder()
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
-            .withPractitioner(doctor.getPractitioner())
-            .toBuilder();
-    return kbvBundleBuilder;
+            .withRequester(practitioner)
+            .withPatient(patientCoverage.first)
+            .withInsurance(patientCoverage.second)
+            .fake();
+
+    return KbvErpBundleBuilder.forPrescription(prescriptionId)
+        .practitioner(practitioner)
+        .medicalOrganization(medOrg)
+        .patient(patientCoverage.first)
+        .insurance(patientCoverage.second)
+        .statusKennzeichen("00", practitioner) // 00/NONE is default
+        .medicationRequest(mr) // what is the medication
+        .medication(medication);
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_08")
@@ -508,11 +514,12 @@ class TaskActivateIT extends ErpTest {
 
     val medication = KbvErpMedicationPZNFaker.builder().withCategory(medicationCategory).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(sina.getKvnr())
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .toBuilder();
 
@@ -537,5 +544,35 @@ class TaskActivateIT extends ErpTest {
               .hasResponseWith(returnCode(400, FhirRequirements.FHIR_PROFILES))
               .isCorrect());
     }
+  }
+
+  @TestcaseId("ERP_TASK_ACTIVATE_09")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt Michael Morgenrot stellt ein {0} E-Rezept für {1} aus")
+  @DisplayName(
+      "Verordnender Arzt Michael Morgenrot, tätig in der Vorsorge- und Rehabilitationsklinik,"
+          + " erstellt ein gültiges E-Rezept aus")
+  @MethodSource("prescriptionTypesProvider")
+  void activatePrescriptionForPreventionAndRehabilitation(
+      InsuranceTypeDe insuranceType,
+      PrescriptionAssignmentKind assignmentKind,
+      PrescriptionFlowType expectedFlowType) {
+
+    sina.changePatientInsuranceType(insuranceType);
+
+    val activation =
+        doctor.performs(
+            IssuePrescription.forPatient(sina)
+                .ofAssignmentKind(assignmentKind)
+                .withRandomKbvBundle());
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType(ErpAfos.A_19022)
+            .hasResponseWith(returnCode(200))
+            .and(hasWorkflowType(expectedFlowType))
+            .and(isInReadyStatus())
+            .and(hasCorrectExpiryDate())
+            .and(hasCorrectAcceptDate(expectedFlowType))
+            .isCorrect());
   }
 }

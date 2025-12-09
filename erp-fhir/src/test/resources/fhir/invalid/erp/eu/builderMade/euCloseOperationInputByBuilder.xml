@@ -1,0 +1,208 @@
+<Parameters xmlns="http://hl7.org/fhir">
+    <id value="dab099a6-375c-4004-a89c-adc9234cc97f"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_CloseOperation_Input|1.0"/>
+    </meta>
+    <parameter>
+        <name value="rxDispensation"/>
+        <part>
+            <name value="medicationDispense"/>
+            <resource>
+                <MedicationDispense xmlns="http://hl7.org/fhir">
+                    <id value="52a06449-2f3c-45ba-ac26-30250966f36e"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_MedicationDispense|1.0"/>
+                    </meta>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                        <value value="160.000.114.463.665.23"/>
+                    </identifier>
+                    <status value="completed"/>
+                    <medicationReference>
+                        <reference value="ec5080f4-fef3-41f8-924e-483c8edbec2c"/>
+                    </medicationReference>
+                    <subject>
+                        <identifier>
+                            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                            <value value="I726573101"/>
+                        </identifier>
+                    </subject>
+                    <performer>
+                        <actor>
+                            <identifier>
+                                <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                                <value value="54029896"/>
+                            </identifier>
+                        </actor>
+                    </performer>
+                    <whenHandedOver value="2025-09-03"/>
+                </MedicationDispense>
+            </resource>
+        </part>
+        <part>
+            <name value="medication"/>
+            <resource>
+                <Medication xmlns="http://hl7.org/fhir">
+                    <id value="48dd1546-1872-420d-9c80-e0d14d385e8d"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Medication|1.0"/>
+                    </meta>
+                    <extension url="https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension">
+                        <valueCoding>
+                            <system value="https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs"/>
+                            <code value="00"/>
+                        </valueCoding>
+                    </extension>
+                    <extension
+                            url="https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension">
+                        <valueBoolean value="false"/>
+                    </extension>
+                    <extension url="http://fhir.de/StructureDefinition/normgroesse">
+                        <valueCode value="N1"/>
+                    </extension>
+                    <code>
+                        <coding>
+                            <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                            <code value="09517644"/>
+                            <display value="Meditonsin® Tropfen 200 mg"/>
+                        </coding>
+                    </code>
+                    <form>
+                        <coding>
+                            <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM"/>
+                            <code value="TEI"/>
+                        </coding>
+                    </form>
+                    <batch>
+                        <lotNumber value="9452438355"/>
+                    </batch>
+                </Medication>
+            </resource>
+        </part>
+    </parameter>
+    <parameter>
+        <name value="requestData"/>
+        <part>
+            <name value="kvnr"/>
+            <valueIdentifier>
+                <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                <value value="X110614233"/>
+            </valueIdentifier>
+        </part>
+        <part>
+            <name value="accessCode"/>
+            <valueIdentifier>
+                <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_EU_AccessCode"/>
+                <value value="65BIr2"/>
+            </valueIdentifier>
+        </part>
+        <part>
+            <name value="countryCode"/>
+            <valueCoding>
+                <system value="urn:iso:std:iso:3166"/>
+                <code value="LI"/>
+            </valueCoding>
+        </part>
+        <part>
+            <name value="practitionerName"/>
+            <valueString value="Default Pharmacist"/>
+        </part>
+        <part>
+            <name value="practitionerRole"/>
+            <valueCoding>
+                <system value="urn:oid:2.16.840.1.113883.2.9.6.2.7"/>
+                <code value="2262"/>
+                <display value="Pharmacists"/>
+            </valueCoding>
+        </part>
+        <part>
+            <name value="pointOfCare"/>
+            <valueString value="Pharmacy"/>
+        </part>
+        <part>
+            <name value="healthcare-facility-type"/>
+            <valueCoding>
+                <system value="https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"/>
+                <code value="1.2.276.0.76.4.54"/>
+                <display value="Öffentliche Apotheke"/>
+            </valueCoding>
+        </part>
+    </parameter>
+    <parameter>
+        <name value="practitionerData"/>
+        <resource>
+            <Practitioner xmlns="http://hl7.org/fhir">
+                <id value="561bead0-37fe-48ce-ad7a-267b6260527b"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Practitioner|1.0"/>
+                </meta>
+                <identifier>
+                    <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                    <value value="1-1-ARZT-AdelheidUlmenwald01"/>
+                </identifier>
+                <name>
+                    <text value="Lily John"/>
+                    <family value="John"/>
+                    <given value="Lily"/>
+                </name>
+            </Practitioner>
+        </resource>
+    </parameter>
+    <parameter>
+        <name value="practitionerRoleData"/>
+        <resource>
+            <PractitionerRole xmlns="http://hl7.org/fhir">
+                <id value="f7dffd22-841f-4145-aa4b-0d12f75916b5"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PractitionerRole|1.0"/>
+                </meta>
+                <practitioner>
+                    <reference value="Practitioner/d874ef32-b554-4c38-9345-a83a7c8d25b0"/>
+                </practitioner>
+                <organization>
+                    <reference value="Organisation/d2884e6a-7c63-46b2-af4c-50c357a0bb8d"/>
+                </organization>
+                <code>
+                    <coding>
+                        <system value="urn:oid:2.16.840.1.113883.2.9.6.2.7"/>
+                        <code value="2262"/>
+                        <display value="Pharmacists"/>
+                    </coding>
+                </code>
+            </PractitionerRole>
+        </resource>
+    </parameter>
+    <parameter>
+        <name value="organizationData"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <id value="2d137b64-d6a9-44c1-90f9-5cd8d5ec21c0"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Organization|1.0"/>
+                </meta>
+                <identifier>
+                    <system value="http://unknown_eu-wide.system"/>
+                    <value value="Michallek-Thriene"/>
+                </identifier>
+                <type>
+                    <coding>
+                        <system value="https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"/>
+                        <code value="1.2.276.0.76.4.54"/>
+                        <display value="Öffentliche Apotheke"/>
+                    </coding>
+                </type>
+                <name value="Louis Bork"/>
+                <address>
+                    <line value="Esmarchstr. 79b"/>
+                    <city value="Nord Annhagen"/>
+                    <state value="Baden-Württemberg"/>
+                    <postalCode value="014643513"/>
+                    <country value="HR"/>
+                </address>
+            </Organization>
+        </resource>
+    </parameter>
+</Parameters>

@@ -59,6 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -67,6 +68,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept mit invalider ANR ausstellen")
+@Tag("ANR-Validierung")
 public class ActivateInvalidPractitionerAnrAndZanrIT extends ErpTest {
 
   /**
@@ -209,9 +211,7 @@ public class ActivateInvalidPractitionerAnrAndZanrIT extends ErpTest {
       String anr,
       String reason) {
     RequirementsSet requirementsSet = FhirRequirements.FHIR_VALIDATION_ERROR;
-    String detailedText =
-        "Ungültige Arztnummer (LANR oder ZANR): Die übergebene Arztnummer entspricht nicht den"
-            + " Prüfziffer-FHIR-Profilen.";
+
     val doc = this.getDoctorNamed(doctors.getName());
     patient.changePatientInsuranceType(insuranceType);
 
@@ -291,10 +291,11 @@ public class ActivateInvalidPractitionerAnrAndZanrIT extends ErpTest {
     if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
+    val patientCoverage = patient.getPatientCoverage();
     medicationRequest =
         KbvErpMedicationRequestFaker.builder()
-            .withPatient(patient.getPatientData())
-            .withInsurance(patient.getInsuranceCoverage())
+            .withPatient(patientCoverage.first)
+            .withInsurance(patientCoverage.second)
             .withRequester(doc.getPractitioner())
             .withAccident(accident)
             .withMedication(medication)
@@ -313,8 +314,8 @@ public class ActivateInvalidPractitionerAnrAndZanrIT extends ErpTest {
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
             .practitioner(doc.getPractitioner())
             .statusKennzeichen(StatusKennzeichen.ASV, doc.getPractitioner())
-            .patient(patient.getPatientData())
-            .insurance(patient.getInsuranceCoverage())
+            .patient(patientCoverage.first)
+            .insurance(patientCoverage.second)
             .medication(medication)
             .medicationRequest(medicationRequest)
             .medicalOrganization(medicalOrganization);
@@ -338,15 +339,18 @@ public class ActivateInvalidPractitionerAnrAndZanrIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, String anr, DoctorActor doctorActor) {
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     AccidentExtension accident = null;
-    if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
+
+    if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG)
+        || patient.getCoverageInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
+    val patientCoverage = patient.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(patient.getKvnr())
             .withPractitioner(doctorActor.getPractitioner())
             .withMedication(medication)
-            .withInsurance(patient.getInsuranceCoverage(), patient.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withAccident(accident)
             .toBuilder();
 

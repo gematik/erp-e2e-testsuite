@@ -21,22 +21,27 @@
 package de.gematik.test.erezept.client;
 
 import de.gematik.test.erezept.client.exceptions.InvalidClientTypeException;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
 public enum ClientType {
-  PS("Primärsystem"), /* Primärsysteme */
-  FDV("Benutzer-App") /* Patienten/Versicherten Systeme wie App (FdV/AdV) */;
+  PS("Primärsystem", "l"), /* Primärsysteme */
+  FDV("Benutzer-App", "v"), /* Patienten/Versicherten Systeme wie App (FdV/AdV) */
+  NCPEH("NCPeH", "n"), /* NCPeH als eHDSI Anbindung*/
+  KTR("Kostenträger", "k"); /* Kostenträger Systeme */
 
   private final String readableType;
-
-  ClientType(String readableType) {
-    this.readableType = readableType;
-  }
+  private final String headerValue;
 
   public static ClientType fromString(@NonNull String type) {
     return switch (type.toLowerCase()) {
       case "ps", "primärsystem" -> PS;
       case "app", "benutzer-app", "fdv", "adv" -> FDV;
+      case "ncpeh", "eu" -> NCPEH;
+      case "ktr", "kostenträger", "kostentraeger", "krankenkasse" -> KTR;
       default -> throw new InvalidClientTypeException(type);
     };
   }

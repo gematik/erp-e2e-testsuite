@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>de.gematik.test.erezept</groupId>
+        <artifactId>bdd-testsuite</artifactId>
+        <version>1.1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>erp-common</artifactId>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.coverage.exclusions>**/*</sonar.coverage.exclusions>
+
+        <!--TODO REMOVE THIS DUPLICATE CODE EXCLUSIONS ONCE THE NEW E2E-TESTSUITE IS READY!-->
+        <sonar.cpd.exclusions>
+            **/PrimSysBddFactory.java,
+            **/FhirDumper.java,
+            **/FhirDumpStepListener.java,
+            **/ScenarioSummary.java,
+            **/de/gematik/test/erezept/screenplay/abilities/**,
+            **/de/gematik/test/erezept/screenplay/util/**,
+            **de/gematik/test/erezept/screenplay/strategy/**
+        </sonar.cpd.exclusions>
+
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-junit5</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-bdd-common</artifactId>
+        </dependency>
+        <!--<dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-screenplay</artifactId>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>crypto-brick</artifactId>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>smartcards-brick</artifactId>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-config-data</artifactId>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-client</artifactId>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>konnektor-client</artifactId>
+        </dependency>-->
+    </dependencies>
+
+</project>

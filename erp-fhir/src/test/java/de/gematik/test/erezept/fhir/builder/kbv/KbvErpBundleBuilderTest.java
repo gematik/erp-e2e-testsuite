@@ -33,21 +33,13 @@ import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider;
 import de.gematik.test.erezept.fhir.values.AsvFachgruppennummer;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.KZVA;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
-import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
-import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
-import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
-import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
-import de.gematik.test.erezept.fhir.valuesets.Wop;
+import de.gematik.test.erezept.fhir.valuesets.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -1070,7 +1062,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .medication(medication)
             .build();
 
-    assertTrue(parser.isValid(kbvBundle));
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest(

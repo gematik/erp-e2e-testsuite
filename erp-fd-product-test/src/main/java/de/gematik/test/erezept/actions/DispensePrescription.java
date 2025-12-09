@@ -25,9 +25,12 @@ import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleComma
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -46,6 +49,7 @@ public class DispensePrescription extends ErpAction<ErxMedicationDispenseBundle>
   @Override
   @Step("{0} dispensiert ein E-Rezept mit #taskId und #accessCode ohne close")
   public ErpInteraction<ErxMedicationDispenseBundle> answeredBy(Actor actor) {
+
     return this.performCommandAs(dispensePrescriptionAsBundleCommand, actor);
   }
 
@@ -53,6 +57,7 @@ public class DispensePrescription extends ErpAction<ErxMedicationDispenseBundle>
   public static class Builder {
     private final TaskId taskId;
     private final Secret secret;
+    private final List<Consumer<KbvErpBundle>> manipulator = new LinkedList<>();
 
     public DispensePrescription withMedDsp(List<ErxMedicationDispense> erxMedicationDispenses) {
       val cmd = new DispensePrescriptionAsBundleCommand(taskId, secret, erxMedicationDispenses);

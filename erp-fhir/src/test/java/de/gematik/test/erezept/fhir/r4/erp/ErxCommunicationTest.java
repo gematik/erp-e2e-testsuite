@@ -21,24 +21,28 @@
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Communication;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ErxCommunicationTest extends ErpFhirParsingTest {
 
@@ -186,19 +190,25 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shouldProvideKvidNamingSystemFromType01() {
+  void shouldProvideKvidNamingSystemFromTypeReply() {
+    val ns = DeBasisProfilNamingSystem.KVID_GKV_SID;
+    val version = ErpWorkflowVersion.V1_5;
     val kvidReceiving = List.of(CommunicationType.REPLY, CommunicationType.REPRESENTATIVE);
-    kvidReceiving.forEach(
-        type ->
-            assertEquals(DeBasisProfilNamingSystem.KVID_GKV_SID, type.getRecipientNamingSystem()));
+    kvidReceiving.forEach(type -> assertEquals(ns, type.getRecipientNamingSystem(version)));
   }
 
-  @Test
-  void shouldProvideKvidNamingSystemFromType02() {
+  @ParameterizedTest
+  @MethodSource("expectedKvidNamingSystemPatientenrechnungVersion")
+  void shouldProvideKvidNamingSystemFromTypeChangeReply(
+      DeBasisProfilNamingSystem ns, PatientenrechnungVersion version) {
     val kvidReceiving = List.of(ChargeItemCommunicationType.CHANGE_REPLY);
-    kvidReceiving.forEach(
-        type ->
-            assertEquals(DeBasisProfilNamingSystem.KVID_PKV_SID, type.getRecipientNamingSystem()));
+    kvidReceiving.forEach(type -> assertEquals(ns, type.getRecipientNamingSystem(version)));
+  }
+
+  static Stream<Arguments> expectedKvidNamingSystemPatientenrechnungVersion() {
+    return Stream.of(
+        Arguments.of(DeBasisProfilNamingSystem.KVID_PKV_SID, PatientenrechnungVersion.V1_0_0),
+        Arguments.of(DeBasisProfilNamingSystem.KVID_GKV_SID, PatientenrechnungVersion.V1_1_0));
   }
 
   @Test
@@ -207,7 +217,8 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     kvidReceiving.forEach(
         type ->
             assertEquals(
-                DeBasisProfilNamingSystem.TELEMATIK_ID_SID, type.getRecipientNamingSystem()));
+                DeBasisProfilNamingSystem.TELEMATIK_ID_SID,
+                type.getRecipientNamingSystem(ErpWorkflowVersion.getDefaultVersion())));
   }
 
   @Test
@@ -216,6 +227,16 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     kvidReceiving.forEach(
         type ->
             assertEquals(
-                DeBasisProfilNamingSystem.TELEMATIK_ID_SID, type.getRecipientNamingSystem()));
+                DeBasisProfilNamingSystem.TELEMATIK_ID_SID,
+                type.getRecipientNamingSystem(PatientenrechnungVersion.getDefaultVersion())));
+  }
+
+  @Test
+  void shouldMatchDigaCommunicationType() {
+    val com = new ErxCommunication();
+    com.getMeta()
+        .addProfile(ErpWorkflowStructDef.COM_DIGA.getVersionedUrl(ErpWorkflowVersion.V1_5));
+    val t = assertDoesNotThrow(com::getType);
+    assertEquals(ErpWorkflowStructDef.COM_DIGA, t.getType());
   }
 }

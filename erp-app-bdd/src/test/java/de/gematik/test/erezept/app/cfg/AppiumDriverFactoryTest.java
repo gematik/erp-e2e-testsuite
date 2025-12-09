@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.app.cfg;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
@@ -37,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.SessionNotCreatedException;
 
 class AppiumDriverFactoryTest {
@@ -67,8 +68,7 @@ class AppiumDriverFactoryTest {
     configDto.getApps().add(desktopConfig);
 
     assertThrows(
-        UnsupportedPlatformException.class,
-        () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
+        UnsupportedPlatformException.class, () -> AppiumDriverFactory.forUser("Alice", config));
   }
 
   @Test
@@ -88,13 +88,13 @@ class AppiumDriverFactoryTest {
 
     // must fail because no local appium should be running
     assertThrows(
-        SessionNotCreatedException.class,
-        () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
+        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("Alice", config));
   }
 
   @Test
   void shouldConnectToAppiumWithIOS() {
-    try (val iosDriver = mockConstruction(IOSDriver.class, (mock, context) -> {})) {
+    // Mock all feature constructions of the IOSDriver class
+    try (val ignored = mockConstruction(IOSDriver.class, (mock, context) -> {})) {
 
       val devices = configDto.getDevices();
       val aliceDevice = config.getAppUserByName("Alice").getDevice();
@@ -109,8 +109,36 @@ class AppiumDriverFactoryTest {
       configDto.getAppium().get(0).setUrl("http://127.0.0.1:1234");
       configDto.getAppium().get(0).setAccessKey("");
 
-      val driver = AppiumDriverFactory.forUser("scenario", "Alice", config);
+      val driver = AppiumDriverFactory.forUser("Alice", config);
       assertNotNull(driver);
+      assertDoesNotThrow(AppiumDriverFactory::closeDriver);
+    }
+  }
+
+  @Test
+  void shouldReuseExistingDriver() {
+    // Mock the AppiumDriverFactory
+    try (MockedStatic<AppiumDriverFactory> factoryMock =
+        mockStatic(AppiumDriverFactory.class, CALLS_REAL_METHODS)) {
+
+      // Make the createDriver method return a mocked IOSDriver
+      val iosDriverMock = mock(IOSDriver.class);
+      factoryMock
+          .when(() -> AppiumDriverFactory.createDriver(any(), any(), any(), any(), any()))
+          .thenReturn(iosDriverMock);
+
+      val firstDriver = AppiumDriverFactory.forUser("Alice", config);
+      val secondDriver = AppiumDriverFactory.forUser("Alice", config);
+
+      assertNotNull(firstDriver);
+      assertNotNull(secondDriver);
+
+      // Verify createDriver is called exactly once
+      factoryMock.verify(
+          () -> AppiumDriverFactory.createDriver(any(), any(), any(), any(), any()), times(1));
+
+      // Clean up
+      assertDoesNotThrow(AppiumDriverFactory::closeDriver);
     }
   }
 
@@ -139,13 +167,13 @@ class AppiumDriverFactoryTest {
 
     // must fail because no local appium should be running
     assertThrows(
-        SessionNotCreatedException.class,
-        () -> AppiumDriverFactory.forUser("scenario", "Alice", config));
+        SessionNotCreatedException.class, () -> AppiumDriverFactory.forUser("Alice", config));
   }
 
   @Test
   void shouldConnectToAppiumWithAndroid() {
-    try (val iosDriver = mockConstruction(AndroidDriver.class, (mock, context) -> {})) {
+    // Mock all feature constructions of the AndroidDriver class
+    try (val ignored = mockConstruction(AndroidDriver.class, (mock, context) -> {})) {
 
       val devices = configDto.getDevices();
       val aliceDevice = config.getAppUserByName("Alice").getDevice();
@@ -160,8 +188,9 @@ class AppiumDriverFactoryTest {
       configDto.getAppium().get(0).setUrl("http://127.0.0.1:1234");
       configDto.getAppium().get(0).setAccessKey("");
 
-      val driver = AppiumDriverFactory.forUser("scenario", "Alice", config);
+      val driver = AppiumDriverFactory.forUser("Alice", config);
       assertNotNull(driver);
+      assertDoesNotThrow(AppiumDriverFactory::closeDriver);
     }
   }
 
@@ -175,13 +204,16 @@ class AppiumDriverFactoryTest {
 
     // must fail because real eGK is used but the device does not support NFC
     val userName = user.getName();
-    assertThrows(
-        ConfigurationException.class,
-        () -> AppiumDriverFactory.forUser("scenario", userName, config));
+    assertThrows(ConfigurationException.class, () -> AppiumDriverFactory.forUser(userName, config));
   }
 
   @Test
   void shouldNotInstantiate() {
     assertTrue(PrivateConstructorsUtil.isUtilityConstructor(AppiumDriverFactory.class));
+  }
+
+  @Test
+  void shouldNotThrowWhenClosingNotExistingDriver() {
+    assertDoesNotThrow(AppiumDriverFactory::closeDriver);
   }
 }

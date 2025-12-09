@@ -24,13 +24,11 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
-import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.Date;
 import java.util.Optional;
@@ -108,9 +106,14 @@ public class KbvErpBundleBuilder
     // note: MedicationRequestEntry is valid without SupplyRequestEntry
     Optional.ofNullable(this.medicationRequest)
         .ifPresent(
-            mr ->
-                bundle.addEntry(
-                    compositionBuilder.createEntryFor("Prescription", medicationRequest)));
+            mr -> {
+              bundle.addEntry(compositionBuilder.createEntryFor("Prescription", medicationRequest));
+
+              // adjust the references in medication request to ensure integrity of the references
+              mr.setRequester(practitioner.asReference());
+              mr.setSubject(patient.asReference());
+              mr.getInsurance().get(0).setReference(coverage.asReference().getReference());
+            });
 
     // note: SupplyRequestEntry is valid without MedicationRequestEntry
     Optional.ofNullable(this.supplyRequest)
@@ -126,6 +129,9 @@ public class KbvErpBundleBuilder
     compositionBuilder.addExtension(statusKennzeichen.asExtension());
     val compositionEntry = compositionBuilder.buildBundleEntryComponent();
     bundle.getEntry().add(0, compositionEntry);
+
+    // adjust some more references
+    coverage.setBeneficiary(patient.asReference());
 
     return bundle;
   }
@@ -161,31 +167,6 @@ public class KbvErpBundleBuilder
     if (medicationRequest == null) {
       this.checkRequired(
           supplyRequest, "KBV Bundle requires a supply request without a medication request");
-    }
-
-    // TODO: we intentionally create this scenario in produkt-testsuite
-    //    if (supplyRequest != null && medicationRequest != null) {
-    //      throw new BuilderException(
-    //          "KBV Bundle requires either a medication request or a supply request but not both");
-    //    }
-
-    if (medicationRequest != null) {
-      medicationRequest
-          .getAccident()
-          .filter(accident -> !accident.accidentCauseType().equals(AccidentCauseType.ACCIDENT))
-          .ifPresent(
-              accident -> {
-                // in case of "Arbeitsunfall" or "Berufskrankheit" coverage is provided by a
-                // "Berufsgenossenschaft"
-                // and the patient is in this case always GKV (gesetzlich krankenversichert)
-                if (!coverage.getInsuranceKind().equals(InsuranceTypeDe.BG)) {
-                  log.warn(
-                      "Accident set to {} and insurance is of type {} but must be {}",
-                      accident.accidentCauseType().getDisplay(),
-                      coverage.getInsuranceKind(),
-                      InsuranceTypeDe.BG);
-                }
-              });
     }
   }
 }

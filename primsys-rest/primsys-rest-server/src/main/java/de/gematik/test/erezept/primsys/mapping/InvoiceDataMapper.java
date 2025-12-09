@@ -64,11 +64,12 @@ public class InvoiceDataMapper extends BaseMapper<InvoiceData> {
               .version(AbdaErpPkvVersion.getDefaultVersion())
               .currency(Currency.valueOf(dto.getCurrency()))
               .type(pc.getType().toLowerCase())
+              .factor(pc.getFactor())
               .insurantCost(pc.getInsurantCost())
               .totalCost(pc.getTotalCost())
               .build();
 
-      davInvoiceBuilder.addPriceComponent(inLiItPc, pc.getPzn(), pc.getCostReason());
+      davInvoiceBuilder.addPriceComponent(inLiItPc, pc.getPzn(), pc.getMedicationName());
     }
   }
 
@@ -83,7 +84,7 @@ public class InvoiceDataMapper extends BaseMapper<InvoiceData> {
     for (PriceComponentData pc : pcs) {
       pc.setCategory(getOrDefault(pc.getCategory(), "ZUZAHLUNG"));
       pc.setType(getOrDefault(pc.getType(), "informational"));
-      pc.setCostReason(getOrDefault(pc.getCostReason(), "auch Apotheker müssen leben können"));
+      pc.setMedicationName(getOrDefault(pc.getMedicationName(), GemFaker.fakerDrugName()));
       pc.setPzn(getOrDefault(pc.getPzn(), PZN.random().getValue()));
       pc.setTotalCost(getOrDefault(pc.getTotalCost(), GemFaker::cost));
       pc.setInsurantCost(

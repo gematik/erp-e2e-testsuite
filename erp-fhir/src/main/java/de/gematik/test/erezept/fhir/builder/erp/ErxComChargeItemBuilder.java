@@ -28,13 +28,14 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Reference;
 
 public class ErxComChargeItemBuilder extends ErxCommunicationBuilder<ErxComChargeItemBuilder> {
 
   private final ChargeItemCommunicationType type;
-  protected PatientenrechnungVersion version = PatientenrechnungVersion.V1_0_0;
+  protected PatientenrechnungVersion version = PatientenrechnungVersion.getDefaultVersion();
 
   protected ErxComChargeItemBuilder(ChargeItemCommunicationType type, String message) {
     super(message);
@@ -65,8 +66,13 @@ public class ErxComChargeItemBuilder extends ErxCommunicationBuilder<ErxComCharg
   @Override
   public ErxCommunication build() {
     checkRequired();
-    val com = buildCommon(type, () -> type.getType().asCanonicalType(version));
+    val com = buildCommon(() -> type.getType().asCanonicalType(version));
     com.setBasedOn(List.of(new Reference(this.baseOnReference)));
+
+    // set sender and receiver
+    com.addRecipient(type.getRecipientReference(this.receiver, this.version));
+    Optional.ofNullable(this.sender)
+        .ifPresent(s -> com.setSender(type.getSenderReference(s, this.version)));
 
     return com;
   }

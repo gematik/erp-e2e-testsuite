@@ -25,6 +25,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.getFaker;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.erp.DeepLink;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -33,6 +34,7 @@ import lombok.val;
 public class ErxMedicationDispenseDiGAFaker
     extends ErxMedicationDispenseBaseFaker<
         ErxMedicationDispenseDiGA,
+        ErpWorkflowVersion,
         ErxMedicationDispenseDiGAFaker,
         ErxMedicationDispenseDiGABuilder> {
 

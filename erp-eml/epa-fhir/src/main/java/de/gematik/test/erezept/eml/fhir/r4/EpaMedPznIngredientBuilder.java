@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
+import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
@@ -42,32 +43,41 @@ public class EpaMedPznIngredientBuilder
     extends ResourceBuilder<EpaMedPznIngredient, EpaMedPznIngredientBuilder> {
 
   private PZN pzn;
-  private final EpaMedicationVersion version = EpaMedicationVersion.getDefaultVersion();
+  private EpaMedicationVersion version = EpaMedicationVersion.getDefaultVersion();
   private String textInCoding;
   @Nullable private String displayInPzn;
   @Nullable private CodeableConcept codeableCocept;
+  private GemEpaIngredientComponentBuilder ingredientCodeBuilder =
+      GemEpaIngredientComponentBuilder.builder();
+  private boolean shouldBuildIngredientComponent = false;
+  private boolean withVersion = true;
 
   public static EpaMedPznIngredientBuilder builder() {
     return new EpaMedPznIngredientBuilder();
   }
 
-  public EpaMedPznIngredientBuilder withPzn(PZN pzn) {
-    return withPzn(pzn, null);
+  public EpaMedPznIngredientBuilder pzn(PZN pzn) {
+    return pzn(pzn, null);
   }
 
-  public EpaMedPznIngredientBuilder withCodingText(String textInCoding) {
+  public EpaMedPznIngredientBuilder codingText(String textInCoding) {
     this.textInCoding = textInCoding;
     return this;
   }
 
-  public EpaMedPznIngredientBuilder withPzn(PZN pzn, String displayInPzn) {
+  public EpaMedPznIngredientBuilder pzn(PZN pzn, String displayInPzn) {
     this.pzn = pzn;
     this.displayInPzn = displayInPzn;
     return this;
   }
 
-  public EpaMedPznIngredientBuilder withPzn(CodeableConcept codeableConcept) {
+  public EpaMedPznIngredientBuilder pzn(CodeableConcept codeableConcept) {
     this.codeableCocept = codeableConcept;
+    return this;
+  }
+
+  public EpaMedPznIngredientBuilder version(EpaMedicationVersion version) {
+    this.version = version;
     return this;
   }
 
@@ -78,16 +88,23 @@ public class EpaMedPznIngredientBuilder
         codeableCocept,
         "Minimum of suitable Entries is a CodeableConcept with Coding or a Pzn to build a"
             + " CodeableConcept");
-    val epaMed =
-        this.createResource(
-            EpaMedPznIngredient::new, EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT, version);
+    EpaMedPznIngredient epaMed;
+    if (withVersion) {
+      epaMed =
+          this.createResource(
+              EpaMedPznIngredient::new, EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT, version);
+    } else {
+      epaMed =
+          this.createResource(
+              EpaMedPznIngredient::new, EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT);
+    }
     epaMed.addExtension(createSnomedExt());
     Optional.ofNullable(this.pzn).ifPresent(pz -> epaMed.getCode().addCoding(pz.asCoding()));
     Optional.ofNullable(this.displayInPzn)
         .ifPresent(disp -> epaMed.getCode().getCoding().get(0).setDisplay(disp));
     Optional.ofNullable(this.textInCoding).ifPresent(text -> epaMed.getCode().setText(text));
     Optional.ofNullable(codeableCocept).ifPresent(epaMed::setCode);
-
+    if (shouldBuildIngredientComponent) epaMed.addIngredient(ingredientCodeBuilder.build());
     return epaMed;
   }
 
@@ -114,5 +131,27 @@ public class EpaMedPznIngredientBuilder
       val prefixedErrorMsg = format("to much properties, one is Max: {0}", errorMsg);
       throw new BuilderException(prefixedErrorMsg);
     }
+  }
+
+  /**
+   * EpaIngredient Object is not mandatory, but if you like to set the Darreichungsform you need a
+   * IngredientItem, too. To realise this constrain the easiest way is to set the Item CC. Text,
+   *
+   * @param darreichungsformText
+   * @param ingredientItemText
+   * @return builder
+   */
+  public EpaMedPznIngredientBuilder darreichungsform(
+      String darreichungsformText, String ingredientItemText) {
+    ingredientCodeBuilder
+        .darreichungsform(darreichungsformText)
+        .ingredientCodingText(ingredientItemText);
+    shouldBuildIngredientComponent = true;
+    return this;
+  }
+
+  public EpaMedPznIngredientBuilder withoutVersion() {
+    this.withVersion = false;
+    return this;
   }
 }

@@ -24,7 +24,7 @@
 @Workflow:162
 @Versicherung:GKV
 @AFO-ID:A_19225-02
-@AFO-ID:A_A_25990
+@AFO-ID:A_25990
 @Hauptdarsteller:Therapeut
 Funktionalität: DiGA negativ Anwendungsfälle
 

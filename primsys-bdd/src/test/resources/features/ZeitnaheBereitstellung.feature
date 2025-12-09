@@ -33,7 +33,7 @@ Funktionalität: Zeitnahe Bereitstellung von Dispensierinformationen für Apothe
       | Name          | PZN      |
       | Schmerzmittel | 12345678 |
     Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
 
   @TCID:ERP_EE_ZBD_01
   @TESTFALL:positiv

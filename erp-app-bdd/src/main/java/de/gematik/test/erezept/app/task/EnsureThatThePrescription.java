@@ -20,29 +20,10 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
-import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
-import de.gematik.test.erezept.app.questions.MovingToPrescription;
-import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,103 +42,16 @@ public class EnsureThatThePrescription implements Task {
   @Override
   @Step("{0} überprüft die Darstellung von dem #deque ausgestellten E-Rezept")
   public <T extends Actor> void performAs(T actor) {
-    actor.attemptsTo(EnsureTheCorrectProfile.isChosen());
-
-    val app = SafeAbility.getAbility(actor, UseTheApp.class);
     val dmcAbility = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
     val dmc = deque.chooseFrom(dmcAbility.chooseStack(DmcStack.ACTIVE));
 
-    app.logEvent(
-        format(
-            "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
-            actor.getName(), deque));
-    app.tap(Mainscreen.REFRESH_BUTTON);
+    val taskId = dmc.getTaskId();
+    val isEVDGA = taskId.toString().split("\\.")[0].equals("162");
 
-    val prescriptionBundle =
-        actor
-            .asksFor(MovingToPrescription.withTaskId(dmc.getTaskId()))
-            .orElseThrow(
-                () ->
-                    new MissingPreconditionError(
-                        format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
-
-    val kbvBundle =
-        prescriptionBundle
-            .getKbvBundle()
-            .orElseThrow(
-                () ->
-                    new MissingFieldException(
-                        ErxPrescriptionBundle.class, KbvItaErpStructDef.BUNDLE));
-    val medication = kbvBundle.getMedication();
-    val medicationRequest = kbvBundle.getMedicationRequest();
-
-    app.swipeIntoView(SwipeDirection.DOWN, PrescriptionDetails.PRESCRIPTION_TITLE);
-    val actualTitle = app.getText(PrescriptionDetails.PRESCRIPTION_TITLE);
-    assertEquals(medication.getMedicationName(), actualTitle);
-
-    if (!kbvBundle.getFlowType().isDirectAssignment()) {
-      // direct assignments have no validity information because these are theoretically already
-      // assigned to a pharmacy
-      val expectedValidityText =
-          this.calculateValidityText(prescriptionBundle.getTask(), kbvBundle);
-      val actualValidityText = app.getText(PrescriptionDetails.PRESCRIPTION_VALIDITY_TEXT);
-      assertEquals(expectedValidityText, actualValidityText);
+    if (isEVDGA) {
+      actor.attemptsTo(EnsureThatTheEVDGAPrescription.fromStack(deque).isShownCorrectly());
     } else {
-      assertTrue(
-          app.isPresent(PrescriptionDetails.DIRECT_ASSIGNMENT_BADGE),
-          "Missing 'Direktzuweisung'-Label");
-    }
-
-    val expectedZuzahlung =
-        medicationRequest
-            .getCoPaymentStatus()
-            .map(
-                status ->
-                    switch (status) {
-                      case STATUS_0 -> "Ja";
-                      case STATUS_1 -> "Nein";
-                      case STATUS_2 -> "Teilweise";
-                    })
-            .orElse("Keine Angabe");
-    val actualZuzahlung = app.getText(PrescriptionDetails.PRESCRIPTION_ADDITIONAL_PAYMENT);
-    assertEquals(expectedZuzahlung, actualZuzahlung, "Expected Zuzahlung to be");
-
-    // leave prescription details and go back to the main screen
-    app.tap(PrescriptionDetails.LEAVE_DETAILS_BUTTON);
-  }
-
-  private String calculateValidityText(ErxTask task, KbvErpBundle kbvBundle) {
-    val dc = DateConverter.getInstance();
-    val now = LocalDate.now();
-
-    LocalDate expiry;
-    if (kbvBundle.getMedicationRequest().isMultiple()) {
-      expiry =
-          kbvBundle
-              .getMedicationRequest()
-              .getMvoEnd()
-              .map(dc::dateToLocalDate)
-              .orElseGet(() -> dc.dateToLocalDate(task.getExpiryDate()));
-    } else {
-      expiry = dc.dateToLocalDate(task.getAcceptDate());
-    }
-
-    // Note: .minusDays(1) is required because the expiryDate is the first day when the prescription
-    // is no longer valid!
-    val remainingDays =
-        Duration.between(now.atStartOfDay(), expiry.minusDays(1).atStartOfDay()).toDays();
-
-    val start =
-        kbvBundle
-            .getMedicationRequest()
-            .getMvoStart()
-            .map(dc::dateToLocalDate)
-            .orElse(dc.dateToLocalDate(task.getAuthoredOn()));
-
-    if (start.isEqual(now) || start.isBefore(now)) {
-      return format("Noch {0} Tage einlösbar", remainingDays);
-    } else {
-      return format("Einlösbar ab {0}", start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+      actor.attemptsTo(EnsureThatThePharmaceuticalPrescription.fromStack(deque).isShownCorrectly());
     }
   }
 

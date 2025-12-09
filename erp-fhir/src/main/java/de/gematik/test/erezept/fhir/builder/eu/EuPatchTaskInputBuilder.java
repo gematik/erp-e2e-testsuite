@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.eu;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.profiles.definitions.ErpEuStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
@@ -49,7 +49,7 @@ public class EuPatchTaskInputBuilder extends ResourceBuilder<Parameters, EuPatch
   @Override
   public Parameters build() {
     val parametersResource =
-        this.createResource(Parameters::new, ErpEuStructDef.PATCH_TASK_INPUT, version);
+        this.createResource(Parameters::new, GemErpEuStructDef.PATCH_TASK_INPUT, version);
 
     parametersResource
         .addParameter()

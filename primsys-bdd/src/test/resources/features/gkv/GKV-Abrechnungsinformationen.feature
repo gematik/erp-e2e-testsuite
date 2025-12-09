@@ -39,7 +39,7 @@ Funktionalität: Keine Abrechnungsinformationen für GKV-Rezepte
     Wenn die Ärztin Dr. Schraßer der Versicherten Hanna Bäcker folgendes apothekenpflichtiges Medikament verschreibt:
       | Workflow |
       | <WF>     |
-    Und die Versicherte Hanna Bäcker sein letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Versicherte Hanna Bäcker sein letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Hanna Bäcker dispensiert
     Dann kann die Apotheke Am Flughafen für das letzte dispensierte E-Rezept keine PKV-Abrechnungsinformationen bereitstellen, weil es kein PKV-Rezept ist

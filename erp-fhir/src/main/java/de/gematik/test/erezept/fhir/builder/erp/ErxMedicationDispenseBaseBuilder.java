@@ -22,9 +22,13 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
@@ -32,23 +36,28 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Reference;
 
 @Slf4j
 public abstract class ErxMedicationDispenseBaseBuilder<
-        M extends ErxMedicationDispenseBase, B extends ResourceBuilder<M, B>>
+        M extends ErxMedicationDispenseBase,
+        V extends ProfileVersion,
+        B extends ResourceBuilder<M, B>>
     extends ResourceBuilder<M, B> {
 
   protected final SimpleDateFormat dateFormat10 = new SimpleDateFormat("yyyy-MM-dd");
-  private final KVNR kvnr;
-  protected ErpWorkflowVersion erpWorkflowVersion;
+  protected V erpWorkflowVersion;
   protected GemErpMedication medication;
+  private KVNR kvnr;
   private String performer;
+  private Reference practitionerRoleReference;
   private PrescriptionId prescriptionId;
   private MedicationDispense.MedicationDispenseStatus status =
       MedicationDispense.MedicationDispenseStatus.COMPLETED;
@@ -56,7 +65,6 @@ public abstract class ErxMedicationDispenseBaseBuilder<
 
   protected ErxMedicationDispenseBaseBuilder(KVNR kvnr) {
     this.kvnr = kvnr;
-    this.version(ErpWorkflowVersion.getDefaultVersion());
   }
 
   /**
@@ -67,7 +75,7 @@ public abstract class ErxMedicationDispenseBaseBuilder<
    * @param version to use for generation of this resource
    * @return Builder
    */
-  public B version(ErpWorkflowVersion version) {
+  public B version(V version) {
     this.erpWorkflowVersion = version;
     return self();
   }
@@ -83,6 +91,11 @@ public abstract class ErxMedicationDispenseBaseBuilder<
 
   public B performerId(String performer) {
     this.performer = performer;
+    return self();
+  }
+
+  public B performerContains(PractitionerRole practitionerRoleForReferenz) {
+    this.practitionerRoleReference = new Reference(practitionerRoleForReferenz.getId());
     return self();
   }
 
@@ -121,31 +134,40 @@ public abstract class ErxMedicationDispenseBaseBuilder<
 
     medDisp.setIdentifier(List.of(this.prescriptionId.asIdentifier()));
 
-    val performerRef = new Reference();
-    performerRef
-        .getIdentifier()
-        .setSystem(DeBasisProfilNamingSystem.TELEMATIK_ID_SID.getCanonicalUrl())
-        .setValue(performer);
+    var performerRef = new Reference();
+    Optional.ofNullable(this.performer)
+        .ifPresent(
+            p -> {
+              performerRef.setIdentifier(
+                  DeBasisProfilNamingSystem.TELEMATIK_ID_SID.asIdentifier(p));
+              medDisp
+                  .getPerformer()
+                  .add(new MedicationDispense.MedicationDispensePerformerComponent(performerRef));
+            });
+    Optional.ofNullable(this.practitionerRoleReference)
+        .ifPresent(pRR -> medDisp.addPerformer().setActor(pRR));
 
-    medDisp
-        .getPerformer()
-        .add(new MedicationDispense.MedicationDispensePerformerComponent(performerRef));
-
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) >= 0) {
+    // this kind of comparison is happened, caused by different .compare() implementations in ENUM
+    // and ProfilVersion
+    if (ErpWorkflowVersion.V1_4.compareTo(erpWorkflowVersion) >= 0
+        || Stream.of(ErpWorkflowVersion.V1_3, ErpWorkflowVersion.V1_2)
+            .anyMatch(wfV -> wfV.equals(erpWorkflowVersion))) {
+      // older Versions
       val subjectIdentifier = DeBasisProfilNamingSystem.KVID_GKV_SID.asIdentifier(kvnr.getValue());
       medDisp.getSubject().setIdentifier(subjectIdentifier);
     } else {
-      val system =
-          prescriptionId.getFlowType().isGkvType()
-              ? DeBasisProfilNamingSystem.KVID_GKV_SID.getCanonicalUrl()
-              : DeBasisProfilNamingSystem.KVID_PKV_SID.getCanonicalUrl();
-      val subjectIdentifier = new Identifier().setSystem(system).setValue(kvnr.getValue());
+      // since WorkflowProfile 1.5.2 KVNR-TYPE ist mandatory
+      kvnr = kvnr.as(InsuranceTypeDe.GKV);
+      val subjectIdentifier =
+          kvnr.asIdentifier().setType(IdentifierTypeDe.KVZ10.asCodeableConcept());
       medDisp.getSubject().setIdentifier(subjectIdentifier);
     }
   }
 
   private void checkRequiredBase() {
-    this.checkRequired(performer, "MedicationDispense requires a Performer");
+    if (performer == null && practitionerRoleReference == null) {
+      throw new BuilderException("MedicationDispense requires a Performer or a Reference");
+    }
     this.checkRequired(prescriptionId, "MedicationDispense requires a Prescription ID");
     this.checkRequired(kvnr, "MedicationDispense requires a KVNR of the receiver");
   }

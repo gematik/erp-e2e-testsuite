@@ -3,9 +3,11 @@
   profiles:
     - name: "de.gematik.epa"
       version: "1.0.6"
+      compatibleVersions: [ "1.0" ]
       canonicalClaims: "https://gematik.de/fhir/epa/"
     - name: "de.gematik.epa.medication"
       version: "1.0.6"
+      compatibleVersions: [ "1.0" ]
       canonicalClaims: "https://gematik.de/fhir/epa-medication/"
     - name: "de.basisprofil.r4"
       version: "1.5.2"
@@ -15,6 +17,7 @@
       canonicalClaims: "http://fhir.de"
     - name: "de.gematik.fhir.directory"
       version: "0.11.25"
+      compatibleVersions: [ "0.11" ]
       canonicalClaims: ["https://gematik.de/fhir/directory/","urn:oid:"]
     #- name: "de.gematik.terminology"
     #  version: "1.0.5"

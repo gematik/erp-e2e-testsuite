@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.actions;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
@@ -31,10 +32,9 @@ import lombok.val;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
-import org.hl7.fhir.r4.model.Resource;
 
 @RequiredArgsConstructor
-public class TaskReject extends ErpAction<Resource> {
+public class TaskReject extends ErpAction<EmptyResource> {
 
   private final TaskId taskId;
   private final AccessCode accessCode;
@@ -42,7 +42,7 @@ public class TaskReject extends ErpAction<Resource> {
 
   @Override
   @Step("{0} weist den akzeptierten Task #taskId mit #accessCode und #secret zurück")
-  public ErpInteraction<Resource> answeredBy(Actor actor) {
+  public ErpInteraction<EmptyResource> answeredBy(Actor actor) {
     val cmd = new TaskRejectCommand(taskId, accessCode, secret);
     return this.performCommandAs(cmd, actor);
   }

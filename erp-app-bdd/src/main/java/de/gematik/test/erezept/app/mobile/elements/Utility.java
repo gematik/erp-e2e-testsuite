@@ -29,9 +29,9 @@ import org.openqa.selenium.By;
 @Getter
 @RequiredArgsConstructor
 public enum Utility implements PageElement {
-  LATER("Perform something later", () -> null, () -> AppiumBy.accessibilityId("Später")),
-  DECLINE_LOGIN("Decline Cardwall Login", null, () -> AppiumBy.accessibilityId("wlcd_btn_decline")),
-  TOOLTIPS("Tooltip", null, () -> AppiumBy.accessibilityId("ctl_tooltip_container"));
+  TOOLTIPS("Tooltip", null, () -> AppiumBy.accessibilityId("ctl_tooltip_container")),
+  GKV_PKV_X_BUTTON(
+      "Close the GKV or PKV drawer", () -> null, () -> AppiumBy.accessibilityId("xmark"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

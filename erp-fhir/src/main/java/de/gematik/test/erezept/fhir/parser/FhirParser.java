@@ -22,7 +22,9 @@ package de.gematik.test.erezept.fhir.parser;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
+import com.google.common.base.Strings;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
@@ -30,6 +32,7 @@ import lombok.Getter;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -43,9 +46,13 @@ public class FhirParser {
   private IParser jsonParser;
 
   public FhirParser() {
+    this(ValidatorType.BRICKS);
+  }
+
+  public FhirParser(ValidatorType validatorType) {
     this.ctx = ProfileFhirParserFactory.createDecoderContext();
     this.profileExtractor = new ProfileExtractor();
-    this.validator = ProfileFhirParserFactory.getProfiledValidators();
+    this.validator = ProfileFhirParserFactory.getValidatorFor(validatorType);
   }
 
   public <T extends Resource> T decode(Class<T> expectedClass, String content) {
@@ -53,8 +60,17 @@ public class FhirParser {
     return this.decode(expectedClass, content, encoding);
   }
 
+  @SuppressWarnings("unchecked")
   public synchronized <T extends Resource> T decode(
       Class<T> expectedClass, String content, EncodingType encoding) {
+
+    val isEmptyContent = Strings.isNullOrEmpty(content) || StringUtils.isBlank(content);
+    if (expectedClass == EmptyResource.class && isEmptyContent) {
+      // if the content is expected to be empty, there is no need to bother HAPI and just simply
+      // return an EmptyResource
+      return (T) new EmptyResource();
+    }
+
     val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
     return parser.parseResource(expectedClass, fixBeforeDecode(content));
   }
@@ -75,6 +91,11 @@ public class FhirParser {
 
   public synchronized String encode(
       IBaseResource resource, EncodingType encoding, boolean prettyPrint) {
+
+    if (resource instanceof EmptyResource) {
+      return "";
+    }
+
     val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
     parser.setPrettyPrint(prettyPrint);
     val encoded = parser.encodeResourceToString(resource);
@@ -119,6 +140,7 @@ public class FhirParser {
    * @return the fixed encoded String
    */
   private String fixBeforeDecode(String content) {
+    content = Strings.nullToEmpty(content);
     if (profileExtractor.isUnprofiledSearchSet(content)) {
       return content.replace("\"Task/", "\"/Task/");
     } else {

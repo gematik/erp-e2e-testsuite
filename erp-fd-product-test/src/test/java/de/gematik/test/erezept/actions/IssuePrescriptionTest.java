@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,6 +36,7 @@ import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
@@ -55,6 +56,7 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -111,7 +113,7 @@ class IssuePrescriptionTest extends ErpFhirParsingTest {
     val useKonnektor =
         UseTheKonnektor.with(smcb)
             .and(hba)
-            .and(CryptoSystem.RSA_2048)
+            .and(CryptoSystem.DEFAULT_CRYPTO_SYSTEM)
             .on(config.instantiateKonnektorClient(docConfig));
 
     prescribingDoctor.can(useErpClient);
@@ -140,6 +142,17 @@ class IssuePrescriptionTest extends ErpFhirParsingTest {
                             .withResponsibleDoctor(responsibleDoctor)
                             .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
                             .withRandomKbvBundle())),
+        arguments(
+            "Pharmacy Only with random KbvBundle-Builder and a custom signing function",
+            (Function<DoctorActor, ErpInteraction<ErxTask>>)
+                doctor ->
+                    doctor.performs(
+                        IssuePrescription.forPatient(patient)
+                            .withResponsibleDoctor(responsibleDoctor)
+                            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                            .withRandomKbvBundle()
+                            .setCustomSigningFunction(
+                                encodedKbv -> new byte[] {0x01, 0x02, 0x03}))),
         arguments(
             "Direct Assignment with given random KbvBundle-Builder",
             (Function<DoctorActor, ErpInteraction<ErxTask>>)
@@ -312,6 +325,36 @@ class IssuePrescriptionTest extends ErpFhirParsingTest {
         IssuePrescription.forPatient(patient)
             .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
             .withSmartFuzzer(new FhirFuzzImpl(new FuzzerContext(FuzzConfig.getRandom())))
+            .withRandomKbvBundle()
+            .setSignatureObserver(sigObserver);
+    assertDoesNotThrow(() -> doc.performs(isPr));
+    assertTrue((Base64.getEncoder().encodeToString(sigObserver.toByteArray())).length() > 20);
+  }
+
+  @Test
+  void shouldCreateValidPrescriptionFromRandomKbvBundleAsBG() {
+    val mockUtil = new MockActorsUtils();
+
+    val patient2 = new PatientActor("Hanna Bäcker");
+    patient2.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient2.getName()));
+    patient2.changeCoverageInsuranceType(InsuranceTypeDe.BG);
+    patient2.setPayorType(PayorType.UK);
+
+    val draftTask = spy(new ErxTask());
+    doReturn(TaskId.from(PrescriptionId.random())).when(draftTask).getTaskId();
+    doReturn(PrescriptionId.random()).when(draftTask).getPrescriptionId();
+    doReturn(AccessCode.random()).when(draftTask).getAccessCode();
+    doReturn(Task.TaskStatus.DRAFT).when(draftTask).getStatus();
+    val createResponse = mockUtil.createErpResponse(draftTask, ErxTask.class, 201);
+    val doc = mockUtil.actorStage.getDoctorNamed("Adelheid Ulmenwald");
+    when(mockUtil.erpClientMock.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+    when(mockUtil.erpClientMock.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+    val sigObserver = new ByteArrayOutputStream();
+    val isPr =
+        IssuePrescription.forPatient(patient2)
+            .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+            .withSmartFuzzer(new FhirFuzzImpl(new FuzzerContext(FuzzConfig.getRandom())))
+            .withResponsibleDoctor(doc)
             .withRandomKbvBundle()
             .setSignatureObserver(sigObserver);
     assertDoesNotThrow(() -> doc.performs(isPr));

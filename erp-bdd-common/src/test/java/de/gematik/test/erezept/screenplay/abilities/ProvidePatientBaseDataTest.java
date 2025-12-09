@@ -60,7 +60,7 @@ class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
     assertEquals(IKNR.asSidIknr(patient.getIknr()), patient.getInsuranceIknr());
     assertFalse(patient.getRememberedConsent().isPresent());
     assertFalse(patient.hasRememberedConsent());
-    assertNotNull(patient.getInsuranceCoverage());
+    assertNotNull(patient.getInsuranceCoverage(patient.getPatient()));
     assertNotNull(patient.getCoverageInsuranceType());
   }
 
@@ -82,7 +82,7 @@ class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
     assertEquals(IKNR.asSidIknr(patient.getIknr()), patient.getInsuranceIknr());
     assertFalse(patient.getRememberedConsent().isPresent());
     assertFalse(patient.hasRememberedConsent());
-    assertNotNull(patient.getInsuranceCoverage());
+    assertNotNull(patient.getInsuranceCoverage(patient.getPatient()));
     assertNotNull(patient.getCoverageInsuranceType());
   }
 
@@ -169,7 +169,7 @@ class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
     } else {
       assertFalse(patient.getPatient().hasPkvKvnr());
     }
-    val coverage = patient.getInsuranceCoverage();
+    val coverage = patient.getInsuranceCoverage(patient.getPatient());
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
   }
@@ -209,7 +209,7 @@ class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
     if (payorType != null) assertFalse(patient.getPayorType().isEmpty());
     else assertTrue(patient.getPayorType().isEmpty());
 
-    val coverage = patient.getInsuranceCoverage();
+    val coverage = patient.getInsuranceCoverage(patient.getPatient());
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
   }
@@ -230,7 +230,7 @@ class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
     val patient = ProvidePatientBaseData.forPatient(KVNR.from("X123456789"), "", "PKV");
     patient.setDmpKennzeichen(DmpKennzeichen.DM1);
 
-    val coverage = patient.getInsuranceCoverage();
+    val coverage = patient.getInsuranceCoverage(patient.getPatient());
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
 
     assertTrue(result.isSuccessful());

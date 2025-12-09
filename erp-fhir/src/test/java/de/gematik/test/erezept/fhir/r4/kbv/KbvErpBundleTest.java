@@ -24,12 +24,10 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,13 +37,10 @@ import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
@@ -58,8 +53,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
@@ -70,8 +63,6 @@ import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.SupplyRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class KbvErpBundleTest extends ErpFhirParsingTest {
@@ -395,54 +386,6 @@ class KbvErpBundleTest extends ErpFhirParsingTest {
     assertTrue(origCompositionDate.before(kbvBundle.getCompositionDate()));
     assertTrue(origTimestamp.before(kbvBundle.getTimestamp()));
     assertTrue(origLastUpdate.before(kbvBundle.getMeta().getLastUpdated()));
-  }
-
-  @ParameterizedTest(name = "{index} Change existing Coverage with {1}")
-  @MethodSource
-  void shouldChangeCoverageOnExistingBundle(String fileName, KbvItaForVersion version) {
-    val content = ResourceLoader.readFileFromResource(fileName);
-
-    IntStream.range(0, 2)
-        .forEach(
-            idx -> {
-              val kbvBundle = parser.decode(KbvErpBundle.class, content);
-              val oldCoverage = kbvBundle.getCoverage();
-              val oldIknr = oldCoverage.getPayorFirstRep().getIdentifier().getValue();
-              val oldName = oldCoverage.getPayorFirstRep().getDisplay();
-
-              KbvCoverage newCoverage = null;
-              while (newCoverage == null
-                  || newCoverage.getIknrOrThrow().getValue().equals(oldIknr)) {
-                // make sure the faker doesn't accidentally hit the same coverage (by IKNR)
-                // otherwise the assertion will fail afterward
-                newCoverage =
-                    KbvCoverageFaker.builder()
-                        .withInsuranceType(oldCoverage.getInsuranceKind())
-                        .withVersion(version)
-                        .fake();
-              }
-
-              kbvBundle.changeCoverage(newCoverage);
-              val nc2 = kbvBundle.getCoverage();
-              val newIknr = nc2.getPayorFirstRep().getIdentifier().getValue();
-              val newName = nc2.getPayorFirstRep().getDisplay();
-
-              // make sure the names are different: coverage has been changed
-              assertNotEquals(oldIknr, newIknr);
-              assertNotEquals(oldName, newName);
-
-              // make sure the KBV Bundle is still valid
-              val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
-              assertTrue(result.isSuccessful());
-            });
-  }
-
-  static Stream<Arguments> shouldChangeCoverageOnExistingBundle() {
-    return Stream.of(
-        arguments(
-            BASE_PATH_1_1_0 + "1f339db0-9e55-4946-9dfa-f1b30953be9b.xml", KbvItaForVersion.V1_1_0),
-        arguments(
-            BASE_PATH_1_1_0 + "328ad940-3fff-11ed-b878-0242ac120002.xml", KbvItaForVersion.V1_1_0));
   }
 
   @Test

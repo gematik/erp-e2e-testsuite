@@ -104,6 +104,12 @@ public class SendMessages extends ErpAction<ErxCommunication> {
       return this;
     }
 
+    @SafeVarargs
+    public final Builder addManipulator(
+        NamedEnvelope<FuzzingMutator<ErxCommunication>>... fuzzingMutator) {
+      return addManipulator(List.of(fuzzingMutator));
+    }
+
     public SendMessages asReply(CommunicationReplyMessage message, ErpActor sender) {
       val patientBaseData = SafeAbility.getAbility(receiver, ProvidePatientBaseData.class);
       val communication =

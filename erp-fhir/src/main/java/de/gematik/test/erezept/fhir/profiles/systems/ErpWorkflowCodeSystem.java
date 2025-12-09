@@ -36,8 +36,12 @@ public enum ErpWorkflowCodeSystem implements WithCodeSystem {
   DOCUMENT_TYPE("https://gematik.de/fhir/CodeSystem/Documenttype"),
   GEM_ERP_CS_DOCUMENT_TYPE("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType"),
   CONSENT_TYPE("https://gematik.de/fhir/CodeSystem/Consenttype"),
+  PROFESSION_OID("https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"),
+  ORGANIZATION_PROVIDER_TYPE(
+      "https://gematik.de/fhir/directory/CodeSystem/OrganizationProviderType"),
+  ORGANIZATION_PROFESSION_OID(
+      "https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"),
   ;
-
   private final String canonicalUrl;
 
   @Override

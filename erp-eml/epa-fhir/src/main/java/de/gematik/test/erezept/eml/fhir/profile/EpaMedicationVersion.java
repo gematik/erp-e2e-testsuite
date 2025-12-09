@@ -35,6 +35,11 @@ public enum EpaMedicationVersion implements ProfileVersion {
   private final String version;
   private final String name = "de.gematik.epa.medication";
 
+  @Override
+  public boolean omitPatch() {
+    return this != V1_0_3;
+  }
+
   public static EpaMedicationVersion getDefaultVersion() {
     return VersionUtil.getDefaultVersionOptionally(
             EpaMedicationVersion.class, "de.gematik.epa.medication")

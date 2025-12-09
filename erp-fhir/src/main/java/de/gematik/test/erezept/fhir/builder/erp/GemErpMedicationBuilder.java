@@ -34,23 +34,26 @@ import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import jakarta.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.Resource;
 
+@Slf4j
 public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<B>>
     extends ResourceBuilder<GemErpMedication, B> {
 
   protected final List<Coding> codes = new LinkedList<>();
+  protected ErpWorkflowVersion version = ErpWorkflowVersion.getDefaultVersion();
   @Nullable protected String codeText;
 
   protected String manufacInstruction;
-  protected ErpWorkflowVersion version = ErpWorkflowVersion.getDefaultVersion();
-  // extentions
+  // extensions
   protected Boolean isVaccine = false;
   protected EpaDrugCategory drugCategory;
 
@@ -66,11 +69,32 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
   protected String amountNumeratorUnit;
   protected Long amountDenominator;
 
-  protected Medication.MedicationIngredientComponent ingredientComponent;
+  protected List<Medication.MedicationIngredientComponent> ingredientComponentList =
+      new LinkedList<>();
 
   protected String batchLotNumber;
 
-  protected List<Resource> containedResources;
+  protected final List<Resource> containedResources = new ArrayList<>();
+
+  public static GemErpMedicationCompoundingBuilder forCompounding() {
+    return new GemErpMedicationCompoundingBuilder();
+  }
+
+  public static GemErpMedicationIngredientBuilder forIngredient() {
+    return new GemErpMedicationIngredientBuilder();
+  }
+
+  public static GemErpMedicationKombiPkgBuilder forKombiPckg() {
+    return new GemErpMedicationKombiPkgBuilder();
+  }
+
+  public static GemErpMedicationPZNBuilder forPZN() {
+    return new GemErpMedicationPZNBuilder();
+  }
+
+  public static GemErpMedFreeTextBuilder forFreeText() {
+    return new GemErpMedFreeTextBuilder();
+  }
 
   public B manufacturingInstruction(String instruction) {
     this.manufacInstruction = instruction;
@@ -112,48 +136,31 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
     return self();
   }
 
-  public static GemErpMedCompoundingBuilder forCompounding() {
-    return new GemErpMedCompoundingBuilder();
-  }
-
-  public static GemErpMedIngredientBuilder forIngredient() {
-    return new GemErpMedIngredientBuilder();
-  }
-
-  public static GemErpMedicationPZNBuilder forPZN() {
-    return new GemErpMedicationPZNBuilder();
-  }
-
-  public static GemErpMedFreeTextBuilder forFreeText() {
-    return new GemErpMedFreeTextBuilder();
-  }
-
   protected void applyCommonFields(GemErpMedication medication) {
     checkRequired();
 
-    Optional.ofNullable(containedResources).ifPresent(medication.getContained()::addAll);
+    medication.getContained().addAll(containedResources);
 
-    Optional.ofNullable(this.drugCategory)
-        .ifPresent(dc -> medication.addExtension(dc.asExtension()));
+    Optional.ofNullable(drugCategory).ifPresent(dc -> medication.addExtension(dc.asExtension()));
 
-    Optional.ofNullable(this.isVaccine)
+    Optional.ofNullable(isVaccine)
         .ifPresent(
             vaccine ->
                 medication.addExtension(
                     EpaMedicationStructDef.VACCINE_EXT.asBooleanExtension(vaccine)));
 
-    Optional.ofNullable(this.manufacInstruction)
+    Optional.ofNullable(manufacInstruction)
         .ifPresent(
             compInstr ->
                 medication.addExtension(
                     EpaMedicationStructDef.MANUFACTURING_INSTRUCTION.asStringExtension(
                         manufacInstruction)));
 
-    Optional.ofNullable(this.codeText).ifPresent(cT -> medication.getCode().setText(cT));
-    Optional.ofNullable(this.normSizeCode)
+    Optional.ofNullable(codeText).ifPresent(cT -> medication.getCode().setText(cT));
+    Optional.ofNullable(normSizeCode)
         .ifPresent(size -> medication.addExtension(size.asExtension()));
-    Optional.ofNullable(this.ingredientComponent).ifPresent(medication::addIngredient);
 
+    medication.getIngredient().addAll(this.ingredientComponentList);
     Optional.ofNullable(this.kbvDdarreichungsform)
         .ifPresent(form -> medication.getForm().addCoding(form.asCoding()));
     Optional.ofNullable(this.batchLotNumber)
@@ -192,7 +199,7 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
               amountRatio.getDenominator().setValue(1);
             });
 
-    // overwrite the default value of 1 from amountNumerator
+    // overwrite the default value of 1 of amountNumerator
     Optional.ofNullable(this.amountDenominator)
         .ifPresent(denom -> medication.getAmount().getDenominator().setValue(denom));
   }
@@ -206,17 +213,10 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
     validatePackagingLength();
     validatePackagingSizeWithAmount();
     validateTotalQuantityWithAmount();
-    checkUnsentIngredientItem();
-  }
-
-  private void checkUnsentIngredientItem() {
-    if (ingredientComponent != null && !ingredientComponent.hasItem()) {
-      throw new BuilderException("IngredientRessource is optional but Item ist mandatory");
-    }
   }
 
   private void validateCodesOrIngredients() {
-    if (ingredientComponent == null && codes.isEmpty() && codeText == null) {
+    if (ingredientComponentList.isEmpty() && codes.isEmpty() && codeText == null) {
       throw new BuilderException(
           "epa-med-1: Medication codes, name, or ingredients must be specified codes.exists() or"
               + " ingredientList.exists()");

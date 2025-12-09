@@ -40,7 +40,7 @@ public class ErxPrescriptionBundle extends Bundle {
   public ErxTask getTask() {
     return this.getEntry().stream()
         .map(BundleEntryComponent::getResource)
-        .filter(resource -> resource.getResourceType().equals(ResourceType.Task))
+        .filter(ErpWorkflowStructDef.TASK::matches)
         .map(ErxTask::fromTask)
         .findFirst()
         .orElseThrow(

@@ -20,7 +20,6 @@
 # language: de
 
 @PRODUKT:eRp_FD
-
 Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbstzahler
   Die Erezept-Anwendungsfälle für apothekenpflichtige Medikamente
 
@@ -30,9 +29,9 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Und die Apotheke Stadtapotheke hat Zugriff auf ihre SMC-B
 
   @TCID:ERP_EE_REZEPTVARIANTEN_01
-    @TESTFALL:positiv
-    @AFO-ID:A_24034
-    @Hauptdarsteller:Arzt
+  @TESTFALL:positiv
+  @AFO-ID:A_24034
+  @Hauptdarsteller:Arzt
   Szenariogrundriss: Einstellen eines Apothekenpflichtigen E-Rezeptes mit verschiedenen Verordnungstypen und Versicherungsverhältnissen
   Die Apotheke akzeptiert das zugewiesene Rezept in den Variationen Frteitext-, Wirkstoff- und Rezepturverordnung.
 
@@ -40,23 +39,23 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgende apothekenpflichtige <Verordnungstyp> Verordnung verschreibt:
       | Name   | Freitext   | PZN   | Menge   | Impfung     |
       | <Name> | <Freitext> | <PZN> | <Menge> | <isVaccine> |
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensieren
 
     Beispiele:
       | Verordnungstyp | Versicherungsart | Name                             | Freitext                                                                                                            | PZN      | Menge | isVaccine |
       | Freitext       | GKV              | PlaceboCondimenti Luffa-Schwämme | Ein Bisschen Davon und noch mehr davon und das in kreisenden Bewegungen einmassieren, wo ? -> nach eigenem Ermessen |          | 1     | false     |
-      | Rezeptur       | GKV              | Anti Aging Chreme für die Achsel | quantum satis                                                                                                       |          | 5     | true      |
+      | Rezeptur       | GKV              | Anti Aging Chreme für die Achsel | quantum satis                                                                                                       | 03438010 | 5     | false     |
       | Wirkstoff      | GKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 2     | true      |
       | Freitext       | PKV              | PlaceboCondimenti Luffa-Schwämme | Ein Bisschen Davon und noch mehr davon und das  ganze gut durchrühren                                               |          | 3     | false     |
       | Rezeptur       | PKV              | Anti Aging Chreme für die Achsel | beidseitig auftragen                                                                                                |          | 5     | false     |
       | Wirkstoff      | PKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 1     | false     |
 
   @TCID:ERP_EE_REZEPTVARIANTEN_02
-    @TESTFALL:positiv
-    @AFO-ID:A_24034
-    @Hauptdarsteller:Arzt
+  @TESTFALL:positiv
+  @AFO-ID:A_24034
+  @Hauptdarsteller:Arzt
   Szenariogrundriss: Einstellen des E-Rezeptes Direktzuweisung mit verschiedenen Verordnungstypen und Versicherungsverhältnissen
   Die Apotheke akzeptiert das zugewiesene Rezept in den Variationen Frteitext-, Wirkstoff- und Rezepturverordnung.
 
@@ -70,7 +69,7 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Beispiele:
       | Verordnungstyp | Versicherungsart | Name                             | Freitext                                                                                                            | PZN      | Menge |
       | Freitext       | GKV              | PlaceboCondimenti Luffa-Schwämme | Ein Bisschen Davon und noch mehr davon und das in kreisenden Bewegungen einmassieren, wo ? -> nach eigenem Ermessen |          | 1     |
-      | Rezeptur       | GKV              | Anti Aging Chreme für die Achsel | quantum satis                                                                                                       |          | 5     |
+      | Rezeptur       | GKV              | Anti Aging Chreme für die Achsel | quantum satis                                                                                                       | 03438010 | 5     |
       | Wirkstoff      | GKV              | Harnsäure Hemmer                 | Ibuprofen und Paracetamol -> beides und viel und so weiter                                                          | 16588573 | 2     |
       | Freitext       | PKV              | PlaceboCondimenti Luffa-Schwämme | Ein Bisschen Davon und noch mehr davon und das  ganze gut durchrühren                                               |          | 3     |
       | Rezeptur       | PKV              | Anti Aging Achsel-Chreme         | beidseitig auftragen                                                                                                |          | 5     |

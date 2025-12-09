@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.ASK;
+import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
@@ -39,11 +40,11 @@ import org.junit.jupiter.api.Test;
 class GemErpMedFreeTextBuilderTest extends ErpFhirParsingTest {
 
   Medication.MedicationIngredientComponent ingredient =
-      IngredientCodeBuilder.builder()
-          .withAsk(ASK.from("askCode"))
+      GemEpaIngredientComponentBuilder.builder()
+          .ask(ASK.from("askCode"))
           .ingredientStrength(new Quantity(3), new Quantity(1), "ml")
           .darreichungsform("im Einer")
-          .textInCoding("falls kein Code zur Hand hier was passendes rein schreiben")
+          .ingredientCodingText("falls kein Code zur Hand hier was passendes rein schreiben")
           .build();
 
   @Test
@@ -79,13 +80,13 @@ class GemErpMedFreeTextBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldWhileCodeTextIsBlank() {
-    val freeTextBuilder = GemErpMedCompoundingBuilder.forFreeText().codeText("");
+    val freeTextBuilder = GemErpMedicationCompoundingBuilder.forFreeText().codeText("");
     assertThrows(BuilderException.class, freeTextBuilder::build);
   }
 
   @Test
   void shouldWhileFormTextIsBlank() {
-    val freeTextBuilder = GemErpMedCompoundingBuilder.forFreeText().formText("");
+    val freeTextBuilder = GemErpMedicationCompoundingBuilder.forFreeText().formText("");
     assertThrows(BuilderException.class, freeTextBuilder::build);
   }
 

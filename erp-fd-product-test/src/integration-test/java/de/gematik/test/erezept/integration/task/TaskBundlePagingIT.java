@@ -21,11 +21,7 @@
 package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsAll5Links;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.containsTotalCountOf;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.expectedParamsIn;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.hasElementAtPosition;
-import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.hasSameEntryIds;
+import static de.gematik.test.core.expectations.verifier.GenericBundleVerifier.*;
 import static de.gematik.test.core.expectations.verifier.TaskBundleVerifier.authoredOnDateIsEqual;
 import static de.gematik.test.core.expectations.verifier.TaskBundleVerifier.verifyAuthoredOnDateWithPredicate;
 import static org.junit.Assert.assertTrue;
@@ -61,15 +57,12 @@ import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -78,10 +71,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("TaskBundle PagingTests")
 @Tag("Task_Paging")
@@ -98,11 +89,6 @@ public class TaskBundlePagingIT extends ErpTest {
 
   @Actor(name = "Am Flughafen")
   private PharmacyActor flughafenApo;
-
-  @BeforeAll
-  static void setTimeZone() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-  }
 
   @AfterAll
   static void housekeeping() {
@@ -387,22 +373,33 @@ public class TaskBundlePagingIT extends ErpTest {
             actor,
             IQueryParameter.search()
                 .withCount(10)
-                .withOffset(5)
+                .withOffset(0)
                 .sortedBy("date", SortOrder.ASCENDING)
                 .createParameter());
+    actor.attemptsTo(
+        Verify.that(firstCall).withExpectedType().and(containsEntriesOfCount(10)).isCorrect());
+
+    // Task of interest
+    val toi = firstCall.getExpectedResponse().getTasks().get(4);
 
     val secondCall =
         getErxTaskBundleInteraction(
             actor,
             IQueryParameter.search()
                 .withCount(5)
-                .withOffset(10)
+                .withOffset(4)
                 .sortedBy("date", SortOrder.ASCENDING)
                 .createParameter());
+
+    /*
+    first:  [ 0 | 1 | 2 | 3 | TOI | 5 | 6 | 7 | 8 | 9 ]
+    second: {  <<offset>>  }[ TOI | 1 | 2 | 3 | 4 ]
+     */
     actor.attemptsTo(
-        Verify.that(firstCall)
+        Verify.that(secondCall)
             .withExpectedType()
-            .and(hasElementAtPosition(secondCall.getExpectedResponse().getTasks().get(4), 9))
+            .and(containsEntriesOfCount(5))
+            .and(hasElementAtPosition(toi, 0))
             .isCorrect());
   }
 

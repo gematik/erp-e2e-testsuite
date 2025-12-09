@@ -29,6 +29,7 @@ public abstract class BaseActorConfiguration implements INamedConfigurationEleme
   /** Just an identifier to distinguish from other clients within config.yaml */
   private String name;
 
+  private String countryCode = "DE";
   private String description = "";
 
   /** which algorithm to use for the Smartcards */
@@ -39,5 +40,5 @@ public abstract class BaseActorConfiguration implements INamedConfigurationEleme
   private String acceptCharset = "utf-8";
 
   private boolean validateRequest = false;
-  private boolean validateResponse = true;
+  private String fhirValidator = "BRICKS";
 }

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -130,26 +130,6 @@
             <artifactId>fhir-codec-brick</artifactId>
             <scope>test</scope>
             <type>test-jar</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>de.gematik.refv</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.serenity-bdd</groupId>
-            <artifactId>serenity-rest-assured</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
@@ -172,8 +152,9 @@
             <artifactId>erp-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>pharmacy-service-provider-ws-client</artifactId>
+            <!-- TODO: can be optional: is required if we activate the reference validator for FHIR validation -->
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>referencevalidator-lib</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
@@ -267,7 +248,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>1.0.0</version>
+                <version>1.1.0</version>
             </plugin>
         </plugins>
     </build>

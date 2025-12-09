@@ -32,10 +32,12 @@ import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.abilities.TSLAbility;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.EuPharmacyActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
@@ -117,6 +119,25 @@ class ErpFdTestsuiteFactoryTest {
       assertNotNull(pharmacy.abilityTo(UseSMCB.class));
       assertNotNull(pharmacy.abilityTo(UseTheKonnektor.class));
       assertNotNull(pharmacy.abilityTo(ManagePharmacyPrescriptions.class));
+      assertNotNull(pharmacy.getDescription());
+    }
+  }
+
+  @Test
+  void shouldEquipEuPharmacyActor() {
+    val pharmacyName = "Hannes Vogt";
+    val config = ErpFdTestsuiteFactory.create();
+    val pharmacy = new EuPharmacyActor(pharmacyName);
+
+    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
+      val erpClient = mock(ErpClient.class);
+      erpClientFactoryMockedStatic
+          .when(() -> ErpClientFactory.createErpClient(any(), any(EuPharmacyConfiguration.class)))
+          .thenReturn(erpClient);
+
+      assertDoesNotThrow(() -> config.equipAsEuPharmacy(pharmacy));
+      assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
+      assertNotNull(pharmacy.abilityTo(UseSMCB.class));
       assertNotNull(pharmacy.getDescription());
     }
   }
@@ -262,7 +283,6 @@ class ErpFdTestsuiteFactoryTest {
 
   @Test
   void shouldEquipPatientActorForOCSP() {
-    val actorName = "Günther Angermänn";
     val actor = new PatientActor("");
     val config = ErpFdTestsuiteFactory.create();
 

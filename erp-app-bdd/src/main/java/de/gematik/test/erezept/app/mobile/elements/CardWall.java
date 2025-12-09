@@ -34,8 +34,7 @@ public enum CardWall implements PageElement {
       "Next Button",
       () -> By.tagName("CardWall.ContinueButton"),
       () -> AppiumBy.accessibilityId("cdw_btn_intro_later")),
-  ADD_HEALTH_CARD_BUTTON(
-      "Next Button", () -> null, () -> AppiumBy.accessibilityId("Gesundheitskarte")),
+  ADD_HEALTH_CARD_BUTTON("Next Button", () -> null, () -> AppiumBy.name("cdw_btn_intro_advance")),
   CAN_INPUT_FIELD(
       "CAN Input Field",
       () -> By.tagName("CardWall.CAN.CANField"),
@@ -51,7 +50,7 @@ public enum CardWall implements PageElement {
   PIN_ACCEPT_BUTTON(
       "PIN Accept Button",
       () -> By.tagName("CardWall.ContinueButton"),
-      () -> AppiumBy.accessibilityId("cdw_btn_pin_done")),
+      () -> AppiumBy.name("cdw_btn_pin_no_pin")),
   DONT_SAVE_CREDENTIAL_BUTTON(
       "Dont save the credentials button",
       () -> null,
@@ -68,7 +67,8 @@ public enum CardWall implements PageElement {
           AppiumBy.iOSNsPredicateString(
               "type == \"XCUIElementTypeButton\" AND name == \"cdw_btn_rc_next\" AND label =="
                   + " \"Karte verbinden\"")),
-  ;
+  GKV_INSURED_BUTTON(
+      "Select GKV insured", () -> null, () -> AppiumBy.accessibilityId("wlcd_btn_gkv_user"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

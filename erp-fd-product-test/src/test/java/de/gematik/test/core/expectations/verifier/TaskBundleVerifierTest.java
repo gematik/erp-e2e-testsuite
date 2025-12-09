@@ -72,7 +72,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
     val erxTaskBundle2 = new ErxTaskBundle();
     val task = new ErxTask();
-    task.getMeta().addProfile(ErpWorkflowStructDef.TASK_12.getCanonicalUrl());
+    task.getMeta().addProfile(ErpWorkflowStructDef.TASK.getCanonicalUrl());
     task.getContained().add(new Binary());
     erxTaskBundle2.addEntry().setResource(task);
 
@@ -85,7 +85,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
   void containsExclusivelyTasksWithGKVInsuranceType() {
     val erxTaskBundle1 = new ErxTaskBundle();
     val task = new ErxTask();
-    task.getMeta().addProfile(ErpWorkflowStructDef.TASK_12.getCanonicalUrl());
+    task.getMeta().addProfile(ErpWorkflowStructDef.TASK.getCanonicalUrl());
     task.addExtension()
         .setUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE_12.getCanonicalUrl())
         .setValue(PrescriptionFlowType.FLOW_TYPE_200.asCoding());
@@ -170,6 +170,16 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
     val erxTaskBundle = new ErxTaskBundle();
     val step = TaskBundleVerifier.hasNoTasks();
     assertDoesNotThrow(() -> step.apply(erxTaskBundle));
+
+    erxTaskBundle.addEntry().setResource(new ErxTask());
+    assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));
+  }
+
+  @Test
+  void shouldReturnFalseWhenNoTasksHasNoMethaProfile() {
+    val erxTaskBundle = new ErxTaskBundle();
+    erxTaskBundle.addEntry().setResource(new ErxTask());
+    val step = TaskBundleVerifier.doesNotContainQES(ErpAfos.A_23452);
 
     erxTaskBundle.addEntry().setResource(new ErxTask());
     assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));

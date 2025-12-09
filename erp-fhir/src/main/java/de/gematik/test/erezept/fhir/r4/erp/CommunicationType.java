@@ -31,6 +31,7 @@ public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> 
   INFO_REQ(ErpWorkflowStructDef.COM_INFO_REQ),
   DISP_REQ(ErpWorkflowStructDef.COM_DISP_REQ),
   REPLY(ErpWorkflowStructDef.COM_REPLY),
+  DIGA(ErpWorkflowStructDef.COM_DIGA),
   REPRESENTATIVE(ErpWorkflowStructDef.COM_REPRESENTATIVE);
 
   // which communication types are received by KVIDs
@@ -55,9 +56,8 @@ public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> 
   }
 
   @Override
-  public WithNamingSystem getRecipientNamingSystem() {
+  public WithNamingSystem getRecipientNamingSystem(ErpWorkflowVersion version) {
     if (PATIENT_RECEIVING.contains(this)) {
-      // TODO: not always true, Patient might also be PKV!
       return DeBasisProfilNamingSystem.KVID_GKV_SID;
     } else {
       return DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
@@ -65,11 +65,10 @@ public enum CommunicationType implements ICommunicationType<ErpWorkflowVersion> 
   }
 
   @Override
-  public WithNamingSystem getSenderNamingSystem() {
+  public WithNamingSystem getSenderNamingSystem(ErpWorkflowVersion version) {
     if (PHARMACY_SENDING.contains(this)) {
       return DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
     } else {
-      // TODO: not always true, Patient might also be PKV!
       return DeBasisProfilNamingSystem.KVID_GKV_SID;
     }
   }

@@ -32,16 +32,20 @@ import de.gematik.test.erezept.client.rest.ErpResponseFactory;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.client.vau.VauException;
 import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.parser.ValidatorType;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import kong.unirest.core.Unirest;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -56,8 +60,11 @@ public class ErpClientFactory {
   private static X509Certificate vauCertificate;
 
   public static ErpClient createErpClient(
-      EnvironmentConfiguration environment, PsActorConfiguration actor) {
-    val erpClientConfig = toErpClientConfig(environment.getTi(), ClientType.PS, actor);
+      EnvironmentConfiguration environment, BaseActorConfiguration actor) {
+    val isEuActor = actor instanceof EuPharmacyConfiguration;
+    val erpClientConfig =
+        toErpClientConfig(environment.getTi(), isEuActor ? ClientType.NCPEH : ClientType.PS, actor);
+
     return createErpClient(erpClientConfig, getVauCertificate(erpClientConfig));
   }
 
@@ -94,20 +101,43 @@ public class ErpClientFactory {
             cfg.getXApiKey(),
             cfg.getUserAgent());
 
-    val fhir = new FhirParser(); // fhir parser which we will use for encode/decode and validation
+    val fhir = getFhirParser(cfg);
+
     // build, configure and assemble the Erp-Client
     return ErpClient.builder()
         .clientType(cfg.getClientType())
         .idpClient(idp)
         .vauClient(vau)
         .fhir(fhir)
-        .responseFactory(new ErpResponseFactory(fhir, cfg.isValidateResponse()))
+        .responseFactory(new ErpResponseFactory(fhir))
         .baseFdUrl(cfg.getFdBaseUrl())
         .acceptCharset(cfg.getAcceptCharset())
         .acceptMime(cfg.getAcceptMimeType())
         .sendMime(cfg.getSendMimeType())
         .validateRequest(cfg.isValidateRequest())
         .build();
+  }
+
+  private static FhirParser getFhirParser(ErpClientConfiguration cfg) {
+    val validatorType =
+        ValidatorType.fromString(cfg.getFhirValidator())
+            .orElseThrow(
+                () ->
+                    new ConfigurationException(
+                        format(
+                            "Configured {0} is not a valid option of {1}",
+                            cfg.getFhirValidator(),
+                            Arrays.stream(ValidatorType.values())
+                                .map(Enum::name)
+                                .collect(Collectors.joining(",")))));
+
+    log.info(
+        "Choosing Validator {} for ErpClient with AcceptEncoding {}",
+        validatorType,
+        cfg.getAcceptMimeType().asString());
+
+    // fhir parser which we will use for encode/decode and validation
+    return new FhirParser(validatorType);
   }
 
   private static ErpClientConfiguration toErpClientConfig(
@@ -132,9 +162,9 @@ public class ErpClientFactory {
     dto.setSendMime(actor.getSendMime());
     dto.setAcceptCharset(actor.getAcceptCharset());
     dto.setValidateRequest(actor.isValidateRequest());
-    dto.setValidateResponse(actor.isValidateResponse());
+    dto.setFhirValidator(actor.getFhirValidator());
     dto.setClientType(type.toString());
-    return de.gematik.test.erezept.client.cfg.ErpClientConfiguration.fromDto(dto);
+    return ErpClientConfiguration.fromDto(dto);
   }
 
   private static X509Certificate getVauCertificate(ErpClientConfiguration clientConfig) {

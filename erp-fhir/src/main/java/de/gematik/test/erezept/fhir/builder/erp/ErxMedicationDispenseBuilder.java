@@ -44,7 +44,8 @@ import org.hl7.fhir.r4.model.Reference;
 
 @Slf4j
 public class ErxMedicationDispenseBuilder
-    extends ErxMedicationDispenseBaseBuilder<ErxMedicationDispense, ErxMedicationDispenseBuilder> {
+    extends ErxMedicationDispenseBaseBuilder<
+        ErxMedicationDispense, ErpWorkflowVersion, ErxMedicationDispenseBuilder> {
 
   private Date whenPrepared;
   private Boolean wasSubstituted;
@@ -57,6 +58,7 @@ public class ErxMedicationDispenseBuilder
 
   protected ErxMedicationDispenseBuilder(KVNR kvnr) {
     super(kvnr);
+    this.version(ErpWorkflowVersion.getDefaultVersion());
   }
 
   public static ErxMedicationDispenseBuilder forKvnr(KVNR kvnr) {

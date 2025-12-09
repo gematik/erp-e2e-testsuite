@@ -20,31 +20,29 @@
 
 package de.gematik.test.erezept.integration.capabilitystatement;
 
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
-import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.ResponseOfGetCapabilityStatement;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.usecases.GetCapabilityStatementCommand;
-import de.gematik.test.erezept.fhir.r4.erp.ErxCapabilityStatement;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import net.serenitybdd.model.buildinfo.BuildInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 
-@Slf4j
-@RunWith(SerenityRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("CapabilityStatement Feature Test")
 @Tag("CapabilityStatementResource")
+@Tag("Smoketest")
 class CapabilityStatementIT extends ErpTest {
 
   @Actor(name = "Sina Hüllmann")
@@ -55,21 +53,28 @@ class CapabilityStatementIT extends ErpTest {
   @DisplayName("Software-Version und Release Date anhand der Capability Statement Resource abrufen")
   @Tag("SoftwareVersionAndDate")
   void getCapabilityStatementAndVerifySoftwareVersionAndDate() {
-    val request = new GetCapabilityStatementCommand();
-    val question = new ResponseOfGetCapabilityStatement();
+    val response = sina.asksFor(ResponseOfGetCapabilityStatement.request());
+    sina.attemptsTo(Verify.that(response).isFromExpectedType());
 
-    ErpInteraction<ErxCapabilityStatement> response = sina.performs(question);
+    val capabilityStatement = response.getExpectedResponse();
 
-    ErxCapabilityStatement capabilityStatement = response.getExpectedResponse();
+    val softwareName = capabilityStatement.getSoftwareName();
+    assertFalse(softwareName.isEmpty());
+    BuildInfo.section("Fachdienst").setProperty("Software", softwareName);
 
-    String softwareVersion = String.valueOf(capabilityStatement.getSoftwareVersion());
-    log.info("Software-Version: {}", softwareVersion);
-
-    String softwareReleaseDate = String.valueOf(capabilityStatement.getSoftwareReleaseDate());
-    log.info("Software-Release-Date: {}", softwareReleaseDate);
-
+    val softwareVersion = capabilityStatement.getSoftwareVersion();
     assertFalse(softwareVersion.isEmpty(), "Software version should not be empty");
+    BuildInfo.section("Fachdienst").setProperty("Software Version", softwareVersion);
 
-    System.setProperty("test.software.version", softwareVersion);
+    val softwareReleaseDate = capabilityStatement.getSoftwareReleaseDate();
+    BuildInfo.section("Fachdienst").setProperty("Software Release", softwareReleaseDate);
+
+    // write the configured FHIR versions
+    val tsSection = BuildInfo.section("Testsuite FHIR Konfiguration");
+    val conf =
+        ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
+    conf.getDefaultProfile()
+        .getProfiles()
+        .forEach(p -> tsSection.setProperty(p.getName(), p.getVersion()));
   }
 }

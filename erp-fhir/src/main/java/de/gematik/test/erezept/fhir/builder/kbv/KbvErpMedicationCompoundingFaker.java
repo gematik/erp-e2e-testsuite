@@ -20,7 +20,10 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.ProductionInstruction;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
@@ -37,10 +40,12 @@ public class KbvErpMedicationCompoundingFaker {
       new HashMap<>();
 
   private KbvErpMedicationCompoundingFaker() {
-    this.withDosageForm("Zäpfchen, viel Spaß")
+
+    this.withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class))
         .withAmount(5, 1, "Stk")
-        .withIngredientStrengthText("halt viel davon")
-        .withIngredItemText("so Kräutertee halt...")
+        .withIngredientStrengthText(
+            format("Ad {0} g", GemFaker.randomElement("25", "50", "75", "100", "150", "200")))
+        .withIngredItemText(GemFaker.fakerDrugName())
         .withProductionInstruction(ProductionInstruction.asCompounding("freitext"));
   }
 
@@ -54,7 +59,9 @@ public class KbvErpMedicationCompoundingFaker {
   }
 
   public KbvErpMedicationCompoundingFaker withDosageForm(Darreichungsform df) {
-    this.withDosageForm(df.getDisplay());
+    val display = df.getDisplay();
+    val maxLen = Math.min(display.length(), 30);
+    this.withDosageForm(display.substring(0, maxLen));
     return this;
   }
 
@@ -142,7 +149,7 @@ public class KbvErpMedicationCompoundingFaker {
   }
 
   public KbvErpMedicationCompoundingFaker withIngredItemText(String ingredItemText) {
-    builderConsumers.put("ingredItemText", b -> b.ingredItemText(ingredItemText));
+    builderConsumers.put("ingredItemText", b -> b.ingredientItemText(ingredItemText));
     return this;
   }
 

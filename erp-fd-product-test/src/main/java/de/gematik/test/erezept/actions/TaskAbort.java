@@ -20,20 +20,22 @@
 
 package de.gematik.test.erezept.actions;
 
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.r4.erp.*;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import net.serenitybdd.annotations.Step;
-import net.serenitybdd.core.steps.*;
-import net.serenitybdd.screenplay.*;
-import org.hl7.fhir.r4.model.*;
+import net.serenitybdd.core.steps.Instrumented;
+import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor
-public class TaskAbort extends ErpAction<Resource> {
+public class TaskAbort extends ErpAction<EmptyResource> {
 
   private final TaskId taskId;
   private final AccessCode accessCode;
@@ -41,7 +43,7 @@ public class TaskAbort extends ErpAction<Resource> {
 
   @Override
   @Step("{0} weist den aktivierten Task #taskId zurück")
-  public ErpInteraction<Resource> answeredBy(Actor actor) {
+  public ErpInteraction<EmptyResource> answeredBy(Actor actor) {
     val cmd = new TaskAbortCommand(taskId, accessCode, secret);
     return this.performCommandAs(cmd, actor);
   }

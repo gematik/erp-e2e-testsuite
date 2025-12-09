@@ -24,6 +24,8 @@ import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
+import de.gematik.bbriccs.toggle.FeatureConfiguration;
+import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import java.util.Optional;
 import lombok.val;
@@ -57,8 +59,13 @@ public interface ErpFhirResource extends IAnyResource {
   }
 
   static Reference createReference(String resourceType, String id) {
+    val referencingType = new FeatureConfiguration().getToggle(new ReferenceFeatureToggle());
     val unqualifiedId = IdentifierUtil.getUnqualifiedId(id);
-    val referenceValue = format("{0}/{1}", resourceType, unqualifiedId);
+    val referenceValue =
+        switch (referencingType) {
+          case UUID -> format("urn:uuid:{0}", unqualifiedId);
+          case HTTP -> format("{0}/{1}", resourceType, unqualifiedId);
+        };
     return new Reference(referenceValue);
   }
 }

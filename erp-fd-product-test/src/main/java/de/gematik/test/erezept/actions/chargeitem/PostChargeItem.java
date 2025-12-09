@@ -72,11 +72,13 @@ public class PostChargeItem extends ErpAction<ErxChargeItem> {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val encodedDavBundle = erpClient.encode(davBundle, EncodingType.XML);
     val signedDavBundle = konnektor.signDocumentWithSmcb(encodedDavBundle).getPayload();
+
+    val patientCoverage = patientActor.getPatientCoverage();
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(prescriptionId)
             .status(ChargeItem.ChargeItemStatus.BILLABLE)
             .enterer(smcb.getTelematikID())
-            .subject(patientActor.getKvnr(), patientActor.getInsuranceCoverage().getName())
+            .subject(patientActor.getKvnr(), patientCoverage.second.getName())
             .verordnung(kbvBundleReference)
             .abgabedatensatz(davBundle.getReference(), signedDavBundle)
             .build();

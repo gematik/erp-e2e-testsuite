@@ -28,27 +28,33 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.FlowTypeUtil;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import java.util.List;
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
+import org.hl7.fhir.r4.model.Parameters;
 
 @AllArgsConstructor
 public class TaskCreate extends ErpAction<ErxTask> {
 
   private final PrescriptionFlowType flowType;
 
+  private final List<Consumer<Parameters>> manipulator;
+
   @Override
   @Step("{0} erstellt einen neuen Task mit FlowType #flowType")
   public ErpInteraction<ErxTask> answeredBy(Actor actor) {
     val cmd = new TaskCreateCommand(flowType);
+    cmd.getRequestBody().ifPresent(body -> manipulator.forEach(m -> m.accept((Parameters) body)));
     return this.performCommandAs(cmd, actor);
   }
 
   public static TaskCreate withFlowType(PrescriptionFlowType flowType) {
-    Object[] params = {flowType};
+    Object[] params = {flowType, List.of()};
     return new Instrumented.InstrumentedBuilder<>(TaskCreate.class, params).newInstance();
   }
 
@@ -59,6 +65,12 @@ public class TaskCreate extends ErpAction<ErxTask> {
   @RequiredArgsConstructor
   public static class Builder {
     private final PatientActor patient;
+    private final List<Consumer<Parameters>> manipulator = new java.util.LinkedList<>();
+
+    public Builder manipulator(Consumer<Parameters> mutator) {
+      this.manipulator.add(mutator);
+      return this;
+    }
 
     public TaskCreate ofAssignmentKind(PrescriptionAssignmentKind kind) {
       /*
@@ -75,7 +87,7 @@ public class TaskCreate extends ErpAction<ErxTask> {
               .orElse(patient.getCoverageInsuranceType());
 
       val flowType = FlowTypeUtil.getFlowType(null, insurance, kind);
-      return TaskCreate.withFlowType(flowType);
+      return new TaskCreate(flowType, manipulator);
     }
   }
 }

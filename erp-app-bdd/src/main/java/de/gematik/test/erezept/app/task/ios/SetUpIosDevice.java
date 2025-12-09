@@ -25,9 +25,10 @@ import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.Environment;
-import de.gematik.test.erezept.app.mobile.elements.DebugSettings;
+import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.app.task.ChangeTheEnvironment;
 import de.gematik.test.erezept.app.task.CreateNewProfile;
+import de.gematik.test.erezept.app.task.EquipWithProvidePatientBaseDataAndErpClient;
 import de.gematik.test.erezept.app.task.NavigateThroughCardwall;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -50,20 +51,36 @@ public class SetUpIosDevice implements Task {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
     val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
 
-    actor.attemptsTo(NavigateThroughOnboardingOnIOS.entirely());
-    actor.attemptsTo(CreateNewProfile.fromSettingsMenu());
-    actor.attemptsTo(
-        ChangeTheEnvironment.bySwitchInTheDebugMenuTo(
-            Environment.fromString(environment.getName())));
+    // Note: only navigate through onboarding, create profile, set virtual eGK and navigate through
+    // card wall if it wasn't done before
+    if (app.isDisplayed(Onboarding.START_BUTTON)) {
+      actor.attemptsTo(NavigateThroughOnboardingOnIOS.entirely());
 
-    if (userConfig.useVirtualEgk()) {
-      val egk = sca.getEgkByICCSN(userConfig.getEgkIccsn());
-      actor.attemptsTo(SetVirtualEgkOnIOS.withEgk(egk));
+      actor.attemptsTo(CreateNewProfile.fromSettingsMenu());
+      actor.attemptsTo(
+          ChangeTheEnvironment.bySwitchInTheDebugMenuTo(
+              Environment.fromString(environment.getName())));
+
+      if (userConfig.useVirtualEgk()) {
+        val egk = sca.getEgkByICCSN(userConfig.getEgkIccsn());
+        actor.attemptsTo(SetVirtualEgkOnIOS.withEgk(egk));
+      }
+
+      app.tap(DebugSettings.LEAVE_BUTTON);
+      actor.attemptsTo(NavigateThroughCardwall.entirely());
+    } else {
+      ensureMainScreenIsOpenedAndScrolledUp(app, actor);
     }
 
-    app.tap(DebugSettings.LEAVE_BUTTON);
     actor.attemptsTo(
-        NavigateThroughCardwall.forEnvironment(environment)
-            .byMappingVirtualEgkFrom(sca, insuranceKind));
+        EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceKind, sca));
+  }
+
+  private void ensureMainScreenIsOpenedAndScrolledUp(UseTheApp<?> app, Actor actor) {
+    // Note: navigate to the main screen
+    app.tap(BottomNav.PRESCRIPTION_BUTTON);
+    // Note: switch the profiles back and forth to swipe down the main screen
+    app.tap(Mainscreen.forProfile("Profil 1"));
+    app.tap(Mainscreen.forProfile(actor.getName()));
   }
 }

@@ -103,9 +103,9 @@ class SendMessagesTest {
   void shouldBuildCommunicationReply() {
     val communicationReplyMessage =
         new CommunicationReplyMessage(SupplyOptionsType.ON_PREMISE, "testMessage");
-    val tsk = mock(ErxTask.class);
-    when(tsk.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
-    when(tsk.getAccessCode()).thenReturn(AccessCode.random());
+    val task = mock(ErxTask.class);
+    when(task.getTaskId()).thenReturn(TaskId.from(UUID.randomUUID().toString()));
+    when(task.getAccessCode()).thenReturn(AccessCode.random());
     val payload =
         ErxCommunicationBuilder.asReply(communicationReplyMessage)
             .basedOn(TaskId.from(UUID.randomUUID().toString()), AccessCode.random())
@@ -116,9 +116,12 @@ class SendMessagesTest {
     when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
     val com =
         SendMessages.to(patientActor)
-            .forTask(tsk)
+            .forTask(task)
             .addManipulator(
-                ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators())
+                ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators()
+                    .stream()
+                    .findFirst()
+                    .orElseThrow())
             .asReply(communicationReplyMessage, pharmacyActor);
     val erpIntCom = com.answeredBy(patientActor);
     assertNotNull(erpIntCom.getExpectedType());

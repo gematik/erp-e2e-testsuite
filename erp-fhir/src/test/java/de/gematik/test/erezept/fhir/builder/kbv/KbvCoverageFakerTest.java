@@ -24,7 +24,9 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
@@ -59,10 +61,12 @@ class KbvCoverageFakerTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void buildFakeKbvCoverageWithInsuranceStatus() {
+  void buildFakeKbvCoverageWithInsurance() {
     val coverage =
         KbvCoverageFaker.builder()
+            .withInsuranceType(randomElement(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
             .withInsuranceStatus(fakerValueSet(VersichertenStatus.class))
+            .withInsurance(IKNR.randomSidIknr(), GemFaker.insuranceName())
             .fake();
     val result = parser.validate(coverage);
     assertTrue(result.isSuccessful());
@@ -72,16 +76,6 @@ class KbvCoverageFakerTest extends ErpFhirParsingTest {
   void buildFakeKbvCoverageWithBeneficiary() {
     val patient = KbvPatientFaker.builder().fake();
     val coverage = KbvCoverageFaker.builder().withBeneficiary(patient).fake();
-    val result = parser.validate(coverage);
-    assertTrue(result.isSuccessful());
-  }
-
-  @Test
-  void buildFakeKbvCoverageWithInsuranceType() {
-    val coverage =
-        KbvCoverageFaker.builder()
-            .withInsuranceType(randomElement(InsuranceTypeDe.PKV, InsuranceTypeDe.GKV))
-            .fake();
     val result = parser.validate(coverage);
     assertTrue(result.isSuccessful());
   }

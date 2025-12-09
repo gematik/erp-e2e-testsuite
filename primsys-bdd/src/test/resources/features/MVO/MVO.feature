@@ -144,7 +144,7 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | 4           | 1         | 0                 | 90               |
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Sina Hüllmann dispensiert
     Dann hat die Apotheke Am Flughafen genau 1 Quittung vorliegen
@@ -160,7 +160,7 @@ Funktionalität: Mehrfachverordnung von apothekenpflichtigen Arzneimitteln
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgendes apothekenpflichtiges Medikament verschreibt:
       | MVO  | Denominator | Numerator | Gueltigkeitsstart | Gueltigkeitsende |
       | true | 4           | <Nummer>  | 90                | 180              |
-    Und die Versicherte Sina Hüllmann ihr letztes ausgestellte E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Dann wird der Versicherten Sina Hüllmann das neue E-Rezept angezeigt
     Dann kann die Apotheke Am Flughafen das letzte zugewiesene E-Rezept nicht beim Fachdienst akzeptieren, weil es noch nicht gültig ist
 

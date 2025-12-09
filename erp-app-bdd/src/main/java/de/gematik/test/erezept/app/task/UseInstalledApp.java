@@ -64,9 +64,7 @@ public class UseInstalledApp implements Task {
     actor.attemptsTo(SetVirtualEgkOnIOS.withEgk(sca.getEgkByICCSN(userConfig.getEgkIccsn())));
     app.tap(DebugSettings.LEAVE_BUTTON);
 
-    actor.attemptsTo(
-        NavigateThroughCardwall.forEnvironment(environment)
-            .byMappingVirtualEgkFrom(sca, insuranceKind));
+    actor.attemptsTo(NavigateThroughCardwall.entirely());
 
     // NOTE: once navigated through cardwall and logged in: waste some time here and tap refresh a
     // few times!!
@@ -76,6 +74,9 @@ public class UseInstalledApp implements Task {
       app.tap(BottomNav.PRESCRIPTION_BUTTON);
       app.tap(Mainscreen.REFRESH_BUTTON);
     }
+
+    actor.attemptsTo(
+        EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceKind, sca));
   }
 
   public static Builder ownedBy(Actor deviceOwner) {

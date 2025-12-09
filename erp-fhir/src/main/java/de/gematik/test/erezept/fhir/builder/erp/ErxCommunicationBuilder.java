@@ -24,11 +24,9 @@ import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ChargeItemCommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.r4.erp.ICommunicationType;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
@@ -109,17 +107,11 @@ public abstract class ErxCommunicationBuilder<B extends ErxCommunicationBuilder<
     return self();
   }
 
-  protected ErxCommunication buildCommon(
-      ICommunicationType<?> type, Supplier<CanonicalType> profileSupplier) {
+  protected ErxCommunication buildCommon(Supplier<CanonicalType> profileSupplier) {
     checkRequiredCommon();
     val com = this.createResource(ErxCommunication::new, profileSupplier.get());
 
     com.setStatus(status);
-    com.addRecipient(type.getRecipientReference(this.receiver));
-
-    // NOTE: "normal" communications do not necessarily require a sender: why?
-    // probably will be added for all Communications in Version 1.2
-    Optional.ofNullable(this.sender).ifPresent(s -> com.setSender(type.getSenderReference(s)));
 
     if (message != null) {
       val payload = new Communication.CommunicationPayloadComponent(new StringType(message));

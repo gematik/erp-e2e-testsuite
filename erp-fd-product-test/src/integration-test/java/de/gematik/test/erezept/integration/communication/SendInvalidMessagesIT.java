@@ -23,8 +23,9 @@ package de.gematik.test.erezept.integration.communication;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
-import static de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators;
+import static de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory.*;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -36,16 +37,19 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -53,10 +57,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication Tests")
 @Tag("Communication")
@@ -638,5 +640,78 @@ public class SendInvalidMessagesIT extends ErpTest {
     // cleanup
     pharma.performs(
         ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
+  }
+
+  private static Stream<Arguments> getDspRequestManipulationComposer() {
+    return ArgumentComposer.composeWith()
+        .arguments()
+        .multiply(0, List.of(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV))
+        .multiply(1, getCommunicationDspRequestSystemsManipulators())
+        .create();
+  }
+
+  private static Stream<Arguments> getReplyManipulationComposer() {
+    return ArgumentComposer.composeWith()
+        .arguments()
+        .multiply(0, List.of(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV))
+        .multiply(1, getCommunicationReplySystemsManipulators())
+        .create();
+  }
+
+  @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_15")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Ein {2}-Patient versucht eine Nachricht für {0} und"
+              + " mit falschen Systems: {1}  zu senden")
+  @DisplayName(
+      "Es muss geprüft werden, dass eine Patient oder eine Apotheke Nachrichten mit ungeslicedten"
+          + " Systems nicht einstellen kann")
+  @MethodSource("getDspRequestManipulationComposer")
+  void shouldPostInvalidCommunicationsAsPatient(
+      InsuranceTypeDe insuranceType, NamedEnvelope<FuzzingMutator<ErxCommunication>> manipulator) {
+    patient.changePatientInsuranceType(insuranceType);
+
+    val task = doc.prescribeFor(patient);
+    val response =
+        patient.performs(
+            SendMessages.to(pharma)
+                .forTask(task)
+                .addManipulator(manipulator)
+                .asDispenseRequest(
+                    new CommunicationDisReqMessage(
+                        SupplyOptionsType.SHIPMENT, "nope, we´ll get SMOK!")));
+    patient.attemptsTo(
+        Verify.that(response).withOperationOutcome().hasResponseWith(returnCode(400)).isCorrect());
+  }
+
+  @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_15")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Ein {2}-Patient versucht eine Nachricht für {0} und"
+              + " mit falschen Systems: {1}  zu senden")
+  @DisplayName(
+      "Es muss geprüft werden, dass eine Apotheke Nachrichten mit ungesliceten"
+          + " Systems nicht einstellen kann")
+  @MethodSource("getReplyManipulationComposer")
+  void shouldPostInvalidSenderCommunicationsAsPharmacy(
+      InsuranceTypeDe insuranceType, NamedEnvelope<FuzzingMutator<ErxCommunication>> manipulator) {
+    patient.changePatientInsuranceType(insuranceType);
+
+    val task = doc.prescribeFor(patient);
+    val response =
+        pharma.performs(
+            SendMessages.to(patient)
+                .forTask(task)
+                .addManipulator(manipulator)
+                .asReply(
+                    new CommunicationReplyMessage(
+                        SupplyOptionsType.SHIPMENT, "We can deliver a mask, too"),
+                    pharma));
+
+    pharma.attemptsTo(
+        Verify.that(response)
+            .withOperationOutcome(ErpAfos.A_22927)
+            .hasResponseWith(returnCode(400))
+            .isCorrect());
   }
 }

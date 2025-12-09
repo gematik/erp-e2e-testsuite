@@ -41,7 +41,9 @@ import de.gematik.ws.conn.signatureservice.wsdl.v7.SignatureServicePortType;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDService;
 import de.gematik.ws.conn.vsds.vsdservice.v5.VSDServicePortType;
 import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.WebServiceClient;
 import java.net.URL;
+import java.util.function.Function;
 import javax.net.ssl.HostnameVerifier;
 import lombok.Getter;
 import lombok.NonNull;
@@ -71,62 +73,90 @@ public class RemoteKonnektorServiceProvider extends ServicePortProvider {
   }
 
   public final SignatureServicePortType getSignatureService() {
-    val service = new SignatureService();
-    val servicePort = service.getSignatureServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getSignaturePath());
-    return servicePort;
+    return createAndConfigurePort(
+        SignatureService.class,
+        s -> ((SignatureService) s).getSignatureServicePort(),
+        profile.getSignaturePath());
   }
 
   public final AuthSignatureServicePortType getAuthSignatureService() {
-    val service = new AuthSignatureService();
-    val servicePort = service.getAuthSignatureServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getAuthSignaturePath());
-    return servicePort;
+    return createAndConfigurePort(
+        AuthSignatureService.class,
+        s -> ((AuthSignatureService) s).getAuthSignatureServicePort(),
+        profile.getAuthSignaturePath());
   }
 
   public final CertificateServicePortType getCertificateService() {
-    val service = new CertificateService();
-    val servicePort = service.getCertificateServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getCertificatePath());
-    return servicePort;
+    return createAndConfigurePort(
+        CertificateService.class,
+        s -> ((CertificateService) s).getCertificateServicePort(),
+        profile.getCertificatePath());
   }
 
-  @SneakyThrows
   public final EventServicePortType getEventService() {
-    val service = new EventService();
-    val servicePort = service.getEventServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getEventPath());
-    return servicePort;
+    return createAndConfigurePort(
+        EventService.class, s -> ((EventService) s).getEventServicePort(), profile.getEventPath());
   }
 
   public final CardServicePortType getCardService() {
-    val service = new CardService();
-    val servicePort = service.getCardServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getCardPath());
-    return servicePort;
+    return createAndConfigurePort(
+        CardService.class, s -> ((CardService) s).getCardServicePort(), profile.getCardPath());
   }
 
   public final CardTerminalServicePortType getCardTerminalService() {
-    val service = new CardTerminalService();
-    val servicePort = service.getCardTerminalServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getEventPath());
-    return servicePort;
+    return createAndConfigurePort(
+        CardTerminalService.class,
+        s -> ((CardTerminalService) s).getCardTerminalServicePort(),
+        profile.getCardTerminalPath());
   }
 
   @Override
   public VSDServicePortType getVSDServicePortType() {
-    val service = new VSDService();
-    val servicePort = service.getVSDServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getVsdPath());
-    return servicePort;
+    return createAndConfigurePort(
+        VSDService.class, s -> ((VSDService) s).getVSDServicePort(), profile.getVsdPath());
   }
 
   @Override
   public EncryptionServicePortType getEncryptionServicePortType() {
-    val service = new EncryptionService();
-    val servicePort = service.getEncryptionServicePort();
-    setEndpointAddress((BindingProvider) servicePort, profile.getEncryptionPath());
-    return servicePort;
+    return createAndConfigurePort(
+        EncryptionService.class,
+        s -> ((EncryptionService) s).getEncryptionServicePort(),
+        profile.getEncryptionPath());
+  }
+
+  public <T> T createAndConfigurePort(
+      Class<?> serviceClass, Function<Object, T> portGetter, String path) {
+    val service = instantiateService(serviceClass);
+    val port = portGetter.apply(service);
+    setEndpointAddress((BindingProvider) port, path);
+    return port;
+  }
+
+  @SneakyThrows
+  private <T> T instantiateService(Class<T> serviceClass) {
+    try {
+      val wsdlLocation = resolveWsdlLocation(serviceClass);
+      return serviceClass.getConstructor(URL.class).newInstance(wsdlLocation);
+    } catch (Exception e) {
+      return serviceClass.getDeclaredConstructor().newInstance();
+    }
+  }
+
+  private URL resolveWsdlLocation(Class<?> serviceClass) {
+    val wsc = serviceClass.getAnnotation(WebServiceClient.class);
+    if (wsc == null) {
+      throw new IllegalStateException(
+          "Annotation WebServiceClient is missing in " + serviceClass.getName());
+    }
+
+    String wsdlLocation = wsc.wsdlLocation();
+    if (wsdlLocation == null || wsdlLocation.isBlank()) {
+      throw new IllegalStateException("wsdlLocation is missing in " + serviceClass.getName());
+    }
+    if (wsdlLocation.contains("gematik_schemes/")) {
+      wsdlLocation = wsdlLocation.substring(wsdlLocation.indexOf("gematik_schemes/"));
+    }
+    return RemoteKonnektorServiceProvider.class.getClassLoader().getResource(wsdlLocation);
   }
 
   @SuppressWarnings("java:S1874")

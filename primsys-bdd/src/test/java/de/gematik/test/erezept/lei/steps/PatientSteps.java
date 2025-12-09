@@ -72,10 +72,10 @@ public class PatientSteps {
    * @param pharmacyName ist die Apotheke, welche den DMC zugewiesen bekommt
    */
   @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
           + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
   @Wenn(
-      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
+      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
           + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
   public void whenAssignDataMatrixCodeFromStack(
       String patientName, String order, String dmcStack, String pharmacyName) {

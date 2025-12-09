@@ -30,7 +30,11 @@ import org.openqa.selenium.By;
 @RequiredArgsConstructor
 public enum MessageScreen implements PageElement {
   MESSAGES_LIST("Message List", () -> AppiumBy.name("ord_txt_list")),
-  PRESCRIPTION_LIST("Prescription List", () -> AppiumBy.accessibilityId("ord_detail_txt_med_list"));
+  PRESCRIPTION_LIST("Prescription List", () -> AppiumBy.accessibilityId("ord_detail_txt_med_list")),
+  BACK_TO_MESSAGE_SCREEN(
+      "Back to Message Screen from a message", () -> AppiumBy.name("Nachrichten")),
+  E_REZEPT_APP_TEAM_TITLE(
+      "E-Rezept App Team Message Title", () -> AppiumBy.name("E-Rezept App Team"));
 
   private final String elementName;
   private final Supplier<By> iosLocator;

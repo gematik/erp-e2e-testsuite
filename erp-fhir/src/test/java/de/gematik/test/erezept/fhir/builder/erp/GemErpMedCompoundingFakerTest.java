@@ -32,7 +32,6 @@ import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
@@ -60,7 +59,6 @@ class GemErpMedCompoundingFakerTest extends ErpFhirParsingTest {
     if (fakerBool()) medication.withLotNumber(fakerLotNumber());
     if (fakerBool()) medication.withVaccineTrue(true);
     if (fakerBool()) medication.withAsk(ASK.from(getFaker().superhero().name()));
-    if (fakerBool()) medication.withVersion(ErpWorkflowVersion.V1_4);
     if (fakerBool())
       medication.withIngredientWithContainedAtc(
           getFaker().random().nextInt(1000),

@@ -27,8 +27,9 @@ public class PriceComponentData {
 
   private String category;
   private String type;
+  private long factor = 1;
   private Float insurantCost;
   private Float totalCost;
-  private String costReason;
   private String pzn;
+  private String medicationName;
 }

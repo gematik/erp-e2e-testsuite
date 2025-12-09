@@ -42,7 +42,6 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
@@ -107,24 +106,23 @@ public class ActivateMedicationCompounding extends ErpTest {
             .withMedicationIngredient(pzn, medicineName, freetext)
             .fake();
 
-    val insurance =
-        KbvCoverageFaker.builder().withInsuranceType(patient.getCoverageInsuranceType()).fake();
+    val patientCoverage = patient.getPatientCoverage();
     val medicationRequest =
         KbvErpMedicationRequestFaker.builder()
-            .withPatient(patient.getPatientData())
+            .withPatient(patientCoverage.first)
             .withMedication(medication)
             .withRequester(doc.getPractitioner())
-            .withInsurance(insurance)
+            .withInsurance(patientCoverage.second)
             .fake();
 
     val organisation = KbvMedicalOrganizationFaker.builder().fake();
     val kbvBundleBuilder =
         KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
-            .patient(patient.getPatientData())
+            .patient(patientCoverage.first)
             .practitioner(doc.getPractitioner())
             .medicalOrganization(organisation)
             .medicationRequest(medicationRequest)
-            .insurance(insurance)
+            .insurance(patientCoverage.second)
             .medication(medication);
     val activation =
         doc.performs(

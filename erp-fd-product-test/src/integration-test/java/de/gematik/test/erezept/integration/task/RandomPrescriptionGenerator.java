@@ -86,13 +86,14 @@ class RandomPrescriptionGenerator extends ErpTest {
           val draftTask = creation.getExpectedResponse();
           val prescriptionId = draftTask.getPrescriptionId();
 
+          val patientCoverage = sina.getPatientCoverage();
           val activation =
               doctor.performs(
                   ActivatePrescription.forGiven(creation)
                       .withKbvBundle(
                           KbvErpBundleFaker.builder()
-                              .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
-                              .withPatient(sina.getPatientData())
+                              .withInsurance(patientCoverage.second, patientCoverage.first)
+                              .withPatient(patientCoverage.first)
                               .withKvnr(sina.getKvnr())
                               .withPrescriptionId(prescriptionId)
                               .fake()));

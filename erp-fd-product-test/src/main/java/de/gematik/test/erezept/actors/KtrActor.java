@@ -20,9 +20,19 @@
 
 package de.gematik.test.erezept.actors;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import lombok.val;
+
 public class KtrActor extends ErpActor {
 
   public KtrActor(String name) {
     super(ActorType.HEALTH_INSURANCE, name);
+  }
+
+  public TelematikID getTelematikId() {
+    val useSmcb = SafeAbility.getAbility(this, UseSMCB.class);
+    return TelematikID.from(useSmcb.getTelematikID());
   }
 }

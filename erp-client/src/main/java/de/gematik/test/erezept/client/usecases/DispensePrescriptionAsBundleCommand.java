@@ -51,6 +51,7 @@ public class DispensePrescriptionAsBundleCommand extends BaseCommand<ErxMedicati
   public DispensePrescriptionAsBundleCommand(
       TaskId taskId, Secret secret, GemDispenseOperationParameters dispenseParameters) {
     super(ErxMedicationDispenseBundle.class, HttpRequestMethod.POST, "Task", taskId.getValue());
+
     this.dispenseParameters = dispenseParameters;
     queryParameters.add(new QueryParameter("secret", secret.getValue()));
   }

@@ -36,7 +36,7 @@ public class GemErpMedFreeTextFaker implements GemErpMedicationFaker {
   private final Map<String, Consumer<GemErpMedFreeTextBuilder>> builderConsumers = new HashMap<>();
 
   public GemErpMedFreeTextFaker() {
-    withVersion(ErpWorkflowVersion.V1_4);
+    withVersion(ErpWorkflowVersion.getDefaultVersion());
     if (fakerBool()) {
       withCodeText(GemFaker.getFaker().chuckNorris().fact());
     }

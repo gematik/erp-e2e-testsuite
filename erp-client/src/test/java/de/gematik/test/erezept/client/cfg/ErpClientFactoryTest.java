@@ -43,9 +43,11 @@ import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
 import de.gematik.test.erezept.client.testutils.VauCertificateGenerator;
 import de.gematik.test.erezept.client.vau.VauException;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
+import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -128,10 +130,12 @@ class ErpClientFactoryTest {
     val env = createEnvironmentConfiguration();
     val patient = new PatientConfiguration();
     val doctor = new DoctorConfiguration();
+    val euPharmacy = new EuPharmacyConfiguration();
 
     try (val mocked = mockConstruction(FhirParser.class)) {
       assertDoesNotThrow(() -> ErpClientFactory.createErpClient(env, patient));
       assertDoesNotThrow(() -> ErpClientFactory.createErpClient(env, doctor));
+      assertDoesNotThrow(() -> ErpClientFactory.createErpClient(env, euPharmacy));
     }
 
     // verify the endpoint was called only once!
@@ -203,5 +207,17 @@ class ErpClientFactoryTest {
           .thenThrow(CertificateException.class);
       assertThrows(CertificateException.class, () -> ErpClientFactory.createErpClient(env, actor));
     }
+  }
+
+  @Test
+  void shouldThrowOnInvalidValidatorType() {
+    val env = createEnvironmentConfiguration();
+    val actor = new DoctorConfiguration();
+    actor.setFhirValidator("ABC");
+
+    val exception =
+        assertThrows(
+            ConfigurationException.class, () -> ErpClientFactory.createErpClient(env, actor));
+    assertTrue(exception.getMessage().contains("ABC is not a valid option of"));
   }
 }

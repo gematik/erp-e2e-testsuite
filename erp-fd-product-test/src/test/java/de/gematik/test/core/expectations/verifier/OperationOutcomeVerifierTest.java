@@ -20,7 +20,7 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

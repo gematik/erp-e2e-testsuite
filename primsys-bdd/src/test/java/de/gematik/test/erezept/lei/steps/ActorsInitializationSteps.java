@@ -158,12 +158,6 @@ public class ActorsInitializationSteps {
     config.equipAsPatientForVsdm(theActor, insuranceType);
   }
 
-  @Angenommen("^die Apotheke (.+) verbindet sich mit seinem Apothekendienstleister$")
-  public void initConnectionToPharmacyServiceProvider(String pharmName) {
-    val thePharmacy = OnStage.theActorCalled(pharmName);
-    config.equipPharmacyWithPspClient(thePharmacy);
-  }
-
   @Wenn("^die Apotheke (.+) sich mit dem Subscription Service verbindet$")
   public void whenConnectedToSubscriptionService(String pharmName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);

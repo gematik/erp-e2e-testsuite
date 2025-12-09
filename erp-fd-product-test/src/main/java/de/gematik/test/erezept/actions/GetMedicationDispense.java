@@ -29,6 +29,7 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor
@@ -69,6 +70,7 @@ public class GetMedicationDispense extends ErpAction<ErxMedicationDispenseBundle
   }
 
   @Override
+  @Step("{0} ruft MedicationDispenses beim FD ab")
   public ErpInteraction<ErxMedicationDispenseBundle> answeredBy(Actor actor) {
     return performCommandAs(medicationDispenseGetCommand, actor);
   }

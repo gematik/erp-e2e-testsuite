@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.actions;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.client.usecases.ConsentDeleteCommand;
@@ -28,10 +29,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import net.serenitybdd.screenplay.Actor;
-import org.hl7.fhir.r4.model.Resource;
 
 @AllArgsConstructor
-public class RejectConsent extends ErpAction<Resource> {
+public class RejectConsent extends ErpAction<EmptyResource> {
 
   private final ConsentDeleteCommand consentDeleteCommand;
   private boolean ensureConsentIsPresent;
@@ -46,7 +46,7 @@ public class RejectConsent extends ErpAction<Resource> {
   }
 
   @Override
-  public ErpInteraction<Resource> answeredBy(Actor actor) {
+  public ErpInteraction<EmptyResource> answeredBy(Actor actor) {
     if (ensureConsentIsPresent) EnsureConsent.shouldBePresent().performAs(actor);
     return performCommandAs(consentDeleteCommand, actor);
   }

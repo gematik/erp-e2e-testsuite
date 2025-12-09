@@ -26,6 +26,7 @@ import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Extension;
@@ -42,9 +43,7 @@ public class ErxComInfoReqBuilder extends ErxComPrescriptionBuilder<ErxComInfoRe
   public ErxCommunication build() {
     checkRequired();
     val com =
-        buildCommon(
-            CommunicationType.INFO_REQ,
-            () -> ErpWorkflowStructDef.COM_INFO_REQ.asCanonicalType(erpWorkflowVersion));
+        buildCommon(() -> ErpWorkflowStructDef.COM_INFO_REQ.asCanonicalType(erpWorkflowVersion));
     val insuranceProvider = ErpWorkflowStructDef.INSURANCE_PROVIDER;
     val substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED;
     val prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12;
@@ -52,6 +51,15 @@ public class ErxComInfoReqBuilder extends ErxComPrescriptionBuilder<ErxComInfoRe
     // hacky but should work fow now!
     val flowTypeCoding =
         flowType.asCoding(true).setSystem(ErpWorkflowCodeSystem.FLOW_TYPE_12.getCanonicalUrl());
+
+    // set sender and receiver
+    com.addRecipient(
+        CommunicationType.INFO_REQ.getRecipientReference(this.receiver, this.erpWorkflowVersion));
+    Optional.ofNullable(this.sender)
+        .ifPresent(
+            s ->
+                com.setSender(
+                    CommunicationType.INFO_REQ.getSenderReference(s, this.erpWorkflowVersion)));
 
     com.addContained(medication);
     com.setAbout(List.of(new Reference(aboutReference)));
