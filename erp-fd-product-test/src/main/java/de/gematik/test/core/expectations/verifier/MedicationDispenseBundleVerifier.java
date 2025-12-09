@@ -30,6 +30,8 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.eu.EuMedicationDispense;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +136,78 @@ public class MedicationDispenseBundleVerifier {
                 .toList();
 
     return containsAllPZNs(expectedPzn, pznProvider);
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsEuPrescriptionAndDispensation(
+      PrescriptionId id, ErpAfos afo) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> !bundle.getEuDispensePairBy(id).isEmpty();
+    val description1 = "Given PrescriptionId matches MedicationDispense with  ";
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(afo, description1)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsEuPractitionerData(
+      PrescriptionId id) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> !bundle.getEuPractitionerBy(id).isEmpty();
+    val description1 = "Given EuMedDispBundle Contains given PractitionerData";
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            ErpAfos.A_19460, description1)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsEuPractitionerRoleRelateTo(
+      EuMedicationDispense medicationDispense) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> bundle.getEuPractitionerRoleTo(medicationDispense).isPresent();
+    val description1 = "Given EuMedDispBundle Contains given PractitionerRole";
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            ErpAfos.A_19460, description1)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsEuOrganisationDataRelatesTo(
+      EuMedicationDispense medicationDispense) {
+
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> {
+          val euPractitionerRole = bundle.getEuPractitionerRoleTo(medicationDispense);
+          if (euPractitionerRole.isEmpty()) return false;
+          return bundle.getEuOrganizations().stream()
+              .anyMatch(
+                  org ->
+                      org.getId()
+                          .contains(
+                              euPractitionerRole.stream()
+                                  .map(
+                                      prR ->
+                                          prR.getOrganization()
+                                              .getReference()
+                                              .replace("urn:uuid:", "")
+                                              .replace("PractitionerRole/", ""))
+                                  .findFirst()
+                                  .orElseThrow()));
+        };
+    val description1 = "Given EuMedDispBundle Contains given EuOrganisation";
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            ErpAfos.A_19460, description1)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle>
+      containsErxMedicationAndGemMedDispense(PrescriptionId id) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> !bundle.getDispensePairBy(id).isEmpty();
+    val description1 = "Given EuMedDispBundle Contains given german Medication";
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            ErpAfos.A_19460, description1)
+        .predicate(predicate)
+        .accept();
   }
 
   public static VerificationStep<ErxMedicationDispenseBundle> verifyWhenHandedOverIsBefore(

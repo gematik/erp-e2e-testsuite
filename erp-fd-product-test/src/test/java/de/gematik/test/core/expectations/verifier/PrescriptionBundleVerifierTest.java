@@ -21,6 +21,7 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,12 +32,14 @@ import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import lombok.val;
@@ -45,6 +48,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class PrescriptionBundleVerifierTest {
+
+  private ErxPrescriptionBundle bundleWithTask(boolean value) {
+    val task = new ErxTask();
+    task.addExtension(EXT_REDEEMABLE_BY_PROPERTIES.asBooleanExtension(value));
+    task.getMeta().addProfile(ErpWorkflowStructDef.TASK.getCanonicalUrl());
+    val bundle = new ErxPrescriptionBundle();
+    val entry = new Bundle.BundleEntryComponent();
+    entry.setResource(task);
+    bundle.addEntry(entry);
+
+    return bundle;
+  }
 
   @BeforeEach
   void setupReporter() {
@@ -165,7 +180,7 @@ class PrescriptionBundleVerifierTest {
     val teststring = "Bauschaum";
     val testText = teststring;
     val verifyText = teststring;
-    when(codeConc.getText()).thenReturn((testText));
+    when(codeConc.getText()).thenReturn(testText);
 
     val step = bundleContainsNameInMedicationCompound(verifyText, ErpAfos.A_24034);
     step.apply(prescriptionBundle);
@@ -256,6 +271,75 @@ class PrescriptionBundleVerifierTest {
     val testStatus = Task.TaskStatus.INPROGRESS;
 
     val step = prescriptionHasStatus(testStatus, ErpAfos.A_24034);
+    assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldVerifyRedeemableByPropertiesForBundle() {
+    val bundle = bundleWithTask(true);
+    val step = PrescriptionBundleVerifier.hasRedeemableByPropertiesForBundlePrescription(true);
+    assertTrue(step.getPredicate().test(bundle));
+  }
+
+  @Test
+  void shouldFailRedeemableByPropertiesForBundleWhenValueDifferent() {
+    val bundle = bundleWithTask(false);
+    val step = PrescriptionBundleVerifier.hasRedeemableByPropertiesForBundlePrescription(true);
+    assertFalse(step.getPredicate().test(bundle));
+  }
+
+  @Test
+  void shouldMatchTimestampCorrect() {
+    val timeStamp = Instant.now();
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    val mockTask = mock(ErxTask.class);
+
+    when(prescriptionBundle.getTask()).thenReturn(mockTask);
+    when(mockTask.getLastMedicationDispenseDate()).thenReturn(Optional.of(timeStamp));
+
+    val step = PrescriptionBundleVerifier.hasLastMedDspTimestampEq(timeStamp, ErpAfos.A_24034);
+    assertDoesNotThrow(() -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldFailWhileMatchingTimestamp() {
+    val timeStamp = Instant.now();
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    val mockTask = mock(ErxTask.class);
+
+    when(prescriptionBundle.getTask()).thenReturn(mockTask);
+    when(mockTask.getLastMedicationDispenseDate())
+        .thenReturn(Optional.of(timeStamp.plus(100, java.time.temporal.ChronoUnit.SECONDS)));
+
+    val step = PrescriptionBundleVerifier.hasLastMedDspTimestampEq(timeStamp, ErpAfos.A_24034);
+    assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldVerifyLastModifiedDateCorrectly() {
+    // Set previous last modified to 2 minutes ago to make it easier to debug: new Date() would also
+    // work
+    val previousLastModified = new Date(System.currentTimeMillis() - 2 * 60 * 1000);
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    val mockTask = mock(ErxTask.class);
+
+    when(prescriptionBundle.getTask()).thenReturn(mockTask);
+    when(mockTask.getLastModified()).thenReturn(new Date());
+
+    val step = PrescriptionBundleVerifier.lastModifiedIsAfter(previousLastModified);
+    assertDoesNotThrow(() -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldVerifyLastModifiedWasNotUpdated() {
+    val previousLastModified = new Date();
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    val mockTask = mock(ErxTask.class);
+
+    when(prescriptionBundle.getTask()).thenReturn(mockTask);
+    when(mockTask.getLastModified()).thenReturn(previousLastModified);
+
+    val step = PrescriptionBundleVerifier.lastModifiedIsAfter(previousLastModified);
     assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
   }
 }

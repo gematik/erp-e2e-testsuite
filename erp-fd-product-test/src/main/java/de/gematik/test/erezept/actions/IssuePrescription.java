@@ -23,18 +23,26 @@ package de.gematik.test.erezept.actions;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
-import static java.text.MessageFormat.format;
 
+import com.ibm.icu.impl.Pair;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.ByteArrayMutator;
@@ -43,9 +51,10 @@ import de.gematik.test.fuzzing.fhirfuzz.FhirResourceFuzz;
 import java.io.ByteArrayOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nullable;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.core.steps.Instrumented;
@@ -57,6 +66,7 @@ import org.hl7.fhir.r4.model.Extension;
 public class IssuePrescription extends ErpAction<ErxTask> {
 
   private final PatientActor patient;
+  private final Pair<KbvPatient, KbvCoverage> patientCoverage;
   @Nullable private final DoctorActor responsibleDoctor;
   private final PrescriptionAssignmentKind assignmentKind;
   private final KbvErpBundleBuilder bundleBuilder;
@@ -66,6 +76,7 @@ public class IssuePrescription extends ErpAction<ErxTask> {
   @Nullable private final FhirResourceFuzz<Bundle> smartFuzzer;
 
   @Nullable private ByteArrayOutputStream signatureObserver;
+  @Nullable private Function<String, byte[]> signingFunc;
 
   public static Builder forPatient(PatientActor patient) {
     return new Builder(patient);
@@ -73,6 +84,11 @@ public class IssuePrescription extends ErpAction<ErxTask> {
 
   public IssuePrescription setSignatureObserver(ByteArrayOutputStream signatureObserver) {
     this.signatureObserver = signatureObserver;
+    return this;
+  }
+
+  public IssuePrescription setCustomSigningFunction(Function<String, byte[]> signingFunc) {
+    this.signingFunc = signingFunc;
     return this;
   }
 
@@ -88,30 +104,21 @@ public class IssuePrescription extends ErpAction<ErxTask> {
             .isCorrect());
 
     val docBaseData = SafeAbility.getAbility(actor, ProvideDoctorBaseData.class);
+    val kbvPractitioner = docBaseData.getPractitioner();
     val draftTask = creation.getExpectedResponse();
     val prescriptionId = draftTask.getPrescriptionId();
 
     bundleBuilder
         .prescriptionId(prescriptionId)
-        .practitioner(docBaseData.getPractitioner())
+        .practitioner(kbvPractitioner)
         .medicalOrganization(docBaseData.getMedicalOrganization())
-        .patient(patient.getPatientData())
-        .insurance(patient.getInsuranceCoverage());
+        .patient(patientCoverage.first)
+        .insurance(patientCoverage.second);
 
     if (this.responsibleDoctor != null) {
       bundleBuilder.attester(responsibleDoctor.getPractitioner());
     }
     val kbvBundle = bundleBuilder.build();
-
-    // when built via withRandomKbvBundle, the practitioner reference does not match and needs to be
-    // fixed
-    kbvBundle
-        .getMedicationRequestOptional()
-        .ifPresent(
-            mr ->
-                mr.getRequester()
-                    .setReference(
-                        format("Practitioner/{0}", docBaseData.getPractitioner().getId())));
 
     if (smartFuzzer != null) {
       smartFuzzer.fuzzTilInvalid(
@@ -121,23 +128,44 @@ public class IssuePrescription extends ErpAction<ErxTask> {
     // now add optional extensions
     manipulator.forEach(extConsumer -> extConsumer.accept(kbvBundle));
 
-    return actor.asksFor(
-        ActivatePrescription.forGiven(draftTask)
-            .withStringMutator(stringMutators)
-            .withByteArrayMutator(signedBundleMutators)
-            .withKbvBundle(kbvBundle)
-            .setSignatureObserver(signatureObserver));
+    val activationResponse =
+        actor.asksFor(
+            ActivatePrescription.forGiven(draftTask)
+                .withStringMutator(stringMutators)
+                .withByteArrayMutator(signedBundleMutators)
+                .withKbvBundle(kbvBundle)
+                .setSignatureObserver(signatureObserver)
+                .setCustomSigningFunction(signingFunc));
+
+    // store prescription in patient ability for automatic teardown
+    Optional.ofNullable(patient.abilityTo(ManageDataMatrixCodes.class))
+        .ifPresent(
+            ability ->
+                activationResponse
+                    .getResponse()
+                    .getResourceOptional()
+                    .ifPresent(
+                        task ->
+                            ability.appendDmc(
+                                DmcPrescription.ownerDmc(task.getTaskId(), task.getAccessCode()))));
+
+    return activationResponse;
   }
 
-  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
     private final PatientActor patient;
+    private final Pair<KbvPatient, KbvCoverage> patientCoverage;
     private final List<Consumer<KbvErpBundle>> fhirActivateMutators = new LinkedList<>();
     private final List<StringMutator> stringMutators = new LinkedList<>();
     private final List<ByteArrayMutator> signedBundleMutators = new LinkedList<>();
     private PrescriptionAssignmentKind assignmentKind = PrescriptionAssignmentKind.PHARMACY_ONLY;
     @Nullable private FhirResourceFuzz<Bundle> smartFuzzer;
     private DoctorActor responsibleDoctor;
+
+    private Builder(PatientActor patient) {
+      this.patient = patient;
+      this.patientCoverage = this.patient.getPatientCoverage();
+    }
 
     public Builder ofAssignmentKind(PrescriptionAssignmentKind assignmentKind) {
       this.assignmentKind = assignmentKind;
@@ -196,12 +224,27 @@ public class IssuePrescription extends ErpAction<ErxTask> {
     }
 
     public IssuePrescription withRandomKbvBundle() {
+      val isUnfallKasse =
+          patient.getCoverageInsuranceType().equals(InsuranceTypeDe.BG)
+              || patient.getPayorType().equals(Optional.of(PayorType.UK));
+
+      if (isUnfallKasse) {
+        return withKbvBundleFrom(
+            KbvErpBundleFaker.builder()
+                .withKvnr(patient.getKvnr())
+                .withPractitioner(responsibleDoctor.getPractitioner())
+                .withMedication(KbvErpMedicationPZNFaker.builder().fake())
+                .withInsurance(patientCoverage.second, patientCoverage.first)
+                .withAccident(AccidentExtension.accidentAtWork().atWorkplace())
+                .toBuilder());
+      }
       return withKbvBundleFrom(KbvErpBundleFaker.builder().withKvnr(patient.getKvnr()).toBuilder());
     }
 
     public IssuePrescription withKbvBundleFrom(KbvErpBundleBuilder builder) {
       Object[] params = {
         patient,
+        patientCoverage,
         responsibleDoctor,
         assignmentKind,
         builder,

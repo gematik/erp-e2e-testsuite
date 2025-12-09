@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -64,7 +65,7 @@ class RejectConsentTest {
 
   @Test
   void shouldBuildConsentRejectCorrectWithEnsure() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 400);
+    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 400);
     val mockConsBundle = new ErxConsentBundle();
     mockConsBundle.addEntry().setResource(ErxConsentBuilder.forKvnr(KVNR.random()).build());
     val mockErxBundleResponse =
@@ -76,7 +77,7 @@ class RejectConsentTest {
 
   @Test
   void shouldBuildConsentRejectCorrectWithoutQueryParam() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 400);
+    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 400);
     val mockConsBundle = new ErxConsentBundle();
     mockConsBundle.addEntry().setResource(ErxConsentBuilder.forKvnr(KVNR.random()).build());
     val mockErxBundleResponse =
@@ -96,7 +97,7 @@ class RejectConsentTest {
 
   @Test
   void shouldBuildConsentRejectCorrectWith() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 400);
+    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 400);
     val mockConsBundle = new ErxConsentBundle();
     mockConsBundle.addEntry().setResource(ErxConsentBuilder.forKvnr(KVNR.random()).build());
     val mockErxBundleResponse =

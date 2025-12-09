@@ -51,11 +51,10 @@ public class OpenPharmacyViaSearchOnIos implements Task {
     val searchInput = format("{0}\n", pharmacyName);
     app.input(searchInput, PharmacySearch.SEARCH_FIELD);
 
-    // Note: Rendering the pharmacy list can take more time on simulators
-    app.pauseApp();
-
     // we will always open only the first element to avoid expensive search through the whole list!
-    app.tap(PharmacySearch.forPharmacyEntry(pharmacyName));
+    val pharmacyEntry = PharmacySearch.forPharmacyEntry(pharmacyName);
+    app.waitUntilElementIsVisible(pharmacyEntry);
+    app.tap(pharmacyEntry);
   }
 
   public static Builder named(Actor pharmacy) {

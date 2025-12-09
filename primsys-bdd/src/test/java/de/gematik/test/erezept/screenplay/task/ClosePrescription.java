@@ -83,6 +83,7 @@ public class ClosePrescription implements Task {
         ResponseOfClosePrescriptionOperation.fromStack(dequeStrategy));
   }
 
+  // TODO: static is a bad idea here - refactor
   private static boolean storeAcceptationInformation = false;
   private static Actor patient;
 
@@ -107,14 +108,14 @@ public class ClosePrescription implements Task {
       strategy
           .getPatient()
           .ifPresent(
-              patient -> {
+              p -> {
                 val prescriptionId = receipt.getPrescriptionId();
                 val dispensationDate = receipt.getTimestamp().toInstant();
                 log.info(
                     "Handout dispensed medication for prescription {} to {}",
                     prescriptionId,
-                    patient.getName());
-                val drugReceive = SafeAbility.getAbility(patient, ReceiveDispensedDrugs.class);
+                    p.getName());
+                val drugReceive = SafeAbility.getAbility(p, ReceiveDispensedDrugs.class);
                 drugReceive.append(prescriptionId, dispensationDate);
               });
 

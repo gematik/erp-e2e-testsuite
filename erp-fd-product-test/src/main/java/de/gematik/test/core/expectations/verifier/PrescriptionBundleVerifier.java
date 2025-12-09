@@ -20,6 +20,7 @@
 
 package de.gematik.test.core.expectations.verifier;
 
+import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
@@ -27,10 +28,15 @@ import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
+import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.function.Predicate;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
@@ -40,6 +46,9 @@ public class PrescriptionBundleVerifier {
   private PrescriptionBundleVerifier() {
     throw new AssertionError("do not instantiate!");
   }
+
+  private static final String EXTENSION_MESSAGE_PATTERN =
+      "Task.extension.{0} muss auf {1} gesetzt sein";
 
   public static VerificationStep<ErxPrescriptionBundle> bundleHasValidAccessCode() {
     Predicate<ErxPrescriptionBundle> predicate =
@@ -164,5 +173,59 @@ public class PrescriptionBundleVerifier {
             requirementsSet,
             format("Das E-Rezept muss im Status {0} sein", taskStatus.getDisplay()));
     return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxPrescriptionBundle>
+      hasRedeemableByPropertiesForBundlePrescription(boolean expected) {
+
+    Predicate<ErxPrescriptionBundle> predicate =
+        bundle -> ErxTask.fromTask(bundle.getTask()).isRedeemableByProperties(expected);
+
+    return new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
+            Requirement.custom("A_27063"),
+            format(EXTENSION_MESSAGE_PATTERN, EXT_REDEEMABLE_BY_PROPERTIES, expected))
+        .predicate(predicate)
+        .accept();
+  }
+
+  /** Prüft, ob der Consent einen gültigen UTC-Zeitstempel hat (±1 Minute Differenz) */
+  public static VerificationStep<ErxPrescriptionBundle> hasLastMedDspTimestampEq(
+      Instant closOpTimeStamp, ErpAfos afo) {
+    Predicate<ErxPrescriptionBundle> predicate =
+        erxPrescBundle ->
+            erxPrescBundle
+                .getTask()
+                .getLastMedicationDispenseDate()
+                .map(
+                    it -> {
+                      val diffMillis = Math.abs(Duration.between(it, closOpTimeStamp).toMillis());
+                      return diffMillis < Duration.ofMinutes(1).toMillis();
+                    })
+                .orElse(false);
+
+    return new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
+            afo.getRequirement(),
+            format(
+                "TimeStamp des $eu-close ''{0}'' entspricht dem Timestamp der"
+                    + " LastMedicationDispense (UTC)",
+                closOpTimeStamp))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxPrescriptionBundle> lastModifiedIsAfter(
+      Date previousLastModified) {
+    Predicate<ErxPrescriptionBundle> predicate =
+        prescription -> prescription.getTask().getLastModified().after(previousLastModified);
+
+    return new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
+            // TODO: there is no specific AFO for this, but App relies on A_24436-01 to update
+            // prescriptions
+            Requirement.custom("A_24436-01"),
+            format(
+                "Das aktuelle lastModified Datum muss nach dem Datum ''{0}'' liegen",
+                previousLastModified))
+        .predicate(predicate)
+        .accept();
   }
 }

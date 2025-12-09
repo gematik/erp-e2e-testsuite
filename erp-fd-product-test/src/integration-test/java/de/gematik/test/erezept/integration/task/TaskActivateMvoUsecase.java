@@ -96,10 +96,11 @@ class TaskActivateMvoUsecase extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withMvo(mvo.getParameter())
             .toBuilder();
@@ -138,10 +139,11 @@ class TaskActivateMvoUsecase extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withMvo(mvo.getParameter())
             .toBuilder();
@@ -175,10 +177,11 @@ class TaskActivateMvoUsecase extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
             .toBuilder();
@@ -216,11 +219,12 @@ class TaskActivateMvoUsecase extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
             .withStatusKennzeichen(statusKennzeichen, doctor.getPractitioner())
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withMvo(MultiplePrescriptionExtension.asMultiple(1, 4).validThrough(0, 365))
             .toBuilder();
@@ -254,10 +258,11 @@ class TaskActivateMvoUsecase extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withMvo(
                 MultiplePrescriptionExtension.asMultiple(1, 4)
@@ -300,10 +305,11 @@ class TaskActivateMvoUsecase extends ErpTest {
     val medication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
 
+    val patientCoverage = sina.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withMedication(medication)
-            .withInsurance(sina.getInsuranceCoverage(), sina.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withPractitioner(doctor.getPractitioner())
             .withMvo(mvo)
             .toBuilder();

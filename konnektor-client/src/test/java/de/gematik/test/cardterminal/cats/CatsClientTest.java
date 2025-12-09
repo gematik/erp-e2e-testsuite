@@ -25,54 +25,55 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.cardterminal.CardTerminalClientFactory;
 import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
-import kong.unirest.core.Config;
-import kong.unirest.core.HttpResponse;
-import kong.unirest.core.Unirest;
-import kong.unirest.core.UnirestInstance;
+import kong.unirest.core.*;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 class CatsClientTest {
 
   private SmartcardArchive smartcards;
-  private Egk hannaEgk;
   private MockedStatic<Unirest> unitRestMock;
 
   @BeforeEach
   void setUp() {
     smartcards = SmartcardArchive.fromResources();
     unitRestMock = mockStatic(Unirest.class, Answers.RETURNS_DEEP_STUBS);
-    when(Unirest.primaryInstance()).thenReturn(new UnirestInstance(new Config()));
+    when(Unirest.spawnInstance()).thenReturn(new UnirestInstance(new Config()));
   }
 
   @SneakyThrows
   @SuppressWarnings("unchecked")
   private void prepareMock(int statusCode, String body) {
-    val httpResponseMock = mock(HttpResponse.class);
-    when(Unirest.post(any())
-            .body(anyString())
-            .contentType(anyString())
-            .asString()
-            .ifFailure(any())
-            .ifSuccess(any()))
-        .thenReturn(httpResponseMock);
+    val httpResponseMock = mock(HttpResponse.class, Answers.RETURNS_DEEP_STUBS);
+    val uniRestClient = mock(UnirestInstance.class);
+    val request = mock(HttpRequestWithBody.class);
+    val requestBodyEntry = mock(RequestBodyEntity.class);
+    val config = mock(Config.class);
+    when(Unirest.spawnInstance()).thenReturn(uniRestClient);
+    when(uniRestClient.post(any())).thenReturn(request);
+    when(uniRestClient.put(any())).thenReturn(request);
+
+    when(uniRestClient.config()).thenReturn(config);
+    when(request.contentType(anyString())).thenReturn(request);
+    when(request.body(anyString())).thenReturn(requestBodyEntry);
+    when(requestBodyEntry.asString()).thenReturn(httpResponseMock);
 
     // mock response status code
-    when(httpResponseMock.getStatus()).thenReturn(statusCode);
+    when(httpResponseMock.ifFailure(any())).thenReturn(httpResponseMock);
+    when(httpResponseMock.ifSuccess(any())).thenReturn(httpResponseMock);
     when(httpResponseMock.getBody()).thenReturn(body);
+    when(httpResponseMock.getStatus()).thenReturn(statusCode);
   }
 
   @Test
@@ -80,6 +81,12 @@ class CatsClientTest {
     prepareMock(200, "");
     val client = CardTerminalClientFactory.createCatsClient("CT1", "http://localhost");
     client.insertCard(smartcards.getEgkByICCSN("80276883110000108142"), 1);
+    val urlCaptor = ArgumentCaptor.forClass(String.class);
+    verify(Unirest.spawnInstance()).put(urlCaptor.capture());
+    assertEquals("http://localhost/config/card/slot/1", urlCaptor.getValue());
+
+    verify(Unirest.spawnInstance()).post(urlCaptor.capture());
+    assertEquals("http://localhost/config/card/insert", urlCaptor.getValue());
   }
 
   @Test
@@ -89,8 +96,6 @@ class CatsClientTest {
     val client = CardTerminalClientFactory.createClient(ctConfig);
     val smartCard = smartcards.getEgkByICCSN("80276883110000108142");
     assertThrows(RuntimeException.class, () -> client.insertCard(smartCard, 1));
-    // Note: see CatsClient#request
-    //    assertThrows(CardTerminalClientException.class, () -> client.insertCard(smartCard, 1));
   }
 
   @Test

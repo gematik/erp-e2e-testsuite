@@ -28,14 +28,17 @@ import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.ListPageElement;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
-import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
-import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
+import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItvEvdgaStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvHealthAppRequest;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Optional;
@@ -52,6 +55,7 @@ import net.serenitybdd.screenplay.Question;
 public class MovingToPrescription implements Question<Optional<ErxPrescriptionBundle>> {
 
   private final TaskId taskId;
+  private boolean isEVDGA;
 
   @Override
   @Step("{0} navigiert zu dem E-Rezept #taskId")
@@ -60,6 +64,8 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     app.logEvent(format("Find the prescription {0}", taskId.getValue()));
+
+    isEVDGA = taskId.getFlowType().equals(PrescriptionFlowType.FLOW_TYPE_162);
 
     val fdPrescription = this.find(erpClient);
     fdPrescription.ifPresentOrElse(
@@ -95,22 +101,9 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
   private void proceedWithBackendPrescription(ErxPrescriptionBundle fdPrescription, UseIOSApp app) {
     log.info(
         "Prescription {} was found in backend: ensure its shown in the app", taskId.getValue());
-    val isMvo =
-        fdPrescription.getKbvBundle().map(x -> x.getMedicationRequest().isMultiple()).orElse(false);
-    log.info(
-        "Found {}Prescription {} in the backend",
-        isMvo ? "MVO-" : "",
-        fdPrescription.getKbvBundle().map(x -> x.getMedication().getMedicationName()));
 
-    val medication =
-        fdPrescription
-            .getKbvBundle()
-            .map(KbvErpBundle::getMedication)
-            .orElseThrow(
-                () ->
-                    new MissingFieldException(
-                        fdPrescription.getClass(), KbvItaErpStructDef.BUNDLE));
-    val prescriptionElement = PrescriptionsViewElement.named(medication.getMedicationName());
+    val prescriptionElement =
+        PrescriptionsViewElement.named(findNameOfPrescription(fdPrescription));
     val webElements = app.getWebElementListLen(prescriptionElement);
 
     var foundInApp = false;
@@ -130,17 +123,75 @@ public class MovingToPrescription implements Question<Optional<ErxPrescriptionBu
     }
   }
 
+  private String findNameOfPrescription(ErxPrescriptionBundle fdPrescription) {
+    // Since there are no PKV EVDGA, the only Code for them is currently 162
+    if (isEVDGA) {
+      return fdPrescription
+          .getEvdgaBundle()
+          .map(KbvEvdgaBundle::getHealthAppRequest)
+          .map(KbvHealthAppRequest::getName)
+          .orElseThrow(
+              () ->
+                  new MissingFieldException(
+                      fdPrescription.getClass(), KbvItvEvdgaStructDef.HEALTH_APP_REQUEST));
+
+    } else {
+      KbvErpMedication medication =
+          fdPrescription
+              .getKbvBundle()
+              .map(KbvErpBundle::getMedication)
+              .orElseThrow(
+                  () ->
+                      new MissingFieldException(
+                          fdPrescription.getClass(), KbvItaErpStructDef.BUNDLE));
+      return medication.getMedicationName();
+    }
+  }
+
   private boolean find(UseTheApp<?> app, ListPageElement listPageElement) {
     app.tap(listPageElement);
-    app.swipeIntoView(SwipeDirection.UP, PrescriptionDetails.TECHNICAL_INFORMATION);
-    app.tap(PrescriptionDetails.TECHNICAL_INFORMATION);
-    val currentTaskId = app.getText(PrescriptionTechnicalInformation.TASKID);
-    app.tap(PrescriptionTechnicalInformation.BACK);
+    if (isEVDGA) {
+      app.waitUntilElementIsVisible(EVDGADetails.DISMISS_FHIR_VZD_DIALOG, 5000);
+      if (app.isDisplayed(EVDGADetails.DISMISS_FHIR_VZD_DIALOG)) {
+        app.acceptAlert();
+      }
+    }
 
-    val found = currentTaskId.equals(taskId.getValue());
+    if (app.isDisplayed(EVDGADetails.DIGA_TITLE)) {
+      // DIGA-specific flow
+      app.tap(EVDGADetails.DIGA_EXTENDED_DETAILS);
+      app.swipeIntoView(SwipeDirection.UP, EVDGADetails.TECHNICAL_INFORMATION);
+      app.tap(EVDGADetails.TECHNICAL_INFORMATION);
 
-    if (!found) app.tap(PrescriptionDetails.LEAVE_DETAILS_BUTTON);
-    return found;
+      val currentTaskId = app.getText(EVDGATechnicalInformation.TASKID);
+      app.tap(EVDGATechnicalInformation.BACK);
+
+      app.waitUntilElementIsVisible(EVDGADetails.DISMISS_FHIR_VZD_DIALOG, 5000);
+      if (app.isDisplayed(EVDGADetails.DISMISS_FHIR_VZD_DIALOG)) {
+        app.acceptAlert();
+      }
+
+      val found = currentTaskId.equals(taskId.getValue());
+
+      if (!found) {
+        app.tap(EVDGADetails.LEAVE_DIGA_DETAILS);
+      } else {
+        app.swipeIntoView(SwipeDirection.DOWN, EVDGADetails.DIGA_OVERVIEW);
+        app.tap(EVDGADetails.DIGA_OVERVIEW);
+      }
+      return found;
+    } else {
+      // Regular Prescription flow
+      app.swipeIntoView(SwipeDirection.UP, PrescriptionDetails.TECHNICAL_INFORMATION);
+      app.tap(PrescriptionDetails.TECHNICAL_INFORMATION);
+      val currentTaskId = app.getText(PrescriptionTechnicalInformation.TASKID);
+      app.tap(PrescriptionTechnicalInformation.BACK);
+
+      val found = currentTaskId.equals(taskId.getValue());
+
+      if (!found) app.tap(PrescriptionDetails.LEAVE_DETAILS_BUTTON);
+      return found;
+    }
   }
 
   private Optional<ErxPrescriptionBundle> find(UseTheErpClient erpClient) {

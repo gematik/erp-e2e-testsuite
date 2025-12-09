@@ -23,8 +23,8 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerPrescriptionId;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerTelematikId;
 
+import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -36,8 +36,9 @@ import org.hl7.fhir.r4.model.MedicationDispense;
 
 public abstract class ErxMedicationDispenseBaseFaker<
     M extends ErxMedicationDispenseBase,
-    F extends ErxMedicationDispenseBaseFaker<M, F, B>,
-    B extends ErxMedicationDispenseBaseBuilder<M, B>> {
+    V extends ProfileVersion,
+    F extends ErxMedicationDispenseBaseFaker<M, V, F, B>,
+    B extends ErxMedicationDispenseBaseBuilder<M, V, B>> {
 
   protected KVNR kvnr = KVNR.random();
   protected final Map<String, Consumer<B>> builderConsumers = new HashMap<>();
@@ -56,7 +57,7 @@ public abstract class ErxMedicationDispenseBaseFaker<
     return self();
   }
 
-  public F withVersion(ErpWorkflowVersion version) {
+  public F withVersion(V version) {
     builderConsumers.put("version", b -> b.version(version));
     return self();
   }

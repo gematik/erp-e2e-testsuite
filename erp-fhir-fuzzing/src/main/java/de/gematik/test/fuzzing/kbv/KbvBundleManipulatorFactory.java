@@ -20,6 +20,9 @@
 
 package de.gematik.test.fuzzing.kbv;
 
+import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef.*;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.coding.WithSystem;
@@ -54,18 +57,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.val;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.CodeType;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.DomainResource;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.IntegerType;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.*;
 
 public class KbvBundleManipulatorFactory {
+
+  public static final String URN_UUID = "urn:uuid";
+  public static final String URN_OID = "urn:oid";
 
   private KbvBundleManipulatorFactory() {
     throw new AssertionError("Do not instantiate");
@@ -90,11 +87,197 @@ public class KbvBundleManipulatorFactory {
     manipulators.addAll(getPatientManipulators());
     manipulators.addAll(getPractitionerManipulators());
     manipulators.addAll(getCompositionManipulators());
+    manipulators.addAll(getSystemsManipulators());
+    manipulators.addAll(getReferenceToOidReferenceManipulators());
+    manipulators.addAll(getResourceIdReduceManipulators());
+    manipulators.addAll(getResourceIdAndFullUrlDiffManipulators());
+    manipulators.addAll(getCompositionReferencedManipulators());
 
     if (includeMvo) {
       manipulators.addAll(MvoExtensionManipulatorFactory.getMvoExtensionKennzeichenFalsifier());
     }
 
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getReferenceToOidReferenceManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.Medication.FullUrl eine OID",
+            b -> {
+              val oid = generateOID();
+              val entry =
+                  b.getEntry().stream().filter(MEDICATION_PZN::matches).findFirst().orElseThrow();
+              entry.setFullUrl(URN_OID + ":" + oid);
+              b.getMedication().setId(oid);
+              b.getMedicationRequest().getMedicationReference().setReference(URN_OID + ":" + oid);
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.Practitioner.FullUrl eine OID",
+            b -> {
+              val oid = URN_OID + ":" + generateOID();
+              b.getComposition().getAuthor().stream()
+                  .filter(a -> a.getType().matches("Practitioner"))
+                  .map(a -> a.setReference(oid))
+                  .findFirst()
+                  .orElseThrow();
+              val entry =
+                  b.getEntry().stream().filter(PRACTITIONER::matches).findFirst().orElseThrow();
+              entry.setFullUrl(oid);
+              b.getMedicationRequest().getRequester().setReference(oid);
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.organization.FullUrl eine OID",
+            b -> {
+              val oid = URN_OID + ":" + generateOID();
+              b.getComposition().getCustodian().setReference(oid);
+              val entry =
+                  b.getEntry().stream().filter(ORGANIZATION::matches).findFirst().orElseThrow();
+              entry.setFullUrl(oid);
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.Patient.FullUrl eine OID",
+            b -> {
+              val oid = URN_OID + ":" + generateOID();
+              b.getComposition().getSubject().setReference(oid);
+              b.getCoverage().getBeneficiary().setReference(oid);
+              val entry = b.getEntry().stream().filter(PATIENT::matches).findFirst().orElseThrow();
+              entry.setFullUrl(oid);
+            }));
+
+    return manipulators;
+  }
+
+  private static String generateOID() {
+    String prefix = "1.3.6.1.4.1";
+    String uniquePart = UUID.randomUUID().toString().replace("-", "");
+    int hash = uniquePart.hashCode();
+    long number = hash < 0 ? hash + (1L + Integer.MAX_VALUE) : hash;
+    return prefix + "." + number;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getCompositionReferencedManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.Component.Practitioner.FullUrl eine falsche ID",
+            b ->
+                b.getComposition().getAuthor().stream()
+                    .filter(a -> a.getType().matches("Practitioner"))
+                    .map(a -> a.setReference(URN_UUID + ":" + UUID.randomUUID()))
+                    .findFirst()
+                    .orElseThrow()));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.composition.custodian eine falsche ID",
+            b ->
+                b.getComposition()
+                    .getCustodian()
+                    .setReference(URN_UUID + ":" + UUID.randomUUID())));
+    manipulators.add(
+        NamedEnvelope.of(
+            "der Bundle.entry.Patient.FullUrl eine falsche ID",
+            b -> b.getComposition().getSubject().setReference(URN_UUID + ":" + UUID.randomUUID())));
+
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getResourceIdReduceManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "löscht in der Medication Ressource die ID",
+            b ->
+                b.getEntry().stream()
+                    .filter(MEDICATION_PZN::matches)
+                    .map(res -> res.getResource().setId(""))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "löscht in der MedicationRequest Ressource die ID",
+            b ->
+                b.getEntry().stream()
+                    .filter(PRESCRIPTION::matches)
+                    .map(res -> res.getResource().setId(""))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "löscht in der Practitioner Ressource die ID",
+            b ->
+                b.getEntry().stream()
+                    .filter(PRACTITIONER::matches)
+                    .map(res -> res.getResource().setId(""))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "löscht in der Organization Ressource die ID",
+            b ->
+                b.getEntry().stream()
+                    .filter(ORGANIZATION::matches)
+                    .map(res -> res.getResource().setId(""))
+                    .findFirst()
+                    .orElseThrow()));
+
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getResourceIdAndFullUrlDiffManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "in der Medication Ressource die ID und FullUrl unterschiedlich",
+            b ->
+                b.getEntry().stream()
+                    .filter(MEDICATION_PZN::matches)
+                    .map(res -> res.getResource().setId(UUID.randomUUID().toString()))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "in der Organization Ressource die ID und FullUrl unterschiedlich",
+            b ->
+                b.getEntry().stream()
+                    .filter(ORGANIZATION::matches)
+                    .map(res -> res.getResource().setId(UUID.randomUUID().toString()))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "in der Practitioner Ressource die ID und FullUrl unterschiedlich",
+            b ->
+                b.getEntry().stream()
+                    .filter(PRACTITIONER::matches)
+                    .map(res -> res.getResource().setId(UUID.randomUUID().toString()))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "in der Prescription Ressource die ID und FullUrl unterschiedlich",
+            b ->
+                b.getEntry().stream()
+                    .filter(PRESCRIPTION::matches)
+                    .map(res -> res.getResource().setId(UUID.randomUUID().toString()))
+                    .findFirst()
+                    .orElseThrow()));
     return manipulators;
   }
 
@@ -528,9 +711,10 @@ public class KbvBundleManipulatorFactory {
         NamedEnvelope.of(
             "MedicationRequest mit fehlender Ressource in der Requester-Referenz",
             b -> {
-              val originalRef =
-                  b.getMedicationRequest().getRequester().getReference().split("/")[1];
-              b.getMedicationRequest().getRequester().setReference(originalRef);
+              val originalRef = b.getMedicationRequest().getRequester().getReference();
+              val uuidRefTokens = originalRef.split("[/:]");
+              val uuidRef = uuidRefTokens[uuidRefTokens.length - 1];
+              b.getMedicationRequest().getRequester().setReference(uuidRef);
             }));
     manipulators.add(
         NamedEnvelope.of(
@@ -562,13 +746,13 @@ public class KbvBundleManipulatorFactory {
         NamedEnvelope.of(
             "BSNR Identifier vom Typ KZVA",
             b -> {
-              val iknrIdentifier =
+              val bsnrIdentifier =
                   b.getMedicalOrganization().getIdentifier().stream()
                       .filter(id -> id.getType().getCodingFirstRep().getCode().equals("BSNR"))
                       .findFirst()
                       .orElseThrow(
                           () -> new MissingFieldException(KbvMedicalOrganization.class, "BSNR"));
-              iknrIdentifier
+              bsnrIdentifier
                   .getType()
                   .getCodingFirstRep()
                   .setSystem(IdentifierTypeDe.CODE_SYSTEM.getCanonicalUrl())
@@ -634,6 +818,42 @@ public class KbvBundleManipulatorFactory {
         NamedEnvelope.of(
             "Organization mit fehlender ID", b -> b.getMedicalOrganization().setId((String) null)));
 
+    return manipulators;
+  }
+
+  /**
+   * These manipulators try to replicate the issue reported in ERPFIND-1068 However, from KBV_FOR
+   * 1.2.0 there is no formal restriction on spaces in the BSNR
+   *
+   * @see <a href="https://service.gematik.de/browse/ERPFIND-1068">ERPFIND-1068</a>
+   * @see <a
+   *     href="https://simplifier.net/packages/de.basisprofil.r4/1.5.2/files/2720742/~json">KBV_PR_FOR_Organization
+   *     1.2.0</a>
+   * @return a list of manipualators for the BSNR of the Organization
+   */
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getOrganizationBsnrManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+    for (var i = 0; i < 2; i++) {
+      // length of BSNR is 9, after manipulation it is expected to be 9 - i
+      val newLen = 9 - i;
+      int finalI = i;
+      manipulators.add(
+          NamedEnvelope.of(
+              format("BSNR enthält Leerzeichen ({0}-stellig)", newLen),
+              b -> {
+                val bsnrIdentifier =
+                    b.getMedicalOrganization().getIdentifier().stream()
+                        .filter(id -> id.getType().getCodingFirstRep().getCode().equals("BSNR"))
+                        .findFirst()
+                        .orElseThrow(
+                            () -> new MissingFieldException(KbvMedicalOrganization.class, "BSNR"));
+                val bsnr = bsnrIdentifier.getValue();
+                val idx = GemFaker.getFaker().random().nextInt(0, bsnr.length() - 1 - finalI);
+                val newBsnr = bsnr.substring(0, idx) + " " + bsnr.substring(idx + 1 + finalI);
+                bsnrIdentifier.setValue(newBsnr);
+              }));
+    }
     return manipulators;
   }
 
@@ -707,24 +927,6 @@ public class KbvBundleManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of("Patient mit fehlender ID", b -> b.getPatient().setId((String) null)));
-
-    /*
-    Note: die Prüfung wird so vom FD aktuell noch nicht gefordert
-    // see https://github.com/gematik/app-referencevalidator/issues/8
-    manipulators.add(
-        NamedEnvelope.of(
-            "Leerzeichen nach der Patient-Adresse",
-            b -> {
-              val addressLine = b.getPatient().getAddressFirstRep().getLine().get(0);
-              addressLine.setValue("Alexander-König-Str.  20");
-              addressLine
-                  .getExtensionByUrl(Hl7StructDef.STREET_NAME.getCanonicalUrl())
-                  .setValue(new StringType("Alexander-König-Str. "));
-              addressLine
-                  .getExtensionByUrl(Hl7StructDef.HOUSE_NUMBER.getCanonicalUrl())
-                  .setValue(new StringType("20"));
-            }));
-     */
 
     return manipulators;
   }
@@ -884,6 +1086,43 @@ public class KbvBundleManipulatorFactory {
     manipulators.add(
         NamedEnvelope.of(
             "Composition mit fehlender ID", b -> b.getComposition().setId((String) null)));
+
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getSystemsManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "snomed system as Identifier instead of PrescriptionId",
+            b -> b.getIdentifier().setSystem("http://some.invalid.system/url")));
+    manipulators.add(
+        NamedEnvelope.of(
+            "switch patients KVNR-System to IKNR_SID",
+            b ->
+                b.getPatient().getIdentifier().stream()
+                    .filter(KVID_GKV_SID::matches)
+                    .findFirst()
+                    .map(id -> id.setSystem(IKNR_SID.getCanonicalUrl()))
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "switch MedicationRequests Notdienstgebühr URL to DOSAGE_FLAG",
+            b ->
+                b.getMedicationRequest().getExtension().stream()
+                    .filter(EMERGENCY_SERVICES_FEE::matches)
+                    .map(ext -> ext.setUrl(DOSAGE_FLAG.getCanonicalUrl()))
+                    .findFirst()
+                    .orElseThrow()));
+    manipulators.add(
+        NamedEnvelope.of(
+            "coverage.Payors system to SER",
+            b ->
+                b.getCoverage()
+                    .getPayorFirstRep()
+                    .getIdentifier()
+                    .setSystem(SER.getCanonicalUrl())));
 
     return manipulators;
   }

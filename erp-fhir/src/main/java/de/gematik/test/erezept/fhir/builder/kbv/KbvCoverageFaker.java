@@ -24,6 +24,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder.insurance;
 
+import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
@@ -89,6 +90,11 @@ public class KbvCoverageFaker {
 
   public KbvCoverageFaker withInsuranceStatus(VersichertenStatus status) {
     builderConsumers.put("versichertenStatus", b -> b.versichertenStatus(status));
+    return this;
+  }
+
+  public KbvCoverageFaker withInsurance(IKNR iknr, String insuranceName) {
+    builderConsumers.put("versicherung", b -> b.insuranceData(iknr, insuranceName));
     return this;
   }
 

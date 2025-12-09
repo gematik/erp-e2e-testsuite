@@ -34,7 +34,9 @@ import picocli.CommandLine.Command;
       PrescriptionsManager.class,
       MedicationDispenseManager.class,
       CommunicationsManager.class,
-      ConsentManager.class,
+      PkvConsentManager.class,
+      EuConsentManager.class,
+      EuAccessManager.class,
       ChargeItemReader.class,
       ListPatients.class,
       ListEnvironments.class

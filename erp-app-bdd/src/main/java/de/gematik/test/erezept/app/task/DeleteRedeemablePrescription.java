@@ -23,6 +23,7 @@ package de.gematik.test.erezept.app.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
@@ -53,6 +54,7 @@ public class DeleteRedeemablePrescription implements Task {
     val dmc = deque.chooseFrom(dmcAbility.chooseStack(DMC_STACK));
 
     // first refresh the screen
+    app.swipeIntoView(SwipeDirection.DOWN, Mainscreen.REFRESH_BUTTON);
     app.tap(Mainscreen.REFRESH_BUTTON);
 
     // java:S2201: return value not required here, because we are expecting the prescription to

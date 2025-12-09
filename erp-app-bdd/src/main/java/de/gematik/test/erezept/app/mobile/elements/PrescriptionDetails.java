@@ -63,16 +63,19 @@ public enum PrescriptionDetails implements PageElement {
   DIRECT_ASSIGNMENT_BADGE(
       "Direct Assignment Badge",
       () -> AppiumBy.accessibilityId("prsc_dtl_btn_direct_assignment_info")),
-  PRESCRIPTION_VALIDITY_TEXT(
-      "Prescription Validity Text",
+  PRESCRIPTION_STATUS_TEXT(
+      "Prescription Status Text",
       () -> AppiumBy.accessibilityId("prsc_dtl_txt_prescription_validity")),
+  PRESCRIPTION_STATUS_INFO(
+      "Prescription Status Info",
+      () -> AppiumBy.accessibilityId("prsc_dtl_btn_prescription_validity_info")),
   PRESCRIPTION_ADDITIONAL_PAYMENT(
       "Additional Payment",
       () ->
           AppiumBy.xpath(
               "//XCUIElementTypeButton[@name='prsc_dtl_btn_scanned_prescription_info']/XCUIElementTypeStaticText[@name!='Zuzahlung']")),
   PRESCRIPTION_MEDICATION(
-      "Prescription Medication", () -> AppiumBy.iOSNsPredicateString("label == \"Medikament\"")),
+      "Prescription Medication", () -> AppiumBy.accessibilityId("prsc_dtl_btn_medication")),
   DELETE_BUTTON_TOOLBAR_ITEM(
       "Delete Prescription button",
       () -> AppiumBy.accessibilityId("prsc_dtl_toolbar_menu_btn_delete")),
@@ -82,7 +85,14 @@ public enum PrescriptionDetails implements PageElement {
       "Technische Informationen",
       () -> AppiumBy.accessibilityId("prsc_dtl_btn_technical_informations")),
   LEAVE_DETAILS_BUTTON("Leave Prescription Details", () -> AppiumBy.name("Rezepte")),
-  ;
+  BACK_BUTTON(
+      "Prescription Details Back Button",
+      () ->
+          AppiumBy.xpath(
+              "//XCUIElementTypeNavigationBar[@name=\"Rezeptdetails\"]/XCUIElementTypeButton[1]")),
+  SELECT_INSURANCE(
+      "Select insurance button",
+      () -> AppiumBy.accessibilityId("diga_dtl_btn_main_select_insurance"));
 
   private final String elementName;
   private final Supplier<By> iosLocator;

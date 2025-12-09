@@ -20,17 +20,23 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 
-import ca.uhn.fhir.validation.*;
-import de.gematik.test.erezept.client.exceptions.*;
+import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import java.time.Duration;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Function;
-import javax.annotation.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.hl7.fhir.r4.model.*;
+import javax.annotation.Nullable;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
@@ -132,7 +138,7 @@ public class ErpResponse<R extends Resource> {
 
   @Nullable
   public Class<? extends Resource> getResourceType() {
-    Class<? extends Resource> ret = null;
+    Class<? extends Resource> ret = EmptyResource.class;
     if (resource != null) {
       ret = resource.getClass();
     }
@@ -170,7 +176,7 @@ public class ErpResponse<R extends Resource> {
   public long getContentLength() {
     val contentLengthHeader = this.headers.get("content-length");
     long contentLength = 0;
-    if (contentLengthHeader != null && !contentLengthHeader.equals("")) {
+    if (contentLengthHeader != null && !contentLengthHeader.isEmpty()) {
       contentLength = Long.parseLong(contentLengthHeader);
     }
 

@@ -63,7 +63,7 @@ class PostChargeItemTest extends ErpFhirParsingTest {
 
     val actorStage = mockUtil.actorStage;
     this.erpClientMock = mockUtil.erpClientMock;
-    pharmacyActor = actorStage.getPharmacyNamed("Stadtapotheke");
+    pharmacyActor = actorStage.getPharmacyNamed("Am Flughafen");
     patientActor = actorStage.getPatientNamed("Leonie Hütter");
 
     acceptBundle = getDecodedAcceptBundle();

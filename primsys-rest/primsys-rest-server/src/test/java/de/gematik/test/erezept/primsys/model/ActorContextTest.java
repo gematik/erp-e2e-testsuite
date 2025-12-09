@@ -185,9 +185,9 @@ class ActorContextTest extends TestWithActorContext {
     val pharmacies = ctx.getActorsSummary(ActorType.PHARMACY);
     val ktrs = ctx.getActorsSummary(ActorType.HEALTH_INSURANCE);
 
-    assertEquals(10, summaries.size());
+    assertEquals(11, summaries.size());
     assertEquals(3, doctors.size());
-    assertEquals(6, pharmacies.size());
+    assertEquals(7, pharmacies.size());
     assertEquals(1, ktrs.size());
   }
 

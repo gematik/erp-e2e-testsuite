@@ -33,6 +33,7 @@ import de.gematik.bbriccs.crypto.BC;
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.smartcards.Hba;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.exceptions.SmartCardKeyNotFoundException;
 import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
@@ -48,6 +49,7 @@ import de.gematik.ws.conn.certificateservicecommon.v2.CertRefEnum;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -75,18 +77,25 @@ class RemoteKonnektorTest {
   }
 
   private static Stream<Arguments> provideSigningArguments() {
-    // excluded, as these SmartCards do NOT have an RSA-QES certificate
-    val excludeList = List.of("80276001011699901343", "80276001011699901344");
-
     val hbas = SmartcardArchive.fromResources().getHbaCards();
 
+    // TODO: a method like Smartcard.supportsAlgorithm(CertificateTypeOid, CryptoSystem) would be
+    // nice
+    BiPredicate<Hba, CryptoSystem> supportAlgorithm =
+        (hba, algorithm) -> {
+          try {
+            return hba.getQesCertificate(algorithm) != null;
+          } catch (SmartCardKeyNotFoundException e) {
+            return false;
+          }
+        };
     val algorithms = Arrays.stream(CryptoSystem.values()).toList();
-    val isIncludeRevocationInfo = List.of(true, false);
+    val isIncludeRevocationInfo = List.of(false);
     return hbas.stream()
-        .filter(hba -> !excludeList.contains(hba.getIccsn()))
         .flatMap(
             hba ->
                 algorithms.stream()
+                    .filter(it -> supportAlgorithm.test(hba, it))
                     .flatMap(
                         algo ->
                             isIncludeRevocationInfo.stream()

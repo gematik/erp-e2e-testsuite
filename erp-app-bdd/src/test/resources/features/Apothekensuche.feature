@@ -25,33 +25,8 @@ Funktionalität: Apothekensuche
 
   @TCID:ERP_FDV_APOTHEKENSUCHE_01
   @Funktionalität:Apothekensuche
-  Szenario: Apothekensuche ohne vorherige Anmeldung mittels eGK in der TI
-    Wenn die Versicherte Alice ihr Smartphone für die Nutzung ohne TI eingerichtet hat
+  Szenario: Apothekensuche
+    Wenn die GKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
     Dann kann die Versicherte Alice die folgenden Apotheken mit den Belieferungsoptionen in der Apothekensuche finden:
-      | Name              | Versand | Botendienst | Abholung |
-      | ZoTI_01_TEST-ONLY | false   | false       | false    |
-      | ZoTI_02_TEST-ONLY | false   | false       | true     |
-      | ZoTI_03_TEST-ONLY | false   | true        | false    |
-      | ZoTI_04_TEST-ONLY | true    | false       | false    |
-      | ZoTI_05_TEST-ONLY | false   | false       | false    |
-      | ZoTI_06_TEST-ONLY | false   | false       | false    |
-      | ZoTI_07_TEST-ONLY | false   | false       | false    |
-      | ZoTI_08_TEST-ONLY | true    | true        | true     |
-      | ZoTI_10_TEST-ONLY | true    | true        | true     |
-
-  @TCID:ERP_FDV_APOTHEKENSUCHE_02
-  @Funktionalität:Apothekensuche
-  Szenario: Apothekensuche mit vorherige Anmeldung mittels eGK in der TI
-    Wenn die GKV Versicherte Alice die E-Rezept App auf ihrem Smartphone eingerichtet hat
-    Dann kann die Versicherte Alice die folgenden Apotheken mit den Belieferungsoptionen in der Apothekensuche finden:
-      | Name              | Versand | Botendienst | Abholung |
-      | ZoTI_01_TEST-ONLY | false   | false       | false    |
-      | ZoTI_02_TEST-ONLY | false   | false       | true     |
-      | ZoTI_03_TEST-ONLY | false   | true        | false    |
-      | ZoTI_04_TEST-ONLY | true    | false       | false    |
-      | ZoTI_05_TEST-ONLY | false   | false       | true     |
-      | ZoTI_06_TEST-ONLY | false   | true        | false    |
-      | ZoTI_07_TEST-ONLY | true    | false       | false    |
-      | ZoTI_08_TEST-ONLY | true    | true        | true     |
-      | ZoTI_10_TEST-ONLY | true    | true        | true     |
-      | ZoTI_12_TEST-ONLY | true    | true        | true     |
+      | Name                 | Versand | Botendienst | Abholung |
+      | Adelheid Ulmendorfer | true    | true        | true     |

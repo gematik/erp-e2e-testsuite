@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
+import de.gematik.test.erezept.fhir.valuesets.eu.EuConsentType;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

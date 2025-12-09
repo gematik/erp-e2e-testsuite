@@ -32,7 +32,7 @@ import net.serenitybdd.screenplay.ensure.Ensure;
 public class PatientMedicationDispenseSteps {
 
   @Und(
-      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVGDA den Freischaltcode"
+      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVDGA den Freischaltcode"
           + " abrufen$")
   public void callEvdgaUnlockCode(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -46,7 +46,7 @@ public class PatientMedicationDispenseSteps {
   }
 
   @Und(
-      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVGDA keinen Freischaltcode"
+      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVDGA keinen Freischaltcode"
           + " abrufen$")
   public void couldNotCallEvdgaUnlockCode(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);

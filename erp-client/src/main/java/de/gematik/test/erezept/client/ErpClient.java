@@ -135,7 +135,7 @@ public class ErpClient {
         idpTokenValidUntil =
             Instant.now()
                 .plus(idpToken.getExpiresIn(), ChronoUnit.SECONDS)
-                .minus(30, ChronoUnit.SECONDS);
+                .minus(120, ChronoUnit.SECONDS);
       } catch (NullPointerException npe) {
         // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
         // broken!
@@ -169,7 +169,7 @@ public class ErpClient {
         .ifPresent(b -> bodyBuilder.append(fhir.encode(b, sendMime.toFhirEncoding())));
 
     val reqBody = bodyBuilder.toString();
-    this.validateRequestFhirContent(reqBody, validateRequest);
+    this.validateRequestFhirContent(reqBody);
 
     val accessToken = idpToken.getAccessToken().getRawString();
 
@@ -191,8 +191,8 @@ public class ErpClient {
         command.expectedResponseBody());
   }
 
-  private void validateRequestFhirContent(String content, boolean shouldValidate) {
-    if (shouldValidate && content != null && !content.isEmpty()) {
+  private void validateRequestFhirContent(String content) {
+    if (this.validateRequest) {
       val vr = fhir.validate(content);
       ValidationResultHelper.throwOnInvalidValidationResult(vr);
     }

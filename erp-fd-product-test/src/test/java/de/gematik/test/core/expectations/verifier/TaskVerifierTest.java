@@ -21,6 +21,7 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
@@ -28,13 +29,16 @@ import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.DateType;
-import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +49,26 @@ class TaskVerifierTest {
   void setupReporter() {
     // need to start a testcase manually as we are not using the ErpTestExtension here
     CoverageReporter.getInstance().startTestcase("not needed");
+  }
+
+  private ErxTask newTask() {
+    return new ErxTask();
+  }
+
+  private ErxTask withRedeemableByProperties(boolean value) {
+    val task = newTask();
+    task.addExtension(
+        new Extension(EXT_REDEEMABLE_BY_PROPERTIES.getCanonicalUrl(), new BooleanType(value)));
+    return task;
+  }
+
+  private ErxTask withRedeemableByPatientAuthorization(boolean value) {
+    val task = newTask();
+    task.addExtension(
+        new Extension(
+            GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION.getCanonicalUrl(),
+            new BooleanType(value)));
+    return task;
   }
 
   @Test
@@ -297,5 +321,64 @@ class TaskVerifierTest {
 
     val step = taskIsInStatus(testStatus, ErpAfos.A_24034);
     assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldVerifyRedeemableByProperties() {
+    val step = TaskVerifier.hasRedeemableByProperties(true);
+    assertTrue(step.getPredicate().test(withRedeemableByProperties(true)));
+  }
+
+  @Test
+  void shouldFailRedeemableByPropertiesWhenExtensionMissing() {
+    val step = TaskVerifier.hasRedeemableByProperties(true);
+    assertFalse(step.getPredicate().test(newTask()));
+  }
+
+  @Test
+  void shouldVerifyRedeemableByPatientAuthorization() {
+    val step = TaskVerifier.hasRedeemableByPatientAuthorization(false);
+    assertTrue(step.getPredicate().test(withRedeemableByPatientAuthorization(false)));
+  }
+
+  @Test
+  void shouldFailRedeemableByPatientAuthorizationWhenValueDifferent() {
+    val step = TaskVerifier.hasRedeemableByPatientAuthorization(true);
+
+    assertFalse(step.getPredicate().test(withRedeemableByPatientAuthorization(false)));
+  }
+
+  @Test
+  void shouldFailRedeemableByPatientAuthorizationWhenExtensionMissing() {
+    val step = TaskVerifier.hasRedeemableByPatientAuthorization(true);
+
+    assertFalse(step.getPredicate().test(newTask()));
+  }
+
+  @Test
+  void shouldVerifySecretPresent() {
+    val task = new ErxTask();
+    task.getMeta().setProfile(List.of(ErpWorkflowStructDef.TASK.asCanonicalType()));
+    task.addIdentifier(ErpWorkflowNamingSystem.SECRET.asIdentifier("0123456789"));
+
+    val bundle = new ErxAcceptBundle();
+    bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+
+    val step = TaskVerifier.hasSecret();
+
+    assertTrue(step.getPredicate().test(bundle));
+  }
+
+  @Test
+  void shouldFailWhenSecretMissing() {
+    val task = new ErxTask();
+    task.getMeta().setProfile(List.of(ErpWorkflowStructDef.TASK.asCanonicalType()));
+
+    val bundle = new ErxAcceptBundle();
+    bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(task)));
+
+    val step = TaskVerifier.hasSecret();
+
+    assertFalse(step.getPredicate().test(bundle));
   }
 }

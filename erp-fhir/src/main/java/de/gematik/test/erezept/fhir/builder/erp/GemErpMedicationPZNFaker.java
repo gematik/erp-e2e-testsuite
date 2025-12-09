@@ -37,11 +37,11 @@ import lombok.val;
 
 public class GemErpMedicationPZNFaker {
 
-  private final Map<String, Consumer<GemErpMedicationPZNBuilderORIGINAL_BUILDER>> builderConsumers =
+  private final Map<String, Consumer<GemErpMedicationPZNBuilder>> builderConsumers =
       new HashMap<>();
 
   GemErpMedicationPZNFaker() {
-    withVersion(ErpWorkflowVersion.V1_4);
+    withVersion(ErpWorkflowVersion.getDefaultVersion());
 
     withPzn(PZN.random(), fakerDrugName());
 
@@ -118,8 +118,9 @@ public class GemErpMedicationPZNFaker {
     return this.toBuilder().build();
   }
 
-  public GemErpMedicationPZNBuilderORIGINAL_BUILDER toBuilder() {
-    val builder = GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder();
+  public GemErpMedicationPZNBuilder toBuilder() {
+    val builder = /*GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()*/
+        GemErpMedicationBuilder.forPZN();
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

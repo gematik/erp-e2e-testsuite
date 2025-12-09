@@ -95,8 +95,8 @@ class ErxMedicationDispenseDiGABuilderTest extends ErpFhirParsingTest {
             .redeemCode("REDEEMCODE")
             .prescriptionId(PrescriptionId.random())
             .build();
-    val result = parser.isValid(md);
-    assertTrue(result);
+    val result = ValidatorUtil.encodeAndValidate(parser, md);
+    assertTrue(result.isSuccessful());
   }
 
   @Test

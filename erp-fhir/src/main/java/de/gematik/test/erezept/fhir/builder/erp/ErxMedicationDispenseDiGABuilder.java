@@ -20,11 +20,13 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.extensions.erp.DeepLink;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +36,7 @@ import org.hl7.fhir.r4.model.Reference;
 @Slf4j
 public class ErxMedicationDispenseDiGABuilder
     extends ErxMedicationDispenseBaseBuilder<
-        ErxMedicationDispenseDiGA, ErxMedicationDispenseDiGABuilder> {
+        ErxMedicationDispenseDiGA, ErpWorkflowVersion, ErxMedicationDispenseDiGABuilder> {
 
   private RedeemCode redeemCode;
   private DeepLink deepLink;
@@ -42,6 +44,7 @@ public class ErxMedicationDispenseDiGABuilder
 
   protected ErxMedicationDispenseDiGABuilder(KVNR kvnr) {
     super(kvnr);
+    this.version(ErpWorkflowVersion.getDefaultVersion());
   }
 
   public static ErxMedicationDispenseDiGABuilder forKvnr(KVNR kvnr) {
@@ -94,7 +97,9 @@ public class ErxMedicationDispenseDiGABuilder
           .getPzn()
           .ifPresent(pzn -> medicationReference.setIdentifier(pzn.asIdentifier()));
       medicationReference.setDisplay(
-          this.medication.getNameFromCodeOreContainedRessource().orElse(null));
+          this.medication
+              .getNameFromCodeOreContainedRessource()
+              .orElseThrow(() -> new BuilderException("no fitting medicine name found")));
     }
     Optional.ofNullable(note).ifPresent(n -> medDisp.addNote().setText(n));
 

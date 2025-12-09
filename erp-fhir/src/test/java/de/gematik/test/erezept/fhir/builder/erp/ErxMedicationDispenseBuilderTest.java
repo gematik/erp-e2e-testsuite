@@ -22,10 +22,7 @@ package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
 import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.coding.WithSystem;
@@ -34,6 +31,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Date;
 import lombok.val;
@@ -88,10 +86,7 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   void buildMedicationDispenseWithMultipleDosageInstructions(ErpWorkflowVersion version) {
     val pzn = "06313728";
     val medication =
-        GemErpMedicationFaker.forPznMedication()
-            .withPzn(PZN.from(pzn), fakerDrugName())
-            //            .withVersion(kbvItaVersion)
-            .fake();
+        GemErpMedicationFaker.forPznMedication().withPzn(PZN.from(pzn), fakerDrugName()).fake();
 
     val kvnr = KVNR.from("X234567890");
     val telematikId = "606358757";
@@ -154,7 +149,7 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
       name = "[{index}] -> Build MedicationDispense with faker and E-Rezept FHIR Profiles {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
   void buildMedicationDispenseWithFaker02(ErpWorkflowVersion erpWorkflowVersion) {
-    val kvnr = KVNR.from("X234567890");
+    val kvnr = KVNR.asGkv("X234567890");
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.from("200.100.000.000.011.09");
     val medicationDispense =
@@ -165,7 +160,7 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
             .withPrescriptionId(prescriptionId)
             .fake();
 
-    assertTrue(parser.isValid(medicationDispense));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
 
     assertNotNull(medicationDispense.getId());
     assertEquals(kvnr.getValue(), medicationDispense.getSubjectId().getValue());

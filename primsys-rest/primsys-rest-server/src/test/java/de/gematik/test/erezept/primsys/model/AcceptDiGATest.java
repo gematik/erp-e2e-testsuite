@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
@@ -89,7 +89,7 @@ class AcceptDiGATest extends TestWithActorContext {
         ErpResponse.forPayload(acceptBundle, ErxAcceptBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskAcceptCommand.class))).thenReturn(acceptResponse);
 
     val useCase = new AcceptDiGA(ktr);

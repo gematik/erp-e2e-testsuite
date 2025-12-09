@@ -133,11 +133,11 @@ public class ProvidePatientBaseData implements Ability {
         .build();
   }
 
-  public KbvCoverage getInsuranceCoverage() {
+  public KbvCoverage getInsuranceCoverage(KbvPatient patient) {
     val coverageType = this.getCoverageInsuranceType();
     val builder =
         KbvCoverageBuilder.insurance(iknr, insuranceName)
-            .beneficiary(this.getPatient())
+            .beneficiary(patient)
             .wop(wop)
             .dmpKennzeichen(dmpKennzeichen)
             .versichertenStatus(VersichertenStatus.MEMBERS);

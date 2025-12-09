@@ -20,11 +20,11 @@
 
 package de.gematik.test.erezept.primsys.rest.response;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
@@ -80,10 +80,10 @@ class ErrorResponseBuilderTest extends ErpFhirBuildingTest {
   @Test
   void shouldEncodeFachdienstErrorResponse() throws JsonProcessingException {
     val erpResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
             .withStatusCode(500)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     val response = ErrorResponseBuilder.createFachdienstError(erpResponse);
     val entity = response.getEntity();
 
@@ -96,10 +96,10 @@ class ErrorResponseBuilderTest extends ErpFhirBuildingTest {
   @Test
   void shouldThrowFachdienstErrorResponse() {
     val erpResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), Resource.class)
+        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
             .withStatusCode(500)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     assertThrows(
         WebApplicationException.class,
         () -> ErrorResponseBuilder.throwFachdienstError(erpResponse));
@@ -111,7 +111,7 @@ class ErrorResponseBuilderTest extends ErpFhirBuildingTest {
         ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of("content-length", "10"))
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     try {
       val response = ErrorResponseBuilder.createFachdienstError(erpResponse);
     } catch (WebApplicationException wae) {
@@ -126,7 +126,7 @@ class ErrorResponseBuilderTest extends ErpFhirBuildingTest {
         ErpResponse.forPayload(null, Resource.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
     try {
       val response = ErrorResponseBuilder.createFachdienstError(erpResponse);
     } catch (WebApplicationException wae) {

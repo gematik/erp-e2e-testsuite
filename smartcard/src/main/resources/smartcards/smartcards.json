@@ -536,7 +536,16 @@
     "stores": [
       "smcb/80276883110000092475/80276883110000092475_C.HCI.ENC.R2048/80276883110000092475_C.HCI.ENC.R2048.p12",
       "smcb/80276883110000092475/80276883110000092475_C.HCI.OSIG.R2048/80276883110000092475_C.HCI.OSIG.R2048.p12",
-      "smcb/80276883110000092475/80276883110000092475_C.HCI.AUT.R2048/80276883110000092475_C.HCI.AUT.R2048.p12"
+      "smcb/80276883110000092475/80276883110000092475_C.HCI.AUT.R2048/80276883110000092475_C.HCI.AUT.R2048.p12",
+      "smcb/80276883110000092475/80276883110000092475_C.HCI.AUT.SMCB57_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000147759",
+    "type": "SMC_B",
+    "ownerName": "Apotheke an der SchuleTEST-ONLY",
+    "stores": [
+      "smcb/80276883110000147759/80276883110000147759-C_SMCB_HCI_AUT_E256.p12"
     ]
   },
   {
@@ -645,25 +654,26 @@
     ]
   },
   {
-    "iccsn": "ncpeh-smb-denmark",
+    "iccsn": "ncpeh-smb",
     "note": "Oid: 1.2.276.0.76.4.292, valid until 31.03.2030",
     "type": "SMC_B",
-    "ownerName": "Dänemark (MT)",
+    "ownerName": "NCPeH Fachdienst Land A",
     "stores": [
-      "smb/ncpeh-denmark/NCPeH-C_SM-B_HCI_AUT_DK_E256.p12"
+      "smb/ncpeh/NCPeH-C_SMCB_HCI_AUT_E256.p12",
+      "smb/ncpeh/NCPeH-C_SMCB_HCI_ENC_E256.p12"
     ]
   },
   {
-    "iccsn": "ncpeh-smb-malta",
-    "note": "Oid: 1.2.276.0.76.4.292, valid until 31.03.2030",
+    "iccsn": "80276883110000159320",
+    "note": "Betriebsstätte Vorsorge- und Rehabilitation Oid: oid_institution-vorsorge-reha, valid until Sun Oct 13 21:59:59 UTC 2030",
     "type": "SMC_B",
-    "ownerName": "Malta (MT)",
+    "ownerName": "Reha-Klinik Morgenrot",
     "stores": [
-      "smb/ncpeh-malta/NCPeH-C_SM-B_HCI_AUT_MT_E256.p12"
+      "smcb/80276883110000159320/80276883110000159320-C_HCI_AUT_SMCB57_E256.p12",
+      "smcb/80276883110000159320/80276883110000159320-C_HCI_ENC_SMCB57_E256.p12",
+      "smcb/80276883110000159320/80276883110000159320-C_HCI_OSIG_SMCB57_E256.p12"
     ]
   },
-
-
   {
     "iccsn": "80276883110000161759",
     "type": "HBA",
@@ -689,6 +699,18 @@
       "hba/80276883110000095767/80276883110000095767-C_HP_ENC_E256.p12",
       "hba/80276883110000095767/80276883110000095767-C_HP_QES_R2048.p12",
       "hba/80276883110000095767/80276883110000095767-C_HP_QES_PSS_R2048.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000170943",
+    "type": "HBA",
+    "ownerName": "Max Tangerðal",
+    "note": "valid Until: Sun Sep 22 23:59:59 UTC 2030, CA: GEM.HBA-CA57",
+    "stores": [
+      "hba/80276883110000170943/80276883110000170943-C_HP_QES_E256.p12",
+      "hba/80276883110000170943/80276883110000170943-C_HP_AUT_E256.p12",
+      "hba/80276883110000170943/80276883110000170943-C_HP_AUT_R2048.p12",
+      "hba/80276883110000170943/80276883110000170943-C_HP_ENC_E256.p12"
     ]
   },
   {

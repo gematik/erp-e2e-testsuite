@@ -26,12 +26,10 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
-import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -97,61 +95,6 @@ public class KbvErpBundle extends KbvBaseBundle {
       ret = Optional.empty();
     }
     return ret;
-  }
-
-  /**
-   * In some rare cases it might be required to change the coverage. However, within the KBV Bundle
-   * the coverage is linked by other entries like Composition or MedicationRequest. This method will
-   * remove the old coverage (if one exists), replace with the given one and adapt the linked
-   * references
-   *
-   * @param coverage which shall be set
-   */
-  public void changeCoverage(KbvCoverage coverage) {
-    /* find the index of the coverage */
-    val covIdx =
-        IntStream.range(0, this.entry.size())
-            .filter(
-                idx ->
-                    this.getEntry()
-                        .get(idx)
-                        .getResource()
-                        .getResourceType()
-                        .equals(ResourceType.Coverage))
-            .findFirst()
-            .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Coverage));
-    val oldEntry = this.getEntry().get(covIdx);
-    val oldCoverage = this.getCoverage();
-    val oldId = IdentifierUtil.getUnqualifiedId(oldCoverage.getId());
-    val newId = IdentifierUtil.getUnqualifiedId(coverage.getId());
-    val fullUrl = oldEntry.getFullUrl().replace(oldId, newId);
-
-    /* get the beneficiary from old to new one */
-    coverage.getBeneficiary().setReference(oldCoverage.getBeneficiary().getReference());
-
-    /* remove the coverage with the identified index */
-    this.entry.remove(covIdx);
-
-    /* replace the coverage with the new one */
-    val covEntry = new BundleEntryComponent().setResource(coverage);
-    covEntry.setFullUrl(fullUrl);
-    this.addEntry(covEntry);
-
-    /* change the reference within the composition */
-    val covSection =
-        this.getComposition().getSection().stream()
-            .filter(section -> section.getCode().getCodingFirstRep().getCode().equals("Coverage"))
-            .findFirst()
-            .orElseThrow(
-                () -> new MissingFieldException(this.getClass(), "Coverage in Composition"));
-    // replace the entry reference with the new one
-    val newCoverageReference = coverage.asReferenceWithDisplay();
-    covSection.getEntryFirstRep().setReference(newCoverageReference.getReference());
-
-    /* change insurance in medication request */
-    this.getMedicationRequest()
-        .getInsuranceFirstRep()
-        .setReference(newCoverageReference.getReference());
   }
 
   public KbvErpMedication getMedication() {

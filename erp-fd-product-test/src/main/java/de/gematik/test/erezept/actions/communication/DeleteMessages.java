@@ -20,15 +20,15 @@
 
 package de.gematik.test.erezept.actions.communication;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import lombok.RequiredArgsConstructor;
 import net.serenitybdd.screenplay.Actor;
-import org.hl7.fhir.r4.model.Resource;
 
 @RequiredArgsConstructor
-public class DeleteMessages extends ErpAction<Resource> {
+public class DeleteMessages extends ErpAction<EmptyResource> {
 
   private final CommunicationDeleteCommand communicationDeleteCommand;
 
@@ -38,7 +38,7 @@ public class DeleteMessages extends ErpAction<Resource> {
   }
 
   @Override
-  public ErpInteraction<Resource> answeredBy(Actor actor) {
+  public ErpInteraction<EmptyResource> answeredBy(Actor actor) {
     return performCommandAs(communicationDeleteCommand, actor);
   }
 }

@@ -78,9 +78,10 @@ public class IssueDiGAPrescription implements Task {
     // Practitioner base data (Stammdaten)
     val kbvPractitioner = baseDataAbility.getPractitioner();
     val kbvOrganization = baseDataAbility.getMedicalOrganization();
-    val insurance =
-        SafeAbility.getAbility(patient, ProvidePatientBaseData.class).getInsuranceCoverage();
     val kbvPatient = getPatientBaseData();
+    val insurance =
+        SafeAbility.getAbility(patient, ProvidePatientBaseData.class)
+            .getInsuranceCoverage(kbvPatient);
 
     val flowType = PrescriptionFlowType.FLOW_TYPE_162;
     val createCmd = new TaskCreateCommand(flowType);

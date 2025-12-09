@@ -25,12 +25,16 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.mvo;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
+import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -38,9 +42,17 @@ import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MedicationRequest;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class KbvErpBundleFakerTest extends ErpFhirParsingTest {
 
@@ -225,5 +237,55 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     val bundle = KbvErpBundleFaker.builder().withMvo(mvo()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldBuildForPkvCoverage() {
+    val bundle = KbvErpBundleFaker.builderForPkvCoverage().fake();
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
+    assertTrue(result.isSuccessful());
+    assertNotNull(bundle.getCoverage());
+    assertTrue(
+        ((Coding)
+                ((java.util.ArrayList<?>)
+                        ((KbvCoverage)
+                                bundle.getEntry().stream()
+                                    .filter(KbvItaForStructDef.COVERAGE::matches)
+                                    .toList()
+                                    .get(0)
+                                    .getResource())
+                            .getType()
+                            .getCoding())
+                    .get(0))
+            .getCode()
+            .matches("PKV"));
+  }
+
+  @ParameterizedTest
+  @EnumSource(ReferenceFeatureToggle.RefencingType.class)
+  @ClearSystemProperty(key = ReferenceFeatureToggle.TOGGLE_KEY)
+  void shouldFakeWithReferencingType(ReferenceFeatureToggle.RefencingType type) {
+    System.setProperty(ReferenceFeatureToggle.TOGGLE_KEY, type.getValue());
+
+    val kbvBundle = KbvErpBundleFaker.builder().fake();
+
+    ValidatorUtil.encodeAndValidate(parser, kbvBundle, EncodingType.XML);
+
+    val fullUrlPrefix = type == ReferenceFeatureToggle.RefencingType.UUID ? "urn:uuid:" : "http";
+    val entries =
+        kbvBundle.getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getFullUrl)
+            .allMatch(it -> it.startsWith(fullUrlPrefix));
+    assertTrue(entries);
+
+    val composition = kbvBundle.getComposition();
+    // not all of them, but easier to check, HAPI should have caught them already
+    Predicate<String> p = it -> it.startsWith("urn:uuid");
+    p = type == ReferenceFeatureToggle.RefencingType.UUID ? p : p.negate();
+    val compositionEntries =
+        Stream.of(composition.getSubject(), composition.getCustodian())
+            .map(Reference::getReference)
+            .allMatch(p);
+    assertTrue(compositionEntries);
   }
 }

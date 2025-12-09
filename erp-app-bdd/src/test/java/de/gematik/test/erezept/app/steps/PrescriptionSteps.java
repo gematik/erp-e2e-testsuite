@@ -27,10 +27,7 @@ import static org.junit.Assert.assertTrue;
 import de.gematik.test.erezept.app.questions.DeletingThePrescription;
 import de.gematik.test.erezept.app.questions.HasReceivedDispensedMedication;
 import de.gematik.test.erezept.app.questions.PrescriptionHasGone;
-import de.gematik.test.erezept.app.task.DeleteRedeemablePrescription;
-import de.gematik.test.erezept.app.task.EnsureThatThePrescription;
-import de.gematik.test.erezept.app.task.EnsureThatThePrescriptionValidity;
-import de.gematik.test.erezept.app.task.RefreshPrescriptions;
+import de.gematik.test.erezept.app.task.*;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
@@ -62,7 +59,10 @@ public class PrescriptionSteps {
   }
 
   @Dann(
-      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
+      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
+          + " E-Rezept in der App nicht mehr angezeigt$")
+  @Und(
+      "^(?:der|dem) Versicherten (.+) wird (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
           + " E-Rezept in der App nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String patientName, String order, String stack) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -77,6 +77,9 @@ public class PrescriptionSteps {
   @Dann(
       "^wird das (letzte|erste) (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten in der"
           + " App nicht mehr angezeigt$")
+  @Dann(
+      "^wird das (letzte|erste) (ausgestellte|gelöschte) EVDGA E-Rezept (?:dem|der) Versicherten in"
+          + " der App nicht mehr angezeigt$")
   public void thenPrescriptionNotDisplayed(String order, String stack) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
@@ -151,6 +154,7 @@ public class PrescriptionSteps {
   }
 
   @Dann("^hat (?:der|die) Versicherte (.+) das (letzte|erste) E-Rezept elektronisch erhalten")
+  @Und("^(?:der|die) Versicherte (.+) hat  das (letzte|erste) E-Rezept elektronisch erhalten")
   public void thenReceivedPrescription(String userName, String order) {
     val theAppUser = OnStage.theActorCalled(userName);
     assertTrue(
@@ -159,6 +163,7 @@ public class PrescriptionSteps {
   }
 
   @Dann("^hat (?:der|die) Versicherte das (letzte|erste) E-Rezept elektronisch erhalten")
+  @Und("^(?:der|die) Versicherte hat das (letzte|erste) E-Rezept elektronisch erhalten")
   public void thenReceivedPrescription(String order) {
     val theAppUser = OnStage.theActorInTheSpotlight();
     assertTrue(

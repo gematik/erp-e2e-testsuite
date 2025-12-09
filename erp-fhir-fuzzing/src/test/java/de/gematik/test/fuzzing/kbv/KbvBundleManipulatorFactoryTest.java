@@ -101,6 +101,21 @@ class KbvBundleManipulatorFactoryTest extends ErpFhirParsingTest {
   }
 
   @Test
+  void shouldManipulateBsnr() {
+    KbvBundleManipulatorFactory.getOrganizationBsnrManipulators()
+        .forEach(
+            m -> {
+              val kbvBundle =
+                  KbvErpBundleFaker.builder().toBuilder()
+                      .medicalOrganization(KbvMedicalOrganizationFaker.medicalPractice().fake())
+                      .build();
+              assertDoesNotThrow(() -> m.getParameter().accept(kbvBundle));
+              val bsnr = kbvBundle.getMedicalOrganization().getBsnrOrThrow().getValue();
+              assertTrue(bsnr.contains(" ")); // contains whitespace
+            });
+  }
+
+  @Test
   void shouldHaveAdditionalMvoMutators() {
     val withoutMvo = KbvBundleManipulatorFactory.getAllKbvBundleManipulators();
     val withMvo = KbvBundleManipulatorFactory.getAllKbvBundleManipulators(true);

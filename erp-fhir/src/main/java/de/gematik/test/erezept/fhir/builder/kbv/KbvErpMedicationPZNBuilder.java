@@ -20,36 +20,27 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
+import com.google.common.base.Strings;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.erp.IngredientCodeBuilder;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import lombok.val;
-import org.assertj.core.util.Strings;
 import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Ratio;
 
 public class KbvErpMedicationPZNBuilder
-    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationPZNBuilder> {
+    extends KbvErpMedicationBaseBuilder<KbvErpMedicationPZNBuilder> {
 
-  private final List<Extension> extensions = new LinkedList<>();
-  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
   private BaseMedicationType baseMedicationType = BaseMedicationType.MEDICAL_PRODUCT;
-  private MedicationCategory category = MedicationCategory.C_00;
-  private boolean isVaccine = false;
+
   private StandardSize normgroesse = StandardSize.NB;
   private Darreichungsform darreichungsform = Darreichungsform.TAB;
   private PZN pzn;
@@ -66,31 +57,8 @@ public class KbvErpMedicationPZNBuilder
     return new KbvErpMedicationPZNBuilder();
   }
 
-  /**
-   * <b>Attention:</b> use with care as this setter might break automatic choice of the version.
-   * This builder will set the default version automatically, so there should be no need to provide
-   * an explicit version
-   *
-   * @param version to use for generation of this resource
-   * @return Builder
-   */
-  public KbvErpMedicationPZNBuilder version(KbvItaErpVersion version) {
-    this.kbvItaErpVersion = version;
-    return this;
-  }
-
   public KbvErpMedicationPZNBuilder type(BaseMedicationType type) {
     this.baseMedicationType = type;
-    return this;
-  }
-
-  public KbvErpMedicationPZNBuilder category(MedicationCategory category) {
-    this.category = category;
-    return this;
-  }
-
-  public KbvErpMedicationPZNBuilder isVaccine(boolean isVaccine) {
-    this.isVaccine = isVaccine;
     return this;
   }
 
@@ -168,7 +136,7 @@ public class KbvErpMedicationPZNBuilder
               .findFirst()
               .ifPresent(c -> c.setVersion("http://snomed.info/sct/11000274103/version/20240515"));
 
-      val ingredient = IngredientCodeBuilder.builder().dontFillMissingIngredientStrength();
+      val ingredient = KbvIngredientComponentBuilder.builder().dontFillMissingIngredientStrength();
 
       ingredient.textInCoding(
           ingredientText != null && !ingredientText.isBlank()

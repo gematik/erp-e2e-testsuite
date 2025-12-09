@@ -21,7 +21,6 @@
 package de.gematik.test.erezept.app.task;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.OnboardingScreen;
 import de.gematik.test.erezept.app.task.ios.NavigateThroughOnboardingOnIOS;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.function.Supplier;
@@ -46,13 +45,7 @@ public class NavigateThroughOnboarding implements Task {
     platformTask.performAs(actor);
   }
 
-  public static NavigateThroughOnboarding byFinishingTheEntireOnboardingSuccessfully() {
-    return new NavigateThroughOnboarding(
-        () -> null, () -> NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.FINISH_ALL));
-  }
-
-  public static NavigateThroughOnboarding untilTermsAndPrivacy() {
-    return new NavigateThroughOnboarding(
-        () -> null, () -> NavigateThroughOnboardingOnIOS.toScreen(OnboardingScreen.WELCOME_SCREEN));
+  public static NavigateThroughOnboarding entirely() {
+    return new NavigateThroughOnboarding(() -> null, NavigateThroughOnboardingOnIOS::entirely);
   }
 }

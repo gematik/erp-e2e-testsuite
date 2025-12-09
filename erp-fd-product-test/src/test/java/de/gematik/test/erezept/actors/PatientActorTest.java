@@ -118,11 +118,13 @@ class PatientActorTest extends ErpFhirParsingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.randomGkv(), patient.getName()));
 
     // initialised as Not_Set
-    assertEquals(DmpKennzeichen.NOT_SET, patient.getInsuranceCoverage().getDmpKennzeichen());
+    var coverage = patient.getPatientCoverage().second;
+    assertEquals(DmpKennzeichen.NOT_SET, coverage.getDmpKennzeichen());
 
     // now change to DmpKennzeichen.DM1
     patient.changeDmpKennzeichen(DmpKennzeichen.DM1);
-    assertEquals(DmpKennzeichen.DM1, patient.getInsuranceCoverage().getDmpKennzeichen());
+    coverage = patient.getPatientCoverage().second;
+    assertEquals(DmpKennzeichen.DM1, coverage.getDmpKennzeichen());
   }
 
   @ParameterizedTest(name = "Create Coverage with PayorType {0}")
@@ -133,7 +135,7 @@ class PatientActorTest extends ErpFhirParsingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.randomGkv(), patient.getName()));
 
     patient.setPayorType(payorType);
-    val coverage = patient.getInsuranceCoverage();
+    val coverage = patient.getPatientCoverage().second;
     val result = ValidatorUtil.encodeAndValidate(parser, coverage);
     assertTrue(result.isSuccessful());
   }

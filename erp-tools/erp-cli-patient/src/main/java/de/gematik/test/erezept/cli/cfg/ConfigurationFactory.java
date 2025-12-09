@@ -33,7 +33,7 @@ public class ConfigurationFactory {
   public static PatientConfiguration createPatientConfigurationFor(Egk egk) {
     val pcfg = new PatientConfiguration();
     pcfg.setName(egk.getOwnerData().getGivenName());
-    pcfg.setValidateResponse(false);
+    pcfg.setFhirValidator("NONE");
     return pcfg;
   }
 }

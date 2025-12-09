@@ -20,8 +20,7 @@
 
 package de.gematik.test.erezept;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;

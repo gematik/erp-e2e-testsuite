@@ -7,54 +7,59 @@ actors:
       hbaIccsn: 80276001011699901501
       qualificationType: Arzt
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Dr. Schraßer
       smcbIccsn: 80276883110000163972 #Praxis Peer Graf von Müller
       hbaIccsn: 80276883110000095767 #Arzt Sam Schraßer
       qualificationType: Arzt
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Gündüla Gunther
       smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
       hbaIccsn: 80276883110000161759 #Arzt Gunther
       qualificationType: Zahnarzt
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
 
   pharmacies:
     - name: Am Flughafen
       smcbIccsn: 80276883110000163973
       konnektor: Soft-Konn
       algorithm: E256
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Stadtapotheke
       smcbIccsn: 80276883110000163973
       konnektor: Soft-Konn
       algorithm: E256
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Am Waldesrand
       smcbIccsn: 80276001011699900861
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Adelheid Ulmendorfer
       smcbIccsn: 80276001011699902301
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Bernd Ulmendorfer
       smcbIccsn: 80276001011699902302
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
 
     - name: Christine Ulmendorfer
       smcbIccsn: 80276001011699902303
       konnektor: Soft-Konn
-      validateResponse: false
+      fhirValidator: NONE
+
+    - name: An der Schule
+      smcbIccsn: 80276883110000147759
+      konnektor: Soft-Konn
+      fhirValidator: NONE
 
   apothecaries:
     - name: Finn-Louis Nullmayr

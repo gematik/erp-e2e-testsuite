@@ -20,11 +20,7 @@
 
 package de.gematik.test.erezept.primsys.rest.data;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,15 +43,15 @@ class InvoiceDataTest extends ErpFhirBuildingTest {
                        "type" : "informational",
                        "insurantCost" : 12.3,
                        "totalCost" : 75.5,
-                       "costReason" : "issSo",
-                       "pzn" : "123456789"
+                       "medicationName" : "Olanzapin Heumann 20mg 70 Schmelztbl. N3",
+                       "pzn" : "08850519"
                      }, {
                      "category" : "ZUZAHLUNG",
                          "type" : "informational",
                          "insurantCost" : 110.3,
                          "totalCost" : 175.5,
-                         "costReason" : "Weil immer noch",
-                         "pzn" : "987654321"
+                         "medicationName" : "Beloc-Zok® mite 47,5 mg, 30 Retardtabletten N1",
+                         "pzn" : "03879429"
                        } ]
                      }
                 """;
@@ -73,14 +69,14 @@ class InvoiceDataTest extends ErpFhirBuildingTest {
                              "type" : "informational",
                              "insurantCost" : 110.3,
                              "totalCost" : 175.5,
-                             "costReason" : "Weil immer noch",
-                             "pzn" : "987654321"
+                             "medicationName" : "Beloc-Zok® mite 47,5 mg, 30 Retardtabletten N1",
+                             "pzn" : "03879429"
                            } ]
                          }
                     """;
 
   @Test
-  void shouldCreateInvoiceData() throws JsonProcessingException {
+  void shouldCreateInvoiceData() {
     val invoiceData = new InvoiceData();
     invoiceData.setCurrency("EUR");
     val priceComponent = new PriceComponentData();
@@ -88,14 +84,14 @@ class InvoiceDataTest extends ErpFhirBuildingTest {
     priceComponent.setCategory("ZUZAHLUNG");
     priceComponent.setInsurantCost(12.3f);
     priceComponent.setTotalCost(75.5f);
-    priceComponent.setCostReason("issSo");
+    priceComponent.setMedicationName("Olanzapin Heumann 20mg 70 Schmelztbl. N3");
     priceComponent.setPzn("123456789");
     val priceComponent2 = new PriceComponentData();
     priceComponent2.setType("informational");
     priceComponent2.setInsurantCost(110.3f);
     priceComponent2.setTotalCost(175.5f);
     priceComponent2.setPzn("987654321");
-    priceComponent2.setCostReason("Weil immer noch");
+    priceComponent2.setMedicationName("Beloc-Zok® mite 47,5 mg, 30 Retardtabletten N1");
     invoiceData.setPriceComponents(List.of(priceComponent, priceComponent2));
     val mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
     assertDoesNotThrow(() -> mapper.writeValueAsString(invoiceData));

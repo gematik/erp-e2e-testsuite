@@ -75,6 +75,7 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
                     format("Unable to find Prescription {0} in Archive", prescriptionId)));
 
     // open the medication overview
+    app.swipe(SwipeDirection.DOWN, 0.6f);
     app.tap(PrescriptionDetails.PRESCRIPTION_MEDICATION);
 
     val medReq =

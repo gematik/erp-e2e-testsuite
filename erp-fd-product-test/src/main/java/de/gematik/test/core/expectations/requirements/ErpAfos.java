@@ -24,6 +24,9 @@ import lombok.Getter;
 
 @Getter
 public enum ErpAfos implements RequirementsSet {
+  A_10395("A_10395", "E-Rezept - Zugriffsberechtigung durch Versicherten erstellen"),
+  A_10396("A_10396", "E-Rezept - Demographische Daten eines Versicherten abrufen"),
+  A_10406("A_10406", "E-Rezept - Zugriffsberechtigung durch Versicherten einsehen"),
   A_19018("A_19018", "Rollenprüfung Verordnender stellt Rezept ein"),
   A_19019("A_19019", "Generierung Rezept-ID"),
   A_19569("A_19569-03", "Task abrufen - Versicherter - Suchparameter Task"),
@@ -44,12 +47,21 @@ public enum ErpAfos implements RequirementsSet {
           + " dem Task zugrunde liegenden Verordnungsdatensatzes>"),
 
   A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
+  A_19284_11("A_19284_11", "E-Rezept-Fachdienst - Versichertenprotokoll zu Operationen"),
   A_19405("A_19405-01", "E-Rezept-Fachdienst - Rollenprüfung Versicherter liest MedicationDispens"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
+  A_19447_05("A_19447_05", "E-Rezept-Fachdienst - Nachricht einstellen - Schemaprüfung"),
+  A_19460(
+      "A_19460-01",
+      " E-Rezept-Fachdienst - MedicationDispense abrufen - Filter MedicationDispense auf KVNR des"
+          + " Versicherten "),
   A_19514("A_19514-03", "HTTP Status-Codes"),
   A_19520("A_19520-01", "E-Rezept-Fachdienst - Nachrichten abrufen - für Empfänger filtern"),
   A_19521("A_19521", "E-Rezept-Fachdienst - Nachrichten als abgerufen markieren"),
-  A_19522("A_19522-01", " E-Rezept-Fachdienst - Nachrichtenabruf Suchparameter"),
+  A_19522("A_19522-01", "E-Rezept-Fachdienst - Nachrichtenabruf Suchparameter"),
+  A_20159(
+      "A_20159-04",
+      "E-Rezept-Fachdienst - Task aktivieren - QES Prüfung Signaturzertifikat des HBA"),
   A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
   A_20513("A_20513", "E-Rezept-Fachdienst - nicht mehr benötigte Einlösekommunikation"),
   A_21782("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
@@ -65,6 +77,11 @@ public enum ErpAfos implements RequirementsSet {
   A_22162(
       "A_22162",
       "E-Rezept-Fachdienst - Consent schreiben – nur eine Einwilligung CHARGCONS pro KVNR"),
+  A_22162_01(
+      "A_22162_01",
+      "E-Rezept-Fachdienst - Consent schreiben – nur eine Einwilligung pro KVNR und"
+          + " Einwilligungstyp"),
+  A_22222("A_22222", "E-Rezept-Fachdienst - Task aktivieren - Ausschluss weitere Kostenträger"),
   A_22289("A_22289", "E-Rezept-Fachdienst - Consent schreiben - Prüfung KVNR"),
   A_22487("A_22487", "Prüfregel Ausstellungsdatum"),
   A_22627("A_22627-01", "Mehrfachverordnung - zulässige Flowtype"),
@@ -80,7 +97,7 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Task akzeptieren Mehrfachverordnung - Beginn Einlösefrist prüfen"),
   A_22704("A_22704", "Mehrfachverordnung - Numerator größer 0"),
   A_22874("A_22874-01", "E-Rezept-Fachdienst - Consent löschen - Prüfung category"),
-  A_22927("A_22927", "Ausschluss unspezifizierter Extensions"),
+  A_22927("A_22927-02", " FHIR-Ressource validieren - Ausschluss unspezifizierter Extensions"),
   A_23443("A_23443", "Task aktivieren – Flowtype 160/169 - Prüfung Coverage Type"),
   A_22347("A_22347-01", "Task aktivieren – Flowtype 200/209 - Prüfung Coverage Type"),
   A_22350("A_22350", "E-Rezept-Fachdienst - Consent schreiben – Persistieren"),
@@ -142,6 +159,10 @@ public enum ErpAfos implements RequirementsSet {
       "A_24178",
       "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"
           + " in-progress"),
+  A_24179(
+      "A_24179",
+      "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - erneuter Abruf"
+          + " Verordnung"),
   A_24285_01(
       "A_24285_01", "E-Rezept-Fachdienst - Dispensierinformationen bereitstellen - Zeitstempel"),
   A_24434(
@@ -191,6 +212,10 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filteroperatoren"
           + " für Datumsabfragen"),
   A_25962("A_25962", "E-Rezept-Fachdienst - ePA - Medication Service - Versichertenprotokoll"),
+  A_26229(
+      "A_26229-02",
+      "E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Konsistenz Ressource IDs"),
+  A_26233("A_26233-2", "Fullurl entspricht urn::oid"),
   A_26320(
       "A_26320",
       " E-Rezept-Fachdienst - Nachricht einstellen - Dispense Request - Prüfung Status Task"),
@@ -203,12 +228,55 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Nachricht einstellen - Dispense Request - Prüfung Beginn Gültigkeit"
           + " Task"),
   A_26337("A_26337", "E-Rezept-Fachdienst - Task schließen - Zeitstempel MedicationDispense"),
+  A_27061(
+      "A_27061", "E-Rezept-Fachdienst - eu-prescription abfragen - Prüfung Einwilligung für KVNR"),
+  A_27062(
+      "A_27062", "E-Rezept-Fachdienst - eu-prescription abfragen - Prüfung Zugriffsberechtigung"),
+  A_27063(
+      "A_27063", "E-Rezept-Fachdienst - eu-prescription abfragen - Filter einlösbarer E-Rezepte"),
+  A_27068("A_27068", "E-Rezept-Fachdienst - Task schließen - EU - Rollenprüfung"),
+  A_27069("A_27069", " E-Rezept-Fachdienst - Task schließen - EU - Schemaprüfung"),
+  A_27070("A_27070", "E-Rezept-Fachdienst - Task schließen - EU - Prüfung Einwilligung für KVNR"),
+  A_27071("A_27071", "E-Rezept-Fachdienst - Task schließen - EU - Prüfung Zugriffsberechtigung"),
+  A_27072("A_27072", "E-Rezept-Fachdienst - Task schließen - EU - Statusprüfung"),
+  A_27074("A_27074", "E-Rezept-Fachdienst - Task schließen - EU - Zeitstempel MedicationDispense"),
+  A_27091("A_27091", "E-Rezept-Fachdienst - Zugriffsberechtigung schreiben - Prüfung Zugriffscode"),
+  A_27097("A_27097", "Format Zugriffscode"),
+  A_27131(
+      "A_27131",
+      "E-Rezept-Fachdienst - Consent löschen - EUDISPCONS - Löschen Zugriffsberechtigung"),
+  A_27143("A_27143", "E-Rezept-Fachdienst - Consent schreiben - Zeitstempel setzen"),
   A_27287("A_27287", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Vergleich KVNR"),
   A_27346("A_27346", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - URL hcv"),
   A_27347("A_27347", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - VSDM - Vergleich hcv"),
   A_27446(
       "A_27446",
-      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - Ratelimit pro Telematik-ID prüfen");
+      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - Ratelimit pro Telematik-ID prüfen"),
+  A_27550("A_27550", "E-Rezept-Fachdienst -Task markieren -Versicherter - Prüfung KVNR"),
+  A_27551(
+      "A_27551", "E-Rezept-Fachdienst -Task markieren -Versicherter - FHIR-Validierung Parameters"),
+  A_27552(
+      "A_27552",
+      "E-Rezept-Fachdienst -Task markieren -Versicherter - Änderung Markierung Task Ressource"),
+  A_27587(
+      "A_27587",
+      "E-Rezept-Fachdienst - eu-prescription abfragen - Filter Status - Abfrage der aktuellsten"
+          + " Verordnungsinformationen"),
+  A_27588(
+      "A_27588",
+      "E-Rezept-Fachdienst - eu-prescription abfragen - Filter Status - Abfrage aller einlösbaren"
+          + " Verordnungsinformationen"),
+  A_27589(
+      "A_27589",
+      "E-Rezept-Fachdienst - eu-prescription abfragen - Filter Status - Abfrage nach Liste"
+          + " Rezept-Ids"),
+  A_27648(
+      "A_27648",
+      "E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Existenz von Ressource.id"),
+  A_27649(
+      "A_27649",
+      " E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Auflösbarkeit von Referenzen"),
+  ;
   private final Requirement requirement;
 
   ErpAfos(String id, String description) {

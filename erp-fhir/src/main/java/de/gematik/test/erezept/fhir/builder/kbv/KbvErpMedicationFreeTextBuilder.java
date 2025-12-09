@@ -20,36 +20,21 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Extension;
 
 public class KbvErpMedicationFreeTextBuilder
-    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationFreeTextBuilder> {
+    extends KbvErpMedicationBaseBuilder<KbvErpMedicationFreeTextBuilder> {
 
-  private final List<Extension> extensions = new LinkedList<>();
-  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
   private String darreichungsform;
-  private boolean isVaccine = false;
-  private MedicationCategory category = MedicationCategory.C_00;
   private String nameOreFreetext;
 
   public static KbvErpMedicationFreeTextBuilder builder() {
     return new KbvErpMedicationFreeTextBuilder();
-  }
-
-  public KbvErpMedicationFreeTextBuilder version(KbvItaErpVersion version) {
-    this.kbvItaErpVersion = version;
-    return self();
   }
 
   /**
@@ -71,16 +56,6 @@ public class KbvErpMedicationFreeTextBuilder
    */
   public KbvErpMedicationFreeTextBuilder freeText(String freeText) {
     this.nameOreFreetext = freeText;
-    return self();
-  }
-
-  public KbvErpMedicationFreeTextBuilder isVaccine(boolean isVaccine) {
-    this.isVaccine = isVaccine;
-    return self();
-  }
-
-  public KbvErpMedicationFreeTextBuilder category(MedicationCategory category) {
-    this.category = category;
     return self();
   }
 

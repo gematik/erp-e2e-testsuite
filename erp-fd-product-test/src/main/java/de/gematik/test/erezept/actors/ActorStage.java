@@ -23,10 +23,13 @@ package de.gematik.test.erezept.actors;
 import de.gematik.test.core.exceptions.MissingCacheException;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.val;
 import net.serenitybdd.core.steps.Instrumented;
+import net.serenitybdd.screenplay.Actor;
 
 public class ActorStage {
 
@@ -34,13 +37,22 @@ public class ActorStage {
   private final Map<String, DoctorActor> doctors;
   private final Map<String, PatientActor> patients;
   private final Map<String, PharmacyActor> pharmacies;
+  private final Map<String, EuPharmacyActor> euPharmacies;
   private final Map<String, KtrActor> ktrs;
+
+  private final List<ErpActor> actorsCast;
 
   public ActorStage() {
     this.doctors = new HashMap<>();
     this.patients = new HashMap<>();
     this.pharmacies = new HashMap<>();
+    this.euPharmacies = new HashMap<>();
     this.ktrs = new HashMap<>();
+    this.actorsCast = new LinkedList<>();
+  }
+
+  public void drawTheCurtain() {
+    this.actorsCast.forEach(Actor::wrapUp);
   }
 
   public DoctorActor getDoctorNamed(String name) {
@@ -53,6 +65,10 @@ public class ActorStage {
 
   public PharmacyActor getPharmacyNamed(String name) {
     return getFromCache(PharmacyActor.class, pharmacies, name);
+  }
+
+  public EuPharmacyActor getEuPharmacyNamed(String name) {
+    return getFromCache(EuPharmacyActor.class, euPharmacies, name);
   }
 
   public KtrActor getKtrNamed(String name) {
@@ -69,6 +85,7 @@ public class ActorStage {
 
   public <T extends ErpActor> T instrumentNewActor(Class<T> klass, String name) {
     val actor = new Instrumented.InstrumentedBuilder<>(klass).withProperties(name);
+    this.actorsCast.add(actor);
 
     // add to cache for later calls
     if (klass.equals(DoctorActor.class)) {
@@ -80,6 +97,9 @@ public class ActorStage {
     } else if (klass.equals(PharmacyActor.class)) {
       config.equipAsPharmacy(actor);
       pharmacies.put(name, (PharmacyActor) actor);
+    } else if (klass.equals(EuPharmacyActor.class)) {
+      config.equipAsEuPharmacy(actor);
+      euPharmacies.put(name, (EuPharmacyActor) actor);
     } else if (klass.equals(KtrActor.class)) {
       config.equipAsKtr(actor);
       ktrs.put(name, (KtrActor) actor);

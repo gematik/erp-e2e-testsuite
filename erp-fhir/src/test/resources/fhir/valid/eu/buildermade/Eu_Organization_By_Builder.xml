@@ -1,0 +1,60 @@
+<Organization xmlns="http://hl7.org/fhir">
+    <id value="b85a09ba-eb6e-4b6b-81b6-84f69d62cbcd"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Organization|1.0"/>
+    </meta>
+    <extension url="https://gematik.de/fhir/ti/StructureDefinition/ncpeh-country-extension">
+        <valueCoding>
+            <system value="urn:iso:std:iso:3166"/>
+            <code value="BE"/>
+        </valueCoding>
+    </extension>
+    <identifier>
+        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+        <value value="12345678901234567890"/>
+    </identifier>
+    <identifier>
+        <type>
+            <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+                <code value="BSNR"/>
+            </coding>
+        </type>
+        <system value="https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR"/>
+        <value value="039662800"/>
+    </identifier>
+    <identifier>
+        <type>
+            <coding>
+                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                <code value="KZVA"/>
+            </coding>
+        </type>
+        <system value="http://fhir.de/sid/kzbv/kzvabrechnungsnummer"/>
+        <value value="189702952"/>
+    </identifier>
+    <identifier>
+        <system value="http://fhir.de/sid/arge-ik/iknr"/>
+        <value value="072740748"/>
+    </identifier>
+    <type>
+        <coding>
+            <system value="https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"/>
+            <code value="1.2.276.0.76.4.54"/>
+            <display value="Öffentliche Apotheke"/>
+        </coding>
+    </type>
+    <type>
+        <coding>
+            <code value="pharmacist"/>
+        </coding>
+    </type>
+    <name value="Test Pharmacy"/>
+    <address>
+        <line value="137 Nowhere Street"/>
+        <city value="Elsewhere in Nowhere"/>
+        <state value="NoMansLand"/>
+        <postalCode value="123-B-friendly"/>
+        <country value="Zimbabwe"/>
+    </address>
+</Organization>

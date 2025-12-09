@@ -20,84 +20,54 @@
 
 package de.gematik.test.erezept.app.task.ios;
 
-import static de.gematik.test.erezept.app.mobile.OnboardingScreen.ANALYTICS_SCREEN;
-import static de.gematik.test.erezept.app.mobile.OnboardingScreen.FINISH_ALL;
-import static de.gematik.test.erezept.app.mobile.OnboardingScreen.SECURITY_SCREEN;
-import static de.gematik.test.erezept.app.mobile.OnboardingScreen.TERMS_AND_PRIVACY_SCREEN;
-import static de.gematik.test.erezept.app.mobile.OnboardingScreen.WELCOME_SCREEN;
-
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
-import de.gematik.test.erezept.app.mobile.OnboardingScreen;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Onboarding;
-import de.gematik.test.erezept.app.mobile.elements.Utility;
+import de.gematik.test.erezept.app.mobile.elements.OperatingSystem;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
-import net.serenitybdd.core.steps.Instrumented;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 
 @Slf4j
 @RequiredArgsConstructor
 public class NavigateThroughOnboardingOnIOS implements Task {
-  private final OnboardingScreen onboardingScreen;
-
-  public static NavigateThroughOnboardingOnIOS toScreen(OnboardingScreen onboardingScreen) {
-    return Instrumented.instanceOf(NavigateThroughOnboardingOnIOS.class)
-        .withProperties(onboardingScreen);
-  }
 
   public static NavigateThroughOnboardingOnIOS entirely() {
-    return toScreen(FINISH_ALL);
+    return new NavigateThroughOnboardingOnIOS();
   }
 
   @Override
-  @Step("{0} durchläuft das Onboarding bis zum #onboardingScreen")
+  @Step("{0} durchläuft das Onboarding")
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseIOSApp.class);
 
-    if (onboardingScreen.getiOSOrdinal() >= WELCOME_SCREEN.getiOSOrdinal()) {
-      app.tap(Onboarding.NEXT_BUTTON);
-    }
+    // Welcome Screen
+    app.tap(Onboarding.START_BUTTON);
 
-    if (onboardingScreen.getiOSOrdinal() >= TERMS_AND_PRIVACY_SCREEN.getiOSOrdinal()) {
-      app.waitUntilElementIsVisible(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-      app.tap(Onboarding.CHECK_PRIVACY_AND_TOU_BUTTON);
-      app.tap(Onboarding.ACCEPT_PRIVACY_AND_TOU_BUTTON);
-    }
+    // Data & Usage Screen
+    app.tap(Onboarding.NEXT_BUTTON);
 
-    if (onboardingScreen.getiOSOrdinal() >= SECURITY_SCREEN.getiOSOrdinal()) {
-      val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
-      app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
-      app.swipe(SwipeDirection.UP);
-      app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
-      app.tap(Onboarding.ACCEPT_PASSWORD_BUTTON);
-    }
+    // App Safety Screen
+    app.tap(Onboarding.PASSWORD_BUTTON);
+    val password = SafeAbility.getAbility(actor, HandleAppAuthentication.class).getPassword();
+    app.inputPassword(password, Onboarding.PASSWORD_INPUT_FIELD);
+    app.swipe(SwipeDirection.UP);
+    app.inputPassword(password, Onboarding.PASSWORD_CONFIRMATION_FIELD);
+    app.tap(Onboarding.PASSWORD_BUTTON);
 
-    if (onboardingScreen.getiOSOrdinal() >= ANALYTICS_SCREEN.getiOSOrdinal()) {
-      app.tap(Onboarding.CONTINUE_ANALYTICS_SCREEN_BUTTON);
-      app.tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
+    // System Password Manager Dialog
+    app.tapIfDisplayed(3, OperatingSystem.LATER);
 
-      // no need to ask both elements separately because they always appear together
-      if (app.isDisplayed(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON)) {
-        app.tap(Onboarding.HIDE_SUGGESTION_PIN_SELECTION_BUTTON);
-        app.tap(Onboarding.ACCEPT_SUGGESTION_PIN_SELECTION_BUTTON);
-      }
+    // Tracking Screen
+    app.tap(Onboarding.NOT_ACCEPT_ANALYTICS_BUTTON);
 
-      app.logEvent("Remove all Tooltips");
-      if (onboardingScreen.getiOSOrdinal() >= FINISH_ALL.getiOSOrdinal()) app.removeTooltips();
-
-      // in most cases a login overlay appears after that randomly: enforce the app to show it here
-      // to get rid of that overlay in the following steps
-      app.logEvent("Remove Login Overlay");
-      app.tap(BottomNav.PHARMACY_SEARCH_BUTTON);
-      app.tap(BottomNav.PRESCRIPTION_BUTTON);
-      app.tapIfDisplayed(2, Utility.DECLINE_LOGIN);
-    }
+    // Tooltips on Mainscreen
+    app.logEvent("Remove all Tooltips");
+    app.removeTooltips();
   }
 }

@@ -47,7 +47,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
-import net.serenitybdd.screenplay.HasTeardown;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
@@ -61,7 +60,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
 @Slf4j
-public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasTeardown {
+public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
 
   protected final T driver;
   @Getter @Setter private String currentUserProfile;
@@ -90,6 +89,11 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
   @SneakyThrows
   public void pauseApp() {
     Thread.sleep(1000);
+  }
+
+  @SneakyThrows
+  public void longPauseApp() {
+    Thread.sleep(45000);
   }
 
   protected int getPollingInterval() {
@@ -416,16 +420,6 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability, HasT
         "Sending test info for scenario: {} {}",
         scenarioName,
         sendTestInfoStatus ? "was successful" : "failed");
-  }
-
-  @Override
-  public void tearDown() {
-    log.info("Quit driver");
-    try {
-      driver.quit();
-    } catch (Exception e) {
-      log.error("Error while quitting the driver", e);
-    }
   }
 
   @Override

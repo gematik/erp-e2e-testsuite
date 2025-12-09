@@ -20,16 +20,7 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.containsAllPZNsForNewProfiles;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyAllPerformerIdsAre;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyCountOfContainedMedication;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsAfter;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsBefore;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsEqual;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverIsSortedSerialAscend;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenHandedOverWithPredicate;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenPreparedIsBefore;
-import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.verifyWhenPreparedWithPredicate;
+import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,8 +29,12 @@ import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.erezept.fhir.builder.eu.EuMedicationDispenseFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerRoleBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
 import java.time.Month;
 import lombok.val;
@@ -48,11 +43,17 @@ import org.junit.jupiter.api.Test;
 
 class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
 
+  private final LocalDate testDate = LocalDate.of(2025, Month.SEPTEMBER, 6);
   ErxMedicationDispenseBundle validMedDisp =
       parser.decode(
           ErxMedicationDispenseBundle.class,
           ResourceLoader.readFileFromResource(
               "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-MultipleMedicationDispenseBundle.json"));
+  ErxMedicationDispenseBundle simpleEuMedDispBundle =
+      parser.decode(
+          ErxMedicationDispenseBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/eu/09_response_get_multiple_medication_dispense.json"));
 
   @BeforeEach
   void init() {
@@ -72,8 +73,6 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
             ld -> !ld.isEqual(testDate.minusMonths(3)), "is halt so..." + testDate + "enthalten");
     assertDoesNotThrow(() -> step.apply(validMedDisp));
   }
-
-  private final LocalDate testDate = LocalDate.of(2025, Month.SEPTEMBER, 6);
 
   @Test
   void shouldVerifyWhenHandedOverCorrect2() {
@@ -163,6 +162,25 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
   }
 
   @Test
+  void shouldPassWhileVerifyingEuMedDispense() {
+    val singleBundle =
+        parser.decode(
+            ErxMedicationDispenseBundle.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/eu/08_response_get_single_medicationdispense.json"));
+    val step =
+        containsEuPrescriptionAndDispensation(
+            PrescriptionId.from("160.000.000.000.000.01"), ErpAfos.A_27070);
+    assertDoesNotThrow(() -> step.apply(singleBundle));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyNonEuDispensation() {
+    val step = containsEuPrescriptionAndDispensation(PrescriptionId.random(), ErpAfos.A_10406);
+    assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
+  }
+
+  @Test
   void shouldVerifyWhenHandedOverIsBeforeCorrect() {
     val step = verifyWhenHandedOverIsBefore(testDate.plusDays(2));
     assertDoesNotThrow(() -> step.apply(validMedDisp));
@@ -228,15 +246,90 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 
+  private ErxMedicationDispenseBundle simpleMedDispBundle =
+      parser.decode(
+          ErxMedicationDispenseBundle.class,
+          ResourceLoader.readFileFromResource(
+              "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-SimpleMedicationDispenseBundle.json"));
+
   @Test
   void shouldDetectCorrectContainedMedicationDispensesForNewProfiles() {
-    val simpleMedDispBundle =
-        parser.decode(
-            ErxMedicationDispenseBundle.class,
-            ResourceLoader.readFileFromResource(
-                "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-SimpleMedicationDispenseBundle.json"));
 
     val step = containsAllPZNsForNewProfiles(simpleMedDispBundle.getMedications());
     assertDoesNotThrow(() -> step.apply(simpleMedDispBundle));
+  }
+
+  @Test
+  void shouldDetectContainedEuPractitionerData() {
+    val step = containsEuPractitionerData(PrescriptionId.from("160.000.000.000.000.01"));
+    assertDoesNotThrow(() -> step.apply(simpleEuMedDispBundle));
+  }
+
+  @Test
+  void shouldThrowWhileDetectContainedEuPractitionerData() {
+    val step = containsEuPractitionerData(PrescriptionId.from("000.000.000.000.000.01"));
+    assertThrows(AssertionError.class, () -> step.apply(simpleEuMedDispBundle));
+  }
+
+  @Test
+  void shouldDetectContainedEuPractitionerRole() {
+    val medDsp =
+        simpleEuMedDispBundle
+            .getEuMedicationDispenseBy(PrescriptionId.from("160.000.000.000.000.01"))
+            .stream()
+            .findFirst()
+            .orElseThrow();
+    val step = containsEuPractitionerRoleRelateTo(medDsp);
+    assertDoesNotThrow(() -> step.apply(simpleEuMedDispBundle));
+  }
+
+  @Test
+  void shouldThrowWhileDetectContainedEuPractitionerRole() {
+    val medDsp =
+        EuMedicationDispenseFaker.builder()
+            .withPrescriptionId(PrescriptionId.from("000.000.000.000.000.01"))
+            .fake();
+    medDsp.getPerformer().stream()
+        .findFirst()
+        .orElseThrow()
+        .getActor()
+        .setReference("PractitionerRole/0000000-276b-436d-a9ea-9dd5e042637b");
+    val step = containsEuPractitionerRoleRelateTo(medDsp);
+    assertThrows(AssertionError.class, () -> step.apply(simpleEuMedDispBundle));
+  }
+
+  @Test
+  void shouldDetectEuOrganization() {
+    val praRole =
+        new KbvPractitionerRoleBuilder().setId("ebe39d92-276b-436d-a9ea-9dd5e042637b").build();
+    val referedDispensation = EuMedicationDispenseFaker.builder().withPerformer(praRole).fake();
+
+    val step = containsEuOrganisationDataRelatesTo(referedDispensation);
+    assertDoesNotThrow(() -> step.apply(simpleEuMedDispBundle));
+  }
+
+  @Test
+  void shouldThrowWhileDetectEuOrganization() {
+    val praRole =
+        new KbvPractitionerRoleBuilder().setId("ebe39d92-276b-436d-a9ea-00000000").build();
+
+    val referedDispensation = EuMedicationDispenseFaker.builder().withPerformer(praRole).fake();
+
+    val step = containsEuOrganisationDataRelatesTo(referedDispensation);
+    assertThrows(AssertionError.class, () -> step.apply(simpleEuMedDispBundle));
+  }
+
+  @Test
+  void shouldDetectContainedErxMedicationAndGemDispense() {
+    val step =
+        containsErxMedicationAndGemMedDispense(PrescriptionId.from("160.000.000.000.000.01"));
+    assertDoesNotThrow(() -> step.apply(simpleMedDispBundle));
+  }
+
+  @Test
+  void shoulThrowWhiledDetectContainedErxMedicationAndGemDispense() {
+    val step =
+        containsErxMedicationAndGemMedDispense(PrescriptionId.from("000.000.000.000.000.01"));
+    assertThrows(AssertionError.class, () -> step.apply(simpleMedDispBundle));
   }
 }

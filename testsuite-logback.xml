@@ -53,7 +53,9 @@
     <logger name="de.gematik.test.erezept.fhir.parser" level="INFO" additivity="false">
         <appender-ref ref="FHIR"/>
     </logger>
-
+    <logger name="de.gematik.bbriccs.fhir" level="TRACE" additivity="false">
+        <appender-ref ref="FHIR"/>
+    </logger>
     <logger name="de.gematik.test.erezept.client" level="TRACE" additivity="false">
         <appender-ref ref="REST"/>
     </logger>

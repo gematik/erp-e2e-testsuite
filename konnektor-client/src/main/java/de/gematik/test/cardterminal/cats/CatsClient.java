@@ -31,7 +31,7 @@ import de.gematik.test.cardterminal.cats.dto.CardStatusDto;
 import de.gematik.test.cardterminal.exceptions.CardConfigurationException;
 import de.gematik.test.cardterminal.exceptions.CardTerminalClientException;
 import de.gematik.test.erezept.config.dto.konnektor.CardTerminalClientConfiguration;
-import java.util.concurrent.TimeUnit;
+import kong.unirest.core.HttpRequestWithBody;
 import kong.unirest.core.Unirest;
 import lombok.Getter;
 import lombok.NonNull;
@@ -55,39 +55,29 @@ public class CatsClient implements CardTerminalClient {
   @Override
   @SneakyThrows
   public void insertCard(Smartcard card, int slotId) {
-    // deactivate card
+    val restClient = Unirest.spawnInstance();
+    restClient.config().verifySsl(false);
     request(
-        address + "/config/card/insert",
-        OBJECT_MAPPER.writeValueAsString(new CardStatusDto(slotId, false)));
+        restClient.put(format("{0}/config/card/slot/{1}", address, slotId)),
+        OBJECT_MAPPER.writeValueAsString(new CardConfigurationDto(toCatsConfigurationPath(card))));
 
-    // change card configuration
     request(
-        address + "/config/card/configuration",
+        restClient.post(address + "/config/card/insert"),
         OBJECT_MAPPER.writeValueAsString(
-            new CardConfigurationDto(slotId, toCatsConfigurationPath(card))));
-
-    // activate card
-    request(
-        address + "/config/card/insert",
-        OBJECT_MAPPER.writeValueAsString(new CardStatusDto(slotId, true)));
+            new CardStatusDto(slotId, true, toCatsConfigurationPath(card), false)));
   }
 
   @SneakyThrows
-  private void request(String address, String body) {
+  private void request(HttpRequestWithBody req, String body) {
     log.debug(format("Request with Cats Client to Address {0} and Content {1}", address, body));
-    // Workaround to prevent tls client authentication
-    Unirest.config().verifySsl(false);
     val resp =
-        Unirest.post(address)
+        req.contentType("application/json")
             .body(body)
-            .contentType("application/json")
             .asString()
             .ifFailure(CardConfigurationException::new)
             .ifSuccess(
                 it ->
                     log.debug(format("Request successful {0}", it.getRequestSummary().asString())));
-    // Workaround to prevent tls client authentication
-    Unirest.config().verifySsl(true);
     if (resp.getStatus() != 200) {
       log.error(
           format(
@@ -95,8 +85,6 @@ public class CatsClient implements CardTerminalClient {
               resp.getStatus(), resp.getBody()));
       throw new CardTerminalClientException(address, body, resp);
     }
-
-    TimeUnit.SECONDS.sleep(1);
   }
 
   private String toCatsConfigurationPath(Smartcard card) {

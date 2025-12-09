@@ -247,12 +247,13 @@ public class ActivateInvalidPZN extends ErpTest {
     if (patient.getPatientInsuranceType().equals(InsuranceTypeDe.BG))
       accident = AccidentExtension.accidentAtWork().atWorkplace();
 
+    val patientCoverage = patient.getPatientCoverage();
     val kbvBundleBuilder =
         KbvErpBundleFaker.builder()
             .withKvnr(patient.getKvnr())
             .withPractitioner(doctorActor.getPractitioner())
             .withMedication(medication)
-            .withInsurance(patient.getInsuranceCoverage(), patient.getPatientData())
+            .withInsurance(patientCoverage.second, patientCoverage.first)
             .withAccident(accident)
             .toBuilder();
 

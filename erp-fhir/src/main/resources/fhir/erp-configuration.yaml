@@ -30,7 +30,7 @@
       version: "1.4.0"
       canonicalClaims: "http://fhir.abda.de/"
     - name: "de.gematik.erezept-workflow.r4"
-      version: "1.5.0"
+      version: "1.5.0"  # 'actually .json files of Version 1.5.2 contained caused by replacement'
       compatibleVersions: [ "1.5" ]
       canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
     - name: "de.gematik.erezept-patientenrechnung.r4"
@@ -43,6 +43,9 @@
     - name: "de.gematik.fhir.directory"
       version: "0.11.25"
       canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
+    - name: "de.gematik.epa"
+      version: "1.0.6" # actually '1.0.6-2'
+      canonicalClaims: [ "https://gematik.de/fhir/epa" ]
   errorFilter:
     #    - "^2 Profile für contained Ressource gefunden.*"
     - "^2 profiles found for contained resource.*"

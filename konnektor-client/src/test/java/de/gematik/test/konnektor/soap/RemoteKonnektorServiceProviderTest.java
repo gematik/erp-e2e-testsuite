@@ -22,21 +22,29 @@ package de.gematik.test.konnektor.soap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
+import com.sun.xml.ws.client.sei.SEIStub;
 import de.gematik.test.erezept.config.dto.konnektor.BasicAuthConfiguration;
 import de.gematik.test.erezept.config.dto.konnektor.TLSConfiguration;
 import de.gematik.test.konnektor.profile.KonSimProfile;
 import de.gematik.test.konnektor.profile.ProfileType;
+import jakarta.xml.ws.WebServiceClient;
 import java.net.URL;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class RemoteKonnektorServiceProviderTest {
 
-  @Test
+  private static RemoteKonnektorServiceProvider rksp;
+
+  @BeforeAll
   @SneakyThrows
-  void shouldProvideServices() {
+  static void setupBC() {
     val tlsConfig = new TLSConfiguration();
     tlsConfig.setKeyStore("konsim_mandant1_keystore.p12");
     tlsConfig.setKeyStorePassword("00");
@@ -47,14 +55,18 @@ class RemoteKonnektorServiceProviderTest {
     val basicAuth = new BasicAuthConfiguration();
     basicAuth.setUsername("user1");
     basicAuth.setPassword("password1");
-
     val url = new URL("https://localhost");
     val sPB = RemoteKonnektorServiceProvider.of(url, new KonSimProfile());
+
     sPB.trustProvider(trust);
     sPB.username(basicAuth.getUsername());
     sPB.password(basicAuth.getPassword());
-    val rksp = sPB.build();
 
+    rksp = sPB.build();
+  }
+
+  @Test
+  void shouldProvideServices() {
     // Well, just ensures code coverage
     assertEquals(ProfileType.KONSIM, rksp.getType());
     assertNotNull(rksp.getAuthSignatureService());
@@ -63,7 +75,43 @@ class RemoteKonnektorServiceProviderTest {
     assertNotNull(rksp.getSignatureService());
     assertNotNull(rksp.getCardService());
     assertNotNull(rksp.getCardTerminalService());
+    assertNotNull(rksp.getVSDServicePortType());
+    assertNotNull(rksp.getEncryptionServicePortType());
     assertEquals("user1", rksp.getUsername());
     assertEquals("password1", rksp.getPassword());
+  }
+
+  @SuppressWarnings("java:S1186")
+  static class TestServiceWithoutAnnotation {
+    public TestServiceWithoutAnnotation() {}
+  }
+
+  @WebServiceClient(
+      name = "",
+      targetNamespace = "",
+      wsdlLocation = "file:/path/to/nonexistent.wsdl")
+  @SuppressWarnings("java:S1186")
+  static class TestServiceNonExistentWsdl {
+    public TestServiceNonExistentWsdl() {}
+  }
+
+  @SuppressWarnings("java:S1186")
+  @WebServiceClient(name = "", targetNamespace = "", wsdlLocation = "")
+  static class TestServiceEmptyWsdlLocation {
+    public TestServiceEmptyWsdlLocation() {}
+  }
+
+  @SneakyThrows
+  @ParameterizedTest
+  @ValueSource(
+      classes = {
+        TestServiceWithoutAnnotation.class,
+        TestServiceNonExistentWsdl.class,
+        TestServiceEmptyWsdlLocation.class
+      })
+  void testResolveWsdlLocation(Class<?> testServiceClass) {
+    val test = mock(SEIStub.class);
+    val result = rksp.createAndConfigurePort(testServiceClass, s -> test, "/test");
+    assertNotNull(result);
   }
 }

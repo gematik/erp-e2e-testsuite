@@ -20,13 +20,11 @@
 
 package de.gematik.test.konnektor.soap.mock.utils;
 
-import static java.lang.String.format;
-
 import de.gematik.bbriccs.crypto.certificate.X509CertificateWrapper;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import java.security.cert.X509Certificate;
+import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -35,25 +33,31 @@ public enum BNetzAVLCa {
   GEM_HBA_QCA6_TEST_ONLY("GEM.HBA-qCA6 TEST-ONLY"),
   GEM_HBA_QCA24_TEST_ONLY("GEM.HBA-qCA24 TEST-ONLY"),
   GEM_HBA_QCA51_TEST_ONLY("GEM.HBA-qCA51 TEST-ONLY"),
+  GEM_KOMP_CA56_TEST_ONLY("GEM.Komp-CA56 TEST-ONLY"),
   ;
 
   private final String subjectCA;
 
+  public static X509Certificate getCA(String subjectCN) {
+    return Arrays.stream(BNetzAVLCa.values())
+        .filter(bNetzAVLCa -> bNetzAVLCa.subjectCA.equalsIgnoreCase(subjectCN))
+        .map(BNetzAVLCa::getCertificate)
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new IllegalArgumentException(
+                    MessageFormat.format("No BNetzAVL CA found with subjectCN: {0}", subjectCN)));
+  }
+
+  public static X509Certificate getCA(X509Certificate eeCert) {
+    val certWrapper = new X509CertificateWrapper(eeCert);
+    return certWrapper.getIssuerCN().map(BNetzAVLCa::getCA).get();
+  }
+
   public X509Certificate getCertificate() {
     val value =
         ResourceLoader.readFileFromResource(
-            format("ca/%s.pem", subjectCA.toLowerCase().replace(" ", "_")));
+            MessageFormat.format("ca/{0}.pem", subjectCA.toLowerCase().replace(" ", "_")));
     return X509CertificateWrapper.fromPem(value).toCertificate();
-  }
-
-  public static Optional<BNetzAVLCa> getBy(String subjectCN) {
-    return Arrays.stream(BNetzAVLCa.values())
-        .filter(it -> it.subjectCA.equalsIgnoreCase(subjectCN))
-        .findFirst();
-  }
-
-  public static Optional<BNetzAVLCa> getBy(X509Certificate eeCert) {
-    val certWrapper = new X509CertificateWrapper(eeCert);
-    return certWrapper.getIssuerCN().flatMap(BNetzAVLCa::getBy);
   }
 }

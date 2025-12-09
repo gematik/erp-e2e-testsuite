@@ -50,22 +50,22 @@ public interface ICommunicationType<T extends ProfileVersion> {
 
   WithStructureDefinition<T> getType();
 
-  WithNamingSystem getRecipientNamingSystem();
+  WithNamingSystem getRecipientNamingSystem(T version);
 
-  WithNamingSystem getSenderNamingSystem();
+  WithNamingSystem getSenderNamingSystem(T version);
 
   boolean doesMatch(String url);
 
-  default Reference getRecipientReference(String value) {
+  default Reference getRecipientReference(String value, T version) {
     val recipientRef = new Reference();
-    val recipientSystem = this.getRecipientNamingSystem().getCanonicalUrl();
+    val recipientSystem = this.getRecipientNamingSystem(version).getCanonicalUrl();
     recipientRef.getIdentifier().setSystem(recipientSystem).setValue(value);
     return recipientRef;
   }
 
-  default Reference getSenderReference(String value) {
+  default Reference getSenderReference(String value, T version) {
     val senderRef = new Reference();
-    val senderSystem = this.getSenderNamingSystem().getCanonicalUrl();
+    val senderSystem = this.getSenderNamingSystem(version).getCanonicalUrl();
     senderRef.getIdentifier().setSystem(senderSystem).setValue(value);
     return senderRef;
   }

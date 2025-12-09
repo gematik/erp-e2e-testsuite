@@ -20,15 +20,43 @@
 
 package de.gematik.test.erezept.actors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import lombok.val;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class KtrActorTest {
 
+  private KtrActor ktr;
+  private UseSMCB smcbAbility;
+
+  @BeforeEach
+  void setup() {
+    ktr = new KtrActor("AOK Berlin");
+    smcbAbility = mock(UseSMCB.class);
+
+    ktr.can(smcbAbility);
+  }
+
   @Test
   void shouldInstantiateKtrActor() {
     val ktr = assertDoesNotThrow(() -> new KtrActor("AOK Berlin"));
+  }
+
+  @Test
+  void shouldReturnTelematikId() {
+    when(smcbAbility.getTelematikID()).thenReturn("TELEMATIC-ID");
+
+    TelematikID tid = ktr.getTelematikId();
+
+    assertNotNull(tid);
+    assertEquals("TELEMATIC-ID", tid.getValue());
   }
 }

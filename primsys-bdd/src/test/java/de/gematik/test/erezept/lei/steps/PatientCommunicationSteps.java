@@ -214,7 +214,7 @@ public class PatientCommunicationSteps {
   public void thenPatientCannotGetAnyCommunications(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(HistSentCommunications.onBackend().noneExistAnymore()).isTrue());
+        .attemptsTo(Ensure.that(HisSentCommunications.onBackend().noneExistAnymore()).isTrue());
   }
 
   @Dann(
@@ -224,7 +224,7 @@ public class PatientCommunicationSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
-            Ensure.that(HistSentCommunications.onBackend().fromQueueStillExists(order)).isFalse());
+            Ensure.that(HisSentCommunications.onBackend().fromQueueStillExists(order)).isFalse());
   }
 
   @Wenn(

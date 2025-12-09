@@ -38,15 +38,9 @@ public enum DebugSettings implements PageElement {
       () -> null,
       () -> AppiumBy.iOSNsPredicateString("label == \"Environment\"")),
   RU_ENVIRONMENT(
-      "Environment Selector for the RU",
-      () -> null,
-      () -> AppiumBy.iOSNsPredicateString("label == \"RU\" AND type == \"XCUIElementTypeButton\"")),
+      "Environment Selector for the RU", () -> null, () -> AppiumBy.accessibilityId("RU")),
   RU_DEV_ENVIRONMENT(
-      "Environment Selector for the RU-DEV",
-      () -> null,
-      () ->
-          AppiumBy.iOSNsPredicateString(
-              "label == \"RU-DEV\" AND type == \"XCUIElementTypeButton\"")),
+      "Environment Selector for the RU-DEV", () -> null, () -> AppiumBy.accessibilityId("RU DEV")),
   TU_ENVIRONMENT(
       "Environment Selector for the TU",
       () -> null,

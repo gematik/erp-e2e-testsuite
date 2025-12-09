@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -37,6 +37,7 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.config.ConfigurationReader;
+import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -102,6 +103,9 @@ public class MockActorsUtils extends ErpFhirParsingTest {
       erpClientFactoryMockedStatic
           .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
           .thenReturn(erpClientMock);
+      erpClientFactoryMockedStatic
+          .when(() -> ErpClientFactory.createErpClient(any(), any(BaseActorConfiguration.class)))
+          .thenReturn(erpClientMock);
       when(erpClientMock.getFhir()).thenReturn(parser);
       when(erpClientMock.encode(any(), any()))
           .thenAnswer(
@@ -127,6 +131,10 @@ public class MockActorsUtils extends ErpFhirParsingTest {
           .getPatients()
           .subList(0, 5)
           .forEach(patient -> this.actorStage.getPatientNamed(patient.getName()));
+      cfg.getActors()
+          .getEuPharmacies()
+          .subList(0, 1)
+          .forEach(euPharmacy -> this.actorStage.getEuPharmacyNamed(euPharmacy.getName()));
     }
   }
 }

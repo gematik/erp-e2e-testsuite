@@ -26,6 +26,7 @@ import static net.serenitybdd.screenplay.GivenWhenThen.when;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
 import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.mobile.elements.OperatingSystem;
 import de.gematik.test.erezept.app.questions.HasSentDispReq;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.app.task.EnsureTheCorrectProfile;
@@ -64,6 +65,8 @@ public class AssignPrescriptionToPharmacyOnIos implements Task {
             "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
             actor.getName(), deque));
     app.tap(Mainscreen.REFRESH_BUTTON);
+    // Note: wait 45s to load the newly created prescription
+    app.longPauseApp();
 
     val prescriptionBundle =
         actor
@@ -117,7 +120,7 @@ public class AssignPrescriptionToPharmacyOnIos implements Task {
     app.waitUntilElementIsVisible(PharmacyDetailScreen.BACK_TO_HOME, 60000);
     app.tap(PharmacyDetailScreen.BACK_TO_HOME);
 
-    app.tapIfDisplayed(Utility.LATER); // rate on app-store later
+    app.tapIfDisplayed(OperatingSystem.LATER); // rate on app-store later
 
     // check if the communicationDispReq was sent
     val isCommunicationDispReqSent =

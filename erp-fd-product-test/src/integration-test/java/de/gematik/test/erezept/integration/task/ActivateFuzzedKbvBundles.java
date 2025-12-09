@@ -38,6 +38,7 @@ import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.FuzzingIncrementsToggle;
 import de.gematik.test.erezept.toggle.FuzzingIterationsToggle;
 import de.gematik.test.fuzzing.core.ByteArrayMutator;
+import de.gematik.test.fuzzing.core.ByteOrderMark;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.core.StringMutator;
 import de.gematik.test.fuzzing.fhirfuzz.FhirFuzzImpl;
@@ -59,6 +60,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 
@@ -237,6 +239,22 @@ class ActivateFuzzedKbvBundles extends ErpTest {
             .withIndefiniteType()
             .hasResponseWith(returnCodeIsBetween(400, 499, FhirRequirements.FHIR_XML_PARSING))
             .isCorrect());
+  }
+
+  @Tag("BOM")
+  @TestcaseId("ERP_TASK_ACTIVATE_FUZZING_14")
+  @ParameterizedTest(name = "[{index}] -> Mit BOM Präfix ''{0}''")
+  @DisplayName("FHIR-XML-kodierte Verordnung mit angehängter BOM")
+  @EnumSource(
+      value = ByteOrderMark.class,
+      mode = EnumSource.Mode.EXCLUDE,
+      names = {"UTF_16BE", "UTF_16LE"})
+  void shouldRejectBoms(ByteOrderMark bom) {
+    // Note: UTF_16BE and UTF_16LE won't have any effect because SoftKon will sign as UTF-8 anyway
+    // However:
+    // - when prefix with UTF-8 BOM, SoftKon will keep it
+    // - when prefix with UTF-16BE/LE, SoftKon would encode as UTF-8 and append UTF-8 BOM
+    executeTest(b -> b.withStringFuzzing(input -> bom.asMutator().apply(input)));
   }
 
   private void executeTest(Consumer<IssuePrescription.Builder> mutator) {

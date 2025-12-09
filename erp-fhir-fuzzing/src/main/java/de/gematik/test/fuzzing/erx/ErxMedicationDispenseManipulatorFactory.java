@@ -21,7 +21,13 @@
 package de.gematik.test.fuzzing.erx;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.time.LocalDateTime;
@@ -35,6 +41,8 @@ import org.hl7.fhir.r4.model.DateTimeType;
 
 public class ErxMedicationDispenseManipulatorFactory {
 
+  private static final String TELAMATIKID_SYSTEM = "https://gematik.de/fhir/sid/telematik-id";
+
   ErxMedicationDispenseManipulatorFactory() {
     throw new AssertionError("Do not instantiate");
   }
@@ -46,6 +54,14 @@ public class ErxMedicationDispenseManipulatorFactory {
    */
   public static List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>>
       getAllMedicationDispenseManipulators() {
+    val manipulators = getAllDateTimeMedicationDispenseManipulators();
+    manipulators.addAll(getSystemManipulator());
+
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>>
+      getAllDateTimeMedicationDispenseManipulators() {
     val manipulators = new LinkedList<>(getDateTimeManipulatorsWhenHandedOver());
     manipulators.addAll(getDateTimeManipulatorsWhenPrepared());
 
@@ -69,6 +85,133 @@ public class ErxMedicationDispenseManipulatorFactory {
                   Date.from(whenHandedOver.toInstant().plusSeconds(60 * 60 * 24)); // Add 1 day
               dispense.setWhenPreparedElement(new DateTimeType(whenPrepared));
             }));
+
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>> getSystemManipulator() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "shorten PrescriptionId-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense.getIdentifier().stream()
+                    .filter(ErpWorkflowNamingSystem.PRESCRIPTION_ID::matches)
+                    .forEach(
+                        prId -> {
+                          val system =
+                              prId.getSystem()
+                                  .substring(0, prId.getSystem().length() - GemFaker.fakerAmount());
+                          prId.setSystem(system);
+                        })));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "shorten KVID-System to trigger Slice-Validation @ ErpFD",
+            dispense -> {
+              val kvidSystem = dispense.getSubject().getIdentifier().getSystem();
+              dispense
+                  .getSubject()
+                  .getIdentifier()
+                  .setSystem(kvidSystem.substring(0, kvidSystem.length() - GemFaker.fakerAmount()));
+            }));
+    manipulators.add(
+        NamedEnvelope.of(
+            "shorten actors Telematik-Id-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense.getPerformer().stream()
+                    .filter(
+                        perf ->
+                            perf.getActor().getIdentifier().getSystem().matches(TELAMATIKID_SYSTEM))
+                    .forEach(
+                        mDCP -> {
+                          val manipulatedSystem = mDCP.getActor().getIdentifier().getSystem();
+                          mDCP.getActor()
+                              .getIdentifier()
+                              .setSystem(
+                                  manipulatedSystem.substring(
+                                      0, manipulatedSystem.length() - GemFaker.fakerAmount()));
+                        })));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "set TelematikID instead of PrescriptionId-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense.getIdentifier().stream()
+                    .filter(ErpWorkflowNamingSystem.PRESCRIPTION_ID::matches)
+                    .forEach(prId -> prId.setSystem(TelematikID.random().getSystemUrl()))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "set Accident-System instead of KVID-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense
+                    .getSubject()
+                    .getIdentifier()
+                    .setSystem(KbvItaErpStructDef.ACCIDENT.getCanonicalUrl())));
+    manipulators.add(
+        NamedEnvelope.of(
+            "set SNOMED_SCT instead of Actors Telematik-Id-System to trigger Slice-Validation @"
+                + " ErpFD",
+            dispense ->
+                dispense.getPerformer().stream()
+                    .filter(
+                        perf ->
+                            perf.getActor().getIdentifier().getSystem().matches(TELAMATIKID_SYSTEM))
+                    .forEach(
+                        mDCP ->
+                            mDCP.getActor()
+                                .getIdentifier()
+                                .setSystem(CommonCodeSystem.SNOMED_SCT.getCanonicalUrl()))));
+    manipulators.add(
+        NamedEnvelope.of(
+            "set BSNR instead of Actors Telematik-Id-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense.getPerformer().stream()
+                    .filter(
+                        perf ->
+                            perf.getActor().getIdentifier().getSystem().matches(TELAMATIKID_SYSTEM))
+                    .forEach(
+                        mDCP ->
+                            mDCP.getActor()
+                                .getIdentifier()
+                                .setSystem(BSNR.getCodeSystem().getCanonicalUrl()))));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "switch PrescriptionId-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense.getIdentifier().stream()
+                    .filter(ErpWorkflowNamingSystem.PRESCRIPTION_ID::matches)
+                    .forEach(
+                        prId ->
+                            prId.setSystem(
+                                dispense.getSubject().getIdentifier().getSystem())) // kvid System
+            ));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "switch KVID-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense
+                    .getSubject()
+                    .getIdentifier()
+                    .setSystem((ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl()))));
+    manipulators.add(
+        NamedEnvelope.of(
+            "switch Actors Telematik-Id-System to trigger Slice-Validation @ ErpFD",
+            dispense ->
+                dispense.getPerformer().stream()
+                    .filter(
+                        perf ->
+                            perf.getActor().getIdentifier().getSystem().matches(TELAMATIKID_SYSTEM))
+                    .forEach(
+                        mDCP ->
+                            mDCP.getActor()
+                                .getIdentifier()
+                                .setSystem(
+                                    ErpWorkflowNamingSystem.PRESCRIPTION_ID.getCanonicalUrl()))));
 
     return manipulators;
   }

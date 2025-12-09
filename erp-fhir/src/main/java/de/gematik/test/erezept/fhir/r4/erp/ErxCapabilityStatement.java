@@ -25,6 +25,7 @@ import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.CapabilityStatement;
+import org.hl7.fhir.r4.model.PrimitiveType;
 
 @Slf4j
 @ResourceDef(name = "CapabilityStatement")
@@ -43,7 +44,7 @@ public class ErxCapabilityStatement extends CapabilityStatement {
 
   public String getSoftwareReleaseDate() {
     return Optional.ofNullable(this.getSoftware().getReleaseDateElement())
-        .map(element -> element.asStringValue())
+        .map(PrimitiveType::asStringValue)
         .orElseThrow(() -> new MissingFieldException(this.getClass(), "Software ReleaseDate"));
   }
 

@@ -22,6 +22,7 @@ package de.gematik.test.erezept.integration.task;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 
+import com.ibm.icu.impl.Pair;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -31,15 +32,11 @@ import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.SupplyRequestBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import lombok.extern.slf4j.Slf4j;
@@ -68,14 +65,18 @@ class DeclinePrescriptionWithPracticeSupplyIT extends ErpTest {
     patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
-    val coverage = KbvCoverageFaker.builder().fake();
+
+    val patientCoverage = patient.getPatientCoverage();
     val kbvBundleBuilder =
         generateKbvBundle(
-            coverage, medication, KbvMedicalOrganizationFaker.builder().fake(), supplyRequest);
+            patientCoverage,
+            medication,
+            KbvMedicalOrganizationFaker.builder().fake(),
+            supplyRequest);
 
     kbvBundleBuilder.medicationRequest(
         KbvErpMedicationRequestFaker.builder()
-            .withPatient(patient.getPatientData())
+            .withPatient(patientCoverage.first)
             .withMedication(medication)
             .withRequester(doctor.getPractitioner())
             .fake());
@@ -100,9 +101,10 @@ class DeclinePrescriptionWithPracticeSupplyIT extends ErpTest {
     patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val supplyRequest = getSupplyRequest(medication);
+    val patientCoverage = patient.getPatientCoverage();
     val kbvBundleBuilder =
         generateKbvBundle(
-            KbvCoverageFaker.builder().fake(),
+            patientCoverage,
             medication,
             KbvMedicalOrganizationFaker.builder().fake(),
             supplyRequest);
@@ -122,22 +124,24 @@ class DeclinePrescriptionWithPracticeSupplyIT extends ErpTest {
   }
 
   private SupplyRequest getSupplyRequest(KbvErpMedication medication) {
-    return SupplyRequestBuilder.withCoverage(patient.getInsuranceCoverage())
+    val patientCoverage = patient.getPatientCoverage();
+    return SupplyRequestBuilder.withCoverage(patientCoverage.second)
         .medication(medication)
         .requester(doctor.getPractitioner())
         .build();
   }
 
   private KbvErpBundleBuilder generateKbvBundle(
-      KbvCoverage coverage,
+      Pair<KbvPatient, KbvCoverage> patientCoverage,
       Medication medication,
       KbvMedicalOrganization organization,
       SupplyRequest supplyRequest) {
+
     return KbvErpBundleBuilder.forPrescription(PrescriptionId.random())
         .practitioner(doctor.getPractitioner())
         .medicalOrganization(organization)
-        .patient(patient.getPatientData())
-        .insurance(coverage)
+        .patient(patientCoverage.first)
+        .insurance(patientCoverage.second)
         .statusKennzeichen("00", doctor.getPractitioner()) // 00/NONE is default
         .supplyRequest(supplyRequest)
         .medication(medication);

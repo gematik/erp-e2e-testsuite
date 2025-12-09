@@ -25,9 +25,7 @@ import de.gematik.test.erezept.client.usecases.TaskGetByIdAsAcceptBundleCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
@@ -49,6 +47,32 @@ public class ResponseOfGetTaskById {
 
   public static ResponseOfGetTaskByIdAsPharmacy asPharmacy(DequeStrategy deque) {
     return new ResponseOfGetTaskByIdAsPharmacy(deque);
+  }
+
+  public static ResponseOfGetTaskByIdAsKtr asKtr(DequeStrategy deque) {
+    return new ResponseOfGetTaskByIdAsKtr(deque);
+  }
+
+  public static class ResponseOfGetTaskByIdAsKtr extends FhirResponseQuestion<ErxAcceptBundle> {
+
+    private final DequeStrategy deque;
+
+    private ResponseOfGetTaskByIdAsKtr(DequeStrategy deque) {
+      this.deque = deque;
+    }
+
+    @Override
+    public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
+      val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
+
+      val erxAcceptBundle = deque.chooseFrom(prescriptionManager.getAcceptedPrescriptions());
+      val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+
+      val cmd =
+          new TaskGetByIdAsAcceptBundleCommand(
+              erxAcceptBundle.getTaskId(), erxAcceptBundle.getTask().getAccessCode());
+      return erpClient.request(cmd);
+    }
   }
 
   public static class ResponseOfGetTaskByIdAsPharmacy

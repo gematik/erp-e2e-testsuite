@@ -27,6 +27,8 @@ import de.gematik.test.erezept.client.exceptions.InvalidClientTypeException;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ClientTypeTest {
 
@@ -42,12 +44,44 @@ class ClientTypeTest {
     inputs.forEach(input -> assertEquals(ClientType.FDV, ClientType.fromString(input)));
   }
 
-  @Test
-  void shouldThrowOnInvalidTypes() {
-    val inputs = List.of("Apps", "Edv", "Xdv", "Primersystem", "prim-sys");
-    inputs.forEach(
-        input ->
-            assertThrows(InvalidClientTypeException.class, () -> ClientType.fromString(input)));
+  @ParameterizedTest
+  @ValueSource(strings = {"ncpeh", "eu", "EU", "NCPEH", "NCPeH"})
+  void shouldDetectNcpehFromString(String input) {
+    assertEquals(ClientType.NCPEH, ClientType.fromString(input));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "ktr",
+        "kostenträger",
+        "kostentraeger",
+        "krankenkasse",
+        "KTR",
+        "Kostenträger",
+        "Krankenkasse",
+        "Kostentraeger",
+      })
+  void shouldDetectKtrFromString(String input) {
+    assertEquals(ClientType.KTR, ClientType.fromString(input));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "Apps",
+        "Edv",
+        "Xdv",
+        "Primersystem",
+        "prim-sys",
+        "NCPEH-Client",
+        "KTR-System",
+        "Kostenträger-KK",
+        "Diga-App",
+        "Evdga-App"
+      })
+  void shouldThrowOnInvalidTypes(String input) {
+    assertThrows(InvalidClientTypeException.class, () -> ClientType.fromString(input));
   }
 
   @Test
@@ -55,5 +89,7 @@ class ClientTypeTest {
     // well, actually only for coverage
     assertEquals("Primärsystem", ClientType.PS.toString());
     assertEquals("Benutzer-App", ClientType.FDV.toString());
+    assertEquals("NCPeH", ClientType.NCPEH.toString());
+    assertEquals("Kostenträger", ClientType.KTR.toString());
   }
 }

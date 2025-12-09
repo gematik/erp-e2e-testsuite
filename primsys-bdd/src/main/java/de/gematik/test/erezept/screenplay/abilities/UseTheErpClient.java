@@ -22,6 +22,7 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.apimeasure.LoggingStopwatch;
@@ -131,8 +132,8 @@ public class UseTheErpClient implements Ability {
   }
 
   protected String reportFhirResource(String title, @Nullable Resource resource) {
-    var content = "[]";
-    if (resource != null) {
+    var content = "[EMPTY BODY]";
+    if (resource != null && !(resource instanceof EmptyResource)) {
       val fhir = client.getFhir();
       val encodingType = client.getAcceptMime().toFhirEncoding();
       content = fhir.encode(resource, encodingType, true);

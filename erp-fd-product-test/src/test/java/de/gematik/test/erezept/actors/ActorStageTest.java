@@ -37,6 +37,7 @@ import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import lombok.val;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -48,6 +49,11 @@ class ActorStageTest {
   static void setup() {
     StopwatchProvider.init();
     stage = new ActorStage();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    stage.drawTheCurtain();
   }
 
   @Test

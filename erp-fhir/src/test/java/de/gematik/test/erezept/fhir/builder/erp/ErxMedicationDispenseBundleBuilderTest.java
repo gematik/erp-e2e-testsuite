@@ -29,6 +29,7 @@ import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -53,14 +54,14 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
                 builder.add(
                     ErxMedicationDispenseFaker.builder()
                         .withKvnr(kvnr)
-                        .withVersion(ErpWorkflowVersion.V1_4)
+                        .withVersion(ErpWorkflowVersion.getDefaultVersion())
                         .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
 
     val bundle = builder.build();
 
-    assertTrue(parser.isValid(bundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
     assertEquals(3, bundle.getEntry().size());
   }
 
@@ -78,7 +79,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
             .withPrescriptionId(prescriptionId)
             .fake();
 
-    assertTrue(parser.isValid(bundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
     assertEquals(2, bundle.getEntry().size());
   }
 
@@ -105,7 +106,8 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
                         .fake()));
 
     val bundle = builder.build();
-    assertTrue(parser.isValid(bundle));
+
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
     assertFalse(bundle.getMeta().getProfile().isEmpty());
     assertTrue(ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.matches(bundle.getMeta()));
   }

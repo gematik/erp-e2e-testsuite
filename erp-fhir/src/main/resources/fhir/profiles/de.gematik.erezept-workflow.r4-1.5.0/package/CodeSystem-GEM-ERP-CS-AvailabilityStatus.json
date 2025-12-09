@@ -6,7 +6,7 @@
   "id": "GEM-ERP-CS-AvailabilityStatus",
   "title": "CodeSystem of AvailabilityStatus",
   "description": "Type of the availability status for medication availability request.",
-  "version": "1.5.0",
+  "version": "1.5.2",
   "url": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_AvailabilityStatus",
   "concept": [
     {
@@ -34,7 +34,7 @@
       "display": "unbekannt"
     }
   ],
-  "date": "2025-04-10",
+  "date": "2025-06-23",
   "publisher": "gematik GmbH",
   "contact": [
     {

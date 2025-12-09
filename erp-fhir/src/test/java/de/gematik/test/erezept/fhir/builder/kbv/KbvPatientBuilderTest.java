@@ -47,13 +47,13 @@ class KbvPatientBuilderTest extends ErpFhirParsingTest {
     val patient =
         KbvPatientBuilder.builder()
             .version(kbvForVersion)
-            .kvnr(KVNR.random(), insuranceType) // TODO: rollback to GKV
+            .kvnr(KVNR.random(), insuranceType)
             .name("Erwin", "Fleischer")
             .birthDate("09.07.1973")
             .address(Country.D, "Berlin", "10117", "Friedrichstraße 136")
             .build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, patient, true);
+    val result = ValidatorUtil.encodeAndValidate(parser, patient);
     assertTrue(result.isSuccessful());
   }
 

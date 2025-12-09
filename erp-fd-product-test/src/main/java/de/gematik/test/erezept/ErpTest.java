@@ -24,35 +24,32 @@ import de.gematik.bbriccs.toggle.FeatureConfiguration;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.exceptions.NotAnActorException;
 import de.gematik.test.core.extensions.ErpTestExtension;
-import de.gematik.test.erezept.actors.ActorStage;
-import de.gematik.test.erezept.actors.DoctorActor;
-import de.gematik.test.erezept.actors.ErpActor;
-import de.gematik.test.erezept.actors.KtrActor;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.actors.*;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
-import de.gematik.test.erezept.toggle.CucumberFeatureParser;
-import de.gematik.test.erezept.toggle.CucumberFeatureToggle;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(ErpTestExtension.class)
 public abstract class ErpTest {
 
   protected static final FeatureConfiguration featureConf = new FeatureConfiguration();
-  protected static final CucumberFeatureParser cucumberFeatures =
-      featureConf.getToggle(new CucumberFeatureToggle());
 
   protected final ActorStage stage;
   protected final ErpFdTestsuiteFactory config;
 
   protected ErpTest() {
     this.stage = new ActorStage();
-    this.config = stage.getConfig();
+    this.config = ActorStage.getConfig();
     instrumentAnnotatedActors();
+  }
+
+  @AfterEach
+  void teardownActorStage() {
+    this.stage.drawTheCurtain();
   }
 
   /**

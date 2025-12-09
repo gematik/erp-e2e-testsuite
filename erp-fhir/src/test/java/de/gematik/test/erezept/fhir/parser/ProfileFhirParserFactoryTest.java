@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class ProfileFhirParserFactoryTest {
 
@@ -38,14 +40,24 @@ class ProfileFhirParserFactoryTest {
 
   @Test
   void shouldCreateProfiledValidator() {
-    val validator = assertDoesNotThrow(ProfileFhirParserFactory::getProfiledValidators);
+    val validator = assertDoesNotThrow(ProfileFhirParserFactory::getDefaultValidator);
     assertNotNull(validator);
+  }
+
+  @ParameterizedTest
+  @EnumSource(ValidatorType.class)
+  void shouldCreateValidatorFor(ValidatorType validatorType) {
+    val validatorOne =
+        assertDoesNotThrow(() -> ProfileFhirParserFactory.getValidatorFor(validatorType));
+    val validatorTwo =
+        assertDoesNotThrow(() -> ProfileFhirParserFactory.getValidatorFor(validatorType));
+    assertEquals(validatorOne, validatorTwo);
   }
 
   @Test
   void shouldCacheValidator() {
-    val validatorOne = assertDoesNotThrow(ProfileFhirParserFactory::getProfiledValidators);
-    val validatorTwo = assertDoesNotThrow(ProfileFhirParserFactory::getProfiledValidators);
+    val validatorOne = assertDoesNotThrow(ProfileFhirParserFactory::getDefaultValidator);
+    val validatorTwo = assertDoesNotThrow(ProfileFhirParserFactory::getDefaultValidator);
     assertEquals(validatorOne, validatorTwo);
   }
 }

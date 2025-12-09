@@ -5,9 +5,9 @@
   "id": "GEM-ERP-VS-FlowType",
   "title": "ValueSet of Flowtype Codes",
   "description": "Shows the different types of the ePrescription according to the prescription forms.",
-  "version": "1.5.0",
+  "version": "1.5.2",
   "url": "https://gematik.de/fhir/erp/ValueSet/GEM_ERP_VS_FlowType",
-  "date": "2025-04-10",
+  "date": "2025-06-23",
   "publisher": "gematik GmbH",
   "contact": [
     {

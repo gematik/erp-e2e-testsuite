@@ -25,9 +25,11 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasValidPrescriptionId;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInDraftStatus;
+import static de.gematik.test.fuzzing.kbv.CreateManipulatorFactory.getCreateManipulators;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.ArgumentComposer;
+import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
@@ -35,14 +37,18 @@ import de.gematik.test.erezept.actions.TaskCreate;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.ActorStage;
 import de.gematik.test.erezept.actors.ActorType;
+import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.hl7.fhir.r4.model.Parameters;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,12 +63,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 @Tag("TaskCreateOnly")
 class TaskCreateIT extends ErpTest {
 
+  @Actor(name = "Adelheid Ulmenwald")
+  private DoctorActor doctor;
+
   @TestcaseId("ERP_TASK_CREATE_01")
   @ParameterizedTest(name = "[{index}] -> Verordnender Arzt erstellt Task mit WorkFlow {0}")
   @DisplayName("Erstelle einen E-Rezept Task als Verordnender Arzt")
   @EnumSource(value = PrescriptionFlowType.class)
   void createTask(PrescriptionFlowType flowType) {
-    val doctor = this.getDoctorNamed("Adelheid Ulmenwald");
 
     val creation = doctor.performs(TaskCreate.withFlowType(flowType));
     doctor.attemptsTo(
@@ -90,20 +98,45 @@ class TaskCreateIT extends ErpTest {
             .isCorrect());
   }
 
+  @TestcaseId("ERP_TASK_CREATE_03")
+  @ParameterizedTest(
+      name = "[{index}] -> Verordnender Arzt erstellt einen Task mit Manipuliertem System: {1}")
+  @DisplayName("Erstelle einen E-Rezept Task als Verordnender Arzt und verändere das System")
+  @MethodSource("createManipulatedTasksProvider")
+  void createManipulatedTasks(NamedEnvelope<FuzzingMutator<Parameters>> manipulator) {
+
+    val sina = this.getPatientNamed("Sina Hüllmann");
+
+    val creation =
+        doctor.performs(
+            TaskCreate.forPatient(sina)
+                .manipulator(manipulator.getParameter())
+                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY));
+    doctor.attemptsTo(
+        Verify.that(creation)
+            .withOperationOutcome(ErpAfos.A_22927)
+            .hasResponseWith(returnCode(400))
+            .isCorrect());
+  }
+
+  static Stream<Arguments> createManipulatedTasksProvider() {
+    return ArgumentComposer.composeWith().arguments(getCreateManipulators()).create();
+  }
+
   static Stream<Arguments> taskCreateProvider() {
     return ArgumentComposer.composeWith()
         .arguments(
             NamedEnvelope.of(
                 format("{0} Sina Hüllmann", ActorType.PATIENT),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPatientNamed("Sina Hüllmann")))
+                (Function<ActorStage, ErpActor>) stage -> stage.getPatientNamed("Sina Hüllmann")))
         .arguments(
             NamedEnvelope.of(
                 format("{0} Am Flughafen", ActorType.PHARMACY),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getPharmacyNamed("Am Flughafen")))
+                (Function<ActorStage, ErpActor>) stage -> stage.getPharmacyNamed("Am Flughafen")))
         .arguments(
             NamedEnvelope.of(
                 format("{0} AOK Bremen", ActorType.HEALTH_INSURANCE),
-                (Function<ActorStage, ErpActor>) (stage) -> stage.getKtrNamed("AOK Bremen")))
+                (Function<ActorStage, ErpActor>) stage -> stage.getKtrNamed("AOK Bremen")))
         .multiplyAppend(PrescriptionFlowType.class)
         .create();
   }

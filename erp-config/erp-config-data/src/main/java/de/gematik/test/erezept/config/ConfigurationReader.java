@@ -107,10 +107,15 @@ public class ConfigurationReader<DTO extends BaseConfigurationDto> {
   }
 
   private static Path calculateDefaultPath(ConfigurationScope scope) {
-    val basePath = Path.of("config", scope.getDefaultDirectoryName(), "config.yaml");
-    return (basePath.toFile().exists() ? basePath : Path.of("..").resolve(basePath))
-        .toAbsolutePath()
-        .normalize();
+    var basePath = Path.of("config", scope.getDefaultDirectoryName(), "config.yaml");
+    var doesExist = basePath.toFile().exists();
+    var counter = 0;
+    while (!doesExist && counter < 3) {
+      basePath = Path.of("..").resolve(basePath);
+      doesExist = basePath.toFile().exists();
+      counter++;
+    }
+    return basePath.toAbsolutePath().normalize();
   }
 
   public static class Builder<BDTO extends BaseConfigurationDto> {

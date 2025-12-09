@@ -22,14 +22,17 @@ package de.gematik.test.erezept.eml.fhir.profile;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.bbriccs.fhir.coding.WithNamingSystem;
+import de.gematik.bbriccs.fhir.coding.WithCodeSystem;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UseFulCodeSystems implements WithNamingSystem {
+public enum UseFulCodeSystems implements WithCodeSystem {
+  BFARM_CS_MED_REF(
+      "https://terminologieserver.bfarm.de/fhir/CodeSystem/arzneimittel-referenzdaten-pharmazeutisches-produkt"),
   SNOMED_SCT("http://snomed.info/sct"),
+  UCUM("http://unitsofmeasure.org"), // Unified Code for Units of Measure
   ;
 
   private final String canonicalUrl;

@@ -20,15 +20,16 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class ChargeItemDeleteCommand extends BaseCommand<Resource> {
+public class ChargeItemDeleteCommand extends BaseCommand<EmptyResource> {
 
   public ChargeItemDeleteCommand(PrescriptionId prescriptionId) {
-    super(Resource.class, HttpRequestMethod.DELETE, "ChargeItem", prescriptionId.getValue());
+    super(EmptyResource.class, HttpRequestMethod.DELETE, "ChargeItem", prescriptionId.getValue());
   }
 
   /**

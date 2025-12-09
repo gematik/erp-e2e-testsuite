@@ -33,6 +33,7 @@ import de.gematik.test.fuzzing.core.*;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import lombok.*;
 import net.serenitybdd.annotations.Step;
@@ -50,6 +51,7 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
   private final List<StringMutator> stringBundleMutators;
   private final List<ByteArrayMutator> signedBundleMutators;
   @Nullable private ByteArrayOutputStream signatureObserver;
+  @Nullable private Function<String, byte[]> signingFunc;
 
   public static Builder forGiven(ErpInteraction<ErxTask> interaction) {
     return forGiven(interaction.getExpectedResponse());
@@ -68,6 +70,11 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
     return this;
   }
 
+  public ActivatePrescription setCustomSigningFunction(Function<String, byte[]> signingFunc) {
+    this.signingFunc = signingFunc;
+    return this;
+  }
+
   @SneakyThrows
   @Override
   @Step("{0} aktiviert Task #taskId mit #accessCode und #kbvBundle")
@@ -80,7 +87,10 @@ public class ActivatePrescription extends ErpAction<ErxTask> {
       encodedKbv = fuzzingStep.apply(encodedKbv);
     }
 
-    val signedKbv = konnektor.signDocumentWithHba(encodedKbv).getPayload();
+    val signedKbv =
+        signingFunc != null
+            ? signingFunc.apply(encodedKbv)
+            : konnektor.signDocumentWithHba(encodedKbv).getPayload();
     if (signatureObserver != null) {
       signatureObserver.writeBytes(signedKbv);
       signatureObserver.flush();

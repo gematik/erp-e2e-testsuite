@@ -25,10 +25,10 @@ import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.ActCode;
 import de.gematik.bbriccs.fhir.de.valueset.ConsentScope;
-import de.gematik.test.erezept.fhir.profiles.definitions.ErpEuStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsent;
-import de.gematik.test.erezept.fhir.valuesets.EuConsentType;
+import de.gematik.test.erezept.fhir.valuesets.eu.EuConsentType;
 import java.util.Date;
 import java.util.List;
 import lombok.val;
@@ -71,7 +71,7 @@ public class EuConsentBuilder extends ResourceBuilder<EuConsent, EuConsentBuilde
 
   @Override
   public EuConsent build() {
-    val consent = this.createResource(EuConsent::new, ErpEuStructDef.CONSENT_TYPE, version);
+    val consent = this.createResource(EuConsent::new, GemErpEuStructDef.CONSENT, version);
 
     consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_GKV_SID, false));
     consent.setPolicyRule(policyRule.asCodeableConcept());

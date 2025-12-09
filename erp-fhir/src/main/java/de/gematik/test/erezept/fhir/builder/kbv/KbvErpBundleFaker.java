@@ -62,14 +62,25 @@ public class KbvErpBundleFaker {
   private PrescriptionId prescriptionId = PrescriptionId.random();
   private KbvItaForVersion forVersion;
 
-  private KbvErpBundleFaker() {
-    val patient =
-        KbvPatientFaker.builder()
-            .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
-            .fake();
-    val practitioner = KbvPractitionerFaker.builder().fake();
+  private KbvErpBundleFaker(boolean forPkvCoverage) {
+    KbvPatient patient;
+    if (forPkvCoverage) {
+      patient =
+          KbvPatientFaker.builder()
+              .withKvnrAndInsuranceType(KVNR.randomPkv(), InsuranceTypeDe.PKV)
+              .fake();
+    } else {
+      patient =
+          KbvPatientFaker.builder()
+              .withKvnrAndInsuranceType(KVNR.randomGkv(), InsuranceTypeDe.GKV)
+              .fake();
+    }
+    val practitioner =
+        KbvPractitionerFaker.builder().withQualificationType(QualificationType.DOCTOR).fake();
     kbvCoverageFaker =
-        KbvCoverageFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).withBeneficiary(patient);
+        KbvCoverageFaker.builder()
+            .withInsuranceType(forPkvCoverage ? InsuranceTypeDe.PKV : InsuranceTypeDe.GKV)
+            .withBeneficiary(patient);
 
     val kbvErpMedication =
         KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
@@ -91,7 +102,11 @@ public class KbvErpBundleFaker {
   }
 
   public static KbvErpBundleFaker builder() {
-    return new KbvErpBundleFaker();
+    return new KbvErpBundleFaker(false);
+  }
+
+  public static KbvErpBundleFaker builderForPkvCoverage() {
+    return new KbvErpBundleFaker(true);
   }
 
   public KbvErpBundleFaker withVersion(KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {

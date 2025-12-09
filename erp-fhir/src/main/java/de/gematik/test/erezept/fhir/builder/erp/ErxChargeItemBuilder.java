@@ -54,7 +54,7 @@ import org.hl7.fhir.r4.model.Resource;
 public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChargeItemBuilder> {
 
   private final PrescriptionId prescriptionId;
-  private PatientenrechnungVersion version = PatientenrechnungVersion.V1_0_0;
+  private PatientenrechnungVersion version = PatientenrechnungVersion.getDefaultVersion();
   private ChargeItem.ChargeItemStatus status = ChargeItem.ChargeItemStatus.BILLABLE;
   private Date enteredDate = new Date();
   private Reference receiptReference;
@@ -188,8 +188,11 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
 
     chargeItem.setIdentifier(identifiers);
 
-    // Note: PKV system is hardcoded here - should be refactored in testsuites first
-    val kvnrIdentifier = kvnr.asIdentifier(DeBasisProfilNamingSystem.KVID_PKV_SID, false);
+    val ns =
+        version.isSmallerThanOrEqualTo(PatientenrechnungVersion.V1_0_0)
+            ? DeBasisProfilNamingSystem.KVID_PKV_SID
+            : DeBasisProfilNamingSystem.KVID_GKV_SID;
+    val kvnrIdentifier = kvnr.asIdentifier(ns, false);
     kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
     chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));
 

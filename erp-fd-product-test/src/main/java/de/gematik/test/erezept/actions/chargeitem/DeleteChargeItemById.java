@@ -22,6 +22,7 @@ package de.gematik.test.erezept.actions.chargeitem;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.client.usecases.ChargeItemDeleteCommand;
@@ -30,11 +31,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
-import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
 @RequiredArgsConstructor
-public class DeleteChargeItemById extends ErpAction<Resource> {
+public class DeleteChargeItemById extends ErpAction<EmptyResource> {
   private final PrescriptionId prescriptionId;
 
   public static DeleteChargeItemById withId(PrescriptionId prescriptionId) {
@@ -42,7 +42,7 @@ public class DeleteChargeItemById extends ErpAction<Resource> {
   }
 
   @Override
-  public ErpInteraction<Resource> answeredBy(Actor actor) {
+  public ErpInteraction<EmptyResource> answeredBy(Actor actor) {
     val interaction = this.performCommandAs(new ChargeItemDeleteCommand(prescriptionId), actor);
     log.info(format("Deleted ChargeItem with ID: {0} !", prescriptionId));
     return interaction;

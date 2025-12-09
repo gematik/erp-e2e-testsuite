@@ -14,9 +14,15 @@ actors:
       qualificationType: Arzt
       konnektor: Soft-Konn
 
+    - name: Michael Morgenrot
+      smcbIccsn: 80276883110000159320 # Reha-Klinik Morgenrot
+      hbaIccsn: 80276001011699901501 # HBA von Ulmenwald
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
     - name: Dr. Schraßer
       smcbIccsn: 80276883110000163972 #Praxis Peer Graf von Müller
-      hbaIccsn: 80276883110000095767
+      hbaIccsn: 80276883110000170943 # Arzt Max Tangeroal
       qualificationType: Arzt
       konnektor: Soft-Konn
 
@@ -91,7 +97,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Stadtapotheke
-      smcbIccsn: 80276883110000163973
+      smcbIccsn: 80276883110000092475
       konnektor: Soft-Konn
 
     - name: Keine Apotheke
@@ -114,6 +120,11 @@ actors:
     - name: Christine Ulmendorfer
       smcbIccsn: 80276001011699902303
       konnektor: Soft-Konn
+
+    - name: An der Schule
+      smcbIccsn: 80276883110000147759
+      konnektor: Soft-Konn
+
 
   apothecaries:
     - name: Finn-Louis Nullmayr
@@ -147,6 +158,19 @@ actors:
     - name: AOK Bremen
       smcbIccsn: 80276883110000163954
       konnektor: Soft-Konn
+
+  euPharmacies:
+    - name: Hannes Vogt
+      countryCode: LI
+      smcbIccsn: ncpeh-smb
+      pharmacistIdentifier: GLN Person 7601001380592
+      organizationIdentifier: GLN 7601001401228
+
+    - name: Martina Gauci
+      countryCode: MT
+      smcbIccsn: ncpeh-smb
+      pharmacistIdentifier: Spiżjar 5351001380592
+      organizationIdentifier: 5351001380532
 
 environments:
   - name: TU
@@ -368,7 +392,7 @@ konnektors:
   - name: SECUNET@kon9
     type: remote
     profile: SECUNET
-    address: ksp.ltuzd.telematik-test/kon9
+    address: kon9.ksp.ltuzd.telematik-test
     protocol: https
     context:
       mandantId: Mandant1
@@ -384,9 +408,9 @@ konnektors:
       username: "DUMMY VALUE"
       password: "DUMMY VALUE"
     cats:
-      - ctId: daca044c-16df-4f5e-82c6-592d2590040a
-        url: https://ksp.ltuzd.telematik-test/kon9/cats
-      - ctId: 59e0cc5a-89f8-4b68-86df-487b036bb849
+      - ctId: 8cf501d2-c97f-436e-8d87-ddd9bb674318
+        url: https://ksp.ltuzd.telematik-test/kon9/cats1
+      - ctId: e526d874-e1fb-4b88-b55f-930a5ca7baab
         url: https://ksp.ltuzd.telematik-test/kon9/cats2
 
   - name: KocoRu@kon19

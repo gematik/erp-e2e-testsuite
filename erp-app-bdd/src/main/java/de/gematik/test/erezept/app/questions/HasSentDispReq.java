@@ -39,22 +39,28 @@ public class HasSentDispReq implements Question<Boolean> {
   public Boolean answeredBy(Actor actor) {
     val app = SafeAbility.getAbility(actor, UseIOSApp.class);
 
-    // verify that Messages Button Badge got incremented
-    // button value is something like "3 Objekte" -> get only the number
+    // verify that the Messages Button Badge got incremented
+    // the button value is something like "3 Objekte" -> get only the number
     val oldMessagesButtonNumber = Integer.parseInt(oldMessagesButtonValue.split(" ")[0]);
     val newMessagesButtonNumber =
         Integer.parseInt(app.getText(BottomNav.MESSAGES_BUTTON).split(" ")[0]);
 
     val isMessagesButtonIncremented = oldMessagesButtonNumber + 1 == newMessagesButtonNumber;
 
-    // verify that message is shown
+    // verify that the message is shown
+    // open the first message
     app.tap(BottomNav.MESSAGES_BUTTON);
-
-    // tap on latest message
-    val messageElement = ListPageElement.forElement(MessageScreen.MESSAGES_LIST, 0);
+    var messageElement = ListPageElement.forElement(MessageScreen.MESSAGES_LIST, 0);
     app.tap(messageElement);
 
-    // tap on first prescription
+    // if this is a message from E-Rezept App Team -> open the second message
+    if (app.isDisplayed(MessageScreen.E_REZEPT_APP_TEAM_TITLE)) {
+      app.tap(MessageScreen.BACK_TO_MESSAGE_SCREEN);
+      messageElement = ListPageElement.forElement(MessageScreen.MESSAGES_LIST, 1);
+      app.tap(messageElement);
+    }
+
+    // tap on the first prescription
     try {
       val prescriptionElement = ListPageElement.forElement(MessageScreen.PRESCRIPTION_LIST, 0);
       app.tap(prescriptionElement);
@@ -72,7 +78,9 @@ public class HasSentDispReq implements Question<Boolean> {
     app.tap(PrescriptionTechnicalInformation.BACK);
 
     // navigate back to the main screen
-    app.tap(PrescriptionDetails.LEAVE_DETAILS_BUTTON);
+    app.tap(PrescriptionDetails.BACK_BUTTON);
+    app.tap(MessageScreen.BACK_TO_MESSAGE_SCREEN);
+    app.tap(BottomNav.PRESCRIPTION_BUTTON);
 
     return actualTaskId.equals(expectedTaskId) && isMessagesButtonIncremented;
   }

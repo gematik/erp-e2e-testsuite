@@ -24,6 +24,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
+import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
@@ -37,7 +38,7 @@ import org.hl7.fhir.r4.model.Quantity;
 
 public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
 
-  private final Map<String, Consumer<GemErpMedCompoundingBuilder>> builderConsumers =
+  private final Map<String, Consumer<GemErpMedicationCompoundingBuilder>> builderConsumers =
       new HashMap<>();
   private String askKey = "ask";
   private String snomedKey = "snomed";
@@ -45,7 +46,7 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
 
   public GemErpMedicationCompoundingFaker() {
 
-    withVersion(ErpWorkflowVersion.V1_4);
+    withVersion(ErpWorkflowVersion.getDefaultVersion());
 
     if (fakerBool()) {
       withAsk(ASK.from(GemFaker.fakerBsnr()));
@@ -131,7 +132,7 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
   public GemErpMedicationCompoundingFaker withIngredientWithContainedAtc(
       int numerator, int denominator, ATC atc) {
     builderConsumers.put(
-        "ingredientComponent",
+        "ingredientComponentList",
         b -> b.ingredientComponent(buildIngredient(numerator, denominator, atc)));
     return this;
   }
@@ -161,15 +162,15 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
   }
 
   private Medication.MedicationIngredientComponent buildIngredient(int num, int denom, ATC atc) {
-    return IngredientCodeBuilder.builder()
+    return GemEpaIngredientComponentBuilder.builder()
         .ingredientStrength(
             Quantity.fromUcum(String.valueOf(num), "mg"),
             Quantity.fromUcum(String.valueOf(denom), "mg"))
-        .withAtc(atc)
+        .atc(atc)
         .build();
   }
 
-  public GemErpMedCompoundingBuilder toBuilder() {
+  public GemErpMedicationCompoundingBuilder toBuilder() {
     val builder = GemErpMedicationBuilder.forCompounding();
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;

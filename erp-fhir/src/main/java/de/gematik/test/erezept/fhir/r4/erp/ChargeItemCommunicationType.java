@@ -42,23 +42,30 @@ public enum ChargeItemCommunicationType implements ICommunicationType<Patientenr
   private final PatientenrechnungStructDef type;
 
   @Override
-  public WithNamingSystem getRecipientNamingSystem() {
+  public WithNamingSystem getRecipientNamingSystem(PatientenrechnungVersion version) {
     if (PATIENT_RECEIVING.contains(this)) {
-      return DeBasisProfilNamingSystem.KVID_PKV_SID;
+      return kvidFor(version);
     } else {
       return DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
     }
   }
 
   @Override
-  public WithNamingSystem getSenderNamingSystem() {
+  public WithNamingSystem getSenderNamingSystem(PatientenrechnungVersion version) {
     WithNamingSystem ns;
     if (PHARMACY_SENDING.contains(this)) {
       ns = DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
     } else {
-      ns = DeBasisProfilNamingSystem.KVID_PKV_SID;
+      ns = kvidFor(version);
     }
     return ns;
+  }
+
+  private WithNamingSystem kvidFor(PatientenrechnungVersion version) {
+    if (version.isSmallerThanOrEqualTo(PatientenrechnungVersion.V1_0_0)) {
+      return DeBasisProfilNamingSystem.KVID_PKV_SID;
+    }
+    return DeBasisProfilNamingSystem.KVID_GKV_SID;
   }
 
   @Override

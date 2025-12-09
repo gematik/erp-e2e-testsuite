@@ -31,4 +31,5 @@ public class ActorsListConfiguration {
   private List<HealthInsuranceConfiguration> healthInsurances;
   private List<ApothecaryConfiguration> apothecaries;
   private List<PatientConfiguration> patients;
+  private List<EuPharmacyConfiguration> euPharmacies;
 }

@@ -1,1 +1,1 @@
-Die OpenAPI ist nun verfügbar unter: https://github.com/gematik/ref-erp-fdv-testdriver/tree/main/openapi/src/main/resources
+Die OpenAPI ist nun verfügbar unter: https://github.com/gematik/ref-erp-fdv-testdriver/tree/main/openapi

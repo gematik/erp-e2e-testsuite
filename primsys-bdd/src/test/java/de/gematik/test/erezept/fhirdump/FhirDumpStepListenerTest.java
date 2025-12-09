@@ -76,6 +76,7 @@ class FhirDumpStepListenerTest {
     assertDoesNotThrow(() -> listener.assumptionViolated("hello"));
     assertDoesNotThrow(() -> listener.takeScreenshots(List.of()));
     assertDoesNotThrow(() -> listener.takeScreenshots(TestResult.SUCCESS, List.of()));
+    assertDoesNotThrow(() -> listener.recordScreenshot("screenshot", new byte[] {}));
   }
 
   @Test

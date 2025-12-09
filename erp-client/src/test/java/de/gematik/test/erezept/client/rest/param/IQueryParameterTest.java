@@ -170,6 +170,16 @@ class IQueryParameterTest {
   }
 
   @Test
+  void shouldBuildBundlePagingQueryWithIdentifierValue() {
+    val iQP =
+        IQueryParameter.search()
+            .identifierValue(new Identifier().setSystem("123").setValue("456"))
+            .createParameter();
+    Assertions.assertEquals("identifier", iQP.get(0).parameter());
+    Assertions.assertEquals("456", iQP.get(0).value());
+  }
+
+  @Test
   void shouldBuildBundlePagingQueryWithRecipient() {
     val iQP = IQueryParameter.search().andRecipient("id").createParameter();
     Assertions.assertEquals("recipient", iQP.get(0).parameter());

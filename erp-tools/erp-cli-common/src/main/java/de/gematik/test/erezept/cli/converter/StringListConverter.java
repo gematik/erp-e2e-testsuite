@@ -38,6 +38,6 @@ public class StringListConverter implements ITypeConverter<List<String>> {
   }
 
   private boolean isNullOrEmpty(String value) {
-    return value == null || value.isEmpty() || value.isBlank();
+    return value == null || value.isBlank();
   }
 }

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class ResponseOfGetCapabilityStatementTest {
 
   @Test
-  void shouldPerformGetCapabilityStatementCommanddd() {
+  void shouldPerformGetCapabilityStatementRequest() {
     val actor = new PharmacyActor("Test-Apotheke");
     val useErpClient = mock(UseTheErpClient.class);
 
@@ -42,7 +42,7 @@ class ResponseOfGetCapabilityStatementTest {
 
     actor.can(useErpClient);
 
-    ResponseOfGetCapabilityStatement action = spy(new ResponseOfGetCapabilityStatement());
+    ResponseOfGetCapabilityStatement action = spy(ResponseOfGetCapabilityStatement.request());
 
     doReturn(mockInteraction)
         .when(action)

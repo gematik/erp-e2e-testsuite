@@ -56,10 +56,10 @@ public class PharmacyAcceptSteps {
   }
 
   @Dann(
-      "^kann die Apotheke (.+) das (letzte|erste) (?:zugewiesene )?(?:EVGDA )?E-Rezept"
+      "^kann die Apotheke (.+) das (letzte|erste) (?:zugewiesene )?(?:EVDGA )?E-Rezept"
           + " nicht(?: beim Fachdienst)? akzeptieren$")
   @Und(
-      "^die Apotheke (.+) kann das (letzte|erste) (?:zugewiesene )?(?:EVGDA )?E-Rezept"
+      "^die Apotheke (.+) kann das (letzte|erste) (?:zugewiesene )?(?:EVDGA )?E-Rezept"
           + " nicht(?: beim Fachdienst)? akzeptieren$")
   public void thenForbiddenToAcceptPrescription(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);

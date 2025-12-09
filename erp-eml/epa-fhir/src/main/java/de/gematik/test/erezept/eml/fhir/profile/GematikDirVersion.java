@@ -28,11 +28,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum GematikDirVersion implements ProfileVersion {
   V0_11_12("0.11.12"),
+  V0_11_25("0.11.25"),
   ;
 
   @Override
   public boolean omitZeroPatch() {
     return false;
+  }
+
+  @Override
+  public boolean omitPatch() {
+    return this != V0_11_12;
   }
 
   @Override

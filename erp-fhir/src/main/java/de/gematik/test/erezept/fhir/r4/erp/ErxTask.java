@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -38,16 +39,12 @@ import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.InstantType;
-import org.hl7.fhir.r4.model.PrimitiveType;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * @see <a href="https://simplifier.net/erezept-workflow/gemerxtask">Gem_erxTask</a>
@@ -221,6 +218,30 @@ public class ErxTask extends Task {
       adaptee.copyValues(erxTask);
       return erxTask;
     }
+  }
+
+  public boolean isRedeemableByProperties(boolean expected) {
+    List<BooleanType> values =
+        this.getExtension().stream()
+            .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES::matches)
+            .map(Extension::getValue)
+            .filter(BooleanType.class::isInstance)
+            .map(BooleanType.class::cast)
+            .toList();
+
+    return values.size() == 1 && values.get(0).booleanValue() == expected;
+  }
+
+  public boolean isRedeemableByAuthorization(boolean expected) {
+    List<BooleanType> values =
+        this.getExtension().stream()
+            .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION::matches)
+            .map(Extension::getValue)
+            .filter(BooleanType.class::isInstance)
+            .map(BooleanType.class::cast)
+            .toList();
+
+    return values.size() == 1 && values.get(0).booleanValue() == expected;
   }
 
   public static ErxTask fromTask(Resource adaptee) {

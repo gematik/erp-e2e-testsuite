@@ -28,11 +28,9 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.rest.UnirestHttpClient;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.abilities.OCSPAbility;
-import de.gematik.test.erezept.abilities.RawHttpAbility;
-import de.gematik.test.erezept.abilities.TSLAbility;
-import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
+import de.gematik.test.erezept.abilities.*;
 import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
@@ -87,8 +85,10 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
+        .can(UseHBA.itHasAccessTo(hba))
         .can(useTheKonnektor)
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor))
+        .can(ManageDoctorsPrescriptions.heIssued())
         .can(ProvideDoctorBaseData.fromConfiguration(cfg, hba.getTelematikId()));
   }
 
@@ -128,7 +128,26 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(useTheKonnektor)
         .can(ManagePharmacyPrescriptions.itWorksWith())
+        .can(
+            ProvidePharmacyBaseData.forNationalPharmacy()
+                .practitionerIdentifier("telematik-id HBA")
+                .organizationIdentifier(smcb)
+                .build())
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor));
+  }
+
+  public <T extends ErpActor> void equipAsEuPharmacy(T actor) {
+    val name = actor.getName();
+    log.info("Equip EU-Pharmacy {}", name);
+
+    val cfg = this.getEuPharmacyConfig(name);
+    val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
+
+    givenThat(actor)
+        .describedAs(cfg.getDescription())
+        .whoCan(UseSMCB.itHasAccessTo(smcb))
+        .can(ProvidePharmacyBaseData.fromConfiguration(cfg))
+        .can(useTheErpClientFrom(cfg).authenticatingWith(smcb));
   }
 
   public <A extends Actor> void equipAsKtr(A actor) {
@@ -160,6 +179,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .describedAs("Ein/e 'E-Rezept-ready' Versicherte/r der E-Rezepte erhalten kann")
         .whoCan(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), name))
         .can(ProvideEGK.sheOwns(egk))
+        .can(ManageDataMatrixCodes.heGetsPrescribed())
         .can(useTheErpClientFrom(cfg).authenticatingWith(egk));
   }
 
@@ -246,6 +266,9 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     } else if (config instanceof PsActorConfiguration pcfg) {
       return UseTheErpClient.with(
           ErpClientFactory.createErpClient(getActiveEnvironment(), pcfg), stopwatch);
+    } else if (config instanceof EuPharmacyConfiguration pcfg) {
+      return UseTheErpClient.with(
+          ErpClientFactory.createErpClient(getActiveEnvironment(), pcfg), stopwatch);
     } else {
       throw new ConfigurationException(
           format(
@@ -264,6 +287,10 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public PharmacyConfiguration getPharmacyConfig(String name) {
     return getConfig(name, dto.getActors().getPharmacies());
+  }
+
+  public EuPharmacyConfiguration getEuPharmacyConfig(String name) {
+    return getConfig(name, dto.getActors().getEuPharmacies());
   }
 
   public HealthInsuranceConfiguration getKtrConfig(String name) {

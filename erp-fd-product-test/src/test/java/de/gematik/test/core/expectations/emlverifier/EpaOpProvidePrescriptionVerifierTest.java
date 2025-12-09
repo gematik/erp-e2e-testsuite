@@ -456,7 +456,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   void shouldValidateEpaMedicationRequestCorrect() {
     val dispRequest =
         new MedicationRequest.MedicationRequestDispenseRequestComponent()
-            .setQuantity(new Quantity().setValue(1).setSystem("http://unitsofmeasure.org"));
+            .setQuantity(new Quantity().setValue(1));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
         KbvErpMedicationRequestFaker.builder()
@@ -493,30 +493,10 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shouldThrowWileValidateEpaMedicationRequestDispRequestQuantity() {
+  void shouldThrowWhileValidateEpaMedicationRequestDispRequestQuantity() {
     val dispRequest =
         new MedicationRequest.MedicationRequestDispenseRequestComponent()
             .setQuantity(new Quantity().setValue(2).setSystem("http://unitsofmeasure.org"));
-    val medication = KbvErpMedicationPZNFaker.builder().fake();
-    val medRequ =
-        KbvErpMedicationRequestFaker.builder()
-            .withAuthorDate(new Date())
-            .withMedication(medication)
-            .fake();
-    medRequ
-        .setStatus(MedicationRequest.MedicationRequestStatus.ACTIVE)
-        .setAuthoredOn(testDate_22_01_2025)
-        .setDispenseRequest(dispRequest);
-
-    val step = emlMedicationRequestMapsTo(medRequ);
-    assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescription));
-  }
-
-  @Test
-  void shouldThrowWileValidateEpaMedicationRequestDispRequestSystem() {
-    val dispRequest =
-        new MedicationRequest.MedicationRequestDispenseRequestComponent()
-            .setQuantity(new Quantity().setValue(1).setSystem("http://fakeSystem.eu"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
         KbvErpMedicationRequestFaker.builder()

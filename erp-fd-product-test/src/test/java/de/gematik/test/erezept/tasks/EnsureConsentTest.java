@@ -20,16 +20,13 @@
 
 package de.gematik.test.erezept.tasks;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
@@ -174,7 +171,7 @@ class EnsureConsentTest extends ErpFhirBuildingTest {
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     val postConsentResponse =
-        ErpResponse.forPayload(mock(Resource.class), Resource.class)
+        ErpResponse.forPayload(mock(Resource.class), EmptyResource.class)
             .withStatusCode(201)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());

@@ -20,6 +20,8 @@
 
 package de.gematik.test.core.expectations.verifier;
 
+import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION;
+import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
@@ -28,6 +30,7 @@ import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Date;
@@ -41,6 +44,9 @@ public class TaskVerifier {
   private TaskVerifier() {
     throw new AssertionError("do not instantiate!");
   }
+
+  private static final String EXTENSION_MESSAGE_PATTERN =
+      "Task.extension.{0} muss auf {1} gesetzt sein";
 
   public static VerificationStep<ErxTask> hasWorkflowType(PrescriptionFlowType flowType) {
     return hasWorkflowType(flowType, ErpAfos.A_19112);
@@ -199,5 +205,39 @@ public class TaskVerifier {
             requirementsSet,
             format("Das E-Rezept muss im Status {0} sein", taskStatus.getDisplay()));
     return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<ErxTask> hasRedeemableByProperties(boolean expected) {
+    Predicate<ErxTask> predicate = task -> task.isRedeemableByProperties(expected);
+
+    return new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_27063.getRequirement(),
+            format(EXTENSION_MESSAGE_PATTERN, EXT_REDEEMABLE_BY_PROPERTIES, expected))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxTask> hasRedeemableByPatientAuthorization(boolean expected) {
+    Predicate<ErxTask> predicate = task -> task.isRedeemableByAuthorization(expected);
+
+    return new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_27063.getRequirement(),
+            format(EXTENSION_MESSAGE_PATTERN, EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION, expected))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxAcceptBundle> hasSecret() {
+
+    Predicate<ErxAcceptBundle> predicate =
+        bundle -> {
+          val task = bundle.getTask();
+          return task.hasSecret();
+        };
+
+    return new VerificationStep.StepBuilder<ErxAcceptBundle>(
+            ErpAfos.A_24177.getRequirement(), ("Task secret muss vorhanden sein"))
+        .predicate(predicate)
+        .accept();
   }
 }

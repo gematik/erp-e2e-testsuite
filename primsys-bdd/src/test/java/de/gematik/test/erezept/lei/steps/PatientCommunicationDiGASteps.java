@@ -41,7 +41,7 @@ public class PatientCommunicationDiGASteps {
    * @param insuranceName
    */
   @Wenn(
-      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) ausgestelltes (?:EVGDA"
+      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) ausgestelltes (?:EVDGA"
           + " E-Rezept|E-Rezept) ihrem Kostenträger (.+) zuweist$")
   public void whenRequestDispenseViaCommunication(
       String patientName, String order, String insuranceName) {
@@ -57,9 +57,9 @@ public class PatientCommunicationDiGASteps {
   }
 
   @Und(
-      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVGDA Verordnung Informationen"
+      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVDGA Verordnung Informationen"
           + " vom Kostenträger (.*) im FdV einsehen$")
-  public void andCHeckReceivedCommunications(
+  public void andCheckReceivedCommunications(
       String patientName, String order, String insuranceName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val theInsurance = OnStage.theActorCalled(insuranceName);

@@ -22,4 +22,4 @@ package de.gematik.test.cardterminal.cats.dto;
 
 import lombok.NonNull;
 
-public record CardConfigurationDto(int slotNumber, @NonNull String cardConfigPath) {}
+public record CardConfigurationDto(@NonNull String cardConfigPath) {}

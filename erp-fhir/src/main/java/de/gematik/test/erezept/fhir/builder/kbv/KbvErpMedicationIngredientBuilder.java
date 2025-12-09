@@ -20,58 +20,34 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import java.util.LinkedList;
-import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.Ratio;
 
 public class KbvErpMedicationIngredientBuilder
-    extends ResourceBuilder<KbvErpMedication, KbvErpMedicationIngredientBuilder> {
+    extends KbvErpMedicationBaseBuilder<KbvErpMedicationIngredientBuilder> {
 
   private static final long MINIMUM_OF_ONE = 1;
-  private final List<Extension> extensions = new LinkedList<>();
   private String amountNumerator;
   private String amountNumeratorUnit;
   private long amountDenominator = MINIMUM_OF_ONE;
-  private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
-  private MedicationCategory category = MedicationCategory.C_00;
-  private boolean isVaccine = false;
   private String darreichungsform;
   private Medication.MedicationIngredientComponent ingredient;
   private long ingredientNumerator = 1;
   private long ingredientDenominator = 1;
-  private String ingredientUnit = "eier";
+  private String ingredientUnit = "ml";
   private StandardSize standardSize = StandardSize.N1;
   private String wirkstoffName;
 
   public static KbvErpMedicationIngredientBuilder builder() {
     return new KbvErpMedicationIngredientBuilder();
-  }
-
-  public KbvErpMedicationIngredientBuilder version(KbvItaErpVersion kbvItaErpVersion) {
-    this.kbvItaErpVersion = kbvItaErpVersion;
-    return self();
-  }
-
-  public KbvErpMedicationIngredientBuilder category(MedicationCategory category) {
-    this.category = category;
-    return self();
-  }
-
-  public KbvErpMedicationIngredientBuilder isVaccine(boolean isVaccine) {
-    this.isVaccine = isVaccine;
-    return self();
   }
 
   public KbvErpMedicationIngredientBuilder amount(String numerator) {

@@ -20,12 +20,12 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
+import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -37,13 +37,12 @@ class EpaMedPznIngredientBuilderTest extends EpaFhirParsingTest {
   void shouldBuildEpaMedPznIngredient() {
     val epaPznIngr =
         EpaMedPznIngredientBuilder.builder()
-            .withPzn(PZN.from("123456789"), "displayText")
-            .withCodingText("textInCoding")
+            .pzn(PZN.from("123456789"), "displayText")
+            .codingText("textInCoding")
             .build();
 
-    val pznIngreAsString = epaFhir.encode(epaPznIngr, EncodingType.XML, true);
-    val isValid = epaFhir.isValid(pznIngreAsString);
-    assertTrue(isValid);
+    val result = encodeAndValidate((epaPznIngr));
+    assertTrue(result.isSuccessful());
   }
 
   @Test
@@ -51,20 +50,61 @@ class EpaMedPznIngredientBuilderTest extends EpaFhirParsingTest {
     val cC = new CodeableConcept().addCoding(PZN.random().asCoding());
     cC.getCoding().get(0).setDisplay("display");
 
-    val epaPznIngr = EpaMedPznIngredientBuilder.builder().withPzn(cC).build();
+    val epaPznIngr = EpaMedPznIngredientBuilder.builder().pzn(cC).build();
 
-    val pznIngreAsString = epaFhir.encode(epaPznIngr, EncodingType.XML, true);
-    val isValid = epaFhir.isValid(pznIngreAsString);
-    assertTrue(isValid);
+    val result = encodeAndValidate((epaPznIngr));
+    assertTrue(result.isSuccessful());
   }
 
   @Test
-  void shouldBuildMinimalEpaMedPznIngredWithPZN() {
-    val epaPznIngr = EpaMedPznIngredientBuilder.builder().withPzn(PZN.from("123")).build();
+  void shouldSetCorrectVersion() {
+    val epaPznIngr =
+        EpaMedPznIngredientBuilder.builder()
+            .version(EpaMedicationVersion.V1_0_3)
+            .pzn(PZN.from("123"))
+            .build();
 
-    val pznIngreAsString = epaFhir.encode(epaPznIngr, EncodingType.XML, true);
-    val isValid = epaFhir.isValid(pznIngreAsString);
-    assertTrue(isValid);
+    val result = encodeAndValidate((epaPznIngr));
+    assertTrue(result.isSuccessful());
+    assertTrue(
+        epaPznIngr.getMeta().getProfile().stream()
+            .findFirst()
+            .orElseThrow()
+            .getValue()
+            .endsWith("|1.0.3"));
+  }
+
+  @Test
+  void shouldBuildMinimalEpaMedPznIngredPzn() {
+    val epaPznIngr = EpaMedPznIngredientBuilder.builder().pzn(PZN.from("123")).build();
+
+    val result = encodeAndValidate((epaPznIngr));
+    assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldBuildMinimalEpaMedPznIngredPznWithoutVersion() {
+    val epaPznIngr =
+        EpaMedPznIngredientBuilder.builder().withoutVersion().pzn(PZN.from("123")).build();
+
+    val result = encodeAndValidate((epaPznIngr));
+    assertTrue(result.isSuccessful());
+    assertEquals(
+        EpaMedicationStructDef.MEDICATION_PZN_INGREDIENT.getCanonicalUrl(),
+        epaPznIngr.getMeta().getProfile().stream().findFirst().orElseThrow().getValue());
+  }
+
+  @Test
+  void shouldBuildMinimalEpaMedPznIngredPznWithDarreichungsform() {
+    val testText = "darreichungsform";
+    val epaPznIngr =
+        EpaMedPznIngredientBuilder.builder()
+            .darreichungsform(testText, "ingredItemText")
+            .pzn(PZN.from("123"))
+            .build();
+    val result = encodeAndValidate((epaPznIngr));
+    assertTrue(result.isSuccessful());
+    assertEquals(testText, epaPznIngr.getDarreichungsform().orElseThrow());
   }
 
   @Test
@@ -78,7 +118,7 @@ class EpaMedPznIngredientBuilderTest extends EpaFhirParsingTest {
     val cC = new CodeableConcept().addCoding(PZN.random().asCoding());
     cC.getCoding().get(0).setDisplay("display");
     val epaPznIngrBuilder = EpaMedPznIngredientBuilder.builder();
-    epaPznIngrBuilder.withPzn(PZN.random()).withPzn(cC);
+    epaPznIngrBuilder.pzn(PZN.random()).pzn(cC);
     assertThrows(BuilderException.class, epaPznIngrBuilder::build);
   }
 }

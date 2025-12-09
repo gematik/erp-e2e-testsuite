@@ -184,8 +184,7 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
         "Die Löschinformation zum E-Rezept konnte nicht in die Patientenakte übermittelt werden.";
     val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
 
-    assertDoesNotThrow(
-        () -> step.apply(firstErxAuditEventBundle)); // Should pass without throwing exceptions
+    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
   }
 
   @Test
@@ -195,8 +194,7 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
         "Die Löschinformation zum E-Rezept konnte nicht in die Patientenakte übermittelt werden.";
     val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
 
-    assertDoesNotThrow(
-        () -> step.apply(secondErxAuditEventBundle)); // Should pass without throwing exceptions
+    assertDoesNotThrow(() -> step.apply(secondErxAuditEventBundle));
   }
 
   @Test
@@ -205,7 +203,20 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
     val logContent = "Some random log content that shouldn't exist in the audit events";
     val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
 
-    assertDoesNotThrow(
-        () -> step.apply(firstErxAuditEventBundle)); // Should pass without throwing exceptions
+    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldContainLogContentInAuditEventBundle() {
+    val logContent = "Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID";
+    val step = AuditEventVerifier.bundleContainsLog(logContent);
+    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldThrowWhenLogContentNotInAuditEventBundle() {
+    val logContent = "Nicht existierender Logeintrag";
+    val step = AuditEventVerifier.bundleContainsLog(logContent);
+    assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }
 }

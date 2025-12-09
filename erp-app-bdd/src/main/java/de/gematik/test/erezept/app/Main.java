@@ -35,8 +35,8 @@ public class Main {
     for (var i = 0; i < 10; i++) {
       val start = System.currentTimeMillis();
       try {
-        val driver = AppiumDriverFactory.forUser("Connection Test", "Alice", config);
-        driver.tearDown();
+        AppiumDriverFactory.forUser("Alice", config);
+        AppiumDriverFactory.closeDriver();
       } catch (Exception e) {
         System.out.println(format("Error after {0}ms", System.currentTimeMillis() - start));
         System.out.println(e.getMessage() + "\n-----------------------");

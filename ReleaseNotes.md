@@ -1,10 +1,44 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.1.0
+
+* erp-client:
+    - add X-erp-client & X-erp-user header values for NCPeH
+    - add Commands to set and revoke EuConsent (@NCPeH)
+    - add Commands to send EuAccessPermission (@NCPeH)
+    - add Commands to send EuGetPrescriptionInput (@NCPeH)
+    - add Command to send EuCloseInputPostCommand (NCPeH)
+    - add Command and QueryBuilder to GetEuMedicationDispenseBundle as EuMedicationDispenseGetCommand
+    - add Builder and ObjectClasses to generate EuAccessPermissionObjects
+
+* erp-fd-product-test:
+    - Implement testcases for EU Consent
+    - Implement testcases for EU Access Permission
+    - Implement testcases for setting the marker for redemption in EU
+    - Implement testcases for filters in the EU redeemable prescriptions
+    - Implement testcases close Prescriptions in the EU
+    - Implement Reply-Communication-Testcase for DiGA
+    - Implement testcase for different insurance types 
+    - Implement testcase for oid_institution-vorsorge-reha test identity
+    - Implement testcases for get use case for DiGA
+
+
+* erp-fhir:
+    - add Builder and ObjectClasses to generate EuAccessPermissionObjects
+    - add Builder and ObjectClasses for EuPractitionerRole, EuPractitioner, EuMedication, EuMedicationDispense,
+      EuOrganization, EuDispenseCloseOperationInput, EuMedicationDispenseBundle,
+    - add Builder and ObjectClasses for GemErpMedicationKombiPkg
+
+* erp-eml:
+    - add Builder and ObjectClasses for EpaMedPharmaceuticalProduct, EpaIngredientCode
+    -
+
 ## Release 1.0.0
 
 * erp-fhir:
     - add EuConsentBuilder for NCPeH
-    - add EuConsent Commands
+    - add Builder and ObjectClasses to generate EuAccessPermission-Resources
+    - add Builder and ObjectClasses to generate EuGetPrescriptionInput-Resources
     - Remove FHIR profile view `1.1.1`
     - add GemErpMedCompoundingBuilder and GemErpMedicationCompoundingFaker
     - add GemErpMedicationIngredientBuilder and GemErpMedicationIngredientFaker
@@ -18,7 +52,11 @@
     - reduce the FHIR profile version 1.2.0 for `de.gematik.erezept-workflow.r4`
     - reduce switches for FHIR profile version 1.3.0 and 1.2.0
     - update erp-configuration to use ErpWorkFlowVersion 1.5.2 instead of 1.5.0
+    - add EuGrandAccess Builder
     - add EuPatchTaskInputBuilder and TaskPatchCommand
+* erp-client:
+    - add EuGrandAccess Commands (Post/GET/DELETE)
+    - add EuConsent Commands
 
 * primsys-bbd:
     - for Workflow 162 add new FeatureFile for "diga_usecase" with Tasks and Questions

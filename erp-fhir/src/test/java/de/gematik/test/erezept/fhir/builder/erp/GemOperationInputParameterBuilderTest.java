@@ -20,15 +20,14 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -59,7 +58,8 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
             .version(ErpWorkflowVersion.getDefaultVersion())
             .build();
 
-    assertTrue(parser.isValid(closeOperation));
+    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
+    assertTrue(result.isSuccessful());
   }
 
   @Test
@@ -76,7 +76,8 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
             .version(version)
             .build();
 
-    assertTrue(parser.isValid(closeOperation));
+    val result = ValidatorUtil.encodeAndValidate(parser, closeOperation);
+    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest

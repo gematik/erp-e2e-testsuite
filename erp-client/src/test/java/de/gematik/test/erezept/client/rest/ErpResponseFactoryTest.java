@@ -20,16 +20,12 @@
 
 package de.gematik.test.erezept.client.rest;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
@@ -61,7 +57,7 @@ class ErpResponseFactoryTest extends ErpFhirParsingTest {
 
   @BeforeAll
   static void setUp() {
-    responseFactory = new ErpResponseFactory(parser, false);
+    responseFactory = new ErpResponseFactory(parser);
   }
 
   private String encodeTestRessource(Resource resource, EncodingType type) {
@@ -213,16 +209,18 @@ class ErpResponseFactoryTest extends ErpFhirParsingTest {
     assertFalse(response.isResourceOfType(ErxAuditEvent.class));
   }
 
-  @Test
-  void shouldValidateEmptyContentCorrectly() {
-    val rf = new ErpResponseFactory(parser, true);
-    val response = rf.createFrom(201, HEADERS_JSON, testToken, "", Resource.class);
-    assertTrue(response.isValidPayload());
+  @ParameterizedTest
+  @ValueSource(strings = {"", "\t", "\n"})
+  @NullSource
+  void shouldValidateEmptyContentCorrectly(String content) {
+    val rf = new ErpResponseFactory(parser);
+    val response = rf.createFrom(201, HEADERS_JSON, testToken, content, Resource.class);
+    assertTrue(response.isValidPayload(), "Payload of EmptyResource is always valid");
   }
 
   @Test
   void shouldValidateOperationOutcomeCorrectly() {
-    val rf = new ErpResponseFactory(parser, true);
+    val rf = new ErpResponseFactory(parser);
     val testOperationOutcome = encodeTestRessource(createOperationOutcome(), EncodingType.JSON);
     val response =
         rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, ErxAuditEvent.class);
@@ -231,7 +229,7 @@ class ErpResponseFactoryTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFailOnInvalidOperationOutcomeCorrectly() {
-    val rf = new ErpResponseFactory(parser, true);
+    val rf = new ErpResponseFactory(parser);
     val testOperationOutcome =
         encodeTestRessource(createOperationOutcome(), EncodingType.JSON).replace("issue", "issues");
     val response =
@@ -239,16 +237,33 @@ class ErpResponseFactoryTest extends ErpFhirParsingTest {
     assertFalse(response.isValidPayload());
   }
 
+  @Test
+  void shouldDetectOperationOutcomeWhenEmptyResourceExpected() {
+    val rf = new ErpResponseFactory(parser);
+    val testOperationOutcome =
+        encodeTestRessource(createOperationOutcome(), EncodingType.JSON).replace("issue", "issues");
+    val response =
+        rf.createFrom(404, HEADERS_JSON, testToken, testOperationOutcome, EmptyResource.class);
+    assertFalse(response.getResourceOptional().isPresent());
+    assertThrows(UnexpectedResponseResourceError.class, response::getExpectedResource);
+  }
+
   @ParameterizedTest
   @ValueSource(strings = {"", " ", "\t", "\n", "\r", "\r\n"})
   @NullSource
   void shouldNotFailOnBlankContent(String content) {
-    val validatingResponseFactory = new ErpResponseFactory(parser, true);
+    val validatingResponseFactory = new ErpResponseFactory(parser);
     val response =
         assertDoesNotThrow(
             () ->
                 validatingResponseFactory.createFrom(
-                    STATUS_ERROR, Duration.ZERO, HEADERS_JSON, testToken, content, Resource.class));
-    assertTrue(response.getResourceOptional().isEmpty());
+                    STATUS_ERROR,
+                    Duration.ZERO,
+                    HEADERS_JSON,
+                    testToken,
+                    content,
+                    EmptyResource.class));
+    assertTrue(response.getResourceOptional().isPresent());
+    assertDoesNotThrow(response::getExpectedResource);
   }
 }

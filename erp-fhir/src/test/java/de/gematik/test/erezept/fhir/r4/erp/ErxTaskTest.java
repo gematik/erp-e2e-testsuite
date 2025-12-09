@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -39,6 +40,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import lombok.val;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.Test;
@@ -266,5 +269,43 @@ class ErxTaskTest extends ErpFhirParsingTest {
     assertNotNull(task, "Valid ErxTask must be parseable");
 
     assertFalse(task.getLastMedicationDispenseDateElement().isPresent());
+  }
+
+  @Test
+  void shouldBeRedeemableByPropertiesWhenExtensionMatches() {
+    val task = new ErxTask();
+    task.addExtension(
+        new Extension(
+            GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES.getCanonicalUrl(),
+            new BooleanType(true)));
+
+    assertTrue(task.isRedeemableByProperties(true));
+    assertFalse(task.isRedeemableByProperties(false));
+  }
+
+  @Test
+  void shouldBeRedeemableByPropertiesWhenExtensionIsMissing() {
+    val task = new ErxTask();
+    assertFalse(task.isRedeemableByProperties(true));
+    assertFalse(task.isRedeemableByProperties(false));
+  }
+
+  @Test
+  void shouldBeRedeemableByAuthorizationWhenExtensionMatches() {
+    val task = new ErxTask();
+    task.addExtension(
+        new Extension(
+            GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION.getCanonicalUrl(),
+            new BooleanType(false)));
+
+    assertTrue(task.isRedeemableByAuthorization(false));
+    assertFalse(task.isRedeemableByAuthorization(true));
+  }
+
+  @Test
+  void shouldBeRedeemableByAuthorizationWhenExtensionIsMissing() {
+    val task = new ErxTask();
+    assertFalse(task.isRedeemableByAuthorization(true));
+    assertFalse(task.isRedeemableByAuthorization(false));
   }
 }

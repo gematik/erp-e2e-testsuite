@@ -1,0 +1,15 @@
+import http-client.env.json
+
+@actor = 6a7f66bc2bb0f4cd76deaa260abbb484
+
+### DOC-PHARMACEUTICAL-PRESCRIBE-01
+# prescribe a completly random pharmaceutical prescription
+POST {{host}}/doc/{{actor}}/prescribe
+Content-Type: application/json
+apikey: {{apikey}}
+
+{
+  "patient": {
+    "kvnr": "S040464113"
+  }
+}

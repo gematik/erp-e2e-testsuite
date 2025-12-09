@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,7 +31,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
@@ -89,13 +89,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
         ErpResponse.forPayload(draftErxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
         ErpResponse.forPayload(activatedErxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
@@ -138,13 +138,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
         ErpResponse.forPayload(draftErxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
         ErpResponse.forPayload(activatedErxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
@@ -228,10 +228,10 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     prescribeRequest.setPatient(patientDto);
 
     val createResponse =
-        ErpResponse.forPayload(FhirTestResourceUtil.createOperationOutcome(), ErxTask.class)
+        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
             .withHeaders(Map.of())
             .withStatusCode(401)
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(createResponse))
         .when(mockClient)
@@ -275,13 +275,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
         ErpResponse.forPayload(draftErxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
         ErpResponse.forPayload(activatedErxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
@@ -322,13 +322,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
         ErpResponse.forPayload(erxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
         ErpResponse.forPayload(erxTask, ErxTask.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
-            .andValidationResult(FhirTestResourceUtil.createEmptyValidationResult());
+            .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);

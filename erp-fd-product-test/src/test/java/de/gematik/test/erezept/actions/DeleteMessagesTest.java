@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actions.communication.DeleteMessages;
 import de.gematik.test.erezept.actors.ActorStage;
@@ -32,7 +33,6 @@ import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +52,7 @@ class DeleteMessagesTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldGetCommunication() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 200);
+    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 200);
     when(erpClientMock.request(any(CommunicationDeleteCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(

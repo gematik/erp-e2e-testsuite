@@ -39,17 +39,13 @@ import de.gematik.test.erezept.app.task.SetUpDevice;
 import de.gematik.test.erezept.app.task.SetVirtualEgk;
 import de.gematik.test.erezept.app.task.SkipOnboarding;
 import de.gematik.test.erezept.app.task.UseInstalledApp;
-import de.gematik.test.erezept.app.task.ios.NavigateThroughOnboardingOnIOS;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.BeforeAll;
-import io.cucumber.java.Scenario;
+import io.cucumber.java.*;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
@@ -65,9 +61,7 @@ public class AppInitializationSteps {
   private static SmartcardArchive smartcards;
   private static ErpAppConfiguration config;
   private static PrimSysBddFactory primsysConfig;
-
-  private String scenarioName;
-  /* the actor who is responsible for reporting the test result to the MDC */
+  /* the actor who is responsible for reporting the test result to the LDF */
   private Actor testReporter;
 
   @BeforeAll
@@ -80,18 +74,28 @@ public class AppInitializationSteps {
   }
 
   @Before
-  public void setUp(Scenario scenario) {
-    scenarioName = scenario.getName();
+  public void setUp() {
     OnStage.setTheStage(Cast.ofStandardActors());
   }
 
   @After
-  public void tearDown(Scenario scenario) {
-    Optional.ofNullable(this.testReporter)
+  public void finishScenario(Scenario scenario) {
+    Optional.ofNullable(testReporter)
         .map(actor -> actor.abilityTo(UseTheApp.class))
         .ifPresent(driver -> driver.finish(scenario));
 
+    // Note: close the driver after a failed scenario so the app will be freshly installed in the
+    // next one. We do this because we don't know in which state the app is after a failure
+    if (scenario.isFailed()) {
+      AppiumDriverFactory.closeDriver();
+    }
+
     OnStage.drawTheCurtain();
+  }
+
+  @AfterAll
+  public static void closeDriver() {
+    AppiumDriverFactory.closeDriver();
   }
 
   @Angenommen(
@@ -101,13 +105,13 @@ public class AppInitializationSteps {
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) die E-Rezept App auf"
           + " (?:seinem|ihrem) Smartphone eingerichtet hat$")
   public void initPatient(String insuranceType, String userName) {
-    val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
+    val useTheAppiumDriver = AppiumDriverFactory.forUser(userName, config);
 
     // assemble the screenplay
     val theAppUser = OnStage.theActorCalled(userName);
 
     // remember the app user for reporting the final test result to MDC
-    this.testReporter = theAppUser;
+    testReporter = theAppUser;
 
     theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));
     givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
@@ -124,30 +128,6 @@ public class AppInitializationSteps {
             SetUpDevice.forEnvironment(primsysConfig.getActiveEnvironment())
                 .withInsuranceType(insuranceType)
                 .byMappingVirtualEgkFrom(smartcards));
-  }
-
-  @Angenommen(
-      "^(?:der|die) Versicherte (.+) hat die E-Rezept App auf"
-          + " (?:seinem|ihrem) Smartphone für die Nutzung ohne TI eingerichtet$")
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) Smartphone für die Nutzung ohne TI eingerichtet"
-          + " hat$")
-  public void initPatientWithoutTi(String userName) {
-    val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
-
-    // assemble the screenplay
-    val theAppUser = OnStage.theActorCalled(userName);
-    // remember the app user for reporting the final test result to MDC
-    this.testReporter = theAppUser;
-
-    theAppUser.describedAs(format("Eine App-Nutzer des E-Rezept ohne eGK"));
-    givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
-    givenThat(theAppUser).can(useTheAppiumDriver);
-
-    givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
-
-    // walk through onboarding
-    givenThat(theAppUser).attemptsTo(NavigateThroughOnboardingOnIOS.entirely());
   }
 
   @Angenommen(
@@ -177,7 +157,7 @@ public class AppInitializationSteps {
   @Angenommen(
       "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) überspringt das Onboarding")
   public void initPatientWithoutOnboarding(String insuranceType, String userName) {
-    val useTheAppiumDriver = AppiumDriverFactory.forUser(scenarioName, userName, config);
+    val useTheAppiumDriver = AppiumDriverFactory.forUser(userName, config);
     val userConfiguration = UseConfigurationData.forUser(userName, config);
 
     // assemble the screenplay
@@ -194,28 +174,12 @@ public class AppInitializationSteps {
     givenThat(theAppUser).attemptsTo(SkipOnboarding.directly());
   }
 
-  @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) öffnet das Onboarding$")
-  public void initPatientOpenOnboarding(String insuranceType, String userName) {
-    val theAppUser = OnStage.theActorCalled(userName);
-    val useTheApp = AppiumDriverFactory.forUser(scenarioName, userName, config);
-    // remember the app user for reporting the final test result to MDC
-    this.testReporter = theAppUser;
-
-    theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));
-    givenThat(theAppUser).can(UseConfigurationData.forUser(userName, config));
-    givenThat(theAppUser).can(useTheApp);
-
-    givenThat(theAppUser).can(HandleAppAuthentication.withStrongPassword());
-  }
-
   @Dann("^kann (?:der|die) Versicherte (.+) das Onboarding erfolgreich durchlaufen$")
   @Und("^(?:der|die) Versicherte (.+) kann das Onboarding erfolgreich durchlaufen$")
   @Wenn("^(?:der|die) Versicherte (.+) das Onboarding erfolgreich durchläuft$")
   public void userCanFinishTheOnboardingSuccessfully(String userName) {
     val theAppUser = OnStage.theActorCalled(userName);
-    when(theAppUser)
-        .attemptsTo(NavigateThroughOnboarding.byFinishingTheEntireOnboardingSuccessfully());
+    when(theAppUser).attemptsTo(NavigateThroughOnboarding.entirely());
 
     when(theAppUser)
         .attemptsTo(
@@ -236,10 +200,7 @@ public class AppInitializationSteps {
     val theAppUser = OnStage.theActorCalled(user);
     givenThat(theAppUser).can(ReceiveDispensedDrugs.forHimself());
 
-    when(theAppUser)
-        .attemptsTo(
-            NavigateThroughCardwall.forEnvironment(primsysConfig.getActiveEnvironment())
-                .byMappingVirtualEgkFrom(smartcards));
+    when(theAppUser).attemptsTo(NavigateThroughCardwall.entirely());
 
     val egk = SafeAbility.getAbility(theAppUser, ProvideEGK.class);
     givenThat(theAppUser)
