@@ -127,9 +127,17 @@ public class KbvMedicalOrganizationBuilder
   public KbvMedicalOrganization build() {
     checkRequired();
     val identifier = firstIdentifier();
-    return KbvMedicalOrganization.fromOrganization(
-        buildOrganizationWith(
-            () -> KbvItaForStructDef.ORGANIZATION.asCanonicalType(kbvItaForVersion), identifier));
+    val oranization =
+        KbvMedicalOrganization.fromOrganization(
+            buildOrganizationWith(
+                () -> KbvItaForStructDef.ORGANIZATION.asCanonicalType(kbvItaForVersion),
+                identifier));
+
+    if (kbvItaForVersion.isBiggerThan(KbvItaForVersion.V1_2_0)) {
+      oranization.getMeta().setVersionId("1");
+    }
+
+    return oranization;
   }
 
   protected void checkRequired() {

@@ -86,8 +86,11 @@ class EuPractitionerBuilderTest extends ErpFhirParsingTest {
   @Test
   void shouldSetVersionCorrect() {
     val practitioner =
-        EuPractitionerBuilder.buildPractitioner().identifier(id).version(EuVersion.V1_0).build();
-    assertTrue(practitioner.getMeta().getProfile().get(0).asStringValue().contains("|1.0"));
+        EuPractitionerBuilder.buildPractitioner()
+            .identifier(id)
+            .version(EuVersion.getDefaultVersion())
+            .build();
+    assertTrue(practitioner.getMeta().getProfile().get(0).asStringValue().contains("|1.1"));
     val result = ValidatorUtil.encodeAndValidate(parser, practitioner);
     assertTrue(result.isSuccessful());
   }

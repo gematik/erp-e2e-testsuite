@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public enum EpaMedicationVersion implements ProfileVersion {
   V1_0_3("1.0.3"),
   V1_0_6("1.0.6"),
-  ;
+  V1_3_0("1.3.0");
 
   private final String version;
   private final String name = "de.gematik.epa.medication";

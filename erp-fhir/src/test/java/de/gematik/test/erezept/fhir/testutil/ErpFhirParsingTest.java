@@ -21,17 +21,26 @@
 package de.gematik.test.erezept.fhir.testutil;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.bbriccs.utils.StopwatchUtil;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 
+@Slf4j
 @SuppressWarnings({"java:S2187"})
 public abstract class ErpFhirParsingTest extends ErpFhirBuildingTest {
 
   protected static FhirParser parser;
 
   static {
-    parser = new FhirParser();
+    // TODO: measure time of parser initialization
+    val measurement = StopwatchUtil.measure(() -> new FhirParser());
+
+    log.info("Initialized FhirParser in {}", measurement.duration());
+    parser = measurement.response();
+    //    parser = new FhirParser();
   }
 
   protected <T extends Resource> T getDecodedFromPath(

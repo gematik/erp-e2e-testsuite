@@ -24,6 +24,7 @@ import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.ListPageElement;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.*;
+import de.gematik.test.erezept.app.task.OpenLatestMessage;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -48,17 +49,7 @@ public class HasSentDispReq implements Question<Boolean> {
     val isMessagesButtonIncremented = oldMessagesButtonNumber + 1 == newMessagesButtonNumber;
 
     // verify that the message is shown
-    // open the first message
-    app.tap(BottomNav.MESSAGES_BUTTON);
-    var messageElement = ListPageElement.forElement(MessageScreen.MESSAGES_LIST, 0);
-    app.tap(messageElement);
-
-    // if this is a message from E-Rezept App Team -> open the second message
-    if (app.isDisplayed(MessageScreen.E_REZEPT_APP_TEAM_TITLE)) {
-      app.tap(MessageScreen.BACK_TO_MESSAGE_SCREEN);
-      messageElement = ListPageElement.forElement(MessageScreen.MESSAGES_LIST, 1);
-      app.tap(messageElement);
-    }
+    actor.attemptsTo(OpenLatestMessage.fromMainScreen());
 
     // tap on the first prescription
     try {

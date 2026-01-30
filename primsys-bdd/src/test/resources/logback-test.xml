@@ -26,11 +26,17 @@
             <pattern>${date_format} [%thread] %-5level %logger{6} [%file:%line] - %msg%n</pattern>
         </encoder>
     </appender>
-
+    <logger name="de.gematik.bbriccs.fhir.validation.support" level="INFO" additivity="false">
+        <!--    <logger name="de.gematik.bbriccs.fhir.validation" level="INFO" additivity="false">-->
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="ca.uhn.fhir" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
     <logger name="de.gematik.test.erezept.client" level="TRACE" additivity="false">
         <appender-ref ref="REST"/>
     </logger>
-    <logger name="de.gematik" level="INFO" additivity="false">
+    <logger name="de.gematik" level="TRACE" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

@@ -43,7 +43,7 @@ class EuOrganizationTest extends ErpFhirParsingTest {
 
   private final EuOrganizationBuilder builder =
       EuOrganizationBuilder.builder("Test Pharmacy")
-          .version(EuVersion.V1_0)
+          .version(EuVersion.getDefaultVersion())
           .ncpehCountry(IsoCountryCode.BE)
           .identifier(TelematikID.from("12345678901234567890"))
           .identifier(

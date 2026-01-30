@@ -139,6 +139,9 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
   protected void applyCommonFields(GemErpMedication medication) {
     checkRequired();
 
+    // from Versaion 1.6 a VersionId is mandatory
+    if (version.isBiggerThan(ErpWorkflowVersion.V1_5)) medication.getMeta().setVersionId("1");
+
     medication.getContained().addAll(containedResources);
 
     Optional.ofNullable(drugCategory).ifPresent(dc -> medication.addExtension(dc.asExtension()));

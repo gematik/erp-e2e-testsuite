@@ -123,6 +123,11 @@ public class KbvErpMedicationPZNBuilder
     val medication =
         this.createResource(
             KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_PZN, kbvItaErpVersion);
+
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      medication.getMeta().setVersionId("1");
+    }
+
     this.defaultAmount();
 
     val amount = new Ratio();

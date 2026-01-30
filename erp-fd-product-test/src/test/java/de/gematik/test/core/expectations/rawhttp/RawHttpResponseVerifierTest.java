@@ -159,4 +159,26 @@ class RawHttpResponseVerifierTest {
     val step = RawHttpResponseVerifier.hasNoHeaderWith("1", unspecificAfo);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
+
+  @Test
+  void shouldVerifyEmptyBody() {
+    val step = RawHttpResponseVerifier.bodyIsEmpty(unspecificAfo);
+
+    String emptyBody = "";
+    assertDoesNotThrow(() -> step.apply(emptyBody));
+  }
+
+  @Test
+  void shouldVerifyNoBody() {
+    val step = RawHttpResponseVerifier.bodyIsEmpty(unspecificAfo);
+    assertThrows(AssertionError.class, () -> step.apply(null));
+  }
+
+  @Test
+  void shouldThrowWhileBodyIsNotEmpty() {
+    val step = RawHttpResponseVerifier.bodyIsEmpty(unspecificAfo);
+
+    String nonEmptyBody = "not empty";
+    assertThrows(AssertionError.class, () -> step.apply(nonEmptyBody));
+  }
 }

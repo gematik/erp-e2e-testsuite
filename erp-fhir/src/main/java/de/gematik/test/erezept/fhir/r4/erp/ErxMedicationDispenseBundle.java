@@ -97,7 +97,8 @@ public class ErxMedicationDispenseBundle extends Bundle {
         .map(
             md -> {
               val medicationRef = Optional.ofNullable(md.getMedicationReference().getReference());
-              val urnMedicationRef = medicationRef.orElse("").replace(URN_UUID, "");
+              val urnMedicationRef =
+                  medicationRef.orElse("").replace(URN_UUID, "").replace("#", "");
 
               if (medicationRef.isEmpty() || isContainedKbvMedication(md, urnMedicationRef)) {
                 // TODO: skip contained medications for now!

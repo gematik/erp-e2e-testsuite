@@ -66,7 +66,7 @@ class KbvPatientBuilderTest extends ErpFhirParsingTest {
             .withVersion(version)
             .fake();
 
-    assertTrue(parser.isValid(patient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, patient).isSuccessful());
 
     assertTrue(patient.hasGkvKvnr());
   }
@@ -80,7 +80,7 @@ class KbvPatientBuilderTest extends ErpFhirParsingTest {
             .withVersion(version)
             .fake();
 
-    assertTrue(parser.isValid(patient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, patient).isSuccessful());
 
     //  from KbvItaForVersion.V1_2_0 GKV is a fixed value
     if (version.compareTo(KbvItaForVersion.V1_1_0) <= 0) {

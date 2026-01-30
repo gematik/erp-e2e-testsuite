@@ -44,14 +44,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.BooleanType;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Dosage;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 public class KbvErpMedicationRequestBuilder
@@ -251,7 +244,10 @@ public class KbvErpMedicationRequestBuilder
     medReq =
         this.createResource(
             KbvErpMedicationRequest::new, KbvItaErpStructDef.PRESCRIPTION, kbvItaErpVersion);
-
+    // from Version 1.6 a VersionId is mandatory
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      medReq.getMeta().setVersionId("1");
+    }
     if (this.kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) == 0) {
       // check for 'default-able' and non-set values
       if (dispenseRequestQuantity == null) this.quantityPackages(1); // by default 1 package
@@ -294,11 +290,26 @@ public class KbvErpMedicationRequestBuilder
         .setDispenseRequest(dispenseRequestQuantity)
         .setExtension(extensions);
 
+    // todo reactivate while adapting builder for mew Profiles
+    /* if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      val dosageInformation = medReq.getDosageInstruction().stream().findFirst().orElseThrow();
+      val dgmp = DosageDgMPBuilder.dosageBuilder().text(dosageInformation.getText()).build();
+      medReq.addExtension(dosageInformation.getExtension().stream().findFirst().orElseThrow());
+      val generatedDosage = GENERATED_DOSAGE_INSTRUCTION_META.asExtension();
+      generatedDosage
+          .addExtension()
+          .setUrl("algorithmVersion")
+          .setValue(new StringType(dosageInformation.getText()));
+      medReq.setDosageInstruction(null);
+      medReq.setDosageInstruction(List.of(dgmp));
+    }*/
+
     return medReq;
   }
 
   @SuppressWarnings("java:S6205")
   private void medicationTypeConfig(KbvErpMedicationRequest medReq) {
+
     Optional.ofNullable(this.medicationType)
         .ifPresentOrElse(
             mt -> {

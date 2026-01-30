@@ -2,7 +2,7 @@
     <id value="erp-eprescription-06-GET-Prescription-DEMOGRAPHICS"/>
     <meta>
         <profile
-                value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Input|1.0"/>
+                value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_PAR_GET_Prescription_Input|1.1"/>
     </meta>
     <parameter>
         <name value="requestData"/>

@@ -29,28 +29,28 @@ class EuVersionTest {
 
   @Test
   void shouldReturnCorrectVersionString() {
-    assertEquals("1.0.0", EuVersion.V1_0.getVersion());
+    assertEquals("1.1.1", EuVersion.V1_1.getVersion());
   }
 
   @Test
   void shouldReturnCorrectProfileName() {
-    assertEquals("de.gematik.erezept.eu", EuVersion.V1_0.getName());
+    assertEquals("de.gematik.erezept.eu", EuVersion.getDefaultVersion().getName());
   }
 
   @Test
   void shouldReturnTrueForOmitPatch() {
-    assertTrue(EuVersion.V1_0.omitPatch());
+    assertTrue(EuVersion.getDefaultVersion().omitPatch());
   }
 
   @Test
   void fromStringShouldReturnCorrectEnum() {
-    assertEquals(EuVersion.V1_0, EuVersion.fromString("1.0.0"));
+    assertEquals(EuVersion.V1_1, EuVersion.fromString("1.1.1"));
   }
 
   @Test
   void shouldGetFromString() {
-    val result = EuVersion.fromString("1.0.0");
+    val result = EuVersion.fromString("1.1.1");
     assertNotNull(result);
-    assertEquals(EuVersion.V1_0, result);
+    assertEquals(EuVersion.V1_1, result);
   }
 }

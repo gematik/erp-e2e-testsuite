@@ -61,31 +61,10 @@ actors:
       konnektor: Soft-Konn
       fhirValidator: NONE
 
-  apothecaries:
-    - name: Finn-Louis Nullmayr
-      hbaIccsn: 80276001011699901726
-      algorithm: E256
-      konnektor: Soft-Konn
-
-  patients:
-    - name: Fridolin Straßer
-      egkIccsn: 80276883110000163961
-
-    - name: Hanna Bäcker
-      egkIccsn: 80276883110000163962
-
-    - name: Sina Hüllmann
-      egkIccsn: 80276883110000163963
-
-    - name: Leonie Hütter
-      egkIccsn: 80276883110000163964
-
-    - name: Günther Angermänn
-      egkIccsn: 80276883110000163965
-
   healthInsurances:
     - name: AOK Bremen
       smcbIccsn: 80276883110000163954
+      fhirValidator: NONE
 
 
 environments:

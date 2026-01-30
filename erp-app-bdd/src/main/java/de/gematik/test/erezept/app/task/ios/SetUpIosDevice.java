@@ -26,10 +26,7 @@ import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.Environment;
 import de.gematik.test.erezept.app.mobile.elements.*;
-import de.gematik.test.erezept.app.task.ChangeTheEnvironment;
-import de.gematik.test.erezept.app.task.CreateNewProfile;
-import de.gematik.test.erezept.app.task.EquipWithProvidePatientBaseDataAndErpClient;
-import de.gematik.test.erezept.app.task.NavigateThroughCardwall;
+import de.gematik.test.erezept.app.task.*;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +40,7 @@ import net.serenitybdd.screenplay.Task;
 public class SetUpIosDevice implements Task {
 
   private final EnvironmentConfiguration environment;
-  private final InsuranceTypeDe insuranceKind;
+  private final InsuranceTypeDe insuranceType;
   private final SmartcardArchive sca;
 
   @Override
@@ -72,8 +69,10 @@ public class SetUpIosDevice implements Task {
       ensureMainScreenIsOpenedAndScrolledUp(app, actor);
     }
 
+    actor.attemptsTo(EnsureProfileMatchesInsurance.ofType(insuranceType));
+
     actor.attemptsTo(
-        EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceKind, sca));
+        EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceType, sca));
   }
 
   private void ensureMainScreenIsOpenedAndScrolledUp(UseTheApp<?> app, Actor actor) {

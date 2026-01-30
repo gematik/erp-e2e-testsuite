@@ -1,0 +1,77 @@
+<MedicationRequest xmlns="http://hl7.org/fhir">
+    <id value="b12e7181-39dd-4864-a63f-74bb81d643a1" />
+    <meta>
+        <versionId value="1" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.4" />
+    </meta>
+    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_StatusCoPayment">
+        <valueCoding>
+            <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_StatusCoPayment" />
+            <code value="0" />
+        </valueCoding>
+    </extension>
+    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee">
+        <valueBoolean value="false" />
+    </extension>
+    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_SER">
+        <valueBoolean value="false" />
+    </extension>
+    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription">
+        <extension url="Kennzeichen">
+            <valueBoolean value="false" />
+        </extension>
+    </extension>
+    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag">
+        <valueBoolean value="true" />
+    </extension>
+    <extension url="http://hl7.org/fhir/5.0/StructureDefinition/extension-MedicationRequest.renderedDosageInstruction">
+        <valueMarkdown value="alle 2 Wochen: je 1 Stück"/>
+    </extension>
+    <extension url="http://ig.fhir.de/igs/medication/StructureDefinition/GeneratedDosageInstructionsMeta">
+        <extension url="algorithmVersion">
+            <valueString value="1.0.0" />
+        </extension>
+        <extension url="language">
+            <valueCode value="de-DE" />
+        </extension>
+    </extension>
+    <status value="active" />
+    <intent value="order" />
+    <medicationReference>
+        <reference value="Medication/aad9fb8b-2ec2-4cda-874a-82565c9d45ef" />
+    </medicationReference>
+    <subject>
+        <reference value="Patient/30635f5d-c233-4500-94e8-6414940236aa" />
+    </subject>
+    <authoredOn value="2025-05-20" />
+    <requester>
+        <reference value="Practitioner/667ffd79-42a3-4002-b7ca-6b9098f20ccb" />
+    </requester>
+    <insurance>
+        <reference value="Coverage/e51239e1-ba74-48e0-97fb-9754d2b05c60" />
+    </insurance>
+    <dosageInstruction>
+        <timing>
+            <repeat>
+                <frequency value="1"/>
+                <period value="2"/>
+                <periodUnit value="wk"/>
+            </repeat>
+        </timing>
+        <doseAndRate>
+            <doseQuantity>
+                <value value="1"/>
+                <unit value="Stück"/>
+                <system
+                        value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_BMP_DOSIEREINHEIT"/>
+                <code value="1"/>
+            </doseQuantity>
+        </doseAndRate>
+    </dosageInstruction>
+    <dispenseRequest>
+        <quantity>
+            <value value="1" />
+            <unit value="Packung" />
+        </quantity>
+    </dispenseRequest>
+</MedicationRequest>

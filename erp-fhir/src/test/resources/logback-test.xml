@@ -10,7 +10,7 @@
 
     <appender name="STDOUT" class="ConsoleAppender">
         <encoder class="PatternLayoutEncoder">
-            <pattern>${date_format} [%thread] %highlight(%-5level) %logger{6} - %msg%n</pattern>
+            <pattern>${date_format} %highlight(%-5level) %logger{30} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -18,11 +18,18 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="de.gematik.bbriccs.fhir" level="WARN" additivity="false">
+<!--    Note: these are useful for analyzing the validator-->
+     <logger name="de.gematik.bbriccs.fhir.validation.support" level="INFO" additivity="false">
+<!--    <logger name="de.gematik.bbriccs.fhir.validation" level="INFO" additivity="false">-->
         <appender-ref ref="STDOUT"/>
     </logger>
-
     <logger name="ca.uhn.fhir" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+<!--    <logger name="ca.uhn.fhir.log.terminology_troubleshooting" level="TRACE" additivity="false">-->
+<!--        <appender-ref ref="STDOUT"/>-->
+<!--    </logger>-->
+    <logger name="org.hl7.fhir.common.hapi.validation.validator" level="TRACE" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

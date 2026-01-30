@@ -1,0 +1,24 @@
+{
+  "name" : "hl7.fhir.uv.tools.r4",
+  "version" : "0.8.0",
+  "tools-version" : 3,
+  "type" : "IG",
+  "date" : "20250805200906",
+  "license" : "CC0-1.0",
+  "canonical" : "http://hl7.org/fhir/tools",
+  "url" : "http://hl7.org/fhir/tools/0.8.0",
+  "title" : "FHIR Tooling Extensions IG",
+  "description" : "This IG defines the extensions that the tools use internally. Some of these extensions are content that are being evaluated for elevation into the main spec, and others are tooling concerns (built Tue, Aug 5, 2025 20:09+1000+10:00)",
+  "fhirVersions" : ["4.0.1"],
+  "dependencies" : {
+    "hl7.fhir.r4.core" : "4.0.1",
+    "hl7.terminology.r4" : "6.5.0",
+    "hl7.fhir.uv.extensions.r4" : "5.3.0-ballot-tc1"
+  },
+  "author" : "HL7 International / FHIR Infrastructure",
+  "directories" : {
+    "lib" : "package",
+    "example" : "example"
+  },
+  "jurisdiction" : "http://unstats.un.org/unsd/methods/m49/m49.htm#001"
+}

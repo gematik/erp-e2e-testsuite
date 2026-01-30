@@ -5,12 +5,13 @@
   <parent>
     <artifactId>erezept-testsuite</artifactId>
     <groupId>de.gematik.test.erezept</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>konnektor-client</artifactId>
   <name>Konnektor Client</name>
+  <description>Implementation of a client for the Konnektor</description>
 
   <properties>
     <java.version>${version.java}</java.version>

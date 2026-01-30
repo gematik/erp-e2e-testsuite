@@ -1,0 +1,14 @@
+
+@actor = 886c6eda7dd5a1c6b1d112907f544d3
+@taskId = 160.000.117.416.784.64
+@secret = 9562fcea0e5d88f9f7d5ba7069149f2c45e060d27fdfd89c9aea1acb9277536e
+
+### PHARM-CLOSE-PHARMACEUTICAL-01
+POST {{host}}/pharm/{{actor}}/close?taskId={{taskId}}&secret={{secret}}
+Content-Type: application/json
+apikey: {{apikey}}
+
+### PHARM-RECEIPT-REFETCH-01
+GET {{host}}/pharm/{{actor}}/receipt?taskId={{taskId}}&secret={{secret}}
+Content-Type: application/json
+apikey: {{apikey}}

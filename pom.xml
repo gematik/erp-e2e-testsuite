@@ -7,8 +7,45 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
+
+    <name>E-Rezept E2E Testsuite</name>
+    <description>Parent project for testing the E-Rezept</description>
+
+    <url>https://github.com/gematik/erp-e2e-testsuite</url>
+    <scm>
+        <url>https://github.com/gematik/erp-e2e-testsuite</url>
+        <connection>scm:git:git://github.com/gematik/erp-e2e-testsuite.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:gematik/erp-e2e-testsuite.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/gematik/erp-e2e-testsuite/issues</url>
+    </issueManagement>
+
+    <organization>
+        <name>gematik GmbH</name>
+        <url>https://www.gematik.de</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>gematik</name>
+            <email>software-development@gematik.de</email>
+            <url>https://gematik.github.io/</url>
+            <organization>gematik GmbH</organization>
+            <organizationUrl>https://www.gematik.de/</organizationUrl>
+        </developer>
+    </developers>
 
     <modules>
         <module>bdd-javadocs</module>
@@ -25,7 +62,6 @@
         <module>erp-fd-product-test</module>
         <module>erp-tools</module>
         <module>primsys-rest</module>
-        <module>openapi</module>
         <module>bdd-testsuite</module>
     </modules>
 
@@ -48,7 +84,6 @@
         <version.surefire-report>3.0.0-M2</version.surefire-report>
         <version.maven-javadoc-plugin>3.5.0</version.maven-javadoc-plugin>
         <version.maven-owasp-plugin>8.2.1</version.maven-owasp-plugin>
-        <version.hapi-fhir>7.2.3</version.hapi-fhir>
         <version.serenity>4.3.2</version.serenity>
         <version.idp-client>28.0.2</version.idp-client>
         <version.spotless>2.41.1</version.spotless>
@@ -70,7 +105,7 @@
         <version.jaxb-runtime>2.3.1</version.jaxb-runtime>
         <version.jersey>4.0.0-M1</version.jersey>
         <version.poto>3.0.3-215</version.poto>
-        <version.bricks>0.8.0</version.bricks>
+        <version.bricks>0.9.0-SNAPSHOT</version.bricks>
 
         <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
 
@@ -85,14 +120,17 @@
             **/primsys/PrimSysApplication.java,
             **/test/erezept/cli/cmd/*.java,
             **/primsys/controller/*.java,
-            **/test/erezept/operator/jframe/*.java
+            **/test/erezept/operator/jframe/*.java,
+            **/test/erezept/app/questions/*.java,
+            **/test/erezept/app/task/*.java,
+            **/test/erezept/app/mobile/elements/*.java
         </sonar.exclusions>
 
         <!-- JavaDoc properties -->
         <javadoc.doctitle>E-Rezept E2E TestSuite</javadoc.doctitle>
         <javadoc.header>${javadoc.doctitle}</javadoc.header>
         <javadoc.footer>${javadoc.doctitle}</javadoc.footer>
-        <javadoc.bottom>© gematik GmbH 2022</javadoc.bottom>
+        <javadoc.bottom>© gematik GmbH 2025</javadoc.bottom>
     </properties>
 
     <dependencyManagement>
@@ -117,92 +155,92 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-mock-client</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>konnektor-client</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -341,11 +379,6 @@
                 <version>${version.bricks}</version>
             </dependency>
             <dependency>
-                <groupId>de.gematik.refv</groupId>
-                <artifactId>referencevalidator-lib</artifactId>
-                <version>2.12.0</version>
-            </dependency>
-            <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>fhir-coding-system-brick</artifactId>
                 <version>${version.bricks}</version>
@@ -371,6 +404,11 @@
                 <artifactId>fhir-validation-brick</artifactId>
                 <version>${version.bricks}</version>
                 <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.refv</groupId>
+                <artifactId>referencevalidator-lib</artifactId>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
@@ -902,7 +940,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.7.0</version>
+                        <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>

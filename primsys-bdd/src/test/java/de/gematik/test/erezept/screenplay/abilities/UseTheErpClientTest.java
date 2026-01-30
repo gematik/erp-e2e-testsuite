@@ -104,6 +104,7 @@ class UseTheErpClientTest extends ErpFhirBuildingTest {
 
       val response = ability.request(cmd);
       val requestTitle = format("{0} {1}", cmd.getMethod(), cmd.getRequestLocator());
+
       verify(mockWithTitle, times(1)).withTitle(requestTitle);
       verify(mockWithTitle, times(3)).withTitle(anyString());
       verify(mockAndContent, times(2)).andContents("mock fhir resource");
@@ -118,6 +119,7 @@ class UseTheErpClientTest extends ErpFhirBuildingTest {
 
     val ret = ability.decode(ErxChargeItem.class, "don't care");
     assertEquals(chargeItem, ret);
+
     verify(mockFhir, times(1)).decode(ErxChargeItem.class, "don't care");
   }
 

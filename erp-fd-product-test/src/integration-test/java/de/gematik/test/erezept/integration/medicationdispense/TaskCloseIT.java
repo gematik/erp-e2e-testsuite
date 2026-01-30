@@ -49,7 +49,6 @@ import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.DisplayName;
@@ -59,15 +58,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @Tag("Smoketest")
 @Tag("UseCase:Close")
 @DisplayName("E-Rezept dispensieren")
-public class TaskCloseIT extends ErpTest {
+class TaskCloseIT extends ErpTest {
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -293,7 +290,7 @@ public class TaskCloseIT extends ErpTest {
   @DisplayName(
       "Prüfe, dass ein patient beim Abruf seiner MedicationDispense bei einem Close die"
           + " lastMedicationDispense Informationen der Dispensierung vorliegen")
-  public void shouldDownloadMedicDispenseWithAllInformation() {
+  void shouldDownloadMedicDispenseWithAllInformation() {
     val task =
         doctor
             .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())

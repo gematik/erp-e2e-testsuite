@@ -31,7 +31,6 @@ import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenBuilder;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvDispensedMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
-import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.r4.dav.DavInvoice;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvDispensedMedication;
@@ -140,7 +139,6 @@ public class ChargeItemUseCase {
 
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(PrescriptionId.from(dispenseData.getPrescriptionId()))
-            .version(PatientenrechnungVersion.V1_0_0) // NOTE: this will change in the future!!
             .status("billable")
             .enterer(pharmacy.getSmcb().getTelematikId())
             .subject(KVNR.from(acceptData.getForKvnr()), acceptData.getInsurance().getName())

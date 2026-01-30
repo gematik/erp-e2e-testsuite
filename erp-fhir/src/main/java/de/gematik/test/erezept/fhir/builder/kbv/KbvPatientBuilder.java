@@ -154,6 +154,8 @@ public class KbvPatientBuilder extends ResourceBuilder<KbvPatient, KbvPatientBui
     val patient =
         this.createResource(KbvPatient::new, KbvItaForStructDef.PATIENT, kbvItaForVersion);
 
+    if (kbvItaForVersion.isBiggerThan(KbvItaForVersion.V1_2_0)) patient.getMeta().setVersionId("1");
+
     setIdentifier();
 
     val humanName =

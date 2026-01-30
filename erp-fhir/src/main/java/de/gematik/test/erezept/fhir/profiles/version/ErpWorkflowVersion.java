@@ -32,7 +32,9 @@ public enum ErpWorkflowVersion implements ProfileVersion {
   V1_2("1.2.0"),
   V1_3("1.3.1"),
   V1_4("1.4.3"),
-  V1_5("1.5.0");
+  V1_5("1.5.2"),
+  V1_6("1.6.1"),
+  ;
 
   public static final String PROFILE_NAME = "de.gematik.erezept-workflow.r4";
   private final String version;

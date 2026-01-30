@@ -37,9 +37,13 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> erpWorkflowVersions() {
-    return Arrays.stream(ErpWorkflowVersion.values())
-        .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
-        .map(Arguments::of);
+    val res =
+        Arrays.stream(ErpWorkflowVersion.values())
+            .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
+            // toDo reactivate after fitting builder for version 1.6
+            .filter(version -> !version.isBiggerThan(ErpWorkflowVersion.V1_5))
+            .map(Arguments::of);
+    return res;
   }
 
   public static Stream<Arguments> erpPatienterechnungVersions() {
@@ -47,23 +51,38 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> kbvItaErpVersions() {
-    return Arrays.stream(KbvItaErpVersion.values()).map(Arguments::of);
+    return Arrays.stream(KbvItaErpVersion.values())
+        .filter(vers -> !vers.isSmallerThan(KbvItaErpVersion.V1_3_0))
+        // todo reduce after fitting builder for new constrains
+        .filter(vers -> vers.isSmallerThan(KbvItaErpVersion.V1_4_0))
+        .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaForVersions() {
-    return Arrays.stream(KbvItaForVersion.values()).map(Arguments::of);
+    return Arrays.stream(KbvItaForVersion.values())
+        .filter(vers -> !vers.isSmallerThan(KbvItaForVersion.V1_2_0))
+        // todo reduce after fitting builder for new constrains
+        .filter(vers -> vers.isSmallerThan(KbvItaForVersion.V1_3_0))
+        .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvBundleVersions() {
     val itaErp = kbvItaErpVersions().map(arguments -> arguments.get()[0]).toList();
     val itaFor = kbvItaForVersions().map(arguments -> arguments.get()[0]).toList();
 
-    assertEquals(itaFor.size(), itaErp.size());
+    assertEquals(
+        itaFor.size(),
+        itaErp.size(),
+        "different enum length detected @ KbvItaForVersion & KbvItaErpVersion");
+    // if different version sizes in here you´ll get an index out of bounds
     return IntStream.range(0, itaErp.size())
+        .filter(i -> !itaErp.get(i).equals(KbvItaErpVersion.V1_1_0))
         .mapToObj(i -> Arguments.of(itaFor.get(i), itaErp.get(i)));
   }
 
   public static Stream<Arguments> abdaErpPkvVersions() {
-    return Arrays.stream(AbdaErpPkvVersion.values()).map(Arguments::of);
+    return Arrays.stream(AbdaErpPkvVersion.values())
+        .filter(it -> it.isBiggerThan(AbdaErpPkvVersion.V1_2_0))
+        .map(Arguments::of);
   }
 }

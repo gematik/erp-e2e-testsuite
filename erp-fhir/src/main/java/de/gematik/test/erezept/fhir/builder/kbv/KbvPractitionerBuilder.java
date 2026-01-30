@@ -145,6 +145,10 @@ public class KbvPractitionerBuilder
         this.createResource(
             KbvPractitioner::new, KbvItaForStructDef.PRACTITIONER, kbvItaForVersion);
 
+    if (kbvItaForVersion.isBiggerThan(KbvItaForVersion.V1_2_0)) {
+      practitioner.getMeta().setVersionId("1");
+    }
+
     val humanNameBuilder =
         HumanNameBuilder.official()
             .prefix(this.namePrefix)

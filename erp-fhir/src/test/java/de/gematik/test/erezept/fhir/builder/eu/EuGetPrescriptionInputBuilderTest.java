@@ -79,8 +79,9 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetVersionCorrect() {
-    val euGetPrescription = euGetPrescriptionBundleBuilder.version(EuVersion.V1_0).build();
-    assertTrue(euGetPrescription.getMeta().getProfile().get(0).asStringValue().contains("|1.0"));
+    val euGetPrescription =
+        euGetPrescriptionBundleBuilder.version(EuVersion.getDefaultVersion()).build();
+    assertTrue(euGetPrescription.getMeta().getProfile().get(0).asStringValue().contains("|1.1"));
   }
 
   @Test

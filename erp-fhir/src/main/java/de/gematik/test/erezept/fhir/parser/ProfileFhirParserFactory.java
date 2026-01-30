@@ -203,7 +203,7 @@ public class ProfileFhirParserFactory {
   }
 
   private static ValidatorFhir createBricksValidator(ProfilesConfigurator erpConfigurator) {
-    return ValidatorFhirFactory.createValidator(
-        FhirContext.forR4(), erpConfigurator.getProfileConfigurations());
+
+    return ValidatorFhirFactory.createValidator(erpConfigurator.getProfileConfigurations());
   }
 }

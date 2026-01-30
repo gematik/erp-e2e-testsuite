@@ -34,7 +34,7 @@ import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.AcceptPrescription;
 import de.gematik.test.erezept.actions.ClosePrescriptionWithoutDispensation;
-import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.DispensePrescriptionOld;
 import de.gematik.test.erezept.actions.DownloadAuditEvent;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
@@ -137,7 +137,7 @@ public class ProvideDispensationPermitIT extends ErpTest {
     acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
 
     val dispenseAction =
-        DispensePrescription.withCredentials(task.getTaskId(), acceptance.getSecret())
+        DispensePrescriptionOld.withCredentials(task.getTaskId(), acceptance.getSecret())
             .withParameters(getDispenseParameters(task));
 
     val dispensationInterAction = pharmacy.performs(dispenseAction);

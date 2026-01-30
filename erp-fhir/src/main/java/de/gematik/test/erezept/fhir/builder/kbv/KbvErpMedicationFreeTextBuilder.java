@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import java.util.Optional;
@@ -65,6 +66,11 @@ public class KbvErpMedicationFreeTextBuilder
     val medication =
         this.createResource(
             KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_FREETEXT, kbvItaErpVersion);
+
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      medication.getMeta().setVersionId("1");
+    }
+
     medication.setCode(MedicationType.FREETEXT.asCodeableConcept());
     medication.getCode().setText(nameOreFreetext);
     Optional.ofNullable(darreichungsform)

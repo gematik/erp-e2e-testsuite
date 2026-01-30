@@ -1,0 +1,39 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "ActivateOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/ActivateOperationDefinition",
+  "status": "draft",
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "name": "Activate",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "Diese Operation aktiviert die erstellte Aufgabe für das Rezept. Der Eingabeparameter muss das qualifizierte signierte Bundle des Rezepts enthalten. Der E-Rezept-Fachdienst validiert das Rezept, aktualisiert die Task-ressource und startet den Workflow.",
+  "code": "activate",
+  "inputProfile": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "outputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_ActivateOperation_Output",
+  "parameter": [
+    {
+      "name": "ePrescription",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Das qualifizierte unterzeichnete Verordnung (QES) zur Aktivierung des E-Rezept-Workflows.",
+      "type": "Binary"
+    },
+    {
+      "name": "return",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "Geben Sie die aktualisierte und aktivierte Aufgabe zurück.",
+      "type": "Task"
+    }
+  ]
+}

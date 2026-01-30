@@ -1,0 +1,1012 @@
+{
+  "index-version" : 2,
+  "files" : [
+    {
+      "filename" : "CodeSystem-fhir-types.json",
+      "resourceType" : "CodeSystem",
+      "id" : "fhir-types",
+      "url" : "http://hl7.org/fhir/fhir-types",
+      "version" : "5.0.0",
+      "valueSet" : "http://hl7.org/fhir/ValueSet/fhir-types",
+      "content" : "complete"
+    },
+    {
+      "filename" : "ValueSet-concept-map-relationship.json",
+      "resourceType" : "ValueSet",
+      "id" : "concept-map-relationship",
+      "url" : "http://hl7.org/fhir/ValueSet/concept-map-relationship",
+      "version" : "5.0.0"
+    },
+    {
+      "filename" : "CodeSystem-concept-map-relationship.json",
+      "resourceType" : "CodeSystem",
+      "id" : "concept-map-relationship",
+      "url" : "http://hl7.org/fhir/concept-map-relationship",
+      "version" : "5.0.0",
+      "valueSet" : "http://hl7.org/fhir/ValueSet/concept-map-relationship",
+      "content" : "complete"
+    },
+    {
+      "filename" : "ImplementationGuide-hl7.fhir.uv.tools.json",
+      "resourceType" : "ImplementationGuide",
+      "id" : "hl7.fhir.uv.tools",
+      "url" : "http://hl7.org/fhir/tools/ImplementationGuide/hl7.fhir.uv.tools",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "StructureDefinition-TestCases.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "TestCases",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/TestCases",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/TestCases",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-xml-no-order.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "xml-no-order",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/xml-no-order",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "CodeSystem-CDSActionType.json",
+      "resourceType" : "CodeSystem",
+      "id" : "CDSActionType",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/CDSActionType",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-CDSIndicator.json",
+      "resourceType" : "CodeSystem",
+      "id" : "CDSIndicator",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/CDSIndicator",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-CDSLinkType.json",
+      "resourceType" : "CodeSystem",
+      "id" : "CDSLinkType",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/CDSLinkType",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-CDSSelectionBehavior.json",
+      "resourceType" : "CodeSystem",
+      "id" : "CDSSelectionBehavior",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/CDSSelectionBehavior",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-additional-binding-purpose.json",
+      "resourceType" : "CodeSystem",
+      "id" : "additional-binding-purpose",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/additional-binding-purpose",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-binding-style.json",
+      "resourceType" : "CodeSystem",
+      "id" : "binding-style",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/binding-style",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-extension-style.json",
+      "resourceType" : "CodeSystem",
+      "id" : "extension-style",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/extension-style",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-id-expectation.json",
+      "resourceType" : "CodeSystem",
+      "id" : "id-expectation",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/id-expectation",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-ig-parameters.json",
+      "resourceType" : "CodeSystem",
+      "id" : "ig-parameters",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/ig-parameters",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-json-empty-behavior.json",
+      "resourceType" : "CodeSystem",
+      "id" : "json-empty-behavior",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/json-empty-behavior",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-matchetype-mode.json",
+      "resourceType" : "CodeSystem",
+      "id" : "matchetype-mode",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/matchetype-mode",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-r4-equivalence.json",
+      "resourceType" : "CodeSystem",
+      "id" : "r4-equivalence",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/r4-equivalence",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-snapshot-behavior.json",
+      "resourceType" : "CodeSystem",
+      "id" : "snapshot-behavior",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/snapshot-behavior",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-tx-issue-type.json",
+      "resourceType" : "CodeSystem",
+      "id" : "tx-issue-type",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/tx-issue-type",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-type-profile-style.json",
+      "resourceType" : "CodeSystem",
+      "id" : "type-profile-style",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/type-profile-style",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "CodeSystem-view-hint.json",
+      "resourceType" : "CodeSystem",
+      "id" : "view-hint",
+      "url" : "http://hl7.org/fhir/tools/CodeSystem/view-hint",
+      "version" : "0.8.0",
+      "content" : "complete"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookAppointmentBookContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookAppointmentBookContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookAppointmentBookContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookAppointmentBookContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookEncounterDischargeContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookEncounterDischargeContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookEncounterDischargeContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookEncounterDischargeContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookEncounterStartContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookEncounterStartContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookEncounterStartContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookEncounterStartContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookOrderDispatchContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookOrderDispatchContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookOrderDispatchContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookOrderDispatchContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookOrderSelectContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookOrderSelectContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookOrderSelectContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookOrderSelectContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookOrderSignContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookOrderSignContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookOrderSignContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookOrderSignContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHookPatientViewContext.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHookPatientViewContext",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookPatientViewContext",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHookPatientViewContext",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHooksElement.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHooksElement",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksElement",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksElement",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHooksExtensions.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHooksExtensions",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksExtensions",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksExtensions",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHooksRequest.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHooksRequest",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksRequest",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksRequest",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHooksResponse.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHooksResponse",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksResponse",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksResponse",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-CDSHooksServices.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "CDSHooksServices",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksServices",
+      "version" : "0.8.0",
+      "kind" : "logical",
+      "type" : "http://hl7.org/fhir/tools/StructureDefinition/CDSHooksServices",
+      "derivation" : "specialization"
+    },
+    {
+      "filename" : "StructureDefinition-additional-binding.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "additional-binding",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/additional-binding",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-binding-definition.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "binding-definition",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/binding-definition",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-binding-parameter.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "binding-parameter",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/binding-parameter",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-elementdefinition-binding-style.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "elementdefinition-binding-style",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/elementdefinition-binding-style",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-elementdefinition-date-format.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "elementdefinition-date-format",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/elementdefinition-date-format",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-elementdefinition-date-rules.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "elementdefinition-date-rules",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/elementdefinition-date-rules",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-elementdefinition-string-format.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "elementdefinition-string-format",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/elementdefinition-string-format",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-extension-style.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "extension-style",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/extension-style",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-id-expectation.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "id-expectation",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/id-expectation",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-actor-example-url.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-actor-example-url",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-actor-example-url",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-example-actor.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-example-actor",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-example-actor",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-internal-dependency.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-internal-dependency",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-internal-dependency",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-link-dependency.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-link-dependency",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-link-dependency",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-load-as-resource.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-load-as-resource",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-load-as-resource",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-page-name.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-page-name",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-page-name",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-parameter.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-parameter",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-parameter",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-ig-use-as-resource-id.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "ig-use-as-resource-id",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/ig-use-as-resource-id",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-igpublisher-bundle.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "igpublisher-bundle",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/igpublisher-bundle",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-implementationguide-dependency-comment.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "implementationguide-dependency-comment",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-dependency-comment",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-implementationguide-resource-format.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "implementationguide-resource-format",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-format",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-implementationguide-resource-fragment.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "implementationguide-resource-fragment",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-fragment",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-implementationguide-resource-logical.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "implementationguide-resource-logical",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-implementationguide-resource-uri.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "implementationguide-resource-uri",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-uri",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-implied-string-prefix.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "implied-string-prefix",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/implied-string-prefix",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-inherit-obligations.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "inherit-obligations",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/inherit-obligations",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-json-empty-behavior.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "json-empty-behavior",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/json-empty-behavior",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-json-name.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "json-name",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/json-name",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-json-nullable.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "json-nullable",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/json-nullable",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-json-primitive-choice.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "json-primitive-choice",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/json-primitive-choice",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-json-property-key.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "json-property-key",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/json-property-key",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-json-suppress-resourcetype.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "json-suppress-resourcetype",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/json-suppress-resourcetype",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-logical-container.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "logical-container",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/logical-container",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-logical-target.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "logical-target",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/logical-target",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-matchetype-count.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "matchetype-count",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/matchetype-count",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-matchetype-optional.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "matchetype-optional",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/matchetype-optional",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-matchetype-sort.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "matchetype-sort",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/matchetype-sort",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-matchetype.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "matchetype",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/matchetype",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-no-binding.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "no-binding",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/no-binding",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-obligation-profile.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "obligation-profile",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/obligation-profile",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-package-scope.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "package-scope",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/package-scope",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-profile-mapping.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "profile-mapping",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/profile-mapping",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-resource-sort.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "resource-sort",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-sort",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-searchparameter-base-type.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "searchparameter-base-type",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/searchparameter-base-type",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-select-by-map.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "select-by-map",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/select-by-map",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-snapshot-base-version.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "snapshot-base-version",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/snapshot-base-version",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-snapshot-behavior.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "snapshot-behavior",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/snapshot-behavior",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-snapshot-source.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "snapshot-source",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/snapshot-source",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-type-operation.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "type-operation",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/type-operation",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-type-parameter.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "type-parameter",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/type-parameter",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-type-profile-style.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "type-profile-style",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/type-profile-style",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-type-specifier.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "type-specifier",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/type-specifier",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-valueset-expansion-parameter.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "valueset-expansion-parameter",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/valueset-expansion-parameter",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-valueset-parameter.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "valueset-parameter",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/valueset-parameter",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-view-hint.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "view-hint",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/view-hint",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-web-source.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "web-source",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/web-source",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-xml-choice-group.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "xml-choice-group",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/xml-choice-group",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-xml-name.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "xml-name",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/xml-name",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "StructureDefinition-xml-namespace.json",
+      "resourceType" : "StructureDefinition",
+      "id" : "xml-namespace",
+      "url" : "http://hl7.org/fhir/tools/StructureDefinition/xml-namespace",
+      "version" : "0.8.0",
+      "kind" : "complex-type",
+      "type" : "Extension",
+      "derivation" : "constraint"
+    },
+    {
+      "filename" : "ValueSet-CDSActionType.json",
+      "resourceType" : "ValueSet",
+      "id" : "CDSActionType",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/CDSActionType",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-CDSIndicator.json",
+      "resourceType" : "ValueSet",
+      "id" : "CDSIndicator",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/CDSIndicator",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-CDSLinkType.json",
+      "resourceType" : "ValueSet",
+      "id" : "CDSLinkType",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/CDSLinkType",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-CDSSelectionBehavior.json",
+      "resourceType" : "ValueSet",
+      "id" : "CDSSelectionBehavior",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/CDSSelectionBehavior",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-additional-binding-purpose.json",
+      "resourceType" : "ValueSet",
+      "id" : "additional-binding-purpose",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/additional-binding-purpose",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-binding-style.json",
+      "resourceType" : "ValueSet",
+      "id" : "binding-style",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/binding-style",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-extension-style.json",
+      "resourceType" : "ValueSet",
+      "id" : "extension-style",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/extension-style",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-id-expectation.json",
+      "resourceType" : "ValueSet",
+      "id" : "id-expectation",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/id-expectation",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-ig-parameters.json",
+      "resourceType" : "ValueSet",
+      "id" : "ig-parameters",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/ig-parameters",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-json-empty-behavior.json",
+      "resourceType" : "ValueSet",
+      "id" : "json-empty-behavior",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/json-empty-behavior",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-matchetype-mode.json",
+      "resourceType" : "ValueSet",
+      "id" : "matchetype-mode",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/matchetype-mode",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-primitive-types.json",
+      "resourceType" : "ValueSet",
+      "id" : "primitive-types",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/primitive-types",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-select-by-map-filter.json",
+      "resourceType" : "ValueSet",
+      "id" : "select-by-map-filter",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/select-by-map-filter",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-snapshot-behavior.json",
+      "resourceType" : "ValueSet",
+      "id" : "snapshot-behavior",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/snapshot-behavior",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-type-profile-style.json",
+      "resourceType" : "ValueSet",
+      "id" : "type-profile-style",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/type-profile-style",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "ValueSet-view-hint.json",
+      "resourceType" : "ValueSet",
+      "id" : "view-hint",
+      "url" : "http://hl7.org/fhir/tools/ValueSet/view-hint",
+      "version" : "0.8.0"
+    },
+    {
+      "filename" : "Binary-CDSHookServices.json",
+      "resourceType" : "Binary",
+      "id" : "CDSHookServices"
+    }
+  ]
+}

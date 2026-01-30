@@ -29,7 +29,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum KbvItaErpVersion implements ProfileVersion {
   V1_1_0("1.1.0"),
-  V1_2_0("1.3.1");
+  V1_3_0("1.3.3"),
+  V1_4_0("1.4.0");
 
   private static final String PROFILE_NAME = "kbv.ita.erp";
   private final String version;
@@ -50,7 +51,8 @@ public enum KbvItaErpVersion implements ProfileVersion {
   }
 
   public static KbvItaErpVersion fromString(String version) {
-    if (version.equals("1.3")) return V1_2_0;
+    if (version.equals("1.3")) return V1_3_0;
+    if (version.equals("1.4")) return V1_4_0;
     return VersionUtil.fromString(KbvItaErpVersion.class, version);
   }
 }

@@ -106,8 +106,8 @@ class EuOrganizationFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldCreateOrganizationWithSpecificVersion() {
-    var org = EuOrganizationFaker.faker().withVersion(EuVersion.V1_0).fake();
-    assertTrue(org.getMeta().getProfile().get(0).asStringValue().contains("|1.0"));
+    var org = EuOrganizationFaker.faker().withVersion(EuVersion.getDefaultVersion()).fake();
+    assertTrue(org.getMeta().getProfile().get(0).asStringValue().contains("|1.1"));
   }
 
   @Test

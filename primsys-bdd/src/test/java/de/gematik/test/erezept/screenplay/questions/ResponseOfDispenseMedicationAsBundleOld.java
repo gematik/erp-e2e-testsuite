@@ -1,0 +1,424 @@
+/*
+ * Copyright 2025 gematik GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+ */
+
+package de.gematik.test.erezept.screenplay.questions;
+
+import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
+import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
+import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.konnektor.soap.mock.LocalVerifier;
+import io.cucumber.datatable.DataTable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+
+/**
+ * Legacy Screenplay question that dispenses an ePrescription using the old, bundle-based flow
+ * ({@link de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld}).
+ *
+ * <p>Behavior:
+ *
+ * <ul>
+ *   <li>Determines the active ERP workflow profile version and either
+ *       <ul>
+ *         <li>builds a list of {@link de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense}
+ *             (old profile), or
+ *         <li>creates {@link de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters}
+ *             (newer profiles)
+ *       </ul>
+ *   <li>Performs the dispense request and, on success, appends the dispensed bundle to the pharmacy
+ *       prescription manager and records the dispensation timestamp for the patient.
+ *   <li>Returns early if the ERP responds with an {@code OperationOutcome}.
+ * </ul>
+ *
+ * <p>Inputs/Outputs:
+ *
+ * <ul>
+ *   <li>Input: accepted Task (TaskId + Secret) from the pharmacy stack, optional medication table,
+ *       and number of dispense iterations.
+ *   <li>Output: {@link de.gematik.test.erezept.client.rest.ErpResponse} of {@link
+ *       de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle}.
+ * </ul>
+ *
+ * <p>Edge cases:
+ *
+ * <ul>
+ *   <li>Empty medication table triggers a conversion from the signed KBV bundle.
+ *   <li>For newer profiles, server-side creation is preferred via {@link
+ *       de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters}.
+ * </ul>
+ *
+ * <p>Deprecation:
+ *
+ * <ul>
+ *   <li>This question is deprecated and planned for removal after 2026-03-26 (RU 1.21.0).
+ *   <li>Use the newer flow (operation-parameter-based dispense) for current profiles.
+ * </ul>
+ *
+ * @deprecated Use the operation-parameter-based dispense question for current workflows.
+ */
+@Deprecated(since = "Fachdienst 1.21.0")
+public class ResponseOfDispenseMedicationAsBundleOld
+    extends FhirResponseQuestion<ErxMedicationDispenseBundle> {
+
+  private final Actor patient;
+  private final DequeStrategy dequeue;
+  private final List<Map<String, String>> medicationDspMapList;
+
+  private final int dispenseIterations;
+
+  private ResponseOfDispenseMedicationAsBundleOld(
+      Actor patient,
+      DequeStrategy dequeue,
+      List<Map<String, String>> medications,
+      int dispenseIterations) {
+    this.patient = patient;
+    this.dequeue = dequeue;
+    this.medicationDspMapList = medications;
+    this.dispenseIterations = dispenseIterations;
+  }
+
+  public static Builder fromStackForPatient(DequeStrategy dequeue, Actor patient) {
+    return new Builder(dequeue, patient);
+  }
+
+  public static Builder fromStackForPatient(String dequeue, Actor patient) {
+    return fromStackForPatient(DequeStrategy.fromString(dequeue), patient);
+  }
+
+  /**
+   * Executes the dispense flow as the given actor.
+   *
+   * <p>Side effects:
+   *
+   * <ul>
+   *   <li>Appends the dispensed bundle to the pharmacy's prescription store.
+   *   <li>Records the dispensation timestamp in the patient's dispense information.
+   * </ul>
+   *
+   * @param actor the pharmacy actor with ERP client abilities
+   * @return ERP response containing {@link ErxMedicationDispenseBundle}, or an OperationOutcome
+   *     response wrapped in {@link de.gematik.test.erezept.client.rest.ErpResponse}
+   */
+  @Override
+  public ErpResponse<ErxMedicationDispenseBundle> answeredBy(Actor actor) {
+    val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+    val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
+    val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
+    val patientDispenseInformation = SafeAbility.getAbility(patient, ReceiveDispensedDrugs.class);
+    val acceptBundle = dequeue.chooseFrom(prescriptionManager.getAcceptedPrescriptions());
+    val taskId = acceptBundle.getTaskId();
+    val secret = acceptBundle.getSecret();
+
+    ErpResponse<ErxMedicationDispenseBundle> resp = null;
+    List<ErxMedicationDispense> medicationDispense = null;
+    GemDispenseOperationParameters gemDispenseOperationParameters = null;
+
+    for (int x = 1; x <= dispenseIterations; x++) {
+      val client = SafeAbility.getAbility(actor, UseTheErpClient.class);
+      if (medicationDspMapList.isEmpty()) {
+        val kbvAsString = LocalVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
+        val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
+
+        if (isOldProfile()) {
+          medicationDispense =
+              List.of(this.dispensePrescribedMedication(kbvBundle, smcb.getTelematikID()));
+        } else {
+          gemDispenseOperationParameters = convertKbvBundle(kbvBundle, smcb.getTelematikID());
+        }
+      } else {
+        if (isOldProfile()) {
+          medicationDispense =
+              getErxMedDIsp(
+                  medicationDspMapList,
+                  PrescriptionId.from(taskId),
+                  smcb.getTelematikID(),
+                  patient);
+        } else {
+          gemDispenseOperationParameters =
+              getAlternativeDispenseParams(
+                  medicationDspMapList,
+                  PrescriptionId.from(taskId),
+                  smcb.getTelematikID(),
+                  patient);
+        }
+      }
+      resp =
+          isOldProfile()
+              ? client.request(
+                  new DispensePrescriptionAsBundleCommandOld(taskId, secret, medicationDispense))
+              : client.request(
+                  new DispensePrescriptionAsBundleCommandOld(
+                      taskId, secret, gemDispenseOperationParameters));
+
+      if (resp.isOperationOutcome()) return resp;
+
+      val dispensationTime = resp.getExpectedResource().getTimestamp().toInstant();
+      prescriptionManager.getDispensedPrescriptions().append(resp.getExpectedResource());
+      patientDispenseInformation.append(taskId.toPrescriptionId(), dispensationTime);
+    }
+    return resp;
+  }
+
+  /**
+   * Builds a list of {@link ErxMedicationDispense} resources from a data table mapping.
+   *
+   * @param medicationDspMapList list of medication rows with fields like PZN, Name, Menge, etc.
+   * @param taskId the prescription id associated with the dispense
+   * @param performerId the pharmacy performer (telematik) id
+   * @param patient the patient actor providing KVNR
+   * @return list of {@link ErxMedicationDispense}
+   */
+  private List<ErxMedicationDispense> getErxMedDIsp(
+      List<Map<String, String>> medicationDspMapList,
+      PrescriptionId taskId,
+      String performerId,
+      Actor patient) {
+    val egk = SafeAbility.getAbility(patient, ProvideEGK.class);
+    val medicationDispenses = new ArrayList<ErxMedicationDispense>();
+
+    medicationDspMapList.forEach(
+        medMap -> {
+          val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
+          val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
+          val amount =
+              Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
+          val unit = medMap.getOrDefault("Einheit", "Stk");
+          val categoryCode =
+              medMap.getOrDefault(
+                  "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
+          val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
+          val darreichungsCode =
+              medMap.getOrDefault(
+                  "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
+          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
+
+          val medication =
+              KbvErpMedicationPZNBuilder.builder()
+                  .pzn(pzn, name)
+                  .amount(amount, unit)
+                  .category(MedicationCategory.fromCode(categoryCode))
+                  .isVaccine(isVaccine)
+                  .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
+                  .normgroesse(StandardSize.fromCode(sizeCode))
+                  .build();
+
+          val medicationDispense =
+              ErxMedicationDispenseBuilder.forKvnr(egk.getKvnr())
+                  .prescriptionId(taskId)
+                  .performerId(performerId)
+                  .medication(medication)
+                  .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+                  .wasSubstituted(true)
+                  .build();
+
+          medicationDispenses.add(medicationDispense);
+        });
+
+    return medicationDispenses;
+  }
+
+  /**
+   * Converts a KBV prescription bundle to server-side dispense operation parameters.
+   *
+   * @param kbvBundle the KBV ePrescription bundle
+   * @param telematikID pharmacy telematics id
+   * @return populated {@link GemDispenseOperationParameters}
+   */
+  private GemDispenseOperationParameters convertKbvBundle(
+      KbvErpBundle kbvBundle, String telematikID) {
+    val paramsBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
+    val medication =
+        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvBundle.getMedication())
+            .lotNumber(GemFaker.fakerLotNumber())
+            .build();
+
+    val medDisp =
+        ErxMedicationDispenseBuilder.forKvnr(kbvBundle.getPatient().getKvnr())
+            .prescriptionId(kbvBundle.getPrescriptionId())
+            .performerId(telematikID)
+            .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
+            .medication(medication)
+            .wasSubstituted(false)
+            .medication(medication)
+            .build();
+    return paramsBuilder.with(medDisp, medication).build();
+  }
+
+  /**
+   * Builds operation parameters for dispensing based on a free-form medication table.
+   *
+   * @param medicationDspMapList list of medication rows
+   * @param taskId prescription id
+   * @param performerId pharmacy telematics id
+   * @param patient patient actor (for KVNR)
+   * @return {@link GemDispenseOperationParameters} to be sent to the ERP endpoint
+   */
+  private GemDispenseOperationParameters getAlternativeDispenseParams(
+      List<Map<String, String>> medicationDspMapList,
+      PrescriptionId taskId,
+      String performerId,
+      Actor patient) {
+    val paramsBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
+    medicationDspMapList.forEach(
+        medMap -> {
+          val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
+          val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
+          val amount =
+              Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
+          val unit = medMap.getOrDefault("Einheit", "Stk");
+          val categoryCode =
+              medMap.getOrDefault(
+                  "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
+          val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
+          val darreichungsCode =
+              medMap.getOrDefault(
+                  "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
+          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
+
+          val medication =
+              GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
+                  .pzn(pzn, name)
+                  .amount(amount, unit)
+                  .category(EpaDrugCategory.fromCode(categoryCode))
+                  .isVaccine(isVaccine)
+                  .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
+                  .normgroesse(StandardSize.fromCode(sizeCode))
+                  .build();
+          val egk = SafeAbility.getAbility(patient, ProvideEGK.class);
+          val medicationDisp =
+              ErxMedicationDispenseBuilder.forKvnr(egk.getKvnr())
+                  .prescriptionId(taskId)
+                  .performerId(performerId)
+                  .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+                  .whenPrepared(new Date())
+                  .whenHandedOver(new Date())
+                  .wasSubstituted(true)
+                  .medication(medication)
+                  .build();
+
+          paramsBuilder.with(medicationDisp, medication);
+        });
+
+    return paramsBuilder.build();
+  }
+
+  /**
+   * the Method compares the given ErpWorkflowVersion with ErpWorkflowVersion.V1_3_0 and returns
+   * true if it is lower or equals Version 1.3.0
+   *
+   * @return true while oldProfile in use
+   */
+  private boolean isOldProfile() {
+    return (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0);
+  }
+
+  /**
+   * Creates a single {@link ErxMedicationDispense} from a KBV bundle using the prescribed
+   * medication and the given performer id.
+   *
+   * @param bundle KBV ePrescription bundle
+   * @param telematikId pharmacy telematics id
+   * @return a populated {@link ErxMedicationDispense}
+   */
+  private ErxMedicationDispense dispensePrescribedMedication(
+      KbvErpBundle bundle, String telematikId) {
+
+    return ErxMedicationDispenseBuilder.forKvnr(bundle.getPatient().getKvnr())
+        .prescriptionId(bundle.getPrescriptionId())
+        .performerId(telematikId)
+        .whenHandedOver(new Date())
+        .medication(bundle.getMedication())
+        .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+        .wasSubstituted(false)
+        .build();
+  }
+
+  /** Builder for {@link ResponseOfDispenseMedicationAsBundleOld}. */
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class Builder {
+    private final DequeStrategy dequeue;
+    private final Actor patient;
+    private int dispenseIterations = 1;
+    private List<Map<String, String>> medications = List.of();
+
+    /**
+     * Finalizes the question instance.
+     *
+     * @return the constructed {@link ResponseOfDispenseMedicationAsBundleOld}
+     */
+    public ResponseOfDispenseMedicationAsBundleOld build() {
+      return new ResponseOfDispenseMedicationAsBundleOld(
+          patient, dequeue, medications, dispenseIterations);
+    }
+
+    /**
+     * Dispense multiple times in a loop.
+     *
+     * @param dispenseIterations number of dispense iterations (>= 1)
+     * @return the builder itself
+     */
+    public Builder multiple(int dispenseIterations) {
+      this.dispenseIterations = dispenseIterations;
+      return this;
+    }
+
+    /**
+     * Provide a Cucumber data table with medication information to build dispense resources.
+     *
+     * @param medication data table with columns like PZN, Name, Menge, Einheit, etc.
+     * @return the builder itself
+     */
+    public Builder withMedicationDispense(DataTable medication) {
+
+      this.medications = medication.asMaps();
+      return this;
+    }
+  }
+}

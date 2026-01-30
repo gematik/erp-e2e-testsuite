@@ -22,6 +22,7 @@ package de.gematik.test.erezept.lei.steps;
 
 import static de.gematik.test.erezept.lei.steps.ActorsInitializationSteps.config;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static org.hamcrest.Matchers.is;
 
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.questions.DispenseDigaPrescription;
@@ -34,7 +35,6 @@ import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class KtrSteps {
 
@@ -126,7 +126,7 @@ public class KtrSteps {
   @Dann("^wird der Kostenträger (.+) über die neue Zuweisungen informiert$")
   public void hasSubscriptionPing(String ktrName) {
     val theKtr = OnStage.theActorCalled(ktrName);
-    then(theKtr).attemptsTo(Ensure.that(HasNewSubscriptionPing.hasNewPing()).isTrue());
+    then(theKtr).should(seeThat(HasNewSubscriptionPing.hasNewPing(), is(true)));
   }
 
   @Dann(

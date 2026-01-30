@@ -28,7 +28,6 @@ import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -47,7 +46,6 @@ class EuMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     val lotNumber = "123456";
     val medicationDispenseBuilder =
         EuMedicationDispenseBuilder.forKvnr(kvnr)
-            .version(EuVersion.V1_0)
             .performerId(telematikId)
             .prescriptionId(prescriptionId)
             .status("completed") // default COMPLETED
@@ -90,7 +88,6 @@ class EuMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     val lotNumber = "123456";
     val medicationDispense =
         EuMedicationDispenseBuilder.forKvnr(kvnr)
-            .version(EuVersion.V1_0)
             .performerId(telematikId)
             .prescriptionId(prescriptionId)
             .medication(medication)
@@ -129,7 +126,7 @@ class EuMedicationDispenseBuilderTest extends ErpFhirParsingTest {
             .withPrescriptionId(prescriptionId)
             .fake();
 
-    assertTrue(parser.isValid(medicationDispense));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
 
     assertNotNull(medicationDispense.getId());
     assertEquals(prescriptionId, medicationDispense.getPrescriptionId());
@@ -145,7 +142,6 @@ class EuMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     val medicationDispense =
         EuMedicationDispenseFaker.builder()
             .withKvnr(kvnr)
-            .withVersion(EuVersion.V1_0)
             .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();

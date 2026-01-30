@@ -1,0 +1,40 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GEM_ERP_CS_DocumentType",
+  "id": "GEM-ERP-CS-DocumentType",
+  "title": "CodeSystem der Dokumententypen",
+  "description": "Dokumententyp abhängig vom Empfänger des Bundles.",
+  "url": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType",
+  "concept": [
+    {
+      "code": "1",
+      "display": "Health Care Provider Prescription"
+    },
+    {
+      "code": "2",
+      "display": "Patient Confirmation"
+    },
+    {
+      "code": "3",
+      "display": "Receipt"
+    }
+  ],
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 3
+}

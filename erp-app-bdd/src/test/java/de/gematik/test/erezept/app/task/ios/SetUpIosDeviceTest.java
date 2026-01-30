@@ -94,6 +94,7 @@ class SetUpIosDeviceTest {
     actor.can(userConfigAbility);
     when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(true);
     when(app.getText(Profile.USER_KVNR)).thenReturn(egk.getKvnr());
+    when(app.getText(Profile.USER_INSURANCE)).thenReturn("GKVInsurance");
 
     try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {
       val erpClient = mock(ErpClient.class);
@@ -119,6 +120,7 @@ class SetUpIosDeviceTest {
 
     when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(true);
     when(app.getText(Profile.USER_KVNR)).thenReturn("X110406067");
+    when(app.getText(Profile.USER_INSURANCE)).thenReturn("GKVInsurance");
 
     val config = createDefaultTestConfiguration("Bob", egk.getIccsn(), true);
 
@@ -157,6 +159,7 @@ class SetUpIosDeviceTest {
     actor.can(userConfigAbility);
     when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(false);
     when(app.getText(Profile.USER_KVNR)).thenReturn(egk.getKvnr());
+    when(app.getText(Profile.USER_INSURANCE)).thenReturn("GKVInsurance");
 
     try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {
       val erpClient = mock(ErpClient.class);

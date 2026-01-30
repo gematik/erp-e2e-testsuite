@@ -41,4 +41,14 @@ class KbvItaErpVersionTest extends ErpFhirBuildingTest {
               assertEquals(version, defaultVersion);
             });
   }
+
+  @Test
+  void getVersion1_3() {
+    assertEquals(KbvItaErpVersion.V1_3_0, KbvItaErpVersion.fromString("1.3"));
+  }
+
+  @Test
+  void getVersion1_4() {
+    assertEquals(KbvItaErpVersion.V1_4_0, KbvItaErpVersion.fromString("1.4"));
+  }
 }

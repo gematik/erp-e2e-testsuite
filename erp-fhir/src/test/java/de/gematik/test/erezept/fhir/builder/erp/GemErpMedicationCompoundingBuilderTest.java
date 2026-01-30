@@ -316,7 +316,7 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .ingredientComponent(pznIngredient)
             .build();
 
-    assertTrue(parser.isValid(gemMedCompounding));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, gemMedCompounding).isSuccessful());
     assertEquals(name, gemMedCompounding.getNameFromCodeOreContainedRessource().orElseThrow());
   }
 
@@ -380,7 +380,7 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .getValueAsPrimitive()
             .getValueAsString());
 
-    assertTrue(parser.isValid(gemMedCompounding));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, gemMedCompounding).isSuccessful());
   }
 
   @Test
@@ -437,7 +437,8 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .ingredientComponent(atcIngredient)
             .build();
 
-    assertTrue(parser.isValid(gemMedCompounding));
+    val vr = ValidatorUtil.encodeAndValidate(parser, gemMedCompounding);
+    assertTrue(vr.isSuccessful());
     assertEquals(
         5,
         gemMedCompounding
@@ -461,7 +462,8 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
     val atcCode = "123456789";
     val gemMedCompounding =
         GemErpMedicationCompoundingBuilder.forCompounding().atc(ATC.from(atcCode)).build();
-    assertTrue(parser.isValid(gemMedCompounding));
+    val vr = ValidatorUtil.encodeAndValidate(parser, gemMedCompounding);
+    assertTrue(vr.isSuccessful());
     assertEquals(atcCode, gemMedCompounding.getCode().getCodingFirstRep().getCode());
   }
 
@@ -508,6 +510,7 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .build();
     val medCompounding =
         GemErpMedicationCompoundingBuilder.forCompounding().ingredientComponent(ingr).build();
-    assertTrue(parser.isValid(medCompounding));
+    val vr = ValidatorUtil.encodeAndValidate(parser, medCompounding);
+    assertTrue(vr.isSuccessful());
   }
 }

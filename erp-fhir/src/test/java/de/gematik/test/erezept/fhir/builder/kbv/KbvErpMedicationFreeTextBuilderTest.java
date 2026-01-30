@@ -80,7 +80,7 @@ class KbvErpMedicationFreeTextBuilderTest extends ErpFhirParsingTest {
     assertThrows(
         BuilderException.class,
         () -> {
-          val test1 = builder.build();
+          builder.build();
         });
   }
 }

@@ -29,7 +29,8 @@ import lombok.experimental.Accessors;
 @Getter
 @RequiredArgsConstructor
 public enum EuVersion implements ProfileVersion {
-  V1_0("1.0.0");
+  V1_0("1.0.0"),
+  V1_1("1.1.1");
 
   public static final String PROFILE_NAME = "de.gematik.erezept.eu";
   private final String version;
@@ -39,7 +40,7 @@ public enum EuVersion implements ProfileVersion {
   private final boolean omitPatch = true;
 
   public static EuVersion getDefaultVersion() {
-    return EuVersion.V1_0;
+    return EuVersion.V1_1;
   }
 
   public static EuVersion fromString(String version) {

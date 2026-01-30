@@ -1,0 +1,43 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "CreateOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/CreateOperationDefinition",
+  "status": "draft",
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "name": "Create",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": true,
+  "instance": false,
+  "description": "Diese Operation erstellt eine Aufgabe für die Verschreibung eines bestimmten Flowtypes.",
+  "code": "create",
+  "inputProfile": "http://hl7.org/fhir/StructureDefinition/Parameters",
+  "outputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CreateOperation_Output",
+  "parameter": [
+    {
+      "name": "workflowType",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Dieser Parameter fordert die Erstellung eines Tasks mit bestimmten Flowtype an.",
+      "type": "Coding",
+      "binding": {
+        "strength": "required",
+        "valueSet": "https://gematik.de/fhir/erp/ValueSet/GEM_ERP_VS_FlowType"
+      }
+    },
+    {
+      "name": "return",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "Der erstellte Task mit einer flowType-spezifischen Rezept-ID",
+      "type": "Task"
+    }
+  ]
+}

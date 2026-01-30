@@ -5,11 +5,13 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>smartcard</artifactId>
+    <name>E-Rezept virtual smartcards</name>
+    <description>virtual smartcards for the E-Rezepte testsuites</description>
 
     <properties>
         <java.version>${version.java}</java.version>

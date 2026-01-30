@@ -177,7 +177,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
                 GemFaker.fakerValueSet(
                     Darreichungsform.class,
                     Darreichungsform.KPG)) // mapping Kombipackung not possible yet
-            .withAmount(3, null)
+            .withAmount(3, "fl")
             .fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedication)
@@ -191,8 +191,8 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
     assertEquals(
         kbvMedication.getPackagingSizeOrEmpty(),
         gemMedication.getAmountNumerator().orElse(Integer.MIN_VALUE));
-    // assertEquals(kbvMedication.getPackagingUnit(), gemMedication.getAmountNumeratorUnit());
-    assertEquals("Stk", gemMedication.getAmountNumeratorUnit().orElse(null));
+    assertEquals(kbvMedication.getPackagingUnit(), gemMedication.getAmountNumeratorUnit());
+    assertEquals("fl", gemMedication.getAmountNumeratorUnit().orElse(null));
   }
 
   @Test
@@ -353,7 +353,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .orElseThrow()
             .getValue());
     val medReference = gemMedication.getIngredientFirstRep().getItemReference().getReference();
-    assertEquals(gemMedication.getContained().get(0).getId(), medReference);
+    assertEquals("#" + gemMedication.getContained().get(0).getId(), medReference);
     assertFalse(gemMedication.getIngredientFirstRep().hasItemCodeableConcept());
   }
 

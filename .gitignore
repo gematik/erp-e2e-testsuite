@@ -5,7 +5,7 @@
 /target/*
 /.idea/*
 /.idea/sonarlint/**
-
+/.run/**
 **/.DS_Store
 
 *.apk

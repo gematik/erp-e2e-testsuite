@@ -58,13 +58,9 @@ class KbvErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
 
     assertTrue(
         medicationCompounding.getExtension().stream()
-            .filter(KbvItaErpStructDef.COMPOUNDING_INSTRUCTION::matches)
-            .findAny()
-            .stream()
-            .findFirst()
-            .isPresent());
+            .anyMatch(KbvItaErpStructDef.COMPOUNDING_INSTRUCTION::matches));
 
-    assertTrue(parser.isValid(medicationCompounding));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationCompounding).isSuccessful());
   }
 
   @Test

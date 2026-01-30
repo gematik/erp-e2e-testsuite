@@ -20,17 +20,19 @@
 
 package de.gematik.test.erezept.integration.pki;
 
-import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.containsHeaderWith;
-import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.hasNoHeaderWith;
+import static de.gematik.test.core.expectations.verifier.rawhttpverifier.RawHttpResponseVerifier.*;
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.PrescriptionServiceVersion;
 import de.gematik.test.erezept.ErpTest;
+import de.gematik.test.erezept.actions.ResponseOfGetCapabilityStatement;
 import de.gematik.test.erezept.actions.rawhttpactions.GetCertListResponse;
 import de.gematik.test.erezept.actions.rawhttpactions.GetOcspListResponse;
 import de.gematik.test.erezept.actions.rawhttpactions.VerifyRawHttp;
 import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCapabilityStatement;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -53,44 +55,90 @@ class OCSPListAndCertListHeaderIT extends ErpTest {
   @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_01")
   @Test
   @DisplayName(
-      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes OCSPList ein Sunset Header"
-          + " zurück gegeben wird.")
+      "Es muss sichergestellt werden, dass beim Aufruf des Endpunktes OCSPList ein Sunset Header "
+          + "zurückgegeben wird.")
   void verifyOcspResponse() {
 
     this.config.equipWithRawHttp(patientActor);
+
+    val interaction = patientActor.asksFor(new ResponseOfGetCapabilityStatement());
+    ErxCapabilityStatement cs = interaction.getResponse().getExpectedResource();
+
+    PrescriptionServiceVersion currentVersion =
+        PrescriptionServiceVersion.from(cs.getSoftwareVersion());
+
     val r = patientActor.asksFor(new GetOcspListResponse());
-    patientActor.attemptsTo(
-        VerifyRawHttp.that(r, String.class)
-            .andHttp(containsHeaderWith("Sunset", "Wed, 31 Dec 2025 22:59:59 UTC", ErpAfos.A_25057))
-            .isCorrect());
+
+    if (currentVersion.isBetween(
+        PrescriptionServiceVersion.V_1_19_0, PrescriptionServiceVersion.V_1_20_0)) {
+
+      patientActor.attemptsTo(
+          VerifyRawHttp.that(r, String.class)
+              .andHttp(
+                  containsHeaderWith("Sunset", "Wed, 31 Dec 2025 22:59:59 UTC", ErpAfos.A_25057))
+              .isCorrect());
+
+    } else {
+
+      patientActor.attemptsTo(
+          VerifyRawHttp.that(r, String.class)
+              .andHttp(returnCode(200))
+              .andHttp(containsHeaderWith("Content-Length", "0", ErpAfos.A_25057))
+              .and(bodyIsEmpty(ErpAfos.A_25057))
+              .isCorrect());
+    }
   }
 
   @SneakyThrows
   @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_02")
   @Test
   @DisplayName(
-      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes CertList einen Sunset Header"
-          + " zurück gibt.")
+      "Es muss sichergestellt werden, dass beim Aufruf des Endpunktes CertList ein Sunset Header "
+          + "zurückgegeben wird.")
   void verifyCertListResponse() {
 
     this.config.equipWithRawHttp(patientActor);
+
+    val interaction = patientActor.asksFor(new ResponseOfGetCapabilityStatement());
+    ErxCapabilityStatement cs = interaction.getResponse().getExpectedResource();
+
+    PrescriptionServiceVersion currentVersion =
+        PrescriptionServiceVersion.from(cs.getSoftwareVersion());
+
     val r = patientActor.asksFor(new GetCertListResponse());
-    patientActor.attemptsTo(
-        VerifyRawHttp.that(r, String.class)
-            .andHttp(containsHeaderWith("Sunset", "Wed, 31 Dec 2025 22:59:59 UTC", ErpAfos.A_25057))
-            .isCorrect());
+
+    if (currentVersion.isBetween(
+        PrescriptionServiceVersion.V_1_19_0, PrescriptionServiceVersion.V_1_20_0)) {
+
+      patientActor.attemptsTo(
+          VerifyRawHttp.that(r, String.class)
+              .andHttp(
+                  containsHeaderWith("Sunset", "Wed, 31 Dec 2025 22:59:59 UTC", ErpAfos.A_25057))
+              .isCorrect());
+
+    } else {
+
+      patientActor.attemptsTo(
+          VerifyRawHttp.that(r, String.class)
+              .andHttp(returnCode(200))
+              .andHttp(containsHeaderWith("Content-Length", "0", ErpAfos.A_25057))
+              .and(bodyIsEmpty(ErpAfos.A_25057))
+              .isCorrect());
+    }
   }
 
   @SneakyThrows
   @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_03")
   @Test
   @DisplayName(
-      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes OCSPList kein Deprecation"
-          + " Header zurück gegeben wird.")
+      "Es muss sichergestellt werden, dass beim Aufruf des Endpunktes OCSPList kein Deprecation "
+          + "Header zurückgegeben wird.")
   void verifyOcspResponseHasNoDeprecationHeader() {
 
     this.config.equipWithRawHttp(patientActor);
+
     val r = patientActor.asksFor(new GetOcspListResponse());
+
     patientActor.attemptsTo(
         VerifyRawHttp.that(r, String.class)
             .andHttp(hasNoHeaderWith("Deprecation", ErpAfos.A_25057))
@@ -102,12 +150,14 @@ class OCSPListAndCertListHeaderIT extends ErpTest {
   @TestcaseId("ERP_OCSPList_CerList_HEADER_VALIDATION_04")
   @Test
   @DisplayName(
-      "Es mus sicher gestellt werden, dass beim Aufruf des Endpunktes CertList kein Deprecation"
-          + " Header zurück gegeben wird.")
+      "Es muss sichergestellt werden, dass beim Aufruf des Endpunktes CertList kein Deprecation "
+          + "Header zurückgegeben wird.")
   void verifyCertListResponseHasNoDeprecationHeader() {
 
     this.config.equipWithRawHttp(patientActor);
+
     val r = patientActor.asksFor(new GetCertListResponse());
+
     patientActor.attemptsTo(
         VerifyRawHttp.that(r, String.class)
             .andHttp(hasNoHeaderWith("Deprecation", ErpAfos.A_25057))

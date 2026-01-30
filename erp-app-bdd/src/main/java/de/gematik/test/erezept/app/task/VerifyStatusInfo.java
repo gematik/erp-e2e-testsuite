@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static de.gematik.test.erezept.app.cfg.StatusParser.*;
+import static de.gematik.test.erezept.app.parsers.StatusParser.*;
 import static java.lang.String.format;
 import static org.hl7.fhir.r4.model.Task.TaskStatus;
 import static org.hl7.fhir.r4.model.Task.TaskStatus.*;

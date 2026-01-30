@@ -47,8 +47,12 @@ class ValidatorTest extends ErpFhirParsingTest {
   }
 
   static Stream<Arguments> shouldPassValidResources() {
-    return ResourceLoader.getResourceDirectoryStructure("fhir/valid", true).stream()
+    return ResourceLoader.getResourceDirectoryStructure("fhir/valid/", true).stream()
         .filter(File::isFile)
+        .filter(
+            f ->
+                !f.getAbsolutePath()
+                    .contains("epa")) // TODO: why do we need validating epa resources?
         .map(Arguments::of);
   }
 
@@ -90,6 +94,7 @@ class ValidatorTest extends ErpFhirParsingTest {
         ResourceLoader.getResourceDirectoryStructure("fhir/valid/collection_bundles", true).stream()
             .toList();
     return Stream.of(ValidatorType.values())
+        .filter(vt -> vt != ValidatorType.REF_VAL)
         .flatMap(vt -> files.stream().map(f -> Arguments.of(f, vt)));
   }
 

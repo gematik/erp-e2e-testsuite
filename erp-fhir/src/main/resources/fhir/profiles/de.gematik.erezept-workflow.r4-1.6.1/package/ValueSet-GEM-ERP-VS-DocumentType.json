@@ -1,0 +1,29 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "GEM_ERP_VS_DocumentType",
+  "id": "GEM-ERP-VS-DocumentType",
+  "title": "ValueSet der Dokumenttyp-Codes",
+  "description": "Art der Dokumente je nach Empfänger.",
+  "url": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_VS_DocumentType",
+  "version": "1.6.1",
+  "date": "2025-12-19",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "compose": {
+    "include": [
+      {
+        "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType"
+      }
+    ]
+  }
+}

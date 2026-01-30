@@ -21,17 +21,7 @@
 package de.gematik.test.erezept.primsys.controller;
 
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
-import de.gematik.test.erezept.primsys.model.AbortUseCase;
-import de.gematik.test.erezept.primsys.model.AcceptUseCase;
-import de.gematik.test.erezept.primsys.model.ActorContext;
-import de.gematik.test.erezept.primsys.model.ChargeItemUseCase;
-import de.gematik.test.erezept.primsys.model.CloseUseCase;
-import de.gematik.test.erezept.primsys.model.DeleteCommunicationUseCase;
-import de.gematik.test.erezept.primsys.model.DispenseUseCase;
-import de.gematik.test.erezept.primsys.model.GetCommunicationsUseCase;
-import de.gematik.test.erezept.primsys.model.GetPrescriptionsWithPNUseCase;
-import de.gematik.test.erezept.primsys.model.RejectUseCase;
-import de.gematik.test.erezept.primsys.model.ReplyUseCase;
+import de.gematik.test.erezept.primsys.model.*;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.params.CommunicationFilterParams;
 import jakarta.ws.rs.BeanParam;
@@ -149,6 +139,18 @@ public class PharmacyController {
     } else {
       return usecase.dispensePrescription(taskId, secret, body);
     }
+  }
+
+  @GET
+  @Path("{pharmacyId}/receipt")
+  @Produces("application/fhir+xml")
+  public Response getReceipt(
+      @PathParam("pharmacyId") String pharmacyId,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("secret") String secret) {
+    val pharmacy = actors.getPharmacyOrThrowNotFound(pharmacyId);
+    log.info("Pharmacy {} fetches receipt for prescription {}", pharmacy.getName(), taskId);
+    return new FetchReceiptUseCase(pharmacy).fetchReceipt(taskId, secret);
   }
 
   @POST

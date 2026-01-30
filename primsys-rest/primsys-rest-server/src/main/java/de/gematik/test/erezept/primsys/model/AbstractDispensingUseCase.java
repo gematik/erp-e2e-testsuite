@@ -24,7 +24,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemDispenseCloseOperationPharmaceuticalsBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
@@ -177,7 +177,7 @@ public abstract class AbstractDispensingUseCase {
     }
   }
 
-  protected DispensePrescriptionAsBundleCommand createDispenseCommand(
+  protected DispensePrescriptionAsBundleCommandOld createDispenseCommand(
       String prescriptionId,
       Secret secret,
       List<PznDispensedMedicationDto> medications,
@@ -188,14 +188,14 @@ public abstract class AbstractDispensingUseCase {
     if (shouldUseOldMedicationDispenseBundle()) {
       val medicationDispenses =
           this.createMedicationDispenses(prescriptionId, kvnr, medications, isSubstituted);
-      return new DispensePrescriptionAsBundleCommand(
+      return new DispensePrescriptionAsBundleCommandOld(
           TaskId.from(prescriptionId), secret, medicationDispenses);
     } else {
       val operationBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
       val operationParams =
           this.feedOperationInputParameterBuilder(
               operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
-      return new DispensePrescriptionAsBundleCommand(
+      return new DispensePrescriptionAsBundleCommandOld(
           TaskId.from(prescriptionId), secret, operationParams);
     }
   }

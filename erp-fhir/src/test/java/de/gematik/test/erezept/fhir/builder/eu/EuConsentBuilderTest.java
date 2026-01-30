@@ -39,7 +39,7 @@ class EuConsentBuilderTest extends ErpFhirParsingTest {
     val kvnr = KVNR.randomPkv();
     val euConsent =
         EuConsentBuilder.forKvnr(kvnr)
-            .version(EuVersion.V1_0)
+            .version(EuVersion.getDefaultVersion())
             .policyRule(ActCode.OPTIN)
             .status(Consent.ConsentState.ACTIVE)
             .scope(ConsentScope.PATIENT_PRIVACY)
@@ -66,7 +66,6 @@ class EuConsentBuilderTest extends ErpFhirParsingTest {
     val status = Consent.ConsentState.ACTIVE;
     val euConsent =
         EuConsentBuilder.forKvnr(KVNR.random())
-            .version(EuVersion.V1_0)
             .policyRule(ActCode.OPTIN)
             .status(status)
             .scope(ConsentScope.PATIENT_PRIVACY)

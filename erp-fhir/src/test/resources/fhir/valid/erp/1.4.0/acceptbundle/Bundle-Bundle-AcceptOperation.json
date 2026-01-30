@@ -1,11 +1,6 @@
 {
   "resourceType": "Bundle",
   "id": "Bundle-AcceptOperation",
-  "meta": {
-    "profile": [
-      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle_OP_Accept"
-    ]
-  },
   "type": "collection",
   "link": [
     {

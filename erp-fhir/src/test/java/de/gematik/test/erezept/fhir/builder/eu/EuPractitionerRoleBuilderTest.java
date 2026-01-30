@@ -36,7 +36,7 @@ class EuPractitionerRoleBuilderTest extends ErpFhirParsingTest {
       EuPractitionerRoleBuilder.builder()
           .euPractitioner((EuPractitioner) new EuPractitioner().setId("123"))
           .euOrganization(EuOrganizationFaker.faker().fake())
-          .version(EuVersion.V1_0)
+          .version(EuVersion.getDefaultVersion())
           .defaultProfessionOID();
 
   @Test

@@ -1,0 +1,40 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-AccessCode",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AccessCode",
+  "version": "1.6.1",
+  "name": "GEM_ERP_PR_AccessCode",
+  "title": "Identifier-Profil für Verschreibungs-IDs",
+  "status": "active",
+  "date": "2025-12-19",
+  "description": "Der AccessCode ist ein generiertes Geheimnis, das Zugriff auf eine E-Rezept-Ressource gewährt, z. B. Task.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Identifier",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Identifier",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Identifier.use",
+        "path": "Identifier.use",
+        "fixedCode": "official"
+      },
+      {
+        "id": "Identifier.system",
+        "path": "Identifier.system",
+        "min": 1,
+        "fixedUri": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode",
+        "mustSupport": true
+      },
+      {
+        "id": "Identifier.value",
+        "path": "Identifier.value",
+        "comment": "Das Datenmodell ist in der gemSpecDMeRp zu finden.",
+        "min": 1,
+        "mustSupport": true
+      }
+    ]
+  }
+}

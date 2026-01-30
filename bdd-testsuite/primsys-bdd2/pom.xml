@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>bdd-testsuite</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -19,7 +19,7 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-remote-fdv-steps</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.2.0</version>
                     <type>test-jar</type>
                     <exclusions>
                         <exclusion>
@@ -39,7 +39,7 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-remote-fdv-steps</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.2.0</version>
                     <exclusions>
                         <exclusion>
                             <groupId>de.gematik.test.erezept</groupId>
@@ -63,7 +63,7 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-app-bdd</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.2.0</version>
                     <exclusions>
                         <exclusion>
                             <groupId>de.gematik.test.erezept</groupId>
@@ -78,7 +78,7 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-app-bdd</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.2.0</version>
                     <type>test-jar</type>
                     <exclusions>
                         <exclusion>
@@ -99,12 +99,12 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-client-fdv-steps</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.2.0</version>
                 </dependency>
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-client-fdv-steps</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.2.0</version>
                     <type>test-jar</type>
                 </dependency>
             </dependencies>
@@ -116,12 +116,12 @@
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client-lei-steps</artifactId>
             <type>test-jar</type>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client-lei-steps</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>

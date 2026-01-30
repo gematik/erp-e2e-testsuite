@@ -77,7 +77,7 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
       PrescriptionFlowType expectedFlowType) {
 
     // TODO: make parametrizeable
-    System.setProperty("erp.fhir.profile", "1.3.0");
+    System.setProperty("erp.fhir.profile", "1.4.0");
     val patient = new Actor("Marty");
     patient.can(ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe));
 

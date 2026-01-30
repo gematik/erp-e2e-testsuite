@@ -111,7 +111,7 @@ public class BillingInformationConsent implements Task {
         .flatMap(ErxConsentBundle::getConsent);
   }
 
-  private enum ConsentAction {
+  public enum ConsentAction {
     GRANT,
     REVOKE,
     GET;

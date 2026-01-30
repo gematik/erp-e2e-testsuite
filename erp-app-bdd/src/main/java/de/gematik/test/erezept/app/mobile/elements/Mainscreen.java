@@ -69,7 +69,11 @@ public enum Mainscreen implements PageElement {
   PRESCRIPTION_ARCHIVE(
       "Prescription Archive",
       () -> null,
-      () -> AppiumBy.accessibilityId("erx_btn_arc_prescription"));
+      () -> AppiumBy.accessibilityId("erx_btn_arc_prescription")),
+  CLOSE_CHARGE_ITEM_CONSENT_DRAWER_BUTTON(
+      "Close button of the charge item consent drawer",
+      null,
+      () -> AppiumBy.accessibilityId("erx_btn_consent_drawer_close"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

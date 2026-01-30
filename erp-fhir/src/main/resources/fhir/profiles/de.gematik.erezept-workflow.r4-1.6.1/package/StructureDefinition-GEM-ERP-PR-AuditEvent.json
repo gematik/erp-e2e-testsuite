@@ -1,0 +1,169 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-AuditEvent",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent",
+  "version": "1.6.1",
+  "name": "GEM_ERP_PR_AuditEvent",
+  "title": "AuditEvent für die Protokollierung des Zugriffs auf eRezepte",
+  "status": "active",
+  "date": "2025-12-19",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "AuditEvent",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/AuditEvent",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "AuditEvent.meta",
+        "path": "AuditEvent.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.meta.profile",
+        "path": "AuditEvent.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing für meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.meta.profile:workflowProfile",
+        "path": "AuditEvent.meta.profile",
+        "sliceName": "workflowProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent|1.6",
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.type",
+        "path": "AuditEvent.type",
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.type.system",
+        "path": "AuditEvent.type.system",
+        "min": 1,
+        "fixedUri": "http://terminology.hl7.org/CodeSystem/audit-event-type"
+      },
+      {
+        "id": "AuditEvent.type.code",
+        "path": "AuditEvent.type.code",
+        "min": 1,
+        "fixedCode": "rest"
+      },
+      {
+        "id": "AuditEvent.subtype",
+        "path": "AuditEvent.subtype",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "AuditEvent.action",
+        "path": "AuditEvent.action",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.outcome",
+        "path": "AuditEvent.outcome",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.agent",
+        "path": "AuditEvent.agent",
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.agent.type",
+        "path": "AuditEvent.agent.type",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.agent.who.identifier",
+        "path": "AuditEvent.agent.who.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-telematik-id",
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AuditEvent.agent.name",
+        "path": "AuditEvent.agent.name",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.source",
+        "path": "AuditEvent.source",
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.source.site",
+        "path": "AuditEvent.source.site",
+        "min": 1,
+        "fixedString": "E-Rezept Fachdienst"
+      },
+      {
+        "id": "AuditEvent.source.observer",
+        "path": "AuditEvent.source.observer",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Device"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AuditEvent.source.observer.reference",
+        "path": "AuditEvent.source.observer.reference",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.entity",
+        "path": "AuditEvent.entity",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "AuditEvent.entity.what",
+        "path": "AuditEvent.entity.what",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.entity.name",
+        "path": "AuditEvent.entity.name",
+        "short": "KVNR des Patienten, auf den sich das AuditEvent bezieht",
+        "definition": "KVNR des Patienten, auf den sich das AuditEvent bezieht, verwendet als Filterkriterium, wenn der Patient auf seine Daten zugreift.",
+        "min": 1
+      },
+      {
+        "id": "AuditEvent.entity.description",
+        "path": "AuditEvent.entity.description",
+        "short": "E-Rezept-ID",
+        "definition": "E-Rezept-ID soll eine Beziehung zu den Versicherungsunternehmensdaten haben, wenn der Task bereits gelöscht wurde",
+        "min": 1
+      }
+    ]
+  }
+}

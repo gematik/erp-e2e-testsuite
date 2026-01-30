@@ -46,6 +46,7 @@ public enum KbvCodeSystem implements WithCodeSystem {
   PAYOR_TYPE("https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Payor_Type_KBV"),
   PKV_TARIFF("https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_PKV_TARIFF"),
   URSACHE_TYPE("https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Ursache_Type"),
+  DOSIEREINHEIT("https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_BMP_DOSIEREINHEIT"),
   ;
 
   private final String canonicalUrl;

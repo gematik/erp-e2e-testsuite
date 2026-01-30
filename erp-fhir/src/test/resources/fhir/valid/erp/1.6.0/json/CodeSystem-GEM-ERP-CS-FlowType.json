@@ -1,0 +1,56 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GEM_ERP_CS_FlowType",
+  "id": "GEM-ERP-CS-FlowType",
+  "title": "CodeSystem der Flowtypen",
+  "description": "Zeigt die verschiedenen Typen des E-Rezept Workflows entsprechend der Verordnungsformulare.\n\nWICHTIG: Der Codebereich 9xx ist reserviert für Abrechnungsprozesse in Apotheken wie z.B. Pharmazeutische Dienstleistungen!",
+  "url": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+  "concept": [
+    {
+      "code": "160",
+      "display": "Flowtype für Apothekenpflichtige Arzneimittel"
+    },
+    {
+      "code": "162",
+      "display": "Flowtype für Digitale Gesundheitsanwendungen"
+    },
+    {
+      "code": "165",
+      "display": "Flowtype für Betäubungsmittel"
+    },
+    {
+      "code": "166",
+      "display": "Flowtype für Arzneimittel nach § 3a AMVV"
+    },
+    {
+      "code": "169",
+      "display": "Flowtype zur Workflow-Steuerung durch Leistungserbringer"
+    },
+    {
+      "code": "200",
+      "display": "Flowtype für Apothekenpflichtige Arzneimittel (PKV)"
+    },
+    {
+      "code": "209",
+      "display": "Flowtype zur Workflow-Steuerung durch Leistungserbringer (PKV)"
+    }
+  ],
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "publisher": "gematik GmbH",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.gematik.de"
+        }
+      ]
+    }
+  ],
+  "copyright": "gematik GmbH",
+  "caseSensitive": true,
+  "count": 7
+}

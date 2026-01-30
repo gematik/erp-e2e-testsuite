@@ -27,6 +27,7 @@ import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.bbriccs.utils.StopwatchUtil;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.io.File;
 import java.util.List;
@@ -57,8 +58,10 @@ public class ValidatorUtil {
 
     log.info("Validate {}", file.getName());
     val content = ResourceLoader.readString(file);
-    val vr = parser.validate(content);
+    val measurement = StopwatchUtil.measure(() -> parser.validate(content));
+    val vr = measurement.response();
     if (printResult) {
+      log.info("Validation of {} took {}", file.getName(), measurement.duration());
       printValidationResult(vr);
     }
     validationAssertion.accept(vr.isSuccessful());

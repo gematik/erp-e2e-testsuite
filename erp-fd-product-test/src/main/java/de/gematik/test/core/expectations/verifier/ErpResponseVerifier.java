@@ -178,4 +178,18 @@ public class ErpResponseVerifier {
       Predicate<ErpResponse<? extends Resource>> resourceTypePredicate(Class<R> type) {
     return r -> r.isResourceOfType(type);
   }
+
+  public static VerificationStep<ErpResponse<? extends Resource>> warningHeaderIsUnset() {
+    Predicate<ErpResponse<? extends Resource>> predicate =
+        r -> {
+          String headerValue = r.getHeaderValue("Warning");
+          return headerValue == null || headerValue.isEmpty();
+        };
+    val step =
+        new VerificationStep.StepBuilder<ErpResponse<? extends Resource>>(
+            Requirement.custom("Unspecified Requirement"),
+            "Der Warning-Header darf beim Löschen einer bereits abgerufenen Communication nicht"
+                + " gesetzt sein!");
+    return step.predicate(predicate).accept();
+  }
 }

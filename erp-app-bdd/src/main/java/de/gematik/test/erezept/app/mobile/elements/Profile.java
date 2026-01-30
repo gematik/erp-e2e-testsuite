@@ -32,7 +32,25 @@ public enum Profile implements PageElement {
   USER_KVNR(
       "health insurance number",
       null,
-      () -> AppiumBy.accessibilityId("stg_txt_edit_profile_insurance_id"));
+      () -> AppiumBy.accessibilityId("stg_txt_edit_profile_insurance_id")),
+  USER_INSURANCE(
+      "User insurance company",
+      null,
+      () -> AppiumBy.accessibilityId("stg_txt_edit_profile_insurance_company")),
+  DELETE_PROFILE_BUTTON(
+      "Delete profile button", null, () -> AppiumBy.accessibilityId("stg_btn_edit_profile_delete")),
+  CONFIRM_PROFILE_DELETION_BUTTON(
+      "Confirm profile deletion button", null, () -> AppiumBy.name("Löschen")),
+  CHARGE_ITEM_BUTTON(
+      "Show charge items button",
+      null,
+      () ->
+          AppiumBy.accessibilityId(
+              "stg_txt_edit_profile_charge_item_list_section_show_charge_item_list")),
+  LEAVE_BUTTON(
+      "Leave Debug Menu",
+      null,
+      () -> AppiumBy.xpath("(//XCUIElementTypeButton[@name=\"Einstellungen\"])[1]"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

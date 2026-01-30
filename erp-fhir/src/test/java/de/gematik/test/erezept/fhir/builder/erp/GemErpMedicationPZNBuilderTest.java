@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import lombok.val;
@@ -39,7 +40,7 @@ class GemErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
   void shouldSetCorrectPzn() {
     val pzn = PZN.from("pzn-Code");
     val pznMedication = GemErpMedicationBuilder.forPZN().pzn(pzn).build();
-    assertTrue(parser.isValid(pznMedication));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, pznMedication).isSuccessful());
     assertEquals(pzn.getValue(), pznMedication.getPzn().orElseThrow().getValue());
   }
 
@@ -66,7 +67,7 @@ class GemErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
     val size = "100";
     val pznMedication =
         GemErpMedicationBuilder.forPZN().pzn("123").amount(3).packagingSize(size).build();
-    assertTrue(parser.isValid(pznMedication));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, pznMedication).isSuccessful());
     assertEquals(
         size,
         pznMedication

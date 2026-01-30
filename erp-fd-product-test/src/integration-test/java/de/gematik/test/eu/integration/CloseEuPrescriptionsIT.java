@@ -73,7 +73,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor germanDoctor;
 
-  @Actor(name = "Sina Hüllmann")
+  @Actor(name = "Hanna Bäcker")
   private PatientActor patientAtJourney;
 
   @Actor(name = "Hannes Vogt")

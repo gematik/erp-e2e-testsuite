@@ -27,6 +27,7 @@ import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
@@ -55,6 +56,7 @@ public class ErxMedicationDispenseBuilder
   // required because here we need to support KbvMedication and GemErpMedication at the same time
   private Medication baseMedication;
   private Medication.MedicationBatchComponent batch;
+  private DosageDgMP dosageDgMP;
 
   protected ErxMedicationDispenseBuilder(KVNR kvnr) {
     super(kvnr);
@@ -100,6 +102,11 @@ public class ErxMedicationDispenseBuilder
     return this;
   }
 
+  public ErxMedicationDispenseBuilder dosage(DosageDgMP dosageDgMP) {
+    this.dosageDgMP = dosageDgMP;
+    return this;
+  }
+
   public ErxMedicationDispenseBuilder dosageInstruction(String instruction) {
     this.dosageInstructions.add(instruction);
     return this;
@@ -140,7 +147,7 @@ public class ErxMedicationDispenseBuilder
     this.dosageInstructions.stream()
         .map(instruction -> new Dosage().setText(instruction))
         .forEach(medDisp::addDosageInstruction);
-
+    Optional.ofNullable(dosageDgMP).ifPresent(medDisp::addDosageInstruction);
     this.notes.stream().map(note -> new Annotation().setText(note)).forEach(medDisp::addNote);
 
     return medDisp;

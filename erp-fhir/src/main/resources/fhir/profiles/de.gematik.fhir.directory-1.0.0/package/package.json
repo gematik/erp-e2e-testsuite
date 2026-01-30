@@ -1,0 +1,13 @@
+{
+  "name": "de.gematik.fhir.directory",
+  "version": "1.0.0",
+  "description": "\r\ngematik FHIR Directory: Verzeichnisdienst der Telematikinfrastruktur ",
+  "author": "gematik GmbH",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "jurisdiction": "urn:iso:std:iso:3166#DE",
+  "dependencies": {
+    "de.gematik.ti": "1.1.1"
+  }
+}
