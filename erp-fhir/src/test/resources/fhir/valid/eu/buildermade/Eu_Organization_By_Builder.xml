@@ -1,7 +1,7 @@
 <Organization xmlns="http://hl7.org/fhir">
     <id value="b85a09ba-eb6e-4b6b-81b6-84f69d62cbcd"/>
     <meta>
-        <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Organization|1.0"/>
+        <profile value="https://gematik.de/fhir/erp-eu/StructureDefinition/GEM_ERPEU_PR_Organization|1.1"/>
     </meta>
     <extension url="https://gematik.de/fhir/ti/StructureDefinition/ncpeh-country-extension">
         <valueCoding>
@@ -42,11 +42,6 @@
             <system value="https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"/>
             <code value="1.2.276.0.76.4.54"/>
             <display value="Öffentliche Apotheke"/>
-        </coding>
-    </type>
-    <type>
-        <coding>
-            <code value="pharmacist"/>
         </coding>
     </type>
     <name value="Test Pharmacy"/>

@@ -6,12 +6,13 @@
   <parent>
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erp-config</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>erp-config-data</artifactId>
   <name>E-Rezept TestSuite Configurations Data</name>
+  <description>E-Rezept TestSuite Configurations Data</description>
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>

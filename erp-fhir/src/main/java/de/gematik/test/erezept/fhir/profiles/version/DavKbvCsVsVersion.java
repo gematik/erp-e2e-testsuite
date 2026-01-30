@@ -29,12 +29,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DavKbvCsVsVersion implements ProfileVersion {
   V1_0_2("1.0.2"),
-  V1_0_3("1.0.3");
+  V1_0_3("1.0.3"),
+  V1_6_0("1.6.0");
 
-  public static final String PROFILE_NAME = "dav.kbv.sfhir.cs.vs";
+  public static final String PROFILE_NAME = "gematik.kbv.sfhir.cs.vs";
   private final String version;
   private final String name = PROFILE_NAME;
 
+  @Deprecated(since = "until knowing for what") // NOSONAR
   public static DavKbvCsVsVersion getDefaultVersion() {
     return VersionUtil.getDefaultVersion(DavKbvCsVsVersion.class, PROFILE_NAME);
   }

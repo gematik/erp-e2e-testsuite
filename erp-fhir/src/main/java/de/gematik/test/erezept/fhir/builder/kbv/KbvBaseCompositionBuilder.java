@@ -29,6 +29,7 @@ import de.gematik.bbriccs.toggle.FeatureConfiguration;
 import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -190,6 +191,12 @@ public abstract class KbvBaseCompositionBuilder<
   @Override
   public Composition build() {
     val composition = this.createResource(Composition::new, this.getProfile());
+
+    // from Version 1.6 a VersionId is mandatory
+    if (version.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      composition.getMeta().setVersionId("1");
+    }
+
     composition.setDate(new Date());
 
     composition

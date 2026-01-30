@@ -135,9 +135,13 @@ public class KbvErpMedicationCompoundingBuilder
         this.createResource(
             KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_COMPOUNDING, kbvItaErpVersion);
 
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      medication.getMeta().setVersionId("1");
+    }
+
     val amount = new Ratio();
 
-    if (this.kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
+    if (this.kbvItaErpVersion.isSmallerThanOrEqualTo(KbvItaErpVersion.V1_1_0)) {
       medication.addExtension(BASE_MEDICATION_TYPE.asExtension());
     } else {
       medication.addExtension(getNewSnomedKategorie());

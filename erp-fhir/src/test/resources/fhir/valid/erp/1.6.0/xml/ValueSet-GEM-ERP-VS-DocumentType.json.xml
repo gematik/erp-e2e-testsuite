@@ -1,0 +1,22 @@
+<ValueSet xmlns="http://hl7.org/fhir">
+  <id value="GEM-ERP-VS-DocumentType" />
+  <url value="https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_VS_DocumentType" />
+  <version value="1.6.0" />
+  <name value="GEM_ERP_VS_DocumentType" />
+  <title value="ValueSet der Dokumenttyp-Codes" />
+  <status value="active" />
+  <date value="2025-09-25" />
+  <publisher value="gematik GmbH" />
+  <contact>
+    <telecom>
+      <system value="url" />
+      <value value="http://www.gematik.de" />
+    </telecom>
+  </contact>
+  <description value="Art der Dokumente je nach Empfänger." />
+  <compose>
+    <include>
+      <system value="https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType" />
+    </include>
+  </compose>
+</ValueSet>

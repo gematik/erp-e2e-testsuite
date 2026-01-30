@@ -1,0 +1,38 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "AcceptOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/AcceptOperationDefinition",
+  "status": "draft",
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "name": "Accept",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "Mit der $accept-Operation beansprucht eine Apotheke ein E-Rezept. Der Status der referenzierten Aufgabe ändert sich in 'in-progress'.",
+  "code": "accept",
+  "outputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_AcceptOperation_Output",
+  "parameter": [
+    {
+      "name": "ac",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Der Secret-Parameter, der es Benutzern ermöglicht, exklusiv über die URL und den Parameter ?ac auf die Aufgabe zuzugreifen.",
+      "type": "string"
+    },
+    {
+      "name": "return",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "Sammlung von Ressourcen (Task und Binary), damit eine Apotheke ein eRezept verarbeiten kann, das Folgendes enthält: 1. die aktualisierte Task (einschließlich eines Geheimnisses, das einer Apotheke exklusiven Zugriff auf die Task gewährt) und 2. eine base64Binary des qualifiziert signierten eRezepts. Der Status der Task ändert sich in 'in-progress'. Der Rezeptserver erstellt ein secret und speichert sie in Task.identifier:Secret.",
+      "type": "Bundle"
+    }
+  ]
+}

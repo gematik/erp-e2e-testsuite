@@ -1,16 +1,13 @@
 {
-  "name": "de.gematik.erezept-workflow.r4",
+  "name": "de.basisprofil.r4",
   "version": "1.5.2",
-  "description": "Die E-Rezept-Spezifikation",
-  "author": "gematik",
+  "description": "Projekt Basisprofilierung R4 (HL7 Deutschland e.V.)",
+  "author": "stefanlang1",
   "fhirVersions": [
     "4.0.1"
   ],
-  "jurisdiction": "urn:iso:std:iso:3166#DE",
   "dependencies": {
-    "hl7.fhir.r4.core": "4.0.1",
-    "de.basisprofil.r4": "1.5.2",
-    "de.gematik.epa.medication": "1.0.6-2",
-    "de.gematik.terminology": "1.0.5-4"
-  }
+    "hl7.fhir.r4.core": "4.0.1"
+  },
+  "jurisdiction": "urn:iso:std:iso:3166#DE"
 }

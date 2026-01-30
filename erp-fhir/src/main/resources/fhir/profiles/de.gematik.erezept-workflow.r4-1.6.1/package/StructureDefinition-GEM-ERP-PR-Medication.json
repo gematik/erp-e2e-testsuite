@@ -1,0 +1,204 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-Medication",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication",
+  "version": "1.6.1",
+  "name": "GEM_ERP_PR_Medication",
+  "title": "Medikament zur Ausgabe des Rezepts",
+  "status": "active",
+  "date": "2025-12-19",
+  "description": "Verarbeitet medizinische Informationen über das eingelöste Rezept",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Medication",
+  "baseDefinition": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Medication.meta",
+        "path": "Medication.meta",
+        "min": 1
+      },
+      {
+        "id": "Medication.meta.profile",
+        "path": "Medication.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing für meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.meta.profile:workflowProfile",
+        "path": "Medication.meta.profile",
+        "sliceName": "workflowProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication|1.6",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.contained",
+        "path": "Medication.contained",
+        "short": "Enthaltene Medications",
+        "definition": "Dieses Feld kann weitere Medication Ressourcen enthalten, die hier gelistet werden. Dies tritt z.B. bei Rezepturen auf."
+      },
+      {
+        "id": "Medication.extension:isVaccine",
+        "path": "Medication.extension",
+        "sliceName": "isVaccine",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.extension:drugCategory",
+        "path": "Medication.extension",
+        "sliceName": "drugCategory",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.extension:normSizeCode",
+        "path": "Medication.extension",
+        "sliceName": "normSizeCode",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.extension:packaging",
+        "path": "Medication.extension",
+        "sliceName": "packaging",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.extension:manufacturingInstructions",
+        "path": "Medication.extension",
+        "sliceName": "manufacturingInstructions",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.identifier",
+        "path": "Medication.identifier",
+        "short": "Business-Identifier der Medication",
+        "definition": "Dieses Feld bietet die Möglichkeit, für eine Medikation Business Identifier zu belegen.",
+        "comment": "Gegenüber dem E-Rezept-Fachdienst wird dieser Wert nicht ausgewertet."
+      },
+      {
+        "id": "Medication.code",
+        "path": "Medication.code",
+        "short": "Code der Medikation",
+        "definition": "Ein Code (oder eine Gruppe von Codes), der dieses Medikament identifiziert, oder eine textuelle Beschreibung, falls kein Code verfügbar ist."
+      },
+      {
+        "id": "Medication.form",
+        "path": "Medication.form",
+        "short": "Darreichungsform",
+        "definition": "Beschreibt die Darreichungsform des Arzneimittels."
+      },
+      {
+        "id": "Medication.amount",
+        "path": "Medication.amount",
+        "short": "Menge des Arzneimittels in einer Packung",
+        "definition": "Angabe der Packungsgröße, bzw. der Gesamtmenge der Packung"
+      },
+      {
+        "id": "Medication.amount.numerator.extension:packagingSize",
+        "path": "Medication.amount.numerator.extension",
+        "sliceName": "packagingSize",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.amount.numerator.extension:totalQuantity",
+        "path": "Medication.amount.numerator.extension",
+        "sliceName": "totalQuantity",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.ingredient",
+        "path": "Medication.ingredient",
+        "short": "Wirkstoffe",
+        "definition": "Hier können Bestandteile, die Wirkstoffe oder keine Wirkstoffe sind, erfasst werden."
+      },
+      {
+        "id": "Medication.ingredient.extension:darreichungsform",
+        "path": "Medication.ingredient.extension",
+        "sliceName": "darreichungsform",
+        "short": "Darreichungsform",
+        "definition": "Angabe der Darreichungsform eines Wirkstoffes als string",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.ingredient.item[x]:itemCodeableConcept",
+        "path": "Medication.ingredient.item[x]",
+        "sliceName": "itemCodeableConcept",
+        "short": "Wirkstoff kodiert",
+        "definition": "An dieser Stelle können die Informationen des Wirkstoffs in einer kodierten Art und weise angegeben werden.",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "Medication.ingredient.item[x]:itemReference",
+        "path": "Medication.ingredient.item[x]",
+        "sliceName": "itemReference",
+        "short": "Wirkstoff Referenz",
+        "definition": "An dieser Stelle können Referenzen zu verlinkten Medikationen angegeben werden.",
+        "comment": "Wird in diesem Profil ausschließlich dafür genutzt, um für Rezepturen und Kombipackungen die Einzelbestandteile unter `.contained` anzugeben",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pharmaceutical-product",
+              "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient"
+            ],
+            "aggregation": [
+              "contained"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Medication.ingredient.strength",
+        "path": "Medication.ingredient.strength",
+        "short": "Wirkstärke",
+        "definition": "Angabe zur Wirkstärke des Wirkstoffs"
+      },
+      {
+        "id": "Medication.ingredient.strength.extension:amountText",
+        "path": "Medication.ingredient.strength.extension",
+        "sliceName": "amountText",
+        "short": "Angabe der Menge",
+        "definition": "Freitextmenge des Wirkstoffs für klassische lateinische Notationen wie 'ad 100,0' oder 'quantum satis', einschließlich der Einheit.",
+        "mustSupport": true
+      },
+      {
+        "id": "Medication.batch",
+        "path": "Medication.batch",
+        "short": "Chargeninformationen",
+        "definition": "Informationen, die nur für Packungen gelten (nicht für Produkte)."
+      },
+      {
+        "id": "Medication.batch.lotNumber",
+        "path": "Medication.batch.lotNumber",
+        "short": "Chargennummer",
+        "definition": "Die zugewiesene Chargennummer einer Charge des angegebenen Produkts."
+      },
+      {
+        "id": "Medication.batch.expirationDate",
+        "path": "Medication.batch.expirationDate",
+        "short": "Verfallsdatum",
+        "definition": "Wann diese spezielle Charge des Produkts abläuft"
+      }
+    ]
+  }
+}

@@ -145,7 +145,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .amount(5, "Stk") // default 10 {tbl}
+            .amount(5, "Stk") // default 10 `tbl`
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -184,7 +184,9 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
     assertNotNull(kbvBundle.getId());
     assertEquals(prescriptionId, kbvBundle.getPrescriptionId());
 
-    assertTrue(parser.isValid(kbvBundle));
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(result.isSuccessful());
+
     assertEquals(InsuranceTypeDe.GKV, kbvBundle.getPatient().getInsuranceType());
     assertEquals(
         "1-0-0-0", kbvBundle.getMedicationRequest().getDosageInstructionFirstRep().getText());
@@ -258,7 +260,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .amount(5, "Stk") // default 10 {tbl}
+            .amount(5, "Stk") // default 10  `tbl`
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -295,7 +297,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
     assertNotNull(kbvBundle.getId());
     assertEquals(prescriptionId, kbvBundle.getPrescriptionId());
 
-    assertTrue(parser.isValid(kbvBundle));
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(result.isSuccessful());
     if (kbvErpVersion.compareTo(KbvItaErpVersion.V1_1_0) <= 0)
       assertEquals(InsuranceTypeDe.PKV, kbvBundle.getPatient().getInsuranceType());
   }
@@ -353,7 +356,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .amount(5, "Stk") // default 10 {tbl}
+            .amount(5, "Stk") // default 10 `tbl`
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -390,7 +393,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
     assertNotNull(kbvBundle.getId());
     assertEquals(prescriptionId, kbvBundle.getPrescriptionId());
 
-    assertTrue(parser.isValid(kbvBundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
   }
 
   @ParameterizedTest(
@@ -460,7 +463,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .amount(5, "Stk") // default 10 {tbl}
+            .amount(5, "Stk") // default 10 `tbl`
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -498,7 +501,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
     assertNotNull(kbvBundle.getId());
     assertEquals(prescriptionId, kbvBundle.getPrescriptionId());
 
-    assertTrue(parser.isValid(kbvBundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
   }
 
   @ParameterizedTest(
@@ -557,7 +560,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .amount(5, "Stk") // default 10 {tbl}
+            .amount(5, "Stk") // default 10 `tbl`
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -590,7 +593,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .medication(medication)
             .build();
 
-    assertTrue(parser.isValid(kbvBundle));
+    val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(result.isSuccessful());
 
     assertEquals(prescriptionId, kbvBundle.getPrescriptionId());
   }
@@ -677,7 +681,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
               .withInsurance(insurance, patient)
               .withMedication(medication)
               .fake();
-      assertTrue(parser.isValid(kbvBundle));
+      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+      assertTrue(result.isSuccessful());
     }
   }
 
@@ -703,7 +708,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
               .withPznAndMedicationName(PZN.from("04773414"), fakerDrugName())
               .fake();
 
-      assertTrue(parser.isValid(kbvBundle));
+      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+      assertTrue(result.isSuccessful());
     }
   }
 
@@ -729,7 +735,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
               .withPractitioner(KbvPractitionerFaker.builder().fake())
               .fake();
 
-      assertTrue(parser.isValid(kbvBundle));
+      val result = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+      assertTrue(result.isSuccessful());
     }
   }
 
@@ -751,7 +758,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
 
     for (int i = 0; i < 1; i++) {
       val kbvBundle = KbvErpBundleFaker.builder().withKvnr(KVNR.random()).fake();
-      assertTrue(parser.isValid(kbvBundle));
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
     }
   }
 
@@ -777,7 +784,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
               .withPrescriptionId(PrescriptionId.from("160.002.362.150.600.45"))
               .fake();
 
-      assertTrue(parser.isValid(kbvBundle));
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
     }
   }
 
@@ -798,7 +805,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
 
     val authoredOn = Date.from(Instant.now().minus(2, ChronoUnit.DAYS));
     val kbvBundle = KbvErpBundleFaker.builder().withAuthorDate(authoredOn).fake();
-    assertTrue(parser.isValid(kbvBundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
 
     val expected = authoredOn.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     val actual = kbvBundle.getAuthoredOn().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -866,7 +873,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .prescriptionId(PrescriptionId.random())
             .build();
 
-    assertTrue(parser.isValid(kbvBundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
   }
 
   @ParameterizedTest(
@@ -936,6 +943,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .requester(practitioner)
             .medication(medication)
             .build();
+
     val kbvBundle =
         KbvErpBundleBuilder.forPrescription(prescriptionId)
             .version(kbvErpVersion)
@@ -948,7 +956,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .medication(medication)
             .build();
 
-    assertTrue(parser.isValid(kbvBundle));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle).isSuccessful());
   }
 
   @ParameterizedTest(
@@ -1103,7 +1111,8 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .medication(medication)
             .build();
 
-    assertTrue(parser.isValid(bundle));
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
+    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest(
@@ -1142,6 +1151,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
             .medication(medication)
             .build();
 
-    assertTrue(parser.isValid(bundle));
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
+    assertTrue(result.isSuccessful());
   }
 }

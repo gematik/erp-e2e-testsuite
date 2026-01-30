@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.lei.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
+import static org.hamcrest.Matchers.is;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -33,7 +34,6 @@ import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class PharmacyDispenseSteps {
 
@@ -262,7 +262,7 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
                         .build())
                 .isEqualTo(200));
   }
@@ -277,7 +277,7 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
                         .withMedicationDispense(medications)
                         .build())
                 .isEqualTo(200));
@@ -293,7 +293,7 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
                         .multiple(2)
                         .build())
                 .isEqualTo(200));
@@ -310,7 +310,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundle.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
                         .build())
                 .isEqualTo(403));
     and(then(thePharmacy))
@@ -329,11 +329,11 @@ public class PharmacyDispenseSteps {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePharmacy)
-        .attemptsTo(
-            Ensure.that(
-                    ResponseOfDispenseMedicationWithoutAcceptance.forPatient(thePatient)
-                        .withReturnCode(403)
-                        .forPrescription(DequeStrategy.fromString(order)))
-                .isTrue());
+        .should(
+            seeThat(
+                ResponseOfDispenseMedicationWithoutAcceptance.forPatient(thePatient)
+                    .withReturnCode(403)
+                    .forPrescription(DequeStrategy.fromString(order)),
+                is(true)));
   }
 }

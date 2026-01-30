@@ -119,4 +119,11 @@ public class RawHttpResponseVerifier {
             req.getRequirement(), format("ReturnCode muss {0} entsprechen", codes));
     return step.predicate(predicate).accept();
   }
+
+  public static VerificationStep<String> bodyIsEmpty(RequirementsSet req) {
+    return new VerificationStep.StepBuilder<String>(
+            req.getRequirement(), "Der Response Body ist leer")
+        .predicate(body -> body != null && body.isEmpty())
+        .accept();
+  }
 }

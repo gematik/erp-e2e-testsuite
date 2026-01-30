@@ -156,6 +156,10 @@ public class KbvCoverageBuilder extends ResourceBuilder<KbvCoverage, KbvCoverage
     val coverage =
         this.createResource(KbvCoverage::new, KbvItaForStructDef.COVERAGE, kbvItaForVersion);
 
+    if (kbvItaForVersion.isBiggerThan(KbvItaForVersion.V1_2_0)) {
+      coverage.getMeta().setVersionId("1");
+    }
+
     val extensions = new LinkedList<Extension>();
     extensions.add(personGroup.asExtension());
     extensions.add(dmpKennzeichen.asExtension());

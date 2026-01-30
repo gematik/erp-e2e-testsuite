@@ -1,0 +1,37 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "AbortOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/AbortOperationDefinition",
+  "status": "draft",
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "name": "Abort",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "Diese Operation bricht den Workflow eines E-Rezepts ab und löscht alle Daten, die mit dieser Aufgabe zusammenhängen.",
+  "code": "abort",
+  "parameter": [
+    {
+      "name": "ac",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "documentation": "[Nur von Patienten und Anbietern (Ärzten/Zahnärzten) zu verwenden] Der secret Parameter, der es Benutzern ermöglicht, exklusiv über die URL und den Parameter ?ac auf die Aufgabe zuzugreifen.",
+      "type": "string"
+    },
+    {
+      "name": "secret",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "documentation": "[Nur von der Apotheke zu verwenden] Der secret Parameter, der es einer Apotheke ermöglicht, exklusiv über die URL und den Parameter ?secret auf die Aufgabe zuzugreifen.",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-EX-SupplyOptionsType",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType",
+  "version": "1.6.1",
+  "name": "GEM_ERP_EX_SupplyOptionsType",
+  "status": "active",
+  "date": "2025-12-19",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Communication.payload"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Optionen für bevorzugte oder angebotene Versorgungskanäle",
+        "comment": "Sowohl Patient als auch Apotheke können ihre Lieferoptionen oder Angebote für die Abgabe von Medikamenten angeben."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "description": "Extensions are always sliced by (at least) url",
+          "rules": "closed"
+        },
+        "min": 3
+      },
+      {
+        "id": "Extension.extension:delivery",
+        "path": "Extension.extension",
+        "sliceName": "delivery",
+        "short": "Dispensation wird vom Boten angeboten/bevorzugt.",
+        "definition": "Patient oder Apotheke können ihre bevorzugte oder angebotene Lieferoption angeben, um Medikamente per Boten zuzustellen.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:delivery.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:delivery.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "delivery"
+      },
+      {
+        "id": "Extension.extension:delivery.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "wahr = Lieferung per Bote akzeptiert/angeboten",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:onPremise",
+        "path": "Extension.extension",
+        "sliceName": "onPremise",
+        "short": "Dispensation wird vor Ort angeboten/bevorzugt.",
+        "definition": "Patient oder Apotheke können ihre bevorzugte oder angebotene Lieferoption angeben, um Medikamente vor Ort abzuholen.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:onPremise.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:onPremise.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "onPremise"
+      },
+      {
+        "id": "Extension.extension:onPremise.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "true = auf Prämisse akzeptiert/angeboten eingehen",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:shipment",
+        "path": "Extension.extension",
+        "sliceName": "shipment",
+        "short": "Dispensation wird durch Versand angeboten/bevorzugt.",
+        "definition": "Patient oder Apotheke können ihre bevorzugte oder angebotene Lieferoption angeben, um Medikamente per Paketversand zu versenden.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:shipment.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:shipment.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "shipment"
+      },
+      {
+        "id": "Extension.extension:shipment.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "wahr = Paketversand akzeptiert/angeboten",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "max": "0"
+      }
+    ]
+  }
+}

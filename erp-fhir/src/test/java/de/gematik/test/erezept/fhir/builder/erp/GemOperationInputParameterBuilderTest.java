@@ -93,7 +93,8 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
     val closeOperation =
         builderSupplier.get().version(version).with(medDispense, medication).build();
 
-    assertTrue(parser.isValid(closeOperation));
+    val vr = ValidatorUtil.encodeAndValidate(parser, closeOperation);
+    assertTrue(vr.isSuccessful());
   }
 
   @ParameterizedTest
@@ -118,7 +119,8 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
             });
 
     val closeOperation = builder.version(version).build();
-    assertTrue(parser.isValid(closeOperation));
+    val vr = ValidatorUtil.encodeAndValidate(parser, closeOperation);
+    assertTrue(vr.isSuccessful());
   }
 
   @Test

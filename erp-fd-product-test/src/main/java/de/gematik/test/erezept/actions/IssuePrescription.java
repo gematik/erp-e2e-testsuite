@@ -40,6 +40,7 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
@@ -148,6 +149,13 @@ public class IssuePrescription extends ErpAction<ErxTask> {
                         task ->
                             ability.appendDmc(
                                 DmcPrescription.ownerDmc(task.getTaskId(), task.getAccessCode()))));
+
+    // store prescription in doctor ability for automatic teardown
+    // this is required because the patient cannot delete all (e.g. 169/209) prescriptions
+    Optional.ofNullable(actor.abilityTo(ManageDoctorsPrescriptions.class))
+        .ifPresent(
+            ability ->
+                activationResponse.getResponse().getResourceOptional().ifPresent(ability::append));
 
     return activationResponse;
   }

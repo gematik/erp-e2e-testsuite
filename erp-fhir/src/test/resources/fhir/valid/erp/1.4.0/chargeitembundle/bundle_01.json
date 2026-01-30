@@ -1050,7 +1050,7 @@
                 {
                   "entry": [
                     {
-                      "reference": "Binary/PrescriptionDigest-200.000.003.355.048.35"
+                      "reference": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Binary/PrescriptionDigest-200.000.003.355.048.35"
                     }
                   ]
                 }

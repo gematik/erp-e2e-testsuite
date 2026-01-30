@@ -20,8 +20,8 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static de.gematik.test.erezept.app.cfg.MedicationParser.compareMedicationNames;
-import static de.gematik.test.erezept.app.cfg.MedicationParser.getMedicationName;
+import static de.gematik.test.erezept.app.parsers.MedicationParser.compareMedicationNames;
+import static de.gematik.test.erezept.app.parsers.MedicationParser.getMedicationName;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

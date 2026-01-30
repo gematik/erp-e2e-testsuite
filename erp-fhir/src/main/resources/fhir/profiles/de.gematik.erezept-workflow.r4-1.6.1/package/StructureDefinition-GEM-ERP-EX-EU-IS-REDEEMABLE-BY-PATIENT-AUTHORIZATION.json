@@ -1,0 +1,58 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-EX-EU-IS-REDEEMABLE-BY-PATIENT-AUTHORIZATION",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_EU_IS_REDEEMABLE_BY_PATIENT_AUTHORIZATION",
+  "version": "1.6.1",
+  "name": "GEM_ERP_EX_EU_IS_REDEEMABLE_BY_PATIENT_AUTHORIZATION",
+  "status": "active",
+  "date": "2025-12-19",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "expression": "Task",
+      "type": "element"
+    },
+    {
+      "expression": "http://hl7.org/fhir/StructureDefinition/Extension",
+      "type": "extension"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Einlösbares EU-E-Rezept durch Patientenautorisierung",
+        "definition": "Diese Flagge wird vom Benutzer gesetzt, um anzugeben, ob das E-Rezept in der EU zur Einlösung verfügbar sein soll oder nicht."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_EU_IS_REDEEMABLE_BY_PATIENT_AUTHORIZATION"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Sollte in EU eingelöst werden Flagge",
+        "definition": "Diese Flagge wird vom Benutzer gesetzt, um anzugeben, ob das E-Rezept in der EU zur Einlösung verfügbar sein soll oder nicht.",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.app.task;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
-import static de.gematik.test.erezept.app.cfg.MedicationParser.getMedicationName;
+import static de.gematik.test.erezept.app.parsers.MedicationParser.getMedicationName;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

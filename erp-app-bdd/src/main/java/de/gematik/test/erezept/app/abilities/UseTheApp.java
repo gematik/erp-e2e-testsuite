@@ -93,7 +93,7 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
 
   @SneakyThrows
   public void longPauseApp() {
-    Thread.sleep(45000);
+    Thread.sleep(60000);
   }
 
   protected int getPollingInterval() {

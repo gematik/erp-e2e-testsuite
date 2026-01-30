@@ -1,0 +1,28 @@
+{
+  "name" : "de.fhir.medication",
+  "version" : "1.0.0",
+  "tools-version" : 3,
+  "type" : "IG",
+  "date" : "20250917073747",
+  "license" : "CC0-1.0",
+  "canonical" : "http://ig.fhir.de/igs/medication",
+  "url" : "http://ig.fhir.de/igs/medication/1.0.0",
+  "title" : "Medication IG DE",
+  "fhirVersions" : ["4.0.1"],
+  "dependencies" : {
+    "hl7.fhir.r4.core" : "4.0.1",
+    "hl7.terminology.r4" : "6.5.0",
+    "hl7.fhir.uv.extensions.r4" : "5.2.0"
+  },
+  "author" : "HL7 Deutschland e.V.",
+  "maintainers" : [
+    {
+      "name" : "HL7 Deutschland e.V.",
+      "url" : "https://hl7.de"
+    }
+  ],
+  "directories" : {
+    "lib" : "package",
+    "example" : "example"
+  }
+}

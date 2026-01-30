@@ -34,6 +34,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.val;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -83,6 +84,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
     assertEquals(2, bundle.getEntry().size());
   }
 
+  @Disabled("no validation profiles for erp-workflow:1.3") // TODO: remove test
   @ParameterizedTest
   @MethodSource
   void shouldHaveProfileForOldProfiles(

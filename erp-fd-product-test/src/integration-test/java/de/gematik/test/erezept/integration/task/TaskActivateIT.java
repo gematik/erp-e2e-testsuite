@@ -150,19 +150,6 @@ class TaskActivateIT extends ErpTest {
     return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dfList).create();
   }
 
-  static Stream<Arguments> pkvPrescriptionTypesProvider() {
-    return ArgumentComposer.composeWith()
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.PHARMACY_ONLY,
-            PrescriptionFlowType.FLOW_TYPE_200)
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            PrescriptionFlowType.FLOW_TYPE_209)
-        .create();
-  }
-
   static Stream<Arguments> prescriptionTypesProviderInvalidTemporalPrecision() {
     val excludedPrecisions =
         new TemporalPrecisionEnum[] {

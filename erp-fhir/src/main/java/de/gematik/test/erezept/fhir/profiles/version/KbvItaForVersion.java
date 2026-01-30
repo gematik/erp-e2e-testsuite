@@ -29,7 +29,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum KbvItaForVersion implements ProfileVersion {
   V1_1_0("1.1.0"),
-  V1_2_0("1.2.0");
+  V1_2_0("1.2.0"),
+  V1_3_0("1.3.0");
 
   public static final String PROFILE_NAME = "kbv.ita.for";
   private final String version;

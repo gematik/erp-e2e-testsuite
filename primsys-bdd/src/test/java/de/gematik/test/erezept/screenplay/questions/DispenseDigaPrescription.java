@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseDiGAFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
@@ -40,6 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
+// Deprecated until 26.03.2026 - 1.21.0 release in ru
+@Deprecated
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DispenseDigaPrescription extends FhirResponseQuestion<ErxMedicationDispenseBundle> {
@@ -74,7 +76,7 @@ public class DispenseDigaPrescription extends FhirResponseQuestion<ErxMedication
     // $dispense without $close should fail by A_24279
     val dDP = DigaDispenseParameters.fromCloseParameters(operationParams);
     val cmd =
-        new DispensePrescriptionAsBundleCommand(
+        new DispensePrescriptionAsBundleCommandOld(
             acceptBundle.getTask().getTaskId(), acceptBundle.getSecret(), dDP);
 
     log.info(

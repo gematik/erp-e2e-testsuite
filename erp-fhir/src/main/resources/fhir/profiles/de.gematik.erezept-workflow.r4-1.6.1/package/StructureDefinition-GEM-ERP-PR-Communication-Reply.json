@@ -1,0 +1,151 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-Communication-Reply",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply",
+  "version": "1.6.1",
+  "name": "GEM_ERP_PR_Communication_Reply",
+  "title": "Antwort vom Leistungserbringer an den Patienten",
+  "status": "active",
+  "date": "2025-12-19",
+  "description": "Ressource, die für die Kommunikation der Antwort zur Weitergabe/Informationsanfrage vom Leistungserbringer an Patienten/Vertreter verwendet wird",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Communication",
+  "baseDefinition": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Communication.meta",
+        "path": "Communication.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.meta.profile",
+        "path": "Communication.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing für meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.meta.profile:workflowProfile",
+        "path": "Communication.meta.profile",
+        "sliceName": "workflowProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.6",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.recipient",
+        "path": "Communication.recipient",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Communication.recipient.identifier",
+        "path": "Communication.recipient.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.sender.identifier",
+        "path": "Communication.sender.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10",
+              "http://fhir.de/StructureDefinition/identifier-telematik-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.payload",
+        "path": "Communication.payload",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Communication.payload.extension",
+        "path": "Communication.payload.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "description": "Erweiterungen werden immer (mindestens) nach url gesliced.",
+          "rules": "closed"
+        }
+      },
+      {
+        "id": "Communication.payload.extension:OfferedSupplyOptions",
+        "path": "Communication.payload.extension",
+        "sliceName": "OfferedSupplyOptions",
+        "short": "Angebotene Lieferoptionen durch die Apotheke",
+        "definition": "In einer Kommunikation kann eine Apotheke ihre verfügbaren Lieferoptionen angeben, ob sie Kunden im Geschäft bedienen, Medikamente per Boten senden oder den Versand per Paket nutzen.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.payload.extension:AvailabilityStatus",
+        "path": "Communication.payload.extension",
+        "sliceName": "AvailabilityStatus",
+        "short": "Verfügbarkeitsstatus des abgefragten Medikaments",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AvailabilityState"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.payload.content[x]",
+        "path": "Communication.payload.content[x]",
+        "comment": "Dieser Inhalt muss gemäß gemSpec_DM_eRp ein JSON sein.",
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

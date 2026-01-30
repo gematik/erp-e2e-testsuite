@@ -26,12 +26,15 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.test.erezept.fhir.date.PeriodDateUtil;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
+import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -49,6 +52,17 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
   public Optional<String> getNoteText() {
     val note = this.getNoteFirstRep().getText();
     return Optional.ofNullable(note);
+  }
+
+  public Optional<String> getRenderedDosageInstruction() {
+    return this.getExtension().stream()
+        .filter(DgMPStructDef.MR_RENDERED_DOSAGE_INSTRUCTION::matches)
+        .map(it -> ((MarkdownType) it.getValue()).getValue())
+        .findFirst();
+  }
+
+  public List<DosageDgMP> getDosageInstructionDgMPs() {
+    return this.getDosageInstruction().stream().map(DosageDgMP::fromDosage).toList();
   }
 
   public int getDispenseQuantity() {

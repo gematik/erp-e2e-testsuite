@@ -35,7 +35,7 @@ import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.AcceptPrescription;
 import de.gematik.test.erezept.actions.ClosePrescriptionWithoutDispensation;
-import de.gematik.test.erezept.actions.DispensePrescription;
+import de.gematik.test.erezept.actions.DispensePrescriptionOld;
 import de.gematik.test.erezept.actions.DownloadAuditEvent;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
@@ -175,7 +175,7 @@ public class ProvideDispensationWithoutConsentIT extends ErpTest {
 
     dispensation =
         pharmacy.performs(
-            DispensePrescription.withCredentials(acceptance.getTaskId(), acceptance.getSecret())
+            DispensePrescriptionOld.withCredentials(acceptance.getTaskId(), acceptance.getSecret())
                 .withParameters(
                     GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
                         .with(gemMedDsp, gemMedication)

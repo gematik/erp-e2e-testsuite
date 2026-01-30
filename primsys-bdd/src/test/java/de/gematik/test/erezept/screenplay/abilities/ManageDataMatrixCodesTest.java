@@ -60,6 +60,7 @@ class ManageDataMatrixCodesTest {
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 
     dmc = DequeStrategy.LIFO.chooseFrom(manageDmcs.getDmcs());
+
     assertEquals(second, dmc.getTaskId());
     assertEquals(2, manageDmcs.getDmcs().getRawList().size());
 

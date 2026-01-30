@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static de.gematik.test.erezept.app.cfg.StatusParser.compareStatusInfo;
+import static de.gematik.test.erezept.app.parsers.StatusParser.compareStatusInfo;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

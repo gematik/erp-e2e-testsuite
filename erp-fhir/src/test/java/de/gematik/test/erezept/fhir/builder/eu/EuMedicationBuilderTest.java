@@ -160,7 +160,7 @@ class EuMedicationBuilderTest extends ErpFhirParsingTest {
     val packaging = "packag";
     val formText = "formText";
     val manufacturingInstruction = "manufacturingInstruction";
-    val version = EuVersion.V1_0;
+    val version = EuVersion.getDefaultVersion();
     val ask = ASK.from("ASK_12345678");
     val snomed = "snomed";
     val atc = ATC.from("ATC_12345678");
@@ -206,7 +206,7 @@ class EuMedicationBuilderTest extends ErpFhirParsingTest {
     assertEquals(packaging, medication.getPackaging().orElseThrow());
     assertEquals(formText, medication.getFormText().orElseThrow());
     assertEquals(manufacturingInstruction, medication.getManufacturingInstruction().orElseThrow());
-    assertTrue(medication.getMeta().getProfile().get(0).getValue().endsWith("|1.0"));
+    assertTrue(medication.getMeta().getProfile().get(0).getValue().endsWith("|1.1"));
     assertEquals(ask, medication.getAsk().orElseThrow());
     assertEquals(snomed, medication.getSnomed().orElseThrow());
     assertEquals(atc, medication.getAtc().orElseThrow());

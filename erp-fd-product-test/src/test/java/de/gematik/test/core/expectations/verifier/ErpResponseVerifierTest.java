@@ -212,4 +212,28 @@ class ErpResponseVerifierTest extends ErpFhirBuildingTest {
     val step = payloadIsNotOfType(KbvErpBundle.class, ErpAfos.A_19022);
     assertThrows(AssertionError.class, () -> step.apply(response));
   }
+
+  @Test
+  void warningHeaderIsUnsetCorrectTest() {
+    val response =
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(createEmptyValidationResult());
+
+    val step = warningHeaderIsUnset();
+    step.apply(response);
+  }
+
+  @Test
+  void warningHeaderIsUnsetFailsWhenHeaderIsPresentAndNotEmpty() {
+    val response =
+        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of("Warning", "not empty"))
+            .andValidationResult(createEmptyValidationResult());
+
+    val step = warningHeaderIsUnset();
+    assertThrows(AssertionError.class, () -> step.apply(response));
+  }
 }

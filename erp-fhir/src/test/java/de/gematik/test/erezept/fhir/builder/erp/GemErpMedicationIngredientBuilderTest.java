@@ -35,6 +35,7 @@ import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.math.BigDecimal;
 import lombok.val;
@@ -53,9 +54,10 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .ingredientComponent(ingredient)
             .formText("Tablette")
             .build();
+
     assertNotNull(medIngredient);
     assertEquals("Tablette", medIngredient.getForm().getText());
-    val result = parser.validate(medIngredient);
+    val result = ValidatorUtil.encodeAndValidate(parser, medIngredient);
     assertTrue(result.isSuccessful());
   }
 
@@ -72,7 +74,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
 
     assertNotNull(medIngredient);
     assertTrue(medIngredient.getMeta().getProfile().get(0).getValue().contains("1.4"));
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -84,7 +86,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertTrue(medIngredient.isVaccine());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -96,7 +98,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertFalse(medIngredient.isVaccine());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -110,7 +112,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
 
     assertNotNull(medIngredient);
     assertEquals(value, medIngredient.getCategory().orElseThrow());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -123,7 +125,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertEquals(value, medIngredient.getStandardSize().orElseThrow());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -146,7 +148,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
 
     assertNotNull(medIngredient);
     assertEquals(value, totalQuantity);
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -159,7 +161,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertEquals(value, medIngredient.getManufacturingInstruction().orElseThrow());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -175,7 +177,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .getCode()
             .getCodingFirstRep()
             .is(actCoding.getSystemUrl(), actCoding.getValue()));
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -188,7 +190,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .getCode()
             .getCodingFirstRep()
             .is(CommonCodeSystem.SNOMED_SCT.getCanonicalUrl(), value));
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -199,7 +201,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
     val askCoding = ASK.from(value);
     assertNotNull(medIngredient);
     assertTrue(medIngredient.getCode().getCodingFirstRep().is(askCoding.getSystemUrl(), value));
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -212,7 +214,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertEquals(value, medIngredient.getForm().getText());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -225,7 +227,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertEquals(value, medIngredient.getAmountNumerator().get().longValue());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -240,7 +242,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
     assertNotNull(medIngredient);
     assertEquals(BigDecimal.valueOf(value), medIngredient.getAmount().getDenominator().getValue());
 
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -285,7 +287,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
         GemErpMedicationIngredientBuilder.forIngredient().ingredientComponent(ingredient).build();
     assertNotNull(medIngredient);
     assertEquals(ingredient, medIngredient.getIngredientFirstRep());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -298,7 +300,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
     assertNotNull(medIngredient);
     assertEquals(value, medIngredient.getBatch().getLotNumber());
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
   @Test
@@ -314,6 +316,6 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
     assertEquals(
         value,
         String.valueOf(medIngredient.getAmount().getNumerator().getExtensionFirstRep().getValue()));
-    assertTrue(parser.isValid(medIngredient));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 }

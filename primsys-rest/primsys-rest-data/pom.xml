@@ -6,12 +6,13 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>primsys-rest</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>primsys-rest-data</artifactId>
-    <name>PrimSys REST data objects</name>
+    <name>PrimSys REST data model</name>
+    <description>REST data model between client and server</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

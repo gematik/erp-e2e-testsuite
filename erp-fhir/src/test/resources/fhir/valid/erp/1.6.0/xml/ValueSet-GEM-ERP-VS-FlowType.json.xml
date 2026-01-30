@@ -1,0 +1,22 @@
+<ValueSet xmlns="http://hl7.org/fhir">
+  <id value="GEM-ERP-VS-FlowType" />
+  <url value="https://gematik.de/fhir/erp/ValueSet/GEM_ERP_VS_FlowType" />
+  <version value="1.6.0" />
+  <name value="GEM_ERP_VS_FlowType" />
+  <title value="ValueSet der FlowType-Codes" />
+  <status value="active" />
+  <date value="2025-09-25" />
+  <publisher value="gematik GmbH" />
+  <contact>
+    <telecom>
+      <system value="url" />
+      <value value="http://www.gematik.de" />
+    </telecom>
+  </contact>
+  <description value="Zeigt die verschiedenen Arten des E-Rezepts entsprechend den Verschreibungsformularen." />
+  <compose>
+    <include>
+      <system value="https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType" />
+    </include>
+  </compose>
+</ValueSet>

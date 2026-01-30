@@ -108,6 +108,10 @@ public class KbvErpMedicationIngredientBuilder
         this.createResource(
             KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_INGREDIENT, kbvItaErpVersion);
 
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      medication.getMeta().setVersionId("1");
+    }
+
     if (amountNumerator != null) {
       val amount = new Ratio();
       amount

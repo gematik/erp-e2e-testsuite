@@ -102,7 +102,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
             .withAccident(AccidentExtension.accident())
             .fake();
 
-    assertTrue(parser.isValid(medicationRequest));
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
+    assertTrue(result.isSuccessful());
   }
 
   @ParameterizedTest(
@@ -216,7 +217,7 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
   void shouldSetPrescriberId() {
     val medicationRequest =
         KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
-            .version(KbvItaErpVersion.V1_2_0)
+            .version(KbvItaErpVersion.V1_3_0)
             .prescriberId("123456789")
             .insurance(KbvCoverageFaker.builder().fake())
             .requester(KbvPractitionerFaker.builder().fake())

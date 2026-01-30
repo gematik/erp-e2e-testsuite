@@ -1,0 +1,17 @@
+{
+  "name": "de.gematik.erezept-workflow.r4",
+  "version": "1.6.1",
+  "description": "Die E-Rezept-Spezifikation",
+  "author": "gematik GmbH",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "jurisdiction": "urn:iso:std:iso:3166#DE",
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1",
+    "de.basisprofil.r4": "1.5.4",
+    "de.gematik.epa.medication": "1.3.0",
+    "de.gematik.terminology": "1.0.8",
+    "de.gematik.ti": "1.2.0"
+  }
+}

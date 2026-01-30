@@ -10,6 +10,7 @@
     - add Command to send EuCloseInputPostCommand (NCPeH)
     - add Command and QueryBuilder to GetEuMedicationDispenseBundle as EuMedicationDispenseGetCommand
     - add Builder and ObjectClasses to generate EuAccessPermissionObjects
+    - update the testcases of OCSP- And Cert-List in OCSPListAndCertListHeaderIT
 
 * erp-fd-product-test:
     - Implement testcases for EU Consent
@@ -18,9 +19,10 @@
     - Implement testcases for filters in the EU redeemable prescriptions
     - Implement testcases close Prescriptions in the EU
     - Implement Reply-Communication-Testcase for DiGA
-    - Implement testcase for different insurance types 
+    - Implement testcase for different insurance types
     - Implement testcase for oid_institution-vorsorge-reha test identity
     - Implement testcases for get use case for DiGA
+    - Implement testcase for DeleteCommunication purpose
 
 
 * erp-fhir:
@@ -28,6 +30,10 @@
     - add Builder and ObjectClasses for EuPractitionerRole, EuPractitioner, EuMedication, EuMedicationDispense,
       EuOrganization, EuDispenseCloseOperationInput, EuMedicationDispenseBundle,
     - add Builder and ObjectClasses for GemErpMedicationKombiPkg
+    - add Profiles for de.gematik.erezept-workflow.r4-1.6.1
+    - add Profiles for kbv.ita.erp-1.4.0
+    - needs HAPI 8.6.1 from now
+ 
 
 * erp-eml:
     - add Builder and ObjectClasses for EpaMedPharmaceuticalProduct, EpaIngredientCode

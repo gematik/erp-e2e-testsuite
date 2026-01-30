@@ -22,7 +22,9 @@ package de.gematik.test.erezept.primsys.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeEvdgaRequestDto;
 import lombok.val;
@@ -38,6 +40,8 @@ class PrescribeEvdgaRequestDataMapperTest extends ErpFhirParsingTest {
     requestDto.setPatient(patientDto);
     val prescribeMapper = PrescribeEvdgaRequestDataMapper.from(requestDto);
     val kbvBundle = prescribeMapper.createEvdgaBundle("Bernd Claudius");
-    assertTrue(parser.isValid(kbvBundle));
+    assertTrue(
+        ValidatorUtil.encodeAndValidate(parser, kbvBundle, EncodingType.XML, true, true)
+            .isSuccessful());
   }
 }

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommand;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -67,7 +67,7 @@ class DispenseUseCaseTest extends TestWithActorContext {
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
-    when(mockClient.request(any(DispensePrescriptionAsBundleCommand.class)))
+    when(mockClient.request(any(DispensePrescriptionAsBundleCommandOld.class)))
         .thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
@@ -114,7 +114,7 @@ class DispenseUseCaseTest extends TestWithActorContext {
             .withStatusCode(204)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
-    when(mockClient.request(any(DispensePrescriptionAsBundleCommand.class)))
+    when(mockClient.request(any(DispensePrescriptionAsBundleCommandOld.class)))
         .thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();

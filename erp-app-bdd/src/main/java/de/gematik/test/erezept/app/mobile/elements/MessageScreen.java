@@ -34,7 +34,8 @@ public enum MessageScreen implements PageElement {
   BACK_TO_MESSAGE_SCREEN(
       "Back to Message Screen from a message", () -> AppiumBy.name("Nachrichten")),
   E_REZEPT_APP_TEAM_TITLE(
-      "E-Rezept App Team Message Title", () -> AppiumBy.name("E-Rezept App Team"));
+      "E-Rezept App Team Message Title", () -> AppiumBy.name("E-Rezept App Team")),
+  SHOW_CHARGE_ITEM_BUTTON("Show Charge Item", () -> AppiumBy.name("Apothekenrechnung anzeigen"));
 
   private final String elementName;
   private final Supplier<By> iosLocator;

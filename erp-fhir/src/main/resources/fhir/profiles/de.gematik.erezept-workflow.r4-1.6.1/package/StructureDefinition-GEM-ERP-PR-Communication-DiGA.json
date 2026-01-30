@@ -1,0 +1,102 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-Communication-DiGA",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DiGA",
+  "version": "1.6.1",
+  "name": "GEM_ERP_PR_Communication_DiGA",
+  "title": "Antwort des Leistungserbringers an den Patienten",
+  "status": "active",
+  "date": "2025-12-19",
+  "description": "Ressource, die für die Kommunikation des Leistungserbringers mit dem Patienten im Kontext der Einlösung von DiGA-Verordnungen verwendet wird.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Communication",
+  "baseDefinition": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Communication.meta",
+        "path": "Communication.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.meta.profile",
+        "path": "Communication.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "closed",
+          "description": "Slicing für meta profile",
+          "ordered": false
+        },
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.meta.profile:workflowProfile",
+        "path": "Communication.meta.profile",
+        "sliceName": "workflowProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DiGA|1.6",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.recipient",
+        "path": "Communication.recipient",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Communication.recipient.identifier",
+        "path": "Communication.recipient.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-kvid-10"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.sender.identifier",
+        "path": "Communication.sender.identifier",
+        "min": 1,
+        "type": [
+          {
+            "code": "Identifier",
+            "profile": [
+              "http://fhir.de/StructureDefinition/identifier-telematik-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Communication.payload",
+        "path": "Communication.payload",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Communication.payload.content[x]",
+        "path": "Communication.payload.content[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

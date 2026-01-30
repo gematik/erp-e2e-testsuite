@@ -1,0 +1,31 @@
+{
+  "name": "de.gematik.terminology",
+  "version": "1.0.7",
+  "author": "gematik GmbH",
+  "license": "Apache-2.0",
+  "directories": {
+    "lib": "package",
+    "example": "example"
+  },
+  "title": "TI Terminology",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "type": "IG",
+  "maintainers": [
+    {
+      "name": "gematik GmbH",
+      "email": "patientteam [ at ] gematik.de"
+    }
+  ],
+  "canonical": "https://gematik.de/fhir/terminology",
+  "url": "https://gematik.de/fhir/terminology/1.0.7",
+  "jurisdiction": "urn:iso:std:iso:3166#DE",
+  "description": "Terminologies for Telematics Infrastructure (TI)",
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1",
+    "hl7.terminology.r4": "6.5.0",
+    "hl7.fhir.uv.extensions.r4": "5.2.0",
+    "dvmd.kdl.r4": "2025.0.1"
+  }
+}

@@ -27,6 +27,8 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
@@ -43,7 +45,18 @@ public class AcceptPrescription extends ErpAction<ErxAcceptBundle> {
   @Step("{0} akzeptiert das E-Rezept mit #taskId und #accessCode")
   public ErpInteraction<ErxAcceptBundle> answeredBy(Actor actor) {
     val cmd = new TaskAcceptCommand(taskId, accessCode);
-    return this.performCommandAs(cmd, actor);
+    val response = this.performCommandAs(cmd, actor);
+
+    // store accepted prescription in pharmacy ability for automatic teardown
+    Optional.ofNullable(actor.abilityTo(ManagePharmacyPrescriptions.class))
+        .ifPresent(
+            ability ->
+                response
+                    .getResponse()
+                    .getResourceOptional()
+                    .ifPresent(ability::appendAcceptedPrescription));
+
+    return response;
   }
 
   public static AcceptPrescription forTheTaskFrom(

@@ -90,8 +90,8 @@ class EuCloseOperationInputBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetVersionCorrect() {
-    val closeInput = closeInputBuilder.version(EuVersion.V1_0).build();
-    assertTrue(closeInput.getMeta().getProfile().get(0).asStringValue().contains("|1.0"));
+    val closeInput = closeInputBuilder.version(EuVersion.getDefaultVersion()).build();
+    assertTrue(closeInput.getMeta().getProfile().get(0).asStringValue().contains("|1.1"));
   }
 
   @Test

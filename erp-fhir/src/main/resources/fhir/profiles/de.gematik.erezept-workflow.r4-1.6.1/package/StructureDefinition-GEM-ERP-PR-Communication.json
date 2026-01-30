@@ -1,0 +1,171 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GEM-ERP-PR-Communication",
+  "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication",
+  "version": "1.6.1",
+  "name": "GEM_ERP_PR_Communication",
+  "title": "Generische Workflow-Communication",
+  "status": "active",
+  "date": "2025-12-19",
+  "description": "Diese Communication beschreibt Felder und Anforderungen für alle Communications im Workflow-Paket.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": true,
+  "type": "Communication",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Communication",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Communication.instantiatesCanonical",
+        "path": "Communication.instantiatesCanonical",
+        "max": "0"
+      },
+      {
+        "id": "Communication.instantiatesUri",
+        "path": "Communication.instantiatesUri",
+        "max": "0"
+      },
+      {
+        "id": "Communication.basedOn",
+        "path": "Communication.basedOn",
+        "short": "Gibt das E-Rezept-Token gemäß gemSpec_DM_eRp an.",
+        "comment": "Hat die Form 'Task/{{PrescriptionID}}'",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task"
+            ],
+            "aggregation": [
+              "referenced"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.basedOn.reference",
+        "path": "Communication.basedOn.reference",
+        "short": "Gibt das E-Rezept-Token gemäß gemSpec_DM_eRp an.",
+        "comment": "Hat die Form 'Task/{{PrescriptionID}}'",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.partOf",
+        "path": "Communication.partOf",
+        "max": "0"
+      },
+      {
+        "id": "Communication.inResponseTo",
+        "path": "Communication.inResponseTo",
+        "max": "0"
+      },
+      {
+        "id": "Communication.status",
+        "path": "Communication.status",
+        "comment": "Muss standardmäßig laut FHIR Core Specification angegeben werden, wird jedoch während des Lebenszyklus der Ressource nicht verändert.",
+        "fixedCode": "unknown",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.statusReason",
+        "path": "Communication.statusReason",
+        "max": "0"
+      },
+      {
+        "id": "Communication.category",
+        "path": "Communication.category",
+        "max": "0"
+      },
+      {
+        "id": "Communication.priority",
+        "path": "Communication.priority",
+        "max": "0"
+      },
+      {
+        "id": "Communication.medium",
+        "path": "Communication.medium",
+        "max": "0"
+      },
+      {
+        "id": "Communication.subject",
+        "path": "Communication.subject",
+        "max": "0"
+      },
+      {
+        "id": "Communication.topic",
+        "path": "Communication.topic",
+        "max": "0"
+      },
+      {
+        "id": "Communication.about",
+        "path": "Communication.about",
+        "max": "0"
+      },
+      {
+        "id": "Communication.encounter",
+        "path": "Communication.encounter",
+        "max": "0"
+      },
+      {
+        "id": "Communication.sent",
+        "path": "Communication.sent",
+        "short": "Der Zeitpunkt, zu dem diese Kommunikation gesendet wurde.",
+        "comment": "Wird vom E-Rezept-Server gesetzt. Ein Client hat diesen Wert daher immer verfügbar.",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.received",
+        "path": "Communication.received",
+        "short": "Der Zeitpunkt, zu dem diese Kommunikation empfangen wurde.",
+        "comment": "Wird vom E-Rezept-Server gesetzt. Ein Client hat diesen Wert daher immer verfügbar.",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.recipient",
+        "path": "Communication.recipient",
+        "short": "Die Entität (z. B. Person, Organisation), die Ziel der Kommunikation war.",
+        "comment": "Muss vom Absender der Kommunikation gesetzt werden, um das Ziel festzulegen.",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.sender",
+        "path": "Communication.sender",
+        "short": "Die Entität (z. B. Person, Organisation), die Quelle der Kommunikation war.",
+        "definition": "Nachrichtenabsender — wird vom E-Rezept-Server unter Verwendung der AuthN-Credential des Clients gesetzt.\r\nDie Entität (z. B. Person, Organisation), die Quelle der Kommunikation war.",
+        "comment": "Wird vom E-Rezept-Server unter Verwendung der AuthN-Credential des Clients gesetzt.",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.reasonCode",
+        "path": "Communication.reasonCode",
+        "max": "0"
+      },
+      {
+        "id": "Communication.reasonReference",
+        "path": "Communication.reasonReference",
+        "max": "0"
+      },
+      {
+        "id": "Communication.payload",
+        "path": "Communication.payload",
+        "mustSupport": true
+      },
+      {
+        "id": "Communication.payload.content[x]",
+        "path": "Communication.payload.content[x]",
+        "short": "Der tatsächliche Inhalt der Nachricht",
+        "comment": "Dieser Inhalt muss ein JSON gemäß gemSpec_DM_eRp sein."
+      },
+      {
+        "id": "Communication.note",
+        "path": "Communication.note",
+        "max": "0"
+      }
+    ]
+  }
+}

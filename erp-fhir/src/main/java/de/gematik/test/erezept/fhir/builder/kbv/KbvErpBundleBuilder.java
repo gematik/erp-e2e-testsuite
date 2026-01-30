@@ -85,6 +85,11 @@ public class KbvErpBundleBuilder
     practitioner.getQualificationType();
     val bundle = this.createResource(KbvErpBundle::new, KbvItaErpStructDef.BUNDLE, version);
 
+    // from Version 1.6 a VersionId is mandatory
+    if (version.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      bundle.getMeta().setVersionId("1");
+    }
+
     // set FHIR-specific values provided by HAPI
     bundle.setType(Bundle.BundleType.DOCUMENT);
     bundle.setTimestamp(new Date());

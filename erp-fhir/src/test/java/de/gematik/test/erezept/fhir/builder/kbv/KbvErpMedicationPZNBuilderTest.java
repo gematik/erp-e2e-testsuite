@@ -54,7 +54,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
-    assertTrue(parser.isValid(medication));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
   }
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
@@ -69,7 +69,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .packagingSize("5x3") // default 10 {tbl}
+            .packagingSize("5x3") // default 10 `tbl`
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -116,7 +116,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .ingredientStrengthDenomUnit("")
             .build();
 
-    assertTrue(parser.isValid(medication));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
     if (version.compareTo(KbvItaErpVersion.V1_1_0) > 0) {
       assertEquals(
           "ingredText", medication.getIngredient().get(0).getItemCodeableConcept().getText());
@@ -141,7 +141,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .ingredientStrengthDenomUnit(null)
             .build();
 
-    assertTrue(parser.isValid(medication));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
   }
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with Faker for KbvItaErpVersion {0}")

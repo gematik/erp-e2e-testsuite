@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 public enum AbdaErpPkvVersion implements ProfileVersion {
   V1_2_0("1.2.0"),
-  V1_3("1.3.0"),
+  V1_3("1.3"),
   V1_4("1.4.0");
 
   public static final String PROFILE_NAME = "de.abda.erezeptabgabedatenpkv";

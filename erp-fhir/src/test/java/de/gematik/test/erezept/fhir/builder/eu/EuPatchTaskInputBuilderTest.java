@@ -38,7 +38,7 @@ class EuPatchTaskInputBuilderTest {
 
     var param = parameters.getParameterFirstRep();
     assertEquals("eu-isRedeemableByPatientAuthorization", param.getName());
-    assertTrue(param.getValue() instanceof BooleanType);
+    assertInstanceOf(BooleanType.class, param.getValue());
     assertTrue(((BooleanType) param.getValue()).booleanValue());
   }
 
@@ -51,13 +51,14 @@ class EuPatchTaskInputBuilderTest {
 
     var param = parameters.getParameterFirstRep();
     assertEquals("eu-isRedeemableByPatientAuthorization", param.getName());
-    assertTrue(param.getValue() instanceof BooleanType);
+    assertInstanceOf(BooleanType.class, param.getValue());
     assertFalse(((BooleanType) param.getValue()).booleanValue());
   }
 
   @Test
   void shouldAcceptCustomVersion() {
-    Parameters parameters = EuPatchTaskInputBuilder.builder().withVersion(EuVersion.V1_0).build();
+    Parameters parameters =
+        EuPatchTaskInputBuilder.builder().withVersion(EuVersion.getDefaultVersion()).build();
 
     assertNotNull(parameters);
   }

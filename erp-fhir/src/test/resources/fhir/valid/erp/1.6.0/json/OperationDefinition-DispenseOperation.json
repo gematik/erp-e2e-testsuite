@@ -1,0 +1,53 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "DispenseOperation",
+  "url": "https://gematik.de/fhir/erp/OperationDefinition/DispenseOperationDefinition",
+  "status": "draft",
+  "version": "1.6.0",
+  "date": "2025-09-25",
+  "name": "Dispense",
+  "kind": "operation",
+  "affectsState": true,
+  "resource": [
+    "Task"
+  ],
+  "system": false,
+  "type": false,
+  "instance": true,
+  "description": "Die Operation $dispense ermöglicht es der Apotheke, eine Ausgabe für ein Medikament durchzuführen, ohne den Status der Aufgabe zu ändern. Diese Aktion erlaubt es einem Frontend anzuzeigen, dass ein Medikament ausgegeben wurde, bevor es von der Apotheke abgeschlossen wird.",
+  "code": "dispense",
+  "inputProfile": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_DispenseOperation_Input",
+  "parameter": [
+    {
+      "name": "secret",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "documentation": "Der secret Parameter, der einer Apotheke den exklusiven Zugriff auf die Aufgabe als Teil der URL ermöglicht. Dieser Parameter muss dem Wert entsprechen, der in Task.identifier:Secret gespeichert ist. Andernfalls wird der Vorgang mit einem Fehler abgebrochen.",
+      "type": "string"
+    },
+    {
+      "name": "rxDispensation",
+      "use": "in",
+      "min": 1,
+      "max": "*",
+      "documentation": "Informationen zu abgegebenen Medikament(en)",
+      "part": [
+        {
+          "name": "medicationDispense",
+          "type": "MedicationDispense",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        },
+        {
+          "name": "medication",
+          "type": "Medication",
+          "use": "in",
+          "min": 1,
+          "max": "1"
+        }
+      ]
+    }
+  ]
+}

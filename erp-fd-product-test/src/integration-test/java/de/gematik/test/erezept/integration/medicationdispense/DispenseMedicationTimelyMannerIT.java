@@ -30,6 +30,7 @@ import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.PrescriptionServiceVersion;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -39,10 +40,7 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.erx.ErxMedicationDispenseManipulatorFactory;
@@ -90,71 +88,6 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
     shouldDownloadMedicDispenseWithAllInformationAfterDispenseForNewProfiles(acceptation);
   }
 
-  private void shouldDownloadMedicDispenseWithAllInformationAfterDispenseForNewProfiles(
-      ErxAcceptBundle acceptation) {
-    val task = acceptation.getTask();
-    val expectedMedicationDispenses = getErxMedicationDispensesForNewProfiles(task);
-    val paramsBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
-
-    expectedMedicationDispenses.forEach(p -> paramsBuilder.with(p.getLeft(), p.getRight()));
-
-    val params = paramsBuilder.build();
-
-    val dispensation =
-        pharmacy.performs(
-            DispensePrescription.withCredentials(acceptation.getTaskId(), acceptation.getSecret())
-                .withParameters(params));
-
-    pharmacy.attemptsTo(Verify.that(dispensation).withExpectedType().isCorrect());
-
-    val prescriptionBundle =
-        patient.performs(GetPrescriptionById.withTaskId(task.getTaskId()).withoutAuthentication());
-
-    patient.attemptsTo(
-        Verify.that(prescriptionBundle)
-            .withExpectedType()
-            .has(bundleHasLastMedicationDispenseDate())
-            .isCorrect());
-
-    val medDisBeforeClose =
-        patient.performs(
-            GetMedicationDispense.withQueryParams(
-                IQueryParameter.search()
-                    .identifier(task.getPrescriptionId().asIdentifier())
-                    .createParameter()));
-
-    patient.attemptsTo(
-        Verify.that(medDisBeforeClose)
-            .withExpectedType()
-            .and(verifyCountOfContainedMedication(2))
-            .and(
-                containsAllPZNsForNewProfiles(
-                    expectedMedicationDispenses.stream().map(Pair::getRight).toList()))
-            .isCorrect());
-
-    val closeResponse =
-        pharmacy.performs(
-            ClosePrescriptionWithoutDispensation.forTheTask(task, acceptation.getSecret()));
-
-    pharmacy.attemptsTo(Verify.that(closeResponse).withExpectedType().isCorrect());
-
-    val medDisAfterClose =
-        patient.performs(
-            GetMedicationDispense.withQueryParams(
-                IQueryParameter.search()
-                    .identifier(task.getPrescriptionId().asIdentifier())
-                    .createParameter()));
-
-    patient.attemptsTo(
-        Verify.that(medDisAfterClose)
-            .withExpectedType()
-            .and(verifyCountOfContainedMedication(2))
-            .and(
-                containsAllPZNsForNewProfiles(
-                    expectedMedicationDispenses.stream().map(Pair::getRight).toList()))
-            .isCorrect());
-  }
-
   @TestcaseId("ERP_DISPENSE_MEDICATION_PROMPT_02")
   @Test
   @DisplayName(
@@ -171,6 +104,62 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
     shouldDownloadMedicDispenseWithAllInformationForNewProfiles(acceptation);
   }
 
+  @TestcaseId("ERP_DISPENSE_MEDICATION_PROMPT_03")
+  @ParameterizedTest(name = "[{index}] -> Eine Apotheke stellt eine Dispensierung mit {0} ")
+  @DisplayName(
+      "Prüfe, dass der Fachdienst manipulierte MedicationDispense-Daten während der Dispensierung"
+          + " ablehnt")
+  @MethodSource("disppensationSystemManipulators")
+  void shouldManipulateSystemsWhileDispensing(
+      NamedEnvelope<FuzzingMutator<ErxMedicationDispense>> manipulator) {
+
+    val task =
+        doctor
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
+            .getExpectedResponse();
+    val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+
+    shouldManipulateAndSendToFD(acceptation, manipulator);
+  }
+
+  @TestcaseId("ERP_DISPENSE_MEDICATION_PROMPT_04")
+  @Test
+  @DisplayName(
+      "Prüfe, dass der Fachdienst bei einer Dispensierung für Release 1.21 keine"
+          + " Rückgabeinformationen mehr liefert und mit StatusCode 204 antwortet")
+  void shouldDispenseWithoutReturnInformations() {
+
+    val task =
+        doctor
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
+            .getExpectedResponse();
+
+    val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+
+    val expectedMedicationDispenses =
+        getErxMedicationDispensesForNewProfiles(acceptation.getTask());
+
+    val dispensation =
+        pharmacy.performs(getDispenseAction(acceptation, expectedMedicationDispenses));
+
+    // derive version from CapabilityStatement
+    val interaction = patient.asksFor(new ResponseOfGetCapabilityStatement());
+    ErxCapabilityStatement cs = interaction.getResponse().getExpectedResource();
+
+    PrescriptionServiceVersion currentVersion =
+        PrescriptionServiceVersion.from(cs.getSoftwareVersion());
+
+    if (currentVersion.isAtLeast(PrescriptionServiceVersion.V_1_21_0)) {
+      pharmacy.attemptsTo(
+          Verify.that(dispensation)
+              .withExpectedType()
+              .hasResponseWith(returnCode(204))
+              .isCorrect());
+    } else {
+      pharmacy.attemptsTo(Verify.that(dispensation).withExpectedType().isCorrect());
+    }
+  }
+
   private void shouldDownloadMedicDispenseWithAllInformationForNewProfiles(
       ErxAcceptBundle acceptation) {
     val task = acceptation.getTask();
@@ -181,7 +170,8 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
 
     val dispensation =
         pharmacy.performs(
-            DispensePrescription.withCredentials(acceptation.getTaskId(), acceptation.getSecret())
+            DispensePrescriptionNew.withCredentials(
+                    acceptation.getTaskId(), acceptation.getSecret())
                 .withParameters(params));
 
     pharmacy.attemptsTo(Verify.that(dispensation).withExpectedType().isCorrect());
@@ -238,22 +228,6 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
     return List.of(Pair.of(medDisp1, medication1), Pair.of(medDisp2, medication2));
   }
 
-  @TestcaseId("ERP_DISPENSE_MEDICATION_PROMPT_03")
-  @ParameterizedTest(name = "[{index}] -> Eine Apotheke stellt eine Dispensierung mit {0} ")
-  @DisplayName("")
-  @MethodSource("disppensationSystemManipulators")
-  void shouldManipulateSystemsWhileDispensing(
-      NamedEnvelope<FuzzingMutator<ErxMedicationDispense>> manipulator) {
-
-    val task =
-        doctor
-            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
-            .getExpectedResponse();
-    val acceptation = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
-
-    shouldManipulateAndSendToFD(acceptation, manipulator);
-  }
-
   private void shouldManipulateAndSendToFD(
       ErxAcceptBundle acceptation,
       NamedEnvelope<FuzzingMutator<ErxMedicationDispense>> manipulator) {
@@ -267,7 +241,8 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
 
     val dispensation =
         pharmacy.performs(
-            DispensePrescription.withCredentials(acceptation.getTaskId(), acceptation.getSecret())
+            DispensePrescriptionOld.withCredentials(
+                    acceptation.getTaskId(), acceptation.getSecret())
                 .withParameters(params));
 
     pharmacy.attemptsTo(
@@ -303,5 +278,89 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
     return ArgumentComposer.composeWith(
             ErxMedicationDispenseManipulatorFactory.getSystemManipulator())
         .create();
+  }
+
+  private ErpAction<?> getDispenseAction(
+      ErxAcceptBundle acceptation, List<Pair<ErxMedicationDispense, GemErpMedication>> dispenses) {
+
+    val paramsBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
+    dispenses.forEach(p -> paramsBuilder.with(p.getLeft(), p.getRight()));
+    val params = paramsBuilder.build();
+
+    // derive version from CapabilityStatement
+    val interaction = patient.asksFor(new ResponseOfGetCapabilityStatement());
+    ErxCapabilityStatement cs = interaction.getResponse().getExpectedResource();
+
+    PrescriptionServiceVersion currentVersion =
+        PrescriptionServiceVersion.from(cs.getSoftwareVersion());
+
+    if (currentVersion.isAtLeast(PrescriptionServiceVersion.V_1_21_0)) {
+      return DispensePrescriptionNew.withCredentials(
+              acceptation.getTaskId(), acceptation.getSecret())
+          .withParameters(params);
+    } else {
+      return DispensePrescriptionOld.withCredentials(
+              acceptation.getTaskId(), acceptation.getSecret())
+          .withParameters(params);
+    }
+  }
+
+  private void shouldDownloadMedicDispenseWithAllInformationAfterDispenseForNewProfiles(
+      ErxAcceptBundle acceptation) {
+
+    val task = acceptation.getTask();
+    val expectedMedicationDispenses = getErxMedicationDispensesForNewProfiles(task);
+
+    val dispensation =
+        pharmacy.performs(getDispenseAction(acceptation, expectedMedicationDispenses));
+
+    pharmacy.attemptsTo(Verify.that(dispensation).withExpectedType().isCorrect());
+
+    val prescriptionBundle =
+        patient.performs(GetPrescriptionById.withTaskId(task.getTaskId()).withoutAuthentication());
+
+    patient.attemptsTo(
+        Verify.that(prescriptionBundle)
+            .withExpectedType()
+            .has(bundleHasLastMedicationDispenseDate())
+            .isCorrect());
+
+    val medDisBeforeClose =
+        patient.performs(
+            GetMedicationDispense.withQueryParams(
+                IQueryParameter.search()
+                    .identifier(task.getPrescriptionId().asIdentifier())
+                    .createParameter()));
+
+    patient.attemptsTo(
+        Verify.that(medDisBeforeClose)
+            .withExpectedType()
+            .and(verifyCountOfContainedMedication(2))
+            .and(
+                containsAllPZNsForNewProfiles(
+                    expectedMedicationDispenses.stream().map(Pair::getRight).toList()))
+            .isCorrect());
+
+    val closeResponse =
+        pharmacy.performs(
+            ClosePrescriptionWithoutDispensation.forTheTask(task, acceptation.getSecret()));
+
+    pharmacy.attemptsTo(Verify.that(closeResponse).withExpectedType().isCorrect());
+
+    val medDisAfterClose =
+        patient.performs(
+            GetMedicationDispense.withQueryParams(
+                IQueryParameter.search()
+                    .identifier(task.getPrescriptionId().asIdentifier())
+                    .createParameter()));
+
+    patient.attemptsTo(
+        Verify.that(medDisAfterClose)
+            .withExpectedType()
+            .and(verifyCountOfContainedMedication(2))
+            .and(
+                containsAllPZNsForNewProfiles(
+                    expectedMedicationDispenses.stream().map(Pair::getRight).toList()))
+            .isCorrect());
   }
 }

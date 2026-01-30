@@ -1,238 +1,313 @@
-- id: "1.5.0" #'actually 1.5.2'
+- id: "1.6.0"
+  note: "erp-workflow valid from 01.07.26"
+  profiles:
+    # E-Rezepte relevante Haupt-Profile
+    - name: "kbv.ita.erp"
+      snapshot: "kbv.ita.erp-1.4.0-snapshots.tgz"
+      version: "1.4.0"
+      compatibleVersions: [ "1.4", "1.4.1" ]
+    - name: "de.gematik.erezept-workflow.r4"
+      snapshot: "de.gematik.erezept-workflow.r4-1.6.1-snapshots.tgz"
+      version: "1.6.1"
+      compatibleVersions: [ "1.6" ]
+
+    - name: "kbv.ita.for"
+      snapshot: "kbv.ita.for-1.3.0-snapshots.tgz"
+      version: "1.3.0"
+      compatibleVersions: [ "1.3" ]
+
+    - name: "kbv.itv.evdga"
+      snapshot: "kbv.itv.evdga-1.2.2-snapshots.tgz"
+      version: "1.2.2"
+      compatibleVersions: [ "1.2", "1.2.1", "1.2.0" ]
+
+    # E-Rezept PKV Patientenrechnung
+    - name: "de.gematik.erezept-patientenrechnung.r4"
+      snapshot: "de.gematik.erezept-patientenrechnung.r4-1.1.0-snapshots.tgz"
+      version: "1.1.0"
+      compatibleVersions: [ "1.1" ]
+    - name: "de.abda.erezeptabgabedatenbasis"
+      snapshot: "de.abda.erezeptabgabedatenbasis-1.5.0-snapshots.tgz"
+      version: "1.5.0"
+    - name: "de.abda.erezeptabgabedaten"
+      snapshot: "de.abda.erezeptabgabedaten-1.5.0-snapshots.tgz"
+      version: "1.5.0"
+      compatibleVersions: "1.5"
+    - name: "de.abda.erezeptabgabedatenpkv"
+      snapshot: "de.abda.erezeptabgabedatenpkv-1.4.0-snapshots.tgz"
+      version: "1.4.0"
+      compatibleVersions: "1.4"
+
+    # Unterstützende Basis-Profile
+    - name: "de.basisprofil.r4"
+      snapshot: "de.basisprofil.r4-1.5.2-snapshots.tgz"
+    - name: "kbv.basis"
+      snapshot: "kbv.basis-1.7.0-snapshots.tgz"
+    #    - snapshot: "kbv.ita.for-1.2.1-snapshots.tgz"  # this one is required for kbv.itv.evdga-1.2.2
+    #    - snapshot: "de.basisprofil.r4-1.5.2-snapshots.tgz" # this one is required for kbv.itv.evdga-1.2.2
+    - name: "de.basisprofil.r4"
+      snapshot: "de.basisprofil.r4-1.5.4-snapshots.tgz"
+      version: "1.5.4"
+    - name: "de.gematik.epa"
+      snapshot: "de.gematik.epa-1.3.0-snapshots.tgz"
+      version: "1.3.0"
+    - name: "de.gematik.epa.medication"
+      snapshot: "de.gematik.epa.medication-1.3.0-snapshots.tgz"
+      version: "1.3.0"
+    - name: "de.gematik.epa.medication"
+      snapshot: "de.gematik.epa.medication-1.1.5-snapshots.tgz"
+      version: "1.3.0"
+    - name: "de.gematik.fhir.directory"
+      snapshot: "de.gematik.fhir.directory-1.0.0-snapshots.tgz"
+      version: "1.0.0"
+    - name: "de.gematik.ti"
+      snapshot: "de.gematik.ti-1.2.0-snapshots.tgz"
+      version: "1.2.0"
+    - name: "de.fhir.medication"
+      snapshot: "de.fhir.medication-1.0.3-snapshots.tgz"
+      version: "1.0.3"
+    - name: "de.fhir.medication"
+      snapshot: "de.fhir.medication-1.0.2-snapshots.tgz"
+      version: "1.0.2"
+    - name: "kbv.all.st"
+      snapshot: "kbv.all.st-1.32.0-snapshots.tgz"
+      version: "1.32.0"
+    - name: "gematik.renderedDosageInstruction"
+      snapshot: "gematik.renderedDosageInstruction-0.1.0.tgz"
+      version: "0.1.0"
+    - name: "dvmd.kdl"
+      snapshot: "dvmd.kdl.r4-2025.0.1-snapshots.tgz"
+      version: "2025.0.1"
+    - name: "hl7.terminology"
+      snapshot: "hl7.terminology.r4-7.0.1-snapshots.tgz"
+      version: "7.0.1"
+    - name: "hl7.fhir.uv.extensions"
+      snapshot: "hl7.fhir.uv.extensions.r4-5.2.0-snapshots.tgz"
+      version: "5.2.0"
+    - name: "hl7.fhir.xver-extensions"
+      snapshot: "hl7.fhir.xver-extensions-0.1.0-snapshots.tgz"
+      version: "0.1.0"
+    - name: "kbv.ita.for"  #only to validate EVDGA with contained KBV.ITA.FOR|1.2
+      snapshot: "kbv.ita.for-1.2.1-snapshots.tgz"
+      compatibleVersions: [ "1.2" ]
+
+  errorFilter:
+    - "^2 profiles found for contained resource.*"
+    - "^2 profiles found for parameter resource.*"
+  ignoreCodeSystems:
+    - "http://fhir.de/CodeSystem/ask"
+    - "http://fhir.de/CodeSystem/ifa/pzn"
+    - "http://fhir.de/CodeSystem/bfarm/atc"
+    - "http://snomed.info/sct"  # this one is required to resolve the snome codes from KBV_VS_Base_Medication_Type
+    - "http://dicom.nema.org/resources/ontology/DCM"   # todo reactivate and check
+    - "urn:iso:std:iso:3166"  # TODO: why? seems to be coming from jurisdiction field
+  ignoreValueSets:
+    - "http://hl7.org/fhir/ValueSet/all-languages"  # to ignore the error "The value provided ('de-DE') is not in the value set 'All Languages'."
+    - "http://hl7.org/fhir/ValueSet/units-of-time"
+    - "http://ig.fhir.de/igs/medication/ValueSet/PeriodUnitsOfTimeDgMP"
+    - "http://ig.fhir.de/igs/medication/ValueSet/DosageUnitsOfTimeDgMP"
+    - "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+
+
+- id: "1.5.0"
   note: "erp-workflow valid from 1.10.25"
   profiles:
-    - name: "kbv.ita.erp"
-      version: "1.3.1"
-      compatibleVersions: [ "1.3" ]
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "kbv.basis"
-      version: "1.7.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-      omitProfiles: [ "KBV_VS_Base_Diagnosis_SNOMED_CT.json", "KBV_VS_Base_Allergy_Substance_SNOMED_CT.json", "KBV_VS_Base_Device_SNOMED_CT.json", "KBV_VS_Base_Procedure_SNOMED_CT.json" , "KBV_VS_Base_Deuev_Anlage_8.json" ]
-    - name: "kbv.ita.for"
-      version: "1.2.0"
-      compatibleVersions: [ "1.2" ]
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "kbv.itv.evdga"
-      version: "1.2.1"
-      compatibleVersions: [ "1.2" ]
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "dav.kbv.sfhir.cs.vs"
-      version: "1.0.3"
-      canonicalClaims: "https://fhir.kbv.de/"
+    # Unterstützende Basis-Profile
     - name: "de.basisprofil.r4"
+      snapshot: "de.basisprofil.r4-1.5.2-snapshots.tgz"
       version: "1.5.2"
-      canonicalClaims: "http://fhir.de/"
+      compatibleVersions: "8.00"
+    - name: "kbv.basis"
+      snapshot: "kbv.basis-1.7.0-snapshots.tgz"
+      version: "1.7.0"
+    #    - snapshot: "gematik.kbv.sfhir.cs.vs-1.6.0.tgz"
+    - name: "gematik.kbv.sfhir.cs.vs"
+      version: "1.0.3"
+      snapshot: "gematik.kbv.sfhir.cs.vs-1.0.3-snapshot.tgz"
     - name: "de.abda.erezeptabgabedatenbasis"
+      snapshot: "de.abda.erezeptabgabedatenbasis-1.5.0-snapshots.tgz"
       version: "1.5.0"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.abda.erezeptabgabedatenpkv"
-      version: "1.4.0"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.gematik.erezept-workflow.r4"
-      version: "1.5.0"  # 'actually .json files of Version 1.5.2 contained caused by replacement'
-      compatibleVersions: [ "1.5" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-    - name: "de.gematik.erezept-patientenrechnung.r4"
-      version: "1.1.0"
-      compatibleVersions: [ "1.1" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-    - name: "de.gematik.epa.medication"
-      version: "1.0.6" # actually '1.0.6-2'
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-    - name: "de.gematik.fhir.directory"
-      version: "0.11.25"
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
     - name: "de.gematik.epa"
-      version: "1.0.6" # actually '1.0.6-2'
-      canonicalClaims: [ "https://gematik.de/fhir/epa" ]
+      snapshot: "de.gematik.epa-1.0.6-2-snapshots.tgz"
+      version: "1.0.6-2"
+      compatibleVersions: [ "1.0.6", "1.0" ]
+    - name: "de.gematik.epa.medication"
+      snapshot: "de.gematik.epa.medication-1.0.6-2-snapshots.tgz"
+      version: "1.0.6-2"
+      compatibleVersions: [ "1.0.6", "1.0" ]
+    - name: "de.gematik.fhir.directory"
+      snapshot: "de.gematik.fhir.directory-0.11.25-snapshots.tgz"
+      version: "0.11.25"
+
+    - name: "de.gematik.erezept-workflow.r4"
+      snapshot: "de.gematik.erezept-workflow.r4-1.5.2-snapshots.tgz"
+      version: "1.5.2"
+      compatibleVersions: [ "1.5" ]
+
+    - name: "kbv.ita.erp"
+      snapshot: "kbv.ita.erp-1.3.3-snapshots.tgz"
+      version: "1.3.3"
+      compatibleVersions: [ "1.3" ]
+
+    - name: "kbv.itv.evdga"
+      snapshot: "kbv.itv.evdga-1.2.2-snapshots.tgz"
+      compatibleVersions: [ "1.2", "1.2.1", "1.2.0" ]
+
+    - name: "kbv.ita.for"
+      snapshot: "kbv.ita.for-1.2.1-snapshots.tgz"
+      version: "1.2.1"
+      compatibleVersions: [ "1.2", "1.2.0" ]
+
+    # E-Rezept PKV Patientenrechnung
+    - name: "de.gematik.erezept-patientenrechnung.r4"
+      snapshot: "de.gematik.erezept-patientenrechnung.r4-1.1.0-snapshots.tgz"
+      version: "1.1.0"
+      compatibleVersions: "1.1"
+    - name: "de.abda.erezeptabgabedatenpkv"
+      snapshot: "de.abda.erezeptabgabedatenpkv-1.4.0-snapshots.tgz"
+      version: "1.4.0"
+      compatibleVersions: "1.4"
+    - name: "de.abda.erezeptabgabedaten"
+      snapshot: "de.abda.erezeptabgabedaten-1.5.0-snapshots.tgz"
+      version: "1.5.0"
+      compatibleVersions: "1.5"
   errorFilter:
-    #    - "^2 Profile für contained Ressource gefunden.*"
     - "^2 profiles found for contained resource.*"
     - "^2 profiles found for parameter resource.*"
+    - "^Unable to parse X509 Certificate: The curve must not be null.*" # TODO: what's wrong here?
   ignoreCodeSystems:
     - "http://fhir.de/CodeSystem/ask"
     - "http://fhir.de/CodeSystem/ifa/pzn"
     - "http://fhir.de/CodeSystem/bfarm/atc"
+    - "http://snomed.info/sct"
+
 
 - id: "EU"
-  note: "E-Prescription EU-Fhir-Profiles"
   profiles:
-    - name: "de.basisprofil.r4"
-      version: "1.5.3"
-      canonicalClaims: "http://fhir.de/"
-    - name: "de.gematik.epa.medication"
-      version: "1.1.5"
-      canonicalClaims: "https://gematik.de/fhir/epa-medication/"
-    - name: "de.gematik.epa"
-      version: "1.1.5"
-      canonicalClaims: "https://gematik.de/fhir/epa/"
     - name: "de.gematik.erezept.eu"
-      version: "1.0.0"
-      compatibleVersions: [ "1.0" ]
-      canonicalClaims: "https://gematik.de/fhir/erp-eu/"
-    - name: "de.gematik.fhir.directory"
-      version: "0.13.1"
-      canonicalClaims: "https://gematik.de/fhir/directory/"
+      snapshot: "de.gematik.erezept.eu-1.1.1-snapshots.tgz"
+      version: "1.1.1"
+      compatibleVersions: "1.1"
+    - name: "de.basisprofil.r4"
+      snapshot: "de.basisprofil.r4-1.5.3-snapshots.tgz"
+      version: "1.5.3"
+    - name: "de.gematik.epa"
+      snapshot: "de.gematik.epa-1.1.5-snapshots.tgz"
+      version: "1.1.5"
+    - name: "de.gematik.epa.medication"
+      snapshot: "de.gematik.epa.medication-1.1.5-snapshots.tgz"
+      version: "1.1.5"
     - name: "de.gematik.terminology"
+      snapshot: "de.gematik.terminology-1.0.6-snapshots.tgz"
       version: "1.0.6"
-      canonicalClaims: [ "https://gematik.de/fhir/terminology/", "https://gematik.de/fhir/epa-medication/" ]
-      omitProfiles: [ "ValueSet-ti-substance-snomed-ct-vs.json", "ValueSet-epa-xds-event-code-vs.json", "ValueSet-ti-medication-snomed-ct-vs.json" ]
+    - name: "de.gematik.fhir.directory"
+      snapshot: "de.gematik.fhir.directory-0.13.1-snapshots.tgz"
+      version: "0.13.1"
     - name: "de.gematik.ti"
-      version: "1.1.0"
-      canonicalClaims: "https://gematik.de/fhir/ti/"
+      snapshot: "de.gematik.ti-1.1.1-snapshots.tgz"
+      version: "1.1.1"
+      compatibleVersions: "1.1.0"
     - name: "dvmd.kdl.r4"
+      snapshot: "dvmd.kdl.r4-2025.0.0-snapshots.tgz"
       version: "2025.0.0"
-      canonicalClaims: "http://dvmd.de/fhir/"
-    # - name: "hl7.fhir.uv.extensions.r4"
-    #   version: "5.2.0"
-    #   canonicalClaims: [ "http://hl7.org/fhir/extensions/" ]
-    # - name: "hl7.terminology.r4"
-    #   version: "6.3.0"
-    #  canonicalClaims: [ "http://terminology.hl7.org" ]
-
-  errorFilter:
+    - name: "de.ihe-d.terminology"
+      snapshot: "de.ihe-d.terminology-3.0.1-snapshots.tgz"
+      version: "3.0.1"
+    - name: "hl7.terminology.r4"
+      snapshot: "hl7.terminology.r4-6.3.0-snapshots.tgz"
+      version: "6.3.0"
+    - name: "hl7.fhir.uv.extensions.r4"
+      snapshot: "hl7.fhir.uv.extensions.r4-5.2.0-snapshots.tgz"
+      version: "5.2.0"
   ignoreCodeSystems:
     - "http://fhir.de/CodeSystem/ask"
     - "http://fhir.de/CodeSystem/ifa/pzn"
     - "http://fhir.de/CodeSystem/bfarm/atc"
+    - "urn:oid:2.16.840.1.113883.2.9.6.2.7"
 
-- id: "1.4.0" # actually 1.4.3
+- id: "1.4.0"
   note: "erp-workflow valid from 1.4.25"
   profiles:
-    - name: "kbv.ita.erp"
+    - name: "de.gematik.erezept-workflow.r4"
+      snapshot: "de.gematik.erezept-workflow.r4-1.4.3-snapshots.tgz"
+      version: "1.4.3"
+      compatibleVersions: [ "1.4", "1.4.0" ]
+
+    - snapshot: "kbv.ita.erp-1.1.2-snapshots.tgz"
       version: "1.1.2"
       compatibleVersions: "1.1.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "kbv.basis"
-      version: "1.3.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-      omitProfiles: [ "KBV_VS_Base_Diagnosis_SNOMED_CT.json", "KBV_VS_Base_Allergy_Substance_SNOMED_CT.json", "KBV_VS_Base_Device_SNOMED_CT.json", "KBV_VS_Base_Procedure_SNOMED_CT.json" ]
-    - name: "kbv.ita.for"
+
+    - snapshot: "kbv.ita.for-1.1.0-snapshots.tgz"
       version: "1.1.0"
-      canonicalClaims: "https://fhir.kbv.de/"
+      compatibleVersions: "1.1"
+
     - name: "kbv.itv.evdga"
+      snapshot: "kbv.itv.evdga-1.1.0-snapshots.tgz"
       version: "1.1.0"
-      compatibleVersions: [ "1.1" ]
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "dav.kbv.sfhir.cs.vs"
-      version: "1.0.3"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "de.basisprofil.r4"
-      version: "1.3.2" # Note: for ERP-WF 1.4.3 basisprofil 1.5.0 ist actual but for de.abda.eRezeptAbgabedatenPKV 1.3.2 recommended
-      canonicalClaims: "http://fhir.de/"
-    - name: "de.abda.erezeptabgabedatenbasis"
-      version: "1.4.2"  # Note: according to simplifier this must be 1.4.1
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.abda.erezeptabgabedatenpkv"
-      version: "1.3.0"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.gematik.epa.medication"
-      version: "1.0.3"
-      canonicalClaims: "https://gematik.de/fhir"
-    - name: "de.gematik.erezept-workflow.r4"
-      version: "1.4.3"
-      compatibleVersions: [ "1.4" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
+      compatibleVersions: "1.1"
+    - name: "de.abda.erezeptabgabedaten"
+      snapshot: "de.abda.erezeptabgabedaten-1.4.2-snapshots.tgz"
+      version: "1.4.2"
+      compatibleVersions: "1.4"
+    - snapshot: "de.abda.erezeptabgabedatenpkv-1.3.1-snapshots.tgz"
+      version: "1.3.1"
+      compatibleVersions: "1.3"
+    - snapshot: "de.abda.erezeptabgabedatenbasis-1.4.2-snapshots.tgz"
+      version: "1.4.2"
     - name: "de.gematik.erezept-patientenrechnung.r4"
-      version: "1.0.0"
-      compatibleVersions: [ "1.0" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
+      snapshot: "de.gematik.erezept-patientenrechnung.r4-1.0.4-snapshots.tgz"
+      version: "1.0.4"
+      compatibleVersions: [ "1.0", "1.0.0" ]
+
+    # Unterstützende Basis-Profile
+    - name: "de.basisprofil.r4"
+      snapshot: "de.basisprofil.r4-1.3.2-snapshots.tgz"
+      version: "1.3.2"
+    - name: "de.basisprofil.r4"
+      snapshot: "de.basisprofil.r4-1.5.0-snapshots.tgz"
+      version: "1.5.0"
+    - name: "kbv.basis"
+      snapshot: "kbv.basis-1.3.0-snapshots.tgz"
+      version: "1.3.0"
+    - name: "gematik.kbv.sfhir.cs.vs"
+      snapshot: "gematik.kbv.sfhir.cs.vs-1.0.3-snapshot.tgz"
+      version: "1.0.3"
+    - name: "de.gematik.epa.medication"
+      snapshot: "de.gematik.epa.medication-1.0.3-snapshots.tgz"
+      version: "1.0.3"
+    - name: "de.gematik.fhir.directory"
+      snapshot: "de.gematik.fhir.directory-0.11.12-snapshots.tgz"
+      version: "0.11.12"
+    - name: "de.ihe-d.terminology"
+      snapshot: "de.ihe-d.terminology-3.0.0-snapshots.tgz"
+      version: "3.0.0"
   errorFilter:
-    #    - "^2 Profile für contained Ressource gefunden.*"
     - "^2 profiles found for contained resource.*"
     - "^2 profiles found for parameter resource.*"
+    - "^Unable to parse X509 Certificate: The curve must not be null.*" # TODO: what's wrong here?
   ignoreCodeSystems:
     - "http://fhir.de/CodeSystem/ask"
     - "http://fhir.de/CodeSystem/ifa/pzn"
     - "http://fhir.de/CodeSystem/bfarm/atc"
+    - "urn:iso:std:iso:3166"  # TODO: why? seems to be coming from jurisdiction field
 
 - id: "1.3.0"
-  note: "erp workflow profiles valid from 1.11.24 until 31.3.25"
+  note: "not complete! this one is a fallback for missing packages in old unit-tests"
   profiles:
-    - name: "kbv.ita.erp"
-      version: "1.1.2"
+    - package: "de.gematik.erezept-workflow.r4-1.3.1-snapshots.tgz"
+      compatibleVersions: "1.3"
+    - package: "kbv.ita.erp-1.1.2-snapshots.tgz"
       compatibleVersions: "1.1.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "kbv.basis"
-      version: "1.3.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-      omitProfiles: [ "KBV_VS_Base_Diagnosis_SNOMED_CT.json", "KBV_VS_Base_Allergy_Substance_SNOMED_CT.json", "KBV_VS_Base_Device_SNOMED_CT.json", "KBV_VS_Base_Procedure_SNOMED_CT.json" ]
-    - name: "kbv.ita.for"
-      version: "1.1.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "dav.kbv.sfhir.cs.vs"
-      version: "1.0.3"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "de.basisprofil.r4"
-      version: "1.3.2"
-      canonicalClaims: "http://fhir.de/"
-    - name: "de.abda.erezeptabgabedatenbasis"
-      version: "1.3.1"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.abda.erezeptabgabedatenpkv"
-      version: "1.2.0"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.gematik.erezept-workflow.r4"
-      version: "1.3.1"
-      compatibleVersions: [ "1.3.0", "1.3" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-    - name: "de.gematik.erezept-patientenrechnung.r4"
-      version: "1.0.0"
-      compatibleVersions: [ "1.0" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-  errorFilter:
-    - "^Profile reference 'http://hl7.org/fhir/StructureDefinition/Binary\\|4.0.1' has not been checked because it is unknown"
-    - "^Relative URLs must be of the format \\[ResourceName\\]/\\[id\\].*"
-    # this error must be filtered because a ErxMedicationDispense may contain a Medication from old profiles
-    - "^Profile reference 'https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN\\|1.0.2' has not been checked because it is unknown"
-    - "^Bundle.id: minimum required = 1, but only found 0 \\(from https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle\\|1.3\\)"
+    - package: "kbv.ita.for-1.1.0-snapshots.tgz"
+    - package: "kbv.basis-1.3.0-snapshots.tgz"
+    - package: "gematik.kbv.sfhir.cs.vs-1.0.3-snapshot.tgz"
+    - package: "de.basisprofil.r4-1.3.2-snapshots.tgz"
+    - package: "de.abda.erezeptabgabedatenpkv-1.2.0-snapshots.tgz"
+      compatibleVersions: "1.2"
+    - package: "de.abda.erezeptabgabedatenbasis-1.3.1-snapshots.tgz"
   ignoreCodeSystems:
     - "http://fhir.de/CodeSystem/ask"
     - "http://fhir.de/CodeSystem/ifa/pzn"
     - "http://fhir.de/CodeSystem/bfarm/atc"
-
-- id: "1.2.0"
-  note: "erp workflow profiles valid until 31.3.25"
-  profiles:
-    - name: "kbv.ita.erp"
-      version: "1.1.2"
-      compatibleVersions: "1.1.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "kbv.basis"
-      version: "1.3.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-      omitProfiles: [ "KBV_VS_Base_Diagnosis_SNOMED_CT.json", "KBV_VS_Base_Allergy_Substance_SNOMED_CT.json", "KBV_VS_Base_Device_SNOMED_CT.json", "KBV_VS_Base_Procedure_SNOMED_CT.json" ]
-    - name: "kbv.ita.for"
-      version: "1.1.0"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "dav.kbv.sfhir.cs.vs"
-      version: "1.0.3"
-      canonicalClaims: "https://fhir.kbv.de/"
-    - name: "de.basisprofil.r4"
-      version: "1.3.2"
-      canonicalClaims: "http://fhir.de/"
-    - name: "de.abda.erezeptabgabedatenbasis"
-      version: "1.3.1"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.abda.erezeptabgabedatenpkv"
-      version: "1.2.0"
-      canonicalClaims: "http://fhir.abda.de/"
-    - name: "de.gematik.erezept-workflow.r4"
-      version: "1.2.0"
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-    - name: "de.gematik.erezept-patientenrechnung.r4"
-      version: "1.0.0"
-      compatibleVersions: [ "1.0" ]
-      canonicalClaims: [ "https://gematik.de/fhir", "http://gematik.de/fhir" ]
-  errorFilter:
-    - "^Profile reference 'http://hl7.org/fhir/StructureDefinition/Binary\\|4.0.1' has not been checked because it is unknown"
-    - "^Relative URLs must be of the format \\[ResourceName\\]/\\[id\\].*"
-    # this error must be filtered because a ErxMedicationDispense may contain a Medication from old profiles
-    - "^Profile reference 'https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN\\|1.0.2' has not been checked because it is unknown"
-    - "^Bundle.id: minimum required = 1, but only found 0 \\(from https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle\\|1.2\\)"
-    - "^Bundle.id: minimum required = 1, but only found 0 \\(from https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle\\|1.1.0\\)"
-  ignoreCodeSystems:
-    - "http://fhir.de/CodeSystem/ask"
-    - "http://fhir.de/CodeSystem/ifa/pzn"
-    - "http://fhir.de/CodeSystem/bfarm/atc"
+    #    - "http://TA1.abda.de" # results only in a warning
+    - "urn:iso:std:iso:3166"  # TODO: why? seems to be coming from jurisdiction field

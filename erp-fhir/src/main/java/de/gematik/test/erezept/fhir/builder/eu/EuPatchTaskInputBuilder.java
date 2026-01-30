@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.Parameters;
 
 public class EuPatchTaskInputBuilder extends ResourceBuilder<Parameters, EuPatchTaskInputBuilder> {
 
-  private EuVersion version = EuVersion.V1_0;
+  private EuVersion version = EuVersion.getDefaultVersion();
   private boolean isRedeemable = true;
 
   public static EuPatchTaskInputBuilder builder() {
