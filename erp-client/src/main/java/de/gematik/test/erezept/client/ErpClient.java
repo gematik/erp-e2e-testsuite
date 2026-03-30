@@ -75,7 +75,7 @@ public class ErpClient {
   // client state
   private IdpTokenResult idpToken;
   private Supplier<IdpTokenResult> authentication;
-  @Default private Instant idpTokenValidUntil = Instant.MIN;
+  @Default private Instant idpTokenValidUntil = Instant.now();
 
   /**
    * Initializes the ERP-Client to use vau client and idp client. Beforehand, the authentication
@@ -128,14 +128,11 @@ public class ErpClient {
   }
 
   public void refreshIdpToken() {
-    if (idpTokenExpired()) {
+    if (needsIdpTokenRefresh()) {
       log.info("Refresh the IDP Token");
       try {
         idpToken = authentication.get();
-        idpTokenValidUntil =
-            Instant.now()
-                .plus(idpToken.getExpiresIn(), ChronoUnit.SECONDS)
-                .minus(120, ChronoUnit.SECONDS);
+        idpTokenValidUntil = Instant.now().plus(idpToken.getExpiresIn(), ChronoUnit.SECONDS);
       } catch (NullPointerException npe) {
         // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
         // broken!
@@ -147,8 +144,9 @@ public class ErpClient {
     }
   }
 
-  private boolean idpTokenExpired() {
-    return idpTokenValidUntil.isBefore(Instant.now());
+  private boolean needsIdpTokenRefresh() {
+    val refreshInstant = idpTokenValidUntil.minus(120, ChronoUnit.SECONDS);
+    return Instant.now().isAfter(refreshInstant);
   }
 
   public String encode(Resource resource, EncodingType encoding) {

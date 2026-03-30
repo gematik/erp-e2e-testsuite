@@ -20,32 +20,42 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 
+@ParameterizedClass
+@MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+@RequiredArgsConstructor
 class KbvErpMedicationPZNFakerTest extends ErpFhirParsingTest {
+
+  private final KbvItaErpVersion erpVersion;
+
   @Test
   void buildFakerKbvErpMedicationPZNWithType() {
     val medication =
-        KbvErpMedicationPZNFaker.builder().withType(BaseMedicationType.MEDICAL_PRODUCT).fake();
+        KbvErpMedicationPZNFaker.builder(erpVersion)
+            .withType(BaseMedicationType.MEDICAL_PRODUCT)
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
 
   @Test
   void buildFakerKbvErpMedicationPZNWithVaccine() {
-    val medication = KbvErpMedicationPZNFaker.builder().withVaccine(fakerBool()).fake();
+    val medication = KbvErpMedicationPZNFaker.builder(erpVersion).withVaccine(fakerBool()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
@@ -53,14 +63,15 @@ class KbvErpMedicationPZNFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakerKbvErpMedicationPZNWithStandardSize() {
     val medication =
-        KbvErpMedicationPZNFaker.builder().withStandardSize(StandardSize.random()).fake();
+        KbvErpMedicationPZNFaker.builder(erpVersion).withStandardSize(StandardSize.random()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
 
   @Test
   void shouldFakeKbvErpMedicationPznWithSupplyForm() {
-    val medication = KbvErpMedicationPZNFaker.builder().withSupplyForm(Darreichungsform.SCH).fake();
+    val medication =
+        KbvErpMedicationPZNFaker.builder(erpVersion).withSupplyForm(Darreichungsform.SCH).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
@@ -68,15 +79,18 @@ class KbvErpMedicationPZNFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakerKbvErpMedicationPZNWithPZNMedicationName() {
     val medication =
-        KbvErpMedicationPZNFaker.builder().withPznMedication(PZN.random(), fakerDrugName()).fake();
+        KbvErpMedicationPZNFaker.builder(erpVersion)
+            .withPznMedication(PZN.random(), fakerDrugName())
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
 
   @Test
   void buildFakerKbvErpMedicationPZNWithAmount() {
-    val medication = KbvErpMedicationPZNFaker.builder().withAmount(fakerAmount()).fake();
-    val medication2 = KbvErpMedicationPZNFaker.builder().withAmount(fakerAmount(), "Stk").fake();
+    val medication = KbvErpMedicationPZNFaker.builder(erpVersion).withAmount(fakerAmount()).fake();
+    val medication2 =
+        KbvErpMedicationPZNFaker.builder(erpVersion).withAmount(fakerAmount(), "Stk").fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     val result2 = ValidatorUtil.encodeAndValidate(parser, medication2);
     assertTrue(result.isSuccessful());

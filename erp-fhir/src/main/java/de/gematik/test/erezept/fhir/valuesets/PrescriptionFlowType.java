@@ -44,17 +44,15 @@ import org.hl7.fhir.r4.model.Extension;
  */
 @Getter
 public enum PrescriptionFlowType implements FromValueSet {
-  FLOW_TYPE_160("160", "Muster 16 (Apothekenpflichtige Arzneimittel)"),
-  FLOW_TYPE_162("162", "Muster 16 (Digitale Gesundheitsanwendungen)"),
-  FLOW_TYPE_169("169", "Muster 16 (Direkte Zuweisung)"),
-  FLOW_TYPE_200("200", "PKV (Apothekenpflichtige Arzneimittel)"),
-  FLOW_TYPE_209("209", "PKV (Direkte Zuweisung)");
+  FLOW_TYPE_160("160", "Flowtype für Apothekenpflichtige Arzneimittel"),
+  FLOW_TYPE_162("162", "Flowtype für Digitale Gesundheitsanwendungen"),
+  // FLOW_TYPE_165("165", "Flowtype für Betäubungsmittel"), // disabled until activated
+  FLOW_TYPE_166("166", "Flowtype für Arzneimittel nach § 3a AMVV"), // T-Rezept
+  FLOW_TYPE_169("169", "Flowtype zur Workflow-Steuerung durch Leistungserbringer"),
+  FLOW_TYPE_200("200", "Flowtype für Apothekenpflichtige Arzneimittel (PKV)"),
+  FLOW_TYPE_209("209", "Flowtype zur Workflow-Steuerung durch Leistungserbringer (PKV)");
 
   public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.FLOW_TYPE_12;
-  public static final String VERSION = "1.0.3";
-  public static final String DESCRIPTION =
-      "Type of the prescription according to the 'Muster 16' forms";
-  public static final String PUBLISHER = "gematik GmbH";
 
   private final String code;
   private final String display;

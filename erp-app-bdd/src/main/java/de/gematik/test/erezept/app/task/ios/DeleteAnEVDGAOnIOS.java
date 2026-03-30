@@ -70,7 +70,7 @@ public class DeleteAnEVDGAOnIOS implements Task {
 
     app.tap(EVDGADetails.DIGA_THREE_DOT_MENU);
     // Element existiert bereits in Prescription details
-    app.tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
+    app.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     app.acceptAlert();
 
     dmcAbility.moveToDeleted(dmc);

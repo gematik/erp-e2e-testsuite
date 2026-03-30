@@ -20,6 +20,9 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static de.gematik.test.erezept.fhir.r4.erp.GemErpMedication.getKombipackungFrom;
+import static de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication.isKPG;
+
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.client.rest.ErpResponse;
@@ -27,6 +30,7 @@ import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.GemDispenseCloseOperationPharmaceuticalsBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
@@ -34,6 +38,7 @@ import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
@@ -46,10 +51,7 @@ import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.strategy.PrescriptionToDispenseStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.datatable.DataTable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -171,9 +173,16 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
       val lotNr = GemFaker.fakerLotNumber();
       val expDate = GemFaker.fakerFutureExpirationDate();
 
-      val gemMedication =
-          GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(medication).lotNumber(lotNr).build();
+      GemErpMedication gemMedication;
 
+      if (isKPG(medication)) {
+        gemMedication = getKombipackungFrom(medication);
+
+      } else {
+
+        gemMedication =
+            GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(medication).lotNumber(lotNr).build();
+      }
       val medicationDisp =
           ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
               .prescriptionId(strategy.getPrescriptionId())
@@ -219,35 +228,13 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
 
     replacementMedications.forEach(
         medMap -> {
-          val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
-          val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
-          val amount =
-              Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
-          val unit = medMap.getOrDefault("Einheit", "Stk");
-          val categoryCode =
-              medMap.getOrDefault(
-                  "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
-          val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
-          val darreichungsCode =
-              medMap.getOrDefault(
-                  "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
-
-          val medication =
-              KbvErpMedicationPZNBuilder.builder()
-                  .pzn(pzn, name)
-                  .amount(amount, unit)
-                  .category(MedicationCategory.fromCode(categoryCode))
-                  .isVaccine(isVaccine)
-                  .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
-                  .normgroesse(StandardSize.fromCode(sizeCode))
-                  .build();
+          final var med = getKbvErpMedication(medMap);
 
           val medicationDispense =
               ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
                   .prescriptionId(strategy.getPrescriptionId())
                   .performerId(performerId)
-                  .medication(medication)
+                  .medication(med)
                   .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
                   .wasSubstituted(true)
                   .build();
@@ -258,51 +245,135 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     return medicationDispenses;
   }
 
+  private KbvErpMedication getKbvErpMedication(Map<String, String> medMap) {
+    val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
+    val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
+    val amount = Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
+    val unit = medMap.getOrDefault("Einheit", "Stk");
+    val categoryCode =
+        medMap.getOrDefault(
+            "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
+    val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
+    val darreichungsCode =
+        medMap.getOrDefault(
+            "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
+    val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
+
+    val medication =
+        KbvErpMedicationPZNBuilder.builder()
+            .pzn(pzn, name)
+            .amount(amount, unit)
+            .category(MedicationCategory.fromCode(categoryCode))
+            .isVaccine(isVaccine)
+            .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
+            .normgroesse(StandardSize.fromCode(sizeCode));
+
+    Optional.ofNullable(medMap.get("Wirkstoffname")).ifPresent(medication::ingredientText);
+    Optional.ofNullable(medMap.get("WirkstoffmengeNum"))
+        .map(Double::valueOf)
+        .ifPresent(
+            it ->
+                medication.ingredientStrengthNum(
+                    it, getOrDefault("WirkstoffEinheitNum", "mg", medMap)));
+
+    Optional.ofNullable(medMap.get("WirkstoffmengeDenom"))
+        .map(Double::valueOf)
+        .ifPresent(
+            it ->
+                medication.ingredientStrengthDenom(
+                    it, getOrDefault("WirkstoffeinheitDemon", "Stück", medMap)));
+    return medication.build();
+  }
+
+  private String getOrDefault(String key, String defaultValue, Map<String, String> medMap) {
+    return Optional.ofNullable(medMap.getOrDefault(key, defaultValue))
+        .map(String::trim)
+        .orElse(defaultValue);
+  }
+
   private GemCloseOperationParameters getAlternativeCloseParameterStructure(
       PrescriptionToDispenseStrategy strategy, String performerId) {
     val paramsBuilder = GemOperationInputParameterBuilder.forClosingPharmaceuticals();
 
-    replacementMedications.forEach(
-        medMap -> {
-          val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
-          val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
-          val amount =
-              Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
-          val unit = medMap.getOrDefault("Einheit", "Stk");
-          val categoryCode =
-              medMap.getOrDefault(
-                  "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
-          val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
-          val darreichungsCode =
-              medMap.getOrDefault(
-                  "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
+    val isKpg =
+        !replacementMedications.isEmpty()
+            && replacementMedications
+                .get(0)
+                .getOrDefault("Darreichungsform", "NOT KPG")
+                .equals(Darreichungsform.KPG.getCode());
+    if (isKpg) {
 
-          val medication =
-              GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
-                  .pzn(pzn, name)
-                  .amount(amount, unit)
-                  .category(EpaDrugCategory.fromCode(categoryCode))
-                  .isVaccine(isVaccine)
-                  .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
-                  .normgroesse(StandardSize.fromCode(sizeCode))
-                  .build();
+      buildKombipackung(strategy, performerId, paramsBuilder);
 
-          val medicationDisp =
-              ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
-                  .prescriptionId(strategy.getPrescriptionId())
-                  .performerId(performerId)
-                  .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
-                  .whenPrepared(new Date())
-                  .whenHandedOver(new Date())
-                  .wasSubstituted(true)
-                  .medication(medication)
-                  .build();
+    } else {
 
-          paramsBuilder.with(medicationDisp, medication);
-        });
+      replacementMedications.forEach(
+          medMap -> {
+            val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
+            val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
+            val amount =
+                Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
+            val unit = medMap.getOrDefault("Einheit", "Stk");
+            val categoryCode =
+                medMap.getOrDefault(
+                    "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
+            val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
+            val darreichungsCode =
+                medMap.getOrDefault(
+                    "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
+            val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
+            val gemErpMedication =
+                GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
+                    .pzn(pzn, name)
+                    .amount(amount, unit)
+                    .category(EpaDrugCategory.fromCode(categoryCode))
+                    .isVaccine(isVaccine)
+                    .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
+                    .normgroesse(StandardSize.fromCode(sizeCode))
+                    .build();
+
+            val medicationDisp =
+                ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
+                    .prescriptionId(strategy.getPrescriptionId())
+                    .performerId(performerId)
+                    .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+                    .whenPrepared(new Date())
+                    .whenHandedOver(new Date())
+                    .wasSubstituted(true)
+                    .medication(gemErpMedication)
+                    .build();
+
+            paramsBuilder.with(medicationDisp, gemErpMedication);
+          });
+    }
     return paramsBuilder.build();
+  }
+
+  private void buildKombipackung(
+      PrescriptionToDispenseStrategy strategy,
+      String performerId,
+      GemDispenseCloseOperationPharmaceuticalsBuilder<GemCloseOperationParameters> paramsBuilder) {
+    val kbvMed1 = getKbvErpMedication(replacementMedications.stream().findFirst().orElseThrow());
+    val kbvMed2 =
+        getKbvErpMedication(
+            replacementMedications.size() >= 2
+                ? replacementMedications.get(1)
+                : replacementMedications.stream().findFirst().orElseThrow());
+
+    val kombiPackung = GemErpMedication.getKombipackungFrom(kbvMed1, kbvMed2);
+    val medicationDisp =
+        ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
+            .prescriptionId(strategy.getPrescriptionId())
+            .performerId(performerId)
+            .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
+            .wasSubstituted(true)
+            .medication(kombiPackung)
+            .build();
+
+    paramsBuilder.with(medicationDisp, kombiPackung);
   }
 
   public static class ResponseOfDispenseMedicationOperationBuilder {

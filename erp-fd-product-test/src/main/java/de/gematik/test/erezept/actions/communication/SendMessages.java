@@ -35,8 +35,10 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
+import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -73,7 +75,22 @@ public class SendMessages extends ErpAction<ErxCommunication> {
   public ErpInteraction<ErxCommunication> answeredBy(Actor actor) {
     fuzzingMutators.forEach(m -> m.getParameter().accept(communication));
     val cmd = new CommunicationPostCommand(communication);
-    return this.performCommandAs(cmd, actor);
+    val response = this.performCommandAs(cmd, actor);
+
+    // store successfully sent messages for the teardown
+    val comAbility = SafeAbility.getAbility(actor, ManageCommunications.class);
+    response
+        .getResponse()
+        .getResourceOptional()
+        .ifPresent(
+            com ->
+                comAbility
+                    .getSentCommunications()
+                    .append(
+                        ExchangedCommunication.from(com)
+                            .withActorNames(actor.getName(), com.getRecipientId())));
+
+    return response;
   }
 
   @RequiredArgsConstructor

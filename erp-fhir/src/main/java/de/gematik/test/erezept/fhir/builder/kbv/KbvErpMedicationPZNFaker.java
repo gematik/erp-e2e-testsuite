@@ -20,12 +20,10 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
@@ -39,11 +37,13 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationPZNFaker {
-
+  private final KbvItaErpVersion version;
   private final Map<String, Consumer<KbvErpMedicationPZNBuilder>> builderConsumers =
       new HashMap<>();
+  private static final String WIRKSTOFF_NAME = "Wirkstoffname";
 
-  private KbvErpMedicationPZNFaker() {
+  private KbvErpMedicationPZNFaker(KbvItaErpVersion version) {
+    this.version = version;
     val supplyForm =
         fakerValueSet(
             Darreichungsform.class,
@@ -58,12 +58,11 @@ public class KbvErpMedicationPZNFaker {
   }
 
   public static KbvErpMedicationPZNFaker builder() {
-    return new KbvErpMedicationPZNFaker();
+    return builder(KbvItaErpVersion.getDefaultVersion());
   }
 
-  public KbvErpMedicationPZNFaker withVersion(KbvItaErpVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+  public static KbvErpMedicationPZNFaker builder(KbvItaErpVersion version) {
+    return new KbvErpMedicationPZNFaker(version);
   }
 
   public KbvErpMedicationPZNFaker withType(BaseMedicationType type) {
@@ -100,6 +99,11 @@ public class KbvErpMedicationPZNFaker {
     return this;
   }
 
+  public KbvErpMedicationPZNFaker withIngredientName(String name) {
+    builderConsumers.put(WIRKSTOFF_NAME, b -> b.ingredientText(name));
+    return this;
+  }
+
   public KbvErpMedicationPZNFaker withAmount(long numerator) {
     return this.withAmount(numerator, "Stk");
   }
@@ -109,12 +113,28 @@ public class KbvErpMedicationPZNFaker {
     return this;
   }
 
+  public static KbvErpMedication asTPrescription() {
+    return asTPrescription(KbvItaErpVersion.V1_4_0);
+  }
+
+  public static KbvErpMedication asTPrescription(KbvItaErpVersion version) {
+    return KbvErpMedicationPZNFaker.builder(version)
+        .withCategory(MedicationCategory.C_02)
+        .withVaccine(false)
+        .withPznMedication(PZN.from("19201712"), "Pomalidomid Accord 1 mg 21 x 1 Hartkapseln")
+        .fake();
+  }
+
   public KbvErpMedication fake() {
     return this.toBuilder().build();
   }
 
   public KbvErpMedicationPZNBuilder toBuilder() {
-    val builder = KbvErpMedicationPZNBuilder.builder();
+    val builder = KbvErpMedicationPZNBuilder.builder().version(version);
+    if (this.version.isBiggerThanOrEqualTo(KbvItaErpVersion.V1_3_0)
+        && this.builderConsumers.get(WIRKSTOFF_NAME) == null) {
+      builderConsumers.put(WIRKSTOFF_NAME, b -> b.ingredientText(GemFaker.fakerDrugName()));
+    }
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

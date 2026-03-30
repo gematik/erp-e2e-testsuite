@@ -23,78 +23,35 @@ package de.gematik.test.erezept.primsys.model;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import jakarta.ws.rs.WebApplicationException;
 import java.util.Map;
-import java.util.Optional;
 import lombok.val;
-import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.Test;
 
 class FetchReceiptUseCaseTest extends TestWithActorContext {
 
   @Test
-  void shouldThrowExceptionWhenNoReceiptPresent() {
+  void shouldRefetchReceipt() {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(1);
     val mockClient = pharmacy.getClient();
 
-    val prescriptionId = PrescriptionId.random();
-    val taskId = prescriptionId.getValue();
-    val secret = Secret.random().getValue();
-
-    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
-    val task = mock(ErxTask.class);
-
-    when(prescriptionBundle.getTask()).thenReturn(task);
-    when(task.getStatus()).thenReturn(Task.TaskStatus.INPROGRESS);
     val getResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
+        ErpResponse.forPayload(new ErxPrescriptionBundle(), ErxPrescriptionBundle.class)
             .withStatusCode(200)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskGetByIdCommand.class))).thenReturn(getResponse);
 
     val useCase = new FetchReceiptUseCase(pharmacy);
-    assertThrows(WebApplicationException.class, () -> useCase.fetchReceipt(taskId, secret));
-  }
-
-  @Test
-  void shouldExtractReceipt() {
-    val ctx = ActorContext.getInstance();
-    val pharmacy = ctx.getPharmacies().get(1);
-    val mockClient = pharmacy.getClient();
-
-    val prescriptionId = PrescriptionId.random();
-    val taskId = prescriptionId.getValue();
-    val secret = Secret.random().getValue();
-
-    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
-    val task = mock(ErxTask.class);
-    val receipt = new ErxReceipt();
-
-    when(prescriptionBundle.getTask()).thenReturn(task);
-    when(task.getStatus()).thenReturn(Task.TaskStatus.COMPLETED);
-    when(prescriptionBundle.getReceipt()).thenReturn(Optional.of(receipt));
-    val getResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withStatusCode(200)
-            .withHeaders(Map.of())
-            .andValidationResult(createEmptyValidationResult());
-    when(mockClient.request(any(TaskGetByIdCommand.class))).thenReturn(getResponse);
-
-    val useCase = new FetchReceiptUseCase(pharmacy);
-    try (val response = useCase.fetchReceipt(taskId, secret)) {
+    try (val response = useCase.fetchReceipt(TaskId.random(), Secret.random())) {
       assertTrue(response.hasEntity());
       assertEquals(200, response.getStatus());
     }

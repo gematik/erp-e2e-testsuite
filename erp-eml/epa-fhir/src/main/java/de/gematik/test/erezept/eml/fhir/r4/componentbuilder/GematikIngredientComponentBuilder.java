@@ -29,17 +29,16 @@ import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Ratio;
+import org.hl7.fhir.r4.model.*;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class GematikIngredientComponentBuilder<
         C extends Medication.MedicationIngredientComponent,
@@ -55,6 +54,7 @@ public abstract class GematikIngredientComponentBuilder<
   private WithCodeSystem strengthNumSystem;
   private Extension darreichungsFormFreitext;
   private String ingredItemCodingText;
+  private CodeableConcept ingredientCoding;
 
   public C build() {
     this.ingredientList.forEach(coding -> ingredient.getItemCodeableConcept().addCoding(coding));
@@ -79,8 +79,8 @@ public abstract class GematikIngredientComponentBuilder<
     ingredientComponent.setStrength(strength);
   }
 
-  public B strengthAmountText(String form) {
-    this.strengthAmountText = form;
+  public B strengthAmountText(String amountTextExtension) {
+    this.strengthAmountText = amountTextExtension;
     return self();
   }
 
@@ -94,6 +94,11 @@ public abstract class GematikIngredientComponentBuilder<
     return self();
   }
 
+  /**
+   * @param numerator
+   * @param demoninator
+   * @return
+   */
   public B ingredientStrength(Quantity numerator, Quantity demoninator) {
     this.strength = new Ratio().setNumerator(numerator).setDenominator(demoninator);
     return self();
@@ -121,8 +126,17 @@ public abstract class GematikIngredientComponentBuilder<
     return ingredientStrength(ingredStrength);
   }
 
+  public B ingredientStrength(long numerator, long demoninator, String numUnit, String denomUnit) {
+    val ingredStrength =
+        new Ratio().setNumerator(new Quantity(numerator)).setDenominator(new Quantity(demoninator));
+    ingredStrength.getNumerator().setCode(numUnit);
+    ingredStrength.getDenominator().setCode(denomUnit);
+    return ingredientStrength(ingredStrength);
+  }
+
   public B atc(ATC atc) {
-    this.ingredientList.add(atc.asCoding());
+    log.info("Version is mandatory until ErpWorkflowVersion.V_6");
+    this.ingredientList.add(atc.asCoding().setVersion("2026"));
     return self();
   }
 
@@ -153,5 +167,19 @@ public abstract class GematikIngredientComponentBuilder<
 
   public B pzn(PZN pzn) {
     return pzn(pzn, null);
+  }
+
+  public B ingredienCoding(Coding... codings) {
+    return ingredienCoding(Arrays.asList(codings));
+  }
+
+  public B ingredienCoding(ASK ask) {
+    this.ingredientList.add((ask.asCoding()));
+    return self();
+  }
+
+  public B ingredienCoding(List<Coding> coding) {
+    this.ingredientList.addAll(coding);
+    return self();
   }
 }

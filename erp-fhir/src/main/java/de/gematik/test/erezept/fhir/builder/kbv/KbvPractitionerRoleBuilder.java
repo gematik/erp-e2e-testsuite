@@ -64,6 +64,9 @@ public class KbvPractitionerRoleBuilder
     val practitionerRole =
         this.createResource(
             KbvPractitionerRole::new, KbvItaForStructDef.PRACTITIONER_ROLE, kbvItaForVersion);
+    if (kbvItaForVersion.isBiggerThan(KbvItaForVersion.V1_2_0)) {
+      practitionerRole.getMeta().setVersionId("1");
+    }
     practitionerRole.setPractitioner(practitioner);
     practitionerRole.getOrganization().setIdentifier(asvTeamNummer);
     return practitionerRole;

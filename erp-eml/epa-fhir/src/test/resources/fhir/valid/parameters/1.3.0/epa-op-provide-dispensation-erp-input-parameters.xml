@@ -1,0 +1,208 @@
+<Parameters xmlns="http://hl7.org/fhir">
+    <id value="example-epa-op-provide-dispensation-erp-input-parameters-1"/>
+    <meta>
+        <profile
+                value="https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-dispensation-erp-input-parameters|1.3.0"/>
+    </meta>
+    <parameter>
+        <name value="rxDispensation"/>
+        <part>
+            <name value="prescriptionId"/>
+            <valueIdentifier>
+                <system
+                        value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                <value value="160.100.000.000.011.09"/>
+            </valueIdentifier>
+        </part>
+        <part>
+            <name value="authoredOn"/>
+            <valueDate value="2025-09-06"/>
+        </part>
+        <part>
+            <name value="medicationDispense"/>
+            <resource>
+                <MedicationDispense>
+                    <id value="72f86151-cdb2-472c-8e98-e5ba71191e1d"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-dispense|1.3.0"/>
+                    </meta>
+                    <status value="completed"/>
+                    <medicationReference>
+                        <reference
+                                value="Medication/9fae333f-92b1-4f03-b838-cd5c5d2285b5"/>
+                    </medicationReference>
+                    <subject>
+                        <identifier>
+                            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                            <value value="X110411319"/>
+                        </identifier>
+                    </subject>
+                    <performer>
+                        <actor>
+                            <reference
+                                    value="Organization/ccc03731-4c38-4b48-bd41-583766b796c6"/>
+                            <identifier>
+                                <type>
+                                    <coding>
+                                        <system
+                                                value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+                                        <code value="PRN"/>
+                                        <display value="Provider number"/>
+                                    </coding>
+                                </type>
+                                <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                                <value value="9-2.58.00000023"/>
+                            </identifier>
+                            <display value="gematik Apotheke"/>
+                        </actor>
+                    </performer>
+                    <whenHandedOver value="2025-09-08"/>
+                    <substitution>
+                        <wasSubstituted value="false"/>
+                    </substitution>
+                </MedicationDispense>
+            </resource>
+        </part>
+        <part>
+            <name value="medication"/>
+            <resource>
+                <Medication>
+                    <id value="9fae333f-92b1-4f03-b838-cd5c5d2285b5"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication|1.3.0"/>
+                    </meta>
+                    <extension
+                            url="https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension">
+                        <valueCoding>
+                            <system value="http://snomed.info/sct"/>
+                            <code value="763158003"/>
+                            <display value="Medicinal product (product)"/>
+                        </valueCoding>
+                    </extension>
+                    <extension
+                            url="https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension">
+                        <valueCoding>
+                            <system
+                                    value="https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs"/>
+                            <code value="00"/>
+                        </valueCoding>
+                    </extension>
+                    <extension url="http://fhir.de/StructureDefinition/normgroesse">
+                        <valueCode value="N1"/>
+                    </extension>
+                    <extension
+                            url="https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension">
+                        <valueBoolean value="false"/>
+                    </extension>
+                    <code>
+                        <coding>
+                            <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                            <code value="04773414"/>
+                        </coding>
+                        <text value="Doxycyclin AL 200 T, 10 Tabletten N1"/>
+                    </code>
+                    <status value="active"/>
+                    <form>
+                        <coding>
+                            <system
+                                    value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM"/>
+                            <code value="TAB"/>
+                        </coding>
+                    </form>
+                    <amount>
+                        <numerator>
+                            <extension
+                                    url="https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension">
+                                <valueString value="10"/>
+                            </extension>
+                            <unit value="Tabletten"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                        </denominator>
+                    </amount>
+                    <ingredient>
+                        <itemCodeableConcept>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/ask"/>
+                                <code value="03876"/>
+                            </coding>
+                            <text value="Doxycyclin"/>
+                        </itemCodeableConcept>
+                        <strength>
+                            <numerator>
+                                <value value="200"/>
+                                <unit value="mg"/>
+                            </numerator>
+                            <denominator>
+                                <value value="1"/>
+                                <unit value="Tbl."/>
+                            </denominator>
+                        </strength>
+                    </ingredient>
+                </Medication>
+            </resource>
+        </part>
+        <part>
+            <name value="organization"/>
+            <resource>
+                <Organization>
+                    <id value="ccc03731-4c38-4b48-bd41-583766b796c6"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory|1.0.0"/>
+                        <tag>
+                            <system
+                                    value="https://gematik.de/fhir/directory/CodeSystem/Origin"/>
+                            <code value="ldap"/>
+                        </tag>
+                    </meta>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="9-2.58.00000023"/>
+                    </identifier>
+                    <active value="true"/>
+                    <type>
+                        <coding>
+                            <system
+                                    value="https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID"/>
+                            <code value="1.2.276.0.76.4.54"/>
+                            <display value="Öffentliche Apotheke"/>
+                        </coding>
+                    </type>
+                    <name value="gematik Apotheke"/>
+                    <alias value="Apotheke"/>
+                    <address>
+                        <text value="gematik Apotheke
+Friedrichstr. 136,
+10117 Berlin"/>
+                        <line value="Friedrichstr. 136"/>
+                        <city value="Berlin"/>
+                        <district value="Mitte"/>
+                        <state value="Berlin"/>
+                        <postalCode value="10117"/>
+                        <country value="DE"/>
+                    </address>
+                    <contact>
+                        <purpose>
+                            <coding>
+                                <system
+                                        value="http://terminology.hl7.org/CodeSystem/contactentity-type"/>
+                                <code value="ADMIN"/>
+                            </coding>
+                        </purpose>
+                        <name>
+                            <text value="gematik ITSM"/>
+                        </name>
+                        <telecom>
+                            <system value="email"/>
+                            <value value="betrieb@gematik.de"/>
+                        </telecom>
+                    </contact>
+                </Organization>
+            </resource>
+        </part>
+    </parameter>
+</Parameters>

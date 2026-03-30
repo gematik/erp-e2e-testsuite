@@ -45,6 +45,7 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.CommunicationGetCommand;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
@@ -55,7 +56,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -63,14 +63,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication PagingTests")
 @Tag("Communication")
-public class GetCommunicationsWithPagingIT extends ErpTest {
+class GetCommunicationsWithPagingIT extends ErpTest {
 
   @Actor(name = "Hanna Bäcker")
   private static PatientActor patient;
@@ -87,10 +85,10 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
     return ArgumentComposer.composeWith()
         .arguments(
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPatientNamed("Hanna Bäcker"))
         .arguments(
             "Apotheke",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPharmacyNamed("Am Flughafen"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPharmacyNamed("Am Flughafen"))
         .create();
   }
 
@@ -128,15 +126,15 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
         .arguments(
             2,
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPatientNamed("Hanna Bäcker"))
         .arguments(
             1,
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPatientNamed("Hanna Bäcker"))
         .arguments(
             4,
             "Patient",
-            (Function<ErpTest, ErpActor>) (erpTest) -> erpTest.getPatientNamed("Hanna Bäcker"))
+            (Function<ErpTest, ErpActor>) erpTest -> erpTest.getPatientNamed("Hanna Bäcker"))
         .create();
   }
 
@@ -292,15 +290,11 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
   void shouldGetCommunicationsWithDifferentOffset(
       String actorType, Function<ErpTest, ErpActor> actorProvider) {
     val actor = actorProvider.apply(this);
-    val queries = IQueryParameter.search().sortedByDate(SortOrder.ASCENDING).createParameter();
+    val parameters =
+        IQueryParameter.search().withOffset(5).sortedByDate(SortOrder.ASCENDING).createParameter();
     val firstCall =
         actor.performs(
-            GetMessages.fromServerWith(
-                CommunicationSearch.withAdditionalQuery(
-                    IQueryParameter.search()
-                        .withOffset(5)
-                        .sortedByDate(SortOrder.ASCENDING)
-                        .createParameter())));
+            GetMessages.fromServerWith(CommunicationSearch.withAdditionalQuery(parameters)));
 
     val secondCall =
         actor.performs(
@@ -395,11 +389,20 @@ public class GetCommunicationsWithPagingIT extends ErpTest {
                         .withOffset(5)
                         .sortedByDate(SortOrder.ASCENDING)
                         .createParameter())));
+
+    // Note: this will prevent ArrayIndexOutOfBoundException, this test requires a proper
+    // pre-condition!
+    val communications = firstCall.getExpectedResponse().getCommunications();
+    val expected =
+        communications.size() > 9
+            ? firstCall.getExpectedResponse().getCommunications().get(9)
+            : new ErxCommunication(); // just a dummy because we don't have enough communications!
+
     actor.attemptsTo(
         Verify.that(secondBundleInteraction)
             .withExpectedType()
-            .and(
-                hasElementAtPosition(firstCall.getExpectedResponse().getCommunications().get(9), 4))
+            .has(minimumCountOfEntriesOf(10))
+            .and(hasElementAtPosition(expected, 4))
             .isCorrect());
   }
 

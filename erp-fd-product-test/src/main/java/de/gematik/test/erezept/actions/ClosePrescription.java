@@ -27,9 +27,11 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
+import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
+import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
@@ -57,6 +59,8 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
   @Nullable private final Date handedOver;
 
   private final List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>> fhirCloseMutators;
+  private final List<NamedEnvelope<FuzzingMutator<GemCloseOperationParameters>>>
+      closeOperationParameterMutators;
 
   @Override
   @Step("{0} dispensiert ein E-Rezept und schließt den Vorgang mit $close ab")
@@ -91,11 +95,16 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
     if (handedOver != null) {
       medicationDispenseBuilder.whenHandedOver(handedOver);
     }
-
+    kbvBundle
+        .getMedicationRequest()
+        .getDosageInstruction()
+        .forEach(dI -> medicationDispenseBuilder.dgmp(DosageDgMP.fromDosage(dI)));
     val medicationDispense = medicationDispenseBuilder.build();
     applyMutators(this.fhirCloseMutators, medicationDispense);
 
     val gemMedicationDispense = gemOperationBuilder.with(medicationDispense, medication).build();
+    applyClosMutators(this.closeOperationParameterMutators, gemMedicationDispense);
+
     val cmd = new CloseTaskCommand(taskId, secret, gemMedicationDispense);
 
     return this.performCommandAs(cmd, actor);
@@ -108,6 +117,18 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
         manipulator -> {
           Serenity.recordReportData().withTitle("Apply Mutator").andContents(manipulator.getName());
           manipulator.getParameter().accept(medicationDispense);
+        });
+  }
+
+  static void applyClosMutators(
+      List<NamedEnvelope<FuzzingMutator<GemCloseOperationParameters>>> mutators,
+      GemCloseOperationParameters closeOperationParameters) {
+    mutators.forEach(
+        manipulator -> {
+          Serenity.recordReportData()
+              .withTitle("Apply Close Mutator")
+              .andContents(manipulator.getName());
+          manipulator.getParameter().accept(closeOperationParameters);
         });
   }
 
@@ -126,6 +147,8 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
   public static class Builder {
     private final List<NamedEnvelope<FuzzingMutator<ErxMedicationDispense>>> fhirCloseMutators =
         new LinkedList<>();
+    private final List<NamedEnvelope<FuzzingMutator<GemCloseOperationParameters>>>
+        closeOperationParameterMutators = new LinkedList<>();
 
     public Builder performer(String telematikId) {
       return this.withResourceManipulator(
@@ -161,6 +184,12 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
       return this;
     }
 
+    public Builder withCloseResourceManipulator(
+        NamedEnvelope<FuzzingMutator<GemCloseOperationParameters>> mutator) {
+      this.closeOperationParameterMutators.add(mutator);
+      return this;
+    }
+
     public ClosePrescription acceptedWith(ErpInteraction<ErxAcceptBundle> interaction) {
       return acceptedWith(interaction.getExpectedResponse());
     }
@@ -181,7 +210,9 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
 
     public ClosePrescription acceptedWith(
         ErxAcceptBundle acceptBundle, Date prepareDate, Date handedOver) {
-      Object[] params = {acceptBundle, prepareDate, handedOver, fhirCloseMutators};
+      Object[] params = {
+        acceptBundle, prepareDate, handedOver, fhirCloseMutators, closeOperationParameterMutators
+      };
       return new Instrumented.InstrumentedBuilder<>(ClosePrescription.class, params).newInstance();
     }
   }

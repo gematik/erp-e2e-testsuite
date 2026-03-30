@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
@@ -35,11 +34,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
-@SetSystemProperty(
-    key = ERP_FHIR_PROFILES_TOGGLE,
-    value = "1.4.0") // before 1.4.0 EVDGA was not available
+/*@SetSystemProperty(
+key = ERP_FHIR_PROFILES_TOGGLE,
+value = "1.4.0") // before 1.4.0 EVDGA was not available*/
 class KbvHealthAppRequestBuilderTest extends ErpFhirParsingTest {
 
   @Test

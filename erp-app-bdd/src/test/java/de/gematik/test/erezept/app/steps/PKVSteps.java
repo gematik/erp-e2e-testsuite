@@ -23,24 +23,16 @@ package de.gematik.test.erezept.app.steps;
 import static de.gematik.test.erezept.screenplay.task.BillingInformationConsent.ConsentAction.fromString;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
-import de.gematik.test.erezept.app.abilities.HandleChargeItems;
 import de.gematik.test.erezept.app.task.DeleteChargeItem;
 import de.gematik.test.erezept.app.task.HandleChargeItemConsent;
 import de.gematik.test.erezept.app.task.VerifyChargeItemInMessages;
 import de.gematik.test.erezept.app.task.VerifyChargeItemInProfileSettings;
-import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
 
 public class PKVSteps {
-  @Angenommen("^(?:der|die) Versicherte (.+) kann Kostenbelege verwalten")
-  public void canHandleChargeItems(String patientName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    givenThat(thePatient).can(HandleChargeItems.forHerself());
-  }
-
   @Wenn(
       "^(?:der|die) Versicherte (.+) (?:seine|ihre) Einwilligung zum Speichern der"
           + " PKV-Abrechnungsinformationen über die App (erteilt|widerruft)$")

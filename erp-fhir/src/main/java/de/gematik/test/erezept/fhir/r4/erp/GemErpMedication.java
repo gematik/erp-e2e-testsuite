@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.PACKAGING_SIZE;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
@@ -31,10 +32,14 @@ import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
+import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProdBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationBuilder;
 import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.math.BigDecimal;
@@ -60,6 +65,65 @@ public class GemErpMedication extends Medication implements ErpFhirResource {
 
   public static GemErpMedication fromMedication(Resource adaptee) {
     return fromMedication((Medication) adaptee);
+  }
+
+  /**
+   * this Method mocks the second medication in KombiPackung by duplicate the first one
+   *
+   * @param medication
+   * @return GemMedication containing 2 medications
+   */
+  public static GemErpMedication getKombipackungFrom(KbvErpMedication medication) {
+    return getKombipackungFrom(medication, medication);
+  }
+
+  public static GemErpMedication getKombipackungFrom(
+      KbvErpMedication medication1, KbvErpMedication medication2) {
+
+    val ingredientItemCoding1 =
+        medication1.getIngredientFirstRep().getItemCodeableConcept().getCoding().stream()
+            .findFirst()
+            .orElseGet(() -> ATC.from("R01AC03").asCoding().setDisplay("Natriumcromoglicat"));
+
+    val ingredientItemCoding2 =
+        medication2.getIngredientFirstRep().getItemCodeableConcept().getCoding().stream()
+            .findFirst()
+            .orElseGet(() -> ATC.from("R01AC03").asCoding().setDisplay("Natriumcromoglicat"));
+
+    val kombiPkgBuilder =
+        GemErpMedicationBuilder.forKombiPckg()
+            .containedMedications(
+                EpaPharmaceuticalProdBuilder.builder()
+                    .withoutVersion()
+                    .codingText(medication1.getMedicationName())
+                    .ingredientComponent(
+                        GemEpaIngredientComponentBuilder.builder()
+                            .ingredientCodingText(medication1.getIngredientText().orElse(null))
+                            .ingredienCoding(ingredientItemCoding1.setVersion("2026"))
+                            .ingredientStrength(medication1.getIngredientFirstRep().getStrength())
+                            .build())
+                    .build(),
+                EpaPharmaceuticalProdBuilder.builder()
+                    .withoutVersion()
+                    .codingText(medication2.getMedicationName())
+                    .ingredientComponent(
+                        GemEpaIngredientComponentBuilder.builder()
+                            .ingredientCodingText(medication2.getIngredientText().orElse(null))
+                            .ingredienCoding(ingredientItemCoding2.setVersion("2026"))
+                            .ingredientStrength(medication2.getIngredientFirstRep().getStrength())
+                            .build())
+                    .build())
+            .packagingSize(
+                medication1.getAmount().getNumerator().getExtension().stream()
+                    .filter(PACKAGING_SIZE::matches)
+                    .map(ex -> ex.getValue().castToString(ex.getValue()).getValue())
+                    .findFirst()
+                    .orElse(null))
+            .amountNumUnit(medication1.getAmount().getNumerator().getUnit());
+    medication1.getFreeTextOptional().ifPresent(kombiPkgBuilder::formText);
+    medication1.getPznOptional().ifPresent(kombiPkgBuilder::pzn);
+
+    return kombiPkgBuilder.build();
   }
 
   public Optional<EpaDrugCategory> getCategory() {

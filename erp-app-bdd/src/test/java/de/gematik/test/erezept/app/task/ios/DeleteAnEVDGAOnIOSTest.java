@@ -74,7 +74,7 @@ class DeleteAnEVDGAOnIOSTest {
     assertDoesNotThrow(() -> theAppUser.attemptsTo(deleteAnEVDGA));
 
     verify(app, times(1)).tap(EVDGADetails.DIGA_THREE_DOT_MENU);
-    verify(app, times(1)).tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
+    verify(app, times(1)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     verify(app, times(1)).waitUntilElementIsVisible(Mainscreen.REFRESH_BUTTON, 60000);
   }
 

@@ -61,7 +61,7 @@ public class DoctorsController {
   @POST
   @Path("{doctorId}/xml/prescribe")
   @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_XML)
+  @Consumes({MediaType.APPLICATION_XML, "application/fhir+xml"})
   public Response issuePrescription(
       @PathParam("doctorId") String doctorId,
       @DefaultValue("false") @QueryParam("direct") boolean isDirectAssignment,
@@ -79,7 +79,7 @@ public class DoctorsController {
   @POST
   @Path("{doctorId}/xml/evdga")
   @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_XML)
+  @Consumes({MediaType.APPLICATION_XML, "application/fhir+xml"})
   public Response issueDiGAPrescription(
       @PathParam("doctorId") String doctorId, String evdgaBundle) {
     val doctor = actors.getDoctorOrThrowNotFound(doctorId);

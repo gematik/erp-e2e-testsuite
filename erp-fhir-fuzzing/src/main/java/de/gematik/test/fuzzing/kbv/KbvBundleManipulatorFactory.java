@@ -1117,12 +1117,12 @@ public class KbvBundleManipulatorFactory {
                     .orElseThrow()));
     manipulators.add(
         NamedEnvelope.of(
-            "coverage.Payors system to SER",
+            "coverage.Payors system to SER_EXTENSION",
             b ->
                 b.getCoverage()
                     .getPayorFirstRep()
                     .getIdentifier()
-                    .setSystem(SER.getCanonicalUrl())));
+                    .setSystem(KbvItaForStructDef.SER_EXTENSION.getCanonicalUrl())));
 
     return manipulators;
   }

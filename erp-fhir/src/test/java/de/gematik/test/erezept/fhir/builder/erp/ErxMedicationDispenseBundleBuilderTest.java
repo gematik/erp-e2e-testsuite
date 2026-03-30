@@ -53,9 +53,8 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseFaker.builder()
+                    ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.getDefaultVersion())
                         .withKvnr(kvnr)
-                        .withVersion(ErpWorkflowVersion.getDefaultVersion())
                         .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
                         .fake()));
@@ -72,9 +71,8 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
     val performerId = "3-SMC-B-Testkarte-883110000116873";
     val prescriptionId = PrescriptionId.from("160.000.006.741.854.62");
     val bundle =
-        ErxMedicationDispenseBundleFaker.build()
+        ErxMedicationDispenseBundleFaker.build(ErpWorkflowVersion.V1_4)
             .withAmount(2)
-            .version(ErpWorkflowVersion.V1_4)
             .withKvnr(kvnr)
             .withPerformerId(performerId)
             .withPrescriptionId(prescriptionId)
@@ -98,13 +96,11 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseFaker.builder()
+                    ErxMedicationDispenseFaker.builder(erpWorkflowVersion)
                         .withKvnr(kvnr)
                         .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
-                        .withVersion(erpWorkflowVersion)
-                        .withMedication(
-                            KbvErpMedicationPZNFaker.builder().withVersion(kbvItaErpVersion).fake())
+                        .withMedication(KbvErpMedicationPZNFaker.builder(kbvItaErpVersion).fake())
                         .fake()));
 
     val bundle = builder.build();

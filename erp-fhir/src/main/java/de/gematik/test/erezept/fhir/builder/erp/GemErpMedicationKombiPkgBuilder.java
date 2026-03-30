@@ -59,7 +59,7 @@ public class GemErpMedicationKombiPkgBuilder
   @Override
   public GemErpMedicationKombiPkgBuilder manufacturingInstruction(String instruction) {
     this.manufacInstruction = instruction;
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder containedMedications(
@@ -75,7 +75,7 @@ public class GemErpMedicationKombiPkgBuilder
             this.ingredientComponentList.add(
                 new Medication.MedicationIngredientComponent(
                     new Reference(format("#{0}", phPr.getId())))));
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder containedAtcMedications(List<ATC> atcList) {
@@ -85,42 +85,48 @@ public class GemErpMedicationKombiPkgBuilder
             medications.add(
                 EpaPharmaceuticalProdBuilder.builder().withoutVersion().atcCode(atc).build()));
     containedMedications(medications);
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder packagingSize(String packagingSize) {
+    amountNumerator = Long.parseLong(packagingSize);
     this.packagingSize = packagingSize;
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder pzn(PZN pzn) {
     this.codes.add(pzn.asCoding());
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder packaging(String packagingInExtensions) {
     this.packaging = packagingInExtensions;
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder amount(long numerator) {
     return this.amount(numerator, "Stk");
   }
 
+  public GemErpMedicationKombiPkgBuilder amountNumUnit(String unit) {
+    this.amountNumeratorUnit = unit;
+    return this;
+  }
+
   public GemErpMedicationKombiPkgBuilder amount(long numerator, String unit) {
     this.amountNumerator = numerator;
     this.amountNumeratorUnit = unit;
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder amountDenominator(long denominator) {
     this.amountDenominator = denominator;
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder codeText(String codeText) {
     this.codeText = codeText;
-    return self();
+    return this;
   }
 
   /**
@@ -133,11 +139,11 @@ public class GemErpMedicationKombiPkgBuilder
   public GemErpMedicationKombiPkgBuilder ingredientComponent(
       Medication.MedicationIngredientComponent ingredientComponent) {
     this.ingredientComponentList.add(ingredientComponent);
-    return self();
+    return this;
   }
 
   public GemErpMedicationKombiPkgBuilder formText(String formText) {
     this.formText = formText;
-    return self();
+    return this;
   }
 }

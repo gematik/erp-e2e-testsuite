@@ -28,6 +28,7 @@ import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerBuilder;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.AsvFachgruppennummer;
@@ -87,24 +88,30 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   public KbvPractitioner getPractitioner() {
-    if (isAsv) {
-      this.asvFachgruppennummer = AsvFachgruppennummer.from("555555013");
-      return getAsvPractitioner();
-    } else return getStandardPractitioner();
+    return getPractitioner(KbvItaForVersion.getDefaultVersion());
   }
 
-  private KbvPractitioner getAsvPractitioner() {
+  public KbvPractitioner getPractitioner(KbvItaForVersion forVersion) {
+    if (isAsv) {
+      this.asvFachgruppennummer = AsvFachgruppennummer.from("555555013");
+      return getAsvPractitioner(forVersion);
+    } else return getStandardPractitioner(forVersion);
+  }
+
+  private KbvPractitioner getAsvPractitioner(KbvItaForVersion forVersion) {
     return KbvPractitionerBuilder.builder()
+        .version(forVersion)
         .setId(practitionerId)
         .name(firstName, lastName, "Dr.")
         .addQualification(qualificationType)
         .addQualification(asvFachgruppennummer)
-        .addQualification("Super-Facharzt für alles Mögliche")
+        .addQualification("Super-ASV-Facharzt für alles Mögliche")
         .build();
   }
 
-  private KbvPractitioner getStandardPractitioner() {
+  private KbvPractitioner getStandardPractitioner(KbvItaForVersion forVersion) {
     return KbvPractitionerBuilder.builder()
+        .version(forVersion)
         .setId(practitionerId)
         .anr(doctorNumber)
         .name(firstName, lastName, "Dr.")
@@ -114,7 +121,12 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   public KbvMedicalOrganization getMedicalOrganization() {
+    return getMedicalOrganization(KbvItaForVersion.getDefaultVersion());
+  }
+
+  public KbvMedicalOrganization getMedicalOrganization(KbvItaForVersion forVersion) {
     return KbvMedicalOrganizationBuilder.builder()
+        .version(forVersion)
         .setId(medicationOrganizationId)
         .bsnr(bsnr)
         .phone(phone)

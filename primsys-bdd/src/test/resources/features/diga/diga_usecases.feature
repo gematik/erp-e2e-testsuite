@@ -32,7 +32,7 @@ Funktionalität: DiGA Anwendungsfälle
 
   @TCID:ERP_EE_WF162_03
   Szenariogrundriss: Ein Psychotherapeut verschreibt der Versicherten Hanna Bäcker ein EVDGA E-Rezept.
-    Der Kostenträger "AOK Bremen" akzeptiert und generiert den Freischaltcode und die Abgabeinformationen.
+  Der Kostenträger "AOK Bremen" akzeptiert und generiert den Freischaltcode und die Abgabeinformationen.
     Angenommen der Arzt <VerordnendeName> hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     Und der <VerordnendeRolle> <VerordnendeName> der Versicherten Hanna Bäcker ein EVDGA E-Rezept verschreibt
     Wenn die GKV Versicherte Hanna Bäcker ihr letztes ausgestelltes EVDGA E-Rezept ihrem Kostenträger AOK Bremen zuweist
@@ -45,7 +45,7 @@ Funktionalität: DiGA Anwendungsfälle
     Beispiele:
       | VerordnendeRolle                | VerordnendeName    |
       | Psychotherapeut                 | Finn Stauffenberg  |
-      | Psychologischer Psychotherapeut | Julian Böcher       |
+      | Psychologischer Psychotherapeut | Julian Böcher      |
       | Kinderpsychotherapeut           | Peter Kleinschmidt |
       | Arzt                            | Adelheid Ulmenwald |
       | Zahnarzt                        | Gündüla Gunther    |
@@ -92,15 +92,22 @@ Funktionalität: DiGA Anwendungsfälle
     Dann kann der Kostenträger AOK Bremen das letzte akzeptierte EVDGA zurückweisen
     Und die GKV Versicherte Hanna Bäcker kann für die letzte EVDGA keinen Freischaltcode abrufen
 
-
+  @AFO-ID:A_27767-01
   @TCID:ERP_EE_WF162_09
   Szenario: Kostenträger darf kein Workflow 160 abrufen/akzeptieren
     Angenommen der Arzt Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
     Und der Arzt Adelheid Ulmenwald der Versicherten Hanna Bäcker ein apothekenpflichtiges Medikament verschreibt
-    Wenn die GKV Versicherte Hanna Bäcker ihr letztes ausgestelltes E-Rezept ihrem Kostenträger AOK Bremen zuweist
-    Dann kann der Kostenträger AOK Bremen das letzte E-Rezept der Versicherten Hanna Bäcker nicht akzeptieren
+    Und die Versicherte Hanna Bäcker ihr letztes ausgestelltes E-Rezept dem Kostenträger AOK Bremen via Data Matrix Code zuweist
+    Dann darf der Kostenträger AOK Bremen das letzte EVDGA E-Rezept der Versicherten Hanna Bäcker nicht beim Fachdienst akzeptieren
 
   @TCID:ERP_EE_WF162_10
+  Szenario: Kostenträger darf kein Workflow 160 zugewiesen werden
+    Angenommen der Arzt Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
+    Und der Arzt Adelheid Ulmenwald der Versicherten Hanna Bäcker ein apothekenpflichtiges Medikament verschreibt
+    Dann kann die GKV Versicherte Hanna Bäcker ihr letztes ausgestelltes E-Rezept ihrem Kostenträger AOK Bremen nicht zuweisen
+
+
+  @TCID:ERP_EE_WF162_11
   Szenario: Subscription für den Kostenträger
     Angenommen der Psychotherapeut Finn Stauffenberg hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
     Und der Kostenträger AOK Bremen sich beim E-Rezept Fachdienst registriert
@@ -108,7 +115,7 @@ Funktionalität: DiGA Anwendungsfälle
     Wenn die GKV Versicherte Hanna Bäcker ihr letztes ausgestelltes EVDGA E-Rezept ihrem Kostenträger AOK Bremen zuweist
     Dann wird der Kostenträger AOK Bremen über die neue Zuweisungen informiert
 
-  @TCID:ERP_EE_WF162_11
+  @TCID:ERP_EE_WF162_12
   Szenario: Kostenträger erklärt die Ablehnung der DiGA mit Hilfe des Fachdienstes
     Angenommen der Psychotherapeut Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
     Und der Psychotherapeut Adelheid Ulmenwald der Versicherten Hanna Bäcker ein EVDGA E-Rezept verschreibt
@@ -119,3 +126,17 @@ Funktionalität: DiGA Anwendungsfälle
     Und die GKV Versicherte Hanna Bäcker kann für die letzte EVDGA Verordnung Informationen vom Kostenträger AOK Bremen im FdV einsehen
 
 
+  @TCID:ERP_EE_WF162_13
+  @TESTFALL:positiv
+  @Funktionalität:Subscription
+  @Hauptdarsteller:Krankenkasse
+  Szenario: Benachrichtigung des Kostenträgers beim Eingang einer neuen Anfrage
+
+    Angenommen der Psychotherapeut Adelheid Ulmenwald hat Zugriff auf seinen HBA und auf die SMC-B der Praxis
+    Und der Psychotherapeut Adelheid Ulmenwald der Versicherten Hanna Bäcker ein EVDGA E-Rezept verschreibt
+    Wenn der Kostenträger AOK Bremen sich für die Subscription Communication registriert
+    Und der Kostenträger AOK Bremen sich mit dem Subscription Service verbindet
+    Und die GKV Versicherte Hanna Bäcker ihr letztes ausgestelltes EVDGA E-Rezept ihrem Kostenträger AOK Bremen zuweist
+    Dann wird der Kostenträger AOK Bremen durch den Subscription Service informiert
+    Dann kann der Kostenträger AOK Bremen das letzte EVDGA E-Rezept der Versicherten Hanna Bäcker akzeptieren
+    Und der Kostenträger AOK Bremen kann für die letzte EVDGA der Versicherten Hanna Bäcker Abgabeinformationen mit Freischaltcode bereitstellen

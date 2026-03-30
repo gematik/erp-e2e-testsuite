@@ -95,7 +95,7 @@ public class MedicationRequestDataMapper
             .medication(medication)
             .dosage(dto.getDosage())
             .note(dto.getNote())
-            .quantityPackages(dto.getPackageQuantity())
+            .dispenseRequestQuantity(dto.getPackageQuantity())
             .status("active")
             .intent("order")
             .isBVG(dto.isBvg())

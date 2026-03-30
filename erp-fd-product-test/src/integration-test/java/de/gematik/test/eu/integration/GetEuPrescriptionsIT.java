@@ -22,6 +22,7 @@ package de.gematik.test.eu.integration;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErxEuPrescriptionVerifier.*;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
 import static org.hl7.fhir.r4.model.Task.TaskStatus.INPROGRESS;
 
@@ -361,14 +362,23 @@ class GetEuPrescriptionsIT extends ErpTest {
     } else {
       bundleBehavior = bundleNotContainsPrescription(prescriptionId);
     }
-
-    hannesVogt.attemptsTo(
-        Verify.that(euPrescriptions)
-            .withExpectedType()
-            .hasResponseWith(returnCode(200))
-            .and(bundleBehavior)
-            .isCorrect());
-
+    if (!euPrescriptions.isOfExpectedType() && !expectedInResult) {
+      hannesVogt.attemptsTo(
+          Verify.that(euPrescriptions)
+              .withOperationOutcome()
+              .hasResponseWith(returnCode(404))
+              .and(
+                  operationOutcomeHasDetailsText(
+                      "Keine einlösbaren Rezepte gefunden", ErpAfos.A_27066))
+              .isCorrect());
+    } else {
+      hannesVogt.attemptsTo(
+          Verify.that(euPrescriptions)
+              .withExpectedType()
+              .hasResponseWith(returnCode(200))
+              .and(bundleBehavior)
+              .isCorrect());
+    }
     // houseKeeping
     sina.performs(TaskAbort.asPatient(activation.getExpectedResponse()));
   }
@@ -408,14 +418,24 @@ class GetEuPrescriptionsIT extends ErpTest {
         expectedInResult
             ? bundleContainsPrescription(prescriptionId, 1)
             : bundleNotContainsPrescription(prescriptionId);
-
-    hannesVogt.attemptsTo(
-        Verify.that(euPrescriptions)
-            .withExpectedType()
-            .hasResponseWith(returnCode(200))
-            .and(bundleContains)
-            .isCorrect());
-    sina.performs(TaskAbort.asPatient(activation.getExpectedResponse()));
+    if (!euPrescriptions.isOfExpectedType() && !expectedInResult) {
+      hannesVogt.attemptsTo(
+          Verify.that(euPrescriptions)
+              .withOperationOutcome()
+              .hasResponseWith(returnCode(404))
+              .and(
+                  operationOutcomeHasDetailsText(
+                      "Keine einlösbaren Rezepte gefunden", ErpAfos.A_27066))
+              .isCorrect());
+    } else {
+      hannesVogt.attemptsTo(
+          Verify.that(euPrescriptions)
+              .withExpectedType()
+              .hasResponseWith(returnCode(200))
+              .and(bundleContains)
+              .isCorrect());
+      sina.performs(TaskAbort.asPatient(activation.getExpectedResponse()));
+    }
   }
 
   @Test
@@ -456,7 +476,7 @@ class GetEuPrescriptionsIT extends ErpTest {
   @MethodSource(
       "de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer#workflowPharmacyOnlyAndAlternativeMedicationComposer")
   @DisplayName("Abfrage einer e-Rezeptur für Compounding-, Freitext- und Rezepturverordnung")
-  void shouldFailWhileTryingToGetUnsupportedPrescriptionsVariationsInOtherEuropeanCounties(
+  void shouldFailWhileTryingToPatchUnsupportedPrescriptionsVariationsToOtherEuropeanCounties(
       InsuranceTypeDe insuranceType,
       PrescriptionFlowType expectedFlowTypeForDescription,
       String medicationType) {
@@ -472,23 +492,36 @@ class GetEuPrescriptionsIT extends ErpTest {
 
     sina.changePatientInsuranceType(insuranceType);
     sina.attemptsTo(EnsureEuConsent.shouldBePresent());
+
     sina.performs(
         PatchPrescriptionForEuRedemption.of(activation.getExpectedResponse().getTaskId()));
 
-    val acessPermission =
+    val accessPermission =
         sina.performs(GrantEuAccessPermission.withRandomAccessCode().forCountryOf(hannesVogt));
 
-    val euAccessCode = acessPermission.getExpectedResponse().getAccessCode();
+    val euAccessCode = accessPermission.getExpectedResponse().getAccessCode();
     val euPrescriptions =
         hannesVogt.performs(GetEuPrescriptions.forPatient(sina).withAccessCode(euAccessCode));
 
-    hannesVogt.attemptsTo(
-        Verify.that(euPrescriptions)
-            .withExpectedType()
-            .hasResponseWith(returnCode(200))
-            .and(
-                bundleNotContainsPrescription(activation.getExpectedResponse().getPrescriptionId()))
-            .isCorrect());
+    if (euPrescriptions.isOfExpectedType()) {
+      hannesVogt.attemptsTo(
+          Verify.that(euPrescriptions)
+              .withExpectedType()
+              .hasResponseWith(returnCode(200))
+              .and(
+                  bundleNotContainsPrescription(
+                      activation.getExpectedResponse().getPrescriptionId()))
+              .isCorrect());
+    } else {
+      hannesVogt.attemptsTo(
+          Verify.that(euPrescriptions)
+              .withOperationOutcome()
+              .hasResponseWith(returnCode(404))
+              .and(
+                  operationOutcomeHasDetailsText(
+                      "Keine einlösbaren Rezepte gefunden", ErpAfos.A_27066))
+              .isCorrect());
+    }
     sina.performs(TaskAbort.asPatient(activation.getExpectedResponse()));
   }
 

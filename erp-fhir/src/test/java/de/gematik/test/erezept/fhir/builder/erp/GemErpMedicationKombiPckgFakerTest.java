@@ -267,7 +267,7 @@ class GemErpMedicationKombiPckgFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetVersionPositively() {
-    val faker = GemErpMedicationFaker.forKombiPkg().withVersion(ErpWorkflowVersion.V1_5);
+    val faker = GemErpMedicationFaker.forKombiPkg(ErpWorkflowVersion.V1_5);
     val medication = faker.fake();
     assertTrue(parser.isValid(medication));
     assertTrue(medication.getMeta().getProfile().get(0).getValue().endsWith("1.5"));
@@ -275,8 +275,7 @@ class GemErpMedicationKombiPckgFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetVersionNegatively() {
-    val faker =
-        GemErpMedicationFaker.forKombiPkg().withVersion(ErpWorkflowVersion.getDefaultVersion());
+    val faker = GemErpMedicationFaker.forKombiPkg(ErpWorkflowVersion.getDefaultVersion());
     val medication = faker.fake();
     assertTrue(parser.isValid(medication));
   }
@@ -315,7 +314,6 @@ class GemErpMedicationKombiPckgFakerTest extends ErpFhirParsingTest {
             .withVaccine(true)
             .withAsk(ask)
             .withAtc(atc)
-            .withVersion(ErpWorkflowVersion.getDefaultVersion())
             .withIngredientWithContainedAtc(1, 2, atc)
             .withPzn(pzn);
     val medication = faker.fake();

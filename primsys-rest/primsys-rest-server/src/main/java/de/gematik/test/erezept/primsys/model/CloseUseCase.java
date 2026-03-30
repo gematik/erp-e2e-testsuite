@@ -20,12 +20,15 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
+import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import jakarta.ws.rs.core.Response;
+import java.util.Date;
 import java.util.List;
 import lombok.val;
 
@@ -68,6 +71,41 @@ public class CloseUseCase extends AbstractDispensingUseCase {
 
     val dispensedData =
         this.storeDispensedMedication(prescriptionId, secret, accepted, body.getId(), medications);
+    this.ctx.getContextData().removeAcceptedPrescription(prescriptionId);
+    return Response.status(closeResponse.getStatusCode()).entity(dispensedData).build();
+  }
+
+  public Response closePrescriptionWithParameters(
+      String prescriptionId, String secret, String closeOperationInput) {
+    val accepted = this.getAcceptedPrescription(prescriptionId);
+    val fhirParams = pharmacy.decode(GemCloseOperationParameters.class, closeOperationInput);
+
+    // adjust the fhir params
+    fhirParams
+        .getMedicationDispenses()
+        .forEach(
+            md -> {
+              md.getIdentifierFirstRep().setValue(prescriptionId); // adjust the prescription ID
+              md.getSubject().getIdentifier().setValue(accepted.getForKvnr()); // adjust the KVNR
+              md.getPerformerFirstRep()
+                  .getActor()
+                  .getIdentifier()
+                  .setValue(pharmacy.getSmcb().getTelematikId());
+              md.setWhenHandedOver(new Date());
+            });
+
+    val cmd = new CloseTaskCommand(TaskId.from(prescriptionId), Secret.from(secret), fhirParams);
+    val closeResponse = pharmacy.erpRequest(cmd);
+    val body = closeResponse.getExpectedResource();
+
+    // Note: stored dispensation won't contain medication details when closed via parameters ->
+    // empty list
+    // this would require a complex refactoring to extract medication details from the parameters
+    // Erpione will handle this properly in the future
+    val dispensedData =
+        this.storeDispensedMedication(
+            prescriptionId, Secret.from(secret), accepted, body.getId(), List.of());
+    this.ctx.getContextData().removeAcceptedPrescription(prescriptionId);
     return Response.status(closeResponse.getStatusCode()).entity(dispensedData).build();
   }
 }

@@ -41,10 +41,7 @@ class KbvErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
 
   @Test
   void buildFakerKbvErpMedicationIngredientWithVersion() {
-    val ingredient =
-        KbvErpMedicationIngredientFaker.builder()
-            .withVersion(KbvItaErpVersion.getDefaultVersion())
-            .fake();
+    val ingredient = KbvErpMedicationIngredientFaker.builder().fake();
     val result = ValidatorUtil.encodeAndValidate(parser, ingredient);
     assertTrue(result.isSuccessful());
   }
@@ -52,7 +49,7 @@ class KbvErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakerKbvErpMedicationIngredientWithCategory() {
     val ingredient =
-        KbvErpMedicationIngredientFaker.builder()
+        KbvErpMedicationIngredientFaker.builder(KbvItaErpVersion.getDefaultVersion())
             .withCategory(fakerValueSet(MedicationCategory.class))
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, ingredient);

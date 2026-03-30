@@ -39,19 +39,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
+import org.apache.jena.sparql.function.library.version;
 import org.hl7.fhir.r4.model.Quantity;
 
 public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
 
+  private final ErpWorkflowVersion version;
   private final Map<String, Consumer<GemErpMedicationIngredientBuilder>> builderConsumers =
       new HashMap<>();
   private String askKey = "ask";
   private String snomedKey = "snomed";
   private String atcKey = "atc";
 
-  public GemErpMedicationIngredientFaker() {
-
-    withVersion(ErpWorkflowVersion.getDefaultVersion());
+  protected GemErpMedicationIngredientFaker(ErpWorkflowVersion version) {
+    this.version = version;
 
     if (fakerBool()) {
       withAsk(ASK.from(GemFaker.fakerBsnr()));
@@ -62,10 +63,10 @@ public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
 
     if (fakerBool()) withSnomed(GemFaker.fakerPhone());
     if (fakerBool())
-      withIngredientWithContainedAtc(
+      withIngredientWithContainedAsk(
           getFaker().random().nextInt(1, 1000),
           getFaker().random().nextInt(1, 10),
-          ATC.from(getRandomFourDigitsCode()));
+          ASK.from(getRandomFourDigitsCode()));
     if (fakerBool()) withDrugCategory(fakerValueSet(EpaDrugCategory.class));
     if (fakerBool()) withStandardSize(StandardSize.random());
 
@@ -114,12 +115,12 @@ public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
   public GemErpMedicationIngredientFaker withAtc(ATC atc) {
     // to set more than one ATC Codings (Set up a List of Codings) the key will be appended
     if (builderConsumers.containsKey(atcKey)) atcKey = atcKey + "+1";
-    builderConsumers.put(atcKey, b -> b.atc(atc));
-    return this;
-  }
-
-  public GemErpMedicationIngredientFaker withVersion(ErpWorkflowVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
+    val newAtc =
+        ATC.from(
+            atc.getValue(),
+            GemFaker.getFaker().starTrek().specie(),
+            GemFaker.getFaker().funnyName().name());
+    builderConsumers.put(atcKey, b -> b.atc(newAtc));
     return this;
   }
 
@@ -143,14 +144,14 @@ public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
    *
    * @param numerator of the ingredient strength
    * @param denominator of the ingredient strength
-   * @param atc as contained coding of the ingredient
+   * @param ask as contained coding of the ingredient
    * @return GemErpMedicationIngredientFaker
    */
-  public GemErpMedicationIngredientFaker withIngredientWithContainedAtc(
-      int numerator, int denominator, ATC atc) {
+  public GemErpMedicationIngredientFaker withIngredientWithContainedAsk(
+      int numerator, int denominator, ASK ask) {
     builderConsumers.put(
         "ingredientComponentList",
-        b -> b.ingredientComponent(buildIngredient(numerator, denominator, atc)));
+        b -> b.ingredientComponent(buildIngredient(numerator, denominator, ask)));
     return this;
   }
 
@@ -178,17 +179,17 @@ public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
     return this.toBuilder().build();
   }
 
-  private GemErpIngredientComponent buildIngredient(int num, int denom, ATC atc) {
+  private GemErpIngredientComponent buildIngredient(int num, int denom, ASK ask) {
     return GemErpIngredientComponentBuilder.builder()
         .ingredientStrength(
             Quantity.fromUcum(String.valueOf(num), "mg"),
             Quantity.fromUcum(String.valueOf(denom), "mg"))
-        .atc(atc)
+        .ask(ask)
         .build();
   }
 
   public GemErpMedicationIngredientBuilder toBuilder() {
-    val builder = GemErpMedicationBuilder.forIngredient();
+    val builder = GemErpMedicationBuilder.forIngredient().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

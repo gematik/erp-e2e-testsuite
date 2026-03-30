@@ -37,13 +37,13 @@ import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class PharmacyCommunicationSteps {
 
-  @Wenn("^die Apotheke (.+) sich für die Subscription (.+) registriert$")
+  @Wenn("^(?:die Apotheke|der Kostenträger) (.+) sich für die Subscription (.+) registriert$")
   public void whenRegisterForSubscription(String pharmName, String criteria) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     when(thePharmacy).attemptsTo(RegisterNewSubscription.forCriteria(criteria));
   }
 
-  @Dann("^wird die Apotheke (.+) durch den Subscription Service informiert$")
+  @Dann("^wird (?:die Apotheke|der Kostenträger) (.+) durch den Subscription Service informiert$")
   public void hasSubscriptionPing(String pharmName) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy).attemptsTo(Ensure.that(HasNewSubscriptionPing.hasNewPing()).isTrue());

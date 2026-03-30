@@ -56,8 +56,8 @@ public class PharmacyCloseSteps {
     then(thePharmacy)
         .attemptsTo(
             ClosePrescription.fromStack(order)
-                .withAlternativeMedications(medications)
-                .forThePatient(thePatient));
+                .withPatient(thePatient)
+                .withAlternativeMedications(medications));
   }
 
   @Dann(

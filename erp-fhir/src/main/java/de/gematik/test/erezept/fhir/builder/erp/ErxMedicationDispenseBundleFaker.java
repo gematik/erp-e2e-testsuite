@@ -27,27 +27,29 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 
+@RequiredArgsConstructor
 public class ErxMedicationDispenseBundleFaker {
+  private final ErpWorkflowVersion erpWorkflowVersion;
+
   private int amount = fakerAmount();
   private KVNR kvnr = KVNR.random();
   private String performerId = fakerTelematikId();
   private PrescriptionId prescriptionId = PrescriptionId.random();
-  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
 
   public static ErxMedicationDispenseBundleFaker build() {
-    return new ErxMedicationDispenseBundleFaker();
+    return build(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  public static ErxMedicationDispenseBundleFaker build(ErpWorkflowVersion erpWorkflowVersion) {
+    return new ErxMedicationDispenseBundleFaker(erpWorkflowVersion);
   }
 
   public ErxMedicationDispenseBundleFaker withAmount(int amount) {
     this.amount = amount;
-    return this;
-  }
-
-  public ErxMedicationDispenseBundleFaker version(ErpWorkflowVersion version) {
-    this.erpWorkflowVersion = version;
     return this;
   }
 
@@ -71,16 +73,15 @@ public class ErxMedicationDispenseBundleFaker {
   }
 
   public ErxMedicationDispenseBundleBuilder toBuilder() {
-    val builder = ErxMedicationDispenseBundleBuilder.empty();
+    val builder = ErxMedicationDispenseBundleBuilder.empty().version(erpWorkflowVersion);
     IntStream.range(0, amount)
         .forEach(
             idx ->
                 builder.add(
-                    ErxMedicationDispenseFaker.builder()
+                    ErxMedicationDispenseFaker.builder(erpWorkflowVersion)
                         .withKvnr(kvnr)
                         .withPerformer(performerId)
                         .withPrescriptionId(prescriptionId)
-                        .withVersion(erpWorkflowVersion)
                         .fake()));
     return builder;
   }

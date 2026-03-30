@@ -69,7 +69,7 @@ public class ResourcePrinter {
   public void print(KbvHealthAppRequest healthApp) {
     ps.println(format("DiGA: {0}", healthApp.getName()));
     ps.println(format("\tPZN: {0}", healthApp.getPzn().getValue()));
-    ps.println(format("\tSER: {0}", healthApp.relatesToSocialCompensationLaw()));
+    ps.println(format("\tSER_EXTENSION: {0}", healthApp.relatesToSocialCompensationLaw()));
     ps.println(format("\tAccident: {0}", healthApp.hasAccidentExtension()));
   }
 

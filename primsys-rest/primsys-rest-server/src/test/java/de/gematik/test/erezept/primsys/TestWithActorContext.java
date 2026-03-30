@@ -45,6 +45,8 @@ import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -149,6 +151,8 @@ public abstract class TestWithActorContext extends ErpFhirParsingTest {
 
               // now mock the fhir parser back in
               when(erpClient.getFhir()).thenReturn(parser);
+              when(erpClient.getIdpTokenValidUntil())
+                  .thenReturn(Instant.now().plus(30, ChronoUnit.MINUTES));
               when(erpClient.encode(any(), any()))
                   .thenAnswer(
                       (Answer<String>)

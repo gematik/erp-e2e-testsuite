@@ -38,20 +38,21 @@ import lombok.val;
 public class PharmacyOrganizationFaker {
   private final Map<String, Consumer<PharmacyOrganizationBuilder>> builderConsumers =
       new HashMap<>();
+  private final AbdaErpPkvVersion abdaErpPkvVersionn;
 
-  private PharmacyOrganizationFaker() {
+  private PharmacyOrganizationFaker(AbdaErpPkvVersion version) {
+    this.abdaErpPkvVersionn = version;
     this.withIknr(IKNR.randomStringValue());
     this.withName(pharmacyName());
     this.withAddress(fakerCountry(), fakerCity(), fakerZipCode(), fakerStreetName());
   }
 
-  public static PharmacyOrganizationFaker builder() {
-    return new PharmacyOrganizationFaker();
+  public static PharmacyOrganizationFaker builder(AbdaErpPkvVersion version) {
+    return new PharmacyOrganizationFaker(version);
   }
 
-  public PharmacyOrganizationFaker withVersion(AbdaErpPkvVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+  public static PharmacyOrganizationFaker builder() {
+    return builder(AbdaErpPkvVersion.getDefaultVersion());
   }
 
   public PharmacyOrganizationFaker withName(String name) {
@@ -83,7 +84,7 @@ public class PharmacyOrganizationFaker {
   }
 
   public PharmacyOrganizationBuilder toBuilder() {
-    val builder = PharmacyOrganizationBuilder.builder();
+    val builder = PharmacyOrganizationBuilder.builder().version(abdaErpPkvVersionn);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

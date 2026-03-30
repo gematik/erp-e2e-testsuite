@@ -23,10 +23,12 @@ package de.gematik.test.erezept.eml.fhir.r4.componentbuilder;
 import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.INGREDIENT_DARREICHUNGSFORM;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
+import java.math.BigDecimal;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -177,5 +179,27 @@ class GemEpaIngredientComponentBuilderTest extends EpaFhirParsingTest {
         () ->
             ((CodeableConcept) ingredient.getItem())
                 .getCoding().stream().map(Coding::getCode).findFirst().orElseThrow());
+  }
+
+  @Test
+  void shouldBuildCorrectWithIngredientStrengthSetter() {
+    var ingred =
+        GemEpaIngredientComponentBuilder.builder()
+            .ingredientStrength(5, 2, "mg", "ml")
+            .ingredienCoding(ASK.from("askC0de"))
+            .ingredienCoding(ATC.from("atc-Code").asCoding(), PZN.from("Pzn-Code").asCoding())
+            .build();
+    assertEquals(new BigDecimal(5), ingred.getStrength().getNumerator().getValue());
+    assertEquals(new BigDecimal(2), ingred.getStrength().getDenominator().getValue());
+    assertEquals("mg", ingred.getStrength().getNumerator().getCode());
+    assertEquals("ml", ingred.getStrength().getDenominator().getCode());
+    assertEquals(
+        "askC0de",
+        ((CodeableConcept) ingred.getItem())
+            .getCoding().stream()
+                .filter(DeBasisProfilCodeSystem.ASK::matches)
+                .findFirst()
+                .orElseThrow()
+                .getCode());
   }
 }

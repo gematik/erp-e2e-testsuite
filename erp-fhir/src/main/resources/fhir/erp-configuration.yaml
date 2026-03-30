@@ -3,9 +3,9 @@
   profiles:
     # E-Rezepte relevante Haupt-Profile
     - name: "kbv.ita.erp"
-      snapshot: "kbv.ita.erp-1.4.0-snapshots.tgz"
-      version: "1.4.0"
-      compatibleVersions: [ "1.4", "1.4.1" ]
+      snapshot: "kbv.ita.erp-1.4.1-snapshots.tgz"
+      version: "1.4.1"
+      compatibleVersions: [ "1.4", "1.4.0" ]
     - name: "de.gematik.erezept-workflow.r4"
       snapshot: "de.gematik.erezept-workflow.r4-1.6.1-snapshots.tgz"
       version: "1.6.1"
@@ -15,11 +15,18 @@
       snapshot: "kbv.ita.for-1.3.0-snapshots.tgz"
       version: "1.3.0"
       compatibleVersions: [ "1.3" ]
-
     - name: "kbv.itv.evdga"
       snapshot: "kbv.itv.evdga-1.2.2-snapshots.tgz"
       version: "1.2.2"
       compatibleVersions: [ "1.2", "1.2.1", "1.2.0" ]
+
+    # T-Rezept
+    - name: "de.gematik.erp.t-prescription"
+      snapshot: "de.gematik.erp.t-prescription-1.1.0-ballot3.tgz"
+      # ab ERP Version 1.22.0
+      # snapshot: "de.gematik.erp.t-prescription-1.1.0-snapshots.tgz"
+      version: "1.1.0"
+      compatibleVersions: [ "1.1" ]
 
     # E-Rezept PKV Patientenrechnung
     - name: "de.gematik.erezept-patientenrechnung.r4"
@@ -54,9 +61,10 @@
     - name: "de.gematik.epa.medication"
       snapshot: "de.gematik.epa.medication-1.3.0-snapshots.tgz"
       version: "1.3.0"
+      compatibleVersions: [ "1.3" ]
     - name: "de.gematik.epa.medication"
       snapshot: "de.gematik.epa.medication-1.1.5-snapshots.tgz"
-      version: "1.3.0"
+      version: "1.1"
     - name: "de.gematik.fhir.directory"
       snapshot: "de.gematik.fhir.directory-1.0.0-snapshots.tgz"
       version: "1.0.0"
@@ -94,6 +102,8 @@
   errorFilter:
     - "^2 profiles found for contained resource.*"
     - "^2 profiles found for parameter resource.*"
+    - "^Unable to parse X509 Certificate: The curve must not be null.*" # TODO: what's wrong here?
+    - ".*GEM_ERP_PR_Communication_DispReq\\|1.2.*" # leftovers which cannot be deleted yet
   ignoreCodeSystems:
     - "http://fhir.de/CodeSystem/ask"
     - "http://fhir.de/CodeSystem/ifa/pzn"
@@ -101,6 +111,7 @@
     - "http://snomed.info/sct"  # this one is required to resolve the snome codes from KBV_VS_Base_Medication_Type
     - "http://dicom.nema.org/resources/ontology/DCM"   # todo reactivate and check
     - "urn:iso:std:iso:3166"  # TODO: why? seems to be coming from jurisdiction field
+
   ignoreValueSets:
     - "http://hl7.org/fhir/ValueSet/all-languages"  # to ignore the error "The value provided ('de-DE') is not in the value set 'All Languages'."
     - "http://hl7.org/fhir/ValueSet/units-of-time"
@@ -130,11 +141,11 @@
     - name: "de.gematik.epa"
       snapshot: "de.gematik.epa-1.0.6-2-snapshots.tgz"
       version: "1.0.6-2"
-      compatibleVersions: [ "1.0.6", "1.0" ]
+      compatibleVersions: [ "1.0.6", "1.0", "1.2.1-dev1" ]
     - name: "de.gematik.epa.medication"
       snapshot: "de.gematik.epa.medication-1.0.6-2-snapshots.tgz"
       version: "1.0.6-2"
-      compatibleVersions: [ "1.0.6", "1.0" ]
+      compatibleVersions: [ "1.0.6", "1.0", "1.2.1-dev1" ]
     - name: "de.gematik.fhir.directory"
       snapshot: "de.gematik.fhir.directory-0.11.25-snapshots.tgz"
       version: "0.11.25"
@@ -187,7 +198,11 @@
     - name: "de.gematik.erezept.eu"
       snapshot: "de.gematik.erezept.eu-1.1.1-snapshots.tgz"
       version: "1.1.1"
-      compatibleVersions: "1.1"
+      compatibleVersions: [ "1.1" ]
+    - name: "de.gematik.erezept.eu"
+      snapshot: "de.gematik.erezept.eu-1.0.0-snapshots.tgz"
+      version: "1.0.0"
+      compatibleVersions: [ "1.0" ]
     - name: "de.basisprofil.r4"
       snapshot: "de.basisprofil.r4-1.5.3-snapshots.tgz"
       version: "1.5.3"

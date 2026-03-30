@@ -164,7 +164,7 @@ class PrescriptionTests {
     verify(app, times(1)).tap(Receipt.ARCHIVED_PRESCRIPTIONS_BTN);
 
     verify(app, times(2)).tap(REDEEMED_PRESCRIPTION_STATUS_LABEL);
-    verify(app, times(2)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
+    verify(app, times(2)).tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
     verify(app, times(2)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     verify(app, times(2)).acceptAlert();
 
@@ -193,8 +193,8 @@ class PrescriptionTests {
     verify(app, times(3)).tap(Mainscreen.REFRESH_BUTTON);
 
     verify(app, times(2)).tap(Receipt.REDEEMABLE_PRESCRIPTION_CARD_BUTTON);
-    verify(app, times(2)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
-    verify(app, times(2)).tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
+    verify(app, times(2)).tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
+    verify(app, times(2)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     verify(app, times(2)).acceptAlert();
   }
 
@@ -204,7 +204,7 @@ class PrescriptionTests {
     val actor = OnStage.theActorCalled(userName);
     val app = actor.abilityTo(UseIOSApp.class);
     assertDoesNotThrow(() -> actor.attemptsTo(task));
-    verify(app, times(1)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
+    verify(app, times(1)).tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
     verify(app, times(1)).tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     verify(app, times(1)).acceptAlert();
   }

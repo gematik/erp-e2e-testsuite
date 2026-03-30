@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.client.usecases;
 
 import de.gematik.bbriccs.rest.HttpRequestMethod;
+import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
@@ -29,17 +30,7 @@ public class ConsentGetCommand extends BaseCommand<ErxConsentBundle> {
 
   public ConsentGetCommand() {
     super(ErxConsentBundle.class, HttpRequestMethod.GET, "Consent");
-  }
-
-  /**
-   * This method returns the last (tailing) part of the URL of the inner-HTTP Request e.g.
-   * /Task/[id] or /Communication?[queryParameter]
-   *
-   * @return the tailing part of the URL which combines to full URL like [baseUrl][tailing Part]
-   */
-  @Override
-  public String getRequestLocator() {
-    return this.getResourcePath();
+    this.queryParameters.add(new QueryParameter("category", "CHARGCONS"));
   }
 
   /**

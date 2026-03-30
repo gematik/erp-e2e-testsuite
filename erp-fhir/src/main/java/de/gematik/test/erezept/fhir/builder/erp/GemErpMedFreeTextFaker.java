@@ -32,11 +32,12 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class GemErpMedFreeTextFaker implements GemErpMedicationFaker {
-
+  private final ErpWorkflowVersion version;
   private final Map<String, Consumer<GemErpMedFreeTextBuilder>> builderConsumers = new HashMap<>();
 
-  public GemErpMedFreeTextFaker() {
-    withVersion(ErpWorkflowVersion.getDefaultVersion());
+  protected GemErpMedFreeTextFaker(ErpWorkflowVersion version) {
+    this.version = version;
+
     if (fakerBool()) {
       withCodeText(GemFaker.getFaker().chuckNorris().fact());
     }
@@ -64,11 +65,6 @@ public class GemErpMedFreeTextFaker implements GemErpMedicationFaker {
     return this;
   }
 
-  public GemErpMedFreeTextFaker withVersion(ErpWorkflowVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
-  }
-
   public GemErpMedFreeTextFaker withDrugCategory(EpaDrugCategory category) {
     builderConsumers.put("category", b -> b.category(category));
     return this;
@@ -89,7 +85,7 @@ public class GemErpMedFreeTextFaker implements GemErpMedicationFaker {
   }
 
   public GemErpMedFreeTextBuilder toBuilder() {
-    val builder = GemErpMedicationBuilder.forFreeText();
+    val builder = GemErpMedicationBuilder.forFreeText().version(version);
     if (!builderConsumers.containsKey("codeText")) {
       withCodeText(GemFaker.getFaker().chuckNorris().fact());
     }

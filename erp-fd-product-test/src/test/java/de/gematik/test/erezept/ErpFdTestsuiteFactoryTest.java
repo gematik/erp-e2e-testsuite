@@ -20,33 +20,21 @@
 
 package de.gematik.test.erezept;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.abilities.OCSPAbility;
-import de.gematik.test.erezept.abilities.RawHttpAbility;
-import de.gematik.test.erezept.abilities.TSLAbility;
-import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
-import de.gematik.test.erezept.actors.DoctorActor;
-import de.gematik.test.erezept.actors.EuPharmacyActor;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.abilities.*;
+import de.gematik.test.erezept.actors.*;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -100,6 +88,38 @@ class ErpFdTestsuiteFactoryTest {
 
     assertDoesNotThrow(() -> config.equipWithEpaMockClient(actor));
     assertNotNull(actor.abilityTo(UseTheEpaMockClient.class));
+  }
+
+  @Test
+  void shouldEquipActorWithTRegisterMockClient() {
+    val actor = new GemaTestActor("Holly Goodhead");
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertDoesNotThrow(() -> config.equipWithTPrescriptionMockClient(actor));
+    assertNotNull(actor.abilityTo(UseTheTRegisterMockClient.class));
+  }
+
+  @Test
+  void shouldEquipActorWithTRegisterMockClientWhenProxyIsSet() {
+    val actor = new GemaTestActor("Holly Goodhead");
+    val config = ErpFdTestsuiteFactory.create();
+
+    System.setProperty("https.gematikProxy", "localhost");
+
+    try {
+      assertDoesNotThrow(() -> config.equipWithTPrescriptionMockClient(actor));
+      assertNotNull(actor.abilityTo(UseTheTRegisterMockClient.class));
+    } finally {
+      System.clearProperty("https.gematikProxy");
+    }
+  }
+
+  @Test
+  void shouldEquipActorWithFhirValidator() {
+    val actor = new GemaTestActor("Holly Goodhead");
+    val config = ErpFdTestsuiteFactory.create();
+
+    assertDoesNotThrow(() -> config.equipWithTPrescriptionMockClient(actor));
   }
 
   @Test

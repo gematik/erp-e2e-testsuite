@@ -22,7 +22,6 @@ package de.gematik.test.erezept.app.task;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
-import de.gematik.test.erezept.app.mobile.ListPageElement;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.MessageScreen;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
@@ -55,6 +54,8 @@ public class VerifyChargeItemInMessages implements Task {
         erpClient.request(new ChargeItemGetByIdCommand(dmc.getTaskId().toPrescriptionId()));
     val erxChargeItemBundle = erpResponse.getResourceOptional().orElseThrow();
 
+    // Note: often the charge item is not shown directly in the messages, so navigate to the
+    // main screen (and refresh) and check again (max. 3 times)
     var tries = 3;
     var foundChargeItem = app.isDisplayed(MessageScreen.SHOW_CHARGE_ITEM_BUTTON);
 
@@ -62,8 +63,7 @@ public class VerifyChargeItemInMessages implements Task {
       if (app.isDisplayed(MessageScreen.BACK_TO_MESSAGE_SCREEN)) {
         app.tap(MessageScreen.BACK_TO_MESSAGE_SCREEN);
         app.tap(BottomNav.PRESCRIPTION_BUTTON);
-        app.tap(BottomNav.MESSAGES_BUTTON);
-        app.tap(ListPageElement.forElement(MessageScreen.MESSAGES_LIST, 0));
+        actor.attemptsTo(OpenLatestMessage.fromMainScreen());
       }
 
       foundChargeItem = app.isDisplayed(MessageScreen.SHOW_CHARGE_ITEM_BUTTON);

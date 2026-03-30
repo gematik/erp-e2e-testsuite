@@ -48,6 +48,9 @@ import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -356,6 +359,37 @@ class IssuePrescriptionTest extends ErpFhirParsingTest {
             .withSmartFuzzer(new FhirFuzzImpl(new FuzzerContext(FuzzConfig.getRandom())))
             .withResponsibleDoctor(doc)
             .withRandomKbvBundle()
+            .setSignatureObserver(sigObserver);
+    assertDoesNotThrow(() -> doc.performs(isPr));
+    assertTrue((Base64.getEncoder().encodeToString(sigObserver.toByteArray())).length() > 20);
+  }
+
+  @Test
+  void shouldCreateValidPrescriptionFromRandomKbvBundleATPrescription() {
+    val mockUtil = new MockActorsUtils();
+
+    val patient2 = new PatientActor("Hanna Bäcker");
+    patient2.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient2.getName()));
+    patient2.changeCoverageInsuranceType(InsuranceTypeDe.BG);
+    patient2.setPayorType(PayorType.UK);
+
+    val draftTask = spy(new ErxTask());
+    doReturn(TaskId.from(PrescriptionId.random())).when(draftTask).getTaskId();
+    doReturn(PrescriptionId.random()).when(draftTask).getPrescriptionId();
+    doReturn(AccessCode.random()).when(draftTask).getAccessCode();
+    doReturn(Task.TaskStatus.DRAFT).when(draftTask).getStatus();
+    val createResponse = mockUtil.createErpResponse(draftTask, ErxTask.class, 201);
+    val doc = mockUtil.actorStage.getDoctorNamed("Adelheid Ulmenwald");
+    when(mockUtil.erpClientMock.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+    when(mockUtil.erpClientMock.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+    val sigObserver = new ByteArrayOutputStream();
+    val isPr =
+        IssuePrescription.forPatient(patient2)
+            .asTPrescription(
+                KbvErpBundleFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+                    .withMedication(KbvErpMedicationPZNFaker.asTPrescription())
+                    .withKvnr(patient2.getKvnr())
+                    .toBuilder())
             .setSignatureObserver(sigObserver);
     assertDoesNotThrow(() -> doc.performs(isPr));
     assertTrue((Base64.getEncoder().encodeToString(sigObserver.toByteArray())).length() > 20);

@@ -20,12 +20,13 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker.OrganizationFakerType;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -38,33 +39,40 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
-@SetSystemProperty(
-    key = ERP_FHIR_PROFILES_TOGGLE,
-    value = "1.4.0") // before 1.4.0 EVDGA was not available
+/*@SetSystemProperty(
+key = ERP_FHIR_PROFILES_TOGGLE,
+value = "1.5.0") // before 1.4.0 EVDGA was not available*/
 class KbvEvdgaBundleBuilderTest extends ErpFhirParsingTest {
 
+  private static KbvItvEvdgaVersion evdgaVersion = KbvItvEvdgaVersion.V1_2;
+  private static KbvItaForVersion kbvItaForVersion = KbvItaForVersion.V1_2_0;
+
   @ParameterizedTest
-  @MethodSource
-  void shouldBuildKbvEvdgaBundle(
+  @MethodSource("shouldBuildKbvEvdgaBundle")
+  void shouldBuildKbvEvdgaBundleCorrect(
       QualificationType qualificationType, InsuranceTypeDe insuranceType) {
-    val patient = KbvPatientFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).fake();
+    val patient =
+        KbvPatientFaker.builder(kbvItaForVersion).withInsuranceType(InsuranceTypeDe.GKV).fake();
     val practitioner =
-        KbvPractitionerFaker.builder().withQualificationType(qualificationType).fake();
-    val insurance = KbvCoverageFaker.builder().withInsuranceType(insuranceType).fake();
+        KbvPractitionerFaker.builder(kbvItaForVersion)
+            .withQualificationType(qualificationType)
+            .fake();
+    val insurance =
+        KbvCoverageFaker.builder(kbvItaForVersion).withInsuranceType(insuranceType).fake();
     val medicalOrgFaker =
         (qualificationType.equals(QualificationType.DENTIST))
-            ? KbvMedicalOrganizationFaker.dentalPractice()
-            : KbvMedicalOrganizationFaker.medicalPractice();
+            ? KbvMedicalOrganizationFaker.dentalPractice(kbvItaForVersion)
+            : KbvMedicalOrganizationFaker.medicalPractice(kbvItaForVersion);
     val medicalOrg = medicalOrgFaker.fake();
 
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(
                 PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
+            .version(evdgaVersion)
             .statusKennzeichen(StatusKennzeichen.NONE, practitioner)
             .healthAppRequest(
-                KbvHealthAppRequestFaker.forPatient(patient)
+                KbvHealthAppRequestFaker.forPatient(patient, evdgaVersion)
                     .withRequester(practitioner)
                     .withInsurance(insurance)
                     .withoutAccident()
@@ -83,20 +91,29 @@ class KbvEvdgaBundleBuilderTest extends ErpFhirParsingTest {
   @MethodSource("shouldBuildKbvEvdgaBundle")
   void shouldBuildKbvEvdgaBundleWithPractitionerRole(
       QualificationType qualificationType, InsuranceTypeDe insuranceType) {
-    val patient = KbvPatientFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).fake();
+
+    val patient =
+        KbvPatientFaker.builder(kbvItaForVersion).withInsuranceType(InsuranceTypeDe.GKV).fake();
+
     val practitioner =
-        KbvPractitionerFaker.builder().withQualificationType(qualificationType).fake();
-    val insurance = KbvCoverageFaker.builder().withInsuranceType(insuranceType).fake();
+        KbvPractitionerFaker.builder(kbvItaForVersion)
+            .withQualificationType(qualificationType)
+            .fake();
+
+    val insurance =
+        KbvCoverageFaker.builder(kbvItaForVersion).withInsuranceType(insuranceType).fake();
+
     val medicalOrgFaker =
         (qualificationType.equals(QualificationType.DENTIST))
-            ? KbvMedicalOrganizationFaker.dentalPractice()
-            : KbvMedicalOrganizationFaker.medicalPractice();
+            ? KbvMedicalOrganizationFaker.dentalPractice(kbvItaForVersion)
+            : KbvMedicalOrganizationFaker.medicalPractice(kbvItaForVersion);
     val medicalOrg = medicalOrgFaker.fake();
 
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(
                 PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
-            .statusKennzeichen(StatusKennzeichen.ASV, practitioner)
+            .version(evdgaVersion)
+            .statusKennzeichen(StatusKennzeichen.ASV, practitioner, kbvItaForVersion)
             .healthAppRequest(
                 KbvHealthAppRequestFaker.forPatient(patient)
                     .withRequester(practitioner)
@@ -127,21 +144,26 @@ class KbvEvdgaBundleBuilderTest extends ErpFhirParsingTest {
       QualificationType qualificationType,
       InsuranceTypeDe insuranceType,
       AccidentExtension accident) {
-    val patient = KbvPatientFaker.builder().withInsuranceType(InsuranceTypeDe.GKV).fake();
+    val patient =
+        KbvPatientFaker.builder(kbvItaForVersion).withInsuranceType(InsuranceTypeDe.GKV).fake();
     val practitioner =
-        KbvPractitionerFaker.builder().withQualificationType(qualificationType).fake();
-    val insurance = KbvCoverageFaker.builder().withInsuranceType(insuranceType).fake();
+        KbvPractitionerFaker.builder(kbvItaForVersion)
+            .withQualificationType(qualificationType)
+            .fake();
+    val insurance =
+        KbvCoverageFaker.builder(kbvItaForVersion).withInsuranceType(insuranceType).fake();
     val medicalOrgFaker =
         (qualificationType.equals(QualificationType.DENTIST))
-            ? KbvMedicalOrganizationFaker.dentalPractice()
-            : KbvMedicalOrganizationFaker.medicalPractice();
+            ? KbvMedicalOrganizationFaker.dentalPractice(kbvItaForVersion)
+            : KbvMedicalOrganizationFaker.medicalPractice(kbvItaForVersion);
     val medicalOrg = medicalOrgFaker.fake();
 
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(
                 PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
+            .version(evdgaVersion)
             .healthAppRequest(
-                KbvHealthAppRequestFaker.forPatient(patient)
+                KbvHealthAppRequestFaker.forPatient(patient, evdgaVersion)
                     .withRequester(practitioner)
                     .withInsurance(insurance)
                     .withAccident(accident)
@@ -180,20 +202,23 @@ class KbvEvdgaBundleBuilderTest extends ErpFhirParsingTest {
       names = {"HOSPITAL", "HOSPITAL_KSN"})
   void shouldBuildKbvEvdgaBundleForHospital(OrganizationFakerType orgType) {
     val insuranceType = InsuranceTypeDe.GKV;
-
-    val patient = KbvPatientFaker.builder().withInsuranceType(insuranceType).fake();
+    val patient = KbvPatientFaker.builder(kbvItaForVersion).withInsuranceType(insuranceType).fake();
     val practitioner =
-        KbvPractitionerFaker.builder()
+        KbvPractitionerFaker.builder(kbvItaForVersion)
             .withQualificationType(QualificationType.DOCTOR_AS_REPLACEMENT)
             .fake();
     val attester =
-        KbvPractitionerFaker.builder().withQualificationType(QualificationType.DOCTOR).fake();
-    val insurance = KbvCoverageFaker.builder().withInsuranceType(insuranceType).fake();
-    val medicalOrg = KbvMedicalOrganizationFaker.builder(orgType).fake();
+        KbvPractitionerFaker.builder(kbvItaForVersion)
+            .withQualificationType(QualificationType.DOCTOR)
+            .fake();
+    val insurance =
+        KbvCoverageFaker.builder(kbvItaForVersion).withInsuranceType(insuranceType).fake();
+    val medicalOrg = KbvMedicalOrganizationFaker.builder(orgType, kbvItaForVersion).fake();
 
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(
                 PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
+            .version(evdgaVersion)
             .healthAppRequest(
                 KbvHealthAppRequestFaker.forPatient(patient)
                     .withRequester(practitioner)

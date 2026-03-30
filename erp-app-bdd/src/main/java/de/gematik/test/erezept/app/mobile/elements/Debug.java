@@ -80,7 +80,8 @@ public enum Debug implements PageElement {
           By.xpath(
               "//XCUIElementTypeSwitch[@name=\"debug_tog_hide_intro\"]/XCUIElementTypeSwitch")),
   MARK_AS_PKV_BUTTON(
-      "Mark as PKV Button", null, () -> AppiumBy.accessibilityId("debug_btn_mark_profile_as_pkv"));
+      "Mark as PKV Button", null, () -> AppiumBy.accessibilityId("debug_btn_mark_profile_as_pkv")),
+  FEATURE_FLAG_BUTTON("Feature Flag Button", null, () -> AppiumBy.name("Feature Flags"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;

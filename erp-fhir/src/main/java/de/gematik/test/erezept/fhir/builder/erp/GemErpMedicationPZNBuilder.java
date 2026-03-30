@@ -46,6 +46,7 @@ public class GemErpMedicationPZNBuilder
 
   public GemErpMedicationPZNBuilder pzn(PZN pzn, String name) {
     this.codes.add(pzn.asCoding().setDisplay(name));
+    this.codeText = name;
     return self();
   }
 

@@ -21,7 +21,8 @@
 package de.gematik.test.erezept.eml.fhir.r4;
 
 import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.BFARM_CS_MED_REF;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.ASK;
@@ -30,7 +31,10 @@ import de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import java.util.Optional;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Medication;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Ratio;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +70,8 @@ class EpaPharmaceuticalProductTest extends EpaFhirParsingTest {
                       new org.hl7.fhir.r4.model.Coding()
                           .setSystem(DeBasisProfilCodeSystem.ATC.getCanonicalUrl())
                           .setCode(ingredientAtcCode)
-                          .setDisplay(ingredientDisplay)))
+                          .setDisplay(ingredientDisplay)
+                          .setVersion("2026")))
           .setStrength(strengthRatio);
 
   @BeforeAll

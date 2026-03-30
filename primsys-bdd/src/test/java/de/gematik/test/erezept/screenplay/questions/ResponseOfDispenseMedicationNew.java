@@ -44,6 +44,7 @@ import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.konnektor.soap.mock.LocalVerifier;
+import io.cucumber.datatable.DataTable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -284,6 +285,29 @@ public class ResponseOfDispenseMedicationNew extends FhirResponseQuestion<EmptyR
 
     public ResponseOfDispenseMedicationNew build() {
       return new ResponseOfDispenseMedicationNew(patient, dequeue, medications, dispenseIterations);
+    }
+
+    /**
+     * Dispense multiple times in a loop.
+     *
+     * @param dispenseIterations number of dispense iterations (>= 1)
+     * @return the builder itself
+     */
+    public Builder multiple(int dispenseIterations) {
+      this.dispenseIterations = dispenseIterations;
+      return this;
+    }
+
+    /**
+     * Provide a Cucumber data table with medication information to build dispense resources.
+     *
+     * @param medication data table with columns like PZN, Name, Menge, Einheit, etc.
+     * @return the builder itself
+     */
+    public Builder withMedicationDispense(DataTable medication) {
+
+      this.medications = medication.asMaps();
+      return this;
     }
   }
 }

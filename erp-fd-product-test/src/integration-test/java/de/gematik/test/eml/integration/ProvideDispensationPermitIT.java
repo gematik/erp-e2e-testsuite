@@ -21,23 +21,14 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_COMPOUNDING;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_FREITEXT;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_INGREDIENT;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_PZN;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
 
-import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.ClosePrescriptionWithoutDispensation;
-import de.gematik.test.erezept.actions.DispensePrescriptionOld;
-import de.gematik.test.erezept.actions.DownloadAuditEvent;
-import de.gematik.test.erezept.actions.IssuePrescription;
-import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -46,29 +37,17 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
-import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.hl7.fhir.r4.model.MedicationDispense;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -135,21 +114,20 @@ public class ProvideDispensationPermitIT extends ErpTest {
             .getExpectedResponse();
 
     acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptance));
 
-    val dispenseAction =
-        DispensePrescriptionOld.withCredentials(task.getTaskId(), acceptance.getSecret())
-            .withParameters(getDispenseParameters(task));
+    val medDispBundle =
+        patient
+            .performs(
+                GetMedicationDispense.withQueryParams(
+                    IQueryParameter.search()
+                        .identifier(task.getPrescriptionId().asIdentifier())
+                        .createParameter()))
+            .getExpectedResponse();
 
-    val dispensationInterAction = pharmacy.performs(dispenseAction);
-
-    pharmacy.attemptsTo(Verify.that(dispensationInterAction).withExpectedType().isCorrect());
-    pharmacy.performs(
-        ClosePrescriptionWithoutDispensation.forTheTask(task, acceptance.getSecret()));
-
-    val mdBundle = dispensationInterAction.getExpectedResponse();
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvideDispensation.forDispensation(
-            mdBundle, pharmacy.getTelematikId(), task.getPrescriptionId()));
+            medDispBundle, pharmacy.getTelematikId(), task.getPrescriptionId()));
 
     val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
     patient.attemptsTo(
@@ -172,50 +150,5 @@ public class ProvideDispensationPermitIT extends ErpTest {
           .build();
       default -> throw new IllegalArgumentException("Unknown medication type: " + medicationType);
     };
-  }
-
-  private List<ErxMedicationDispense> getMedDisp(ErxTask task) {
-    val medication1 =
-        KbvErpMedicationPZNFaker.builder()
-            .withAmount(666)
-            .withPznMedication(PZN.from("17377588"), "Comirnaty von BioNTech/Pfizer")
-            .fake();
-
-    val md =
-        ErxMedicationDispenseBuilder.forKvnr(patient.getKvnr())
-            .dosageInstruction("1-2-3-4")
-            .whenHandedOver(new Date())
-            .wasSubstituted(false)
-            .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
-            .medication(medication1)
-            .performerId(pharmacy.getTelematikId().getValue())
-            .prescriptionId(task.getPrescriptionId())
-            .build();
-
-    return List.of(md);
-  }
-
-  private GemDispenseOperationParameters getDispenseParameters(ErxTask task) {
-
-    val medication =
-        GemErpMedicationFaker.forPznMedication()
-            .withAmount(666)
-            .withPzn(PZN.from("17377588"), "Comirnaty von BioNTech/Pfizer")
-            .fake();
-
-    val md =
-        ErxMedicationDispenseBuilder.forKvnr(patient.getKvnr())
-            .dosageInstruction("1-2-3-4")
-            .whenHandedOver(new Date())
-            .wasSubstituted(false)
-            .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
-            .medication(medication)
-            .performerId(pharmacy.getTelematikId().getValue())
-            .prescriptionId(task.getPrescriptionId())
-            .build();
-
-    return GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
-        .with(md, medication)
-        .build();
   }
 }

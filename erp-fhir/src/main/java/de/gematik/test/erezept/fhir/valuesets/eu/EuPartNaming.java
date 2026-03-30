@@ -39,9 +39,14 @@ public enum EuPartNaming {
   PRACTITIONER_ROLE_DATA("practitionerRoleData"),
   PRACTITIONER_DATA("practitionerData"),
   RX_DISPENSATION("rxDispensation"),
+
   ORGANIZATION_DATA("organizationData"),
   MED_DISPENSE("medicationDispense"),
-  MEDICATION("medication");
+  MEDICATION("medication"),
+  RX_PRESCRIPTION("rxPrescription"),
+  PRESCRIPTION_ID_CAMELCASE("prescriptionId"),
+  DISPENSEINFORMATION("dispenseInformation"),
+  ;
   ;
 
   private final String code;

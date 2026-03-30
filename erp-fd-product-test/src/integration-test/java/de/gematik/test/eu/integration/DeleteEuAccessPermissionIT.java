@@ -64,7 +64,7 @@ class DeleteEuAccessPermissionIT extends ErpTest {
   void shouldDeleteAccessPermission() {
     sina.performs(EuGrantConsent.forOneSelf().withDefaultConsent());
     val response =
-        sina.performs(GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCode.LI));
+        sina.performs(GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCode.MT));
 
     sina.attemptsTo(
         Verify.that(response)
@@ -102,7 +102,7 @@ class DeleteEuAccessPermissionIT extends ErpTest {
                 bundleContainsLog(
                     format(
                         "Sie haben die Zugriffsberechtigung zum Einlösen von E-Rezepten für das"
-                            + " Land LI gelöscht.")))
+                            + " Land MT gelöscht.")))
             .isCorrect());
   }
 

@@ -20,14 +20,11 @@
 
 package de.gematik.test.eml.tasks;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlDispensationIdIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlHandedOverIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationDispenseMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlOrganisationHasSMCBTelematikId;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.*;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
+import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
@@ -35,6 +32,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +46,23 @@ public class CheckEpaOpProvideDispensation implements Task {
   private final ErxMedicationDispenseBundle erxMedicationDispenseBundle;
   private final TelematikID tiIdSMCB;
   private final PrescriptionId prescriptionId;
+  private final List<VerificationStep<EpaOpProvideDispensation>> additionalVerificationSteps;
 
   public static CheckEpaOpProvideDispensation forDispensation(
       ErxMedicationDispenseBundle erxMedicationDispenseBundle,
       TelematikID tiIdSmcb,
       PrescriptionId prescriptionId) {
-    return new CheckEpaOpProvideDispensation(erxMedicationDispenseBundle, tiIdSmcb, prescriptionId);
+    return forDispensationWithAdditionalVerifier(
+        erxMedicationDispenseBundle, tiIdSmcb, prescriptionId, null);
+  }
+
+  public static CheckEpaOpProvideDispensation forDispensationWithAdditionalVerifier(
+      ErxMedicationDispenseBundle erxMedicationDispenseBundle,
+      TelematikID tiIdSmcb,
+      PrescriptionId prescriptionId,
+      List<VerificationStep<EpaOpProvideDispensation>> additionalVerificationSteps) {
+    return new CheckEpaOpProvideDispensation(
+        erxMedicationDispenseBundle, tiIdSmcb, prescriptionId, additionalVerificationSteps);
   }
 
   @Override
@@ -75,7 +84,7 @@ public class CheckEpaOpProvideDispensation implements Task {
             List.of(
                 emlDispensationIdIsEqualTo(prescriptionId),
                 emlOrganisationHasSMCBTelematikId(tiIdSMCB)));
-
+    Optional.ofNullable(additionalVerificationSteps).ifPresent(verifiers::addAll);
     val mdPair = erxMedicationDispenseBundle.getDispensePairBy(prescriptionId).get(0);
     verifiers.addAll(
         List.of(

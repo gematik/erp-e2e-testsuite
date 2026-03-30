@@ -46,6 +46,7 @@ import lombok.val;
 public class KbvMedicalOrganizationFaker {
   private final Map<String, Consumer<KbvMedicalOrganizationBuilder>> builderConsumers =
       new HashMap<>();
+  private final KbvItaForVersion version;
 
   public enum OrganizationFakerType {
     GENERAL,
@@ -54,7 +55,8 @@ public class KbvMedicalOrganizationFaker {
     HOSPITAL_KSN
   }
 
-  private KbvMedicalOrganizationFaker(OrganizationFakerType type) {
+  private KbvMedicalOrganizationFaker(OrganizationFakerType type, KbvItaForVersion version) {
+    this.version = version;
     this.withPhoneNumber(fakerPhone())
         .withAddress(fakerCity(), fakerZipCode(), fakerStreetName())
         .withName(fakerName())
@@ -85,16 +87,21 @@ public class KbvMedicalOrganizationFaker {
    * @return KbvMedicalOrganizationFaker
    */
   public static KbvMedicalOrganizationFaker forPractitioner(KbvPractitioner practitioner) {
-    if (practitioner.getQualificationType() == QualificationType.DENTIST) {
+    return forPractitioner(practitioner, KbvItaForVersion.getDefaultVersion());
+  }
 
-      return dentalPractice();
+  public static KbvMedicalOrganizationFaker forPractitioner(
+      KbvPractitioner practitioner, KbvItaForVersion version) {
+    if (practitioner.getQualificationType() == QualificationType.DENTIST) {
+      return dentalPractice(version);
     } else {
       // Note: older KbvItaForVersion does not accept KSN. HOSPITAL_KSN can be removed from
       // exclusion once KbvItaForVersion.V1_0_3 is removed
       return builder(
           fakerValueSet(
               OrganizationFakerType.class,
-              List.of(OrganizationFakerType.DENTAL, OrganizationFakerType.HOSPITAL_KSN)));
+              List.of(OrganizationFakerType.DENTAL, OrganizationFakerType.HOSPITAL_KSN)),
+          version);
     }
   }
 
@@ -105,7 +112,17 @@ public class KbvMedicalOrganizationFaker {
    * @return KbvMedicalOrganizationFaker
    */
   public static KbvMedicalOrganizationFaker builder() {
-    return builder(fakerValueSet(OrganizationFakerType.class));
+    return builder(KbvItaForVersion.getDefaultVersion());
+  }
+
+  /**
+   * Medical Organization requires a KZVA Abrechnungsnummer in case Of Dentists, if you randomly
+   * generate Practitioners it is recommended to use .forPractitioner()
+   *
+   * @return KbvMedicalOrganizationFaker
+   */
+  public static KbvMedicalOrganizationFaker builder(KbvItaForVersion version) {
+    return builder(fakerValueSet(OrganizationFakerType.class), version);
   }
 
   /**
@@ -115,11 +132,26 @@ public class KbvMedicalOrganizationFaker {
    * @return KbvMedicalOrganizationFaker
    */
   public static KbvMedicalOrganizationFaker builder(OrganizationFakerType type) {
-    return new KbvMedicalOrganizationFaker(type);
+    return builder(type, KbvItaForVersion.getDefaultVersion());
+  }
+
+  /**
+   * Medical Organization requires a KZVA Abrechnungsnummer in case Of Dentists, if you randomly
+   * generate Practitioners it is recommended to use .forPractitioner()
+   *
+   * @return KbvMedicalOrganizationFaker
+   */
+  public static KbvMedicalOrganizationFaker builder(
+      OrganizationFakerType type, KbvItaForVersion version) {
+    return new KbvMedicalOrganizationFaker(type, version);
   }
 
   public static KbvMedicalOrganizationFaker dentalPractice() {
-    return builder(OrganizationFakerType.DENTAL);
+    return builder(OrganizationFakerType.DENTAL, KbvItaForVersion.getDefaultVersion());
+  }
+
+  public static KbvMedicalOrganizationFaker dentalPractice(KbvItaForVersion version) {
+    return builder(OrganizationFakerType.DENTAL, version);
   }
 
   /**
@@ -129,16 +161,25 @@ public class KbvMedicalOrganizationFaker {
    * @return KbvMedicalOrganizationFaker
    */
   public static KbvMedicalOrganizationFaker medicalPractice() {
-    return builder(OrganizationFakerType.GENERAL);
+    return builder(OrganizationFakerType.GENERAL, KbvItaForVersion.getDefaultVersion());
+  }
+
+  /**
+   * !! Take Care you have no Dentist as Practitioner !! in case of a Dentist pleas use
+   * dentalPractice() or forPractitioner()
+   *
+   * @return KbvMedicalOrganizationFaker
+   */
+  public static KbvMedicalOrganizationFaker medicalPractice(KbvItaForVersion version) {
+    return builder(OrganizationFakerType.GENERAL, version);
   }
 
   public static KbvMedicalOrganizationFaker hospital() {
-    return builder(OrganizationFakerType.HOSPITAL);
+    return builder(OrganizationFakerType.HOSPITAL, KbvItaForVersion.getDefaultVersion());
   }
 
-  public KbvMedicalOrganizationFaker withVersion(KbvItaForVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+  public static KbvMedicalOrganizationFaker hospital(KbvItaForVersion version) {
+    return builder(OrganizationFakerType.HOSPITAL, version);
   }
 
   public KbvMedicalOrganizationFaker withName(String name) {
@@ -194,7 +235,7 @@ public class KbvMedicalOrganizationFaker {
   }
 
   public KbvMedicalOrganizationBuilder toBuilder() {
-    val builder = KbvMedicalOrganizationBuilder.builder();
+    val builder = KbvMedicalOrganizationBuilder.builder().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

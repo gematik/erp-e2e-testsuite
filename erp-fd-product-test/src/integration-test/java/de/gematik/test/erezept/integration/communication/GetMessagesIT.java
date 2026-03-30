@@ -59,7 +59,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.annotations.WithTag;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -67,14 +66,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication Get Tests")
 @Tag("Communication")
-public class GetMessagesIT extends ErpTest {
+class GetMessagesIT extends ErpTest {
 
   private static final String SUT_RELEASE_VERSION_1_19 = "1.19";
 
@@ -320,12 +317,12 @@ public class GetMessagesIT extends ErpTest {
                 CommunicationBundleVerifier.containsOnlyRecipientWith(
                     sina.getKvnr().getValue(), ErpAfos.A_19522))
             .isCorrect());
-    val SinaMessagesAtWoodland =
+    val sinaMessagesAtWoodland =
         woodlandPharma.performs(
             GetMessages.fromServerWith(
                 CommunicationSearch.getRecipientCommunications(sina.getKvnr().getValue())));
     woodlandPharma.attemptsTo(
-        Verify.that(SinaMessagesAtWoodland)
+        Verify.that(sinaMessagesAtWoodland)
             .withExpectedType()
             .and(
                 CommunicationBundleVerifier.containsOnlyRecipientWith(

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @NoArgsConstructor
@@ -39,4 +40,10 @@ public class ActorDto {
   private String tid;
   private String smcb;
   private String publicKey;
+
+  @Accessors(chain = true)
+  private String idpValidUntil;
+
+  @Accessors(chain = true)
+  private String idpTimeToLive;
 }

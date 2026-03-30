@@ -36,7 +36,7 @@ public class MvoDataMapper extends DataMapper<MvoDto, MultiplePrescriptionExtens
     ensure(dto::getStartDate, dto::setStartDate, Date::new);
 
     if (dto.getNumerator() == null || dto.getDenominator() == null) {
-      // if any of them is missing replace both to ensure the ratio is valid!
+      // if any of them is missing replace both to ensure the amountRatio is valid!
       val faked = GemFaker.mvo(true);
       dto.setNumerator(faked.getNumerator());
       dto.setDenominator(faked.getDenominator());

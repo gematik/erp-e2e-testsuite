@@ -44,9 +44,9 @@ class PrescriptionDetailsTest {
 
   @Test
   void checkNewDeleteButton() {
-    val element = PrescriptionDetails.DELETE_BUTTON_TOOLBAR;
-    assertTrue(element.getFullName().contains("Delete Prescription tool bar item"));
-    assertTrue(element.name().toLowerCase().contains("button"));
+    val element = PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR;
+    assertTrue(element.getFullName().contains("Prescription details toolbar button"));
+    assertTrue(element.name().toLowerCase().contains("toolbar"));
     assertEquals(
         element.getIosLocator().get(), AppiumBy.accessibilityId("prsc_dtl_btn_toolbar_item"));
     assertNull(element.getAndroidLocator().get());
@@ -60,15 +60,6 @@ class PrescriptionDetailsTest {
     assertEquals(
         element.getIosLocator().get(),
         AppiumBy.accessibilityId("prsc_dtl_toolbar_menu_btn_delete"));
-    assertNull(element.getAndroidLocator().get());
-  }
-
-  @Test
-  void checkDeletePrescriptionItemButton() {
-    val element = PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON;
-    assertTrue(element.getFullName().contains("Delete Prescription button"));
-    assertTrue(element.name().toLowerCase().contains("button"));
-    assertEquals(element.getIosLocator().get(), AppiumBy.name("Horizontaler Rollbalken, 1 Seite"));
     assertNull(element.getAndroidLocator().get());
   }
 

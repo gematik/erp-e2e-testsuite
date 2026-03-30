@@ -308,4 +308,20 @@ class ErxTaskTest extends ErpFhirParsingTest {
     assertFalse(task.isRedeemableByAuthorization(true));
     assertFalse(task.isRedeemableByAuthorization(false));
   }
+
+  @Test
+  void shouldBeTrueForRedeemableByPropertiesWhenExtensionMatches() {
+    val task = new ErxTask();
+    task.addExtension(
+        new Extension(
+            GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES.getCanonicalUrl(),
+            new BooleanType(true)));
+    assertTrue(task.getRedeemableByProperties());
+  }
+
+  @Test
+  void shouldBeFalseForRedeemableByPropertiesWhenExtensionIsMissing() {
+    val task = new ErxTask();
+    assertFalse(task.getRedeemableByProperties());
+  }
 }

@@ -318,4 +318,24 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
         String.valueOf(medIngredient.getAmount().getNumerator().getExtensionFirstRep().getValue()));
     assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
+
+  @Test
+  void shouldSetVersionInAtcAutomatic() {
+    val code = "12345678";
+    val medIngredient =
+        GemErpMedicationIngredientBuilder.forIngredient()
+            .version(ErpWorkflowVersion.V1_6)
+            .atc(ATC.from(code))
+            .build();
+
+    assertNotNull(medIngredient);
+    assertTrue(medIngredient.getCode().getCodingFirstRep().hasVersion());
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
+  }
+
+  @Test()
+  void shouldBuildWithoutExplicitVersion() {
+    val med = GemErpMedicationFaker.forMedicationIngredient().fake();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, med).isSuccessful());
+  }
 }

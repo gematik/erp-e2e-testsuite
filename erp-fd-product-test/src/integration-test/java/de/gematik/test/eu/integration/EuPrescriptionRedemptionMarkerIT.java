@@ -21,8 +21,7 @@
 package de.gematik.test.eu.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLog;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeBetween;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.*;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 import static java.text.MessageFormat.format;
@@ -34,10 +33,7 @@ import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.TaskVerifier;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.DownloadAuditEvent;
-import de.gematik.test.erezept.actions.GetPrescriptionById;
-import de.gematik.test.erezept.actions.IssuePrescription;
-import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actions.eu.EuGrantConsent;
 import de.gematik.test.erezept.actions.eu.PatchPrescriptionForEuRedemption;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -67,6 +63,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -306,5 +303,73 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
         .withOperationOutcome(ErpAfos.A_27550)
         .hasResponseWith(returnCode(403))
         .isCorrect();
+  }
+
+  @Test
+  @Tag("B_FD-1506")
+  @TestcaseId("ERP_EU_PATCH_PRESCRIPTION_05")
+  @DisplayName("Markieren eines gelöschten E-Rezepts im EU-Ausland schlägt fehl")
+  void shouldRejectPatchForDeletedPrescription() {
+    val erxTask =
+        doctor
+            .performs(
+                IssuePrescription.forPatient(sina)
+                    .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                    .withRandomKbvBundle())
+            .getExpectedResponse();
+
+    val taskId = erxTask.getTaskId();
+
+    // delete the prescription
+    val deleteResponse = sina.performs(TaskAbort.asPatient(erxTask)).getResponse();
+    sina.attemptsTo(
+        Verify.that(deleteResponse)
+            .withExpectedType()
+            .hasResponseWith(returnCodeIs(204))
+            .isCorrect());
+
+    val patchResponse = sina.performs(PatchPrescriptionForEuRedemption.of(taskId));
+
+    sina.attemptsTo(
+        Verify.that(patchResponse)
+            .withOperationOutcome()
+            .hasResponseWith(returnCode(403))
+            .isCorrect());
+  }
+
+  @Test
+  @Tag("B_FD-1506")
+  @TestcaseId("ERP_EU_PATCH_PRESCRIPTION_06")
+  @DisplayName("Markieren eines abgeschlossenen E-Rezepts im EU-Ausland schlägt NICHT fehl")
+  void shouldRejectPatchForClosedPrescription() {
+    val erxTask =
+        doctor
+            .performs(
+                IssuePrescription.forPatient(sina)
+                    .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                    .withRandomKbvBundle())
+            .getExpectedResponse();
+
+    val taskId = erxTask.getTaskId();
+
+    // close the prescription as national pharmacy
+    val pharmacy = this.getPharmacyNamed("Am Flughafen");
+    val acceptBundle =
+        pharmacy.performs(AcceptPrescription.forTheTask(erxTask)).getExpectedResponse();
+    val receipt =
+        pharmacy.performs(ClosePrescription.acceptedWith(acceptBundle)).getExpectedResponse();
+
+    // check the prescription is completed
+    val r = sina.performs(TheTask.withId(taskId));
+    sina.attemptsTo(
+        Verify.that(r)
+            .withExpectedType()
+            .has(prescriptionInStatus(Task.TaskStatus.COMPLETED))
+            .isCorrect());
+
+    val patchResponse = sina.performs(PatchPrescriptionForEuRedemption.of(taskId));
+
+    sina.attemptsTo(
+        Verify.that(patchResponse).withExpectedType().hasResponseWith(returnCode(200)).isCorrect());
   }
 }

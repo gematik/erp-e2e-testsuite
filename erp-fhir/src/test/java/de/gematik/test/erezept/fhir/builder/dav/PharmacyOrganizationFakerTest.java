@@ -38,10 +38,8 @@ import org.junit.jupiter.api.Test;
 class PharmacyOrganizationFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakePharmacyOrganizationWithVersion() {
-    val pharmacy =
-        PharmacyOrganizationFaker.builder()
-            .withVersion(AbdaErpPkvVersion.getDefaultVersion())
-            .fake();
+    val pharmacy = PharmacyOrganizationFaker.builder(AbdaErpPkvVersion.getDefaultVersion()).fake();
+
     val result = ValidatorUtil.encodeAndValidate(parser, pharmacy);
     assertTrue(result.isSuccessful());
   }

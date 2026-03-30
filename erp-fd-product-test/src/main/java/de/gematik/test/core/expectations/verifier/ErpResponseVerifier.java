@@ -48,8 +48,8 @@ public class ErpResponseVerifier {
     throw new AssertionError("do not instantiate!");
   }
 
-  public static VerificationStep<ErpResponse<? extends Resource>> returnCode(int expected) {
-    return returnCodeIs(expected);
+  public static VerificationStep<ErpResponse<? extends Resource>> returnCode(int... expected) {
+    return returnCodeIsIn(expected);
   }
 
   public static VerificationStep<ErpResponse<? extends Resource>> returnCode(

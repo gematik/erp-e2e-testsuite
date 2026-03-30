@@ -52,8 +52,8 @@ public class DeleteBatchRedeemablePrescriptions implements Task {
       for (int i = 0; i < elements.size(); i++) {
         log.info(format("Deleting {0}/{1} receipt(s)", i, elements.size()));
         driver.tap(Receipt.REDEEMABLE_PRESCRIPTION_CARD_BUTTON);
-        driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
-        driver.tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
+        driver.tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
+        driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
         driver.acceptAlert();
         driver.tap(Mainscreen.REFRESH_BUTTON);
       }

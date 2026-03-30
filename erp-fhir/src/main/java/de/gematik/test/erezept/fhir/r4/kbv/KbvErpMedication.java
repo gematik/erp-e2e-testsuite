@@ -55,6 +55,13 @@ import org.hl7.fhir.r4.model.Resource;
 @SuppressWarnings({"java:S110", "java:S1192"})
 public class KbvErpMedication extends Medication implements ErpFhirResource {
 
+  public static boolean isKPG(KbvErpMedication medication) {
+    return medication
+        .getDarreichungsform()
+        .filter(it -> it.equals(Darreichungsform.KPG))
+        .isPresent();
+  }
+
   public static KbvErpMedication fromMedication(Medication adaptee) {
     if (adaptee instanceof KbvErpMedication erpMedication) {
       return erpMedication;
@@ -69,7 +76,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
     return fromMedication((Medication) adaptee);
   }
 
-  public List<MedicationCategory> getCatagory() {
+  public List<MedicationCategory> getCategory() {
     return this.getExtension().stream()
         .filter(KbvItaErpStructDef.MEDICATION_CATEGORY::matches)
         .map(Extension::getValue)
@@ -79,7 +86,7 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
   }
 
   public MedicationCategory getCategoryFirstRep() {
-    return this.getCatagory().stream()
+    return this.getCategory().stream()
         .findFirst()
         .orElseThrow(
             () ->
@@ -140,14 +147,16 @@ public class KbvErpMedication extends Medication implements ErpFhirResource {
 
   public Optional<String> getIngredientText() {
     return this.getIngredient().stream()
-        .map(mic -> mic.getItemCodeableConcept().getText())
+        .map(MedicationIngredientComponent::getItemCodeableConcept)
+        .flatMap(it -> Optional.ofNullable(it.getText()).stream())
         .findFirst();
   }
 
-  public Optional<String> getManufactoringInstrOptional() {
+  public Optional<String> getManufacturingInstruction() {
     return this.getExtension().stream()
-        .filter(ex -> ex.getUrl().contains(COMPOUNDING_INSTRUCTION.getCanonicalUrl()))
-        .map(instr -> instr.getValue().primitiveValue())
+        .filter(COMPOUNDING_INSTRUCTION::matches)
+        .map(Extension::getValue)
+        .flatMap(it -> Optional.ofNullable(it.primitiveValue()).stream())
         .findFirst();
   }
 

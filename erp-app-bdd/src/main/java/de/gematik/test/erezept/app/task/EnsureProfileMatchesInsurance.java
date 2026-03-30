@@ -71,6 +71,8 @@ public class EnsureProfileMatchesInsurance implements Task {
       app.tap(DebugSettings.LEAVE_BUTTON);
       actor.attemptsTo(NavigateThroughCardwall.entirely());
     }
+
+    app.tap(Profile.LEAVE_BUTTON);
   }
 
   public static EnsureProfileMatchesInsurance ofType(InsuranceTypeDe insuranceType) {

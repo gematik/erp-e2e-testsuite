@@ -29,6 +29,7 @@ import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,6 +46,7 @@ public class GrantEuAccessPermission extends ErpAction<EuAccessPermission> {
   }
 
   @Override
+  @Step("{0} setzt am Erp-FD die den AccessCode für die Einlösung im EU Ausland")
   public ErpInteraction<EuAccessPermission> answeredBy(Actor actor) {
     return performCommandAs(euGrantAccessPostCommand, actor);
   }

@@ -27,6 +27,7 @@ import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvEvdgaBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestBuilder;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
@@ -50,6 +51,8 @@ public class IssueDiGAPrescription implements Task {
 
   private final Actor patient;
 
+  private final KbvItaForVersion forVersionForEVDGA = KbvItaForVersion.V1_2_0;
+
   private IssueDiGAPrescription(Actor patient) {
     this.patient = patient;
   }
@@ -64,7 +67,7 @@ public class IssueDiGAPrescription implements Task {
         "Issue ePrescription to patient {} with insurance type {}",
         baseData.getFullName(),
         baseData.getPatientInsuranceType());
-    return baseData.getPatient();
+    return baseData.getPatient(forVersionForEVDGA);
   }
 
   @Override
@@ -76,12 +79,12 @@ public class IssueDiGAPrescription implements Task {
     val managePrescriptions = SafeAbility.getAbility(actor, ManageDoctorsPrescriptions.class);
 
     // Practitioner base data (Stammdaten)
-    val kbvPractitioner = baseDataAbility.getPractitioner();
-    val kbvOrganization = baseDataAbility.getMedicalOrganization();
+    val kbvPractitioner = baseDataAbility.getPractitioner(forVersionForEVDGA);
+    val kbvOrganization = baseDataAbility.getMedicalOrganization(forVersionForEVDGA);
     val kbvPatient = getPatientBaseData();
     val insurance =
         SafeAbility.getAbility(patient, ProvidePatientBaseData.class)
-            .getInsuranceCoverage(kbvPatient);
+            .getInsuranceCoverage(kbvPatient, forVersionForEVDGA);
 
     val flowType = PrescriptionFlowType.FLOW_TYPE_162;
     val createCmd = new TaskCreateCommand(flowType);

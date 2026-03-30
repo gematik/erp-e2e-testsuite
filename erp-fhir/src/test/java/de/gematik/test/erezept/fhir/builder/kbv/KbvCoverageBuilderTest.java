@@ -49,11 +49,7 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
   @ParameterizedTest(name = "[{index}] -> Build KBV GKV Coverage with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFixedValues(KbvItaForVersion version) {
-    val patient =
-        KbvPatientFaker.builder()
-            .withVersion(version)
-            .withInsuranceType(InsuranceTypeDe.GKV)
-            .fake();
+    val patient = KbvPatientFaker.builder(version).withInsuranceType(InsuranceTypeDe.GKV).fake();
     val coverage =
         KbvCoverageBuilder.insurance(GkvInsuranceCoverageInfo.TK)
             .version(version)
@@ -77,7 +73,7 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
       name = "[{index}] -> Build KBV Coverage with UK PayorType with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithUKPayorType(KbvItaForVersion version) {
-    val patient = KbvPatientFaker.builder().withVersion(version).fake();
+    val patient = KbvPatientFaker.builder(version).fake();
     val tkCoverageInfo = GkvInsuranceCoverageInfo.TK;
     val coverage =
         KbvCoverageBuilder.insurance(tkCoverageInfo)
@@ -105,7 +101,7 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
       name = "[{index}] -> Build KBV Coverage with SKT PayorType with KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithSKTPayorType(KbvItaForVersion version) {
-    val patient = KbvPatientFaker.builder().withVersion(version).fake();
+    val patient = KbvPatientFaker.builder(version).fake();
     val tkCoverageInfo = GkvInsuranceCoverageInfo.TK;
     val coverage =
         KbvCoverageBuilder.insurance(tkCoverageInfo)
@@ -131,7 +127,7 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildCoverageWithFaker01(KbvItaForVersion version) {
     for (var i = 0; i < 2; i++) {
-      val coverage = KbvCoverageFaker.builder().withVersion(version).fake();
+      val coverage = KbvCoverageFaker.builder(version).fake();
       val result = ValidatorUtil.encodeAndValidate(parser, coverage);
       assertTrue(result.isSuccessful());
     }
@@ -146,8 +142,7 @@ class KbvCoverageBuilderTest extends ErpFhirParsingTest {
     insuranceKinds.forEach(
         ik -> {
           for (var i = 0; i < 2; i++) {
-            val coverage =
-                KbvCoverageFaker.builder().withInsuranceType(ik).withVersion(version).fake();
+            val coverage = KbvCoverageFaker.builder(version).withInsuranceType(ik).fake();
             val result = ValidatorUtil.encodeAndValidate(parser, coverage);
             assertTrue(result.isSuccessful());
           }

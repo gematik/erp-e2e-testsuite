@@ -56,7 +56,7 @@ public class GetChargeItemByIdForGkv extends ErpTest {
   @Test
   @TestcaseId("ERP_CHARGE_ITEM_GKV_01")
   @DisplayName("Abrufen von Abrechnungsinformation für einen GKV Versicherten")
-  void getChargeItemForGkv() {
+  void getChargeItemForGkvIT() {
     sina.changePatientInsuranceType(InsuranceTypeDe.GKV);
     val activation = doctor.performs(IssuePrescription.forPatient(sina).withRandomKbvBundle());
     val task = activation.getExpectedResponse();
@@ -70,7 +70,7 @@ public class GetChargeItemByIdForGkv extends ErpTest {
     sina.attemptsTo(
         Verify.that(chargeItem)
             .withOperationOutcome()
-            .hasResponseWith(returnCode(400))
+            .hasResponseWith(returnCode(404))
             .isCorrect());
   }
 }

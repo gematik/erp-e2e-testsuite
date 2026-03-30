@@ -31,23 +31,23 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationFreeTextFaker {
-
+  private final KbvItaErpVersion version;
   private final Map<String, Consumer<KbvErpMedicationFreeTextBuilder>> builderConsumers =
       new HashMap<>();
 
-  private KbvErpMedicationFreeTextFaker() {
+  private KbvErpMedicationFreeTextFaker(KbvItaErpVersion version) {
+    this.version = version;
     this.withDosageForm("Lutscher mit Brausepulverfü...") // TODO: why only 30 characters?
         .withFreeText("3 mal täglich einen lutscher lutschen und anschließend Zähnchen putzen")
         .withVaccine(fakerBool());
   }
 
   public static KbvErpMedicationFreeTextFaker builder() {
-    return new KbvErpMedicationFreeTextFaker();
+    return builder(KbvItaErpVersion.getDefaultVersion());
   }
 
-  public KbvErpMedicationFreeTextFaker withVersion(KbvItaErpVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+  public static KbvErpMedicationFreeTextFaker builder(KbvItaErpVersion version) {
+    return new KbvErpMedicationFreeTextFaker(version);
   }
 
   public KbvErpMedicationFreeTextFaker withDosageForm(String df) {
@@ -75,7 +75,7 @@ public class KbvErpMedicationFreeTextFaker {
   }
 
   public KbvErpMedicationFreeTextBuilder toBuilder() {
-    val builder = KbvErpMedicationFreeTextBuilder.builder();
+    val builder = KbvErpMedicationFreeTextBuilder.builder().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

@@ -29,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 public enum GematikDirVersion implements ProfileVersion {
   V0_11_12("0.11.12"),
   V0_11_25("0.11.25"),
+  V1_0_0("1.0.0"),
+  V1_0_1("1.0.1"),
   ;
 
   @Override
@@ -38,6 +40,10 @@ public enum GematikDirVersion implements ProfileVersion {
 
   @Override
   public boolean omitPatch() {
+    // TODO: Johannes clear with Florian / Steven / Dirk
+    if (this.equals(GematikDirVersion.V1_0_0) || this.equals(GematikDirVersion.V1_0_1)) {
+      return false;
+    }
     return this != V0_11_12;
   }
 

@@ -42,8 +42,10 @@ public abstract class ErxMedicationDispenseBaseFaker<
 
   protected KVNR kvnr = KVNR.random();
   protected final Map<String, Consumer<B>> builderConsumers = new HashMap<>();
+  protected final V version;
 
-  protected ErxMedicationDispenseBaseFaker() {
+  protected ErxMedicationDispenseBaseFaker(V version) {
+    this.version = version;
     this.withPerformer(fakerTelematikId()).withPrescriptionId(fakerPrescriptionId());
   }
 
@@ -54,11 +56,6 @@ public abstract class ErxMedicationDispenseBaseFaker<
 
   public F withKvnr(KVNR kvnr) {
     this.kvnr = kvnr;
-    return self();
-  }
-
-  public F withVersion(V version) {
-    builderConsumers.put("version", b -> b.version(version));
     return self();
   }
 

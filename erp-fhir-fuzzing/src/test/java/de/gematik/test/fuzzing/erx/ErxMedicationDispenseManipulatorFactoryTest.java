@@ -28,7 +28,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
-import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationKombiPkgFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -233,7 +233,7 @@ class ErxMedicationDispenseManipulatorFactoryTest extends ErpFhirParsingTest {
 
   private ErxMedicationDispense getMedicationDispense() {
     return ErxMedicationDispenseBuilder.forKvnr(KVNR.random())
-        .medication(new GemErpMedicationKombiPkgFaker().fake())
+        .medication(GemErpMedicationFaker.forKombiPkg().fake())
         .performerId(TelematikID.random())
         .prescriptionId(PrescriptionId.random())
         .build();

@@ -20,19 +20,23 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.fhir.r4.erp.GemErpMedication.getKombipackungFrom;
 import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProdBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProduct;
 import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import java.util.List;
 import lombok.val;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hl7.fhir.r4.model.Medication;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
@@ -88,17 +92,17 @@ class GemErpMedicationKombiPkgBuilderTest extends ErpFhirParsingTest {
         GemErpMedicationKombiPkgBuilder.forKombiPckg()
             .codeText("CodeText")
             .amount(3)
-            .packagingSize("N1")
+            .packagingSize("100")
             .build();
 
     assertTrue(parser.isValid(kombiPckg));
-    assertEquals("N1", kombiPckg.getPackagingSize().orElseThrow());
+    assertEquals("100", kombiPckg.getPackagingSize().orElseThrow());
   }
 
   @Test
   void shouldThrowWhenPackagingSizeTooLong() {
-    val longSize = RandomStringUtils.random(91, true, true);
-    val builder = GemErpMedicationKombiPkgBuilder.forKombiPckg().amount(3).packagingSize(longSize);
+    val builder =
+        GemErpMedicationKombiPkgBuilder.forKombiPckg().amount(3).packagingSize("12345678");
     assertThrows(BuilderException.class, builder::build);
   }
 
@@ -188,26 +192,41 @@ class GemErpMedicationKombiPkgBuilderTest extends ErpFhirParsingTest {
 
     val kombiPckg =
         GemErpMedicationKombiPkgBuilder.forKombiPckg()
-            .amount(2, "Stk")
+            .amount(2)
             .amountDenominator(4)
             .packaging("Box")
-            .packagingSize("N2")
+            .packagingSize("10")
             .lotNumber("LOT999")
             .formText("Kapsel")
+            .amountNumUnit("pillen")
             .codeText("KombiText")
             .containedMedications(contained1)
             .build();
 
     assertTrue(parser.isValid(kombiPckg));
-    assertEquals(2, kombiPckg.getAmount().getNumerator().getValue().intValue());
-    assertEquals("Stk", kombiPckg.getAmount().getNumerator().getUnit());
+    assertEquals(10, kombiPckg.getAmount().getNumerator().getValue().intValue());
+    assertEquals("pillen", kombiPckg.getAmount().getNumerator().getUnit());
     assertEquals(4, kombiPckg.getAmount().getDenominator().getValue().intValue());
     assertEquals("Box", kombiPckg.getPackaging().orElseThrow());
-    assertEquals("N2", kombiPckg.getPackagingSize().orElseThrow());
+    assertEquals("10", kombiPckg.getPackagingSize().orElseThrow());
     assertEquals("LOT999", kombiPckg.getBatchLotNumber().orElseThrow());
     assertEquals("Kapsel", kombiPckg.getForm().getText());
     assertEquals("KombiText", kombiPckg.getCode().getText());
     assertEquals(contained1.getId(), kombiPckg.getContained().get(0).getId());
+  }
+
+  @Test
+  void shouldMapKombipackungCorrect() {
+    val kbvMedication =
+        KbvErpMedicationPZNFaker.builder()
+            .withPznMedication(PZN.from("12345678"), "Some PznMedication")
+            .withSupplyForm(Darreichungsform.KPG)
+            .fake();
+    val gemMecicationKPG = getKombipackungFrom(kbvMedication);
+    assertEquals(2, gemMecicationKPG.getContained().size());
+    val validResult =
+        ValidatorUtil.encodeAndValidate(parser, gemMecicationKPG, EncodingType.XML, true, true);
+    assertTrue(validResult.isSuccessful());
   }
 
   Medication.MedicationIngredientComponent ingredComp =

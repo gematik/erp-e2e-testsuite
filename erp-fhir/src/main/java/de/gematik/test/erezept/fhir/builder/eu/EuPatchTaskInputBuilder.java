@@ -23,22 +23,23 @@ package de.gematik.test.erezept.fhir.builder.eu;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Parameters;
 
+@RequiredArgsConstructor
 public class EuPatchTaskInputBuilder extends ResourceBuilder<Parameters, EuPatchTaskInputBuilder> {
 
-  private EuVersion version = EuVersion.getDefaultVersion();
+  private final EuVersion euVersion;
   private boolean isRedeemable = true;
 
-  public static EuPatchTaskInputBuilder builder() {
-    return new EuPatchTaskInputBuilder();
+  public static EuPatchTaskInputBuilder builder(EuVersion euVersion) {
+    return new EuPatchTaskInputBuilder(euVersion);
   }
 
-  public EuPatchTaskInputBuilder withVersion(EuVersion version) {
-    this.version = version;
-    return this;
+  public static EuPatchTaskInputBuilder builder() {
+    return builder(EuVersion.getDefaultVersion());
   }
 
   public EuPatchTaskInputBuilder withIsRedeemable(boolean isRedeemable) {
@@ -49,7 +50,7 @@ public class EuPatchTaskInputBuilder extends ResourceBuilder<Parameters, EuPatch
   @Override
   public Parameters build() {
     val parametersResource =
-        this.createResource(Parameters::new, GemErpEuStructDef.PATCH_TASK_INPUT, version);
+        this.createResource(Parameters::new, GemErpEuStructDef.PATCH_TASK_INPUT, euVersion);
 
     parametersResource
         .addParameter()

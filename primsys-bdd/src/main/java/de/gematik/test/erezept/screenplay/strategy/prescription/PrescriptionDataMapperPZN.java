@@ -23,6 +23,7 @@ package de.gematik.test.erezept.screenplay.strategy.prescription;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -30,6 +31,7 @@ import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
@@ -52,13 +54,38 @@ public class PrescriptionDataMapperPZN extends PrescriptionDataMapper {
     val darreichungsForm = getOrDefault("Darreichungsform", "TAB", medMap);
     val darreichungsMenge = getOrDefault("Darreichungsmenge", "1", medMap);
 
-    return KbvErpMedicationPZNBuilder.builder()
-        .category(MedicationCategory.fromCode(category))
-        .isVaccine(isVaccine)
-        .normgroesse(StandardSize.fromCode(size))
-        .darreichungsform(Darreichungsform.fromCode(darreichungsForm))
-        .amount(Integer.decode(darreichungsMenge))
-        .pzn(pzn, name)
-        .build();
+    val pznBuilder =
+        KbvErpMedicationPZNBuilder.builder()
+            .category(MedicationCategory.fromCode(category))
+            .isVaccine(isVaccine)
+            .normgroesse(StandardSize.fromCode(size))
+            .darreichungsform(Darreichungsform.fromCode(darreichungsForm))
+            .amount(Integer.decode(darreichungsMenge))
+            .pzn(pzn, name);
+    // temporary fix caused by deleting this behavior in PznBuilder and moved to PznFaker, but
+    // forgot
+    // to enforce that behavior in E2E scope
+    if (KbvItaErpVersion.getDefaultVersion().isSmallerThanOrEqualTo(KbvItaErpVersion.V1_3_0)) {
+      pznBuilder.ingredientText(
+          getOrDefault("Wirkstoffname", "Phrmakologische Fachbegriffe", medMap));
+    }
+
+    Optional.ofNullable(medMap.get("Wirkstoffname")).ifPresent(pznBuilder::ingredientText);
+
+    Optional.ofNullable(medMap.get("WirkstoffMenge"))
+        .map(Double::valueOf)
+        .ifPresent(
+            it ->
+                pznBuilder.ingredientStrengthNum(
+                    it, getOrDefault("WirkstoffMengeEinheit", "mg", medMap)));
+
+    Optional.ofNullable(medMap.get("Bezugsmenge"))
+        .map(Double::valueOf)
+        .ifPresent(
+            it ->
+                pznBuilder.ingredientStrengthDenom(
+                    it, getOrDefault("BezugsmengeEinheit", "Stück", medMap)));
+
+    return pznBuilder.build();
   }
 }

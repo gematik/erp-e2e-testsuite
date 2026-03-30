@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static net.serenitybdd.screenplay.GivenWhenThen.then;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.task.IssuePrescription;
@@ -97,21 +95,6 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)?"
-          + " (.+) verschreibt:$")
-  public void whenIssueMultiplePrescriptionsToActor(
-      String docName, String patientName, DataTable medications) {
-    val theDoctor = OnStage.theActorCalled(docName);
-    val thePatient = OnStage.theActorCalled(patientName);
-
-    when(theDoctor)
-        .attemptsTo(
-            IssuePrescription.forPatient(thePatient)
-                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .forPznPrescription(medications.asMaps()));
-  }
-
-  @Wenn(
       "^(?:der Arzt|die Ärztin) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)? (.+)"
           + " verschreibt:$")
   public void whenIssueMultiplePrescriptionsToActor(String patientName, DataTable medications) {
@@ -123,20 +106,6 @@ public class DoctorPrescribeSteps {
             IssuePrescription.forPatient(thePatient)
                 .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
                 .forPznPrescription(medications.asMaps()));
-  }
-
-  @Wenn(
-      "^(?:der Arzt|die Ärztin) (.+) ein E-Rezept an (?:den|die) Versicherte(?:n)? (.+)"
-          + " verschreibt$")
-  public void whenIssueSingleRandomPrescriptionsToActor(String docName, String patientName) {
-    val theDoctor = OnStage.theActorCalled(docName);
-    val thePatient = OnStage.theActorCalled(patientName);
-
-    when(theDoctor)
-        .attemptsTo(
-            IssuePrescription.forPatient(thePatient)
-                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .randomPrescription());
   }
 
   @Wenn("^(?:der Arzt|die Ärztin) ein E-Rezept an (?:den|die) Versicherte(?:n)? (.+) verschreibt$")
@@ -162,6 +131,21 @@ public class DoctorPrescribeSteps {
       "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) folgende(?:s)?"
           + " apothekenpflichtige(?:s)? Medikament(?:e)? verschreibt:$")
   public void whenIssuePharmacyOnlyPrescriptionToActor(
+      String docName, String patientName, DataTable medications) {
+    val theDoctor = OnStage.theActorCalled(docName);
+    val thePatient = OnStage.theActorCalled(patientName);
+
+    when(theDoctor)
+        .attemptsTo(
+            IssuePrescription.forPatient(thePatient)
+                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .forPznPrescription(medications.asMaps()));
+  }
+
+  @Wenn(
+      "^(?:der Arzt|die Ärztin) (.+) folgende(?:s)? E-Rezept(?:e)? an (?:den|die) Versicherte(?:n)?"
+          + " (.+) verschreibt:$")
+  public void whenIssueMultiplePrescriptionsToActor( // NOSONAR
       String docName, String patientName, DataTable medications) {
     val theDoctor = OnStage.theActorCalled(docName);
     val thePatient = OnStage.theActorCalled(patientName);
@@ -219,20 +203,6 @@ public class DoctorPrescribeSteps {
   }
 
   @Wenn(
-      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) folgende(?:s)?"
-          + " apothekenpflichtige(?:s)? Medikament(?:e)? verschreibt:$")
-  public void whenIssuePharmacyOnlyPrescriptionToActor(String patientName, DataTable medications) {
-    val theDoctor = OnStage.theActorInTheSpotlight();
-    val thePatient = OnStage.theActorCalled(patientName);
-
-    when(theDoctor)
-        .attemptsTo(
-            IssuePrescription.forPatient(thePatient)
-                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .forPznPrescription(medications.asMaps()));
-  }
-
-  @Wenn(
       "^(?:der Arzt|die Ärztin) (.+) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges"
           + " Medikament verschreibt$")
   @Angenommen(
@@ -241,20 +211,6 @@ public class DoctorPrescribeSteps {
   public void whenIssueSingleRandomPharmacyOnlyPrescriptionToActor(
       String docName, String patientName) {
     val theDoctor = OnStage.theActorCalled(docName);
-    val thePatient = OnStage.theActorCalled(patientName);
-
-    when(theDoctor)
-        .attemptsTo(
-            IssuePrescription.forPatient(thePatient)
-                .as(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .randomPrescription());
-  }
-
-  @Wenn(
-      "^(?:der Arzt|die Ärztin) (?:dem|der) Versicherten (.+) ein apothekenpflichtiges Medikament"
-          + " verschreibt$")
-  public void whenIssuePharmacyOnlyPrescriptionToActor(String patientName) {
-    val theDoctor = OnStage.theActorInTheSpotlight();
     val thePatient = OnStage.theActorCalled(patientName);
 
     when(theDoctor)

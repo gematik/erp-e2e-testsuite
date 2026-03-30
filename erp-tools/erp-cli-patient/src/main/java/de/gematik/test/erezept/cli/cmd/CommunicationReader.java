@@ -27,10 +27,10 @@ import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 
 @Slf4j
@@ -95,7 +95,8 @@ public class CommunicationReader extends BaseRemoteCommand {
         .ifPresent(ac -> System.out.println(format("\tAccessCode: {0}", ac)));
     System.out.println(format("\t{0} -> {1}", com.getSenderId(), com.getRecipientId()));
     System.out.println(format("\tsent: {0} -> received: {1}", com.getSent(), com.getReceived()));
-    if (!com.getBasedOnReferenceId().getFlowType().equals(PrescriptionFlowType.FLOW_TYPE_162))
-      System.out.println(format("\t{0}", com.getMessage()));
+    // message is occasionally empty, in case create a placeholder for visual recognition
+    val message = StringUtils.getIfEmpty(com.getMessage(), () -> "[EMPTY MESSAGE]");
+    System.out.println(format("\t{0}", message));
   }
 }

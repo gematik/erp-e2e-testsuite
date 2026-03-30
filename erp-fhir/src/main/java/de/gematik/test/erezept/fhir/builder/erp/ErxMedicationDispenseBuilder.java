@@ -20,28 +20,25 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.createGeneratorExtension;
+import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.render;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.test.erezept.fhir.builder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Annotation;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Dosage;
-import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 public class ErxMedicationDispenseBuilder
@@ -51,12 +48,13 @@ public class ErxMedicationDispenseBuilder
   private Date whenPrepared;
   private Boolean wasSubstituted;
   private final List<String> dosageInstructions = new LinkedList<>();
+  private final List<DosageDgMP> dosageDgMPS = new ArrayList<>();
+
   private final List<String> notes = new LinkedList<>();
 
   // required because here we need to support KbvMedication and GemErpMedication at the same time
   private Medication baseMedication;
   private Medication.MedicationBatchComponent batch;
-  private DosageDgMP dosageDgMP;
 
   protected ErxMedicationDispenseBuilder(KVNR kvnr) {
     super(kvnr);
@@ -85,6 +83,16 @@ public class ErxMedicationDispenseBuilder
     return this;
   }
 
+  public ErxMedicationDispenseBuilder dgmp(DosageDgMP dosageDgMP) {
+    this.dosageDgMPS.add(dosageDgMP);
+    return this;
+  }
+
+  public ErxMedicationDispenseBuilder dgmp(List<DosageDgMP> dosageDgMPs) {
+    this.dosageDgMPS.addAll(dosageDgMPs);
+    return this;
+  }
+
   public ErxMedicationDispenseBuilder batch(String lotNumber, Date expirationDate) {
     val newBatch = new Medication.MedicationBatchComponent();
     newBatch.setLotNumber(lotNumber);
@@ -99,11 +107,6 @@ public class ErxMedicationDispenseBuilder
 
   public ErxMedicationDispenseBuilder wasSubstituted(Boolean wasSubstituted) {
     this.wasSubstituted = wasSubstituted;
-    return this;
-  }
-
-  public ErxMedicationDispenseBuilder dosage(DosageDgMP dosageDgMP) {
-    this.dosageDgMP = dosageDgMP;
     return this;
   }
 
@@ -144,10 +147,34 @@ public class ErxMedicationDispenseBuilder
     Optional.ofNullable(wasSubstituted)
         .ifPresent(s -> medDisp.getSubstitution().setWasSubstituted(s));
 
-    this.dosageInstructions.stream()
-        .map(instruction -> new Dosage().setText(instruction))
-        .forEach(medDisp::addDosageInstruction);
-    Optional.ofNullable(dosageDgMP).ifPresent(medDisp::addDosageInstruction);
+    if (erpWorkflowVersion.isBiggerThan(ErpWorkflowVersion.V1_5)) {
+
+      if (!dosageInstructions.isEmpty()) {
+        this.dosageDgMPS.add(
+            DosageDgMPBuilder.dosageBuilder().text(String.join(", ", dosageInstructions)).build());
+      }
+
+      if (!dosageDgMPS.isEmpty()) {
+        // ext setzen
+        medDisp.addExtension(createGeneratorExtension());
+        // ext setzen
+        medDisp.addExtension(
+            new Extension(
+                DgMPStructDef.MD_RENDERED_DOSAGE_INSTRUCTION.getCanonicalUrl(),
+                new MarkdownType(render(dosageDgMPS))));
+        // dgmp setzten
+        dosageDgMPS.forEach(medDisp::addDosageInstruction);
+      }
+
+    } else {
+      // old behavior
+      this.dosageInstructions.stream()
+          .map(instruction -> new Dosage().setText(instruction))
+          .forEach(medDisp::addDosageInstruction);
+      if (!dosageDgMPS.isEmpty())
+        dosageDgMPS.forEach(
+            dosageDgMP -> medDisp.addDosageInstruction(new Dosage().setText(dosageDgMP.getText())));
+    }
     this.notes.stream().map(note -> new Annotation().setText(note)).forEach(medDisp::addNote);
 
     return medDisp;
@@ -155,7 +182,7 @@ public class ErxMedicationDispenseBuilder
 
   private void checkRequired() {
     this.checkRequired(baseMedication, "MedicationDispense requires a Medication");
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3) <= 0) {
+    if (erpWorkflowVersion.isSmallerThanOrEqualTo(ErpWorkflowVersion.V1_3)) {
       if (this.baseMedication instanceof GemErpMedication) {
         throw new BuilderException(
             format(

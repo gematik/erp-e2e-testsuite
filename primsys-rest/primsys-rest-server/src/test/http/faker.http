@@ -1,0 +1,85 @@
+
+
+### FAKER-DOC-PHARMACEUTICAL-01
+POST {{host}}/faker/doc/kbvbundle
+Content-Type: application/json
+apikey: {{apikey}}
+
+{
+  "patient": {
+    "kvnr": "string",
+    "insuranceType": "GKV",
+    "firstName": "string",
+    "lastName": "string",
+    "birthDate": "15.12.2025",
+    "city": "string",
+    "postal": "string",
+    "street": "string"
+  }
+}
+
+### FAKER-DOC-DIGA-01
+POST {{host}}/faker/doc/evdgabundle
+Content-Type: application/json
+apikey: {{apikey}}
+
+{
+  "patient": {
+    "kvnr": "string"
+  },
+  "coverage": {
+    "iknr": "string",
+    "name": "string"
+  },
+  "medicationRequest": {
+    "dosage": "string",
+    "packageQuantity": 0,
+    "note": "string",
+    "substitutionAllowed": true,
+    "bvg": true,
+    "emergencyFee":false
+  },
+  "medication": {
+    "type": "PZN",
+    "category": "Arzneimittel",
+    "vaccine": true,
+    "standardSize": "KA",
+    "supplyForm": "Ätherisches Öl",
+    "packagingSize": "string",
+    "packagingUnit": "string",
+    "pzn": "string",
+    "name": "string"
+  }
+}
+
+### FAKER-PHARM-PZN-DISPENSE-01
+# Note: broken since 1.5 requires GEM_Medication
+POST {{host}}/faker/pharm/pznmedicationdispense?kvnr=S040464113&prescriptionId=160.000.117.427.370.25
+Content-Type: application/json
+apikey: {{apikey}}
+
+[
+  {
+    "type": "PZN",
+    "category": "Arzneimittel",
+    "vaccine": true,
+    "standardSize": "KA",
+    "supplyForm": "Ätherisches Öl",
+    "packagingSize": "string",
+    "packagingUnit": "string",
+    "pzn": "string",
+    "name": "string",
+    "batch": {
+      "lotNumber": "string",
+      "expiryDate": "31/12/2025"
+    },
+    "whenHandedOver": "15/12/2025",
+    "whenPrepared": "15/12/2025",
+    "dosageInstructions": [
+      "1-0-1"
+    ],
+    "notes": [
+      "nicht auf nüchternen Magen einnehmen"
+    ]
+  }
+]

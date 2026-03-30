@@ -28,6 +28,7 @@ import de.gematik.test.erezept.app.mobile.Environment;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.app.task.*;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.screenplay.task.BillingInformationConsent;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,10 +70,13 @@ public class SetUpIosDevice implements Task {
       ensureMainScreenIsOpenedAndScrolledUp(app, actor);
     }
 
-    actor.attemptsTo(EnsureProfileMatchesInsurance.ofType(insuranceType));
-
     actor.attemptsTo(
         EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceType, sca));
+
+    actor.attemptsTo(BillingInformationConsent.revokeConsent());
+    actor.attemptsTo(EnsureThatTheEUConsent.isRevoked());
+    actor.attemptsTo(EnsureProfileMatchesInsurance.ofType(insuranceType));
+    actor.attemptsTo(EnsureThatTheEUFeature.isInActive());
   }
 
   private void ensureMainScreenIsOpenedAndScrolledUp(UseTheApp<?> app, Actor actor) {

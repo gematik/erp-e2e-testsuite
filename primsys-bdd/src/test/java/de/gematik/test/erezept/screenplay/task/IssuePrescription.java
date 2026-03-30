@@ -28,6 +28,7 @@ import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhirdump.FhirDumper;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
@@ -35,11 +36,7 @@ import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapper;
-import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperCompounding;
-import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperFreitext;
-import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperIngredient;
-import de.gematik.test.erezept.screenplay.strategy.prescription.PrescriptionDataMapperPZN;
+import de.gematik.test.erezept.screenplay.strategy.prescription.*;
 import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
@@ -85,6 +82,7 @@ public class IssuePrescription implements Task {
     val kbvOrganization = baseDataAbility.getMedicalOrganization();
 
     val type = prescriptionDataMapper.getType();
+
     prescriptionDataMapper
         .createKbvBundles(kbvPractitioner, kbvOrganization)
         .forEach(
@@ -204,6 +202,7 @@ public class IssuePrescription implements Task {
     private Actor pharmacy;
     private PrescriptionAssignmentKind type =
         PrescriptionAssignmentKind.PHARMACY_ONLY; // as default
+    private PrescriptionFlowType flowType;
 
     private IssuePrescriptionBuilder(Actor patient) {
       this.patient = patient;

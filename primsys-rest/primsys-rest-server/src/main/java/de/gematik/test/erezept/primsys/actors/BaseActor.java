@@ -46,6 +46,8 @@ import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -157,7 +159,9 @@ public abstract class BaseActor {
   }
 
   public ActorDto getActorSummary() {
-    return this.actorInfo;
+    val validUntil = this.getClient().getIdpTokenValidUntil();
+    val ttl = Duration.between(Instant.now(), validUntil);
+    return actorInfo.setIdpValidUntil(validUntil.toString()).setIdpTimeToLive(ttl.toString());
   }
 
   private ActorDto initActorSummary() {

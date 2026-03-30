@@ -24,7 +24,6 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDiagnostics;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectAcceptDate;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectExpiryDate;
@@ -58,7 +57,6 @@ import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.ErpDarreichungsformAprilActive;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -81,9 +79,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 @DisplayName("E-Rezept ausstellen")
 @Tag("UseCase:Activate")
 class TaskActivateIT extends ErpTest {
-
-  private static final Boolean EXPECT_DARREICHUNGSFORM_APRIL_IS_ACTIVE =
-      featureConf.getToggle(new ErpDarreichungsformAprilActive());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -234,26 +229,15 @@ class TaskActivateIT extends ErpTest {
                 .ofAssignmentKind(assignmentKind)
                 .withKbvBundleFrom(kbvBundleBuilder));
 
-    if (EXPECT_DARREICHUNGSFORM_APRIL_IS_ACTIVE) {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DARREICHUNGSFORMEN)
-              .hasResponseWith(returnCode(200))
-              .and(hasWorkflowType(expectedFlowType))
-              .and(isInReadyStatus())
-              .and(hasCorrectExpiryDate())
-              .and(hasCorrectAcceptDate(expectedFlowType))
-              .isCorrect());
-    } else {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome()
-              .responseWith(returnCodeIs(400))
-              .has(
-                  operationOutcomeHasDetailsText(
-                      "FHIR-Validation error", FhirRequirements.FHIR_VALIDATION_ERROR))
-              .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType(KbvProfileRules.EXTENDED_VALUE_SET_DARREICHUNGSFORMEN)
+            .hasResponseWith(returnCode(200))
+            .and(hasWorkflowType(expectedFlowType))
+            .and(isInReadyStatus())
+            .and(hasCorrectExpiryDate())
+            .and(hasCorrectAcceptDate(expectedFlowType))
+            .isCorrect());
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_03")

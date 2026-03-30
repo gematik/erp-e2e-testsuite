@@ -20,25 +20,48 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+
+@SuppressWarnings("javaarchitecture:S7027")
 public interface GemErpMedicationFaker {
 
   static GemErpMedicationKombiPkgFaker forKombiPkg() {
-    return new GemErpMedicationKombiPkgFaker();
+    return GemErpMedicationFaker.forKombiPkg(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  static GemErpMedicationKombiPkgFaker forKombiPkg(ErpWorkflowVersion version) {
+    return new GemErpMedicationKombiPkgFaker(version);
   }
 
   static GemErpMedicationPZNFaker forPznMedication() {
-    return new GemErpMedicationPZNFaker();
+    return GemErpMedicationFaker.forPznMedication(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  static GemErpMedicationPZNFaker forPznMedication(ErpWorkflowVersion version) {
+    return new GemErpMedicationPZNFaker(version);
   }
 
   static GemErpMedicationCompoundingFaker forMedicationCompounding() {
-    return new GemErpMedicationCompoundingFaker();
+    return GemErpMedicationFaker.forMedicationCompounding(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  static GemErpMedicationCompoundingFaker forMedicationCompounding(ErpWorkflowVersion version) {
+    return new GemErpMedicationCompoundingFaker(version);
   }
 
   static GemErpMedicationIngredientFaker forMedicationIngredient() {
-    return new GemErpMedicationIngredientFaker();
+    return GemErpMedicationFaker.forMedicationIngredient(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  static GemErpMedicationIngredientFaker forMedicationIngredient(ErpWorkflowVersion version) {
+    return new GemErpMedicationIngredientFaker(version);
   }
 
   static GemErpMedFreeTextFaker forFreeTextMedication() {
-    return new GemErpMedFreeTextFaker();
+    return GemErpMedicationFaker.forFreeTextMedication(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  static GemErpMedFreeTextFaker forFreeTextMedication(ErpWorkflowVersion version) {
+    return new GemErpMedFreeTextFaker(version);
   }
 }

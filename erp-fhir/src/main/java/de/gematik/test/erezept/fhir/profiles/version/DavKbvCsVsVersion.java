@@ -21,23 +21,22 @@
 package de.gematik.test.erezept.fhir.profiles.version;
 
 import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
-import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @deprecated no usage found... and can be removed in future
+ */
 @Getter
 @RequiredArgsConstructor
+@Deprecated(forRemoval = true)
 public enum DavKbvCsVsVersion implements ProfileVersion {
   V1_0_2("1.0.2"),
   V1_0_3("1.0.3"),
+  V1_0_6("1.0.6"),
   V1_6_0("1.6.0");
 
   public static final String PROFILE_NAME = "gematik.kbv.sfhir.cs.vs";
   private final String version;
   private final String name = PROFILE_NAME;
-
-  @Deprecated(since = "until knowing for what") // NOSONAR
-  public static DavKbvCsVsVersion getDefaultVersion() {
-    return VersionUtil.getDefaultVersion(DavKbvCsVsVersion.class, PROFILE_NAME);
-  }
 }

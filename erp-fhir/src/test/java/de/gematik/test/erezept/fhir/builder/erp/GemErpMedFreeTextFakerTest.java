@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,18 +30,26 @@ import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-@SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.5.0")
+@ParameterizedClass
+@MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+@RequiredArgsConstructor
 class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
+
+  private final ErpWorkflowVersion version;
+
   @Test
   void shouldBuildMedicationWithCodeText() {
     String codeText = "Test Code Text";
     val gemErpMedFreeText =
-        GemErpMedicationFaker.forFreeTextMedication().withCodeText(codeText).fake();
+        GemErpMedicationFaker.forFreeTextMedication(version).withCodeText(codeText).fake();
     assertNotNull(gemErpMedFreeText);
     assertEquals(codeText, gemErpMedFreeText.getCode().getText());
     assertTrue(parser.isValid(gemErpMedFreeText));
@@ -54,15 +61,13 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
     val formText = "Test Form Text";
     val lotNumber = "Test Lot Number";
     val category = EpaDrugCategory.C_00;
-    val version = ErpWorkflowVersion.V1_4;
 
     val gemErpMedFreeText =
-        GemErpMedicationFaker.forFreeTextMedication()
+        GemErpMedicationFaker.forFreeTextMedication(version)
             .withCodeText(codeText)
             .withFormText(formText)
             .withLotNumber(lotNumber)
             .withDrugCategory(category)
-            .withVersion(version)
             .withVaccineTrue(true)
             .fake();
 
@@ -73,7 +78,13 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
     assertTrue(gemErpMedFreeText.isVaccine());
     assertEquals(category.getCode(), gemErpMedFreeText.getCategory().orElseThrow().getCode());
 
-    assertTrue(gemErpMedFreeText.getMeta().getProfile().get(0).getValue().endsWith("1.4"));
+    assertTrue(
+        gemErpMedFreeText
+            .getMeta()
+            .getProfile()
+            .get(0)
+            .getValue()
+            .endsWith(version.getVersion().substring(0, 3)));
     assertTrue(parser.isValid(gemErpMedFreeText));
   }
 
@@ -82,7 +93,7 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
     val codeText = "Minimal Code Text";
 
     val gemErpMedFreeText =
-        GemErpMedicationFaker.forFreeTextMedication().withCodeText(codeText).fake();
+        GemErpMedicationFaker.forFreeTextMedication(version).withCodeText(codeText).fake();
 
     assertNotNull(gemErpMedFreeText);
     assertEquals(codeText, gemErpMedFreeText.getCode().getText());
@@ -91,7 +102,7 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildMedicationWitWithoutValues() {
-    val gemErpMedFreeText = GemErpMedicationFaker.forFreeTextMedication().fake();
+    val gemErpMedFreeText = GemErpMedicationFaker.forFreeTextMedication(version).fake();
 
     assertNotNull(gemErpMedFreeText);
     assertNotNull(gemErpMedFreeText.getNameFromCodeOreContainedRessource());
@@ -100,7 +111,7 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldNotThrowExceptionWhenCodeTextIsMissing() {
-    val faker = GemErpMedicationFaker.forFreeTextMedication().withFormText("Test Form Text");
+    val faker = GemErpMedicationFaker.forFreeTextMedication(version).withFormText("Test Form Text");
     assertDoesNotThrow(faker::fake);
   }
 
@@ -108,7 +119,7 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
   void shouldFakeValidWithAllValues() {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(true);
-      val gemErpMedFreeText = GemErpMedicationFaker.forFreeTextMedication().fake();
+      val gemErpMedFreeText = GemErpMedicationFaker.forFreeTextMedication(version).fake();
 
       assertNotNull(gemErpMedFreeText);
       assertTrue(parser.isValid(gemErpMedFreeText));
@@ -119,10 +130,16 @@ class GemErpMedFreeTextFakerTest extends ErpFhirParsingTest {
   void shouldFakeValidWithMinimumValues() {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(false);
-      val gemErpMedFreeText = GemErpMedicationFaker.forFreeTextMedication().fake();
+      val gemErpMedFreeText = GemErpMedicationFaker.forFreeTextMedication(version).fake();
 
       assertNotNull(gemErpMedFreeText);
       assertTrue(parser.isValid(gemErpMedFreeText));
     }
+  }
+
+  @Test()
+  void shouldBuildWithoutExplicitVersion() {
+    val med = GemErpMedicationFaker.forFreeTextMedication().fake();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, med).isSuccessful());
   }
 }

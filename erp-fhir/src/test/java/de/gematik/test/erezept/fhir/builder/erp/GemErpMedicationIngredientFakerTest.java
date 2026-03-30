@@ -33,23 +33,32 @@ import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
+@ParameterizedClass
+@MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+@RequiredArgsConstructor
 class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
+
+  private final ErpWorkflowVersion version;
 
   @RepeatedTest(5)
   void shouldRandomlyFake() {
-    val medication = GemErpMedicationFaker.forMedicationIngredient().fake();
-    assertTrue(parser.isValid(medication));
+    val medication = GemErpMedicationFaker.forMedicationIngredient(version).fake();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
   }
 
   @RepeatedTest(5)
   void shouldFakeWithFixedValues() {
-    val medication = GemErpMedicationFaker.forMedicationIngredient();
+    val medication = GemErpMedicationFaker.forMedicationIngredient(version);
 
     if (fakerBool()) medication.withSnomed(fakerLotNumber());
     if (fakerBool())
@@ -58,15 +67,15 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
     if (fakerBool()) medication.withLotNumber(fakerLotNumber());
     if (fakerBool()) medication.withVaccineTrue(true);
     if (fakerBool()) medication.withAsk(ASK.from(getFaker().superhero().name()));
-    if (fakerBool()) medication.withVersion(ErpWorkflowVersion.V1_4);
+
     if (fakerBool()) medication.withStandardSize(StandardSize.random());
     if (fakerBool())
-      medication.withIngredientWithContainedAtc(
+      medication.withIngredientWithContainedAsk(
           getFaker().random().nextInt(1000),
           getFaker().random().nextInt(500),
-          ATC.from(GemFaker.getFaker().regexify("[0-9]{1,4}")));
+          ASK.from(GemFaker.getFaker().regexify("[0-9]{1,4}")));
 
-    assertTrue(parser.isValid(medication.fake()));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication.fake()).isSuccessful());
   }
 
   @RepeatedTest(5)
@@ -74,9 +83,9 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(true);
 
-      val medication = GemErpMedicationFaker.forMedicationIngredient().fake();
+      val medication = GemErpMedicationFaker.forMedicationIngredient(version).fake();
 
-      assertTrue(parser.isValid(medication));
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
     }
   }
 
@@ -85,7 +94,7 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(false);
       val medication =
-          GemErpMedicationFaker.forMedicationIngredient()
+          GemErpMedicationFaker.forMedicationIngredient(version)
               .withAsk(ASK.from(getFaker().superhero().name()))
               .withAsk(ASK.from(getFaker().superhero().name()))
               .withAsk(ASK.from(getFaker().superhero().name()))
@@ -97,7 +106,7 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
               .withAtc(ATC.from(getFaker().superhero().name()))
               .fake();
 
-      assertTrue(parser.isValid(medication));
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
       assertEquals(10, medication.getCode().getCoding().size());
     }
   }
@@ -110,7 +119,7 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
       val ask = ASK.from("TestASK");
       val snomed = "TestSNOMED";
       val atc = ATC.from("TestATC");
-      val version = ErpWorkflowVersion.V1_4;
+
       val category = EpaDrugCategory.C_00;
       val standardSize = StandardSize.N1;
       val numerator = 5;
@@ -119,15 +128,14 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
       val isVaccine = true;
 
       val faker =
-          new GemErpMedicationIngredientFaker()
+          new GemErpMedicationIngredientFaker(version)
               .withAsk(ask)
               .withAtc(atc)
               .withSnomed(snomed)
-              .withVersion(version)
               .withDrugCategory(category)
               .withFreeText("TestFreeText")
               .withStandardSize(standardSize)
-              .withIngredientWithContainedAtc(numerator, denominator, atc)
+              .withIngredientWithContainedAsk(numerator, denominator, ask)
               .withVaccineTrue(isVaccine)
               .withAmount(numerator, "mg")
               .withLotNumber(lotNumber);
@@ -149,7 +157,7 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
           String.valueOf(result.getIngredientFirstRep().getStrength().getDenominator().getValue()));
       assertEquals(lotNumber, result.getBatchLotNumber().orElseThrow());
 
-      assertTrue(parser.isValid(result));
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, result).isSuccessful());
     }
   }
 }

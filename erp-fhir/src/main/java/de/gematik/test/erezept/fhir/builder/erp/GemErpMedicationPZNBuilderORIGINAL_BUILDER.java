@@ -111,7 +111,7 @@ extends ResourceBuilder<GemErpMedication, GemErpMedicationPZNBuilderORIGINAL_BUI
           .getIngredient()
           .forEach(ing -> builder.ingredientItemCodeConcept(ing.getItemCodeableConcept()));
 
-      kbvMedication.getManufactoringInstrOptional().ifPresent(builder::manufacturingInstruction);
+      kbvMedication.getManufacturingInstruction().ifPresent(builder::manufacturingInstruction);
       kbvMedication.getPackagingOptional().ifPresent(builder::packaging);
       kbvMedication.getIngredientStrengthRatio().ifPresent(builder::ingredientStrength);
     }

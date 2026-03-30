@@ -30,6 +30,7 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,6 +39,7 @@ public class PatchPrescriptionForEuRedemption extends ErpAction<ErxTask> {
   private final TaskId taskId;
 
   @Override
+  @Step("{0} gibt die Verordnung #taskId für die EU-Einlösung frei (Patch Prescription)")
   public ErpInteraction<ErxTask> answeredBy(Actor actor) {
     val patient = (PatientActor) actor;
 

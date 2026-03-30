@@ -30,6 +30,7 @@ import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
@@ -125,7 +126,12 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public KbvPatient getPatient() {
+    return getPatient(KbvItaForVersion.getDefaultVersion());
+  }
+
+  public KbvPatient getPatient(KbvItaForVersion forVersion) {
     return KbvPatientBuilder.builder()
+        .version(forVersion)
         .kvnr(kvnr, patientInsuranceType)
         .name(firstName, lastName)
         .birthDate(birthDate)
@@ -134,9 +140,14 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public KbvCoverage getInsuranceCoverage(KbvPatient patient) {
+    return getInsuranceCoverage(patient, KbvItaForVersion.getDefaultVersion());
+  }
+
+  public KbvCoverage getInsuranceCoverage(KbvPatient patient, KbvItaForVersion forVersion) {
     val coverageType = this.getCoverageInsuranceType();
     val builder =
         KbvCoverageBuilder.insurance(iknr, insuranceName)
+            .version(forVersion)
             .beneficiary(patient)
             .wop(wop)
             .dmpKennzeichen(dmpKennzeichen)

@@ -20,11 +20,11 @@
 
 package de.gematik.test.erezept.lei.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.and;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.task.*;
+import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
@@ -54,6 +54,23 @@ public class PatientCommunicationDiGASteps {
                     .forPrescriptionFromBackend(order)
                     .sentTo(theInsurance)
                     .withoutMessage())); // without message for DiGA Usecase
+  }
+
+  @Dann(
+      "^kann (?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) ausgestelltes (?:EVDGA"
+          + " E-Rezept|E-Rezept) ihrem Kostenträger (.+) nicht zuweisen$")
+  public void requestMedicalDispenseViaCommunication(
+      String patientName, String order, String insuranceName) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    val theInsurance = OnStage.theActorCalled(insuranceName);
+    then(thePatient)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfPostCommunication.dispenseDiGARequest()
+                        .forPrescriptionFromBackend(order)
+                        .sentTo(theInsurance)
+                        .withoutMessage())
+                .isEqualTo(403)); // without message for DiGA Usecase
   }
 
   @Und(

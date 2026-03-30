@@ -35,8 +35,8 @@ public enum PrescriptionDetails implements PageElement {
           By.xpath(
               "(//XCUIElementTypeAlert[@name='Dieses Rezept wird im Rahmen einer Behandlung für Sie"
                   + " eingelöst und kann währenddessen nicht gelöscht werden.'])")),
-  DELETE_BUTTON_TOOLBAR(
-      "Delete Prescription tool bar item",
+  PRESCRIPTION_DETAILS_TOOLBAR(
+      "Prescription details toolbar button",
       () -> AppiumBy.accessibilityId("prsc_dtl_btn_toolbar_item")),
   REDEEM_ON_SITE(
       "Redeem Prescription directly on site in the pharmacy",
@@ -79,8 +79,9 @@ public enum PrescriptionDetails implements PageElement {
   DELETE_BUTTON_TOOLBAR_ITEM(
       "Delete Prescription button",
       () -> AppiumBy.accessibilityId("prsc_dtl_toolbar_menu_btn_delete")),
-  DELETE_PRESCRIPTION_ITEM_BUTTON(
-      "Delete Prescription button", () -> AppiumBy.name("Horizontaler Rollbalken, 1 Seite")),
+  START_EU_REDEEM_TOOLBAR_ITEM(
+      "Starte EU redeem button",
+      () -> AppiumBy.accessibilityId("prsc_dtl_toolbar_menu_btn_redeem_eu_prsc")),
   TECHNICAL_INFORMATION(
       "Technische Informationen",
       () -> AppiumBy.accessibilityId("prsc_dtl_btn_technical_informations")),

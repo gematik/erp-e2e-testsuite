@@ -31,10 +31,13 @@ import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -68,6 +71,8 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithFreeText;
 
   private static FhirCodec epaFhir;
+  private static KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.V1_4_0;
+  private static KbvItaForVersion kbvItaForVersion = KbvItaForVersion.V1_3_0;
 
   @BeforeAll
   static void setup() {
@@ -315,7 +320,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldValidatePznCorrect() {
     val pznMedication =
-        KbvErpMedicationPZNFaker.builder()
+        KbvErpMedicationPZNFaker.builder(kbvItaErpVersion)
             .withPznMedication("10019621", "IBU-ratiopharm 400mg akut Schmerztabletten")
             .withAmount(50, "Tablet")
             .withStandardSize(StandardSize.N3)
@@ -328,7 +333,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldValidateEpaMedicationWithMedicationIngredientCorrect() {
     val ingredientMed =
-        KbvErpMedicationIngredientFaker.builder()
+        KbvErpMedicationIngredientFaker.builder(kbvItaErpVersion)
             .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
             .withAmount("1", 1, "halt sowas")
             .withDrugName("Grippostad C® Fruchtgummi")
@@ -371,6 +376,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   void shouldValidateEpaMedicationAsATCAndPZNCorrect() {
     val medication =
         new KbvErpMedicationPZNBuilder()
+            .version(kbvItaErpVersion)
             .isVaccine(true)
             .pzn(PZN.from("10019621"), "IBU-ratiopharm 400mg akut Schmerztabletten")
             .amount(4, "iss Soo")
@@ -432,6 +438,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
       String pznCode, String atcCode) {
     val medication =
         new KbvErpMedicationPZNBuilder()
+            .version(kbvItaErpVersion)
             .isVaccine(true)
             .pzn(PZN.from(pznCode), "IBU-ratiopharm 400mg akut Schmerztabletten")
             .amount(4, "iss Soo")
@@ -454,12 +461,13 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldValidateEpaMedicationRequestCorrect() {
+
     val dispRequest =
         new MedicationRequest.MedicationRequestDispenseRequestComponent()
             .setQuantity(new Quantity().setValue(1));
-    val medication = KbvErpMedicationPZNFaker.builder().fake();
+    val medication = KbvErpMedicationPZNFaker.builder(kbvItaErpVersion).fake();
     val medRequ =
-        KbvErpMedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder(kbvItaErpVersion, kbvItaForVersion)
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -478,7 +486,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
     val dispRequest =
         new MedicationRequest.MedicationRequestDispenseRequestComponent()
             .setQuantity(new Quantity().setValue(1).setSystem("http://unitsofmeasure.org"));
-    val medication = KbvErpMedicationPZNFaker.builder().fake();
+    val medication = KbvErpMedicationPZNFaker.builder(kbvItaErpVersion).fake();
     val medRequ =
         KbvErpMedicationRequestFaker.builder()
             .withAuthorDate(testDate)
@@ -497,9 +505,9 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
     val dispRequest =
         new MedicationRequest.MedicationRequestDispenseRequestComponent()
             .setQuantity(new Quantity().setValue(2).setSystem("http://unitsofmeasure.org"));
-    val medication = KbvErpMedicationPZNFaker.builder().fake();
+    val medication = KbvErpMedicationPZNFaker.builder(kbvItaErpVersion).fake();
     val medRequ =
-        KbvErpMedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder(kbvItaErpVersion, kbvItaForVersion)
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -519,7 +527,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
             .setQuantity(new Quantity().setValue(1).setSystem("http://unitsofmeasure.org"));
     val medication = KbvErpMedicationPZNFaker.builder().fake();
     val medRequ =
-        KbvErpMedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder(kbvItaErpVersion, kbvItaForVersion)
             .withAuthorDate(new Date())
             .withMedication(medication)
             .fake();
@@ -536,6 +544,18 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   void shouldValidateEpaOrganisationCorrect() {
     val step = emlOrganisationHasSmcbTelematikId(TelematikID.from("9-2.58.00000040"));
     assertDoesNotThrow(() -> step.apply(epaOpProvidePrescription));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationCategoryCorrect() {
+    val step = emlHasMedicationCategory(MedicationCategory.C_00, EmlAfos.A_25946);
+    assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithPzn));
+  }
+
+  @Test
+  void shoulThrowWhiledValidateEpaMedicationCategoryCorrect() {
+    val step = emlHasMedicationCategory(MedicationCategory.C_01, EmlAfos.A_25946);
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithPzn));
   }
 
   @Test
@@ -559,7 +579,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldValidateEpaMedicationWithMedicationCompoundingCorrect() {
     val compoundingMed =
-        KbvErpMedicationCompoundingFaker.builder()
+        KbvErpMedicationCompoundingFaker.builder(kbvItaErpVersion)
             .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
             .withMedicationIngredient("41063001", "Vertigoheel® 20 mg", "freitextPzn")
             .withAmount(5, 1, "Stk")
@@ -586,7 +606,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
                         new Coding().setSystem(SNOMED_SCT.getCanonicalUrl()).setCode("123456"))));
 
     val compoundingMed =
-        KbvErpMedicationCompoundingFaker.builder()
+        KbvErpMedicationCompoundingFaker.builder(kbvItaErpVersion)
             .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
             .withMedicationIngredient("41063001", "Vertigoheel® 20 mg", "freitextPzn")
             .withAmount(5, 1, "Stk")
@@ -609,7 +629,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
       String amountUnit,
       String dosage) {
     val compoundingMed =
-        KbvErpMedicationCompoundingFaker.builder()
+        KbvErpMedicationCompoundingFaker.builder(kbvItaErpVersion)
             .withCategory(category)
             .withMedicationIngredient(ingredientPznCode, ingredientPznName, "freitextPzn")
             .withAmount(amountNUm, amountDenom, amountUnit)
@@ -628,7 +648,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldValidateEpaMedicationWithMedicationFreeTextCorrect() {
     val compoundingMed =
-        KbvErpMedicationFreeTextFaker.builder()
+        KbvErpMedicationFreeTextFaker.builder(kbvItaErpVersion)
             .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
             .withDosageForm("Zäpfchen, viel Spaß")
             .withVaccine(false)
@@ -643,7 +663,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   void shouldThrowWhileValidateEpaMedicationWithMedicationFreeTextWithWrongValues(
       MedicationCategory category, String dosage, boolean isvVaccine, String freeText) {
     val compoundingMed =
-        KbvErpMedicationFreeTextFaker.builder()
+        KbvErpMedicationFreeTextFaker.builder(kbvItaErpVersion)
             .withCategory(category) // Mapped to 'Medication.extension:drugCategory'
             .withDosageForm(dosage)
             .withVaccine(isvVaccine)

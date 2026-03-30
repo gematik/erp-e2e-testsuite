@@ -32,9 +32,8 @@ Funktionalität: Kostenbeleg und Einwilligung
     Und die Apotheke Adelheid Ulmendorfer hat Zugriff auf ihre SMC-B
     Und die PKV Versicherte Alice hat die E-Rezept App auf ihrem Smartphone eingerichtet
 
-  @TCID:ERP_FDV_PKV_04
+  @TCID:ERP_FDV_PKV_KOSTENBELEGE_01
   Szenario: Kostenbelege und Einwilligung verwalten
-    Und die Versicherte Alice kann Kostenbelege verwalten
     Wenn die Versicherte Alice ihre Einwilligung zum Speichern der PKV-Abrechnungsinformationen über die App erteilt
     Und die Ärztin Adelheid Ulmenwald der Versicherten Alice folgendes apothekenpflichtiges Medikament verschreibt:
       | Name          | Workflow |

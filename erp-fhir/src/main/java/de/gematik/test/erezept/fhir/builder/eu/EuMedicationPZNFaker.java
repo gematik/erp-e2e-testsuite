@@ -39,9 +39,10 @@ public class EuMedicationPZNFaker {
 
   private final Map<String, Consumer<EuMedicationBuilder>> builderConsumers = new HashMap<>();
 
-  private EuMedicationPZNFaker() {
-    withVersion(EuVersion.getDefaultVersion());
+  private final EuVersion euVersion;
 
+  private EuMedicationPZNFaker(EuVersion euVersion) {
+    this.euVersion = euVersion;
     withPzn(PZN.random(), fakerDrugName());
 
     if (fakerBool()) withDrugCategory(fakerValueSet(EpaDrugCategory.class));
@@ -64,12 +65,11 @@ public class EuMedicationPZNFaker {
   }
 
   public static EuMedicationPZNFaker faker() {
-    return new EuMedicationPZNFaker();
+    return faker(EuVersion.getDefaultVersion());
   }
 
-  public EuMedicationPZNFaker withVersion(EuVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+  public static EuMedicationPZNFaker faker(EuVersion euVersion) {
+    return new EuMedicationPZNFaker(euVersion);
   }
 
   public EuMedicationPZNFaker withDrugCategory(EpaDrugCategory category) {
@@ -122,7 +122,7 @@ public class EuMedicationPZNFaker {
   }
 
   public EuMedicationBuilder toBuilder() {
-    val builder = EuMedicationBuilder.builder();
+    val builder = EuMedicationBuilder.builder().version(euVersion);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

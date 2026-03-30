@@ -24,6 +24,7 @@ import static de.gematik.test.erezept.lei.steps.ActorsInitializationSteps.config
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 import static org.hamcrest.Matchers.is;
 
+import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.questions.DispenseDigaPrescription;
 import de.gematik.test.erezept.screenplay.questions.HasNewSubscriptionPing;
@@ -144,5 +145,17 @@ public class KtrSteps {
                             "Die Anfrage zur Ausstellung eines Freischaltcodes für die DiGA wurde"
                                 + " abgewiesen, da Sie nicht berechtigt sind.  "))
                 .isEqualTo(201));
+  }
+
+  @Dann(
+      "^darf der Kostenträger (.+) das (letzte|erste) EVDGA E-Rezept (?:der|dem)"
+          + " Versicherten (.+) nicht beim Fachdienst akzeptieren$")
+  public void thenForbiddenToAcceptPrescription(
+      String pharmName, String order, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    then(thePharmacy)
+        .attemptsTo(
+            Negate.the(AcceptPrescription.fromStack(order))
+                .with(UnexpectedResponseResourceError.class));
   }
 }

@@ -20,9 +20,8 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -32,7 +31,9 @@ import de.gematik.test.erezept.primsys.data.valuesets.MedicationTypeDto;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
+@SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
 class KbvPznMedicationDataMapperTest extends ErpFhirParsingTest {
 
   @RepeatedTest(value = 10)
@@ -61,7 +62,7 @@ class KbvPznMedicationDataMapperTest extends ErpFhirParsingTest {
     val medication2 = mapper2.convert();
 
     assertEquals(medication.getMedicationType(), medication2.getMedicationType());
-    assertEquals(medication.getCatagory(), medication2.getCatagory());
+    assertEquals(medication.getCategory(), medication2.getCategory());
     assertEquals(medication.isVaccine(), medication2.isVaccine());
     assertEquals(medication.getStandardSize(), medication2.getStandardSize());
     assertEquals(medication.getDarreichungsform(), medication2.getDarreichungsform());

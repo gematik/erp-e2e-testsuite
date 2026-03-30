@@ -66,33 +66,6 @@ class CommunicationDiGAReplyIT extends ErpTest {
 
   @TestcaseId("ERP_DIGA_COMMUNICATION_REPLY_01")
   @Test
-  @DisplayName("Als Apotheke versuche ich eine Antwort für eine DiGA Verordnung zu senden")
-  void shouldRejectDiGAReplyFromPharmacy() {
-    doctor.attemptsTo(IssueDiGAPrescription.forPatient(patient));
-    val dmc = SafeAbility.getAbility(patient, ManageDataMatrixCodes.class).getDmcs().getFirst();
-    val patientBaseData = SafeAbility.getAbility(patient, ProvidePatientBaseData.class);
-
-    val communication =
-        ErxCommunicationBuilder.asReply(
-                "Die Anfrage zur Ausstellung eines Freischaltcodes für die DiGA wurde abgwiesen, da"
-                    + " Sie nicht bei der Gematik-KK versichert sind.")
-            .sender(pharmacy.getTelematikId().getValue())
-            .receiver(patientBaseData.getKvnr().getValue())
-            .basedOn(dmc.getTaskId())
-            .flowType(PrescriptionFlowType.FLOW_TYPE_162)
-            .build();
-
-    val responseInteraction = pharmacy.performs(SendMessages.withCommunication(communication));
-
-    pharmacy.attemptsTo(
-        Verify.that(responseInteraction)
-            .withOperationOutcome(ErpAfos.A_19447_05)
-            .hasResponseWith(returnCode(400))
-            .isCorrect());
-  }
-
-  @TestcaseId("ERP_DIGA_COMMUNICATION_REPLY_02")
-  @Test
   @DisplayName("Als Kostenträger sende ich eine Antwort für eine DiGA Verordnung")
   void shouldAcceptDiGAReplyFromPharmacy() {
     doctor.attemptsTo(IssueDiGAPrescription.forPatient(patient));

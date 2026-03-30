@@ -27,6 +27,7 @@ import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.val;
 import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Ratio;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
@@ -52,5 +53,40 @@ class GemErpIngredientComponentBuilderTest extends ErpFhirParsingTest {
     assertNotNull(ingrdComponent.getStrength().getDenominator().getCode());
     assertNotNull(ingrdComponent.getStrength().getDenominator().getSystem());
     assertNotNull(ingrdComponent.getStrength().getDenominator().getValue());
+  }
+
+  @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
+  @Test
+  void shouldNotSetIngredientNumSystemAndSoElseAutomaticForNewVersions() {
+    // only to find testcase while restructure versions:
+    val onlyToFindVersionByCompiler = ErpWorkflowVersion.V1_5; // NOSONAR
+    System.setProperty(ERP_FHIR_PROFILES_TOGGLE, "1.5.0");
+
+    val ingrdComponent =
+        new GemErpIngredientComponentBuilder()
+            .ask(ASK.from("123456"))
+            .ingredientStrength(new Quantity(3), new Quantity(2))
+            .darreichungsform("halt irgendwie rein damit")
+            .build();
+    assertNotNull(ingrdComponent);
+    assertNull(ingrdComponent.getStrength().getNumerator().getCode());
+    assertNull(ingrdComponent.getStrength().getNumerator().getSystem());
+    assertNotNull(ingrdComponent.getStrength().getNumerator().getValue());
+    assertNull(ingrdComponent.getStrength().getDenominator().getCode());
+    assertNull(ingrdComponent.getStrength().getDenominator().getSystem());
+    assertNotNull(ingrdComponent.getStrength().getDenominator().getValue());
+  }
+
+  @Test
+  void shouldSetIngredientStrengthBySetRatioDirectly() {
+    val ingrdComponent =
+        new GemErpIngredientComponentBuilder()
+            .ask(ASK.from("123456"))
+            .ingredientStrength(
+                new Ratio().setNumerator(new Quantity(3)).setDenominator(new Quantity(2)))
+            .build();
+    assertNotNull(ingrdComponent);
+    assertEquals(3, ingrdComponent.getStrength().getNumerator().getValue().intValue());
+    assertEquals(2, ingrdComponent.getStrength().getDenominator().getValue().intValue());
   }
 }

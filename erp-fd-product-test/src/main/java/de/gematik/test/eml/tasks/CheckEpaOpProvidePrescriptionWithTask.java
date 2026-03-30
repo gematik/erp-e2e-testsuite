@@ -20,16 +20,13 @@
 
 package de.gematik.test.eml.tasks;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlAuthoredOnIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedicationRequestMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlOrganisationHasSmcbTelematikId;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPractitionerHasHbaTelematikId;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPrescriptionIdIsEqualTo;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.*;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
+import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
+import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
@@ -48,13 +45,14 @@ public class CheckEpaOpProvidePrescriptionWithTask implements Task {
   private final KbvErpBundle kbvErpBundle;
   private final TelematikID tidSmcb;
   private final TelematikID tidHba;
+  private final List<VerificationStep<EpaOpProvidePrescription>> additionalVerificationSteps;
 
   /**
    * Check the EpaOpProvidedPrescription Opject with the given bundle and telematik ids
    *
    * @param bundle is an KbvErpBundle with the Input Data
-   * @param tidSmcb is the TelematikID of the SMC-B and is setting in the
-   *     EmlEpaOpProvidedPrescription by the E-Prescription Backend
+   * @param tidSmcb is the TelematikID of the SMC-B and is set in the EmlEpaOpProvidedPrescription
+   *     by the E-Prescription Backend
    * @param tidHba is the TelematikID of the HBA and is setting in the EmlEpaOpProvidedPrescription
    *     by the E-Prescription Backend
    * @return CheckEpaOpProvidePrescriptionWithTask Object that will be performed by serenity
@@ -62,7 +60,26 @@ public class CheckEpaOpProvidePrescriptionWithTask implements Task {
    */
   public static CheckEpaOpProvidePrescriptionWithTask forPrescription(
       KbvErpBundle bundle, TelematikID tidSmcb, TelematikID tidHba) {
-    return new CheckEpaOpProvidePrescriptionWithTask(bundle, tidSmcb, tidHba);
+    return forPrescription(bundle, tidSmcb, tidHba, List.of());
+  }
+
+  @SafeVarargs
+  public static CheckEpaOpProvidePrescriptionWithTask forPrescription(
+      KbvErpBundle bundle,
+      TelematikID tidSmcb,
+      TelematikID tidHba,
+      VerificationStep<EpaOpProvidePrescription>... additionalVerificationStep) {
+    List<VerificationStep<EpaOpProvidePrescription>> l = List.of(additionalVerificationStep);
+    return new CheckEpaOpProvidePrescriptionWithTask(bundle, tidSmcb, tidHba, l);
+  }
+
+  public static CheckEpaOpProvidePrescriptionWithTask forPrescription(
+      KbvErpBundle bundle,
+      TelematikID tidSmcb,
+      TelematikID tidHba,
+      List<VerificationStep<EpaOpProvidePrescription>> additionalVerificationStep) {
+    return new CheckEpaOpProvidePrescriptionWithTask(
+        bundle, tidSmcb, tidHba, additionalVerificationStep);
   }
 
   @Override
@@ -89,5 +106,6 @@ public class CheckEpaOpProvidePrescriptionWithTask implements Task {
             emlPractitionerHasHbaTelematikId(tidHba));
 
     request.forEach(r -> verifiers.forEach(v -> v.apply(r)));
+    request.forEach(r -> additionalVerificationSteps.forEach(v -> v.apply(r)));
   }
 }

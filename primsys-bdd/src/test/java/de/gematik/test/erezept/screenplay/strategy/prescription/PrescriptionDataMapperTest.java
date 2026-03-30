@@ -21,18 +21,20 @@
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.values.KZVA;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
@@ -77,17 +79,31 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
       PrescriptionFlowType expectedFlowType) {
 
     // TODO: make parametrizeable
-    System.setProperty("erp.fhir.profile", "1.4.0");
+    System.setProperty("erp.fhir.profile", "1.6.0");
     val patient = new Actor("Marty");
     patient.can(ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe));
 
     val practitioner = KbvPractitionerFaker.builder().fake();
-    val medOrganization = KbvMedicalOrganizationFaker.builder().fake();
-    val medications = List.of(Map.of("key", "value"));
+    val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (isDentist) medOrganization.withKzva(KZVA.random());
+    val medications =
+        List.of(
+            Map.of(
+                "Wirkstoffname",
+                "Pomalidomid",
+                "Bezugsmenge",
+                "0.5",
+                "BezugsmengeEinheit",
+                "mg",
+                "WirkstoffMenge",
+                "0.14",
+                "WirkstoffMengeEinheit",
+                "l"));
     val prescriptionDataMapper =
         new PrescriptionDataMapperPZN(patient, prescriptionAssignmentKind, medications);
 
-    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization);
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
 
     assertEquals(1, result.size());
 
@@ -100,6 +116,56 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
     assertTrue(vr.isSuccessful());
     assertEquals(expectedFlowType, flowtype);
     assertFalse(kbvBundle.getMedicationRequest().isMultiple());
+  }
+
+  private final KbvItaForVersion kbvItaForVersion = KbvItaForVersion.V1_3_0;
+
+  @Test
+  void shouldGenerateTPrescription() {
+
+    val patient = new Actor("Marty");
+    patient.can(
+        ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
+    val practitioner =
+        KbvPractitionerFaker.builder(kbvItaForVersion)
+            .withQualificationType(QualificationType.DOCTOR)
+            .fake();
+    val medOrganization = KbvMedicalOrganizationFaker.builder(kbvItaForVersion);
+
+    val medications =
+        List.of(
+            Map.of(
+                "Wirkstoffname",
+                "Pomalidomid",
+                "Bezugsmenge",
+                "0.5",
+                "BezugsmengeEinheit",
+                "mg",
+                "WirkstoffMenge",
+                "0.14",
+                "WirkstoffMengeEinheit",
+                "l",
+                "Reichdauer in Wochen",
+                "4",
+                "Verordnungskategorie",
+                "02"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
+
+    assertEquals(1, result.size());
+
+    val elem = result.get(0);
+    val kbvBundleBuilder = elem.getLeft();
+
+    val flowtype = elem.getRight();
+    val kbvBundle = kbvBundleBuilder.prescriptionId(PrescriptionId.random(flowtype)).build();
+    assertEquals(MedicationCategory.C_02, kbvBundle.getMedication().getCategoryFirstRep());
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(vr.isSuccessful());
   }
 
   @Test
@@ -116,13 +182,17 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
             Map.of("MVO", "true", "MVO-ID", "     ", "FreiText", "third prescription"),
             Map.of("MVO", "true", "MVO-ID", "\t\n", "FreiText", "fourth prescription"),
             Map.of("MVO", "true", "FreiText", "fifth prescription"));
+
     val practitioner = KbvPractitionerFaker.builder().fake();
-    val medOrganization = KbvMedicalOrganizationFaker.builder().fake();
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (practitioner.getQualificationType().equals(QualificationType.DENTIST)) {
+      medOrganization.withKzva(KZVA.random());
+    }
 
     val prescriptionDataMapper =
         new PrescriptionDataMapperFreitext(
             patient, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT, medications);
-    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization);
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
 
     assertNotNull(result);
     assertEquals(medications.size(), result.size());
@@ -154,15 +224,30 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
                 "Gueltigkeitsstart",
                 "1",
                 "Gueltigkeitsende",
-                "2"));
+                "2",
+                "Wirkstoffname",
+                "Pomalidomid",
+                "Bezugsmenge",
+                "0.5",
+                "BezugsmengeEinheit",
+                "mg",
+                "WirkstoffMenge",
+                "0.14",
+                "WirkstoffMengeEinheit",
+                "l"));
     val practitioner = KbvPractitionerFaker.builder().fake();
-    val medOrganization = KbvMedicalOrganizationFaker.builder().fake();
-
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (practitioner.getQualificationType().equals(QualificationType.DENTIST)) {
+      medOrganization.withKzva(KZVA.random());
+    }
     val prescriptionDataMapper =
         new PrescriptionDataMapperFreitext(
             patient, PrescriptionAssignmentKind.DIRECT_ASSIGNMENT, medications);
     val result =
-        prescriptionDataMapper.createKbvBundles(practitioner, medOrganization).get(0).getLeft();
+        prescriptionDataMapper
+            .createKbvBundles(practitioner, medOrganization.fake())
+            .get(0)
+            .getLeft();
 
     assertNotNull(result);
   }

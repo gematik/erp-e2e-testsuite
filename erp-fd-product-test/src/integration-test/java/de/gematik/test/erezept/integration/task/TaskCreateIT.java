@@ -120,7 +120,7 @@ class TaskCreateIT extends ErpTest {
   }
 
   static Stream<Arguments> createManipulatedTasksProvider() {
-    return ArgumentComposer.composeWith().arguments(getCreateManipulators()).create();
+    return getCreateManipulators().stream().map(Arguments::of);
   }
 
   static Stream<Arguments> taskCreateProvider() {

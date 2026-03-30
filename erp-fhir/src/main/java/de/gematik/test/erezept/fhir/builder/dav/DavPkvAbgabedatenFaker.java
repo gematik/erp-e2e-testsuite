@@ -41,9 +41,11 @@ import org.hl7.fhir.r4.model.MedicationDispense;
 public class DavPkvAbgabedatenFaker {
   private final PrescriptionId prescriptionId;
   private final Map<String, Consumer<DavPkvAbgabedatenBuilder>> builderConsumers = new HashMap<>();
+  private final AbdaErpPkvVersion abdaErpPkvVersion;
 
-  private DavPkvAbgabedatenFaker(PrescriptionId prescriptionId) {
+  private DavPkvAbgabedatenFaker(PrescriptionId prescriptionId, AbdaErpPkvVersion version) {
     this.prescriptionId = prescriptionId;
+    this.abdaErpPkvVersion = version;
     val invoiceBuilder =
         DavInvoiceBuilder.builder()
             .currency(Currency.EUR)
@@ -79,20 +81,19 @@ public class DavPkvAbgabedatenFaker {
   }
 
   public static DavPkvAbgabedatenFaker builder() {
+    return builder(AbdaErpPkvVersion.getDefaultVersion());
+  }
+
+  public static DavPkvAbgabedatenFaker builder(AbdaErpPkvVersion version) {
     val prescriptionId =
         PrescriptionId.random(
             GemFaker.randomElement(
                 PrescriptionFlowType.FLOW_TYPE_200, PrescriptionFlowType.FLOW_TYPE_209));
-    return new DavPkvAbgabedatenFaker(prescriptionId);
+    return new DavPkvAbgabedatenFaker(prescriptionId, version);
   }
 
   public static DavPkvAbgabedatenFaker builder(PrescriptionId prescriptionId) {
-    return new DavPkvAbgabedatenFaker(prescriptionId);
-  }
-
-  public DavPkvAbgabedatenFaker withVersion(AbdaErpPkvVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+    return new DavPkvAbgabedatenFaker(prescriptionId, AbdaErpPkvVersion.getDefaultVersion());
   }
 
   public DavPkvAbgabedatenFaker withDispensedMedication(
@@ -109,7 +110,7 @@ public class DavPkvAbgabedatenFaker {
   }
 
   public DavPkvAbgabedatenBuilder toBuilder() {
-    val builder = DavPkvAbgabedatenBuilder.builder(prescriptionId);
+    val builder = DavPkvAbgabedatenBuilder.builder(prescriptionId).version(abdaErpPkvVersion);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

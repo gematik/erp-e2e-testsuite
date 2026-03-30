@@ -23,34 +23,42 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.getFaker;
-import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;
 
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-@SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.5.0")
+@ParameterizedClass
+@MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+@RequiredArgsConstructor
 class GemErpMedCompoundingFakerTest extends ErpFhirParsingTest {
+
+  private final ErpWorkflowVersion version;
 
   @RepeatedTest(5)
   void shouldRandomlyFake() {
-    val medication = GemErpMedicationFaker.forMedicationCompounding().fake();
-    assertTrue(parser.isValid(medication));
+    val medication = GemErpMedicationFaker.forMedicationCompounding(version).fake();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
   }
 
   @RepeatedTest(5)
   void shouldFakeWithFixedValues() {
-    val medication = GemErpMedicationFaker.forMedicationCompounding();
+    val medication = GemErpMedicationFaker.forMedicationCompounding(version);
 
     if (fakerBool()) medication.withSnomed(fakerLotNumber());
     if (fakerBool())
@@ -59,21 +67,16 @@ class GemErpMedCompoundingFakerTest extends ErpFhirParsingTest {
     if (fakerBool()) medication.withLotNumber(fakerLotNumber());
     if (fakerBool()) medication.withVaccineTrue(true);
     if (fakerBool()) medication.withAsk(ASK.from(getFaker().superhero().name()));
-    if (fakerBool())
-      medication.withIngredientWithContainedAtc(
-          getFaker().random().nextInt(1000),
-          getFaker().random().nextInt(500),
-          ATC.from(GemFaker.getFaker().regexify("[0-9]{1,4}")));
 
-    assertTrue(parser.isValid(medication.fake()));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication.fake()).isSuccessful());
   }
 
   @RepeatedTest(5)
   void shouldFakeEverythingWithAllFakerBools() {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(true);
-      val medication = GemErpMedicationFaker.forMedicationCompounding().fake();
-      assertTrue(parser.isValid(medication));
+      val medication = GemErpMedicationFaker.forMedicationCompounding(version).fake();
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
     }
   }
 
@@ -81,8 +84,8 @@ class GemErpMedCompoundingFakerTest extends ErpFhirParsingTest {
   void shouldFakeEverythingWithNoFakerBools() {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(false);
-      val medication = GemErpMedicationFaker.forMedicationCompounding().fake();
-      assertTrue(parser.isValid(medication));
+      val medication = GemErpMedicationFaker.forMedicationCompounding(version).fake();
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
     }
   }
 
@@ -91,7 +94,7 @@ class GemErpMedCompoundingFakerTest extends ErpFhirParsingTest {
     try (val mockFaker = mockStatic(GemFaker.class, Mockito.CALLS_REAL_METHODS)) {
       mockFaker.when(GemFaker::fakerBool).thenReturn(false);
       val medication =
-          GemErpMedicationFaker.forMedicationCompounding()
+          GemErpMedicationFaker.forMedicationCompounding(version)
               .withAsk(ASK.from(getFaker().superhero().name()))
               .withAsk(ASK.from(getFaker().superhero().name()))
               .withAsk(ASK.from(getFaker().superhero().name()))
@@ -103,8 +106,26 @@ class GemErpMedCompoundingFakerTest extends ErpFhirParsingTest {
               .withAtc(ATC.from(getFaker().superhero().name()))
               .fake();
 
-      assertTrue(parser.isValid(medication));
+      assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
       assertEquals(10, medication.getCode().getCoding().size()); // 9 + 1 defaultValue
     }
+  }
+
+  @Test()
+  void shouldBuildWithoutExplicitVersion() {
+    val med = GemErpMedicationFaker.forMedicationCompounding().fake();
+    assertNotEquals(
+        ErpWorkflowStructDef.MEDICATION.getCanonicalUrl(),
+        Objects.requireNonNull(med.getMeta().getProfile().stream().findFirst().orElse(null))
+            .getValueAsString());
+    assertTrue(
+        ErpWorkflowStructDef.MEDICATION.getCanonicalUrl().length()
+            < Objects.requireNonNull(med.getMeta().getProfile().stream().findFirst().orElse(null))
+                .getValueAsString()
+                .length());
+    assertTrue(
+        Objects.requireNonNull(med.getMeta().getProfile().stream().findFirst().orElse(null))
+            .getValueAsString()
+            .contains("|"));
   }
 }

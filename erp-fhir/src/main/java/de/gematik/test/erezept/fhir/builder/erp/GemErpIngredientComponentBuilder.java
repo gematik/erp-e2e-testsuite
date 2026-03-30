@@ -41,6 +41,14 @@ public class GemErpIngredientComponentBuilder
     return new GemErpIngredientComponentBuilder();
   }
 
+  /**
+   * in ErpWorkflowVersion.V1_4 and lower a System and Code ist recommended. caused by this, an UCUM
+   * system and a fitting code will be added automatically
+   *
+   * @param numerator
+   * @param demoninator
+   * @return GemErpIngredientComponentBuilder()
+   */
   @Override
   public GemErpIngredientComponentBuilder ingredientStrength(
       Quantity numerator, Quantity demoninator) {
