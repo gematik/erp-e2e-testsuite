@@ -28,6 +28,7 @@ public enum ErpAfos implements RequirementsSet {
   A_10396("A_10396", "E-Rezept - Demographische Daten eines Versicherten abrufen"),
   A_10406("A_10406", "E-Rezept - Zugriffsberechtigung durch Versicherten einsehen"),
   A_19018("A_19018", "Rollenprüfung Verordnender stellt Rezept ein"),
+  A_19018_01("A_19018-01", "E-Rezept-Fachdienst - Task erzeugen - Rollenprüfung"),
   A_19019("A_19019", "Generierung Rezept-ID"),
   A_19569("A_19569-03", "Task abrufen - Versicherter - Suchparameter Task"),
   A_19021("A_19021", "Generierung AccessCode"),
@@ -118,6 +119,10 @@ public enum ErpAfos implements RequirementsSet {
   A_23456(
       "A_23456-01", "E-Rezept-Fachdienst - Prüfung Prüfziffer - Berechnung HMAC der Prüfziffer"),
   A_23878("A_23878", "E-RezeptFachdienst, validierung des Payload des DispenseRequest"),
+  A_23878_01(
+      "A_23878_01",
+      "E-Rezept-Fachdienst - Nachricht einstellen - Validierung des Payload-Inhalt von"
+          + " GEM_ERP_PR_Communication_DispReq"),
   A_23879("A_23879", "E-RezeptFachdienst, validierung des Payload des CommunicationReply"),
   A_23888(
       "A_23888",
@@ -212,6 +217,10 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Handhabung der Rückgabe von mehreren FHIR-Objekten - Filteroperatoren"
           + " für Datumsabfragen"),
   A_25962("A_25962", "E-Rezept-Fachdienst - ePA - Medication Service - Versichertenprotokoll"),
+  A_25944("A_25944-01", "E-Rezept-Fachdienst - ePA - Flowtype 160/166/169/200/209"),
+
+  A_26002_02(
+      " A_26002_02", "E-Rezept-Fachdienst - Task schließen - Profilprüfung MedicationDispense"),
   A_26229(
       "A_26229-02",
       "E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Konsistenz Ressource IDs"),
@@ -234,6 +243,10 @@ public enum ErpAfos implements RequirementsSet {
       "A_27062", "E-Rezept-Fachdienst - eu-prescription abfragen - Prüfung Zugriffsberechtigung"),
   A_27063(
       "A_27063", "E-Rezept-Fachdienst - eu-prescription abfragen - Filter einlösbarer E-Rezepte"),
+  A_27066(
+      "A_27066 ",
+      "E-Rezept-Fachdienst - eu-prescription abfragen - Abfrage aller einlösbaren"
+          + " Verordnungsinformationen "),
   A_27068("A_27068", "E-Rezept-Fachdienst - Task schließen - EU - Rollenprüfung"),
   A_27069("A_27069", " E-Rezept-Fachdienst - Task schließen - EU - Schemaprüfung"),
   A_27070("A_27070", "E-Rezept-Fachdienst - Task schließen - EU - Prüfung Einwilligung für KVNR"),
@@ -275,7 +288,17 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Existenz von Ressource.id"),
   A_27649(
       "A_27649",
-      " E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Auflösbarkeit von Referenzen"),
+      "E-Rezept-Fachdienst - FHIR-Ressource validieren - Prüfung Auflösbarkeit von Referenzen"),
+  A_27767("A_27767-01", "E-Rezept-Fachdienst - Nachricht einstellen - Prüfung des Empfängers"),
+  A_27812(
+      "A_27812",
+      "E-Rezept-Fachdienst - Task aktivieren - Flowtype 166 - QES durch berechtigte Berufsgruppe"),
+  A_27813(
+      "A_27813",
+      "E-Rezept-Fachdienst - Task aktivieren - Flowtype 166 - Prüfung Arzneimittelverordnung"),
+  A_27827(
+      "A_27827",
+      "E-Rezept-Fachdienst - BfArM - Anwendungsfall Übertragen des digitalen Durchschlags"),
   ;
   private final Requirement requirement;
 

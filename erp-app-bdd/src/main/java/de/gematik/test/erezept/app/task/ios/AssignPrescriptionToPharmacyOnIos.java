@@ -65,7 +65,7 @@ public class AssignPrescriptionToPharmacyOnIos implements Task {
             "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
             actor.getName(), deque));
     app.tap(Mainscreen.REFRESH_BUTTON);
-    // Note: wait 45s to load the newly created prescription
+    // Note: we wait a long time here to make sure the prescription is created and loaded
     app.longPauseApp();
 
     val prescriptionBundle =

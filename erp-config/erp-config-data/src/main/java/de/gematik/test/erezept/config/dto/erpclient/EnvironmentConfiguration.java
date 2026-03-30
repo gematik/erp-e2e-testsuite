@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.config.dto.erpclient;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
 import lombok.Data;
 
@@ -30,4 +31,7 @@ public class EnvironmentConfiguration implements INamedConfigurationElement {
   private BackendRouteConfiguration ti;
   private BackendRouteConfiguration internet;
   private EpaMockClientConfiguration epaMockClient;
+
+  @JsonAlias("tRegisterMockClient")
+  private TRegisterMockClientConfiguration tRegisterMockClient;
 }

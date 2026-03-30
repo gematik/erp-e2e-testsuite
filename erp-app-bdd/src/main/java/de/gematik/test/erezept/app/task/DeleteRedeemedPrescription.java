@@ -35,7 +35,7 @@ public class DeleteRedeemedPrescription implements Task {
   @Override
   public <T extends Actor> void performAs(T actor) {
     val driver = SafeAbility.getAbility(actor, UseTheApp.class);
-    driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
+    driver.tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
     driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     driver.acceptAlert();
   }

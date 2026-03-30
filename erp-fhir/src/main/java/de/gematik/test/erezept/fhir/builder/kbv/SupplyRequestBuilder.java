@@ -65,7 +65,9 @@ public class SupplyRequestBuilder extends ResourceBuilder<SupplyRequest, SupplyR
   public SupplyRequest build() {
     checkRequiredAttributes();
     val sR = this.createResource(SupplyRequest::new, KbvItaErpStructDef.SUPPLY_REQUEST, version);
-
+    if (version.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      sR.getMeta().setVersionId("1");
+    }
     sR.setAuthoredOnElement(new DateTimeType(authoredOn, temporalPrecision));
     addKostentraegerExtension(sR);
     if (version.compareTo(KbvItaErpVersion.V1_1_0) <= 0) {

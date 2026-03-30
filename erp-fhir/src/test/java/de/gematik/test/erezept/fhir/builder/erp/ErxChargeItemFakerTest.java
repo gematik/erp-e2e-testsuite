@@ -43,8 +43,7 @@ import org.junit.jupiter.api.Test;
 class ErxChargeItemFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakeChargeItemWithVersion() {
-    val chargeItem =
-        ErxChargeItemFaker.builder().withVersion(PatientenrechnungVersion.V1_0_0).fake();
+    val chargeItem = ErxChargeItemFaker.builder(PatientenrechnungVersion.V1_0_0).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, chargeItem);
     assertTrue(result.isSuccessful());
   }

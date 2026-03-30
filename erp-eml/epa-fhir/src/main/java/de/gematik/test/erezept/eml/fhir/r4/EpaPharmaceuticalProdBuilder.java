@@ -74,7 +74,7 @@ public class EpaPharmaceuticalProdBuilder
   }
 
   public EpaPharmaceuticalProdBuilder atcCode(ATC atc) {
-    cc.addCoding(atc.asCoding());
+    cc.addCoding(atc.asCoding().setVersion("2026"));
     return this;
   }
 

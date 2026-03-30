@@ -57,7 +57,7 @@ public class ActorContext {
 
   @Getter private final List<HealthInsurance> healthInsurances;
 
-  private final ContextData contextData;
+  @Getter private final ContextData contextData;
 
   private ActorContext(PrimSysRestFactory factory) {
     this.environment = factory.getActiveEnvironment();

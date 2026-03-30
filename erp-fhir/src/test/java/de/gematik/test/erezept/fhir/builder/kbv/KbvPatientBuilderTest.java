@@ -61,9 +61,8 @@ class KbvPatientBuilderTest extends ErpFhirParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildGkvPatientWithFaker(KbvItaForVersion version) {
     val patient =
-        KbvPatientFaker.builder()
+        KbvPatientFaker.builder(version)
             .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.GKV)
-            .withVersion(version)
             .fake();
 
     assertTrue(ValidatorUtil.encodeAndValidate(parser, patient).isSuccessful());
@@ -75,9 +74,8 @@ class KbvPatientBuilderTest extends ErpFhirParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildPkvPatientWithFaker(KbvItaForVersion version) {
     val patient =
-        KbvPatientFaker.builder()
+        KbvPatientFaker.builder(version)
             .withKvnrAndInsuranceType(KVNR.random(), InsuranceTypeDe.PKV)
-            .withVersion(version)
             .fake();
 
     assertTrue(ValidatorUtil.encodeAndValidate(parser, patient).isSuccessful());

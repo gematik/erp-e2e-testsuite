@@ -38,8 +38,7 @@ import org.junit.jupiter.api.Test;
 class DavPkvAbgabedatenFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakeDavAbgabedatenBundleWithVersion() {
-    val davBundle =
-        DavPkvAbgabedatenFaker.builder().withVersion(AbdaErpPkvVersion.getDefaultVersion()).fake();
+    val davBundle = DavPkvAbgabedatenFaker.builder(AbdaErpPkvVersion.getDefaultVersion()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, davBundle);
     assertTrue(result.isSuccessful());
   }

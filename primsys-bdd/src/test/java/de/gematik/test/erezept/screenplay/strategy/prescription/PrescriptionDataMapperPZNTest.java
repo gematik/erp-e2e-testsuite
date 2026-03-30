@@ -20,19 +20,19 @@
 
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
@@ -44,13 +44,86 @@ class PrescriptionDataMapperPZNTest extends ErpFhirParsingTest {
   void shouldGetKbvErpMedicationCorrect() {
     val medMap = Map.of("PZN", "12345678");
     val medications = List.of(medMap);
+
+    val mapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    KbvErpMedication medication = mapper.getKbvErpMedication(medMap);
+
+    assertNotNull(medication);
+    assertEquals("12345678", medication.getPznFirstRep());
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(vr.isSuccessful());
+  }
+
+  @Test
+  void shouldGetKbvErpMedicationWithIngredientNumCorrect() {
+    val medMap = getMedicationMap();
+    val medications = List.of(medMap);
     val mapper =
         new PrescriptionDataMapperPZN(
             patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
     KbvErpMedication medication = mapper.getKbvErpMedication(medMap);
     assertNotNull(medication);
     assertEquals("12345678", medication.getPznFirstRep());
+    assertEquals(
+        new BigDecimal("0.14"),
+        medication.getIngredientFirstRep().getStrength().getNumerator().getValue());
+    assertEquals("l", medication.getIngredientFirstRep().getStrength().getNumerator().getUnit());
 
+    val vr = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(vr.isSuccessful());
+  }
+
+  @Test
+  void shouldGetKbvErpMedicationWithIngredientDenomCorrect() {
+    val medMap = getMedicationMap();
+    val medications = List.of(medMap);
+    val mapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    KbvErpMedication medication = mapper.getKbvErpMedication(medMap);
+    assertNotNull(medication);
+    assertEquals(
+        new BigDecimal("0.5"),
+        medication.getIngredientFirstRep().getStrength().getDenominator().getValue());
+    assertEquals("mg", medication.getIngredientFirstRep().getStrength().getDenominator().getUnit());
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, medication);
+    assertTrue(vr.isSuccessful());
+  }
+
+  @NotNull
+  private static Map<String, String> getMedicationMap() {
+    return Map.of(
+        "PZN",
+        "12345678",
+        "Wirkstoffname",
+        "Pomalidomid",
+        "Bezugsmenge",
+        "0.5",
+        "BezugsmengeEinheit",
+        "mg",
+        "WirkstoffMenge",
+        "0.14",
+        "WirkstoffMengeEinheit",
+        "l");
+  }
+
+  @Test
+  void shouldGetKbvErpMedicationWithKombipackungCorrect() {
+    val medMap = Map.of("PZN", "12345678", "Darreichungsform", "KPG");
+    val medications = List.of(medMap);
+
+    val mapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+    KbvErpMedication medication = mapper.getKbvErpMedication(medMap);
+
+    assertNotNull(medication);
+    assertEquals("12345678", medication.getPznFirstRep());
+    assertEquals(Darreichungsform.KPG, medication.getDarreichungsform().get());
     val vr = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(vr.isSuccessful());
   }

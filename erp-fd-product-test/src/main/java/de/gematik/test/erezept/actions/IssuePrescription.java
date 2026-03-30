@@ -39,6 +39,7 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
@@ -75,6 +76,7 @@ public class IssuePrescription extends ErpAction<ErxTask> {
   private final List<StringMutator> stringMutators;
   private final List<ByteArrayMutator> signedBundleMutators;
   @Nullable private final FhirResourceFuzz<Bundle> smartFuzzer;
+  @Nullable private final PrescriptionFlowType flowType;
 
   @Nullable private ByteArrayOutputStream signatureObserver;
   @Nullable private Function<String, byte[]> signingFunc;
@@ -95,7 +97,12 @@ public class IssuePrescription extends ErpAction<ErxTask> {
 
   @Override
   public ErpInteraction<ErxTask> answeredBy(Actor actor) {
-    val creation = actor.asksFor(TaskCreate.forPatient(patient).ofAssignmentKind(assignmentKind));
+    ErpInteraction<ErxTask> creation;
+    if (flowType != null) {
+      creation = actor.asksFor(TaskCreate.withFlowType(flowType));
+    } else {
+      creation = actor.asksFor(TaskCreate.forPatient(patient).ofAssignmentKind(assignmentKind));
+    }
     actor.attemptsTo(
         Verify.that(creation)
             .withExpectedType(ErpAfos.A_19018)
@@ -249,7 +256,16 @@ public class IssuePrescription extends ErpAction<ErxTask> {
       return withKbvBundleFrom(KbvErpBundleFaker.builder().withKvnr(patient.getKvnr()).toBuilder());
     }
 
+    public IssuePrescription asTPrescription(KbvErpBundleBuilder builder) {
+      return withKbvBundleFrom(builder, PrescriptionFlowType.FLOW_TYPE_166);
+    }
+
     public IssuePrescription withKbvBundleFrom(KbvErpBundleBuilder builder) {
+      return withKbvBundleFrom(builder, null);
+    }
+
+    public IssuePrescription withKbvBundleFrom(
+        KbvErpBundleBuilder builder, @Nullable PrescriptionFlowType flowType) {
       Object[] params = {
         patient,
         patientCoverage,
@@ -259,7 +275,8 @@ public class IssuePrescription extends ErpAction<ErxTask> {
         fhirActivateMutators,
         stringMutators,
         signedBundleMutators,
-        smartFuzzer
+        smartFuzzer,
+        flowType
       };
       return new Instrumented.InstrumentedBuilder<>(IssuePrescription.class, params).newInstance();
     }

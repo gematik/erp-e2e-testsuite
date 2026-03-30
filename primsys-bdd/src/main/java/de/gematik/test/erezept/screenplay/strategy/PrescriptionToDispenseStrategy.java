@@ -35,12 +35,18 @@ import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 
 @Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrescriptionToDispenseStrategy {
+
+  @Getter private final DequeStrategy dequeue;
 
   private TaskId taskId;
   private KVNR kvnr;
@@ -50,11 +56,6 @@ public class PrescriptionToDispenseStrategy {
   private PrescriptionId prescriptionId;
   private ManagePharmacyPrescriptions prescriptionManager;
   private ErxAcceptBundle taskToDispense;
-  private DequeStrategy dequeue;
-
-  private PrescriptionToDispenseStrategy() {
-    // use the builder instead
-  }
 
   public static Builder withDequeue(DequeStrategy dequeue) {
     return new Builder(dequeue);
@@ -141,8 +142,7 @@ public class PrescriptionToDispenseStrategy {
     private final PrescriptionToDispenseStrategy strategy;
 
     public Builder(DequeStrategy dequeue) {
-      this.strategy = new PrescriptionToDispenseStrategy();
-      this.strategy.dequeue = dequeue;
+      this.strategy = new PrescriptionToDispenseStrategy(dequeue);
     }
 
     public Builder taskId(String taskId) {

@@ -27,7 +27,10 @@ import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.task.*;
+import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.screenplay.task.ClosePrescription;
+import de.gematik.test.erezept.screenplay.task.Negate;
+import de.gematik.test.erezept.screenplay.task.ThatNotAllowedToAsk;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
@@ -67,6 +70,9 @@ public class PharmacyDispenseSteps {
   @Wenn(
       "^die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept mit den folgenden Medikamenten"
           + " korrekt an (.+) dispensiert:$")
+  @Dann(
+      "^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept mit den folgenden"
+          + " Medikamenten korrekt an (.+) dispensiert:$")
   public void whenDispenseAlternativeReplacementMedications(
       String pharmName, String order, String patientName, DataTable medications) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
@@ -262,9 +268,8 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
-                        .build())
-                .isEqualTo(200));
+                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient).build())
+                .isEqualTo(204));
   }
 
   @Und(
@@ -277,10 +282,10 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient)
                         .withMedicationDispense(medications)
                         .build())
-                .isEqualTo(200));
+                .isEqualTo(204));
   }
 
   @Und(
@@ -293,10 +298,10 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient)
                         .multiple(2)
                         .build())
-                .isEqualTo(200));
+                .isEqualTo(204));
   }
 
   @Dann(
@@ -310,8 +315,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationAsBundleOld.fromStackForPatient(order, thePatient)
-                        .build())
+                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient).build())
                 .isEqualTo(403));
     and(then(thePharmacy))
         .attemptsTo(

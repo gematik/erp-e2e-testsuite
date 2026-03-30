@@ -20,9 +20,6 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder.createInternalErrorException;
-import static java.text.MessageFormat.format;
-
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -46,18 +43,7 @@ public class FetchReceiptUseCase {
   public Response fetchReceipt(TaskId taskId, Secret secret) {
     val cmd = new TaskGetByIdCommand(taskId, secret);
     val prescriptionBundle = pharmacy.erpRequest2(cmd);
-    val taskStatus = prescriptionBundle.getTask().getStatus();
-    val receipt =
-        prescriptionBundle
-            .getReceipt()
-            .orElseThrow(
-                () ->
-                    createInternalErrorException(
-                        404,
-                        format(
-                            "Prescription {0} does not have a receipt (status: {1})",
-                            taskId.getValue(), taskStatus)));
-    val xml = pharmacy.encode(receipt, EncodingType.XML);
+    val xml = pharmacy.encode(prescriptionBundle, EncodingType.XML);
     return Response.ok(xml).build();
   }
 }

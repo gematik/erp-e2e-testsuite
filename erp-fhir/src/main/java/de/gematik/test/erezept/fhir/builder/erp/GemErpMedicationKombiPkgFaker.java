@@ -41,6 +41,8 @@ import org.hl7.fhir.r4.model.Quantity;
 
 public class GemErpMedicationKombiPkgFaker implements GemErpMedicationFaker {
 
+  private final ErpWorkflowVersion version;
+
   private final Map<String, Consumer<GemErpMedicationKombiPkgBuilder>> builderConsumers =
       new HashMap<>();
   private String askKey = "ask";
@@ -50,9 +52,8 @@ public class GemErpMedicationKombiPkgFaker implements GemErpMedicationFaker {
   private static final String CONTAINED_ATC_MEDICATIONS_KEY = "containedAtcMedications";
   private static final String CONTAINED_MEDICATION_LIST_KEY = "containedMedicationList";
 
-  public GemErpMedicationKombiPkgFaker() {
-
-    withVersion(ErpWorkflowVersion.getDefaultVersion());
+  protected GemErpMedicationKombiPkgFaker(ErpWorkflowVersion version) {
+    this.version = version;
 
     if (fakerBool()) {
       withAsk(ASK.from(GemFaker.fakerBsnr()));
@@ -112,11 +113,6 @@ public class GemErpMedicationKombiPkgFaker implements GemErpMedicationFaker {
     // to set more than one ATC Codings (Set up a List of Codings) the key will be appended
     if (builderConsumers.containsKey(atcKey)) atcKey = atcKey + "+1";
     builderConsumers.put(atcKey, b -> b.atc(atc));
-    return this;
-  }
-
-  public GemErpMedicationKombiPkgFaker withVersion(ErpWorkflowVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
     return this;
   }
 
@@ -201,7 +197,7 @@ public class GemErpMedicationKombiPkgFaker implements GemErpMedicationFaker {
   }
 
   public GemErpMedicationKombiPkgBuilder toBuilder() {
-    val builder = GemErpMedicationBuilder.forKombiPckg();
+    val builder = GemErpMedicationBuilder.forKombiPckg().version(version);
 
     if (!builderConsumers.containsKey(CONTAINED_MEDICATIONS_KEY)
         && !builderConsumers.containsKey(CONTAINED_ATC_MEDICATIONS_KEY)

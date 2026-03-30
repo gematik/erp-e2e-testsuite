@@ -1,0 +1,30 @@
+import http-client.env.json
+
+@doctor = 6a7f66bc2bb0f4cd76deaa260abbb484
+
+
+### prescribe pharmaceutical with FHIR+XML example file
+# @id DOC-PRESCRIBE-01
+POST {{host}}/doc/{{doctor}}/xml/prescribe
+Content-Type: application/xml
+apikey: {{apikey}}
+
+< ../../erp-fhir/src/test/resources/fhir/valid/kbv/1.3.1/Beispiel_1_PZN.xml
+> {%
+    client.assert(response.status == 202, "prescribing with FHIR+XML template must work")
+    console.log("Created prescription: " + client.global.get("prescriptionId"))
+    client.global.set("prescriptionId", response.body["prescriptionId"])
+    client.global.set("accessCode", response.body["accessCode"])
+%}
+
+### DOC-PHARMACEUTICAL-PRESCRIBE-02
+# prescribe a completly random pharmaceutical prescription
+POST {{host}}/doc/{{doctor}}/prescribe
+Content-Type: application/json
+apikey: {{apikey}}
+
+{
+  "patient": {
+    "kvnr": "S040464113"
+  }
+}

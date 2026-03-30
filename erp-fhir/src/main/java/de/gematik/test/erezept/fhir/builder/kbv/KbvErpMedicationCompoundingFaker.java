@@ -38,9 +38,10 @@ public class KbvErpMedicationCompoundingFaker {
 
   private final Map<String, Consumer<KbvErpMedicationCompoundingBuilder>> builderConsumers =
       new HashMap<>();
+  private final KbvItaErpVersion version;
 
-  private KbvErpMedicationCompoundingFaker() {
-
+  private KbvErpMedicationCompoundingFaker(KbvItaErpVersion version) {
+    this.version = version;
     this.withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class))
         .withAmount(5, 1, "Stk")
         .withIngredientStrengthText(
@@ -50,7 +51,11 @@ public class KbvErpMedicationCompoundingFaker {
   }
 
   public static KbvErpMedicationCompoundingFaker builder() {
-    return new KbvErpMedicationCompoundingFaker();
+    return builder(KbvItaErpVersion.getDefaultVersion());
+  }
+
+  public static KbvErpMedicationCompoundingFaker builder(KbvItaErpVersion version) {
+    return new KbvErpMedicationCompoundingFaker(version);
   }
 
   public KbvErpMedicationCompoundingFaker withDosageForm(String df) {
@@ -92,11 +97,6 @@ public class KbvErpMedicationCompoundingFaker {
   public KbvErpMedicationCompoundingFaker withAmount(
       long numerator, long denominator, String unit) {
     builderConsumers.put("amount", b -> b.amount(numerator, denominator, unit));
-    return this;
-  }
-
-  public KbvErpMedicationCompoundingFaker withVersion(KbvItaErpVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
     return this;
   }
 
@@ -143,7 +143,7 @@ public class KbvErpMedicationCompoundingFaker {
   }
 
   public KbvErpMedicationCompoundingBuilder toBuilder() {
-    val builder = KbvErpMedicationCompoundingBuilder.builder();
+    val builder = KbvErpMedicationCompoundingBuilder.builder().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

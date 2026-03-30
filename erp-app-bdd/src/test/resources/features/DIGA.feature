@@ -30,7 +30,7 @@ Funktionalität: DiGA Anwendungsfälle in der App
     Und die Ärztin Adelheid Ulmenwald hat Zugriff auf ihren HBA und auf die SMC-B der Praxis
     # Und die GKV Versicherte Alice hat Zugriff auf ihre eGK
 
-@TCID:ERP_FDV_GKV_DIGA_HAPPY_01
+  @TCID:ERP_FDV_GKV_DIGA_HAPPY_01
   Szenario: Empfang, Anfrage und Erhalt einer Digitalen Gesundheitsanwendung
   Wenn die Ärztin Adelheid Ulmenwald der Versicherten Alice ein EVDGA E-Rezept verschreibt
   Und die GKV Versicherte Alice ihr letztes ausgestelltes EVDGA E-Rezept in der App anzeigen kann

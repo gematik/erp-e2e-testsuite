@@ -1,5 +1,28 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.3.0
+
+* erp-fhir:
+    - add ProfileViews for Gematik WF 1.6.1 - erp-workflow valid from 01.07.26
+    - add ProfileViews for KBV.ITA.ERP 1.4.1 - kbv.ita.erp-1.4.1
+    - adapt Builder & Faker to handle new ProfileVersions
+    - adapt KbvErpBundleFaker && KbvErpMedicationRequestFaker/Builder to build and handle Teratogenic-Prescriptions
+    - expand MedicationCategory with Value 02 for Teratogenic-Prescriptions
+    - refactor GemMedicationBuilders by moving version setter to constructor to resolve side effects
+
+* erp-fd-product-test:
+    - Implement test cases for create t-rezept prescription
+    - Implement test cases for activate t-rezept prescription
+    - Adapt IssuePrescription to activate FlowType 166 
+    - Implement testcases for dispense t-rezept prescription
+    - Implement testcases for send t-rezept communication
+    - Implement testcases for exporting T-Prescriptions to EpaAS
+    - Implement test cases for requirement A_27767-01
+    - Implement testcases for dispense t-rezept prescription
+
+* erp-t-rezept:
+    - Implement T Register Mock Client
+
 ## Release 1.1.0
 
 * erp-client:
@@ -24,7 +47,6 @@
     - Implement testcases for get use case for DiGA
     - Implement testcase for DeleteCommunication purpose
 
-
 * erp-fhir:
     - add Builder and ObjectClasses to generate EuAccessPermissionObjects
     - add Builder and ObjectClasses for EuPractitionerRole, EuPractitioner, EuMedication, EuMedicationDispense,
@@ -33,11 +55,10 @@
     - add Profiles for de.gematik.erezept-workflow.r4-1.6.1
     - add Profiles for kbv.ita.erp-1.4.0
     - needs HAPI 8.6.1 from now
- 
+
 
 * erp-eml:
     - add Builder and ObjectClasses for EpaMedPharmaceuticalProduct, EpaIngredientCode
-    -
 
 ## Release 1.0.0
 

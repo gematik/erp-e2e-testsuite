@@ -48,7 +48,7 @@ public enum Profile implements PageElement {
           AppiumBy.accessibilityId(
               "stg_txt_edit_profile_charge_item_list_section_show_charge_item_list")),
   LEAVE_BUTTON(
-      "Leave Debug Menu",
+      "Leave Profile Menu",
       null,
       () -> AppiumBy.xpath("(//XCUIElementTypeButton[@name=\"Einstellungen\"])[1]"));
 

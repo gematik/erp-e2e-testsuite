@@ -21,10 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -129,6 +126,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
   void shouldBuildFromKbvPznMedication() {
     val kbvMedication =
         KbvErpMedicationPZNFaker.builder()
+            .withIngredientName("ingredientName")
             .withSupplyForm(
                 GemFaker.fakerValueSet(
                     Darreichungsform.class,

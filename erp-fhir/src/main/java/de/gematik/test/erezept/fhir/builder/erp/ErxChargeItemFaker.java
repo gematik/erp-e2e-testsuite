@@ -49,9 +49,12 @@ import org.hl7.fhir.r4.model.Reference;
 public class ErxChargeItemFaker {
 
   private final Map<String, Consumer<ErxChargeItemBuilder>> builderConsumers = new HashMap<>();
+  private final PatientenrechnungVersion patientenrechnungVersion;
+
   private PrescriptionId prescriptionId = PrescriptionId.random();
 
-  private ErxChargeItemFaker() {
+  private ErxChargeItemFaker(PatientenrechnungVersion version) {
+    this.patientenrechnungVersion = version;
     this.withAccessCode(AccessCode.random())
         .withSubject(KVNR.randomPkv(), insuranceName())
         .withEnterer(fakerTelematikId())
@@ -62,16 +65,15 @@ public class ErxChargeItemFaker {
   }
 
   public static ErxChargeItemFaker builder() {
-    return new ErxChargeItemFaker();
+    return builder(PatientenrechnungVersion.getDefaultVersion());
+  }
+
+  public static ErxChargeItemFaker builder(PatientenrechnungVersion version) {
+    return new ErxChargeItemFaker(version);
   }
 
   public ErxChargeItemFaker withPrescriptionId(PrescriptionId prescriptionId) {
     this.prescriptionId = prescriptionId;
-    return this;
-  }
-
-  public ErxChargeItemFaker withVersion(PatientenrechnungVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
     return this;
   }
 
@@ -160,7 +162,8 @@ public class ErxChargeItemFaker {
   }
 
   public ErxChargeItemBuilder toBuilder() {
-    val builder = ErxChargeItemBuilder.forPrescription(prescriptionId);
+    val builder =
+        ErxChargeItemBuilder.forPrescription(prescriptionId).version(patientenrechnungVersion);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

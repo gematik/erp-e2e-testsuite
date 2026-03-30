@@ -23,8 +23,10 @@ package de.gematik.test.erezept.integration.chargeitem;
 import static de.gematik.test.core.expectations.requirements.IbmAgreements.CHARGE_ITEM_SUPPORTING_REFERENCE;
 import static de.gematik.test.core.expectations.verifier.ChargeItemBundleVerifier.chargeItemIdIsEqualTo;
 import static de.gematik.test.core.expectations.verifier.ChargeItemBundleVerifier.prescriptionIdIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.hasAnyOfDetailsText;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
@@ -142,20 +144,21 @@ public class ChargeItemIT extends ErpTest {
             .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
             .getExpectedResponse();
 
-    // pharma1 behavior
+    // flughafenapo accept / close
     val acceptation1 =
         flughafenApo.performs(AcceptPrescription.forTheTask(task1)).getExpectedResponse();
-    flughafenApo.performs(ClosePrescription.acceptedWith(acceptation1));
-    val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(task1.getPrescriptionId()).fake();
+    flughafenApo.performs(ClosePrescription.acceptedWith(acceptation1)).getExpectedResponse();
+    val davAbgabedatenBundleForTask1 =
+        DavPkvAbgabedatenFaker.builder(task1.getPrescriptionId()).fake();
 
-    // waldApo behavior
+    // waldApo accept / close
     val acceptation2 = waldApo.performs(AcceptPrescription.forTheTask(task2)).getExpectedResponse();
-    flughafenApo.performs(ClosePrescription.acceptedWith(acceptation2));
+    flughafenApo.performs(ClosePrescription.acceptedWith(acceptation2)).getExpectedResponse();
 
     val pharmaciesChargeItem =
         flughafenApo.performs(
             PostChargeItem.forPatient(sina)
-                .davBundle(davAbgabedatenBundle)
+                .davBundle(davAbgabedatenBundleForTask1)
                 .withCustomValue(
                     task2.getPrescriptionId(),
                     acceptation1.getSecret(),
@@ -297,7 +300,8 @@ public class ChargeItemIT extends ErpTest {
 
     // patient preset behavior
     sina.changePatientInsuranceType(InsuranceTypeDe.PKV);
-    sina.performs(GrantConsent.forOneSelf().withDefaultConsent());
+    sina.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent())
+        .getExpectedResponse();
 
     // Doc behavior
     val task =
@@ -311,10 +315,12 @@ public class ChargeItemIT extends ErpTest {
     flughafenApo.performs(ClosePrescription.acceptedWith(acceptation));
     val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
 
-    flughafenApo.performs(
-        PostChargeItem.forPatient(sina)
-            .davBundle(davAbgabedatenBundle)
-            .withAcceptBundle(acceptation));
+    flughafenApo
+        .performs(
+            PostChargeItem.forPatient(sina)
+                .davBundle(davAbgabedatenBundle)
+                .withAcceptBundle(acceptation))
+        .getExpectedResponse();
 
     val patientsChargeItemBundle =
         sina.performs(

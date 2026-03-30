@@ -117,7 +117,7 @@ class KbvMedicalOrganizationBuilderTest extends ErpFhirParsingTest {
       name = "[{index}] -> Build KBV MedicalOrganization with Faker and KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void buildMedicalOrganizationWithFaker(KbvItaForVersion version) {
-    val organization = KbvMedicalOrganizationFaker.medicalPractice().withVersion(version).fake();
+    val organization = KbvMedicalOrganizationFaker.medicalPractice(version).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
   }

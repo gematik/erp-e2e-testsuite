@@ -117,7 +117,12 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
   }
 
   public B atc(ATC atc) {
-    this.codes.add(atc.asCoding());
+    val coding = atc.asCoding();
+    if (version.isBiggerThan(ErpWorkflowVersion.V1_5)) {
+      // version is mandatory until ErpWorkflowVersion.V_6
+      coding.setVersion("2026");
+    }
+    this.codes.add(coding);
     return self();
   }
 
@@ -158,7 +163,6 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
                 medication.addExtension(
                     EpaMedicationStructDef.MANUFACTURING_INSTRUCTION.asStringExtension(
                         manufacInstruction)));
-
     Optional.ofNullable(codeText).ifPresent(cT -> medication.getCode().setText(cT));
     Optional.ofNullable(normSizeCode)
         .ifPresent(size -> medication.addExtension(size.asExtension()));

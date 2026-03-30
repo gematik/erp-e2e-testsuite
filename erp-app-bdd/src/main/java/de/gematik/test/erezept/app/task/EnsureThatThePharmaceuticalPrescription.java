@@ -68,6 +68,8 @@ public class EnsureThatThePharmaceuticalPrescription implements Task {
             "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
             actor.getName(), deque));
     app.tap(Mainscreen.REFRESH_BUTTON);
+    // Note: wait 60s to load the newly created prescription
+    app.longPauseApp();
 
     val prescriptionBundle =
         actor

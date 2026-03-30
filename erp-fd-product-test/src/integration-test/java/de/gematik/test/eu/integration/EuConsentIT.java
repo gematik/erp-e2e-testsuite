@@ -282,7 +282,7 @@ class EuConsentIT extends ErpTest {
     val accessCode = EuAccessCode.random();
     val grantEuAccessPermission =
         leonie.performs(
-            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.LI));
+            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.MT));
     leonie.attemptsTo(
         Verify.that(grantEuAccessPermission)
             .withExpectedType()

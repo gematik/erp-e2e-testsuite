@@ -33,19 +33,19 @@ public enum ChargeItemDrawer implements PageElement {
       () ->
           By.xpath(
               "//XCUIElementTypeStaticText[@name=\"Ausgestellt"
-                  + " am\"]/preceding-sibling::XCUIElementTypeStaticText[1]")),
+                  + " am\"]/following-sibling::XCUIElementTypeStaticText[1]")),
   PHARMACY_TEXT_FIELD(
       "Text field of the pharmacy",
       () ->
           By.xpath(
               "//XCUIElementTypeStaticText[@name=\"Eingelöst"
-                  + " in\"]/preceding-sibling::XCUIElementTypeStaticText[1]")),
+                  + " in\"]/following-sibling::XCUIElementTypeStaticText[1]")),
   ENTERED_DATE_TEXT_FIELD(
       "Text field of the entered date",
       () ->
           By.xpath(
               "//XCUIElementTypeStaticText[@name=\"Eingelöst"
-                  + " am\"]/preceding-sibling::XCUIElementTypeStaticText[1]")),
+                  + " am\"]/following-sibling::XCUIElementTypeStaticText[1]")),
   OPEN_CHARGE_ITEM_OVERVIEW_BUTTON(
       "Text field of the entered date", () -> By.name("Zur Übersicht der Apothekenrechnungen")),
   PRICE_TEXT_FIELD(

@@ -38,8 +38,8 @@ public class ErxMedicationDispenseDiGAFaker
         ErxMedicationDispenseDiGAFaker,
         ErxMedicationDispenseDiGABuilder> {
 
-  private ErxMedicationDispenseDiGAFaker() {
-    super();
+  private ErxMedicationDispenseDiGAFaker(ErpWorkflowVersion erpWfVersion) {
+    super(erpWfVersion);
     this.withDeepLink(DeepLink.random())
         .withRedeemCode(RedeemCode.random())
         .withPrescriptionId(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162))
@@ -47,12 +47,18 @@ public class ErxMedicationDispenseDiGAFaker
   }
 
   public static ErxMedicationDispenseDiGAFaker builder() {
-    return new ErxMedicationDispenseDiGAFaker();
+    return builder(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  public static ErxMedicationDispenseDiGAFaker builder(ErpWorkflowVersion erpWfVersion) {
+    return new ErxMedicationDispenseDiGAFaker(erpWfVersion);
   }
 
   public ErxMedicationDispenseDiGAFaker withPzn(String pzn, String digaName) {
     val newMedication =
-        GemErpMedicationFaker.forPznMedication().withPzn(PZN.from(pzn), digaName).fake();
+        GemErpMedicationFaker.forPznMedication(this.version)
+            .withPzn(PZN.from(pzn), digaName)
+            .fake();
     builderConsumers.put("medication", b -> b.medication(newMedication));
     return this;
   }
@@ -77,7 +83,7 @@ public class ErxMedicationDispenseDiGAFaker
 
   @Override
   public ErxMedicationDispenseDiGABuilder toBuilder() {
-    val builder = ErxMedicationDispenseDiGABuilder.forKvnr(kvnr);
+    val builder = ErxMedicationDispenseDiGABuilder.forKvnr(kvnr).version(this.version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

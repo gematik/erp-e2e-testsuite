@@ -20,15 +20,8 @@
 
 package de.gematik.test.core.expectations.emlverifier;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlDispensationIdIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlHandedOverIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationDispenseMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationMapsTo;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlOrganisationHasSMCBTelematikId;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
@@ -45,6 +38,7 @@ import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -394,5 +388,17 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
 
     assertFalse(
         predicate.test(nonEmptyList), "Expected verification step to fail for a non-empty list");
+  }
+
+  @Test
+  void shouldValidateEpaMedicationCategoryCorrect() {
+    val step = emlMedicationHasCategory(MedicationCategory.C_00);
+    assertDoesNotThrow(() -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shoulThrowWhiledValidateEpaMedicationCategoryCorrect() {
+    val step = emlMedicationHasCategory(MedicationCategory.C_01);
+    assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
   }
 }

@@ -20,14 +20,12 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.test.erezept.actions.ClosePrescription.applyMutators;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
@@ -38,10 +36,7 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -52,11 +47,7 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.konnektor.soap.mock.LocalSigner;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -161,9 +152,12 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(CloseTaskCommand.class))).thenReturn(response);
+    FuzzingMutator<GemCloseOperationParameters> mutator1 = mock(FuzzingMutator.class);
 
     val closePrescription =
-        ClosePrescription.alternative().acceptedWith(acceptInteraction, new Date(), new Date());
+        ClosePrescription.alternative()
+            .withCloseResourceManipulator(new NamedEnvelope<>("mutator", mutator1))
+            .acceptedWith(acceptInteraction, new Date(), new Date());
     assertDoesNotThrow(() -> pharmacy.performs(closePrescription));
   }
 

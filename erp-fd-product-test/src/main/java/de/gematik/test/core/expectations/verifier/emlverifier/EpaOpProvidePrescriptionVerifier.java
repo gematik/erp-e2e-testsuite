@@ -36,11 +36,8 @@ import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import java.util.*;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -305,7 +302,7 @@ public class EpaOpProvidePrescriptionVerifier {
       KbvErpMedication expectedMedication, HashMap<String, Optional<String>> expectedValues) {
     expectedValues.put(
         MEDICATION_EXTENSION_ARZNEIMITTELKATEGORIE,
-        Optional.ofNullable(expectedMedication.getCatagory().get(0).getCode()));
+        Optional.ofNullable(expectedMedication.getCategory().get(0).getCode()));
     expectedValues.put(
         MEDICATION_EXTENSION_IMPFSTOFF,
         Optional.of(String.valueOf(expectedMedication.isVaccine())));
@@ -740,6 +737,29 @@ public class EpaOpProvidePrescriptionVerifier {
     return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
             EmlAfos.A_25949.getRequirement(),
             format("Die EpaOrganisation muss die TelematikId {0} enthalten", telematikId))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvidePrescription> emlHasMedicationCategory(
+      MedicationCategory category, EmlAfos emlAfo) {
+
+    Predicate<EpaOpProvidePrescription> predicate =
+        prescription ->
+            prescription.getEpaMedication().getExtension().stream()
+                .filter(
+                    extension ->
+                        extension
+                            .getUrl()
+                            .matches(EpaMedicationStructDef.DRUG_CATEGORY_EXT.getCanonicalUrl()))
+                .map(ex -> ((Coding) ex.getValue()).getCode().equals(category.getCode()))
+                .findAny()
+                .equals(Optional.of(true));
+    return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
+            emlAfo.getRequirement(),
+            format(
+                "Die EpaMedication muss die MedicationCategory {0} enthalten",
+                category.getDisplay()))
         .predicate(predicate)
         .accept();
   }

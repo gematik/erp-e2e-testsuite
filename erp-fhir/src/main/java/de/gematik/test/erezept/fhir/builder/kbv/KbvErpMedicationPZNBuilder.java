@@ -21,6 +21,8 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import com.google.common.base.Strings;
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
+import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
@@ -30,9 +32,11 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.BaseMedicationType;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
+import java.math.BigDecimal;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Ratio;
 
@@ -46,12 +50,15 @@ public class KbvErpMedicationPZNBuilder
   private PZN pzn;
   private String medicationName;
   private String ingredientText;
-  private int ingredientStrengthNumerator;
+  private BigDecimal ingredientStrengthNumerator;
   private String ingredientStrengthNumUnit;
   private String packagingSize;
   private long amountNumerator;
   private String amountNumeratorUnit;
   private String ingredientStrengthDenomUnit;
+  private BigDecimal ingredientStrengthDenominator;
+  private CodeableConcept ingredientItemItemCC;
+  private final Extension absentExt = HL7StructDef.DATA_ABSENT_REASON.asCodeExtension("unknown");
 
   public static KbvErpMedicationPZNBuilder builder() {
     return new KbvErpMedicationPZNBuilder();
@@ -62,18 +69,27 @@ public class KbvErpMedicationPZNBuilder
     return this;
   }
 
+  public KbvErpMedicationPZNBuilder ingredientItemCC(ASK ask) {
+    this.ingredientItemItemCC = ask.asCodeableConcept();
+    return this;
+  }
+
   public KbvErpMedicationPZNBuilder normgroesse(StandardSize size) {
     this.normgroesse = size;
     return this;
   }
 
-  public KbvErpMedicationPZNBuilder ingredientStrengthDenomUnit(String denominatorUnit) {
+  public KbvErpMedicationPZNBuilder ingredientStrengthDenom(
+      double denomValue, String denominatorUnit) {
+    this.ingredientStrengthDenominator = new BigDecimal(String.valueOf(denomValue));
     this.ingredientStrengthDenomUnit = denominatorUnit;
     return this;
   }
 
-  public KbvErpMedicationPZNBuilder ingredientStrengthNum(int num, String unit) {
-    this.ingredientStrengthNumerator = num;
+  public KbvErpMedicationPZNBuilder ingredientStrengthNum(double num, String unit) {
+    // it is important to use String.valueOf() because you can produce floating point calculation
+    // error without
+    this.ingredientStrengthNumerator = new BigDecimal(String.valueOf(num));
     this.ingredientStrengthNumUnit = unit;
     return this;
   }
@@ -120,13 +136,10 @@ public class KbvErpMedicationPZNBuilder
 
   @Override
   public KbvErpMedication build() {
+    checkRequired();
     val medication =
         this.createResource(
             KbvErpMedication::new, KbvItaErpStructDef.MEDICATION_PZN, kbvItaErpVersion);
-
-    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
-      medication.getMeta().setVersionId("1");
-    }
 
     this.defaultAmount();
 
@@ -143,32 +156,65 @@ public class KbvErpMedicationPZNBuilder
 
       val ingredient = KbvIngredientComponentBuilder.builder().dontFillMissingIngredientStrength();
 
-      ingredient.textInCoding(
-          ingredientText != null && !ingredientText.isBlank()
-              ? ingredientText
-              : GemFaker.fakerName());
+      if (this.kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
 
-      val numUnit =
-          Optional.ofNullable(ingredientStrengthNumUnit)
-              .filter(it -> !Strings.isNullOrEmpty(it))
-              .orElse("mg");
-      val denomUnit =
-          Optional.ofNullable(ingredientStrengthDenomUnit)
-              .filter(it -> !Strings.isNullOrEmpty(it))
-              .orElse("mg");
+        // until kbv.ita.erp 1.4.1 there is no need for Ingredient strength Num or Denom
+        val numUnit =
+            Optional.ofNullable(ingredientStrengthNumUnit)
+                .filter(it -> !Strings.isNullOrEmpty(it))
+                .orElse(null);
+        val denomUnit =
+            Optional.ofNullable(ingredientStrengthDenomUnit)
+                .filter(it -> !Strings.isNullOrEmpty(it))
+                .orElse(null);
 
-      val strengthNumerator =
-          Optional.of(ingredientStrengthNumerator)
-              .filter(it -> it != 0)
-              .orElse(GemFaker.fakerAmount(1, 6));
-      ingredient.ingredientStrength(
-          new Quantity(strengthNumerator).setUnit(numUnit), new Quantity(1).setUnit(denomUnit));
-      ingredient.textInCoding(
-          ingredientText != null && !ingredientText.isBlank()
-              ? ingredientText
-              : GemFaker.fakerName());
+        val strengthNumerator =
+            Optional.ofNullable(ingredientStrengthNumerator)
+                .filter(it -> !it.equals(BigDecimal.ZERO))
+                .orElse(null);
+
+        val strengthDenominator =
+            Optional.ofNullable(ingredientStrengthDenominator)
+                .filter(it -> !it.equals(BigDecimal.ZERO))
+                .orElse(null);
+        ingredient.ingredientStrength(
+            new Quantity().setValue(strengthNumerator).setUnit(numUnit),
+            new Quantity().setValue(strengthDenominator).setUnit(denomUnit));
+
+      } else {
+
+        val numUnit =
+            Optional.ofNullable(ingredientStrengthNumUnit)
+                .filter(it -> !Strings.isNullOrEmpty(it))
+                .orElse("mg");
+        val denomUnit =
+            Optional.ofNullable(ingredientStrengthDenomUnit)
+                .filter(it -> !Strings.isNullOrEmpty(it))
+                .orElse("ml");
+
+        val strengthNumerator =
+            Optional.ofNullable(ingredientStrengthNumerator)
+                .filter(it -> !it.equals(BigDecimal.ZERO))
+                .orElse(new BigDecimal(GemFaker.fakerAmount(1, 5)));
+
+        val strengthDenominator =
+            Optional.ofNullable(ingredientStrengthDenominator)
+                .filter(it -> !it.equals(BigDecimal.ZERO))
+                .orElse(BigDecimal.valueOf(1));
+        ingredient.ingredientStrength(
+            new Quantity().setValue(strengthNumerator).setUnit(numUnit),
+            new Quantity().setValue(strengthDenominator).setUnit(denomUnit));
+      }
+
+      Optional.ofNullable(ingredientText).ifPresent(ingredient::textInCoding);
 
       medication.addIngredient(ingredient.build());
+
+      // changes from KBV ITA ERP Version 1.4.0
+      // https://simplifier.net/packages/kbv.ita.erp/1.4.0/files/3113160
+      if (this.kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+        newBehaviorsInItaErp14(medication);
+      }
     }
 
     extensions.add(medExtKategorie);
@@ -194,6 +240,16 @@ public class KbvErpMedicationPZNBuilder
     return medication;
   }
 
+  private void newBehaviorsInItaErp14(KbvErpMedication medication) {
+    medication.getMeta().setVersionId("1");
+    if (Strings.isNullOrEmpty(ingredientText)) {
+      medication.getIngredientFirstRep().getItemCodeableConcept().addExtension(absentExt);
+    }
+    if (!medication.getIngredientFirstRep().hasStrength()) {
+      medication.getIngredientFirstRep().getStrength().addExtension(absentExt);
+    }
+  }
+
   /**
    * The amount is quite tricky: - If not given by the user, make it a default with 10,1 - Use the
    * unit from kbvDarreichungsform - set a default code to Stk for now
@@ -204,6 +260,24 @@ public class KbvErpMedicationPZNBuilder
     if (amountNumerator <= 0) {
       this.amountNumerator = 1;
       this.amountNumeratorUnit = "Stk";
+    }
+  }
+
+  private void checkRequired() {
+    if (this.kbvItaErpVersion.isSmallerThan(KbvItaErpVersion.V1_4_0)
+        && this.ingredientItemItemCC != null
+        && !this.ingredientItemItemCC.isEmpty())
+      this.checkRequired(
+          ingredientText,
+          "a text in Medication.ingredient.item[x]:itemCodeableConcept.text is mandatory until"
+              + " Kbv.Ita.erp 1.4");
+
+    if (this.kbvItaErpVersion.isBiggerThanOrEqualTo(KbvItaErpVersion.V1_4_0)
+        && (ingredientStrengthNumerator != null || ingredientStrengthDenominator != null)) {
+      this.checkRequired(
+          ingredientText,
+          " -erp-angabeWirkstaerkeWirkstoffUnbekannt : Wenn die Wirkstärke angegeben ist, darf der"
+              + " Wirkstoff nicht unbekannt sein.");
     }
   }
 }

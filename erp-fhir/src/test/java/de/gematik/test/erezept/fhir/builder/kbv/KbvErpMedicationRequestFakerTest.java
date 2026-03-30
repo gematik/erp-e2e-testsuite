@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -39,10 +38,7 @@ import org.junit.jupiter.api.Test;
 class KbvErpMedicationRequestFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakerMedicationRequestWithVersion() {
-    val medication =
-        KbvErpMedicationRequestFaker.builder()
-            .withVersion(KbvItaErpVersion.getDefaultVersion())
-            .fake();
+    val medication = KbvErpMedicationRequestFaker.builder().fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
@@ -129,13 +125,11 @@ class KbvErpMedicationRequestFakerTest extends ErpFhirParsingTest {
   @Test
   void buildFakerMedicationRequestWithQuantity() {
     val medicationRequest =
-        KbvErpMedicationRequestFaker.builder().withQuantity(new Quantity()).fake();
+        KbvErpMedicationRequestFaker.builder().withDispenseQuantity(fakerAmount()).fake();
     val medicationRequest2 =
-        KbvErpMedicationRequestFaker.builder()
-            .withQuantity(new MedicationRequest.MedicationRequestDispenseRequestComponent())
-            .fake();
+        KbvErpMedicationRequestFaker.builder().withDispenseQuantity(fakerAmount()).fake();
     val medicationRequest3 =
-        KbvErpMedicationRequestFaker.builder().withQuantityPackages(fakerAmount()).fake();
+        KbvErpMedicationRequestFaker.builder().withDispenseQuantity(fakerAmount()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     val result2 = ValidatorUtil.encodeAndValidate(parser, medicationRequest2);
     val result3 = ValidatorUtil.encodeAndValidate(parser, medicationRequest3);
@@ -156,7 +150,7 @@ class KbvErpMedicationRequestFakerTest extends ErpFhirParsingTest {
 
   @Test
   void buildFakerMedicationRequestWithCoPaymentStatus() {
-    val status = StatusCoPayment.STATUS_0;
+    val status = StatusCoPayment.STATUS_1;
     val medicationRequest =
         KbvErpMedicationRequestFaker.builder().withCoPaymentStatus(status).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);

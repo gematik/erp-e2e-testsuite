@@ -34,6 +34,7 @@ import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
 import de.gematik.test.erezept.primsys.mapping.PatientDataMapper;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -93,9 +94,8 @@ public abstract class PrescribeUseCase<B extends KbvBaseBundle> {
     kbvBundlePrescriptionIdentifier.setValue(draftPrescriptionId.getValue());
     val prescriptionId = PrescriptionId.from(kbvBundlePrescriptionIdentifier);
 
-    val taskId = from.getTaskId();
     to.setPrescriptionId(prescriptionId);
-    to.setId(taskId.getValue());
+    to.setId(UUID.randomUUID().toString());
 
     // will update all dates contained within the KBV Bundle to current date
     to.setAllDates();
@@ -112,7 +112,7 @@ public abstract class PrescribeUseCase<B extends KbvBaseBundle> {
 
   protected byte[] signPrescription(B bundle) {
     val xml = doctor.encode(bundle, EncodingType.XML);
-    log.info("Doctor {} signs Prescription: {}", doctor.getName(), xml);
+    log.info("Doctor {} signs Prescription:\n{}", doctor.getName(), xml);
     return doctor.signDocument(xml);
   }
 

@@ -38,11 +38,8 @@ class EpaPharmaceuticalProdBuilderTest extends EpaFhirParsingTest {
   void shouldBuildEpaMedPharmaceuticalProd() {
     val pharmaceuticalProd =
         EpaPharmaceuticalProdBuilder.builder().productKey("123_Codfe", "displayText").build();
-
     val result = encodeAndValidate((pharmaceuticalProd));
-
     assertTrue(result.isSuccessful());
-
     assertEquals("123_Codfe", pharmaceuticalProd.getProductKey().orElseThrow());
   }
 

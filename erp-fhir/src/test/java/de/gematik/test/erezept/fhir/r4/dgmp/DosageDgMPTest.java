@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -71,7 +72,7 @@ class DosageDgMPTest extends ErpFhirParsingTest {
 
     val original = mr.getRenderedDosageInstruction().orElseThrow();
     val rendered = RenderedDosageInstructionUtil.render(mr.getDosageInstructionDgMPs());
-    log.info(rendered);
+    log.debug(rendered);
     assertEquals(original, rendered, "Calculate DosageInstruction MUST match the original one");
   }
 

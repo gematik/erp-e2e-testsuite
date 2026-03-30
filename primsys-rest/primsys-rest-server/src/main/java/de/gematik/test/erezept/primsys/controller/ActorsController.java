@@ -22,6 +22,8 @@ package de.gematik.test.erezept.primsys.controller;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.test.erezept.client.usecases.GetCapabilityStatementCommand;
 import de.gematik.test.erezept.primsys.actors.BaseActor;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
@@ -29,6 +31,7 @@ import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -64,7 +67,33 @@ public class ActorsController {
     log.info("GET actor with ID {}", actorId);
     return ctx.getActors().stream()
         .filter(actor -> actor.getIdentifier().equals(actorId))
+        .peek(
+            actor -> {
+              log.info("Refresh IDP Token for actor {}", actor.getActorInfo().getId());
+              actor.getClient().refreshIdpToken();
+            })
         .map(BaseActor::getActorSummary)
+        .findFirst()
+        .orElseThrow(
+            () ->
+                ErrorResponseBuilder.createInternalErrorException(
+                    404, format("No Actor with ID {0} found", actorId)));
+  }
+
+  @GET
+  @Path("{actorId}/meta")
+  @Produces("application/fhir+xml")
+  public Response getMetaAsActor(@PathParam("actorId") String actorId) {
+    log.info("GET /meta from FD as actor with ID {}", actorId);
+    return ctx.getActors().stream()
+        .filter(actor -> actor.getIdentifier().equals(actorId))
+        .map(
+            actor -> {
+              val cmd = new GetCapabilityStatementCommand();
+              val cs = actor.erpRequest2(cmd);
+              val out = actor.getClient().encode(cs, EncodingType.XML);
+              return Response.ok(out).build();
+            })
         .findFirst()
         .orElseThrow(
             () ->

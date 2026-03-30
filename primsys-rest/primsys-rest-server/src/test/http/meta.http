@@ -1,0 +1,35 @@
+
+@doc = 6a7f66bc2bb0f4cd76deaa260abbb484
+
+### META-SERVICE-INFO-01
+GET {{host}}/info
+apikey: {{apikey}}
+
+### META-ACTORS-INFO-01
+GET {{host}}/actors
+apikey: {{apikey}}
+
+### DOC-REFRESH-01
+# refreshes only the IDP token but does not reach out to the Fachdienst
+GET {{host}}/actors/{{doc}}
+apikey: {{apikey}}
+
+### DOC-REFRESH-02
+# by calling /meta on the Fachdienst, the IDP token is refreshed implicitly
+GET {{host}}/actors/{{doc}}/meta
+apikey: {{apikey}}
+
+#### PRESCRIPTION-01
+# get all prescriptions from cache
+GET {{host}}/prescription
+apikey: {{apikey}}
+
+#### PRESCRIPTION-02
+# get a specific prescription from cache
+GET {{host}}/prescription/160.000.117.432.117.43
+apikey: {{apikey}}
+
+#### PRESCRIPTION-03
+# get a specific prescription from cache
+GET {{host}}/prescription/accepted/160.000.117.432.117.43
+apikey: {{apikey}}

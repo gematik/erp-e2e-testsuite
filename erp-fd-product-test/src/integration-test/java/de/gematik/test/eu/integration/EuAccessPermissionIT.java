@@ -69,7 +69,7 @@ class EuAccessPermissionIT extends ErpTest {
     val accessCode = EuAccessCode.random();
     val response =
         sina.performs(
-            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.LI));
+            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.MT));
 
     sina.attemptsTo(
         Verify.that(response)
@@ -94,7 +94,7 @@ class EuAccessPermissionIT extends ErpTest {
                 bundleContainsLog(
                     format(
                         "Sie haben eine Zugriffsberechtigung zum Einlösen von E-Rezepten für das"
-                            + " Land LI erteilt.")))
+                            + " Land MT erteilt.")))
             .isCorrect());
   }
 
@@ -105,14 +105,14 @@ class EuAccessPermissionIT extends ErpTest {
     val firstCode = EuAccessCode.random();
     val firstResponse =
         sina.performs(
-            GrantEuAccessPermission.withAccessCode(firstCode).forCountry(IsoCountryCode.LI));
+            GrantEuAccessPermission.withAccessCode(firstCode).forCountry(IsoCountryCode.MT));
     sina.attemptsTo(
         Verify.that(firstResponse).withExpectedType().hasResponseWith(returnCode(201)).isCorrect());
 
     val secondCode = EuAccessCode.random();
     val secondResponse =
         sina.performs(
-            GrantEuAccessPermission.withAccessCode(secondCode).forCountry(IsoCountryCode.LI));
+            GrantEuAccessPermission.withAccessCode(secondCode).forCountry(IsoCountryCode.MT));
     sina.attemptsTo(
         Verify.that(secondResponse)
             .withExpectedType()
@@ -159,7 +159,7 @@ class EuAccessPermissionIT extends ErpTest {
             GrantEuAccessPermission.withRandomAccessCode()
                 .withUncheckedAC(
                     EuAccessPermissionRequestBuilder.withUncheckedAccessCode(accessCode)
-                        .countryCode(IsoCountryCode.LI)
+                        .countryCode(IsoCountryCode.MT)
                         .build()));
 
     sina.attemptsTo(
@@ -177,7 +177,7 @@ class EuAccessPermissionIT extends ErpTest {
     sina.performs(EuRejectConsent.forOneSelf().build());
 
     val response =
-        sina.performs(GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCode.LI));
+        sina.performs(GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCode.MT));
 
     sina.attemptsTo(
         Verify.that(response)
@@ -199,7 +199,7 @@ class EuAccessPermissionIT extends ErpTest {
     val accessCode = EuAccessCode.random();
     val postResponse =
         sina.performs(
-            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.LI));
+            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.MT));
 
     sina.attemptsTo(
         Verify.that(postResponse)
@@ -207,7 +207,7 @@ class EuAccessPermissionIT extends ErpTest {
             .hasResponseWith(returnCode(201))
             .and(validUntilWithinOneHour())
             .and(hasCorrectProfile())
-            .and(hasIsoCountry(IsoCountryCode.LI))
+            .and(hasIsoCountry(IsoCountryCode.MT))
             .and(hasPermissionWithAccessCode(accessCode))
             .isCorrect());
 
@@ -219,7 +219,7 @@ class EuAccessPermissionIT extends ErpTest {
             .hasResponseWith(returnCode(200))
             .and(validUntilWithinOneHour())
             .and(hasCorrectProfile())
-            .and(hasIsoCountry(IsoCountryCode.LI))
+            .and(hasIsoCountry(IsoCountryCode.MT))
             .and(hasPermissionWithAccessCode(accessCode))
             .isCorrect());
   }

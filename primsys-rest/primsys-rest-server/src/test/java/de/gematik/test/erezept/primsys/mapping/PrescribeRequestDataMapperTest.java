@@ -20,9 +20,8 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -34,7 +33,9 @@ import de.gematik.test.erezept.primsys.data.valuesets.InsuranceTypeDto;
 import jakarta.ws.rs.WebApplicationException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
+@SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
 class PrescribeRequestDataMapperTest extends ErpFhirParsingTest {
 
   @Test

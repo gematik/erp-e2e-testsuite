@@ -55,8 +55,8 @@ public class DeletingThePrescription implements Question<Boolean> {
                 new MissingPreconditionError(
                     format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
 
-    driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
-    driver.tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
+    driver.tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
+    driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
 
     val message = driver.isPresent(PrescriptionDetails.PRESCRIPTION_CANNOT_BE_DELETED_INFO);
 

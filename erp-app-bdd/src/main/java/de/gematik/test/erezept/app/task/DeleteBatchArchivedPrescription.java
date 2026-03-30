@@ -51,7 +51,7 @@ public class DeleteBatchArchivedPrescription implements Task {
       for (int i = 0; i < elements.size(); i++) {
         log.info(format("Deleting {0}/{1} receipt(s)", i, elements.size()));
         driver.tap(REDEEMED_PRESCRIPTION_STATUS_LABEL);
-        driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
+        driver.tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
         driver.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
         driver.acceptAlert();
       }

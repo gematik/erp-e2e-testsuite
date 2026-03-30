@@ -29,10 +29,12 @@ import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeEvdgaRequestDto;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
 class PrescribeEvdgaRequestDataMapperTest extends ErpFhirParsingTest {
 
   @Test
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.5.0")
   void shouldGenerateValidRandomEvdgaPrescription() {
     val patientDto = new PatientDto();
     patientDto.setKvnr("X110407071");
@@ -40,8 +42,6 @@ class PrescribeEvdgaRequestDataMapperTest extends ErpFhirParsingTest {
     requestDto.setPatient(patientDto);
     val prescribeMapper = PrescribeEvdgaRequestDataMapper.from(requestDto);
     val kbvBundle = prescribeMapper.createEvdgaBundle("Bernd Claudius");
-    assertTrue(
-        ValidatorUtil.encodeAndValidate(parser, kbvBundle, EncodingType.XML, true, true)
-            .isSuccessful());
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, kbvBundle, EncodingType.XML).isSuccessful());
   }
 }

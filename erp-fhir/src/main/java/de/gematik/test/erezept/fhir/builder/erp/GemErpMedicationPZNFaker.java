@@ -37,12 +37,12 @@ import lombok.val;
 
 public class GemErpMedicationPZNFaker {
 
+  private final ErpWorkflowVersion version;
   private final Map<String, Consumer<GemErpMedicationPZNBuilder>> builderConsumers =
       new HashMap<>();
 
-  GemErpMedicationPZNFaker() {
-    withVersion(ErpWorkflowVersion.getDefaultVersion());
-
+  protected GemErpMedicationPZNFaker(ErpWorkflowVersion version) {
+    this.version = version;
     withPzn(PZN.random(), fakerDrugName());
 
     if (fakerBool()) withDrugCategory(fakerValueSet(EpaDrugCategory.class));
@@ -62,11 +62,6 @@ public class GemErpMedicationPZNFaker {
     if (fakerBool()) withAmount(getFaker().random().nextLong(20), randomElement("St", "ml", "mg"));
 
     if (fakerBool()) withLotNumber(fakerLotNumber());
-  }
-
-  public GemErpMedicationPZNFaker withVersion(ErpWorkflowVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
   }
 
   public GemErpMedicationPZNFaker withDrugCategory(EpaDrugCategory category) {
@@ -119,8 +114,7 @@ public class GemErpMedicationPZNFaker {
   }
 
   public GemErpMedicationPZNBuilder toBuilder() {
-    val builder = /*GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()*/
-        GemErpMedicationBuilder.forPZN();
+    val builder = GemErpMedicationBuilder.forPZN().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

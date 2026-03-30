@@ -164,7 +164,7 @@ public abstract class PrescriptionDataMapper {
             .requester(practitioner)
             .medication(medication)
             .dosage(dosage)
-            .quantityPackages(Integer.decode(amount))
+            .dispenseRequestQuantity(Integer.decode(amount))
             .status("active")
             .intent("order")
             .isBVG(false)

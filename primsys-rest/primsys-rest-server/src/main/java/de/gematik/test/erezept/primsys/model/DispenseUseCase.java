@@ -49,15 +49,10 @@ public class DispenseUseCase extends AbstractDispensingUseCase {
       List<PznDispensedMedicationDto> medications,
       boolean isSubstituted) {
 
-    val accepted = this.getAcceptedPrescription(prescriptionId);
-
     val dispenseCommand =
         this.createDispenseCommand(prescriptionId, secret, medications, isSubstituted);
-    val closeResponse = pharmacy.erpRequest(dispenseCommand);
-    val body = closeResponse.getExpectedResource();
+    val dispenseResponse = pharmacy.erpRequest(dispenseCommand);
 
-    val dispensedData =
-        this.storeDispensedMedication(prescriptionId, secret, accepted, body.getId(), medications);
-    return Response.status(closeResponse.getStatusCode()).entity(dispensedData).build();
+    return Response.status(dispenseResponse.getStatusCode()).build();
   }
 }

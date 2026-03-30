@@ -161,7 +161,7 @@ actors:
 
   euPharmacies:
     - name: Hannes Vogt
-      countryCode: LI
+      countryCode: CZ
       smcbIccsn: ncpeh-smb
       pharmacistIdentifier: GLN Person 7601001380592
       organizationIdentifier: GLN 7601001401228
@@ -191,6 +191,8 @@ environments:
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
       maxWait: 360000
+    tRegisterMockClient:
+      tRegisterMockUrl: https://t-register.test.gematik.solutions
 
   - name: RU
     ti:
@@ -229,6 +231,8 @@ environments:
       epaMockApiKey: DUMMY VALUE
       logRetrieveInterval: 10000
       maxWait: 360000
+    tRegisterMockClient:
+      tRegisterMockUrl: https://t-register.dev.gematik.solutions:443
 
   - name: TITUS
     ti:

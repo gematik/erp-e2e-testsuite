@@ -21,10 +21,7 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_COMPOUNDING;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_FREITEXT;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_INGREDIENT;
-import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.MEDICATION_PZN;
+import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
@@ -32,11 +29,7 @@ import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpProvidePrescriptionWithTask;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.DownloadAuditEvent;
-import de.gematik.test.erezept.actions.GetPrescriptionById;
-import de.gematik.test.erezept.actions.IssuePrescription;
-import de.gematik.test.erezept.actions.TaskAbort;
-import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -44,11 +37,7 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -58,7 +47,6 @@ import java.time.LocalDate;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -66,10 +54,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Provide Prescription with Consent Test")
 @Tag("ProvideEmlPrescription")
@@ -92,8 +78,8 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
           "[{index}] -> für einen Flow Type {2} sollen die zum Epa-Aktensystem gesendete"
               + " Prescription mit {3} überprüft werden")
   @DisplayName(
-      "Es muss geprüft werden, dass die übermittelte Prescription an das Epa Aktensystem den Werten"
-          + " der Prescription entspricht")
+      "Es muss geprüft werden, dass die Werte der vom FD übermittelten Prescription an das Epa"
+          + " Aktensystem den Werten der Prescription des Arztes entspricht")
   @MethodSource("workflowAndMedicationComposer")
   void checkSubmittedPrescriptionInformation(
       InsuranceTypeDe insuranceType,

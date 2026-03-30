@@ -57,9 +57,9 @@ public class KbvHealthAppRequest extends DeviceRequest implements ErpFhirResourc
 
   /**
    * Kennzeichnung, ob diese Verordnung mit Bezug zum Sozialen Entschädigungsrecht nach SGB XIV
-   * (SER) erfolgt
+   * (SER_EXTENSION) erfolgt
    *
-   * @return true if SER extension is set to true and false otherwise
+   * @return true if SER_EXTENSION extension is set to true and false otherwise
    */
   public boolean relatesToSocialCompensationLaw() {
     return this.extension.stream()

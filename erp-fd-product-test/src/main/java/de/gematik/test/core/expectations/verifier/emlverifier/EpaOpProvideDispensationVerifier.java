@@ -21,6 +21,7 @@
 package de.gematik.test.core.expectations.verifier.emlverifier;
 
 import static de.gematik.test.core.Helper.findBySystem;
+import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.DRUG_CATEGORY_EXT;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
@@ -31,9 +32,11 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -41,11 +44,16 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EpaOpProvideDispensationVerifier {
+
+  public static final String NO_MATCHING_CODING =
+      "Die / Das enthaltene/n Coding/s (PZN / ASK / ATC) in der Epa Medication stimmt/-en"
+          + " nicht mit der KbvMedication überein übereinstimmen";
 
   public static VerificationStep<EpaOpProvideDispensation> emlDispensationIdIsEqualTo(
       PrescriptionId prescriptionId) {
@@ -77,9 +85,24 @@ public class EpaOpProvideDispensationVerifier {
         getDispensationPredicate(expectedMedication.getCode());
 
     return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlAfos.A_25946.getRequirement(), NO_MATCHING_CODING)
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation> emlMedicationHasCategory(
+      MedicationCategory category) {
+    Predicate<EpaOpProvideDispensation> predicate =
+        dispensation ->
+            dispensation.getEpaMedication().getExtension().stream()
+                .filter(DRUG_CATEGORY_EXT::matches)
+                .map(ex -> ((Coding) ex.getValue()).getCode().equals(category.getCode()))
+                .findAny()
+                .equals(Optional.of(true));
+
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
             EmlAfos.A_25946.getRequirement(),
-            "Die / Das enthaltene/n Coding/s (PZN / ASK / ATC) in der Epa Medication stimmt/-en"
-                + " nicht mit der KbvMedication überein übereinstimmen")
+            "Die EpaMedication muss die MedicationCategory {0} enthalten")
         .predicate(predicate)
         .accept();
   }
@@ -90,9 +113,7 @@ public class EpaOpProvideDispensationVerifier {
         getDispensationPredicate(expectedMedication.getCode());
 
     return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
-            EmlAfos.A_25946.getRequirement(),
-            "Die / Das enthaltene/n Coding/s (PZN / ASK / ATC) in der Epa Medication stimmt/-en"
-                + " nicht mit der KbvMedication überein übereinstimmen")
+            EmlAfos.A_25946.getRequirement(), NO_MATCHING_CODING)
         .predicate(predicate)
         .accept();
   }

@@ -42,9 +42,8 @@ class AuthorizedChargeItemStrategyTest extends ErpFhirBuildingTest {
     val prescriptionId = PrescriptionId.random();
     val accessCode = AccessCode.random();
     val chargeItem =
-        ErxChargeItemFaker.builder()
+        ErxChargeItemFaker.builder(PatientenrechnungVersion.V1_0_0)
             .withPrescriptionId(prescriptionId)
-            .withVersion(PatientenrechnungVersion.V1_0_0)
             .fake();
     val authorization = ChargeItemChangeAuthorization.forChargeItem(chargeItem, accessCode);
     val useThePharmacyStack = ManagePharmacyPrescriptions.itWorksWith();
@@ -69,9 +68,8 @@ class AuthorizedChargeItemStrategyTest extends ErpFhirBuildingTest {
     val prescriptionId = PrescriptionId.random();
     val accessCode = AccessCode.random();
     val chargeItem =
-        ErxChargeItemFaker.builder()
+        ErxChargeItemFaker.builder(PatientenrechnungVersion.V1_0_0)
             .withPrescriptionId(prescriptionId)
-            .withVersion(PatientenrechnungVersion.V1_0_0)
             .withAccessCode(accessCode)
             .fake();
     val authorization =

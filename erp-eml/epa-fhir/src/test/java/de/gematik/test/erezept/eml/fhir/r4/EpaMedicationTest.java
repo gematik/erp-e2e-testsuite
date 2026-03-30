@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;

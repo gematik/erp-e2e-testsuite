@@ -21,13 +21,13 @@
 package de.gematik.test.erezept.primsys.model;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
@@ -36,6 +36,7 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
@@ -166,7 +167,7 @@ class CloseUseCaseTest extends TestWithActorContext {
             .withSecret(secret)
             .forKvnr("X110407071", PatientInsuranceTypeDto.PKV)
             .andMedication(KbvPznMedicationDataMapper.randomDto());
-    ActorContext.getInstance().addAcceptedPrescription(acceptDto);
+    ctx.addAcceptedPrescription(acceptDto);
     val dispenseMedications =
         List.of(
             PznDispensedMedicationDataMapper.randomDto(),
@@ -176,5 +177,46 @@ class CloseUseCaseTest extends TestWithActorContext {
     try (val response = usecase.closePrescription(taskId, secret, dispenseMedications)) {
       assertEquals(204, response.getStatus());
     }
+  }
+
+  @Test
+  void shouldCloseWithFhirExample() {
+    val ctx = ActorContext.getInstance();
+    val pharmacy = ctx.getPharmacies().get(0);
+    val mockClient = pharmacy.getClient();
+
+    val receiptMock = new ErxReceipt();
+
+    val mockResponse =
+        ErpResponse.forPayload(receiptMock, ErxReceipt.class)
+            .withStatusCode(204)
+            .withHeaders(Map.of())
+            .andValidationResult(createEmptyValidationResult());
+    when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
+
+    val taskId = PrescriptionId.random().getValue();
+    val accessCode = AccessCode.random().getValue();
+    val secret = Secret.random().getValue();
+    val acceptDto =
+        AcceptedPrescriptionDto.withPrescriptionId(taskId)
+            .withAccessCode(accessCode)
+            .withSecret(secret)
+            .forKvnr("X110407071", PatientInsuranceTypeDto.PKV)
+            .andMedication(KbvPznMedicationDataMapper.randomDto());
+    ctx.addAcceptedPrescription(acceptDto);
+
+    val closeInputParameter =
+        ResourceLoader.readFileFromResource(
+            "fhir/valid/erp/1.5.0/close/PZN_Nr33_MedicationDispense.xml");
+
+    val usecase = new CloseUseCase(pharmacy);
+    try (val response =
+        usecase.closePrescriptionWithParameters(taskId, secret, closeInputParameter)) {
+      assertEquals(204, response.getStatus());
+    }
+
+    // make sure the prescription was moved from accepted to dispensed in the cache
+    assertTrue(ctx.getAcceptedPrescription(taskId).isEmpty());
+    assertTrue(ctx.getDispensedMedication(taskId).isPresent());
   }
 }

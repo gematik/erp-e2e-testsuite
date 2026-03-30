@@ -66,8 +66,8 @@ public class DeleteRedeemablePrescription implements Task {
                 new MissingPreconditionError(
                     format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
 
-    app.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR);
-    app.tap(PrescriptionDetails.DELETE_PRESCRIPTION_ITEM_BUTTON);
+    app.tap(PrescriptionDetails.PRESCRIPTION_DETAILS_TOOLBAR);
+    app.tap(PrescriptionDetails.DELETE_BUTTON_TOOLBAR_ITEM);
     app.acceptAlert();
 
     if (dmc.getTaskId().getFlowType().isPkvType()) {

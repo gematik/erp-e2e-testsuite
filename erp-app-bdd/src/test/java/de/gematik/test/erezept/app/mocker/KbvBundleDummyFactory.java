@@ -68,6 +68,7 @@ public class KbvBundleDummyFactory {
             .withMedication(medication)
             .withCoPaymentStatus(coPayment)
             .withMvo(mvo)
+            .withSer(false)
             .withSubstitution(false)
             .withAuthorDate(new Date())
             .fake();

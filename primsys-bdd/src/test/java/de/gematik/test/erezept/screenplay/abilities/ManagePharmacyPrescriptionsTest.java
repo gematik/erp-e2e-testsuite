@@ -27,20 +27,26 @@ import static org.mockito.Mockito.*;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-class ManagePharmacyPrescriptionsTest {
+class ManagePharmacyPrescriptionsTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldHaveInitializedPharmacyPrescriptionStacks() {
@@ -53,8 +59,11 @@ class ManagePharmacyPrescriptionsTest {
     assertDoesNotThrow(ability::toString);
   }
 
-  @Test
-  void shouldTeardown() {
+  @ParameterizedTest
+  @EnumSource(
+      value = PrescriptionFlowType.class,
+      names = {"FLOW_TYPE_160", "FLOW_TYPE_162"})
+  void shouldTeardown(PrescriptionFlowType flowType) {
     OnStage.setTheStage(new Cast() {});
 
     val actor = OnStage.theActor("Am Waldesrand");
@@ -63,7 +72,7 @@ class ManagePharmacyPrescriptionsTest {
 
     val task = mock(ErxTask.class);
     val acceptBundle = mock(ErxAcceptBundle.class);
-    when(acceptBundle.getTaskId()).thenReturn(TaskId.from(PrescriptionId.random()));
+    when(acceptBundle.getTaskId()).thenReturn(TaskId.from(PrescriptionId.random(flowType)));
     when(acceptBundle.getSecret()).thenReturn(Secret.from("123"));
     when(acceptBundle.getTask()).thenReturn(task);
     when(task.getAccessCode()).thenReturn(AccessCode.random());
@@ -77,12 +86,21 @@ class ManagePharmacyPrescriptionsTest {
     val erpClientAbility = UseTheErpClient.with(erpClient);
     actor.can(erpClientAbility);
 
-    val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
-            .withStatusCode(404)
-            .withHeaders(Map.of())
-            .andValidationResult(createEmptyValidationResult());
-    when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
+    if (flowType == PrescriptionFlowType.FLOW_TYPE_162) {
+      val mockResponse =
+          ErpResponse.forPayload(createOperationOutcome(), ErxReceipt.class)
+              .withStatusCode(404)
+              .withHeaders(Map.of())
+              .andValidationResult(createEmptyValidationResult());
+      when(erpClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
+    } else {
+      val mockResponse =
+          ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+              .withStatusCode(404)
+              .withHeaders(Map.of())
+              .andValidationResult(createEmptyValidationResult());
+      when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
+    }
 
     OnStage.drawTheCurtain();
 

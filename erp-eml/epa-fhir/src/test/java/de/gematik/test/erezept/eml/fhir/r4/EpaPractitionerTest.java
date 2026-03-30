@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.eml.fhir.r4;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -39,5 +40,15 @@ class EpaPractitionerTest extends EpaFhirParsingTest {
     val epaMedic = epaFhir.decode(EpaPractitioner.class, medicationAsString);
 
     assertEquals(TelematikID.from("1-1.58.00000040"), epaMedic.getTelematikId());
+  }
+
+  @Test
+  void shouldValidate() {
+    val stringContent =
+        ResourceLoader.readFileFromResource("fhir/valid/dispensationWithRenderedDosage.json");
+    val res = epaFhir.validate(stringContent);
+    res.getMessages().forEach(System.out::println);
+    this.printValidationResult(res);
+    assertTrue(res.isSuccessful());
   }
 }

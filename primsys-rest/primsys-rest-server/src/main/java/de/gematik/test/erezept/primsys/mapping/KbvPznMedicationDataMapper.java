@@ -70,6 +70,7 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
         .packagingSize(dto.getPackagingSize(), dto.getPackagingUnit())
         .pzn(dto.getPzn(), dto.getName())
         .category(MedicationCategory.C_00)
+        .ingredientText("Wirkstoff") // required with
         .build();
   }
 

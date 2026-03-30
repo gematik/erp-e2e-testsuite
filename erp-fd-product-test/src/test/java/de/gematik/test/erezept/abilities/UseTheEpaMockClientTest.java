@@ -53,7 +53,7 @@ class UseTheEpaMockClientTest extends ErpFhirBuildingTest {
     val prescriptionId = PrescriptionId.random();
     val body =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/parameters/Parameters-example-epa-op-provide-prescription-erp-input-parameters-1.json");
+            "fhir/valid/parameters/1.3.0/Parameters-example-epa-op-provide-prescription-erp-input-parameters-1.xml");
 
     val bRequest = HttpBRequest.get().urlPath("provide-prescription-erp").withPayload(body);
     val mockErpEmlLog =

@@ -24,6 +24,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
+import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -37,16 +38,15 @@ import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.Quantity;
 
 public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
-
+  private final ErpWorkflowVersion version;
   private final Map<String, Consumer<GemErpMedicationCompoundingBuilder>> builderConsumers =
       new HashMap<>();
   private String askKey = "ask";
   private String snomedKey = "snomed";
   private String atcKey = "atc";
 
-  public GemErpMedicationCompoundingFaker() {
-
-    withVersion(ErpWorkflowVersion.getDefaultVersion());
+  protected GemErpMedicationCompoundingFaker(ErpWorkflowVersion version) {
+    this.version = version;
 
     if (fakerBool()) {
       withAsk(ASK.from(GemFaker.fakerBsnr()));
@@ -57,10 +57,10 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
 
     if (fakerBool()) withSnomed(GemFaker.fakerPhone());
     if (fakerBool())
-      withIngredientWithContainedAtc(
+      withIngredientWithContainedPzn(
           getFaker().random().nextInt(1, 1000),
           getFaker().random().nextInt(1, 10),
-          ATC.from(getRandomFourDigitsCode()));
+          PZN.from(getRandomFourDigitsCode()));
     if (fakerBool()) withDrugCategory(fakerValueSet(EpaDrugCategory.class));
     if (fakerBool()) withVaccineTrue(fakerBool());
     if (fakerBool()) withAmount(getFaker().random().nextLong(20));
@@ -111,11 +111,6 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
     return this;
   }
 
-  public GemErpMedicationCompoundingFaker withVersion(ErpWorkflowVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
-  }
-
   public GemErpMedicationCompoundingFaker withDrugCategory(EpaDrugCategory category) {
     builderConsumers.put("category", b -> b.category(category));
     return this;
@@ -126,14 +121,14 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
    *
    * @param numerator of the ingredient strength
    * @param denominator of the ingredient strength
-   * @param atc as contained coding of the ingredient
+   * @param pzn as contained coding of the ingredient
    * @return GemErpMedicationCompoundingFaker
    */
-  public GemErpMedicationCompoundingFaker withIngredientWithContainedAtc(
-      int numerator, int denominator, ATC atc) {
+  public GemErpMedicationCompoundingFaker withIngredientWithContainedPzn(
+      int numerator, int denominator, PZN pzn) {
     builderConsumers.put(
         "ingredientComponentList",
-        b -> b.ingredientComponent(buildIngredient(numerator, denominator, atc)));
+        b -> b.ingredientComponent(buildIngredient(numerator, denominator, pzn)));
     return this;
   }
 
@@ -161,17 +156,17 @@ public class GemErpMedicationCompoundingFaker implements GemErpMedicationFaker {
     return this.toBuilder().build();
   }
 
-  private Medication.MedicationIngredientComponent buildIngredient(int num, int denom, ATC atc) {
+  private Medication.MedicationIngredientComponent buildIngredient(int num, int denom, PZN pzn) {
     return GemEpaIngredientComponentBuilder.builder()
         .ingredientStrength(
             Quantity.fromUcum(String.valueOf(num), "mg"),
             Quantity.fromUcum(String.valueOf(denom), "mg"))
-        .atc(atc)
+        .pzn(pzn)
         .build();
   }
 
   public GemErpMedicationCompoundingBuilder toBuilder() {
-    val builder = GemErpMedicationBuilder.forCompounding();
+    val builder = GemErpMedicationBuilder.forCompounding().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

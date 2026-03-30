@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
 import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
@@ -41,7 +40,6 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.val;
@@ -52,6 +50,7 @@ import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class KbvErpBundleFakerTest extends ErpFhirParsingTest {
@@ -67,16 +66,21 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     assertTrue(result2.isSuccessful());
   }
 
-  @Test()
-  void buildFakeKbvErpBundleWithStatusKennzeichen() {
+  @ParameterizedTest
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void buildFakeKbvErpBundleWithStatusKennzeichen(
+      KbvItaForVersion forVersion, KbvItaErpVersion erpVersion) {
+    val practitioner = KbvPractitionerFaker.builder(forVersion).fake();
+    val medication = KbvErpMedicationPZNFaker.builder(erpVersion).fake();
+    val patient = KbvPatientFaker.builder(forVersion).fake();
+    val coverage = KbvCoverageFaker.builder(forVersion).fake();
     val bundle =
-        KbvErpBundleFaker.builder()
-            .withStatusKennzeichen(
-                fakerValueSet(
-                        StatusKennzeichen.class,
-                        List.of(StatusKennzeichen.ASV, StatusKennzeichen.ASV_SUBSTITUTE))
-                    .getCode(),
-                KbvPractitionerFaker.builder().fake())
+        KbvErpBundleFaker.builder(erpVersion, forVersion)
+            .withStatusKennzeichen(StatusKennzeichen.NONE.getCode(), practitioner)
+            .withMedication(medication)
+            .withPractitioner(practitioner)
+            .withPatient(patient)
+            .withInsurance(coverage, patient)
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
@@ -139,27 +143,20 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     assertTrue(result.isSuccessful());
   }
 
-  @Test
-  void buildFakeKbvErpBundleWithMedicationRequestVersion() {
-    val bundle =
-        KbvErpBundleFaker.builder()
-            .withVersion(KbvItaErpVersion.getDefaultVersion(), KbvItaForVersion.getDefaultVersion())
-            .fake();
+  @ParameterizedTest
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void buildFakeKbvErpBundleWithMedicationRequestVersion(
+      KbvItaForVersion forVersion, KbvItaErpVersion erpVersion) {
+    val bundle = KbvErpBundleFaker.builder(erpVersion, forVersion).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
   }
 
   @Test
   void buildFakeKbvErpBundleWithQuantity() {
-    val bundle =
-        KbvErpBundleFaker.builder()
-            .withQuantity(new MedicationRequest.MedicationRequestDispenseRequestComponent())
-            .fake();
-    val bundle2 =
-        KbvErpBundleFaker.builder()
-            .withQuantity(QuantityBuilder.asUcumPackage().withValue(fakerAmount()))
-            .fake();
-    val bundle3 = KbvErpBundleFaker.builder().withQuantityPackages(fakerAmount()).fake();
+    val bundle = KbvErpBundleFaker.builder().withDispenseQuantity(1).fake();
+    val bundle2 = KbvErpBundleFaker.builder().withDispenseQuantity(fakerAmount()).fake();
+    val bundle3 = KbvErpBundleFaker.builder().withDispenseQuantity(fakerAmount()).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     val result2 = ValidatorUtil.encodeAndValidate(parser, bundle2);
     val result3 = ValidatorUtil.encodeAndValidate(parser, bundle3);
@@ -241,7 +238,7 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildForPkvCoverage() {
-    val bundle = KbvErpBundleFaker.builderForPkvCoverage().fake();
+    val bundle = KbvErpBundleFaker.builder(true).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
     assertNotNull(bundle.getCoverage());

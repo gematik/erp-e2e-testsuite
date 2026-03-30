@@ -23,6 +23,7 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 import de.gematik.bbriccs.fhir.builder.FakerBrick;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvHealthAppRequest;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
@@ -37,12 +38,13 @@ import lombok.val;
 public class KbvHealthAppRequestFaker {
 
   private static final String ACCIDENT_KEY = "accident";
-
+  private final KbvItvEvdgaVersion evdgaVersion;
   private final KbvPatient patientSubject;
   private final Map<String, Consumer<KbvHealthAppRequestBuilder>> builderConsumers =
       new HashMap<>();
 
-  private KbvHealthAppRequestFaker(KbvPatient patientSubject) {
+  private KbvHealthAppRequestFaker(KbvPatient patientSubject, KbvItvEvdgaVersion evdgaVersion) {
+    this.evdgaVersion = evdgaVersion;
     this.patientSubject = patientSubject;
 
     val fakerBrick = FakerBrick.getGerman();
@@ -71,11 +73,20 @@ public class KbvHealthAppRequestFaker {
   }
 
   public static KbvHealthAppRequestFaker forPatient(KbvPatient patient) {
-    return new KbvHealthAppRequestFaker(patient);
+    return forPatient(patient, KbvItvEvdgaVersion.getDefaultVersion());
+  }
+
+  public static KbvHealthAppRequestFaker forPatient(
+      KbvPatient patient, KbvItvEvdgaVersion evdgaVersion) {
+    return new KbvHealthAppRequestFaker(patient, evdgaVersion);
   }
 
   public static KbvHealthAppRequestFaker forRandomPatient() {
-    return forPatient(KbvPatientFaker.builder().fake());
+    return forRandomPatient(KbvItvEvdgaVersion.getDefaultVersion());
+  }
+
+  public static KbvHealthAppRequestFaker forRandomPatient(KbvItvEvdgaVersion evdgaVersion) {
+    return forPatient(KbvPatientFaker.builder().fake(), evdgaVersion);
   }
 
   public KbvHealthAppRequestFaker withRequester(KbvPractitioner practitioner) {
@@ -103,7 +114,7 @@ public class KbvHealthAppRequestFaker {
   }
 
   public KbvHealthAppRequestBuilder toBuilder() {
-    val builder = KbvHealthAppRequestBuilder.forPatient(patientSubject);
+    val builder = KbvHealthAppRequestBuilder.forPatient(patientSubject).version(evdgaVersion);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

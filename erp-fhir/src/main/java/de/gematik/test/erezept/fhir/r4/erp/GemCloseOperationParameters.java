@@ -21,8 +21,18 @@
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import java.util.List;
 import org.hl7.fhir.r4.model.Parameters;
 
 @ResourceDef(name = "Parameters")
 @SuppressWarnings({"java:S110"})
-public class GemCloseOperationParameters extends Parameters {}
+public class GemCloseOperationParameters extends Parameters {
+
+  public List<ErxMedicationDispense> getMedicationDispenses() {
+    return this.getParameters("rxDispensation").stream()
+        .flatMap(p -> p.getPart().stream())
+        .filter(p -> "medicationDispense".equals(p.getName()))
+        .map(p -> (ErxMedicationDispense) p.getResource())
+        .toList();
+  }
+}

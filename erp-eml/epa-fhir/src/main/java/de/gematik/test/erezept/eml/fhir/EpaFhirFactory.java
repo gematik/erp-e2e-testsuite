@@ -27,15 +27,7 @@ import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.profile.GematikDirStrucDef;
 import de.gematik.test.erezept.eml.fhir.profile.GematikDirVersion;
-import de.gematik.test.erezept.eml.fhir.r4.EpaMedication;
-import de.gematik.test.erezept.eml.fhir.r4.EpaMedicationDispense;
-import de.gematik.test.erezept.eml.fhir.r4.EpaMedicationRequest;
-import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelDispensation;
-import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
-import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
-import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
-import de.gematik.test.erezept.eml.fhir.r4.EpaOrganisation;
-import de.gematik.test.erezept.eml.fhir.r4.EpaPractitioner;
+import de.gematik.test.erezept.eml.fhir.r4.*;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -89,8 +81,12 @@ public class EpaFhirFactory {
     return list;
   }
 
+  private static FhirCodec cachedCodec;
+
   public static FhirCodec create() {
-    return FhirCodec.forR4().withTypeHints(getTypeHints()).andBbriccsValidator();
+    if (cachedCodec == null)
+      cachedCodec = FhirCodec.forR4().withTypeHints(getTypeHints()).andBbriccsValidator();
+    return cachedCodec;
   }
 
   public static FhirCodec create(ValidatorFhir fhirValidator) {

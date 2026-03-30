@@ -20,27 +20,31 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.PRESCRIBER_ID;
+import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.createGeneratorExtension;
+import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.render;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef.SER_EXTENSION;
+import static de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem.UCUM;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
+import de.gematik.test.erezept.fhir.builder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.extensions.kbv.QuantityPackungExtension;
+import de.gematik.test.erezept.fhir.extensions.kbv.TeratogenicExtension;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -51,6 +55,7 @@ public class KbvErpMedicationRequestBuilder
     extends ResourceBuilder<KbvErpMedicationRequest, KbvErpMedicationRequestBuilder> {
 
   private final List<Extension> extensions = new LinkedList<>();
+  private final List<DosageDgMP> dosageDgMPS = new ArrayList<>();
   private KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.getDefaultVersion();
   @Nullable private MedicationType medicationType;
   private Reference medicationReference;
@@ -65,6 +70,8 @@ public class KbvErpMedicationRequestBuilder
   private MedicationRequest.MedicationRequestSubstitutionComponent substitution =
       new MedicationRequest.MedicationRequestSubstitutionComponent(new BooleanType(true));
   private MedicationRequest.MedicationRequestDispenseRequestComponent dispenseRequestQuantity;
+  private Duration expectedSuplyDuration;
+
   private String dosageInstruction;
   private StatusCoPayment statusCoPayment = StatusCoPayment.STATUS_0;
   private boolean bvg = true;
@@ -74,8 +81,11 @@ public class KbvErpMedicationRequestBuilder
   private Date authoredOn = new Date();
   private TemporalPrecisionEnum temporalPrecision = TemporalPrecisionEnum.DAY;
   private String prescriberId;
+  // becomes true if dosageInformation where given
+  private Boolean dosageFlag = false;
 
   private String note;
+  private boolean isTPrescription = false;
 
   public static KbvErpMedicationRequestBuilder forPatient(KbvPatient patient) {
     val mrb = new KbvErpMedicationRequestBuilder();
@@ -120,6 +130,7 @@ public class KbvErpMedicationRequestBuilder
   public KbvErpMedicationRequestBuilder medication(KbvErpMedication medication) {
     this.medicationType = medication.getMedicationType().orElse(null);
     this.medicationReference = medication.asReference();
+    this.isTPrescription = medication.getCategoryFirstRep().equals(MedicationCategory.C_02);
     return this;
   }
 
@@ -145,6 +156,13 @@ public class KbvErpMedicationRequestBuilder
     return status(status);
   }
 
+  public KbvErpMedicationRequestBuilder expectedSupplyDurationInWeeks(float value) {
+    this.expectedSuplyDuration = new Duration();
+    expectedSuplyDuration.setValue(value);
+    expectedSuplyDuration.setUnit("Woche(n)");
+    return this;
+  }
+
   public KbvErpMedicationRequestBuilder status(MedicationRequest.MedicationRequestStatus status) {
     this.requestStatus = status;
     return this;
@@ -167,6 +185,18 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
+  public KbvErpMedicationRequestBuilder dgmp(DosageDgMP dosageDgMP) {
+    this.dosageFlag = true;
+    this.dosageDgMPS.add(dosageDgMP);
+    return this;
+  }
+
+  public KbvErpMedicationRequestBuilder dgmp(List<DosageDgMP> dosageDgMPs) {
+    this.dosageFlag = true;
+    this.dosageDgMPS.addAll(dosageDgMPs);
+    return this;
+  }
+
   public KbvErpMedicationRequestBuilder dosage(String text) {
     this.dosageInstruction = text;
     return this;
@@ -177,18 +207,12 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
-  public KbvErpMedicationRequestBuilder quantityPackages(int amount) {
-    return quantity(QuantityBuilder.asUcumPackage().withValue(amount));
-  }
-
-  public KbvErpMedicationRequestBuilder quantity(Quantity quantity) {
-    return quantity(
-        new MedicationRequest.MedicationRequestDispenseRequestComponent().setQuantity(quantity));
-  }
-
-  public KbvErpMedicationRequestBuilder quantity(
-      MedicationRequest.MedicationRequestDispenseRequestComponent quantity) {
-    this.dispenseRequestQuantity = quantity;
+  public KbvErpMedicationRequestBuilder dispenseRequestQuantity(int amount) {
+    val q = new Quantity();
+    q.setUnit("Packung");
+    q.setValue(amount);
+    this.dispenseRequestQuantity =
+        new MedicationRequest.MedicationRequestDispenseRequestComponent().setQuantity(q);
     return this;
   }
 
@@ -223,8 +247,14 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
-  public KbvErpMedicationRequestBuilder coPaymentStatus(StatusCoPayment status) {
-    this.statusCoPayment = status;
+  /**
+   * from KbvItaErpVersion.V1_4_0 StatusCoPayment has to be set to [01] if SER has been set
+   *
+   * @param statusCoPayment
+   * @return KbvErpMedicationRequestBuilder
+   */
+  public KbvErpMedicationRequestBuilder coPaymentStatus(StatusCoPayment statusCoPayment) {
+    this.statusCoPayment = statusCoPayment;
     return this;
   }
 
@@ -238,9 +268,11 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
+  @SuppressWarnings({"java:S3776"})
   @Override
   public KbvErpMedicationRequest build() {
     KbvErpMedicationRequest medReq;
+    checkRequired();
     medReq =
         this.createResource(
             KbvErpMedicationRequest::new, KbvItaErpStructDef.PRESCRIPTION, kbvItaErpVersion);
@@ -248,16 +280,39 @@ public class KbvErpMedicationRequestBuilder
     if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
       medReq.getMeta().setVersionId("1");
     }
+
+    if (isTPrescription) extensions.add(new TeratogenicExtension().asExtension());
+
     if (this.kbvItaErpVersion.compareTo(KbvItaErpVersion.V1_1_0) == 0) {
       // check for 'default-able' and non-set values
-      if (dispenseRequestQuantity == null) this.quantityPackages(1); // by default 1 package
+      if (dispenseRequestQuantity == null) {
+        this.dispenseRequestQuantity =
+            new MedicationRequest.MedicationRequestDispenseRequestComponent();
+        val quantity =
+            new Quantity(1)
+                .setSystem(UCUM.getCanonicalUrl())
+                .setCode("{Package}"); // {Package} is a fixed Value
+        this.dispenseRequestQuantity.setQuantity(quantity); // by default 1 package
+      } else {
+        if (dispenseRequestQuantity.getQuantity().getSystem() == null) {
+          dispenseRequestQuantity.getQuantity().setSystem(UCUM.getCanonicalUrl());
+        }
+        if (dispenseRequestQuantity.getQuantity().getCode() == null) {
+          dispenseRequestQuantity.getQuantity().setCode("{Package}"); // {Package} is a fixed Value
+          dispenseRequestQuantity.getQuantity().setUnit(null);
+        }
+      }
       extensions.add(KbvItaErpStructDef.BVG.asBooleanExtension(bvg));
 
     } else {
-      this.quantity(
-          QuantityPackungExtension.asPackung()
-              .withValue(dispenseRequestQuantity.getQuantity().getValue().intValue()));
-      extensions.add(KbvItaErpStructDef.SER.asBooleanExtension(ser));
+
+      extensions.add(SER_EXTENSION.asBooleanExtension(ser));
+      // (defined in https://simplifier.net/erezept/kbv_pr_erp_bundle)
+      if (ser && kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0))
+        // -erp-angabeZuzahlungsbefreiungSER: 'Wenn die SER Kennzeichnung auf true gesetzt ist, dann
+        // muss der Versicherte von der Zuzahlungspflicht befreit sein (Zuzahlungsstatus = 1)'
+        // (defined in https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle)
+        this.statusCoPayment = StatusCoPayment.STATUS_1;
     }
 
     extensions.add(
@@ -271,14 +326,8 @@ public class KbvErpMedicationRequestBuilder
 
     Optional.ofNullable(accident).ifPresent(a -> extensions.add(a.asExtension()));
     Optional.ofNullable(note).ifPresent(n -> medReq.addNote().setText(n));
-
-    if (this.medicationType == null) {
-      medReq.setSubstitution(substitution);
-      medReq.setDosageInstruction(List.of(createFlagedDosage()));
-    } else {
-      medicationTypeConfig(medReq);
-    }
-
+    Optional.ofNullable(expectedSuplyDuration)
+        .ifPresent(eSD -> dispenseRequestQuantity.setExpectedSupplyDuration(eSD));
     medReq
         .setMedication(medicationReference)
         .setSubject(subjectReference)
@@ -290,20 +339,41 @@ public class KbvErpMedicationRequestBuilder
         .setDispenseRequest(dispenseRequestQuantity)
         .setExtension(extensions);
 
-    // todo reactivate while adapting builder for mew Profiles
-    /* if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
-      val dosageInformation = medReq.getDosageInstruction().stream().findFirst().orElseThrow();
-      val dgmp = DosageDgMPBuilder.dosageBuilder().text(dosageInformation.getText()).build();
-      medReq.addExtension(dosageInformation.getExtension().stream().findFirst().orElseThrow());
-      val generatedDosage = GENERATED_DOSAGE_INSTRUCTION_META.asExtension();
-      generatedDosage
-          .addExtension()
-          .setUrl("algorithmVersion")
-          .setValue(new StringType(dosageInformation.getText()));
-      medReq.setDosageInstruction(null);
-      medReq.setDosageInstruction(List.of(dgmp));
-    }*/
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      if (dosageInstruction != null && !dosageInstruction.isEmpty()) {
+        dosageFlag = true;
+        dosageDgMPS.add(DosageDgMPBuilder.dosageBuilder().text(dosageInstruction).build());
+      }
+      if (!dosageDgMPS.isEmpty()) {
+        // ext setzen
+        medReq.addExtension(createGeneratorExtension());
+        // ext setzen
+        medReq.addExtension(
+            new Extension(
+                DgMPStructDef.MR_RENDERED_DOSAGE_INSTRUCTION.getCanonicalUrl(),
+                new MarkdownType(render(dosageDgMPS))));
+        // dgmp setzten
+        dosageDgMPS.forEach(medReq::addDosageInstruction);
+        // set DosageFlag
+        medReq.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(dosageFlag));
+      }
 
+      medReq.setSubstitution(substitution);
+
+    } else {
+      if (this.medicationType == null) {
+        medReq.setSubstitution(substitution);
+        medReq.setDosageInstruction(List.of(createFlagedDosage()));
+      } else {
+        medicationTypeConfig(medReq);
+      }
+    }
+    if (medicationType != null && medicationType.equals(MedicationType.INGREDIENT)) {
+      // KBV constraint since KbvItaErp 1.4.1 -> if MedicationType is Ingredient ; Substitution
+      // (Auditem) is not allowed // -erp-angabeSubstitutionVerbot:
+      // .resource.substitution.exists().not()
+      medReq.setSubstitution(null);
+    }
     return medReq;
   }
 
@@ -337,9 +407,15 @@ public class KbvErpMedicationRequestBuilder
   }
 
   private Dosage createFlagedDosage() {
-    val dosageFlag = dosageInstruction != null && !dosageInstruction.isEmpty();
+    val hasDosageFlag = dosageInstruction != null && !dosageInstruction.isEmpty();
     val d = new Dosage().setText(dosageInstruction);
-    d.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(dosageFlag));
+    d.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(hasDosageFlag));
     return d;
+  }
+
+  private void checkRequired() {
+    if (isTPrescription)
+      this.checkRequired(
+          expectedSuplyDuration, "T-Prescription needs the expectedSuplyDuration in Woche(n)");
   }
 }

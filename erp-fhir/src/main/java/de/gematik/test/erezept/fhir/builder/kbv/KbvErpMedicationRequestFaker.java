@@ -26,10 +26,11 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDosage;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import de.gematik.bbriccs.fhir.ucum.builder.QuantityBuilder;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
@@ -46,39 +47,51 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Quantity;
 
 @Slf4j
 public class KbvErpMedicationRequestFaker {
 
+  private final KbvItaErpVersion erpVersion;
+  private final KbvItaForVersion forVersion;
   private AccidentExtension accident;
+
+  private boolean isTPrescription = false;
 
   private KbvPatient kbvPatient = KbvPatientFaker.builder().fake();
   private final Map<String, Consumer<KbvErpMedicationRequestBuilder>> builderConsumers =
       new HashMap<>();
 
-  private KbvErpMedicationRequestFaker() {
-    if (KbvItaErpVersion.getDefaultVersion().compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
+  private KbvErpMedicationRequestFaker(KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
+    this.erpVersion = erpVersion;
+    this.forVersion = forVersion;
+    if (erpVersion.compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
       this.withBvg(fakerBool());
     } else {
       this.withSer(fakerBool());
     }
     this.withEmergencyServiceFee(fakerBool())
         .withMedication(
-            KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake())
-        .withRequester(KbvPractitionerFaker.builder().fake())
+            KbvErpMedicationPZNFaker.builder(erpVersion)
+                .withCategory(MedicationCategory.C_00)
+                .fake())
+        .withRequester(KbvPractitionerFaker.builder(forVersion).fake())
         .withInsurance(
-            KbvCoverageFaker.builder().withInsuranceType(kbvPatient.getInsuranceType()).fake())
+            KbvCoverageFaker.builder(forVersion)
+                .withInsuranceType(kbvPatient.getInsuranceType())
+                .fake())
         .withDosageInstruction(fakerDosage())
         .withAuthorDate(new Date())
-        .withSubstitution(fakerBool());
-
-    // TODO: why do these not have a faker method?
-    builderConsumers.put("requestQuantity", b -> b.quantityPackages(fakerAmount()));
+        .withSubstitution(fakerBool())
+        .withDispenseQuantity(fakerAmount());
   }
 
   public static KbvErpMedicationRequestFaker builder() {
-    return new KbvErpMedicationRequestFaker();
+    return builder(KbvItaErpVersion.getDefaultVersion(), KbvItaForVersion.getDefaultVersion());
+  }
+
+  public static KbvErpMedicationRequestFaker builder(
+      KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
+    return new KbvErpMedicationRequestFaker(erpVersion, forVersion);
   }
 
   public KbvErpMedicationRequestFaker withPatient(KbvPatient patient) {
@@ -86,12 +99,11 @@ public class KbvErpMedicationRequestFaker {
     return this;
   }
 
-  public KbvErpMedicationRequestFaker withVersion(KbvItaErpVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
-  }
-
   public KbvErpMedicationRequestFaker withMedication(KbvErpMedication medication) {
+    if (medication.getCategory().stream()
+        .map(cat -> cat.equals(MedicationCategory.C_02))
+        .findFirst()
+        .orElse(false)) this.isTPrescription = true;
     builderConsumers.put("medication", b -> b.medication(medication));
     return this;
   }
@@ -157,20 +169,8 @@ public class KbvErpMedicationRequestFaker {
         new MedicationRequest.MedicationRequestSubstitutionComponent(new BooleanType(allowed)));
   }
 
-  public KbvErpMedicationRequestFaker withQuantity(
-      MedicationRequest.MedicationRequestDispenseRequestComponent quantity) {
-    builderConsumers.put("dispenseQuantity", b -> b.quantity(quantity));
-    return this;
-  }
-
-  public KbvErpMedicationRequestFaker withQuantity(Quantity quantity) {
-    this.withQuantity(
-        new MedicationRequest.MedicationRequestDispenseRequestComponent().setQuantity(quantity));
-    return this;
-  }
-
-  public KbvErpMedicationRequestFaker withQuantityPackages(int amount) {
-    this.withQuantity(QuantityBuilder.asUcumPackage().withValue(amount));
+  public KbvErpMedicationRequestFaker withDispenseQuantity(int amount) {
+    builderConsumers.put("dispenseRequestQuantity", b -> b.dispenseRequestQuantity(amount));
     return this;
   }
 
@@ -179,6 +179,12 @@ public class KbvErpMedicationRequestFaker {
     return this;
   }
 
+  /**
+   * from KbvItaErpVersion.V1_4_0 StatusCoPayment has to be set to [01] if SER has been set
+   *
+   * @param statusCoPayment
+   * @return KbvErpMedicationRequestFaker
+   */
   public KbvErpMedicationRequestFaker withCoPaymentStatus(StatusCoPayment statusCoPayment) {
     builderConsumers.put("coPaymentStatus", b -> b.coPaymentStatus(statusCoPayment));
     return this;
@@ -219,12 +225,18 @@ public class KbvErpMedicationRequestFaker {
     return this;
   }
 
+  public KbvErpMedicationRequestFaker withExpectedSupplyDurationInWeeks(float value) {
+    builderConsumers.put(
+        "expectedSupplyDurationInWeeks", b -> b.expectedSupplyDurationInWeeks(value));
+    return this;
+  }
+
   public KbvErpMedicationRequest fake() {
     return this.toBuilder().build();
   }
 
   public KbvErpMedicationRequestBuilder toBuilder() {
-    val builder = KbvErpMedicationRequestBuilder.forPatient(kbvPatient);
+    val builder = KbvErpMedicationRequestBuilder.forPatient(kbvPatient).version(erpVersion);
 
     if (accident != null
             && accident.toString().equals(AccidentCauseType.ACCIDENT_AT_WORK.getDisplay())
@@ -234,6 +246,9 @@ public class KbvErpMedicationRequestFaker {
 
     } else if (builderConsumers.get("coPaymentStatus") == null) {
       this.withCoPaymentStatus(fakerValueSet(StatusCoPayment.class));
+    }
+    if (isTPrescription && builderConsumers.get("expectedSupplyDurationInWeeks") == null) {
+      this.withExpectedSupplyDurationInWeeks(GemFaker.fakerAmount(1, 4));
     }
 
     builderConsumers.values().forEach(c -> c.accept(builder));

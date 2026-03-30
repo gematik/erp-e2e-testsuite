@@ -232,6 +232,17 @@ public class ErxTask extends Task {
     return values.size() == 1 && values.get(0).booleanValue() == expected;
   }
 
+  public boolean getRedeemableByProperties() {
+    return this.getExtension().stream()
+        .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES::matches)
+        .map(Extension::getValue)
+        .filter(BooleanType.class::isInstance)
+        .map(BooleanType.class::cast)
+        .map(BooleanType::booleanValue)
+        .findFirst()
+        .orElse(false);
+  }
+
   public boolean isRedeemableByAuthorization(boolean expected) {
     List<BooleanType> values =
         this.getExtension().stream()

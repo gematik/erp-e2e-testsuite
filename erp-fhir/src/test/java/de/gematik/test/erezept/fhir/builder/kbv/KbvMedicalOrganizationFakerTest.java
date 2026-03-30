@@ -72,7 +72,9 @@ class KbvMedicalOrganizationFakerTest extends ErpFhirParsingTest {
   @Test
   void shouldFakeHospitalMedicalOrganizationWithKsn() {
     val organization =
-        KbvMedicalOrganizationFaker.builder(OrganizationFakerType.HOSPITAL_KSN).fake();
+        KbvMedicalOrganizationFaker.builder(
+                OrganizationFakerType.HOSPITAL_KSN, KbvItaForVersion.V1_3_0)
+            .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
     assertTrue(
@@ -83,14 +85,11 @@ class KbvMedicalOrganizationFakerTest extends ErpFhirParsingTest {
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void shouldBuildDentalOrganizationForPractitioner(KbvItaForVersion kbvItaForVersion) {
     val practitioner =
-        KbvPractitionerFaker.builder()
-            .withVersion(kbvItaForVersion)
+        KbvPractitionerFaker.builder(kbvItaForVersion)
             .withQualificationType(QualificationType.DENTIST)
             .fake();
     val organization =
-        KbvMedicalOrganizationFaker.forPractitioner(practitioner)
-            .withVersion(kbvItaForVersion)
-            .fake();
+        KbvMedicalOrganizationFaker.forPractitioner(practitioner, kbvItaForVersion).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
 
@@ -99,18 +98,50 @@ class KbvMedicalOrganizationFakerTest extends ErpFhirParsingTest {
             organization.getIdentifierFirstRep()));
   }
 
+  @Test
+  void shouldBuildDentalOrganizationForPractitionerWithoutVersion() {
+    val practitioner =
+        KbvPractitionerFaker.builder().withQualificationType(QualificationType.DENTIST).fake();
+    val organization = KbvMedicalOrganizationFaker.forPractitioner(practitioner).fake();
+    assertTrue(
+        DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID.matches(
+            organization.getIdentifierFirstRep()));
+  }
+
+  @Test
+  void shouldBuildDentalOrganizationForDentist() {
+    val organization = KbvMedicalOrganizationFaker.dentalPractice().fake();
+    assertTrue(
+        DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID.matches(
+            organization.getIdentifierFirstRep()));
+  }
+
+  @Test
+  void shouldBuildDentalOrganizationWithFakerType() {
+    val organization = KbvMedicalOrganizationFaker.builder(OrganizationFakerType.DENTAL).fake();
+    assertTrue(
+        DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID.matches(
+            organization.getIdentifierFirstRep()));
+  }
+
+  @Test
+  void shouldBuildDentalOrganizationForHospital() {
+    val organization = KbvMedicalOrganizationFaker.hospital().fake();
+    assertFalse(
+        DeBasisProfilNamingSystem.KZBV_KZVA_ABRECHNUNGSNUMMER_SID.matches(
+            organization.getIdentifierFirstRep()));
+  }
+
   @ParameterizedTest
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void shouldBuildOrganizationForPractitioner(KbvItaForVersion kbvItaForVersion) {
     val practitioner =
-        KbvPractitionerFaker.builder()
-            .withVersion(kbvItaForVersion)
+        KbvPractitionerFaker.builder(kbvItaForVersion)
             .withQualificationType(QualificationType.DOCTOR)
             .fake();
     val organization =
-        KbvMedicalOrganizationFaker.forPractitioner(practitioner)
-            .withVersion(kbvItaForVersion)
-            .fake();
+        KbvMedicalOrganizationFaker.forPractitioner(practitioner, kbvItaForVersion).fake();
+
     val result = ValidatorUtil.encodeAndValidate(parser, organization);
     assertTrue(result.isSuccessful());
 

@@ -118,6 +118,24 @@ public class PharmacyController {
   }
 
   @POST
+  @Path("{pharmacyId}/xml/close")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes({MediaType.APPLICATION_XML, "application/fhir+xml"})
+  public Response closePrescription(
+      @PathParam("pharmacyId") String pharmacyId,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("secret") String secret,
+      String closeOperationInput) {
+    val pharmacy = actors.getPharmacyOrThrowNotFound(pharmacyId);
+    log.info(
+        "Pharmacy {} will close Task {} with dispense data GEM_ERP_PR_PAR_CloseOperation_Input",
+        pharmacy.getName(),
+        taskId);
+    val usecase = new CloseUseCase(pharmacy);
+    return usecase.closePrescriptionWithParameters(taskId, secret, closeOperationInput);
+  }
+
+  @POST
   @Path("{pharmacyId}/dispense")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)

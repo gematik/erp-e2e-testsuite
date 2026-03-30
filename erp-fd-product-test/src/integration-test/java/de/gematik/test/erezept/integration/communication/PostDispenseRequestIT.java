@@ -24,7 +24,9 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.ret
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.prescriptionHasStatus;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.taskIsInStatus;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -34,8 +36,11 @@ import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actions.communication.SendMessages;
 import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.KtrActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
@@ -43,7 +48,11 @@ import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.screenplay.task.IssueDiGAPrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -51,9 +60,11 @@ import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
@@ -61,7 +72,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @DisplayName("Send DispenseRequest Tests")
 @Tag("Communication")
 @Tag("DispenseRequest")
-public class PostDispenseRequestIT extends ErpTest {
+class PostDispenseRequestIT extends ErpTest {
 
   private static final CommunicationDisReqMessage USELESS_DSP_REQUEST =
       new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, "useless Questions");
@@ -74,6 +85,9 @@ public class PostDispenseRequestIT extends ErpTest {
 
   @Actor(name = "Am Flughafen")
   private PharmacyActor pharma;
+
+  @Actor(name = "AOK Bremen")
+  private KtrActor healthInsurance;
 
   private static Stream<Arguments> communicationTestComposer() {
     return ArgumentComposer.composeWith(PrescriptionAssignmentKind.class).create();
@@ -199,6 +213,63 @@ public class PostDispenseRequestIT extends ErpTest {
             .and(
                 operationOutcomeContainsInDetailText(
                     "Prescription is not fillable yet.", ErpAfos.A_26327))
+            .isCorrect());
+  }
+
+  @TestcaseId("ERP_COMMUNICATION_SEND_05")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Zuweisung von GKV/PKV E-Rezepten an Kostenträger fuehrt zu StatusCode 403"
+              + " ({0})")
+  @DisplayName("Zuweisung von GKV/PKV E-Rezepten an Kostenträger fuehrt zu StatusCode 403")
+  @EnumSource(
+      value = InsuranceTypeDe.class,
+      mode = INCLUDE,
+      names = {"GKV", "PKV"})
+  void shouldRejectDispRequestWithAssignmentToHealthInsurance(InsuranceTypeDe insuranceTypeDe) {
+    patient.changePatientInsuranceType(insuranceTypeDe);
+
+    // activate
+    val task =
+        doc.performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
+            .getExpectedResponse();
+
+    val communication =
+        patient.performs(
+            SendMessages.to(healthInsurance)
+                .forTask(task)
+                .asDispenseRequest(
+                    new CommunicationDisReqMessage(
+                        SupplyOptionsType.ON_PREMISE, GemFaker.getFaker().buffy().quotes())));
+
+    patient.attemptsTo(
+        Verify.that(communication)
+            .withOperationOutcome(ErpAfos.A_27767)
+            .hasResponseWith(returnCode(403))
+            .isCorrect());
+  }
+
+  @TestcaseId("ERP_COMMUNICATION_SEND_06")
+  @Test
+  @DisplayName("Zuweisung von DiGA E-Rezepten an Apotheken fuehrt zu StatusCode 403")
+  void shouldRejectDispRequestWithAssignmentToPharmacy() {
+    doc.attemptsTo(IssueDiGAPrescription.forPatient(patient));
+    val dmc = SafeAbility.getAbility(patient, ManageDataMatrixCodes.class).getDmcs().getFirst();
+
+    val communication =
+        ErxCommunicationBuilder.forDiGADispenseRequest()
+            .sender(patient.getKvnr().getValue())
+            .receiver(pharma.getTelematikId().getValue())
+            .basedOn(dmc.getTaskId())
+            .flowType(PrescriptionFlowType.FLOW_TYPE_162)
+            .build();
+
+    val resp = patient.performs(SendMessages.withCommunication(communication));
+
+    patient.attemptsTo(
+        Verify.that(resp)
+            .withOperationOutcome(ErpAfos.A_27767)
+            .hasResponseWith(returnCode(403))
             .isCorrect());
   }
 

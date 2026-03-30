@@ -36,14 +36,19 @@ public class EuMedicationDispenseFaker
     extends ErxMedicationDispenseBaseFaker<
         EuMedicationDispense, EuVersion, EuMedicationDispenseFaker, EuMedicationDispenseBuilder> {
 
-  private EuMedicationDispenseFaker() {
-    super();
+  private EuMedicationDispenseFaker(EuVersion euVersion) {
+    super(euVersion);
+
     this.withBatch(fakerLotNumber(), fakerFutureExpirationDate());
     withMedication(EuMedicationBuilder.builder().build());
   }
 
   public static EuMedicationDispenseFaker builder() {
-    return new EuMedicationDispenseFaker();
+    return builder(EuVersion.getDefaultVersion());
+  }
+
+  public static EuMedicationDispenseFaker builder(EuVersion euVersion) {
+    return new EuMedicationDispenseFaker(euVersion);
   }
 
   public EuMedicationDispenseFaker withMedication(EuMedication medication) {
@@ -74,7 +79,7 @@ public class EuMedicationDispenseFaker
   }
 
   public EuMedicationDispenseBuilder toBuilder() {
-    val builder = EuMedicationDispenseBuilder.forKvnr(kvnr);
+    val builder = EuMedicationDispenseBuilder.forKvnr(kvnr).version(this.version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

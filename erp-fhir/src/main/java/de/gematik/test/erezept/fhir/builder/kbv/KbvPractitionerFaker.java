@@ -39,8 +39,10 @@ public class KbvPractitionerFaker {
   private static final String KEY_QUALIFICATION_TYPE =
       "qualificationType"; // key used for builderConsumers map
   private static final String KEY_BASE_ANR = "baseAnr"; // key used for builderConsumers map
+  private final KbvItaForVersion forVersion;
 
-  private KbvPractitionerFaker() {
+  private KbvPractitionerFaker(KbvItaForVersion forVersion) {
+    this.forVersion = forVersion;
     val qualificationType = randomElement(QualificationType.DOCTOR, QualificationType.DENTIST);
     this.withName(fakerFirstName(), fakerLastName())
         .withQualificationType(fakerProfession())
@@ -48,7 +50,11 @@ public class KbvPractitionerFaker {
   }
 
   public static KbvPractitionerFaker builder() {
-    return new KbvPractitionerFaker();
+    return builder(KbvItaForVersion.getDefaultVersion());
+  }
+
+  public static KbvPractitionerFaker builder(KbvItaForVersion forVersion) {
+    return new KbvPractitionerFaker(forVersion);
   }
 
   public KbvPractitionerFaker withName(String firstName, String lastName) {
@@ -100,17 +106,12 @@ public class KbvPractitionerFaker {
     return this;
   }
 
-  public KbvPractitionerFaker withVersion(KbvItaForVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
-  }
-
   public KbvPractitioner fake() {
     return this.toBuilder().build();
   }
 
   public KbvPractitionerBuilder toBuilder() {
-    val builder = KbvPractitionerBuilder.builder();
+    val builder = KbvPractitionerBuilder.builder().version(forVersion);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

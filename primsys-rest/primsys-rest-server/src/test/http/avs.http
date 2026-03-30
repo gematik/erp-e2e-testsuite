@@ -1,0 +1,31 @@
+@pharmacy = 886c6eda7dd5a1c6b1d112907f544d3
+
+### accept prescription as
+< {%
+    request.variables.set("prescriptionId", client.global.get("prescriptionId"))
+    request.variables.set("accessCode", client.global.get("accessCode"))
+%}
+POST {{host}}/pharm/{{pharmacy}}/accept?taskId={{prescriptionId}}&ac={{accessCode}}
+apikey: {{apikey}}
+
+> {%
+    client.assert(response.status == 200, "could not accept prescription " + client.global.get("prescriptionId"))
+    console.log("Accepted prescription: " + response.body["prescriptionId"] + " with " + response.body["secret"])
+    client.global.set("secret", response.body["secret"])
+%}
+
+### dispense prescription as
+< {%
+    request.variables.set("prescriptionId", client.global.get("prescriptionId"))
+    request.variables.set("secret", client.global.get("secret"))
+%}
+POST {{host}}/pharm/{{pharmacy}}/dispense?taskId={{prescriptionId}}&secret={{secret}}
+apikey: {{apikey}}
+
+### abort prescription as
+< {%
+    request.variables.set("prescriptionId", client.global.get("prescriptionId"))
+    request.variables.set("secret", client.global.get("secret"))
+%}
+DELETE {{host}}/pharm/{{pharmacy}}/abort?taskId={{prescriptionId}}&secret={{secret}}
+apikey: {{apikey}}

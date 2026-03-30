@@ -1,0 +1,107 @@
+<Parameters xmlns="http://hl7.org/fhir">
+    <id value="c547fdd0-a51e-4c88-b3cb-fef095c59b9d"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CloseOperation_Input|1.5"/>
+    </meta>
+    <parameter>
+        <name value="rxDispensation"/>
+        <part>
+            <name value="medicationDispense"/>
+            <resource>
+                <MedicationDispense xmlns="http://hl7.org/fhir">
+                    <id value="0a1ff2ee-9357-4214-99cf-d1fa61bcad06"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.5"/>
+                    </meta>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                        <value value="200.000.000.364.425.83"/>
+                    </identifier>
+                    <status value="completed"/>
+                    <medicationReference>
+                        <reference value="576ab1b3-84d6-4a28-bf22-7678cd45b121"/>
+                    </medicationReference>
+                    <subject>
+                        <identifier>
+                            <type>
+                                <coding>
+                                    <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                    <code value="KVZ10"/>
+                                </coding>
+                            </type>
+                            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                            <value value="X110614233"/>
+                        </identifier>
+                    </subject>
+                    <performer>
+                        <actor>
+                            <identifier>
+                                <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                                <value value="3-SMC-B-Testkarte--883110000163973"/>
+                            </identifier>
+                        </actor>
+                    </performer>
+                    <whenHandedOver value="2026-03-18"/>
+                    <dosageInstruction>
+
+                        <text value="3-2-3-1-1-1-0"/>
+                    </dosageInstruction>
+                </MedicationDispense>
+            </resource>
+        </part>
+        <part>
+            <name value="medication"/>
+            <resource>
+                <Medication xmlns="http://hl7.org/fhir">
+                    <id value="576ab1b3-84d6-4a28-bf22-7678cd45b121"/>
+                    <meta>
+                        <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication|1.5"/>
+                    </meta>
+                    <extension url="https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension">
+                        <valueCoding>
+                            <system value="https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs"/>
+                            <code value="00"/>
+                        </valueCoding>
+                    </extension>
+                    <extension
+                            url="https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension">
+                        <valueBoolean value="false"/>
+                    </extension>
+                    <extension url="http://fhir.de/StructureDefinition/normgroesse">
+                        <valueCode value="N1"/>
+                    </extension>
+                    <code>
+                        <coding>
+                            <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                            <code value="78530153"/>
+                        </coding>
+                        <text value="Loperamid akut Pulver 50 mg"/>
+                    </code>
+                    <form>
+                        <coding>
+                            <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM"/>
+                            <code value="FBE"/>
+                        </coding>
+                    </form>
+                    <amount>
+                        <numerator>
+                            <extension
+                                    url="https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension">
+                                <valueString value="1"/>
+                            </extension>
+                            <value value="1"/>
+                            <unit value="Stk"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                        </denominator>
+                    </amount>
+                    <batch>
+                        <lotNumber value="5551160533"/>
+                    </batch>
+                </Medication>
+            </resource>
+        </part>
+    </parameter>
+</Parameters>

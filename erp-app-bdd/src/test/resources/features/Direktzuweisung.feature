@@ -60,7 +60,7 @@ Funktionalität: E-Rezepte als Direktzuweisung
   @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_03
   @Funktionalität:Löschen
   @Versicherung:GKV
-  Szenario: Anzeigen und  löschen von direkt zugewiesenen E-Rezepten für GKV-Versicherte
+  Szenario: Anzeigen und löschen von direkt zugewiesenen E-Rezepten für GKV-Versicherte
   Der Arzt verschreibt der GKV-Versicherten ein Medikament als Direktzuweisung.
   Dieses E-Rezept soll im FdV angezeigt werden.
   Die GKV Versicherte soll das E-Rezept nicht löschen können.

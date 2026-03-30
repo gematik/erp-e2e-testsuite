@@ -58,7 +58,6 @@ public class HandleChargeItemConsent implements Task {
       app.tap(ChargeItemScreen.REVOKE_CONSENT_MENU_ENTRY_BUTTON);
       app.tap(ChargeItemScreen.CONFIRM_REVOKE_CONSENT_BUTTON);
       navigateBackToMainScreen(app);
-      app.tapIfDisplayed(Mainscreen.CLOSE_CHARGE_ITEM_CONSENT_DRAWER_BUTTON);
     } else {
       fail(format("Invalid consentAction %s. It has to be either GRANT or REVOKE.", consentAction));
     }

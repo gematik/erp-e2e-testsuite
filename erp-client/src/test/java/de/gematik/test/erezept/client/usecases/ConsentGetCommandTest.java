@@ -47,7 +47,7 @@ class ConsentGetCommandTest {
     ConsentGetCommand consentGetCommand = new ConsentGetCommand();
     var request = consentGetCommand.getRequestLocator();
     var requestStringArray = request.split("/");
-    assertEquals("Consent", requestStringArray[1]);
+    assertEquals("Consent?category=CHARGCONS", requestStringArray[1]);
   }
 
   @Test

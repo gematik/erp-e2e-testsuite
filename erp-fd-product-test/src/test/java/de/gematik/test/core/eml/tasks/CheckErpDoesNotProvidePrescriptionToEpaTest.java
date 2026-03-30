@@ -20,9 +20,7 @@
 
 package de.gematik.test.core.eml.tasks;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,7 +31,6 @@ import de.gematik.test.eml.tasks.CheckErpDoesNotProvidePrescriptionToEpa;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.GemaTestActor;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
@@ -54,7 +51,6 @@ class CheckErpDoesNotProvidePrescriptionToEpaTest extends ErpFhirParsingTest {
   static void setup() {
     OnStage.setTheStage(new Cast() {});
     CoverageReporter.getInstance().startTestcase("not needed");
-    val fhir = EpaFhirFactory.create();
 
     kbvErpBundle =
         parser.decode(

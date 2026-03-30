@@ -35,10 +35,11 @@ import org.hl7.fhir.r4.model.Identifier;
 public class EuOrganizationFaker {
 
   private final Map<String, Consumer<EuOrganizationBuilder>> builderConsumers = new HashMap<>();
-
+  private final EuVersion euVersion;
   private String name;
 
-  private EuOrganizationFaker() {
+  private EuOrganizationFaker(EuVersion version) {
+    this.euVersion = version;
     this.withAaddress(fakeAddress())
         .withIdentifier(
             new Identifier()
@@ -57,16 +58,15 @@ public class EuOrganizationFaker {
   }
 
   public static EuOrganizationFaker faker() {
-    return new EuOrganizationFaker();
+    return faker(EuVersion.getDefaultVersion());
+  }
+
+  public static EuOrganizationFaker faker(EuVersion version) {
+    return new EuOrganizationFaker(version);
   }
 
   public EuOrganizationFaker withName(String name) {
     this.name = name;
-    return this;
-  }
-
-  public EuOrganizationFaker withVersion(EuVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
     return this;
   }
 
@@ -101,7 +101,7 @@ public class EuOrganizationFaker {
 
   public EuOrganizationBuilder toBuilder() {
     if (this.name == null) this.name = GemFaker.getFaker().name().name();
-    val builder = EuOrganizationBuilder.builder(name);
+    val builder = EuOrganizationBuilder.builder(name).version(euVersion);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

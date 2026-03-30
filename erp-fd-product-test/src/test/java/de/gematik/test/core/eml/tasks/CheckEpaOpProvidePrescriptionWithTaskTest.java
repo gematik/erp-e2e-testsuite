@@ -20,6 +20,7 @@
 
 package de.gematik.test.core.eml.tasks;
 
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlHasMedicationCategory;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,8 @@ import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.core.expectations.requirements.EmlAfos;
+import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
 import de.gematik.test.eml.tasks.CheckEpaOpProvidePrescriptionWithTask;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
@@ -47,6 +50,7 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -132,7 +136,56 @@ class CheckEpaOpProvidePrescriptionWithTaskTest extends ErpFhirParsingTest {
     epaFhirChecker.can(useEpaMockClient);
     val step =
         CheckEpaOpProvidePrescriptionWithTask.forPrescription(
+            kbvErpBundle,
+            TelematikID.from("9-2.58.00000040"),
+            TelematikID.from("1-1.58.00000040"),
+            emlHasMedicationCategory(MedicationCategory.C_00, EmlAfos.A_25946));
+    assertDoesNotThrow(() -> epaFhirChecker.attemptsTo(step));
+  }
+
+  @Test
+  void shouldCheckEpaOpOutPrescriptionTaskWithoutVerificationElement() {
+    val useEpaMockClient = mock(UseTheEpaMockClient.class);
+    when(useEpaMockClient.downloadProvidePrescriptionBy(any()))
+        .thenReturn(List.of(epaOpProvidePrescriptionWithPzn));
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    epaFhirChecker.can(useEpaMockClient);
+    val step =
+        CheckEpaOpProvidePrescriptionWithTask.forPrescription(
             kbvErpBundle, TelematikID.from("9-2.58.00000040"), TelematikID.from("1-1.58.00000040"));
+    assertDoesNotThrow(() -> epaFhirChecker.attemptsTo(step));
+  }
+
+  @Test
+  void shouldCheckEpaOpOutPrescriptionTaskWithNullVerificationElement() {
+    val useEpaMockClient = mock(UseTheEpaMockClient.class);
+    when(useEpaMockClient.downloadProvidePrescriptionBy(any()))
+        .thenReturn(List.of(epaOpProvidePrescriptionWithPzn));
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    epaFhirChecker.can(useEpaMockClient);
+    val id1 = TelematikID.from("9-2.58.00000040");
+
+    assertThrows(
+        NullPointerException.class,
+        () ->
+            CheckEpaOpProvidePrescriptionWithTask.forPrescription(
+                kbvErpBundle, id1, id1, (VerificationStep<EpaOpProvidePrescription>) null));
+  }
+
+  @Test
+  void shouldCheckEpaOpOutPrescriptionTaskWithMultipleVerificationElements() {
+    val useEpaMockClient = mock(UseTheEpaMockClient.class);
+    when(useEpaMockClient.downloadProvidePrescriptionBy(any()))
+        .thenReturn(List.of(epaOpProvidePrescriptionWithPzn));
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    epaFhirChecker.can(useEpaMockClient);
+    val step =
+        CheckEpaOpProvidePrescriptionWithTask.forPrescription(
+            kbvErpBundle,
+            TelematikID.from("9-2.58.00000040"),
+            TelematikID.from("1-1.58.00000040"),
+            emlHasMedicationCategory(MedicationCategory.C_00, EmlAfos.A_25946),
+            emlHasMedicationCategory(MedicationCategory.C_00, EmlAfos.A_25946));
     assertDoesNotThrow(() -> epaFhirChecker.attemptsTo(step));
   }
 

@@ -57,8 +57,7 @@ class EuPatchTaskInputBuilderTest {
 
   @Test
   void shouldAcceptCustomVersion() {
-    Parameters parameters =
-        EuPatchTaskInputBuilder.builder().withVersion(EuVersion.getDefaultVersion()).build();
+    Parameters parameters = EuPatchTaskInputBuilder.builder(EuVersion.getDefaultVersion()).build();
 
     assertNotNull(parameters);
   }

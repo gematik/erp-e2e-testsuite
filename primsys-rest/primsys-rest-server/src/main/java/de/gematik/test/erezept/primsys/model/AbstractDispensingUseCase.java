@@ -24,12 +24,10 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommandNew;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemDispenseCloseOperationPharmaceuticalsBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -91,34 +89,6 @@ public abstract class AbstractDispensingUseCase {
   }
 
   /**
-   * Creates medication dispenses for $dispense/$close operations prior 1.4.0 FHIR Profiles
-   *
-   * @param prescriptionId of the prescription
-   * @param kvnr of the patient receiving the medication
-   * @param medications which are dispensed by the pharmacy
-   * @param isSubstituted denotes if the MedicationDispense contains substituted medications
-   * @return a List of ErxMedicationDispenses to perform the $dispnse/$close operation
-   */
-  private List<ErxMedicationDispense> createMedicationDispenses(
-      String prescriptionId,
-      String kvnr,
-      List<PznDispensedMedicationDto> medications,
-      boolean isSubstituted) {
-
-    return medications.stream()
-        .map(
-            dispMedication ->
-                PznDispensedMedicationDataMapper.from(
-                        dispMedication,
-                        KVNR.from(kvnr),
-                        PrescriptionId.from(prescriptionId),
-                        pharmacy.getSmcb().getTelematikId(),
-                        isSubstituted)
-                    .convert())
-        .toList();
-  }
-
-  /**
    * Creates the concrete Parameters-Structure for $dispense/$close operations after 1.3.0 FHIR
    * Profiles
    *
@@ -159,25 +129,20 @@ public abstract class AbstractDispensingUseCase {
       boolean isSubstituted) {
 
     val kvnr = this.getAcceptedPrescription(prescriptionId).getForKvnr();
+    val tid = TaskId.from(prescriptionId);
 
-    if (shouldUseOldMedicationDispenseBundle()) {
-      val medicationDispenses =
-          this.createMedicationDispenses(prescriptionId, kvnr, medications, isSubstituted);
-      return new CloseTaskCommand(TaskId.from(prescriptionId), secret, medicationDispenses);
+    if (medications.isEmpty()) {
+      return new CloseTaskCommand(tid, secret);
     } else {
-      if (medications.isEmpty()) {
-        return new CloseTaskCommand(TaskId.from(prescriptionId), secret);
-      } else {
-        val operationBuilder = GemOperationInputParameterBuilder.forClosingPharmaceuticals();
-        val operationParams =
-            this.feedOperationInputParameterBuilder(
-                operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
-        return new CloseTaskCommand(TaskId.from(prescriptionId), secret, operationParams);
-      }
+      val operationBuilder = GemOperationInputParameterBuilder.forClosingPharmaceuticals();
+      val operationParams =
+          this.feedOperationInputParameterBuilder(
+              operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
+      return new CloseTaskCommand(tid, secret, operationParams);
     }
   }
 
-  protected DispensePrescriptionAsBundleCommandOld createDispenseCommand(
+  protected DispensePrescriptionCommandNew createDispenseCommand(
       String prescriptionId,
       Secret secret,
       List<PznDispensedMedicationDto> medications,
@@ -185,22 +150,11 @@ public abstract class AbstractDispensingUseCase {
 
     val kvnr = this.getAcceptedPrescription(prescriptionId).getForKvnr();
 
-    if (shouldUseOldMedicationDispenseBundle()) {
-      val medicationDispenses =
-          this.createMedicationDispenses(prescriptionId, kvnr, medications, isSubstituted);
-      return new DispensePrescriptionAsBundleCommandOld(
-          TaskId.from(prescriptionId), secret, medicationDispenses);
-    } else {
-      val operationBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
-      val operationParams =
-          this.feedOperationInputParameterBuilder(
-              operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
-      return new DispensePrescriptionAsBundleCommandOld(
-          TaskId.from(prescriptionId), secret, operationParams);
-    }
-  }
-
-  private boolean shouldUseOldMedicationDispenseBundle() {
-    return ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4) < 0;
+    val operationBuilder = GemOperationInputParameterBuilder.forDispensingPharmaceuticals();
+    val operationParams =
+        this.feedOperationInputParameterBuilder(
+            operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
+    val tid = TaskId.from(prescriptionId);
+    return new DispensePrescriptionCommandNew(tid, secret, operationParams);
   }
 }

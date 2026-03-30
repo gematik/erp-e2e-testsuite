@@ -36,7 +36,7 @@ import org.hl7.fhir.r4.model.Consent;
 
 public class ErxConsentBuilder extends ResourceBuilder<ErxConsent, ErxConsentBuilder> {
 
-  private PatientenrechnungVersion version = PatientenrechnungVersion.V1_0_0;
+  private PatientenrechnungVersion version = PatientenrechnungVersion.getDefaultVersion();
   private KVNR kvnr;
   private ActCode policyRule = ActCode.OPTIN;
   private Consent.ConsentState status = Consent.ConsentState.ACTIVE;
@@ -75,7 +75,13 @@ public class ErxConsentBuilder extends ResourceBuilder<ErxConsent, ErxConsentBui
 
     // kvnr system hardcoded because we need to ensure first, a proper KVNR is always given!
     // same issue as in ErxChargeItemBuilder.checkPrerequisites
-    consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_PKV_SID, false));
+
+    if (version.isSmallerThanOrEqualTo(PatientenrechnungVersion.V1_0_0)) {
+      consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_PKV_SID, false));
+    } else {
+      consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_GKV_SID, false));
+    }
+
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);
     consent.setScope(scope.asCodeableConcept());

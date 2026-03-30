@@ -33,11 +33,12 @@ import java.util.function.Consumer;
 import lombok.val;
 
 public class KbvErpMedicationIngredientFaker {
-
+  private final KbvItaErpVersion version;
   private final Map<String, Consumer<KbvErpMedicationIngredientBuilder>> builderConsumers =
       new HashMap<>();
 
-  private KbvErpMedicationIngredientFaker() {
+  private KbvErpMedicationIngredientFaker(KbvItaErpVersion version) {
+    this.version = version;
     val unit = randomElement("%", "Stück", "mg", "ml", "Wölkchen");
     val ingrdItemCodingText = GemFaker.getFaker().medical().medicineName();
     this.withDosageForm(fakerDosage())
@@ -51,12 +52,11 @@ public class KbvErpMedicationIngredientFaker {
   }
 
   public static KbvErpMedicationIngredientFaker builder() {
-    return new KbvErpMedicationIngredientFaker();
+    return builder(KbvItaErpVersion.getDefaultVersion());
   }
 
-  public KbvErpMedicationIngredientFaker withVersion(KbvItaErpVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
+  public static KbvErpMedicationIngredientFaker builder(KbvItaErpVersion version) {
+    return new KbvErpMedicationIngredientFaker(version);
   }
 
   public KbvErpMedicationIngredientFaker withCategory(MedicationCategory category) {
@@ -114,7 +114,7 @@ public class KbvErpMedicationIngredientFaker {
   }
 
   public KbvErpMedicationIngredientBuilder toBuilder() {
-    val builder = KbvErpMedicationIngredientBuilder.builder();
+    val builder = KbvErpMedicationIngredientBuilder.builder().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

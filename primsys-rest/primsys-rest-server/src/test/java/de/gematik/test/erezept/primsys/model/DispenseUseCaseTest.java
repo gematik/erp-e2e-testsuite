@@ -24,12 +24,11 @@ import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommandNew;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
@@ -42,33 +41,23 @@ import java.util.List;
 import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class DispenseUseCaseTest extends TestWithActorContext {
 
-  @ParameterizedTest
-  @ValueSource(strings = {"1.4.0", "1.5.0"})
-  @ClearSystemProperty(key = "erp.fhir.profile")
-  void shouldDispensePrescription(String fhirProfile) {
-    System.setProperty("erp.fhir.profile", fhirProfile);
-
+  @Test
+  void shouldDispensePrescription() {
     val ctx = ActorContext.getInstance();
     val pharmacy = ctx.getPharmacies().get(0);
     val mockClient = pharmacy.getClient();
 
-    val bundleMock = mock(ErxMedicationDispenseBundle.class);
-    when(bundleMock.getId()).thenReturn("123456789");
-
+    val responseBody = new EmptyResource();
     val mockResponse =
-        ErpResponse.forPayload(bundleMock, ErxMedicationDispenseBundle.class)
+        ErpResponse.forPayload(responseBody, EmptyResource.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
-    when(mockClient.request(any(DispensePrescriptionAsBundleCommandOld.class)))
-        .thenReturn(mockResponse);
+    when(mockClient.request(any(DispensePrescriptionCommandNew.class))).thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
     val accessCode = AccessCode.random().getValue();
@@ -106,16 +95,14 @@ class DispenseUseCaseTest extends TestWithActorContext {
     val pharmacy = ctx.getPharmacies().get(0);
     val mockClient = pharmacy.getClient();
 
-    val bundleMock = mock(ErxMedicationDispenseBundle.class);
-    when(bundleMock.getId()).thenReturn("123456789");
+    val responseBody = new EmptyResource();
 
     val mockResponse =
-        ErpResponse.forPayload(bundleMock, ErxMedicationDispenseBundle.class)
+        ErpResponse.forPayload(responseBody, EmptyResource.class)
             .withStatusCode(204)
             .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
-    when(mockClient.request(any(DispensePrescriptionAsBundleCommandOld.class)))
-        .thenReturn(mockResponse);
+    when(mockClient.request(any(DispensePrescriptionCommandNew.class))).thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
     val accessCode = AccessCode.random().getValue();

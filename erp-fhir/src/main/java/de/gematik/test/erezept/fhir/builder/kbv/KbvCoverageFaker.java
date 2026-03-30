@@ -48,8 +48,10 @@ public class KbvCoverageFaker {
   private InsuranceTypeDe insurance = randomElement(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV);
   private boolean setInsuranceTypeDirect = false;
   private final Map<String, Consumer<KbvCoverageBuilder>> builderConsumers = new HashMap<>();
+  private final KbvItaForVersion version;
 
-  private KbvCoverageFaker() {
+  private KbvCoverageFaker(KbvItaForVersion version) {
+    this.version = version;
     this.withPersonGroup(fakerValueSet(PersonGroup.class))
         .withDmpKennzeichen(fakerValueSet(DmpKennzeichen.class))
         .withWop(fakerValueSet(Wop.class))
@@ -59,17 +61,16 @@ public class KbvCoverageFaker {
   }
 
   public static KbvCoverageFaker builder() {
-    return new KbvCoverageFaker();
+    return builder(KbvItaForVersion.getDefaultVersion());
+  }
+
+  public static KbvCoverageFaker builder(KbvItaForVersion version) {
+    return new KbvCoverageFaker(version);
   }
 
   public KbvCoverageFaker withInsuranceType(InsuranceTypeDe insuranceT) {
     this.insurance = insuranceT;
     setInsuranceTypeDirect = true;
-    return this;
-  }
-
-  public KbvCoverageFaker withVersion(KbvItaForVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
     return this;
   }
 
@@ -118,6 +119,7 @@ public class KbvCoverageFaker {
           case BG -> insurance(randomElement(BGInsuranceCoverageInfo.values()));
           default -> insurance(DynamicInsuranceCoverageInfo.random(insurance));
         };
+    builder.version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

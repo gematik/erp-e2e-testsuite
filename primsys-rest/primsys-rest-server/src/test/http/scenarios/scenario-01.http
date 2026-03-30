@@ -1,0 +1,11 @@
+import ../doctor.http
+import ../avs.http
+
+### 01 - prescribe
+run #prescribe pharmaceutical with FHIR+XML example file
+
+### 02 - accept prescription
+run #accept prescription as (@pharmacy = 886c6eda7dd5a1c6b1d112907f544d3)
+
+### abort
+run #abort prescription as (@pharmacy = 886c6eda7dd5a1c6b1d112907f544d3)

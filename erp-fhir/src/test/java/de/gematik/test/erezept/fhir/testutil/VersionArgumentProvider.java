@@ -37,13 +37,9 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> erpWorkflowVersions() {
-    val res =
-        Arrays.stream(ErpWorkflowVersion.values())
-            .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
-            // toDo reactivate after fitting builder for version 1.6
-            .filter(version -> !version.isBiggerThan(ErpWorkflowVersion.V1_5))
-            .map(Arguments::of);
-    return res;
+    return Arrays.stream(ErpWorkflowVersion.values())
+        .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
+        .map(Arguments::of);
   }
 
   public static Stream<Arguments> erpPatienterechnungVersions() {
@@ -53,16 +49,12 @@ public class VersionArgumentProvider {
   public static Stream<Arguments> kbvItaErpVersions() {
     return Arrays.stream(KbvItaErpVersion.values())
         .filter(vers -> !vers.isSmallerThan(KbvItaErpVersion.V1_3_0))
-        // todo reduce after fitting builder for new constrains
-        .filter(vers -> vers.isSmallerThan(KbvItaErpVersion.V1_4_0))
         .map(Arguments::of);
   }
 
   public static Stream<Arguments> kbvItaForVersions() {
     return Arrays.stream(KbvItaForVersion.values())
         .filter(vers -> !vers.isSmallerThan(KbvItaForVersion.V1_2_0))
-        // todo reduce after fitting builder for new constrains
-        .filter(vers -> vers.isSmallerThan(KbvItaForVersion.V1_3_0))
         .map(Arguments::of);
   }
 

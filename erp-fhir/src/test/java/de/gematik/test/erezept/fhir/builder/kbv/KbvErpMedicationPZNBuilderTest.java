@@ -20,11 +20,10 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.de.HL7StructDef;
+import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -33,6 +32,7 @@ import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import lombok.val;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -50,7 +50,9 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .isVaccine(false) // default false
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
-            .amount(5, "Stk") // default 10 {tbl}
+            .amount(5, "Stk")
+            .ingredientItemCC(ASK.from("askCode123"))
+            .ingredientText("wirkstoff")
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -70,6 +72,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
             .packagingSize("5x3") // default 10 `tbl`
+            .ingredientText("wirkstoff")
             .pzn("04773414", "Doxycyclin AL 200 T, 10 Tabletten N1")
             .build();
 
@@ -90,6 +93,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .normgroesse(StandardSize.N1) // default NB (nicht betroffen)
             .darreichungsform(Darreichungsform.TKA) // default TAB
             .pzn(PZN.random(), "5 in 1 Medikament")
+            .ingredientText("wirkstoff")
             .amount(4L)
             .build();
 
@@ -112,8 +116,8 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .pzn(PZN.random(), "5 in 1 Medikament")
             .amount(4L)
             .ingredientText("ingredText")
-            .ingredientStrengthNum(0, "")
-            .ingredientStrengthDenomUnit("")
+            .ingredientStrengthNum(1, "unit")
+            .ingredientStrengthDenom(1, "unit")
             .build();
 
     assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
@@ -125,7 +129,7 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(name = "[{index}] -> Build KBV Medication with KbvItaErpVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
-  void shouldBuildMedicationWithoutStrenghtUnit(KbvItaErpVersion version) {
+  void shouldBuildMedicationWithStrenght(KbvItaErpVersion version) {
     val medicationResourceId = "c1e7027e-3c5b-4e87-a10a-572676b92e22";
     val medication =
         KbvErpMedicationPZNBuilder.builder()
@@ -137,8 +141,9 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
             .darreichungsform(Darreichungsform.TKA) // default TAB
             .pzn(PZN.random(), "5 in 1 Medikament")
             .amount(4L)
-            .ingredientStrengthNum(3, null)
-            .ingredientStrengthDenomUnit(null)
+            .ingredientText("wirkstoff")
+            .ingredientStrengthNum(3, "null")
+            .ingredientStrengthDenom(2, " null")
             .build();
 
     assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
@@ -149,10 +154,9 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
   void shouldBuildMedicationWithFakerAndValidValues(KbvItaErpVersion version) {
     val randomPZN = PZN.random();
     val medication =
-        KbvErpMedicationPZNFaker.builder()
+        KbvErpMedicationPZNFaker.builder(version)
             .withPznMedication(randomPZN.getValue(), "Test Medikament")
             .withCategory(MedicationCategory.C_00)
-            .withVersion(version)
             .fake();
 
     assertNotNull(medication);
@@ -168,5 +172,19 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
 
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
+  }
+
+  @Test
+  void shouldSetIngredWithDataAbsentInStrength() {
+    val medication =
+        KbvErpMedicationPZNBuilder.builder()
+            .version(KbvItaErpVersion.V1_4_0)
+            .pzn(PZN.random().getValue(), "Test Medikament")
+            .category(MedicationCategory.C_00)
+            .build();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
+    assertTrue(
+        HL7StructDef.DATA_ABSENT_REASON.matches(
+            medication.getIngredientFirstRep().getStrength().getExtension().get(0)));
   }
 }

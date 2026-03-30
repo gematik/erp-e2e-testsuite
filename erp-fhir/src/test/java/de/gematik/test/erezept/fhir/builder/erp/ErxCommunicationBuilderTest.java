@@ -40,7 +40,8 @@ import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -56,7 +57,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
   @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   void shouldBuildCommunicationInfoReqFixedValues(String erpFhirProfileVersion) {
     System.setProperty(ERP_FHIR_PROFILES_TOGGLE, erpFhirProfileVersion);
-    val medication = KbvErpMedicationPZNFaker.builder().fake();
+    val medication = KbvErpMedicationPZNFaker.builder().withIngredientName("name").fake();
     val infoReq =
         ErxCommunicationBuilder.forInfoRequest("Hallo, das ist meine Request Nachricht!")
             .basedOn(TaskId.from("4711"))
@@ -275,7 +276,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .sender("606358757")
             .build();
 
-    val result = ValidatorUtil.encodeAndValidate(parser, changeReply, true);
+    val result = ValidatorUtil.encodeAndValidate(parser, changeReply);
     assertTrue(result.isSuccessful());
   }
 

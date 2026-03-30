@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Quantity;
 
 public class KbvErpBundleFaker {
 
@@ -60,35 +59,44 @@ public class KbvErpBundleFaker {
 
   private final Map<String, Consumer<KbvErpBundleBuilder>> builderConsumers = new HashMap<>();
   private PrescriptionId prescriptionId = PrescriptionId.random();
-  private KbvItaForVersion forVersion;
+  private final KbvItaErpVersion erpVersion;
+  private final KbvItaForVersion forVersion;
 
-  private KbvErpBundleFaker(boolean forPkvCoverage) {
+  private KbvErpBundleFaker(
+      boolean forPkvCoverage, KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
+    this.erpVersion = erpVersion;
+    this.forVersion = forVersion;
     KbvPatient patient;
     if (forPkvCoverage) {
       patient =
-          KbvPatientFaker.builder()
+          KbvPatientFaker.builder(this.forVersion)
               .withKvnrAndInsuranceType(KVNR.randomPkv(), InsuranceTypeDe.PKV)
               .fake();
     } else {
       patient =
-          KbvPatientFaker.builder()
+          KbvPatientFaker.builder(this.forVersion)
               .withKvnrAndInsuranceType(KVNR.randomGkv(), InsuranceTypeDe.GKV)
               .fake();
     }
     val practitioner =
-        KbvPractitionerFaker.builder().withQualificationType(QualificationType.DOCTOR).fake();
+        KbvPractitionerFaker.builder(this.forVersion)
+            .withQualificationType(QualificationType.DOCTOR)
+            .fake();
     kbvCoverageFaker =
-        KbvCoverageFaker.builder()
+        KbvCoverageFaker.builder(this.forVersion)
             .withInsuranceType(forPkvCoverage ? InsuranceTypeDe.PKV : InsuranceTypeDe.GKV)
             .withBeneficiary(patient);
 
     val kbvErpMedication =
-        KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+        KbvErpMedicationPZNFaker.builder(this.erpVersion)
+            .withCategory(MedicationCategory.C_00)
+            .fake();
 
-    kbvMedicalOrganizationFaker = KbvMedicalOrganizationFaker.forPractitioner(practitioner);
+    kbvMedicalOrganizationFaker =
+        KbvMedicalOrganizationFaker.forPractitioner(practitioner, forVersion);
 
     medicationRequestFaker =
-        KbvErpMedicationRequestFaker.builder()
+        KbvErpMedicationRequestFaker.builder(this.erpVersion, this.forVersion)
             .withPatient(patient)
             .withRequester(practitioner)
             .withMedication(kbvErpMedication)
@@ -102,19 +110,21 @@ public class KbvErpBundleFaker {
   }
 
   public static KbvErpBundleFaker builder() {
-    return new KbvErpBundleFaker(false);
+    return builder(KbvItaErpVersion.getDefaultVersion(), KbvItaForVersion.getDefaultVersion());
   }
 
-  public static KbvErpBundleFaker builderForPkvCoverage() {
-    return new KbvErpBundleFaker(true);
+  /**
+   * @depecated decide how to use these builder without setting concrete profile Versions
+   */
+  @Deprecated
+  public static KbvErpBundleFaker builder(boolean isPKV) {
+    return new KbvErpBundleFaker(
+        isPKV, KbvItaErpVersion.getDefaultVersion(), KbvItaForVersion.getDefaultVersion());
   }
 
-  public KbvErpBundleFaker withVersion(KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
-    builderConsumers.put("version", b -> b.version(erpVersion));
-    medicationRequestFaker.withVersion(erpVersion);
-    this.forVersion = forVersion;
-    kbvCoverageFaker.withVersion(forVersion);
-    return this;
+  public static KbvErpBundleFaker builder(
+      KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
+    return new KbvErpBundleFaker(false, erpVersion, forVersion);
   }
 
   public KbvErpBundleFaker withPrescriptionId(PrescriptionId prescriptionId) {
@@ -138,9 +148,15 @@ public class KbvErpBundleFaker {
     return this.withStatusKennzeichen(StatusKennzeichen.fromCode(code), practitioner);
   }
 
+  /**
+   * @depecated (decide and refactor cause a second Patient is problematic)
+   */
+  @Deprecated(forRemoval = true)
   public KbvErpBundleFaker withKvnr(KVNR kvnr) {
     val patient =
-        KbvPatientFaker.builder().withKvnrAndInsuranceType(kvnr, InsuranceTypeDe.GKV).fake();
+        KbvPatientFaker.builder(forVersion)
+            .withKvnrAndInsuranceType(kvnr, InsuranceTypeDe.GKV)
+            .fake();
     return this.withPatient(patient);
   }
 
@@ -178,19 +194,13 @@ public class KbvErpBundleFaker {
     return this;
   }
 
-  public KbvErpBundleFaker withQuantity(
-      MedicationRequest.MedicationRequestDispenseRequestComponent quantity) {
-    medicationRequestFaker.withQuantity(quantity);
+  public KbvErpBundleFaker withDispenseQuantity(int amount) {
+    medicationRequestFaker.withDispenseQuantity(amount);
     return this;
   }
 
-  public KbvErpBundleFaker withQuantity(Quantity quantity) {
-    medicationRequestFaker.withQuantity(quantity);
-    return this;
-  }
-
-  public KbvErpBundleFaker withQuantityPackages(int amount) {
-    medicationRequestFaker.withQuantityPackages(amount);
+  public KbvErpBundleFaker expectedSupplyDurationInWeeks(float value) {
+    medicationRequestFaker.withExpectedSupplyDurationInWeeks(value);
     return this;
   }
 
@@ -263,7 +273,7 @@ public class KbvErpBundleFaker {
 
   public KbvErpBundleFaker withPznAndMedicationName(PZN pzn, String medicationName) {
     val medication =
-        KbvErpMedicationPZNFaker.builder()
+        KbvErpMedicationPZNFaker.builder(this.erpVersion)
             .withPznMedication(pzn, medicationName)
             .withCategory(MedicationCategory.C_00)
             .fake();
@@ -280,7 +290,7 @@ public class KbvErpBundleFaker {
   }
 
   public KbvErpBundleBuilder toBuilder() {
-    val builder = KbvErpBundleBuilder.forPrescription(prescriptionId);
+    val builder = KbvErpBundleBuilder.forPrescription(prescriptionId).version(this.erpVersion);
     val coverage = kbvCoverageFaker.fake();
     if (!builderConsumers.containsKey(KEY_COVERAGE)) {
       medicationRequestFaker.withInsurance(coverage);
@@ -289,13 +299,7 @@ public class KbvErpBundleFaker {
     builderConsumers.put(
         "medicationRequest", b -> b.medicationRequest(medicationRequestFaker.fake()));
     builderConsumers.put(
-        "organization",
-        b ->
-            b.medicalOrganization(
-                kbvMedicalOrganizationFaker
-                    .withVersion(
-                        forVersion != null ? forVersion : KbvItaForVersion.getDefaultVersion())
-                    .fake()));
+        "organization", b -> b.medicalOrganization(kbvMedicalOrganizationFaker.fake()));
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

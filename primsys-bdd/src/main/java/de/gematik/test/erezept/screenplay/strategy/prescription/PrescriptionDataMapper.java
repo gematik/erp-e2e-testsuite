@@ -25,11 +25,7 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -158,21 +154,24 @@ public abstract class PrescriptionDataMapper {
     }
     val medication = getKbvErpMedication(medMap);
 
-    val medicationRequest =
+    val medicationRequestBuilder =
         KbvErpMedicationRequestBuilder.forPatient(patient)
             .insurance(insurance)
             .requester(practitioner)
             .medication(medication)
             .dosage(dosage)
-            .quantityPackages(Integer.decode(amount))
+            .dispenseRequestQuantity(Integer.decode(amount))
             .status("active")
             .intent("order")
             .isBVG(false)
             .mvo(mvo)
             .hasEmergencyServiceFee(emergencyServiceFee)
             .substitution(substitution)
-            .coPaymentStatus(StatusCoPayment.fromCode(paymentStatus))
-            .build();
+            .coPaymentStatus(StatusCoPayment.fromCode(paymentStatus));
+
+    Optional.ofNullable(medMap.get("Reichdauer in Wochen"))
+        .ifPresent(
+            it -> medicationRequestBuilder.expectedSupplyDurationInWeeks(Float.parseFloat(it)));
 
     // create and return the KBV Bundle
     val kbvBuilder =
@@ -182,7 +181,7 @@ public abstract class PrescriptionDataMapper {
             .medicalOrganization(organization)
             .patient(patient)
             .insurance(insurance)
-            .medicationRequest(medicationRequest) // what is the medication
+            .medicationRequest(medicationRequestBuilder.build()) // what is the medication
             .medication(medication);
 
     return Pair.of(kbvBuilder, this.getFlowType(medMap));

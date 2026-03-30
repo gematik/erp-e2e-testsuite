@@ -22,7 +22,6 @@ package de.gematik.test.erezept.app.questions;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
-import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.app.mobile.elements.Profile;
 import de.gematik.test.erezept.app.mobile.elements.ProfileSelectorElement;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
@@ -47,7 +46,7 @@ public class UsedSessionKVNR implements Question<String> {
     ensureSettingsMenuIsOpened(app);
     app.tap(ProfileSelectorElement.forActor(actor).fromSettingsMenu());
     val userKVNR = app.getText(Profile.USER_KVNR);
-    app.tap(Debug.LEAVE_BUTTON);
+    app.tap(Profile.LEAVE_BUTTON);
     return userKVNR;
   }
 

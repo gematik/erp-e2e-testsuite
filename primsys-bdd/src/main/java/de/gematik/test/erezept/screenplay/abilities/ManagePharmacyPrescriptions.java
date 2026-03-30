@@ -21,15 +21,24 @@
 package de.gematik.test.erezept.screenplay.abilities;
 
 import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
+import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseDiGAFaker;
+import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.ChargeItemChangeAuthorization;
 import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.ManagedList;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -186,11 +195,7 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
                     accepted.getTaskId(),
                     accepted.getTask().getAccessCode(),
                     accepted.getSecret());
-                val cmd =
-                    new TaskAbortCommand(
-                        accepted.getTaskId(),
-                        accepted.getTask().getAccessCode(),
-                        accepted.getSecret());
+                val cmd = getTeardownCommandFor(accepted);
                 val response = erpClient.request(cmd);
 
                 response
@@ -206,6 +211,33 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
                                 accepted.getTaskId(),
                                 errorMessage));
               });
+    }
+  }
+
+  private ICommand<?> getTeardownCommandFor(ErxAcceptBundle accepted) {
+    val taskId = accepted.getTaskId();
+    if (taskId.getFlowType() == PrescriptionFlowType.FLOW_TYPE_162) {
+      // approve/decline this DiGA so it won't stay in status "in-progress"
+      val secret = accepted.getSecret();
+      val kvnr = accepted.getTask().getForKvnr().orElseGet(KVNR::randomGkv);
+      val telematikId =
+          Optional.ofNullable(actor.abilityTo(UseSMCB.class))
+              .map(UseSMCB::getTelematikID)
+              .orElseGet(() -> TelematikID.random().getValue());
+      val operationBuilder = GemOperationInputParameterBuilder.forClosingDiGA();
+      val mdb =
+          ErxMedicationDispenseDiGAFaker.builder()
+              .withKvnr(kvnr)
+              .withPrescriptionId(taskId.toPrescriptionId())
+              .withPerformer(telematikId)
+              .toBuilder();
+
+      mdb.note(GemFaker.getFaker().backToTheFuture().quote());
+
+      val operationParams = operationBuilder.with(mdb.build()).build();
+      return new CloseTaskCommand(taskId, secret, operationParams);
+    } else {
+      return new TaskAbortCommand(taskId, accepted.getTask().getAccessCode(), accepted.getSecret());
     }
   }
 

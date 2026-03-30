@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -29,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.github.javafaker.service.RandomService;
 import de.gematik.bbriccs.fhir.builder.FakerBrick;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
@@ -38,16 +38,15 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
-@SetSystemProperty(
-    key = ERP_FHIR_PROFILES_TOGGLE,
-    value = "1.4.0") // before 1.4.0 EVDGA was not available
+/*@SetSystemProperty(
+key = ERP_FHIR_PROFILES_TOGGLE,
+value = "1.4.0") // before 1.4.0 EVDGA was not available*/
 class KbvHealthAppRequestFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFakeHealthAppRequest() {
-    val har = KbvHealthAppRequestFaker.forRandomPatient().fake();
+    val har = KbvHealthAppRequestFaker.forRandomPatient(KbvItvEvdgaVersion.V1_2).fake();
 
     val result = ValidatorUtil.encodeAndValidate(parser, har);
     assertTrue(result.isSuccessful());

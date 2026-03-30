@@ -24,13 +24,16 @@ import static java.text.MessageFormat.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.config.PartialConfigSubstituter;
 import de.gematik.test.erezept.config.TestsuiteconfigurationScope;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -58,22 +61,27 @@ public class ErpEnvironmentsConfiguration {
     return environments.getEnvironments();
   }
 
+  @SneakyThrows
   private void readEnvironmentConfigurations() {
     val envProperty = System.getProperty(CONF_SYS_PROP, System.getenv(CON_ENV_VAR));
-    File configFile;
+    String configFileContent;
     String readFrom;
+    File configFile;
+
     if (envProperty != null && !envProperty.isEmpty()) {
       configFile = getFromCustomPath(Path.of(envProperty));
+      configFileContent = Files.readString(configFile.toPath());
       readFrom = envProperty;
     } else {
-      configFile = getDefault();
+      configFile = ResourceLoader.getFileFromResource("erp_environments.yaml");
+      configFileContent = ResourceLoader.readFileFromResource("erp_environments.yaml");
       readFrom = "packaged resource";
     }
 
     val mapper = new ObjectMapper(new YAMLFactory());
 
     try {
-      val template = mapper.readTree(configFile);
+      val template = mapper.readTree(configFileContent);
       val finalConfig =
           PartialConfigSubstituter.forScope(TestsuiteconfigurationScope.ERP_PRIMSYS)
               .applyUpdates(configFile, template)
@@ -84,21 +92,6 @@ public class ErpEnvironmentsConfiguration {
       throw new ConfigurationException(
           format("Environment Configurations read from ''{0}'' are invalid", readFrom));
     }
-  }
-
-  private File getDefault() {
-    val envFileUrl = this.getClass().getResource("/erp_environments.yaml");
-
-    if (envFileUrl == null) {
-      // this case will happen when
-      // 1. no environment configuration file is provided via system property or environment
-      // 2. AND no erp_environments.yaml is packaged into jar
-      // variable
-      throw new ConfigurationException(
-          "No Environment Configuration was configured and no default configuration is packaged");
-    }
-
-    return getFromCustomPath(Path.of(envFileUrl.getPath()));
   }
 
   private File getFromCustomPath(Path path) {

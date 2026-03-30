@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,15 +28,12 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.ClearSystemProperty;
 
-@ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
 class ErxMedicationDispenseDiGAFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFakeDiGAMedicationDispense() {
-    val medDispense =
-        ErxMedicationDispenseDiGAFaker.builder().withVersion(ErpWorkflowVersion.V1_4).fake();
+    val medDispense = ErxMedicationDispenseDiGAFaker.builder(ErpWorkflowVersion.V1_4).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medDispense);
     assertTrue(result.isSuccessful());
   }
@@ -50,8 +46,7 @@ class ErxMedicationDispenseDiGAFakerTest extends ErpFhirParsingTest {
     val deepLink = "https://gematico.de?redeemCode=DE12345678901234";
 
     val medDispense =
-        ErxMedicationDispenseDiGAFaker.builder()
-            .withVersion(ErpWorkflowVersion.V1_4)
+        ErxMedicationDispenseDiGAFaker.builder(ErpWorkflowVersion.V1_4)
             .withPzn(pzn, digaName)
             .withRedeemCode(redeemCode)
             .withDeepLink(deepLink)
@@ -69,5 +64,11 @@ class ErxMedicationDispenseDiGAFakerTest extends ErpFhirParsingTest {
 
     assertEquals(pzn, medDispense.getPzn().getValue());
     assertEquals(digaName, medDispense.getDigaName());
+  }
+
+  @Test
+  void ShouldBuildMinimal() {
+    val digaDisp = ErxMedicationDispenseDiGAFaker.builder().fake();
+    assertTrue(digaDisp.isDiGA());
   }
 }

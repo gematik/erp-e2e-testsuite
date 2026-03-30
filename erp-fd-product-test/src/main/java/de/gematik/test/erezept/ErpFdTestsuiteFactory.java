@@ -23,6 +23,7 @@ package de.gematik.test.erezept;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
+import com.apicatalog.jsonld.StringUtils;
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.rest.UnirestHttpClient;
@@ -44,7 +45,10 @@ import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.parser.ValidatorType;
 import de.gematik.test.erezept.screenplay.abilities.*;
+import de.gematik.test.erezept.trezept.TRegisterMockClient;
 import de.gematik.test.konnektor.Konnektor;
 import de.gematik.test.konnektor.cfg.KonnektorFactory;
 import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
@@ -65,6 +69,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
   private final PrimsysConfigurationDto dto;
   @Delegate private final SmartcardArchive smartcards;
   private final ApiCallStopwatch stopwatch = StopwatchProvider.getInstance().getStopwatch();
+  private static final int GEM_PROXY_PORT = 3128;
 
   public VsdmService getSoftKonnVsdmService() {
     val softKonnConfig = (LocalKonnektorConfiguration) this.getKonnektorConfig("Soft-Konn");
@@ -113,6 +118,27 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
                     maxWait)));
   }
 
+  @SuppressWarnings("java:S1313")
+  public <A extends Actor> void equipWithTPrescriptionMockClient(A actor) {
+    val name = actor.getName();
+    log.info("Equip Actor {} with TRezept-MockClient", name);
+
+    val mockClientConfig = getActiveEnvironment().getTRegisterMockClient();
+    val mockUrl = mockClientConfig.getTRegisterMockUrl();
+    val gemProxy = System.getProperty("https.gematikProxy");
+
+    var builder = UnirestHttpClient.forUrl(mockUrl);
+
+    if (StringUtils.isNotBlank(gemProxy)) {
+      builder = builder.proxy(gemProxy, GEM_PROXY_PORT);
+    }
+    // Todo reactivate BRICKS Validator if Profiles are fine
+    val fhirParser = new FhirParser(ValidatorType.NONE);
+
+    val tregisterMockClient = TRegisterMockClient.withRestClient(builder.withoutTlsVerification());
+    givenThat(actor).can(UseTheTRegisterMockClient.with(tregisterMockClient, fhirParser));
+  }
+
   public <A extends Actor> void equipAsPharmacy(A actor) {
     val name = actor.getName();
     log.info("Equip Pharmacy {}", name);
@@ -128,6 +154,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(useTheKonnektor)
         .can(ManagePharmacyPrescriptions.itWorksWith())
+        .can(ManageCommunications.heExchanges())
         .can(
             ProvidePharmacyBaseData.forNationalPharmacy()
                 .practitionerIdentifier("telematik-id HBA")
@@ -165,6 +192,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(useTheKonnektor)
         .can(ManagePharmacyPrescriptions.itWorksWith())
+        .can(ManageCommunications.heExchanges())
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor));
   }
 
@@ -180,6 +208,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .whoCan(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), name))
         .can(ProvideEGK.sheOwns(egk))
         .can(ManageDataMatrixCodes.heGetsPrescribed())
+        .can(ManageCommunications.heExchanges())
         .can(useTheErpClientFrom(cfg).authenticatingWith(egk));
   }
 

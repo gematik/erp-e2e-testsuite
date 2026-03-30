@@ -25,19 +25,25 @@ import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.fhir.builder.componentbuilder.DosageDgMPBuilder;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
+import de.gematik.test.erezept.fhir.builder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.BmpDosiereinheit;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
@@ -91,10 +97,11 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   void buildMedicationDispenseWithMultipleDosageInstructions(ErpWorkflowVersion version) {
     val pzn = "06313728";
     val medication =
-        GemErpMedicationFaker.forPznMedication().withPzn(PZN.from(pzn), fakerDrugName()).fake();
-
+        GemErpMedicationFaker.forPznMedication(version)
+            .withPzn(PZN.from(pzn), fakerDrugName())
+            .fake();
     DosageDgMP dosage =
-        DosageDgMPBuilder.dosageBuilder("Tablette", "1")
+        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.MIO_E)
             .text("1 Tablette morgens")
             .value(new BigDecimal(1))
             .build();
@@ -113,7 +120,56 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
             .whenHandedOver(new Date())
             .batch(lotNumber, new Date())
             .wasSubstituted(true)
-            .dosage(dosage)
+            .dgmp(dosage)
+            .note("in 7 Tagen Rücksprache mit dem Hausarzt halten")
+            .build();
+
+    assertNotNull(medicationDispense.getId());
+    assertEquals(kvnr.getValue(), medicationDispense.getSubjectId().getValue());
+    assertEquals(PrescriptionId.from(prescriptionId), medicationDispense.getPrescriptionId());
+    if (version.isSmallerThanOrEqualTo(ErpWorkflowVersion.V1_5)) {
+
+      assertEquals(1, medicationDispense.getDosageInstruction().size());
+      assertEquals("1 Tablette morgens", medicationDispense.getDosageInstructionText().get(0));
+
+    } else {
+      assertTrue(
+          medicationDispense.getDosageInstructionText().stream()
+              .anyMatch(t -> t.equals("1 Tablette morgens")));
+      assertEquals(2, medicationDispense.getExtension().size());
+    }
+
+    assertEquals(1, medicationDispense.getNote().size());
+    assertEquals(
+        "in 7 Tagen Rücksprache mit dem Hausarzt halten",
+        medicationDispense.getNoteFirstRep().getText());
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
+    System.out.println();
+  }
+
+  @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
+  void buildMedicationDispenseWitDgmpDosageInstruction(ErpWorkflowVersion version) {
+    val pzn = "06313728";
+    val medication =
+        GemErpMedicationFaker.forPznMedication(version)
+            .withPzn(PZN.from(pzn), fakerDrugName())
+            .fake();
+
+    val kvnr = KVNR.from("X234567890");
+    val telematikId = "606358757";
+    val prescriptionId = "160.100.000.000.011.09";
+    val lotNumber = "123456";
+    val medicationDispense =
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
+            .version(version)
+            .performerId(telematikId)
+            .prescriptionId(prescriptionId)
+            .medication(medication)
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
+            .batch(lotNumber, new Date())
+            .wasSubstituted(true)
             .dosageInstruction("nur nach dem Essen")
             .dosageInstruction("nicht vor dem Schlafen")
             .note("in 7 Tagen Rücksprache mit dem Hausarzt halten")
@@ -122,14 +178,26 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     assertNotNull(medicationDispense.getId());
     assertEquals(kvnr.getValue(), medicationDispense.getSubjectId().getValue());
     assertEquals(PrescriptionId.from(prescriptionId), medicationDispense.getPrescriptionId());
-    assertEquals(3, medicationDispense.getDosageInstruction().size());
-    assertEquals("nur nach dem Essen", medicationDispense.getDosageInstructionText().get(0));
-    assertEquals("nicht vor dem Schlafen", medicationDispense.getDosageInstructionText().get(1));
+    if (version.isSmallerThanOrEqualTo(ErpWorkflowVersion.V1_5)) {
+
+      assertEquals(2, medicationDispense.getDosageInstruction().size());
+      assertEquals("nur nach dem Essen", medicationDispense.getDosageInstructionText().get(0));
+      assertEquals("nicht vor dem Schlafen", medicationDispense.getDosageInstructionText().get(1));
+    } else {
+      assertTrue(
+          medicationDispense.getDosageInstructionText().stream()
+              .anyMatch(t -> t.equals("nur nach dem Essen, nicht vor dem Schlafen")));
+      assertEquals(2, medicationDispense.getExtension().size());
+    }
+
     assertEquals(1, medicationDispense.getNote().size());
     assertEquals(
         "in 7 Tagen Rücksprache mit dem Hausarzt halten",
         medicationDispense.getNoteFirstRep().getText());
-    assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
+    assertTrue(
+        ValidatorUtil.encodeAndValidate(parser, medicationDispense, EncodingType.XML, true, true)
+            .isSuccessful());
+    System.out.println();
   }
 
   @ParameterizedTest(
@@ -142,9 +210,8 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     val prescriptionId = PrescriptionId.random();
 
     val medicationDispense =
-        ErxMedicationDispenseFaker.builder()
+        ErxMedicationDispenseFaker.builder(erpWorkflowVersion)
             .withKvnr(kvnr)
-            .withVersion(erpWorkflowVersion)
             .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();
@@ -165,9 +232,8 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.from("200.100.000.000.011.09");
     val medicationDispense =
-        ErxMedicationDispenseFaker.builder()
+        ErxMedicationDispenseFaker.builder(erpWorkflowVersion)
             .withKvnr(kvnr)
-            .withVersion(erpWorkflowVersion)
             .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();
@@ -186,8 +252,7 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   void throwExceptionWhileBuildMedicationDispenseWithFaker02(
       ErpWorkflowVersion erpWorkflowVersion) {
     val erxMedicationDispensebuilder = ErxMedicationDispenseBuilder.forKvnr(KVNR.random());
-    val gemMedication =
-        GemErpMedicationFaker.forPznMedication().withVersion(erpWorkflowVersion).fake();
+    val gemMedication = GemErpMedicationFaker.forPznMedication(erpWorkflowVersion).fake();
     erxMedicationDispensebuilder.medication(gemMedication);
     assertThrows(BuilderException.class, erxMedicationDispensebuilder::build);
   }
@@ -200,9 +265,8 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     val performerId = "01234567890";
     val prescriptionId = PrescriptionId.from("160.100.000.000.011.09");
     val medicationDispense =
-        ErxMedicationDispenseFaker.builder()
+        ErxMedicationDispenseFaker.builder(erpWorkflowVersion)
             .withKvnr(kvnr)
-            .withVersion(erpWorkflowVersion)
             .withPerformer(performerId)
             .withPrescriptionId(prescriptionId)
             .fake();
@@ -219,11 +283,73 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   @Test
   void shouldThrowOnDispensingWrongMedicationForProfileVersion() {
     val medicationDispenseBuilder =
-        ErxMedicationDispenseFaker.builder().withVersion(ErpWorkflowVersion.V1_3).toBuilder();
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_3).toBuilder();
 
-    medicationDispenseBuilder.medication(GemErpMedicationFaker.forPznMedication().fake());
+    medicationDispenseBuilder.medication(
+        GemErpMedicationFaker.forPznMedication(ErpWorkflowVersion.V1_3).fake());
 
     assertThrows(BuilderException.class, medicationDispenseBuilder::build);
+  }
+
+  @Test
+  void shouldSetDosageDgmpCorrect() {
+    DosageDgMP dosage =
+        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.AUGENBADEWANNE)
+            .text("1 Tablette morgens")
+            .value(new BigDecimal(5))
+            .build();
+
+    val medDisp =
+        ErxMedicationDispenseBuilder.forKvnr(KVNR.random())
+            .medication(GemErpMedicationFaker.forPznMedication().fake())
+            .version(ErpWorkflowVersion.V1_6)
+            .dgmp(dosage)
+            .performerId(TelematikID.random())
+            .prescriptionId(PrescriptionId.random())
+            .status("completed") // default COMPLETED
+            .build();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medDisp).isSuccessful());
+    assertEquals(
+        Optional.of(5),
+        medDisp.getDosageInstruction().stream()
+            .flatMap(
+                dI ->
+                    dI.getDoseAndRate().stream()
+                        .map(dAR -> dAR.getDoseQuantity().getValue().intValue()))
+            .findFirst());
+  }
+
+  @Test
+  void shouldSetDosageDgmpCorrectAsList() {
+    DosageDgMP dosage =
+        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.AUGENBADEWANNE)
+            .text("1 Tablette morgens")
+            .value(new BigDecimal(5))
+            .build();
+
+    val medDisp =
+        ErxMedicationDispenseBuilder.forKvnr(KVNR.random())
+            .version(ErpWorkflowVersion.V1_6)
+            .medication(
+                GemErpMedicationFaker.forPznMedication()
+                    .withDrugCategory(EpaDrugCategory.C_02)
+                    .fake())
+            .dgmp(List.of(dosage))
+            .performerId(TelematikID.random())
+            .prescriptionId(PrescriptionId.random())
+            .status("completed") // default COMPLETED
+            .build();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medDisp).isSuccessful());
+    assertEquals(
+        Optional.of(5),
+        medDisp.getDosageInstruction().stream()
+            .map(
+                dI ->
+                    dI.getDoseAndRate().stream()
+                        .map(dAR -> dAR.getDoseQuantity().getValue().intValue())
+                        .findFirst()
+                        .orElseThrow())
+            .findFirst());
   }
 
   private static ValidationResult getRes(Resource medicationDispense) {

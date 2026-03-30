@@ -24,6 +24,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpiratio
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;
@@ -37,14 +38,18 @@ public class ErxMedicationDispenseFaker
         ErxMedicationDispenseFaker,
         ErxMedicationDispenseBuilder> {
 
-  private ErxMedicationDispenseFaker() {
-    super();
+  private ErxMedicationDispenseFaker(ErpWorkflowVersion erpWorkflowVersion) {
+    super(erpWorkflowVersion);
     this.withBatch(fakerLotNumber(), fakerFutureExpirationDate());
-    withMedication(GemErpMedicationFaker.forPznMedication().fake());
+    withMedication(GemErpMedicationFaker.forPznMedication(erpWorkflowVersion).fake());
   }
 
   public static ErxMedicationDispenseFaker builder() {
-    return new ErxMedicationDispenseFaker();
+    return builder(ErpWorkflowVersion.getDefaultVersion());
+  }
+
+  public static ErxMedicationDispenseFaker builder(ErpWorkflowVersion erpWfVersion) {
+    return new ErxMedicationDispenseFaker(erpWfVersion);
   }
 
   public ErxMedicationDispenseFaker withMedication(KbvErpMedication medication) {
@@ -70,8 +75,13 @@ public class ErxMedicationDispenseFaker
   }
 
   public ErxMedicationDispenseBuilder toBuilder() {
-    val builder = ErxMedicationDispenseBuilder.forKvnr(kvnr);
+    val builder = ErxMedicationDispenseBuilder.forKvnr(kvnr).version(this.version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
+  }
+
+  public ErxMedicationDispenseFaker withDgmp(DosageDgMP dosage) {
+    builderConsumers.put("dgmp", b -> b.dgmp(dosage));
+    return this;
   }
 }

@@ -23,10 +23,13 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.erezept.screenplay.task.*;
+import de.gematik.test.erezept.screenplay.task.CheckDispenseStatusAsPatient;
+import de.gematik.test.erezept.screenplay.task.HandoverDataMatrixCode;
+import de.gematik.test.erezept.screenplay.task.RetrievePrescriptionFromServer;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
+import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -71,12 +74,12 @@ public class PatientSteps {
    * @param order ist die Reihenfolge, mit der das gewünschte E-Rezept ausgewählt wird
    * @param pharmacyName ist die Apotheke, welche den DMC zugewiesen bekommt
    */
-  @Wenn(
+  @Und(
       "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
-          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  @Wenn(
-      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
-          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
+          + " E-Rezept dem Kostenträger (.+) via Data Matrix Code zuweist$")
+  @When(
+      "^(?:der|die) (?:Versicherte|GKV Versicherte) (.+) (?:sein|ihr) (letztes|erstes)"
+          + " (ausgestelltes|gelöschtes) E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
   public void whenAssignDataMatrixCodeFromStack(
       String patientName, String order, String dmcStack, String pharmacyName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -131,8 +134,8 @@ public class PatientSteps {
   /**
    * Der angegebene Patient ruft das letzte verschriebene Rezept auf dem Patientenstapel beim FD ab
    *
-   * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
    * @param patientName ist der Name des Versicherten
+   * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
    */
   @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept angezeigt$")
   @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept ohne AccessCode angezeigt$")

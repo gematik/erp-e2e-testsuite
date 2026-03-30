@@ -123,11 +123,23 @@ public class ErxCommunication extends Communication {
     return this.getRecipientFirstRep().getIdentifier().getValue();
   }
 
+  /**
+   * Retrieves the message payload from this Communication resource.
+   *
+   * <ul>
+   *   <li>Returns the message payload as a plain string. If the payload contains JSON, it is not
+   *       parsed or interpreted.
+   *   <li>If the Communication does not contain any message payload, an empty string is returned
+   *       instead of throwing an exception.
+   * </ul>
+   *
+   * @return the message payload as a string, or an empty string if no payload is present
+   */
   public String getMessage() {
     return this.getPayload().stream()
         .map(payload -> payload.getContentStringType().getValue())
         .findFirst()
-        .orElseThrow(() -> new MissingFieldException(this.getClass(), "Message Payload"));
+        .orElse("");
   }
 
   public boolean isSubstitutionAllowed() {

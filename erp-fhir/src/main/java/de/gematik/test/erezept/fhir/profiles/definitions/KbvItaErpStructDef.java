@@ -34,18 +34,18 @@ public enum KbvItaErpStructDef implements WithStructureDefinition<KbvItaErpVersi
   MEDICATION_PZN("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN"),
   MEDICATION_COMPOUNDING(
       "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Compounding"),
+  MEDICATION_FREETEXT("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_FreeText"),
   COMPOUNDING_INSTRUCTION(
       "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_CompoundingInstruction"),
   MEDICATION_CATEGORY("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Category"),
   MEDICATION_VACCINE("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Vaccine"),
   EMERGENCY_SERVICES_FEE("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee"),
-  MEDICATION_FREETEXT("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_FreeText"),
   DOSAGE_FLAG("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag"),
   MULTIPLE_PRESCRIPTION("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription"),
   PACKAGING_SIZE("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_PackagingSize"),
   PACKAGING("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Packaging"),
   ACCIDENT("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Accident"),
-  SER("https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_SER"),
+
   MEDICATION_INGREDIENT_FORM(
       "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Ingredient_Form"),
   PRESCRIBER_ID("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Prescriber_ID"),
@@ -58,6 +58,7 @@ public enum KbvItaErpStructDef implements WithStructureDefinition<KbvItaErpVersi
   MEDICATION_INGREDIENT_AMOUNT(
       "https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Ingredient_Amount"),
   MEDICATION_INGREDIENT("https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Ingredient"),
+  TERATOGENIC("https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Teratogenic"),
   ;
 
   private final String canonicalUrl;

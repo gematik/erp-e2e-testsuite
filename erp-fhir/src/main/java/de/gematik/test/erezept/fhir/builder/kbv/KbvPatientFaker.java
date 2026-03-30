@@ -40,18 +40,23 @@ import lombok.val;
 
 public class KbvPatientFaker {
   private final Map<String, Consumer<KbvPatientBuilder>> builderConsumers = new HashMap<>();
+  private final KbvItaForVersion version;
 
-  private KbvPatientFaker() {
+  private KbvPatientFaker(KbvItaForVersion version) {
+    this.version = version;
     this.withBirthDate(fakerBirthday())
         .withAddress(fakerCity(), fakerZipCode(), fakerStreetName())
         .withName(fakerFirstName(), fakerLastName())
-        .withVersion(KbvItaForVersion.getDefaultVersion())
         .withKvnrAndInsuranceType(
             KVNR.random(), randomElement(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV));
   }
 
   public static KbvPatientFaker builder() {
-    return new KbvPatientFaker();
+    return builder(KbvItaForVersion.getDefaultVersion());
+  }
+
+  public static KbvPatientFaker builder(KbvItaForVersion version) {
+    return new KbvPatientFaker(version);
   }
 
   public KbvPatientFaker withInsuranceType(InsuranceTypeDe insuranceType) {
@@ -79,17 +84,12 @@ public class KbvPatientFaker {
     return this;
   }
 
-  public KbvPatientFaker withVersion(KbvItaForVersion version) {
-    builderConsumers.put("version", b -> b.version(version));
-    return this;
-  }
-
   public KbvPatient fake() {
     return this.toBuilder().build();
   }
 
   public KbvPatientBuilder toBuilder() {
-    val builder = KbvPatientBuilder.builder();
+    val builder = KbvPatientBuilder.builder().version(version);
     builderConsumers.values().forEach(c -> c.accept(builder));
     return builder;
   }

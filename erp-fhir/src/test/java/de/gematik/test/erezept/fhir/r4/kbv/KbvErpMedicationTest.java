@@ -20,10 +20,8 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication.isKPG;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,21 +29,25 @@ import de.gematik.bbriccs.fhir.coding.exceptions.FhirVersionException;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import java.util.Collections;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class KbvErpMedicationTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectVersionCorrectly() {
     val version = KbvItaErpVersion.V1_1_0;
-    val medication = KbvErpMedicationPZNFaker.builder().withVersion(version).fake();
+    val medication = KbvErpMedicationPZNFaker.builder(version).fake();
     assertEquals(version, medication.getVersion());
   }
 
@@ -53,6 +55,17 @@ class KbvErpMedicationTest extends ErpFhirParsingTest {
   void shouldThrowIfMedicationDoesNotContainAProfile() {
     val medication = new KbvErpMedication();
     assertThrows(FhirVersionException.class, medication::getVersion);
+  }
+
+  @Test
+  void shouldFindKpg() {
+    val med =
+        KbvErpMedicationPZNBuilder.builder()
+            .pzn(PZN.random(), "some name")
+            .ingredientText("text")
+            .darreichungsform(Darreichungsform.KPG)
+            .build();
+    assertTrue(isKPG(med));
   }
 
   @Test
@@ -95,11 +108,30 @@ class KbvErpMedicationTest extends ErpFhirParsingTest {
     assertDoesNotThrow(medication::getFreeText);
   }
 
+  @ParameterizedTest
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldNotThrowOnAbsentIngredientText(KbvItaErpVersion version) {
+    val medication = KbvErpMedicationPZNFaker.builder(version).withIngredientName(null).fake();
+    assertDoesNotThrow(medication::getIngredientText);
+    assertTrue(medication.getIngredientText().isEmpty());
+  }
+
+  @ParameterizedTest
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaErpVersions")
+  void shouldNotThrowOnAbsentManufacturingInstruction(KbvItaErpVersion version) {
+    val medication =
+        KbvErpMedicationCompoundingFaker.builder(version)
+            .withProductionInstruction((String) null)
+            .fake();
+    assertDoesNotThrow(medication::getManufacturingInstruction);
+    assertTrue(medication.getManufacturingInstruction().isEmpty());
+  }
+
   @Test
   void shouldThrowOnMissingCategory() {
     List<MedicationCategory> categories = Collections.emptyList();
     val medication = mock(KbvErpMedication.class);
-    when(medication.getCatagory()).thenReturn(categories);
+    when(medication.getCategory()).thenReturn(categories);
     when(medication.getCategoryFirstRep()).thenCallRealMethod();
     assertThrows(MissingFieldException.class, medication::getCategoryFirstRep);
   }
