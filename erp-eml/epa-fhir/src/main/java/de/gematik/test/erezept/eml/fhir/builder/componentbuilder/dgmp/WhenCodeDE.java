@@ -18,19 +18,24 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.eml.fhir.r4.componentbuilder;
+package de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp;
 
-import de.gematik.test.erezept.eml.fhir.r4.EpaIngredientComponent;
+import java.util.Optional;
+import java.util.stream.Stream;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public class GemEpaIngredientComponentBuilder
-    extends GematikIngredientComponentBuilder<
-        EpaIngredientComponent, GemEpaIngredientComponentBuilder> {
+@Getter
+@RequiredArgsConstructor
+public enum WhenCodeDE {
+  MORN("morgens"),
+  NOON("mittags"),
+  EVE("abends"),
+  NIGHT("zur Nacht");
 
-  private GemEpaIngredientComponentBuilder() {
-    super(new EpaIngredientComponent());
-  }
+  private final String translation;
 
-  public static GemEpaIngredientComponentBuilder builder() {
-    return new GemEpaIngredientComponentBuilder();
+  public static Optional<WhenCodeDE> fromCode(String code) {
+    return Stream.of(WhenCodeDE.values()).filter(it -> it.name().equals(code)).findFirst();
   }
 }

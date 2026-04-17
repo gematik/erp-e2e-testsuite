@@ -23,6 +23,7 @@ package de.gematik.test.erezept.eml.fhir.r4;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.builder.EpaMedPznIngredientBuilder;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;

@@ -20,8 +20,8 @@
 
 package de.gematik.test.erezept.client.vau;
 
-import de.gematik.bbriccs.rest.HttpHeaderKey;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
+import de.gematik.bbriccs.rest.headers.HttpHeaderKey;
 import lombok.Getter;
 
 @Getter

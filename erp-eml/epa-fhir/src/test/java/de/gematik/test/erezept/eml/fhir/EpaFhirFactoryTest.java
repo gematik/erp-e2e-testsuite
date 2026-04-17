@@ -50,7 +50,8 @@ class EpaFhirFactoryTest {
   @Test
   void validateWithCustomFhirValidatorShouldWork() {
     val medicationAsString2 =
-        ResourceLoader.readFileFromResource("fhir/valid/parameters/epaMockResponse.json");
+        ResourceLoader.readFileFromResource(
+            "fhir/valid/parameters/epaMockResponseProvidePrescr.json");
 
     val codec = EpaFhirFactory.create(new DummyValidator(FhirContext.forR4()));
     assertTrue(codec.isValid(medicationAsString2));

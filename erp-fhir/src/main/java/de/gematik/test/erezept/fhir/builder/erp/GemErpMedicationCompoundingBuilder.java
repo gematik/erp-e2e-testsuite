@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
-import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredientBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.EpaMedPznIngredientBuilder;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import java.util.List;

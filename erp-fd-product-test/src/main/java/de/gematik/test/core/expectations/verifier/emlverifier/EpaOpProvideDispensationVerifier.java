@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
@@ -192,6 +193,44 @@ public class EpaOpProvideDispensationVerifier {
     return new VerificationStep.StepBuilder<List<EpaOpProvideDispensation>>(
             EmlAfos.A_25951.getRequirement(), "Eml besitzt eine leere Liste")
         .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      emlMedDispenseHasEqualGeneratedDosageInstrWith(ErxMedicationDispense medicationDispense) {
+    val gemDispensationRenderedDosage = medicationDispense.getRenderedDosageInstructionOptional();
+
+    Predicate<EpaOpProvideDispensation> predicate =
+        epaOpDispensation ->
+            epaOpDispensation.getEpaMedicationDispense().getExtension().stream()
+                .filter(DgMPStructDef.MD_RENDERED_DOSAGE_INSTRUCTION::matches)
+                .map(ext -> ext.getValue().primitiveValue())
+                .findFirst()
+                .equals(gemDispensationRenderedDosage);
+
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlAfos.A_25949.getRequirement(),
+            format(
+                "Die EpaMedicationDispense muss die errechnete Dosierinformation {0} enthalten",
+                gemDispensationRenderedDosage))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      provDispensationHasCorrectDosageComponent(ErxMedicationDispense erxMedicationDispense) {
+
+    Predicate<EpaOpProvideDispensation> dgMPContentValidation =
+        dispensation ->
+            dispensation
+                .getEpaMedicationDispense()
+                .getDosageInstructionDgMPs()
+                .equals(erxMedicationDispense.getDosageInstructionDgMPs());
+
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlAfos.A_25949.getRequirement(),
+            "Die EpaMedicationDispense muss die Dosierinformation der DosageDgMP enthalten")
+        .predicate(dgMPContentValidation)
         .accept();
   }
 }

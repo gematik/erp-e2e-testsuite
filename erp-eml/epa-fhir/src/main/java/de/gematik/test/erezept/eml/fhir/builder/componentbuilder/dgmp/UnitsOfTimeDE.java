@@ -18,24 +18,31 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.fhir.builder.dgmp;
+package de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum WhenCodeDE {
-  MORN("morgens"),
-  NOON("mittags"),
-  EVE("abends"),
-  NIGHT("zur Nacht");
+public enum UnitsOfTimeDE {
+  SEKUNDE("s", "Sekunde", "Sekunden"),
+  MINUTE("min", "Minute", "Minuten"),
+  STUNDE("h", "Stunde", "Stunden"),
+  TAG("d", "Tag", "Tage"),
+  WOCHE("wk", "Woche", "Wochen"),
+  MONAT("mo", "Monat", "Monate"),
+  JAHR("a", "Jahr", "Jahre");
 
-  private final String translation;
+  private final String code;
+  private final String singular;
+  private final String plural;
 
-  public static Optional<WhenCodeDE> fromCode(String code) {
-    return Stream.of(WhenCodeDE.values()).filter(it -> it.name().equals(code)).findFirst();
+  public static UnitsOfTimeDE fromCode(String code) {
+    return Stream.of(UnitsOfTimeDE.values())
+        .filter(it -> it.getCode().equals(code))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Unknown GermanTimeUnit code: " + code));
   }
 }

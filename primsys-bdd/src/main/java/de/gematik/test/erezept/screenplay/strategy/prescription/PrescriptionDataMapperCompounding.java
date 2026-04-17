@@ -58,6 +58,7 @@ public class PrescriptionDataMapperCompounding extends PrescriptionDataMapper {
             .withVaccine(isVaccine)
             .withAmount(compoundingNumerator, compoundingNumeratorUnit)
             .withAmount(Integer.decode(darreichungsMenge));
+
     if (medMap.get("PZN") != null) {
       medBuilder.withMedicationIngredient(medMap.get("PZN"), name, freiTextInPzn);
     } else {

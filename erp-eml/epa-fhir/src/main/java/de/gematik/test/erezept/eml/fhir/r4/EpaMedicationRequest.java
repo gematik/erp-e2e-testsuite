@@ -20,6 +20,8 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
+import java.util.List;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Quantity;
 
@@ -28,5 +30,9 @@ public class EpaMedicationRequest extends MedicationRequest {
 
   public Quantity getEmlDisReqQuantity() {
     return this.getDispenseRequest().getQuantity();
+  }
+
+  public List<DosageDgMP> getDosageInstructionDgMPs() {
+    return this.getDosageInstruction().stream().map(DosageDgMP::fromDosage).toList();
   }
 }

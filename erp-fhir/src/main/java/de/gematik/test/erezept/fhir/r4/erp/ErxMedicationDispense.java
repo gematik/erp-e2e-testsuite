@@ -22,7 +22,9 @@ package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.extensions.erp.RedeemCode;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -30,10 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Dosage;
-import org.hl7.fhir.r4.model.MedicationDispense;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.*;
 
 @Slf4j
 @ResourceDef(name = "MedicationDispense")
@@ -54,13 +53,13 @@ public class ErxMedicationDispense extends ErxMedicationDispenseBase {
    * List<GemErpMedication> gemErpMedications = bundle.getMedications();
    * }</pre>
    *
+   * @return List of KbvErpMedication contained within this MedicationDispense
    * @deprecated since 0.10.1 because from FHIR-Profiles 1.4.0 the MedicationDispense won't contain
    *     the Medication anymore. However, as long as FHIR-Profiles lower than 1.3.0 are relevant
    *     this method is still required e.g. for handling searchsets where you cannot simply use
    *     {@link ErxMedicationDispenseBundle#unpackDispensePairBy(PrescriptionId)}
    *     <p>Extracting all {@link KbvErpMedication}s from a searchset might be achieved as shown in
    *     the code snippet above.
-   * @return List of KbvErpMedication contained within this MedicationDispense
    */
   @Deprecated(since = "0.10.1", forRemoval = false)
   public List<KbvErpMedication> getContainedKbvMedication() {
@@ -74,9 +73,9 @@ public class ErxMedicationDispense extends ErxMedicationDispenseBase {
    * This method will return the first contained Medication resource as KbvErpMedication or throw an
    * exception if no Medication is contained
    *
+   * @return the first KbvErpMedication contained within this MedicationDispense
    * @deprecated since 0.10.1 because from FHIR-Profiles 1.4.0 the MedicationDispense won't contain
    *     the Medication anymore
-   * @return the first KbvErpMedication contained within this MedicationDispense
    */
   @Deprecated(since = "0.10.1", forRemoval = true)
   public KbvErpMedication getContainedKbvMedicationFirstRep() {
@@ -97,6 +96,17 @@ public class ErxMedicationDispense extends ErxMedicationDispenseBase {
         .findFirst()
         .orElseThrow(
             () -> new MissingFieldException(ErxMedicationDispense.class, "DosageInstructionText"));
+  }
+
+  public Optional<String> getRenderedDosageInstructionOptional() {
+    return this.getExtension().stream()
+        .filter(DgMPStructDef.MD_RENDERED_DOSAGE_INSTRUCTION::matches)
+        .map(it -> ((MarkdownType) it.getValue()).getValue())
+        .findFirst();
+  }
+
+  public List<DosageDgMP> getDosageInstructionDgMPs() {
+    return this.getDosageInstruction().stream().map(DosageDgMP::fromDosage).toList();
   }
 
   public Optional<RedeemCode> getRedeemCode() {

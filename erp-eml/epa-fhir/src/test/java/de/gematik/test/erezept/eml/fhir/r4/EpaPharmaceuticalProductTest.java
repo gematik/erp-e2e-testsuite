@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
+import de.gematik.test.erezept.eml.fhir.builder.EpaPharmaceuticalProdBuilder;
 import de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import java.util.Optional;

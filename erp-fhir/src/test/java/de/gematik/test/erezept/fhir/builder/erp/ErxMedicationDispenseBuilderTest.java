@@ -25,22 +25,20 @@ import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.validation.ValidationResult;
-import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
-import de.gematik.test.erezept.fhir.builder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.BmpDosiereinheit;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -101,9 +99,8 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
             .withPzn(PZN.from(pzn), fakerDrugName())
             .fake();
     DosageDgMP dosage =
-        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.MIO_E)
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MIO_E)
             .text("1 Tablette morgens")
-            .value(new BigDecimal(1))
             .build();
 
     val kvnr = KVNR.from("X234567890");
@@ -194,10 +191,7 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     assertEquals(
         "in 7 Tagen Rücksprache mit dem Hausarzt halten",
         medicationDispense.getNoteFirstRep().getText());
-    assertTrue(
-        ValidatorUtil.encodeAndValidate(parser, medicationDispense, EncodingType.XML, true, true)
-            .isSuccessful());
-    System.out.println();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
   }
 
   @ParameterizedTest(
@@ -294,9 +288,8 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   @Test
   void shouldSetDosageDgmpCorrect() {
     DosageDgMP dosage =
-        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.AUGENBADEWANNE)
+        DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
             .text("1 Tablette morgens")
-            .value(new BigDecimal(5))
             .build();
 
     val medDisp =
@@ -322,9 +315,8 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   @Test
   void shouldSetDosageDgmpCorrectAsList() {
     DosageDgMP dosage =
-        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.AUGENBADEWANNE)
+        DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
             .text("1 Tablette morgens")
-            .value(new BigDecimal(5))
             .build();
 
     val medDisp =

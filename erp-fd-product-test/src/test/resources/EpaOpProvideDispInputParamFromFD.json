@@ -1,11 +1,11 @@
 {
   "meta": {
     "profile": [
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-dispensation-erp-input-parameters|1.2.1-dev1"
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-dispensation-erp-input-parameters|1.3"
     ]
   },
   "resourceType": "Parameters",
-  "id": "ccb7e505-c560-4f27-af51-393c25532f93",
+  "id": "baeeb129-6590-4ae3-8820-f3861bbd1575",
   "parameter": [
     {
       "name": "rxDispensation",
@@ -14,19 +14,19 @@
           "name": "prescriptionId",
           "valueIdentifier": {
             "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
-            "value": "166.000.000.000.782.12"
+            "value": "160.000.120.401.252.51"
           }
         },
         {
           "name": "authoredOn",
-          "valueDate": "2026-03-09"
+          "valueDate": "2026-04-10"
         },
         {
           "name": "organization",
           "resource": {
             "meta": {
               "profile": [
-                "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory|1.0.0"
+                "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory|1.0.1"
               ],
               "tag": [
                 {
@@ -36,7 +36,7 @@
               ]
             },
             "resourceType": "Organization",
-            "id": "24620be0-e97b-4bc7-ae4e-e10ec77feb0c",
+            "id": "a9476db9-92d3-4b16-a0da-be3b0c4519e9",
             "identifier": [
               {
                 "system": "https://gematik.de/fhir/sid/telematik-id",
@@ -60,10 +60,10 @@
           "name": "medicationDispense",
           "resource": {
             "resourceType": "MedicationDispense",
-            "id": "166.000.000.000.782.12",
+            "id": "160.000.120.401.252.51",
             "meta": {
               "profile": [
-                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-dispense|1.0"
+                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-dispense|1.3"
               ]
             },
             "extension": [
@@ -72,7 +72,7 @@
                 "extension": [
                   {
                     "url": "algorithmVersion",
-                    "valueString": "1.0.0"
+                    "valueString": "1.0.1"
                   },
                   {
                     "url": "language",
@@ -82,18 +82,18 @@
               },
               {
                 "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-MedicationDispense.renderedDosageInstruction",
-                "valueMarkdown": "1-2-3-4"
+                "valueMarkdown": "3-1-3-3-3-0"
               }
             ],
             "identifier": [
               {
                 "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
-                "value": "166.000.000.000.782.12"
+                "value": "160.000.120.401.252.51"
               }
             ],
             "status": "completed",
             "medicationReference": {
-              "reference": "Medication/ab0048b9-f862-4dba-ac40-2c4e064dae21"
+              "reference": "Medication/91bab631-9e3d-43b5-ab41-4c4ebcbb33c3"
             },
             "subject": {
               "identifier": {
@@ -119,26 +119,22 @@
                 }
               }
             ],
-            "whenHandedOver": "2026-03-09",
+            "whenHandedOver": "2026-04-10",
             "dosageInstruction": [
               {
-                "text": "1-2-3-4"
+                "text": "3-1-3-3-3-0"
               }
-            ],
-            "substitution": {
-              "wasSubstituted": false
-            }
+            ]
           }
         },
         {
           "name": "medication",
           "resource": {
             "resourceType": "Medication",
-            "id": "ab0048b9-f862-4dba-ac40-2c4e064dae21",
+            "id": "91bab631-9e3d-43b5-ab41-4c4ebcbb33c3",
             "meta": {
-              "versionId": "1",
               "profile": [
-                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication|1.0"
+                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication|1.3"
               ]
             },
             "extension": [
@@ -146,7 +142,7 @@
                 "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension",
                 "valueCoding": {
                   "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs",
-                  "code": "01"
+                  "code": "00"
                 }
               },
               {
@@ -162,27 +158,36 @@
               "coding": [
                 {
                   "system": "http://fhir.de/CodeSystem/ifa/pzn",
-                  "code": "17377588",
-                  "display": "Comirnaty von BioNTech/Pfizer"
+                  "code": "25726583"
                 }
-              ]
+              ],
+              "text": "MometaHEXAL® 550 mg"
             },
             "form": {
               "coding": [
                 {
                   "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM",
-                  "code": "FRB"
+                  "code": "TUP"
                 }
               ]
             },
             "amount": {
               "numerator": {
-                "value": 666,
+                "extension": [
+                  {
+                    "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension",
+                    "valueString": "19"
+                  }
+                ],
+                "value": 19,
                 "unit": "Stk"
               },
               "denominator": {
                 "value": 1
               }
+            },
+            "batch": {
+              "lotNumber": "0113398918"
             }
           }
         }

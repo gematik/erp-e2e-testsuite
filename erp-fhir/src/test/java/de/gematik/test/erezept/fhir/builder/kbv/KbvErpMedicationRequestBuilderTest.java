@@ -25,20 +25,20 @@ import static de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem.UCU
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
-import de.gematik.test.erezept.fhir.builder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
-import de.gematik.test.erezept.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.val;
@@ -75,7 +75,6 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
     System.out.println(result.getMessages());
 
     assertTrue(result.isSuccessful());
-
     val dosageIntsr = medicationRequest.getDosageInstructionFirstRep();
     assertFalse(dosageIntsr.hasText());
     assertFalse(medicationRequest.hasNote());
@@ -287,7 +286,6 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetDosageDgmp() {
-
     val medicationRequest =
         KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
             .version(KbvItaErpVersion.V1_4_0)
@@ -296,12 +294,15 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
             .requester(KbvPractitionerFaker.builder().fake())
             .dgmp(dosage)
             .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .basedOnEMP("123")
             .dispenseRequestQuantity(20)
             .build();
 
     assertTrue(parser.isValid(medicationRequest));
+    assertEquals("123", medicationRequest.getBasedOn().get(0).getIdentifier().getValue());
+
     assertEquals(
-        Optional.of(5),
+        Optional.of(1),
         medicationRequest.getDosageInstruction().stream()
             .flatMap(it -> it.getDoseAndRate().stream())
             .map(dAR -> dAR.getDoseQuantity().getValue().intValue())
@@ -324,7 +325,7 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
     assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationRequest).isSuccessful());
 
     assertEquals(
-        Optional.of(5),
+        Optional.of(1),
         medicationRequest.getDosageInstruction().stream()
             .map(
                 dI ->
@@ -338,9 +339,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
   @Test
   void shouldSetIncorrectDosageDgmpAsList() {
     val incorrectDosage =
-        DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.AUGENBADEWANNE)
-            .value(new BigDecimal(5))
-            .timing(5, 3, Timing.UnitsOfTime.D)
+        DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
+            .timing(TimingBuilder.forRepeatComp().period(3).frequency(2).timeOfDay("08:00").build())
             .text("this Text is to much following anm KBV constrained")
             .build();
 
@@ -403,9 +403,133 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
     assertFalse(medRequest.hasSubstitution());
   }
 
+  @Test
+  void shouldSetDosageDgmpWithDifferentOrdersInTimerOfDay() {
+    DosageDgMP dosage1 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .timeOfDay("12:00:00")
+                    .timeOfDay("18:00:00")
+                    .build())
+            .build();
+
+    DosageDgMP dosage2 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("12:00:00")
+                    .timeOfDay("18:00:00")
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medicationRequest1 =
+        KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
+            .version(KbvItaErpVersion.V1_4_0)
+            .prescriberId("123456789")
+            .insurance(KbvCoverageFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
+            .dgmp(dosage1)
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .dispenseRequestQuantity(20)
+            .build();
+
+    val medicationRequest2 =
+        KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
+            .version(KbvItaErpVersion.V1_4_0)
+            .prescriberId("123456789")
+            .insurance(KbvCoverageFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
+            .dgmp(dosage2)
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .dispenseRequestQuantity(20)
+            .build();
+
+    assertTrue(parser.isValid(medicationRequest1));
+    assertTrue(parser.isValid(medicationRequest2));
+
+    assertEquals(
+        medicationRequest1.getRenderedDosageInstruction(),
+        medicationRequest2.getRenderedDosageInstruction());
+  }
+
+  @Test
+  void shouldSetDosageDgmpWithDifferentOrdernsInDayOfWeek() {
+    DosageDgMP dosage1 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(1)
+                    .frequency(6)
+                    .periodUnit(Timing.UnitsOfTime.WK)
+                    .dayOfWeek(Timing.DayOfWeek.MON)
+                    .dayOfWeek(Timing.DayOfWeek.WED)
+                    .dayOfWeek(Timing.DayOfWeek.FRI)
+                    .when(Timing.EventTiming.MORN)
+                    .when(Timing.EventTiming.NOON)
+                    .build())
+            .build();
+
+    DosageDgMP dosage2 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(1)
+                    .frequency(6)
+                    .periodUnit(Timing.UnitsOfTime.WK)
+                    .dayOfWeek(Timing.DayOfWeek.FRI)
+                    .dayOfWeek(Timing.DayOfWeek.WED)
+                    .dayOfWeek(Timing.DayOfWeek.MON)
+                    .when(Timing.EventTiming.NOON)
+                    .when(Timing.EventTiming.MORN)
+                    .build())
+            .build();
+
+    val medicationRequest1 =
+        KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
+            .version(KbvItaErpVersion.V1_4_0)
+            .prescriberId("123456789")
+            .insurance(KbvCoverageFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
+            .dgmp(dosage1)
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .dispenseRequestQuantity(20)
+            .build();
+
+    val medicationRequest2 =
+        KbvErpMedicationRequestBuilder.forPatient(KbvPatientFaker.builder().fake())
+            .version(KbvItaErpVersion.V1_4_0)
+            .prescriberId("123456789")
+            .insurance(KbvCoverageFaker.builder().fake())
+            .requester(KbvPractitionerFaker.builder().fake())
+            .dgmp(dosage2)
+            .medication(KbvErpMedicationPZNFaker.builder().fake())
+            .dispenseRequestQuantity(20)
+            .build();
+
+    assertTrue(parser.isValid(medicationRequest1));
+    assertTrue(parser.isValid(medicationRequest2));
+    assertEquals(
+        medicationRequest1.getRenderedDosageInstruction(),
+        medicationRequest2.getRenderedDosageInstruction());
+  }
+
   private DosageDgMP dosage =
-      DosageDgMPBuilder.dosageBuilder("Tablette", BmpDosiereinheit.AUGENBADEWANNE)
-          .value(new BigDecimal(5))
-          .timing(5, 3, Timing.UnitsOfTime.D)
+      DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
+          .timing(
+              TimingBuilder.forRepeatComp()
+                  .period(3)
+                  .frequency(1)
+                  .periodUnit(Timing.UnitsOfTime.D)
+                  .timeOfDay("08:00:00")
+                  .build())
           .build();
 }

@@ -1,7 +1,7 @@
 {
   "meta": {
     "profile": [
-      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-dispensation-erp-input-parameters|1.2.1-dev1"
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-dispensation-erp-input-parameters|1.3"
     ]
   },
   "resourceType": "Parameters",

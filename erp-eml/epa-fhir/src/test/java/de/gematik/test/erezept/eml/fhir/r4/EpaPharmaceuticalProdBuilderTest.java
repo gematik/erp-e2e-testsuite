@@ -25,9 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
+import de.gematik.test.erezept.eml.fhir.builder.EpaPharmaceuticalProdBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems;
-import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;

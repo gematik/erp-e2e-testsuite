@@ -23,6 +23,7 @@ package de.gematik.test.erezept.screenplay.strategy.prescription;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
@@ -46,7 +47,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.ClearSystemProperty;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
 class PrescriptionDataMapperTest extends ErpFhirParsingTest {
 
@@ -72,16 +73,14 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
 
   @ParameterizedTest
   @MethodSource
-  @ClearSystemProperty(key = "erp.fhir.profile")
+  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
   void shouldGenerateRandomKbvBundle(
-      InsuranceTypeDe InsuranceTypeDe,
+      InsuranceTypeDe insuranceTypeDe,
       PrescriptionAssignmentKind prescriptionAssignmentKind,
       PrescriptionFlowType expectedFlowType) {
 
-    // TODO: make parametrizeable
-    System.setProperty("erp.fhir.profile", "1.6.0");
     val patient = new Actor("Marty");
-    patient.can(ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe));
+    patient.can(ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", insuranceTypeDe));
 
     val practitioner = KbvPractitionerFaker.builder().fake();
     val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
@@ -122,7 +121,6 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGenerateTPrescription() {
-
     val patient = new Actor("Marty");
     patient.can(
         ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
@@ -250,5 +248,241 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
             .getLeft();
 
     assertNotNull(result);
+  }
+
+  @Test
+  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
+  void shouldGeneratePZNMedicationInKbvBundleWithDGmP() {
+    val patient = new Actor("Marty");
+    patient.can(
+        ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
+
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (isDentist) medOrganization.withKzva(KZVA.random());
+    val medications =
+        List.of(
+            Map.of(
+                "Wirkstoffname",
+                "So Medizin halt",
+                "frequency",
+                "1",
+                "period",
+                "1",
+                "periodUnit",
+                "d",
+                "timeOfDay",
+                "08:00:00",
+                "value",
+                "1",
+                "unit",
+                "Likörglas"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
+
+    assertEquals(1, result.size());
+
+    val elem = result.get(0);
+    val kbvBundleBuilder = elem.getLeft();
+    val flowtype = elem.getRight();
+    val kbvBundle = kbvBundleBuilder.prescriptionId(PrescriptionId.random(flowtype)).build();
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertEquals(
+        "täglich: 08:00 Uhr — je 1 Likörglas",
+        kbvBundle.getMedicationRequest().getRenderedDosageInstruction().get());
+    assertEquals(1, kbvBundle.getMedicationRequest().getDosageInstruction().size());
+    assertTrue(vr.isSuccessful());
+  }
+
+  @Test
+  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
+  void shouldGeneratePZNMedicationInKbvBundleWithDGmPWithMultipleTmeOfDays() {
+    val patient = new Actor("Marty");
+    patient.can(
+        ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
+
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (isDentist) medOrganization.withKzva(KZVA.random());
+    val medications =
+        List.of(
+            Map.of(
+                "Wirkstoffname",
+                "So Medizin halt",
+                "frequency",
+                "3",
+                "period",
+                "1",
+                "periodUnit",
+                "d",
+                "timeOfDay",
+                "08:00:00 10:00:00 11:00:00",
+                "value",
+                "1",
+                "unit",
+                "Likörglas"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
+
+    assertEquals(1, result.size());
+
+    val elem = result.get(0);
+    val kbvBundleBuilder = elem.getLeft();
+    val flowtype = elem.getRight();
+    val kbvBundle = kbvBundleBuilder.prescriptionId(PrescriptionId.random(flowtype)).build();
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle, EncodingType.XML, true, true);
+    assertEquals(
+        "täglich: 08:00 Uhr, 10:00 Uhr, 11:00 Uhr — je 1 Likörglas",
+        kbvBundle.getMedicationRequest().getRenderedDosageInstruction().get());
+    assertEquals(1, kbvBundle.getMedicationRequest().getDosageInstruction().size());
+    assertTrue(vr.isSuccessful());
+  }
+
+  @Test
+  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
+  void shouldGeneratePZNMedicationInKbvBundleWithComplexDGmP() {
+    val patient = new Actor("Marty");
+    patient.can(
+        ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
+
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (isDentist) medOrganization.withKzva(KZVA.random());
+    val medications =
+        List.of(
+            Map.of(
+                "Wirkstoffname",
+                "So Medizin halt",
+                "frequency",
+                "4",
+                "period",
+                "1",
+                "periodUnit",
+                "wk",
+                "dayOfWeek",
+                "mon fri",
+                "when",
+                "MORN EVE",
+                "value",
+                "1",
+                "unit",
+                "Stück"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperPZN(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
+
+    assertEquals(1, result.size());
+
+    val elem = result.get(0);
+    val kbvBundleBuilder = elem.getLeft();
+    val flowtype = elem.getRight();
+    val kbvBundle = kbvBundleBuilder.prescriptionId(PrescriptionId.random(flowtype)).build();
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertEquals(
+        "montags 1-0-1-0 Stück; freitags 1-0-1-0 Stück",
+        kbvBundle.getMedicationRequest().getRenderedDosageInstruction().get());
+    assertEquals(1, kbvBundle.getMedicationRequest().getDosageInstruction().size());
+    assertTrue(vr.isSuccessful());
+  }
+
+  @Test
+  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
+  void shouldGenerateCompoundingMedicationInKbvBundleWithComplexDGmPAndSingleDayOfWeek() {
+    val patient = new Actor("Marty");
+    patient.can(
+        ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
+
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (isDentist) medOrganization.withKzva(KZVA.random());
+    val medications =
+        List.of(
+            Map.of(
+                "Wirkstoffname",
+                "So Medizin halt",
+                "frequency",
+                "1",
+                "period",
+                "1",
+                "periodUnit",
+                "wk",
+                "dayOfWeek",
+                "mon",
+                "when",
+                "MORN",
+                "value",
+                "1",
+                "unit",
+                "Stück"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperCompounding(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
+
+    assertEquals(1, result.size());
+
+    val elem = result.get(0);
+    val kbvBundleBuilder = elem.getLeft();
+    val flowtype = elem.getRight();
+    val kbvBundle = kbvBundleBuilder.prescriptionId(PrescriptionId.random(flowtype)).build();
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertEquals(
+        "montags 1-0-0-0 Stück",
+        kbvBundle.getMedicationRequest().getRenderedDosageInstruction().get());
+    assertEquals(1, kbvBundle.getMedicationRequest().getDosageInstruction().size());
+    assertTrue(vr.isSuccessful());
+  }
+
+  @Test
+  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.6.0")
+  void shouldGenerateCompoundingMedicationInKbvBundleWithoutDosageInstruction() {
+    val patient = new Actor("Marty");
+    patient.can(
+        ProvidePatientBaseData.forPatient(KVNR.random(), "Marty McFly", InsuranceTypeDe.GKV));
+
+    val practitioner = KbvPractitionerFaker.builder().fake();
+    val isDentist = practitioner.getQualificationType().equals(QualificationType.DENTIST);
+    val medOrganization = KbvMedicalOrganizationFaker.builder();
+    if (isDentist) medOrganization.withKzva(KZVA.random());
+    val medications = List.of(Map.of("Wirkstoffname", "So Medezin halt"));
+    val prescriptionDataMapper =
+        new PrescriptionDataMapperCompounding(
+            patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
+
+    val result = prescriptionDataMapper.createKbvBundles(practitioner, medOrganization.fake());
+
+    assertEquals(1, result.size());
+
+    val elem = result.get(0);
+    val kbvBundleBuilder = elem.getLeft();
+    val flowtype = elem.getRight();
+    val kbvBundle = kbvBundleBuilder.prescriptionId(PrescriptionId.random(flowtype)).build();
+
+    val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
+    assertTrue(
+        kbvBundle
+            .getMedicationRequest()
+            .getRenderedDosageInstruction()
+            .get()
+            .contains("jeweils ein Löffel"));
+    assertEquals(1, kbvBundle.getMedicationRequest().getDosageInstruction().size());
+    assertTrue(vr.isSuccessful());
   }
 }

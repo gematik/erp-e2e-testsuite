@@ -27,6 +27,7 @@ import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
+import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensationsRenderedDosageInstruction;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -37,6 +38,9 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
@@ -48,8 +52,10 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -128,6 +134,100 @@ public class ProvideDispensationPermitIT extends ErpTest {
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvideDispensation.forDispensation(
             medDispBundle, pharmacy.getTelematikId(), task.getPrescriptionId()));
+  }
+
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_02")
+  @Test()
+  @DisplayName(
+      "Es wird geprüft, dass die Werte der Dosierung innerhalb der übermittelten"
+          + " EmlMedicationDispense an das Epa Aktensystem den Werten der Dosierung in der"
+          + " Dispensation entspricht")
+  void checkSubmittedPrescriptionsDosageDgMPInformation() {
+
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+
+    patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
+
+    val dosagDGMP =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val task =
+        doc.performs(
+                IssuePrescription.forPatient(patient)
+                    .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                    .withKbvBundleFrom(
+                        KbvErpBundleFaker.builder()
+                            .withMedication(getMedication("Medication PZN"))
+                            .withDosageDgmp(dosagDGMP)
+                            .toBuilder()))
+            .getExpectedResponse();
+
+    acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptance));
+
+    val medDispBundle =
+        patient
+            .performs(
+                GetMedicationDispense.withQueryParams(
+                    IQueryParameter.search()
+                        .identifier(task.getPrescriptionId().asIdentifier())
+                        .createParameter()))
+            .getExpectedResponse();
+
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvideDispensationsRenderedDosageInstruction.forDispensation(
+            medDispBundle, task.getPrescriptionId()));
+  }
+
+  @Test()
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_03")
+  @DisplayName(
+      "Es wird geprüft, dass nach der Übermittlung der EmlMedicationDispense an das Epa"
+          + " Aktensystem ein entsprechendes AuditEvent geschrieben wurde")
+  void checkSubmittedPrescriptionInformation() throws InterruptedException {
+
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+
+    patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
+
+    val task =
+        doc.performs(
+                IssuePrescription.forPatient(patient)
+                    .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                    .withKbvBundleFrom(
+                        KbvErpBundleFaker.builder()
+                            .withMedication(getMedication(MEDICATION_PZN))
+                            .toBuilder()))
+            .getExpectedResponse();
+
+    acceptance = pharmacy.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptance));
+
+    val medDispBundle =
+        patient
+            .performs(
+                GetMedicationDispense.withQueryParams(
+                    IQueryParameter.search()
+                        .identifier(task.getPrescriptionId().asIdentifier())
+                        .createParameter()))
+            .getExpectedResponse();
+
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvideDispensation.forDispensation(
+            medDispBundle, pharmacy.getTelematikId(), task.getPrescriptionId()));
+
+    // waiting for computing and store AuditEvent for Patient
+    Thread.sleep(2000); // NOSONAR
 
     val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
     patient.attemptsTo(

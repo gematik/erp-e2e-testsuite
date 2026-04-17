@@ -20,16 +20,27 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
+import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.DOSIEREINHEIT;
 import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.ucum.UcumCodeSystem;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.val;
 import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.Timing;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
@@ -99,5 +110,135 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
     val result2 = ValidatorUtil.encodeAndValidate(parser, medDispense2);
     assertTrue(result.isSuccessful());
     assertTrue(result2.isSuccessful());
+  }
+
+  @Test
+  void buildSimpleDosage() {
+
+    DosageDgMP dosage =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
+    assertNotNull(dosage);
+    assertEquals("1 Tablette morgens", dosage.getText());
+    assertEquals(1, dosage.getDoseAndRate().size());
+    assertEquals(
+        "v", ((org.hl7.fhir.r4.model.Quantity) dosage.getDoseAndRate().get(0).getDose()).getCode());
+    assertEquals(
+        "mg",
+        ((org.hl7.fhir.r4.model.Quantity) dosage.getDoseAndRate().get(0).getDose()).getUnit());
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6)
+            .withPrescriptionId(PrescriptionId.random().getValue())
+            .withDgmp(dosage)
+            .fake();
+
+    Assertions.assertTrue(
+        ValidatorUtil.encodeAndValidate(ErpFhirParsingTest.parser, medDisp).isSuccessful());
+  }
+
+  @Test
+  void buildSimpleDosageWithTiming() {
+
+    DosageDgMP dosage =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6)
+            .withPrescriptionId(PrescriptionId.random().getValue())
+            .withDgmp(dosage)
+            .fake();
+
+    Assertions.assertTrue(
+        ValidatorUtil.encodeAndValidate(ErpFhirParsingTest.parser, medDisp, EncodingType.XML)
+            .isSuccessful());
+
+    Assertions.assertEquals(
+        BigDecimal.valueOf(2),
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getValue());
+    Assertions.assertEquals(
+        "mg",
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getUnit());
+    Assertions.assertEquals(
+        DOSIEREINHEIT.getCanonicalUrl(),
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getSystem());
+    Assertions.assertEquals(
+        "v",
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getCode());
+  }
+
+  @Test
+  void shouldBuildWithSpecialSystem() {
+    val value = 2;
+    val unit = "Tablette";
+    val system = UcumCodeSystem.UCUM_URL;
+    val code = "1";
+    DosageDgMP dosage =
+        DosageDgMPBuilder.dosageBuilder(value, unit, code)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(2)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .build())
+            .build();
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6)
+            .withPrescriptionId(PrescriptionId.random().getValue())
+            .withDgmp(dosage)
+            .fake();
+
+    Assertions.assertTrue(
+        ValidatorUtil.encodeAndValidate(ErpFhirParsingTest.parser, medDisp).isSuccessful());
+    Assertions.assertEquals(
+        BigDecimal.valueOf(value),
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getValue());
+    Assertions.assertEquals(
+        unit,
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getUnit());
+    Assertions.assertEquals(
+        system,
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getSystem());
+    Assertions.assertEquals(
+        code,
+        medDisp
+            .getDosageInstructionFirstRep()
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getCode());
   }
 }

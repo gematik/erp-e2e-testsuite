@@ -23,8 +23,11 @@ package de.gematik.test.erezept.fhir.builder.dgmp;
 import static java.text.MessageFormat.format;
 
 import com.google.common.base.Strings;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DayOfWeekDE;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.UnitsOfTimeDE;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.WhenCodeDE;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
-import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;

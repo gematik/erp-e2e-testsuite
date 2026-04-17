@@ -143,8 +143,6 @@ class DispenseTRezeptIT extends ErpTest {
                         + " {http://hl7.org/fhir}category,"
                         + " {http://hl7.org/fhir}medicationCodeableConcept,"
                         + " {http://hl7.org/fhir}medicationReference ).",
-                    // hapi validator sagt:
-                    // "SingleValidationMessage[col=20,row=10,locationString=Parameters.parameter[0].part[0].resource/*MedicationDispense/67c31982-3851-4565-ab11-999c66f1a4e6*/,message=MedicationDispense.medication[x]: minimum required = 1, but only found 0 (from https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.6.1),Validation_VAL_Profile_Minimum,severity=error]"
                     ErpAfos.A_26002_02))
             .isCorrect());
   }
@@ -187,12 +185,7 @@ class DispenseTRezeptIT extends ErpTest {
             .hasResponseWith(returnCode(400))
             .and(
                 operationOutcomeContainsInDiagnostics(
-                    "Resource not found in parameter part",
-                    // "Unzulässige Abgabeinformationen: Für diesen Workflow sind nur"
-                    //        + " Abgabeinformationen für Arzneimittel zulässig.",
-                    // details text: "parsing / validation error"
-                    // diagnostics: "Resource not found in parameter part"
-                    ErpAfos.A_26002_02))
+                    "Resource not found in parameter part", ErpAfos.A_26002_02))
             .isCorrect());
   }
 }

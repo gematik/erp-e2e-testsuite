@@ -24,7 +24,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProdBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.EpaPharmaceuticalProdBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProduct;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
